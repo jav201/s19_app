@@ -32,6 +32,131 @@
 > ⚠ **Every `report_service.py` line number below is as of `031ca8d`.** batch-63 added +47 lines to that module; the file measures 1730 lines at `e347079`. Re-derive line numbers, never copy them.
 >
 
+## 🆕 batch-84 close (2026-08-16) — the assembled selector, measured
+
+**Last refresh: 2026-08-16 (batch-84 close, `/fast-dev-flow`).** `origin/main` tip at its cut =
+**`1afccb0`** (PR [#196](https://github.com/jav201/s19_app/pull/196), the handoff). Branch
+`claude/blind-spot-assembled-selector-c2c117`; **PR not yet opened — this flow runs no git.**
+Shipped `tools/address_origin.py` + `tests/test_address_origin.py` (`AT-B84-01`..`AT-B84-07`,
+21 arms, PR lane) and `bare_name_candidates()` in `tools/address_census.py`. Gate suite
+**2730 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13 by `python -m pytest -q`, run
+on the merged tree. (2725 → 2728 → 2730 as guards were added across Inc-1/Inc-3/Inc-4.)
+
+⚠ **That total is NOT comparable to batch-83's `2684 / 21 deselected`** — the two runs used
+different invocations, and a total without its command is not a measurement (handoff §4.2).
+
+**THE RESULT, and it is a negative one:**
+
+> **`A 14 · B 0 · C 14 · D 13 · U 0`** over the 41 candidates. **No bare-name address argument in
+> the tree is assembled.** The census's `56` computed addresses is complete **with respect to this
+> population** — which is the bound, not a claim about the whole tree. Re-derive with
+> `python tools/address_origin.py`; do not cite this line.
+
+**✅ DONE — closed by this batch:**
+
+- **▸ (was P2) The assembled-selector blind spot is MEASURED and EMPTY.** `sel = f"{prefix}{suffix}"`
+  and `sel = "#" + wid` escape all three of batch-83's shape-keyed nets — **re-executed at this
+  cut, not inherited**: both give `forms=['name'] loose=0 indirect=0`, while the control
+  `sel = f"#{x}"` gives `loose=1 indirect=1`, so the probe discriminates. Neither form occurs.
+  The escape is now **positively detected** rather than merely declared absent: `AT-B84-04`
+  classifies all four assembly forms (f-string, `+`, `%`, `.format`) as **B** on synthetic
+  fixtures, so the guard would fail the day one enters the tree. Same argument that justified
+  `AT-B83-10`: a blind spot that can be cheaply detected is unwritten code, not a limit of design.
+- **▸ (was P2) The 41 non-class-like bare-name arguments are CLASSIFIED, each with its evidence.**
+  `A` = 14 (`_B78_RUN_ENTRY` ×12, `_B78_RUN_NOTE` ×2, all `assign->literal`, grep-resolvable).
+  `C` = 14 (function or lambda parameters). `D` = 13, each with its sub-kind printed
+  (`target` ×2 `[Subscript]` + ×2 `[IfExp,Subscript,call:next]`, `widget_id` `[Tuple]`,
+  `note` `[call:list]`, …). `U` = 0 — every candidate binds somewhere in its own file.
+- **The stale pointer to batch-83's `.fast-dev-flow/spec.md` §9**, in this file and in
+  `.dev-flow/design/BLIND-SPOT-assembled-selector.md` §6. batch-84 archived that spec to
+  `.fast-dev-flow/archive/2026-08-15-batch-83-address-census-spec.md`; both references now name
+  the archived path, in the same commit that moved it.
+- **`EXPECTED_SCANNED_TEST_FILES` 154 → 155**, MEASURED by two paths that share no code:
+  `scanned_test_files()` reports 155, and an independent glob (`tests/**/*.py` minus the four
+  excluded directories) agrees — 153 `test_*.py` plus `conftest.py` and `generate_large_samples.py`.
+
+**⚠ Carries returned — nothing dropped:**
+
+- **▸ (P2) The residue of the measurement: 27 of the 41 are unresolved at ONE HOP, and that is
+  batch-82's to decide.** The 14 `C` sites take their address from a caller; the 13 `D` sites take
+  it from a collection whose elements are never read. Neither is a blind spot in batch-83's sense —
+  their sites ARE visible — but neither has a resolvable value either. **This is the number the
+  Lane A retrofit should size itself from, and it is 27, not 56 and not 41.** The registry proposal
+  (a dictionary of ids plus an existence check) is exactly what would collapse `A` + parts of `C`.
+- **▸ (P2) A THIRD escape exists and the closure argument does not cover it: the
+  attribute-stored selector.** The design doc §3 argues the 41 are the whole population *"because
+  both escapes end as a bare-name argument"* — which proves closure over the **two named** escapes
+  only. `self._sel = "#" + x; query_one(self._sel)` lands as census form `other:Attribute`: outside
+  the 41, outside every shape net, and outside `address_origin` entirely. **Measured empty today** —
+  the census forms table is exactly `{literal, name, fstring}`, zero `other:*` — but that emptiness
+  is measured, not guarded, and nothing goes red the day one appears. **Belongs with batch-82's
+  sizing.** Cheapest fix if it is wanted: assert `set(forms) <= {"literal","name","fstring"}` —
+  membership, not a tree count, and it names the new form when it fails. Found by the Inc-3
+  adversarial review, reproduced before being accepted.
+
+- **▸ (P3) A value assembled inside a conditional or boolean expression is classified `D`, not
+  `B`.** `sel = f"#{x}" if cond else "#y"` reports `D [IfExp]`; `kind_of_value` names the node and
+  does not recurse into its branches. **Two distinct** `IfExp` bindings exist
+  (`tests/test_tui_directionb.py:6809`, `tests/test_tui_patch_editor_v2.py:3103`), appearing across
+  **three** row occurrences; both were read at source and neither branch is one of the four
+  assembled forms — 6809's true branch is `ast.unparse(...)`, a call, so **`B 0` is unaffected**.
+  *(An earlier draft of this bullet said "all three bindings … literal-or-variable" — wrong on both
+  the count and the kind, caught by an adversarial pass. Re-derive, never carry.)* Now **declared**
+  in the tool's own "does NOT
+  resolve" list rather than left implicit. **Reopen when** recursing into branches is wanted — that
+  is a design decision (how deep, and what to do with a mixed branch), not a patch.
+
+- **▸ (P3) `match`/`case` capture patterns are not a binding form `collect_bindings` knows.**
+  A candidate bound only by `case sel:` reports no binding and lands in `U`. That is loud, not
+  silent — `U` is printed as its own section and `AT-B84-06` now guards that it survives the
+  resolver — so the failure mode is "says it cannot resolve this", which is the acceptable
+  direction. **Reopen when** a real candidate lands in `U`.
+
+- **✅ CLOSED at Inc-3 — `+=` assembly was classified `D` instead of `B`.** `sel += name` is
+  `sel = sel + name`, but the augmented branch reported the right-hand OPERAND, so the assembly was
+  invisible and the forward promise (*"the guard fails the day an assembled selector enters the
+  tree"*) was false for that form. Unlike `str.join`, it was **not** a declared exclusion — it was
+  a gap between the approved rule and the code. The operator now decides the kind
+  (`Add → concat`, `Mod → percent-format`); `AT-B84-04` gained escapes 5 and 6 and goes red under
+  the reverting mutation. **No real site was affected** — zero `augassign` bindings across the 41,
+  so the headline never moved.
+
+- **✅ CLOSED at Inc-3 — `AT-B84-06`'s "never drop it" half was VACUOUS.** It was asserted against
+  `classify` only, so `return [r for r in rows if r.bindings]` inside `resolve_origins` passed all
+  sixteen guards: it dropped nothing, because the tree holds zero `U` rows today. **A guard that
+  holds only because today's tree is empty of the case it names is not a guard.** Now covered by a
+  synthetic-tree arm that builds a module with an unbound address argument and asserts the row
+  survives. Found by an adversarial review, **reproduced independently before being accepted**.
+
+- **▸ (P3) `str.join` and `str.replace` are NOT in `ASSEMBLED_KINDS`.** The approved rule named
+  four forms (f-string, `+`, `%`, `.format`) and the implementation ships exactly those — no silent
+  widening. **Verified harmless today:** no candidate binds to either call. **Reopen when** any
+  candidate's binding is a `call:.join` or `call:.replace`, which the `D` sub-kind column prints
+  by name, so the day it happens the row says so.
+- **▸ (P3) The negative result depends on the walk OVER-collecting, and only one guard protects
+  that.** `collect_bindings` is scope-insensitive by design: it reports a binding written in an
+  unrelated function of the same file. Narrow it and every "no assembled selector found" claim
+  weakens while all other guards stay green. `AT-B84-05` is the only thing that goes red.
+  **Reopen when** anyone proposes scope-precise resolution — the trade must be argued, not merged.
+- **▸ (P3, found in passing — NOT this batch's, reported as found)
+  `.fast-dev-flow/ADR-flow-builder-tracer.md:171` points at `.fast-dev-flow/spec.md` for batch-69's
+  rationale.** batch-83 archived that spec to
+  `.fast-dev-flow/archive/2026-07-28-batch-69-fbp2-design-spec.md`, so the ADR now names a file
+  holding a different batch's content. Pre-existing; batch-84 did not create it and did not fold it
+  into its own diff. The two `.dev-flow/2026-07-28-batch-70/` references are frozen batch records
+  and are left alone deliberately.
+- **▸ batch-83's own remaining carries are UNCHANGED and still open in the section below** — the
+  `AT-B83-06` registry conflict (P2), the producer side and `.tcss` (P3), and the four by-design
+  risks with their reopening criteria. They are not duplicated here; each open item lives in
+  exactly one place.
+
+**Unblocked by this batch:** **batch-82's Lane A retrofit can now be scoped on 27 unresolved sites
+with their kinds named**, instead of on a `56` known to be an incomplete lower bound. The question
+the handoff left open — *"is the 56 materially wrong?"* — is answered **no**, and the sizing that
+was waiting on it can proceed.
+
+---
+
 ## 🆕 batch-83 close (2026-08-15) — the unresolvable-address detector
 
 **Last refresh: 2026-08-15 (batch-83 close, `/fast-dev-flow`).** `origin/main` tip at its cut =
@@ -76,27 +201,31 @@ guarda hay que revisarlos"*.
   A blind spot that can be cheaply detected is unwritten code, not a limit of the design.
   Measured today: **0 sites** — the value is that the day one appears, it is visible.
 
-- **▸ (P2) BLIND SPOT, STILL UNMEASURED: the assembled selector with no selector shape.**
+- **✅ CLOSED by batch-84 (2026-08-16) — the assembled selector with no selector shape.**
   `sel = f"{prefix}{suffix}"` matches no selector pattern *and* sits in no address argument, so it
-  escapes **both** nets — including the new one-hop detector, which keys on selector shape.
-  Nobody has sized this. **Size it before quoting the 56 as complete.**
+  escapes **both** nets — including the one-hop detector, which keys on selector shape. **Now
+  measured: zero occurrences**, and the escape is positively detected by `AT-B84-04` rather than
+  declared absent. See the batch-84 section above.
 
 - **✅ CLOSED at Inc-3 — the gating decision now has a written trigger.** *A surface's computed
   addresses become BLOCKING on the day that surface's IFC is written* (spec §8b), per-surface,
   owned by the batch that writes that IFC. Same staging `C-54` chose for `V13`. It was a deferred
   decision with no owner; now it has a condition and an owner.
 
-- **▸ (P2) 41 of 183 bare-name address arguments are NOT class-like** (`selector` ×8,
-  `_B78_RUN_ENTRY` ×12, `select_id`, `widget_id`, `container_id`, `layout_id`). Measured by
-  `tools/address_census.py`. **This is the population most likely to hold a computed selector one
-  assignment away**, and the retrofit should look there — the census reports the split but follows
-  no dataflow (zero hops, declared).
+- **✅ CLOSED by batch-84 (2026-08-16) — 41 of 183 bare-name address arguments are NOT class-like**
+  (`selector` ×8, `_B78_RUN_ENTRY` ×12, `select_id`, `widget_id`, `container_id`, `layout_id`).
+  Measured by `tools/address_census.py`; the census reports the split but follows no dataflow
+  (zero hops, declared). **`tools/address_origin.py` now follows that one hop and classifies all
+  41** — `A 14 · B 0 · C 14 · D 13 · U 0`. The retrofit's real population is the **27** `C`+`D`
+  sites, carried forward as a P2 in the batch-84 section above.
 
 - **▸ (P3) Out of scope and stated: the producer side and `.tcss`.** `id=f"log_line_{i}"` at widget
   construction, and `add_class`/`set_classes`, are addresses nobody greps and this census does not
   see. Neither does it read stylesheets.
 
-- **▸ (P3) By-design risks, with their reopening criteria, live in `.fast-dev-flow/spec.md` §9.**
+- **▸ (P3) By-design risks, with their reopening criteria, live in
+  `.fast-dev-flow/archive/2026-08-15-batch-83-address-census-spec.md` §9** (that spec was archived
+  by batch-84; `.fast-dev-flow/spec.md` now holds batch-84's).
   Four of them (guards fail on a Textual bump; the 18 s derivation cost; the three exclusion rules;
   the taint's unbounded false positives). **Each carries a "reopen when" condition** — a by-design
   risk nobody can quote when its scenario fires is not documented, it is buried. Cite §9, not the

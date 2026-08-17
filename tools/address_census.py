@@ -476,6 +476,51 @@ def resolves_to_class_like(name: str) -> bool:
     return bool(_CLASS_LIKE_RE.match(name))
 
 
+def bare_name_candidates(data: Census) -> list[AddressSite]:
+    """The address sites whose argument is a bare name that is NOT class-like.
+
+    Args:
+        data: Output of :func:`census`.
+
+    Returns:
+        The subset of ``data.sites`` with ``form == 'name'`` whose identifier fails
+        :func:`resolves_to_class_like`, in census order.
+
+    Data Flow:
+        Census.sites -> form == 'name' -> not resolves_to_class_like -> candidates
+
+    Dependencies:
+        Uses: :func:`resolves_to_class_like`.
+        Used by: :func:`report`, ``tools.address_origin.resolve_origins``.
+
+    Note:
+        This population exists as a function, not as a snippet, because batch-83 lost
+        time to one filter living in two places: it ran in one derivation pass and not
+        the other, and nothing failed. Every consumer must call THIS — a second
+        implementation of the same predicate is the defect, not the duplication.
+
+        It is also the exact set a computed selector can hide in. Both escapes an
+        assembled selector can take (an f-string with no selector shape, and a
+        concatenation assigned before use) end as an argument of this form, which is
+        why sizing that blind spot starts here.
+
+    Example:
+        >>> sites = bare_name_candidates(census(Path(".")))  # doctest: +SKIP
+        >>> {s.form for s in sites}                          # doctest: +SKIP
+        {'name'}
+
+        No count is written here on purpose. The size of this population is a
+        property of the tree on the day you ask, and a number in a docstring is the
+        one thing in this module guaranteed to go stale silently. Run
+        ``python tools/address_origin.py`` for today's.
+    """
+    return [
+        site
+        for site in data.sites
+        if site.form == "name" and not resolves_to_class_like(site.shape or "")
+    ]
+
+
 def is_candidate_method(name: str) -> bool:
     """Can a method with this name be an address API a consumer calls?
 
@@ -971,10 +1016,11 @@ def report(data: Census) -> None:
         print("      %-46s %-12s %s:%d"
               % (repr(site.shape)[:46], site.note, site.file, site.line))
     print()
-    class_like = [s for s in data.sites
-                  if s.form == "name" and resolves_to_class_like(s.shape or "")]
+    # Derived as the complement of the candidate set, not by a second filter of its
+    # own, so the predicate that defines "candidate" has exactly one home.
+    class_like = forms.get("name", 0) - len(bare_name_candidates(data))
     print("NOTE on 'name': %d of %d resolve to a class-like symbol (type-addressing);"
-          % (len(class_like), forms.get("name", 0)))
+          % (class_like, forms.get("name", 0)))
     print("      the rest are variables, and a variable is where a computed selector")
     print("      hides one assignment away. Measured, not asserted.")
     print()

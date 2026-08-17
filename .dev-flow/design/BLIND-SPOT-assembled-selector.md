@@ -8,6 +8,13 @@
 > that is the failure mode this project has now found seven times, and the reason nothing here is
 > copied from a previous document.
 
+> **ANSWERED by batch-84 (2026-08-16).** The measurement this document asks for was made:
+> **`A 14 · B 0 · C 14 · D 13 · U 0`** over the 41. **No candidate is assembled — the blind spot is
+> empty at that cut**, and the `56` is complete *with respect to this population*. The prediction in
+> §3 held and went further than it predicted. Re-derive, do not cite this line:
+> `python tools/address_origin.py`. Everything below stands as written — it is the problem
+> statement, and it is what makes the answer checkable.
+
 ---
 
 ## 0 · Verify before reading further
@@ -160,7 +167,8 @@ better decided with this number in hand.
 |---|---|
 | the tool | `tools/address_census.py` |
 | its guards | `tests/test_address_census.py` (`AT-B83-01`..`AT-B83-12`) |
-| batch-83's spec, CLOSED, with its risks and reopening criteria | `.fast-dev-flow/spec.md` §9 |
+| batch-83's spec, CLOSED, with its risks and reopening criteria | `.fast-dev-flow/archive/2026-08-15-batch-83-address-census-spec.md` §9 — **archived by batch-84**, which opened a fresh `.fast-dev-flow/spec.md` |
+| batch-84, which ANSWERED this document | `tools/address_origin.py` · `tests/test_address_origin.py` — and its spec, which was `.fast-dev-flow/spec.md` **as of 2026-08-16**; once batch-85 opens its own, find it under `.fast-dev-flow/archive/` by that date. *(Dated deliberately: an undated pointer to `spec.md` is the exact staleness this batch had to repair twice.)* |
 | this item, registered P2 | `.dev-flow/BACKLOG-CODE.md`, section `batch-83 close` |
 | id allocation | batch-scoped (`AT-B84-*`), **no registry reservation owed** — spec §2.3 |
 

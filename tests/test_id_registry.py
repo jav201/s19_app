@@ -67,8 +67,15 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 154
+EXPECTED_SCANNED_TEST_FILES = 155
 """Test modules scanned, including this one.
+
+batch-84 Inc-1: 154 -> 155. ``tests/test_address_origin.py`` was added for the
+bare-name address origin resolver (``AT-B84-01``..``AT-B84-07``). MEASURED, not
+incremented, and by two paths that do not share code: ``scanned_test_files()``
+reports 155, and an independent re-derivation of the same glob
+(``tests/**/*.py`` minus the four excluded directories) agrees at 155 —
+153 ``test_*.py`` modules plus ``conftest.py`` and ``generate_large_samples.py``.
 
 batch-83 Inc-1: 153 -> 154. ``tests/test_address_census.py`` was added for the
 computed-address detector (``AT-B83-01``..``AT-B83-09``). Same discipline as the
