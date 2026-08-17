@@ -39,7 +39,8 @@
 `claude/blind-spot-assembled-selector-c2c117`; **PR not yet opened — this flow runs no git.**
 Shipped `tools/address_origin.py` + `tests/test_address_origin.py` (`AT-B84-01`..`AT-B84-07`,
 21 arms, PR lane) and `bare_name_candidates()` in `tools/address_census.py`. Gate suite
-**2728 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13 by `python -m pytest -q`.
+**2730 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13 by `python -m pytest -q`, run
+on the merged tree. (2725 → 2728 → 2730 as guards were added across Inc-1/Inc-3/Inc-4.)
 
 ⚠ **That total is NOT comparable to batch-83's `2684 / 21 deselected`** — the two runs used
 different invocations, and a total without its command is not a measurement (handoff §4.2).

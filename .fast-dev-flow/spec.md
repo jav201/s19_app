@@ -265,9 +265,12 @@ the tool prints its own three exclusions rather than letting a reader assume oth
   it reddens.
 - `python -m pytest tests/test_address_census.py -q` → **23 passed**; the census's printed output is
   unchanged, `NOTE on 'name': 142 of 183`.
-- `python -m pytest -q` → **2728 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13.
-  (Inc-1 measured 2725 in 39:00; the delta is exactly the three arms Inc-3 added, and the wall
-  clock is machine noise, not a signal.)
+- `python -m pytest -q` → **2730 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13,
+  **run on the tree that is being merged**. The total moved three times as arms were added —
+  2725 (Inc-1) → 2728 (Inc-3, +3) → 2730 (Inc-4, +2) — and each earlier figure was written into
+  this file while it was true and had to be re-derived when it stopped being. An independent
+  reviewer reproduced the 2728 stage exactly; the 2730 is this session's, on the final tree. Wall
+  clock is machine noise, not a signal.
 - `ruff check` → clean.
 - Manual smoke: `python tools/address_origin.py`, output read end to end.
 
