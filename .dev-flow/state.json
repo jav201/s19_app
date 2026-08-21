@@ -12,7 +12,7 @@
       "reason": "Operator ruling. Part B (address/cardinality/consumers) is this batch's product, and its declared home is .dev-flow/<batch>/01-requirements.md -- a Phase-1 artifact /fast-dev-flow has no phase for. Continuing in the fast lane would have meant inventing a second home for the artifact, against C-50. Promoted, NOT demoted: no control was removed."
     }
   ],
-  "current_station": "P0",
+  "current_station": "P1",
   "phase_status": "awaiting-gate",
   "stations_active": [
     "P0",
@@ -90,7 +90,8 @@
     "metrics": "vault:s19_app/dev-flow-batches/2026-08-21-batch-85/README.md"
   },
   "artifacts": {
-    "PLAN": ".dev-flow/2026-08-21-batch-85/PLAN.md"
+    "PLAN": ".dev-flow/2026-08-21-batch-85/PLAN.md",
+    "P1": ".dev-flow/2026-08-21-batch-85/01-requirements.md"
   },
   "decisions_log": [
     {
@@ -132,6 +133,22 @@
       "why": "Operator instruction 'spawn them' constitutes the explicit request this session's configuration required. In core mode code-reviewer is a GATE, and a session that has already surfaced two unpredicted blocking findings is exactly where independent review pays for itself.",
       "consequence": "R-4 closes. Cost is tokens and wall-clock per gate; benefit is that the reviewer is not the author.",
       "who": "operator"
+    },
+    {
+      "station": "P1",
+      "date": "2026-08-21",
+      "decision": "Adopt the architect's document as the spine; fold qa-reviewer's B3 differential-block-parse as the GATE for LLR-85.5 (TC-B85-07), demoting the test-run to corroboration.",
+      "why": "qa MEASURED that a {-in-comment corruption shifts 259 of 284 blocks while both named B3 tests stay GREEN. Re-running them is a smoke test, not a verification of inertness. The architect's TC-B85-07 ran only the two modules.",
+      "consequence": "LLR-85.5 gains a differential parse with a 284->284 / 0-diff threshold and a binding no-brace constraint on the comment. Costs one extra arm; buys the only check that can actually see the corruption.",
+      "who": "agent"
+    },
+    {
+      "station": "P1",
+      "date": "2026-08-21",
+      "decision": "Keep the architect's id scheme (AT-B85-01..04 + TC-B85-01..10) over qa's (AT-B85-01..08).",
+      "why": "The architect's scheme is already internally consistent across the dual-traceability tables; qa's numbering collides on AT-B85-02/03/04 with different subjects. One had to win and the spine's must.",
+      "consequence": "qa's AT-B85-05..08 content survives as TC/threshold detail inside the LLRs, not as separate ids. Nothing measured was dropped; the mapping is recorded here.",
+      "who": "agent"
     }
   ],
   "obsidian_synced": false,
