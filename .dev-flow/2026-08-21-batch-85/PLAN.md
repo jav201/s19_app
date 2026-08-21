@@ -49,7 +49,7 @@ as evidence that the question has never been asked here.
 | **D-4** | **Promote** fast→core rather than finish in the fast lane | Finish under `/fast-dev-flow` | Part B's declared home is `.dev-flow/<batch>/01-requirements.md`, a Phase-1 artifact the fast lane has no phase for. | Continuing in fast would have meant **inventing a second home** for the artifact, against C-50's one-home rule. Cost: the heavier flow. | operator |
 | **D-5** | Fix the loader **before** opening this batch | Author the record anyway | `V10`–`V14` read 1 of 61 `01-requirements.md` (first-wins by walk order), so the record would have been **invisible** and the rules green. | Shipped as flow **rev38** — a change to a **shared asset** every project running this flow inherits. Bounded: no project has COMPONENT blocks today, so nothing green goes red. | operator |
 | **D-6** | D3's assertion lands in the **existing** `tests/test_address_origin.py` | A new test file | `test_id_registry.py:73` pins `EXPECTED_SCANNED_TEST_FILES` at 155. A new file drifts an unrelated lane's guard into this batch. | Guard untouched, no bump owed. **If a later increment does need a new test file, that count must be re-derived, not assumed.** | agent |
-| **D-7** | Review lenses run **inline**, no `Agent` delegation | Spawn `architect`/`qa-reviewer`/`code-reviewer` | This session's configuration says *"Do not call the AgentTool unless the user requested it"*; `/dev-flow` mandates delegation. Conflict **surfaced, not averaged**. | ⚠ **In `core`, `code-reviewer` is a GATE — so the author reviews the author.** Independence is genuinely reduced. Standing risk R-4, not a discharged item. Operator can reverse this at any gate. | agent |
+| **D-7** | ~~Review lenses inline~~ → **REVERSED: lenses run as spawned sub-agents** | Running them inline | Initially withheld because this session's configuration said not to use the `Agent` tool unless requested, while `/dev-flow` mandates it — conflict **surfaced, not averaged**. **Operator said "spawn them" 2026-08-21**, which is the explicit request that was missing. | ✅ **Risk R-4 CLOSES** — the `code-reviewer` gate is independent as the flow intends, and the author no longer reviews the author. Cost: tokens and wall-clock per gate. | operator |
 
 ---
 
@@ -96,10 +96,10 @@ All three are ≤4 source files. No increment reaches the ⚠ cap.
 
 | id | Risk | Status |
 |---|---|---|
-| **R-1** | A `.tcss` comment edit drifts a structural parser test (**B3**). | Open — verify by running, never by reasoning |
+| **R-1** | A `.tcss` comment edit drifts a structural parser test (**B3**). | **Constraint DERIVED by reading the parser, 2026-08-21.** `tests/test_legend_two_pane.py:651-658` does `text.split("}")` → `partition("{")` → `selector.split("*/")[-1]`. A preceding comment is stripped correctly, **but any `{` or `}` inside a comment shifts EVERY block boundary in the file.** So Inc-2's corrected comment MUST contain no brace and exactly one terminating `*/`. **Pre-edit baseline captured green:** `test_legend_two_pane.py` 9 passed, `TC-B79-02` 1 passed. Re-run both after the edit — verified by running, not by reasoning. |
 | **R-2** | The Part B record's `consumers` list goes stale the same way the three copies did. `V13` is the control that notices; this batch is its first real application. | Open by design |
 | **R-3** | **C-55 — load-bearing emptiness.** D3's assertion is green only because the tree has zero `other:Attribute` bindings today. Mutating it changes nothing. **Discharge owed: a synthetic module the tree lacks.** | Open — discharge is a deliverable |
-| **R-4** | **Author reviews author** (D-7). `code-reviewer` is a gate in `core` and is not independent here. | Open, declared, not discharged |
+| **R-4** | ~~Author reviews author~~ | ✅ **CLOSED 2026-08-21** — operator reversed D-7; lenses are spawned sub-agents. |
 | **R-5** | The CSS-consumer question was recorded as "open" in the scoping doc and is in fact **already settled** by the shipped control (`_V13_EXT` includes `.tcss`; `V14`'s symbol check is conditional). Two of my own claims were wrong. | ✅ Closed — corrected in the promoted spec's premise table |
 
 ---

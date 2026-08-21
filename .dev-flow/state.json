@@ -3,31 +3,42 @@
   "language": "en",
   "batch_id": "2026-08-21-batch-85",
   "batch_objective": "C-54 Information Flow Contract, Lane A retrofit -- PILOT on ONE surface: LoadedArtifactsPanel. Author its Part B record so V10-V14 report a verdict instead of SKIP; correct the three stale 'two shipped readers' consumer lists; fold in D3's membership assertion over the address census; and MEASURE the per-surface cost so the remaining surfaces can be sized from a real number rather than an estimate.",
-
   "mode": "core",
   "mode_history": [
-    {"from": "fast", "to": "core", "date": "2026-08-21",
-     "reason": "Operator ruling. Part B (address/cardinality/consumers) is this batch's product, and its declared home is .dev-flow/<batch>/01-requirements.md -- a Phase-1 artifact /fast-dev-flow has no phase for. Continuing in the fast lane would have meant inventing a second home for the artifact, against C-50. Promoted, NOT demoted: no control was removed."}
+    {
+      "from": "fast",
+      "to": "core",
+      "date": "2026-08-21",
+      "reason": "Operator ruling. Part B (address/cardinality/consumers) is this batch's product, and its declared home is .dev-flow/<batch>/01-requirements.md -- a Phase-1 artifact /fast-dev-flow has no phase for. Continuing in the fast lane would have meant inventing a second home for the artifact, against C-50. Promoted, NOT demoted: no control was removed."
+    }
   ],
-
   "current_station": "P0",
   "phase_status": "awaiting-gate",
-  "stations_active": ["P0", "P1", "P2", "P3", "P4", "P5"],
-  "iterations_per_station": {"P0": 0, "P1": 0, "P2": 0, "P3": 0, "P4": 0, "P5": 0},
-
+  "stations_active": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+  ],
+  "iterations_per_station": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "P5": 0
+  },
   "note_batch_numbering": "85 is the NEXT FREE number, operator ruling 2026-08-21. This batch EXECUTES the charter that BACKLOG-CODE.md, BACKLOG-PROCESS.md and design/C-54-information-flow-contract.md all call 'BATCH-82'. That charter keeps its name as a historical citation; the executing batch is 85 because 83 and 84 have already shipped and this project's allocation philosophy (AT-TC-REGISTRY-SPEC section 4) is monotonic -- no gap-filling, no reuse. Derivation: .dev-flow/ folders top out at 79 because batches 80-84 ran under /fast-dev-flow, which writes to .fast-dev-flow/ and creates no .dev-flow/<batch>/ folder; batch-84 merged as PR #197.",
-
   "note_backlog_lane": "Lane A -- .dev-flow/BACKLOG-CODE.md, per docs/engineering-rules.md section 'Backlog routing' (queue PARTITIONED into two lanes since 2026-07-27). BACKLOG.md is a router holding no open work. The Lane B half of this item is CLOSED in BACKLOG-PROCESS.md (C-54 encoded at flow rev33).",
-
   "note_prior_session": "This batch was PROMOTED from /fast-dev-flow mid-flight. Its blocking Phase-A finding was fixed and shipped BEFORE this batch opened: V10-V14 were reading 1 of 61 files named 01-requirements.md (_artifacts() keys by basename, first-wins by os.walk order), so any IFC authored in a new batch folder was invisible and the rules stayed green reading .dev-flow/2026-05-05-batch-01/, frozen in May. Fixed as flow rev38.",
-
   "rc1": {
     "origin_main_tip": "a112eeb",
     "merge_base_equals_tip": true,
     "verified": "2026-08-21, git fetch origin then git merge-base HEAD origin/main",
     "already_shipped_check": "The pilot's deliverable is an IFC record for LoadedArtifactsPanel. Executed: _ifc_corpus('.') over the whole tree returns 0 COMPONENT blocks and 0 FLOW blocks across all 61 files. Nothing of this batch's scope is already shipped."
   },
-
   "flow_currency": {
     "checked": "2026-08-21",
     "flow_version": "2026.08.21-rev38",
@@ -35,7 +46,6 @@
     "result": "V7 green (flow current), V15 green (21 files, bundle identical), V16 green (all declared checkouts clean and level with origin against refs refreshed with --fetch), V17 green (guard wired). Verified by execution AFTER the rev38 push, not before.",
     "note": "rev38 was authored and shipped by THIS session, in response to this batch's own Phase-A blocker. claude-config d09d4e9, agent-skills c2c2840, ~/kimi/agent-skills pulled to match."
   },
-
   "standing_authorization": {
     "asked_on": "2026-08-21",
     "asked_fresh": "Yes -- asked at this batch's kickoff, NOT inherited from batch-79 or from the promoted fast-flow spec.",
@@ -45,21 +55,31 @@
     "merge_condition": "Merge remains GATED: after the PR is opened and CI is green, a final independent PR-level qa-reviewer pass over the whole merged diff vs main must come back clean (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged). A HIGH finding blocks the merge and returns to the operator.",
     "decision_recording": "Confirmed -- every decision taken autonomously instead of asking is summarized in PLAN.md's decision log WITH ITS RATIONALE AND CONSEQUENCES (operator instruction 2026-08-21: 'raise the decisions in table form so I know why the decision was taken and the consequences of each'), recorded in decisions_log below and in the close artifact, and carried to the vault at sync."
   },
-
   "deviation_declared": {
-    "what": "Agent delegation is NOT being used. /dev-flow mandates invoking architect / qa-reviewer / code-reviewer via the Agent tool; this session's configuration states 'Do not call the AgentTool unless the user requested it'.",
-    "resolution": "Surfaced to the operator at the P0 gate rather than averaged. The review lenses are run INLINE by the orchestrator.",
-    "consequence": "In core mode code-reviewer is a GATE, so its independence is genuinely reduced -- the author reviews the author. Recorded as a standing risk, not as a discharged one."
+    "what": "Agent delegation was initially withheld: /dev-flow mandates the Agent tool while this session's configuration said not to use it unless requested.",
+    "resolution": "REVERSED 2026-08-21 by explicit operator instruction ('spawn them'). Delegation is in scope; architect / qa-reviewer / code-reviewer run as real sub-agents.",
+    "consequence": "Risk R-4 (author reviews author) is CLOSED. The code-reviewer gate in core mode is independent as the flow intends."
   },
-
   "triggers": {
     "evaluated_at": "2026-08-21",
-    "fired": ["B1", "B3", "B4"],
-    "not_fired": ["B2", "C-all", "D1", "F1", "F2"],
-    "undecided_at_intake": ["A2", "E1"],
+    "fired": [
+      "B1",
+      "B3",
+      "B4"
+    ],
+    "not_fired": [
+      "B2",
+      "C-all",
+      "D1",
+      "F1",
+      "F2"
+    ],
+    "undecided_at_intake": [
+      "A2",
+      "E1"
+    ],
     "record": ".dev-flow/2026-08-21-batch-85/PLAN.md#triggers"
   },
-
   "artifact_homes": {
     "requirements": "repo:.dev-flow/2026-08-21-batch-85/01-requirements.md",
     "increments": "repo:.dev-flow/2026-08-21-batch-85/03-increments/",
@@ -69,30 +89,51 @@
     "backlog": "repo:.dev-flow/BACKLOG-CODE.md",
     "metrics": "vault:s19_app/dev-flow-batches/2026-08-21-batch-85/README.md"
   },
-
   "artifacts": {
     "PLAN": ".dev-flow/2026-08-21-batch-85/PLAN.md"
   },
-
   "decisions_log": [
-    {"station": "P0", "date": "2026-08-21", "decision": "batch id = 85 (next free), not 82 (charter name)",
-     "why": "Monotonic allocation matches this project's own id philosophy; 83 and 84 already shipped, so reusing 82 would land it out of order and the project has been burned twice by mid-flight renumbering (64/65, 79/80/81).",
-     "consequence": "Every existing citation still says 'batch-82'. This batch must state, in every artifact, that it EXECUTES the batch-82 charter -- otherwise a later reader finds a charter with no executing batch.",
-     "who": "operator"},
-    {"station": "P0", "date": "2026-08-21", "decision": "mode = core",
-     "why": "Proportionate to one surface. Keeps ids + dual traceability, the RED counterfactual, the code-reviewer gate and a living PLAN.md; drops IEEE 830 two-level HLR/LLR and the 06-docs layer, which this pilot does not need. LLR headings are still produced, which V10 requires for its owner check.",
-     "consequence": "No 06-docs/, no executive summary, no full post-mortem -- the batch closes with 05-close.md and syncs only its metrics README. If the pilot's findings reopen the C-54 design, the mode must be RAISED to full (modes only raise).",
-     "who": "operator"},
-    {"station": "P0", "date": "2026-08-21", "decision": "autonomous + merge authority granted",
-     "why": "Operator ruling at kickoff, asked fresh.",
-     "consequence": "Gates are self-approved and every un-asked decision must be reconstructible from this log. Merge is still blocked behind a clean final PR-level review; a HIGH finding returns to the operator.",
-     "who": "operator"},
-    {"station": "P0", "date": "2026-08-21", "decision": "D3's assertion goes into the EXISTING tests/test_address_origin.py, not a new test file",
-     "why": "tests/test_id_registry.py:73 records EXPECTED_SCANNED_TEST_FILES at 155 (batch-84 Inc-1 moved it 154 -> 155). Adding a new test file would drift that guard and pull an unrelated lane's count into this batch.",
-     "consequence": "The count guard stays untouched and needs no bump. If a later increment does need a new test file, the guard must be re-derived, not assumed.",
-     "who": "agent"}
+    {
+      "station": "P0",
+      "date": "2026-08-21",
+      "decision": "batch id = 85 (next free), not 82 (charter name)",
+      "why": "Monotonic allocation matches this project's own id philosophy; 83 and 84 already shipped, so reusing 82 would land it out of order and the project has been burned twice by mid-flight renumbering (64/65, 79/80/81).",
+      "consequence": "Every existing citation still says 'batch-82'. This batch must state, in every artifact, that it EXECUTES the batch-82 charter -- otherwise a later reader finds a charter with no executing batch.",
+      "who": "operator"
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-21",
+      "decision": "mode = core",
+      "why": "Proportionate to one surface. Keeps ids + dual traceability, the RED counterfactual, the code-reviewer gate and a living PLAN.md; drops IEEE 830 two-level HLR/LLR and the 06-docs layer, which this pilot does not need. LLR headings are still produced, which V10 requires for its owner check.",
+      "consequence": "No 06-docs/, no executive summary, no full post-mortem -- the batch closes with 05-close.md and syncs only its metrics README. If the pilot's findings reopen the C-54 design, the mode must be RAISED to full (modes only raise).",
+      "who": "operator"
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-21",
+      "decision": "autonomous + merge authority granted",
+      "why": "Operator ruling at kickoff, asked fresh.",
+      "consequence": "Gates are self-approved and every un-asked decision must be reconstructible from this log. Merge is still blocked behind a clean final PR-level review; a HIGH finding returns to the operator.",
+      "who": "operator"
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-21",
+      "decision": "D3's assertion goes into the EXISTING tests/test_address_origin.py, not a new test file",
+      "why": "tests/test_id_registry.py:73 records EXPECTED_SCANNED_TEST_FILES at 155 (batch-84 Inc-1 moved it 154 -> 155). Adding a new test file would drift that guard and pull an unrelated lane's count into this batch.",
+      "consequence": "The count guard stays untouched and needs no bump. If a later increment does need a new test file, the guard must be re-derived, not assumed.",
+      "who": "agent"
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-21",
+      "decision": "D-7 REVERSED -- review lenses run as spawned sub-agents, not inline",
+      "why": "Operator instruction 'spawn them' constitutes the explicit request this session's configuration required. In core mode code-reviewer is a GATE, and a session that has already surfaced two unpredicted blocking findings is exactly where independent review pays for itself.",
+      "consequence": "R-4 closes. Cost is tokens and wall-clock per gate; benefit is that the reviewer is not the author.",
+      "who": "operator"
+    }
   ],
-
   "obsidian_synced": false,
   "created_at": "2026-08-21"
 }
