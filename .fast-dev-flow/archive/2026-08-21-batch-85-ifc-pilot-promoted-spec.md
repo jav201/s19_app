@@ -132,6 +132,8 @@ genuinely useful on its own. **C without A does not achieve AC-3** — worth sta
 
 | | |
 |---|---|
-| Current phase | **A — BLOCKED at the gate, awaiting operator decision on §8** |
+| Current phase | **CLOSED — PROMOTED to `/dev-flow`, 2026-08-21 (operator ruling)** |
+| Why promoted | §8 option **A** was taken and is **DONE**: the loader defect is fixed and shipped as flow `rev38` (`claude-config d09d4e9`, `agent-skills c2c2840`, `flow_hash 004ec303f6ca9dbb`), so `AC-3` is now achievable. What remains is §5's routing conflict, which `rev38` does not touch: **Part B's declared home is `.dev-flow/<batch>/01-requirements.md`, a Phase-1 artifact, and this flow has no Phase 1.** Continuing here would mean inventing a second home for the artifact, against `C-50`. |
+| Successor | the `/dev-flow` batch carrying the same pilot. This spec's §3 criteria and §6 premise table are its inputs and are **not re-derived**. |
 | Implementation | **none.** No code, no IFC record, no correction applied |
 | Files changed | this spec + the batch-84 archive move |
