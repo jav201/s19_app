@@ -183,12 +183,33 @@ guarda hay que revisarlos"*.
 
 **⚠ Carries returned — nothing dropped:**
 
-- **▸ (P2) The `AT-B83-06` conflict is registered but NOT resolved, and it is not this batch's to
-  resolve.** `BACKLOG-CODE.md:118` calls the registry's blindness to batch-scoped ids a **P1
-  defect**; `AT-TC-REGISTRY-SPEC.md:468` records the same blindness as **"✅ Accepted,
-  deliberately … zero recorded collisions"**, and §2.3:123 says *"New work should prefer these"*.
-  Both citations verified exact by an independent pass. batch-83 followed the spec. **Whoever owns
-  that P1 must close it or re-word it** — right now the project asserts both.
+- **✅ RESOLVED 2026-08-21 — the `AT-B83-06` CONTRADICTION only. The project no longer asserts
+  both.** It did: this entry cited a **P1 defect** for the registry's blindness to batch-scoped ids
+  while `AT-TC-REGISTRY-SPEC.md:468` recorded the same blindness as **"✅ Accepted, deliberately …
+  zero recorded collisions"**, and §2.3:123 said *"New work should prefer these"*. batch-83 followed
+  the spec, correctly, and had no way to know it was following one of two live positions.
+
+  **Operator ruling 2026-08-21: the P1 stands; the SPEC was re-worded.** The two were never the same
+  claim — the SPEC's justification is about **collisions**, the P1's subject is the **grammar** — and
+  conflating them is what produced a document that accepted a risk it had not actually assessed.
+  §10's row now splits the verdict (collision ✅ accepted · grammar ❌ not accepted, open P1) and
+  §2.3:123 gains a pointer so that cell no longer reads as a complete justification standing alone.
+
+  ⚠️ **The stale citation is itself the finding.** `BACKLOG-CODE.md:118` was exact when written and
+  rotted when batch-84 prepended its close section, leaving a **P2 carry pointing a reader at an
+  unrelated bullet about `+=` assembly.** **No live line number replaces it, deliberately:** writing
+  this very entry moved the P1 again (`:323` → `:338` while the replacement was being drafted), which
+  is the demonstration. This file grows at the top, so **every line number into it is a decaying
+  reference** — cite it by CONTENT, as done here. The other two citations point into
+  `AT-TC-REGISTRY-SPEC.md`, which does not grow at the top; both were re-verified **exact**.
+
+  **What is NOT resolved, stated so nobody reads it as closed:** the blindness itself stays open as
+  the P1 § *"The AT/TC registry is BLIND to all 106 batch-78/79 acceptance nodes"* below. Extending
+  the regex is **its own batch**. Its population was **re-derived, not carried**, while writing this:
+  `grep -rhE "^def test_(at|tc)_b[0-9]+_" tests/*.py | wc -l` = **141** batch-scoped test nodes
+  against **0** registry rows. The narrower batch-79 pattern in that entry read **108** at Inc-11 and
+  reads **109** today, and its own headline still says **106** — three live numbers for one drifting
+  count, which is precisely why **the `0` is the figure that carries the claim**.
 
 - **✅ CLOSED at Inc-3 — the false positives in the derived set.** Resolved by **three rules, each
   a rule and not a list of names**: a selector parameter must be *annotated* as accepting `str`;
@@ -351,6 +372,12 @@ CI only, its own PR).
   decision owed** — extending the regex reclassifies tokens repo-wide and could redden G1/G3/G5
   across 678 existing ids, so it is its own batch. It also qualifies `AT-B78-14`: for this namespace
   the registry never had anything to reconcile.
+
+  ✅ **2026-08-21 — the CONTRADICTION around this entry is closed; THIS ENTRY IS NOT.** The SPEC used
+  to record the same blindness as accepted, so the project held two positions at once; §10 now
+  accepts only the **collision** half and names this P1 as the open **grammar** half. That settles
+  which position the project holds and nothing else. **The decision still owed is the one stated
+  above** — whether to extend the grammar, and at what blast radius.
 - **▸ (P2) Eight `subprocess.run(..., text=True)` calls in the test tree decode with the HOST's
   preferred encoding, not UTF-8.** `text=True` alone uses `locale.getpreferredencoding()` — **cp1252**
   on this Windows host — so any non-cp1252 codepoint in the captured output raises
