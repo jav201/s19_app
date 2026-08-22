@@ -287,6 +287,44 @@ CI only, its own PR).
     is 6, so the composer budgets 11 against a 9-column cell. Outside the supported set, and
     `TC-B79-02` correctly asserts only the three supported sizes. Related to the carried `N-7`.
 
+- **▸ 🛑 (P1 — RETROFIT PROGRAMME, OWED BEFORE SURFACE #2) The HUMAN consolidated view of the
+  Information Flow Contract. Operator ruling 2026-08-21.** The IFC **is** a consolidated view — *for the
+  machine*. `_ifc_corpus` merges all 61 `01-requirements.md` at validation time, and that is the canon:
+  **it is not to be moved or touched.** What does not exist is the view a *human* reads. Operator:
+  *"el IFC es el consolidado para la máquina, tampoco creo que debamos tocarlo, si no más bien debemos
+  tener el consolidado para humanos también"*.
+
+  **The measured problem (batch-85 `F-9`, surfaced by an operator question, not by a guard):** after 27
+  surfaces the contract lives in **27 batch folders, unified only in memory**. No document exists that a
+  person can read to learn how the application is addressed — the reader must assemble a jigsaw.
+  Formally C-50 holds (*one home per artifact*), but only by making the home a **corpus** rather than a
+  file, which is not what a reader means by "one home".
+
+  **The design invariant, and it is the whole of the decision:** the human view is **DERIVED BY COMMAND
+  FROM THE CORPUS, NEVER MAINTAINED BY HAND.** Same relationship `skills/dev-flow/` already has to the
+  manifest table via `--sync-bundle` — **a derived artifact is a build output, not a second home**, so
+  C-50 is satisfied without an exception. A hand-maintained consolidation would reproduce, at project
+  scale, exactly the stale-consumer-list defect this whole programme exists to close.
+
+  **Hard constraint — do not design around it:** `_ifc_corpus` reads **only**
+  `.dev-flow/**/01-requirements.md`. Move a record into a standing document and `V10`–`V14` return to
+  `SKIP`. That is the blocker that closed the fast-lane spec, one level up.
+
+  **Open decisions, enumerated as decisions rather than prose:** one document or a set? · does it cover
+  only the IFC, or requirements + HLR/LLR + test cases + validation as the operator's brief describes? ·
+  how do **batch tags, past revisions and checklists** render, since those are the seams that make
+  completeness auditable (*"la evidencia de que el tejido está completo, no hay huecos"*) ? · which
+  command derives it and in which phase does it run? · how does it relate to `REQUIREMENTS.md`, which is
+  already this project's standing consolidated spec at 6,074 lines?
+
+  **Why BEFORE surface #2:** it is a **one-way door**. 26 records authored in the wrong shape is the cost
+  of deciding it late.
+
+  ⚠️ **C-45 PUSH obligation attached.** Designed here, in the programme where the need is felt — which
+  is the same path `C-54` itself took (discovered in batch-79, encoded to the flow at `rev33`). But the
+  portable half **owes an upstream push once proven**, or every project running this flow re-learns it at
+  full price. Register the Lane B half in `BACKLOG-PROCESS.md` at that point, not before.
+
 - **▸ 🛑 (P1 — BATCH-82 CHARTER) Author the Information Flow Contract for s19's surfaces — the FULL retrofit. LANE A HALF.**
   ⚠️ **Cross-lane item, split per Amendment A.** The **control** (`C-54`: the global flow, template,
   validator rules, propagation) is the Lane B half in
