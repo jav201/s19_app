@@ -33,8 +33,9 @@ that question, written when they were true.
 
 ### 1.2 Scope
 
-**In scope.** One surface: its Part A flow, its Part B component record, correction of every in-repo
-consumer note that contradicts the measured set, one membership assertion over the address census
+**In scope.** One surface: its Part A flow, its Part B component record, correction of the in-repo
+notes **about this surface's addresses** that contradict the measured set — enumerated exhaustively in
+`LLR-85.5`, not described by a category, one membership assertion over the address census
 with its RED counterfactual, and the cost record.
 
 **Out of scope.** The other surfaces. The D-6 consumer-declares inversion. The public-repo question
@@ -118,7 +119,7 @@ held.
 | **P-9** | The retrofit's surface count is known | PREMISE | ❌ **FALSE — three live figures, none reconciled** | **27** by `compose()`, **31** by widget-base, **~40** by R1 D-2. "Surface" has no evaluable definition |
 | **P-10** | `LLR-120.*` can be cited as `owner` | HYPOTHESIS | ❌ **FALSE — and this is a finding** | `_declared_ids` matches `^#{2,5}\s+…`. Batch-78 wrote `**LLR-120.2 — …**` as **bold**, `R8`. Corpus declares 508 ids; `LLR-120.2` is not among them. Citing it → `V10` **BLOCK** |
 | **P-11** | With this record present, `V10`–`V14` report a verdict | HYPOTHESIS | ✅ **TRUE — executed** | §5.5 |
-| **P-12** | The stale claim is confined to prose comments | PREMISE | ❌ **FALSE — one lives inside a shipped assertion message, split across two f-string fragments** | `tests/test_tui_commandbar.py:1301-1303`: `"…Two shipped "` / `"readers index this query positionally…"`. **`grep -c "two shipped readers"` → 0.** The search that maintained the list was narrower than the thing it searched for |
+| **P-12** | The stale claim is confined to prose comments | PREMISE | ❌ **FALSE — one lives inside a shipped assertion message, split across two f-string fragments** | `tests/test_tui_commandbar.py:1302-1303`: `"…Two shipped "` / `"readers index this query positionally…"`. ⚠️ **CORRECTED at the Phase-2 iteration — the first evidence line said `grep -c "two shipped readers"` → 0 without naming a scope, which is FALSE tree-wide** (the phrase IS contiguous at `screens_directionb.py:1954`). The true, narrower claim: **a single-line grep cannot find the `test_tui_commandbar.py` site**, because there the phrase spans two f-string fragments. The conclusion stands; the evidence as first written did not, and it was the orchestrator's own over-generalisation of a probe it had run against a single file |
 | **P-13** | `AT-B85-*` need a registry reservation | PREMISE | ❌ **FALSE** | `_meta.governed`: letter-initial bodies are outside the authority |
 
 ---
@@ -130,7 +131,29 @@ held.
 - **Statement:** When the flow validator runs against this repository, the system shall report a counted `V10`–`V14` verdict naming the `loaded_panel` component, in place of the pre-state verdict that no `FLOW` or `COMPONENT` blocks are declared.
 - **Validation:** `test (integration)`
 - **Executed verification:** `python ~/.claude/docs/tools/devflow-validate.py` at the repo root, filtering `V10`–`V14`; pre-state captured 2026-08-21 (§5.5).
-- **Numeric pass threshold:** all **5** rules change verdict from the recorded pre-state; `V11` names **≥5** `OUTPUT(s)`; `V14` names **≥15** resolved consumers; `V10` names **≥9** owned `FLOW` nodes; `V12` emits exactly **1** finding; `V13` emits exactly **3**, each naming `loaded_panel/…`.
+- **Numeric pass threshold:** all **5** rules change their reported **message** from the recorded pre-state (never their *severity* — see the ⚠ below); `V11` names **5** `OUTPUT(s)`; `V14` names **15** resolved consumers; `V10` names **9** owned `FLOW` nodes; `V12` emits **1** finding; and **`V13`'s undeclared-reacher UNION is exactly**
+
+  ```
+  {prototypes/legend_n8.INVENTORY.md,                                    # mention
+   .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md,                      # mention
+   .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md,# mention
+   s19_app/tui/screens_directionb.py}                                    # PROVIDER, via #loaded_slots
+  ```
+
+  **4 files across 3 findings — and the set is classified per FILE, not per finding**, because the
+  `panel_handle` finding names two files and cannot carry one classification. ⚠️ **The first version of
+  this corrected threshold listed only 3, omitting the provider** — which already reaches
+  `#loaded_slots` today, independent of any Inc-1 edit. Caught by executing the rule instead of
+  reasoning about it, which is the third time in this batch that a hand-written set was wrong and the
+  executed one was right.
+
+  ⚠️ **The `V13` threshold is stated over the reacher SET, never the finding COUNT, and that is a
+  corrected defect rather than a style choice.** The first draft said *"`V13` emits exactly 3 findings"*.
+  A reviewer showed by **one-character edit** that the Inc-1 rewrite this document MANDATES adds
+  `s19_app/tui/screens_directionb.py` as a reacher — turning `LLR-85.2` RED while this threshold stayed
+  GREEN, because the new reacher is absorbed into an existing finding line. **The headline acceptance was
+  green across the exact regression its own sub-requirement forbids** — the misaddressed-observable class
+  reproduced inside the document written to close it. A count over findings is a count over the wrong set.
 - **Acceptance (black-box):** `AT-B85-01`
   - **Observable outcome:** the operator runs the validator and sees five lines counting this surface's flow nodes, outputs and consumers.
   - **⚠ The threshold is stated over a COUNTED QUANTITY IN THE MESSAGE, never over severity** — `V10`/`V11`/`V14` report `SKIP` **both before and after** (§5.5). An acceptance keyed on severity is green over an empty document. *Both review lenses found this independently.*
@@ -140,8 +163,21 @@ held.
 - **Traceability:** US-85-2
 - **Statement:** The repository shall carry no note asserting that two readers depend on `.loaded-detail`, and each surviving note shall enumerate the four measured dependants.
 - **Validation:** `inspection`
-- **Executed verification:** `grep -rniF "two shipped" --exclude-dir=.git .` **plus** a multi-line probe for the split fragment; pre-state 2026-08-21 = **5 sites in 4 files**.
-- **Numeric pass threshold:** **0** surviving two-reader claims; **4** corrected sites enumerate all **4** dependants; **1** errata block on the design record.
+- **Executed verification — the named command is the one that RUNS, and the previous one did not.**
+
+  ```bash
+  python tools/stale_consumer_census.py      # two-form, address-scoped, explicit path list
+  ```
+
+  ⚠️ **The oracle this replaces was `grep -rniF "two shipped" --exclude-dir=.git .`, which ABORTS on
+  this host** (SIGABRT, exit 134 — reproduced independently by the orchestrator and by review). A
+  document whose recorded pre-state was produced by some *other, unnamed* procedure has no oracle at
+  all. The replacement is **address-scoped**, not phrase-scoped: a site counts only when the stale
+  claim occurs within 3 lines of `loaded-detail`. Phrase-scoping alone returns **10** hits of which
+  **6 are unrelated historical prose** in frozen batch records (*"two shipped flows"*, *"two shipped
+  report generators"*, *"two shipped cap precedents"*), making a *"0 surviving"* threshold
+  **unreachable** without editing records no increment authorises.
+- **Numeric pass threshold:** over the **3 correctable in-repo sites** (`LLR-85.5`): **0** surviving two-reader claims and **3/3** enumerating all **4** dependants; **1** errata block covering **both** design-record sites; **0** edits to frozen batch records; **0** edits to the named false positive.
 - **⚠ Two-sided by construction:** *"the stale phrase is gone"* alone is satisfiable by **deleting** the comment. Criterion 2 is mandatory — a single-sided check cannot distinguish *corrected* from *removed*.
 - **Acceptance:** `AT-B85-02`
 
@@ -180,7 +216,8 @@ held.
 - **Statement:** The `loaded_panel` component record shall declare the `artifact_slots` output with `address : query(".loaded-detail"), INDEXED POSITIONALLY`, `cardinality : 3`, and a `consumers` list naming every measured dependant.
 - **Validation:** `test (integration)`
 - **Executed verification:** the `V11`, `V13`, `V14` lines; consumer set independently measured by `grep -rlF '.loaded-detail'`.
-- **Numeric pass threshold:** `V11` **0** BLOCKs for this output; `V14` resolves **4** consumer entries; `V13` at most **1** undeclared reacher and that reacher is the archived spec of §7.3 F-3 — **0** unexplained reachers.
+- **Numeric pass threshold:** `V11` **0** BLOCKs for this output; `V14` resolves **4** consumer entries; `V13`'s reacher set for this output is exactly `{.fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md}` — **0** unexplained reachers.
+- **⚠ BINDING CONSTRAINT on `LLR-85.5`'s edit, and it is load-bearing for this threshold.** The corrected provider comment in `screens_directionb.py` **shall write the class name WITHOUT the leading dot** (`loaded-detail`, as today), never `.loaded-detail`. The dotted form makes the **provider itself** a reacher of its own address and reddens this threshold on a correct edit. The provider is not a consumer of itself (§5.4 D-D), so declaring it is not the fix — not writing the literal is.
 - **Acceptance criteria (informative):** `INDEXED POSITIONALLY` is written even though no rule enforces ordering yet · `cardinality : 3` is the arity the origin defect crossed while set equality held · the consumer list contains `styles.tcss`, because renaming the class silently stops its rule applying.
 
 ### LLR-85.3 — the `project_row` output declares its own address and consumer set
@@ -217,7 +254,8 @@ held.
 - **Numeric pass threshold:** tree arm **0**; synthetic arm **1**; **2** arms; **0** new test files.
 - **⚠ PLACEMENT IS THE CRITERION.** The set shall be taken over **`Census.sites`**, never over `resolve_origins` / `bare_name_candidates`. **Measured:** a tree of pure `other:*` sites yields **0 rows** from `resolve_origins`, so an assertion placed there sees `{"name"}` on **every possible input** and passes its RED arms vacuously by never seeing them. `Census.loose` carries the sentinel form `loose` by construction and is a different population.
 - **C-55 discharge:** the green arm is green *because the population is empty*. Emptiness is why the guard is needed and never a reason to skip its red arm. The synthetic module is a **deliverable**.
-- **Symbol citations:** `census_source`, `_argument_form`, `Census.sites` / `Census.loose` in `tools/address_census.py` — all EXISTING; the new predicate is **NEW — created in Phase 3**.
+- **⚠ WHICH FILE HOSTS THE PREDICATE — corrected at the Phase-2 iteration.** The Statement named `tools/address_origin.py::report()`, but that function is `report(rows: list[OriginRow])` and **has no access to `Census.sites`** — the very population the ⚠ PLACEMENT criterion mandates. The LLR whose banner is *"PLACEMENT IS THE CRITERION"* left its own placement contradictory across two modules. **Resolved:** the predicate is `unmodelled_forms(census: Census) -> set[str]` in **`tools/address_census.py`**, beside `Census` and `_argument_form`; `tools/address_origin.py` imports and calls it (it already imports from that module). `address_origin.report`'s signature is **unchanged** — the naming happens in `address_census.report(data: Census)`, which already receives the right type.
+- **Symbol citations:** `census_source`, `_argument_form`, `Census.sites` / `Census.loose`, `report(data: Census)` in `tools/address_census.py` — all EXISTING; `unmodelled_forms` is **NEW — created in Phase 3**, in `tools/address_census.py`.
 
 ### LLR-85.7 — the per-surface cost record
 - **Traceability:** HLR-85.4
@@ -344,7 +382,7 @@ COMPONENT: loaded_panel
 |---|---|---|---|---|
 | **D-A** | **Five outputs, not the two the design sketched** | declare only `artifact_slots` + `project_row` | Every shipped reader reaches the detail cells *through* `#loaded_panel`, and two further external readers reach `#loaded_slots` and its `> Horizontal` row set — one of which (`tests/test_tui_variants.py`) **indexes a row's children positionally**. Declaring only two outputs would reproduce the original defect one level down. | 3 extra outputs, 11 extra consumer entries, 2 of the 3 `V13` findings. **The single largest contributor to the measured per-surface cost** |
 | **D-B** | **`PARENT : screen_workspace`, left undeclared** | declare it, or write `PARENT : SYSTEM` | Declaring it is out of one-surface scope. `SYSTEM` would be **false** — the panel is not the top of the boundary; it buys a silent `V12` at the price of a lie. | A permanent `V12` NOTICE — *"balancing was NOT checked; this is not a pass"* — the honest state of a staged retrofit |
-| **D-C** | **Retrofit-ownership convention:** a retrofitted node's `owner` is the batch-85 LLR that declares it, not the historical LLR that asked for it | cite `LLR-120.1…5` | `LLR-120.*` is **not citable**: batch-78 wrote its LLRs as bold text, so `_declared_ids` cannot see them and `V10` would BLOCK on correct work (P-10). | The ownership chain points at the *declaring* requirement, not the *originating* one. **A real semantic weakening, flagged not hidden** — §7.3 R-5 |
+| **D-C** | **Retrofit-ownership convention:** a retrofitted node's `owner` is the batch-85 LLR that declares it, not the historical LLR that asked for it | (i) cite `LLR-120.1…5` — impossible, they are not headings; (ii) **promote batch-78's five bold `LLR-120.*` lines to `#####` headings** — five lines in one markdown file, no flow-repo change, fully reversible, and `_ifc_corpus` merges `_declared_ids` from all 61 files so it would make them citable corpus-wide; (iii) a heading *alias* inside THIS document — **rejected outright**: it would make batch-85 falsely appear to declare batch-78's requirement | `LLR-120.*` is **not citable**: batch-78 wrote its LLRs as bold text, so `_declared_ids` cannot see them and `V10` would BLOCK on correct work (P-10). | The ownership chain points at the *declaring* requirement, not the *originating* one. **A real semantic weakening, flagged not hidden** — §7.3 R-5 |
 | **D-D** | **Do not declare mentions or the provider as consumers** | list every grep hit to silence `V13` | A dependant is *anything that would break if the address moved*. An archived spec does not break; the provider is not a consumer of itself. Listing them would make `consumers` mean "whatever grep found". | 3 standing `V13` NOTICEs, itemised in §7.3 |
 
 ### 5.5 Measured validator verdicts
@@ -388,28 +426,65 @@ COMPONENT: loaded_panel
 
 | Requirement | Method | Test case |
 |---|---|---|
-| LLR-85.1 | test (integration) | `TC-B85-01` — `V10`, 9 nodes owned |
-| LLR-85.2 | test (integration) | `TC-B85-02`/`03`/`04` — `V11`/`V14`/`V13` on `artifact_slots` |
-| LLR-85.3 | test (integration) | `TC-B85-02`/`03`/`04` on `project_row` |
+| LLR-85.1 | **inspection** *(was `test (integration)`)* | `TC-B85-01` — `V10`, 9 nodes owned |
+| LLR-85.2 | **inspection** | `TC-B85-02`/`03`/`04` — `V11`/`V14`/`V13` on `artifact_slots` |
+| LLR-85.3 | **inspection** | `TC-B85-02`/`03`/`04` on `project_row` |
 | LLR-85.4 | inspection | `TC-B85-05` — placement + two recorded runs |
-| LLR-85.5 | inspection + test | `TC-B85-06` (two-form grep census) · **`TC-B85-07` (differential block parse — the B3 gate)** |
-| LLR-85.6 | test (unit) | `TC-B85-08` (tree arm) · `TC-B85-09` (synthetic arm — C-55 discharge) |
+| LLR-85.5 | inspection + **test** | `TC-B85-06` (address-scoped two-form census) · **`TC-B85-07` — a REAL pytest node** |
+| LLR-85.6 | test (unit) | `TC-B85-08` (tree arm) · `TC-B85-09` (synthetic arm — C-55 discharge) · `TC-B85-09b` (`report()` names the form) |
 | LLR-85.7 | analysis | `TC-B85-10` |
 
-**Predicates labelled PIN, not gate (C-40):** the tree arm `TC-B85-08` is **invariant under every
-edit this batch makes** — it fails only the day the *tree* grows a fourth form. Useful pin, worthless
-gate. `TC-B85-09`'s synthetic arms are the gate. Likewise the upstream `--selftest` is cited as a
-consumer-contract guard, never as this batch's gate.
+> ⚠️ **`TC-B85-01`…`05` are `inspection`, not `test`, and that is a corrected defect.** They were
+> labelled `test (integration)`, which asserts a pytest node exists. **It cannot.** The validator lives
+> at `~/.claude/docs/tools/devflow-validate.py` — **outside the repository** — and CI checks out onto a
+> clean runner where that path does not exist (`grep -rn "devflow.validate" tests/ tools/` → **0 hits**).
+> A `test`-labelled requirement with no on-disk node is a **C-18 violation**: the traceability table
+> would assert coverage that has no home. Their oracle is **operator-local and NOT reproducible in CI**,
+> and saying so is the honest form.
+>
+> ⚠️ **`TC-B85-07` was the sharpest case and is FIXED rather than relabelled.** `R-1` calls it *"the B3
+> gate"* — but a one-shot manual run **cannot re-fire on the next `.tcss` edit**, which is the entire
+> failure mode `R-1` describes. It becomes a **real pytest node**, and it needs no external tool.
+> **Its invariant is deliberately NOT the 284→284 block count**, which any legitimate new rule would
+> break: it asserts **no `styles.tcss` comment contains `{` or `}`** and that braces balance — the exact
+> corruption mode, stable under honest edits, RED on a single injected brace.
+
+**Predicates labelled PIN, not gate (C-40) — the list grew at the Phase-2 iteration, and the headline
+acceptance is now on it:**
+
+| Predicate | Why it is a PIN |
+|---|---|
+| **`AT-B85-01` + `TC-B85-01`…`05`** | **Already GREEN on the artifact under review, with no implementation done, and invariant under BOTH remaining increments.** Neither Inc-1 (comment corrections) nor Inc-2 (a census predicate) can change `V10`/`V11`/`V12`/`V14`. The batch's headline acceptance gates nothing that remains to be built |
+| `TC-B85-08` (tree arm) | invariant under every edit this batch makes; fails only the day the *tree* grows a fourth form |
+| `LLR-85.3`'s clean `V13` on `project_row` | a legitimate **positive control** — it stays quiet where no stray exists — but it is quiet before and after, so it is a pin |
+| upstream `--selftest` | a consumer-contract guard held upstream, never this batch's gate |
+
+**The only LIVE gates in this batch are `TC-B85-07` and `TC-B85-09`/`09b`.** Saying so is the point:
+a document that presents four inert predicates as its acceptance has the shape of coverage without
+the substance, which is this batch's own subject.
 
 **Trigger obligations:** **B4** — `AT-B85-01` observes the *validator* over the *authored* record, never a hand-built fixture. **B3** — `TC-B85-07` is a differential block parse, because re-running the two named modules is measurably insufficient. **B1** — `tests/test_id_registry.py` re-run; `EXPECTED_SCANNED_TEST_FILES` stays **155**, two independent derivations.
 
 ### 6.3 Batch acceptance criteria
 
-- **7** LLRs covered by **10** TCs; **4** stories by **4** ATs.
-- **0** BLOCK findings attributable to this document.
-- `V12` and `V13` NOTICEs **enumerated and explained** in §7.3, not suppressed: exactly **1** and **3**.
-- Ledger: `base = 2684 passed / 2 skipped / 21 deselected / 3 xfailed`, `D = 0`, `A = 2`.
+- **7** LLRs covered by **11** TCs; **4** stories by **4** ATs.
+- **A falsifiable substitute for the criterion that could not fail** — see the ⚠ below:
+  `python tools/statement_modal_check.py .dev-flow/2026-08-21-batch-85/01-requirements.md`
+  reports **0** modal `should`/`debería` inside any line beginning `- **Statement:**`, and **0**
+  unfilled `<…>` placeholders. This probe **can** go RED: inject one `should` into a Statement.
+- `V12`'s finding count is **1**; `V13`'s undeclared-reacher **union** is the 3-element set of §3
+  (**never a finding count** — see `HLR-85.1`).
+- Ledger: `base = 2684 passed / 2 skipped / 21 deselected / 3 xfailed`, `D = 0`, **`A = 4`**
+  (`TC-B85-07`, `TC-B85-08`, `TC-B85-09`, `TC-B85-09b`).
 - **0** new test files (`EXPECTED_SCANNED_TEST_FILES` stays 155); **0** engine-frozen edits.
+
+> ⚠️ **The criterion this replaces was *"0 BLOCK findings attributable to this document"*, and it was
+> UNFALSIFIABLE.** `V1`–`V9` still use `_artifacts()`, which keys by basename and keeps the first file
+> `os.walk` reaches — `.dev-flow/2026-05-05-batch-01/01-requirements.md`, frozen in May. **Only
+> `V10`–`V14` were moved to `_ifc_corpus` by flow rev38.** So `V1`–`V9` never read this document, all 14
+> live BLOCKs name batch-01 ids, and the criterion was true over **any content whatsoever**, including a
+> document full of `should`. **The orchestrator shipped rev38, deliberately scoped `V1`–`V9` out, and
+> then cited the unfixed half as passing evidence at the P1 gate.** Registered as `F-7`.
 
 ---
 
@@ -423,14 +498,18 @@ consumer-contract guard, never as this batch's gate.
 | **R-2** | The record's `consumers` lists go stale exactly as the five prose sites did. | Open **by design**. `V13` is the control; this is its first real application |
 | **R-3** | **C-55 — load-bearing emptiness** in `LLR-85.6`'s tree arm. | Discharge is a deliverable: `TC-B85-09` |
 | **R-4** | ~~Author reviews author~~ | ✅ **CLOSED** — operator reversed D-7; lenses ran as independent sub-agents |
-| **R-5** | **Historical LLRs are uncitable as owners.** Batch-78 wrote `LLR-120.*` as bold text. Every retrofitted surface inherits D-C's weaker ownership. | Open — register in `BACKLOG-PROCESS.md`. Fix is a flow-repo change |
+| **R-5** | **Historical LLRs are uncitable as owners.** Batch-78 wrote `LLR-120.*` as bold text. Every retrofitted surface inherits D-C's weaker ownership. | Open. ⚠️ **The first draft asserted "fix is a flow-repo change" — that was an OPINION STATED AS FACT and it is wrong.** Option (ii) in D-C is a five-line edit to one project file with no flow change at all. The genuine counter-argument — that promoting ids into `_declared_ids` alters a corpus-wide set and is outside one-surface scope — is the reason it is **deferred, not impossible**. Recorded so the next batch inherits the cheap option rather than the foreclosure |
 | **R-7** | `V13` ships as `NOTICE`; escalation to `BLOCK` is the project's call per surface. This batch does **not** escalate. | Open decision |
 | **F-1** | `V13` reaches two files via `#loaded_panel` that are **mentions, not dependants**. | Classified, left undeclared (D-D) |
 | **F-2** | `V13` reports **the provider itself** as an undeclared consumer of `#loaded_slots`. A structural bound of the rule. The CSS-class addresses escape only because the provider writes `"loaded-detail"` while the address is `".loaded-detail"` — **an accident of syntax, not a property of the rule.** | New finding — register for the flow repo |
 | **F-3** | `.fast-dev-flow/` is **not** in `_V13_SKIP_DIRS` while `.dev-flow/` is. Batch specs appear as reachers of every address they discuss. **This session's own archived spec is a live instance.** | New finding — one-line asymmetry in a shared asset; register, do not fix here |
 | **F-4** | `V10`/`V11`/`V14` severity is `SKIP` in both the failing and passing case. | **Closed in this document** — all thresholds stated over counted quantities |
 | **F-5** | `AddressSite`'s docstring lists a form `type` that `_argument_form` cannot produce. | Registered, **not** fixed (surgical-change rule) |
-| **F-6** | The stale claim at `test_tui_commandbar.py:1301` is **invisible to the single-line grep that would maintain it**. | The defect class one layer up; drives HLR-85.2's two-form verification |
+| **F-6** | The stale claim at `test_tui_commandbar.py:1302` is **invisible to the single-line grep that would maintain it**. | The defect class one layer up; drives HLR-85.2's address-scoped two-form census |
+| **F-7** | **`V1`–`V9` share the first-wins loader defect that rev38 fixed for `V10`–`V14`.** They read `.dev-flow/2026-05-05-batch-01/01-requirements.md` — all 14 live BLOCKs name batch-01 ids. **rev38 fixed half the loader**, and the batch then cited the unfixed half as passing evidence. | **New, and the sharpest process finding of the batch.** Same shape as F-3: a one-line asymmetry in a shared asset. Register for the flow repo; extending it will light up 84 batches of history, which is why it is its own decision |
+| **F-8** | **The IFC cannot express `_project_label`'s real coupling.** `tests/test_tui_variants.py:98` identifies the project row by `LoadedArtifactsPanel._PROJECT_KIND` — a **class attribute, not a selector**. §1.3 defines *address* as selector-only, so renaming that attribute (or changing its value) breaks a declared consumer with **zero** contract signal. | New — a structural bound of C-54, measurable now rather than after the retrofit has priced it in. Register beside F-2 |
+| **F-9** | **The contract is structurally SCATTERED, and no consolidated artifact can hold it.** `_ifc_corpus` reads only `.dev-flow/**/01-requirements.md`; move a record into a standing document and `V10`–`V14` return to `SKIP`. After 27 surfaces the project's information-flow contract lives in **27 batch folders, unified only in memory at validation time** — there is no single document a human can read to learn how the application is addressed. | New, surfaced by an operator question. It satisfies C-50's *one home per artifact* only by making the home a **corpus** rather than a file — which is not what a reader means by "one home". **Registered as the retrofit's most consequential open design question** |
+| **F-10** | **`styles.tcss:197` and `:225-226` carry row-count claims that are now false** — *"title + 3 slot rows + unload-all = 5 rows"* (measured: panel 6, `#loaded_slots` 5) and *"the two lead slots stay visible"* (measured order `[project, S19, MAC, A2L, unload-all]`, so the two visible rows are project + S19 = **one** lead slot). Batch-78/79 added the project row and never updated them. | New. **Semi-load-bearing** — `:197`'s sentence justifies the 80×24 geometry budget. In files Inc-1 already edits; folded into `LLR-85.5` |
 
 ### 7.4 Per-surface cost — measured at Phase 1
 

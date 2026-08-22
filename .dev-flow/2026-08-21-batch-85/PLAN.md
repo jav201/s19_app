@@ -80,17 +80,42 @@ as evidence that the question has never been asked here.
 
 ---
 
-## 6 · Roadmap
+## 6 · Roadmap — RE-CUT at the P1 gate (C-21)
 
-| Inc | Content | Source files | Trigger obligations |
+> **Why re-cut.** The original Inc-1 ("author `01-requirements.md` with the Part B record") **landed
+> inside Phase 1** — the IFC record IS the Phase-1 artifact. And the AT set changed when the two
+> lenses folded. C-21 says a cut is STALE the moment the AT set changes, so it is re-derived here
+> rather than left to orphan an AT.
+
+| Inc | Content | Source files | Obligations |
 |---|---|---|---|
-| **Inc-1** | `01-requirements.md` with LLR headings + the Part B record for `LoadedArtifactsPanel`. Run `V10`–`V14`; capture their verdicts. | 0 source (a `.dev-flow/` artifact) | B4 — the acceptance observes the validator over the authored record |
-| **Inc-2** | Correct the three stale consumer lists. | 2 (`screens_directionb.py`, `styles.tcss`) | **B3** — re-run the `styles.tcss`-parsing tests, do not assume a comment is inert |
-| **Inc-3** | D3's membership assertion + its synthetic-instance RED arm. | 1 (`tools/address_origin.py`) + existing test file | **B1** reverse census; **C-55** discharge — the emptiness is load-bearing |
+| ~~old Inc-1~~ | ~~author the record~~ | — | ✅ **absorbed into Phase 1**, verified by the shipped validator |
+| **Inc-1** | Correct the 3 in-repo stale sites; append errata to the design record. | 2 source (`screens_directionb.py`, `styles.tcss`) + 1 test (`test_tui_commandbar.py`, message only) | **B3** differential block parse is the GATE |
+| **Inc-2** | D3 membership assertion over `Census.sites` + the synthetic-instance RED arm. | 1 source (`tools/address_origin.py`) + existing test file | **C-55** discharge · **B1** reverse census |
 
-All three are ≤4 source files. No increment reaches the ⚠ cap.
+### The stale-site census — measured, with its false positive named
 
----
+| # | Site | Nature | Treatment |
+|---|---|---|---|
+| 1 | `s19_app/tui/styles.tcss:252` | stale phrase | correct in place |
+| 2 | `s19_app/tui/screens_directionb.py:1954` | stale phrase | correct in place |
+| 3 | `tests/test_tui_commandbar.py:1302` | **split f-string** — invisible to a single-line grep | correct in place (assertion *message*, not the predicate) |
+| 4 | `.dev-flow/design/C-54-…md:19` | historical narrative of the original defect | **errata block — do NOT rewrite**; it describes what was true then |
+| 5 | `.dev-flow/design/C-54-…md:155-156` | live 2-entry `consumers` sketch | **errata block** |
+| ⚠ | `tests/test_tui_legend.py:458` | **FALSE POSITIVE** — "two shipped overlay-style constants", about Hex colours, nothing to do with `.loaded-detail` | **DO NOT TOUCH.** A naive "fix every `two shipped`" corrupts an unrelated comment |
+
+### ⚠ Two of my own probes broke while taking this census, and both returned plausible results
+
+Recorded because the batch's own subject is measurement honesty:
+
+1. `--include=*.py` was **expanded by the shell** against the repo root (`setup.py` exists), so the
+   filter matched only files named `setup.py`. The probe returned **empty**, which reads exactly like
+   *"the tree is already clean."*
+2. A `head -12` truncated the result set **before** it reached `s19_app/`, hiding the two sites that
+   matter.
+
+Neither was caught by a guard. Both were caught by contradicting an earlier direct read of
+`styles.tcss:252`. **That is the C-55 rider in the wild, for the third time this session.**
 
 ## 7 · Risks / watch-items
 

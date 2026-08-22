@@ -12,8 +12,8 @@
       "reason": "Operator ruling. Part B (address/cardinality/consumers) is this batch's product, and its declared home is .dev-flow/<batch>/01-requirements.md -- a Phase-1 artifact /fast-dev-flow has no phase for. Continuing in the fast lane would have meant inventing a second home for the artifact, against C-50. Promoted, NOT demoted: no control was removed."
     }
   ],
-  "current_station": "P1",
-  "phase_status": "awaiting-gate",
+  "current_station": "P2",
+  "phase_status": "iterating",
   "stations_active": [
     "P0",
     "P1",
@@ -25,7 +25,7 @@
   "iterations_per_station": {
     "P0": 0,
     "P1": 0,
-    "P2": 0,
+    "P2": 1,
     "P3": 0,
     "P4": 0,
     "P5": 0
@@ -148,6 +148,14 @@
       "decision": "Keep the architect's id scheme (AT-B85-01..04 + TC-B85-01..10) over qa's (AT-B85-01..08).",
       "why": "The architect's scheme is already internally consistent across the dual-traceability tables; qa's numbering collides on AT-B85-02/03/04 with different subjects. One had to win and the spine's must.",
       "consequence": "qa's AT-B85-05..08 content survives as TC/threshold detail inside the LLRs, not as separate ids. Nothing measured was dropped; the mapping is recorded here.",
+      "who": "agent"
+    },
+    {
+      "station": "P2",
+      "date": "2026-08-21",
+      "decision": "GATE DOES NOT PASS. 3 blockers from the qa lens; iterate-to-refine back to Phase 1.",
+      "why": "BLOCKER 1 is decisive: the Inc-1 edit LLR-85.5 MANDATES (rewriting the provider comment to name .loaded-detail) makes LLR-85.2's V13 threshold RED, while HLR-85.1's threshold stays GREEN because it counts FINDINGS and the extra reacher is absorbed into an existing finding line. Reproduced by the reviewer with a one-character edit.",
+      "consequence": "The batch's headline acceptance is green across the exact regression its own sub-requirement forbids - the misaddressed-observable class reproduced INSIDE the document built to close it. Thresholds must be restated over the reacher SET, not the finding COUNT.",
       "who": "agent"
     }
   ],
