@@ -62,6 +62,13 @@ must NOT grow), Atlas regenerated at every gate (V20), per-surface cost to n=2 w
   owed by the Phase-3 seeding increment; G6 measures at CLOSE.
 - **D-II pointer accumulated:** the pilot's absorbed-owner is now the ONLY remaining IFC glue
   in the UNPARSED census — a one-line fix for whoever rules D-II (not this batch).
+- **NEW CONTROL CANDIDATE (Inc-1 code review, F2): an evidence transcript is corpus input.**
+  The increment packet quoted the RED-counterfactual's corrupted id verbatim and used dotted
+  range shorthand — the Atlas id-scanner adopted three phantom ids, and a regeneration would
+  have baked the mutation artifact into the committed derived plane. A mutation reverted in
+  the target file but spelled in the packet is NOT reverted. Carry to the postmortem: the
+  C-40 restore obligation must extend to every scannable artifact that quotes the mutation,
+  and range shorthand is forbidden where an id-scanner reads.
 
 ## Base and flow currency (RC-1 · C-45)
 

@@ -3,9 +3,9 @@
 
 # ATLAS-ORPHANS — where are the holes?
 
-- US/HLR/LLR in the batch record, never in the canon: **1015**
+- US/HLR/LLR in the batch record, never in the canon: **1003**
 - US/HLR/LLR in the canon, in no batch record: **5** — `HLR-053..HLR-056`, `LLR-045A`, `LLR-045D`, `LLR-051.1-.8`, `US-77`
-- corpus heading ids never in the canon: **292**
+- corpus heading ids never in the canon: **280**
 - registry ids never mentioned by tests/: **553**
 
 ## UNPARSED census — what this Atlas failed to read (§5.3)

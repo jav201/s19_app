@@ -93,6 +93,12 @@
       "date": "2026-08-24",
       "decision": "approved after 1 iteration (autonomous D-86-7)",
       "notes": "All 14 findings discharged; orchestrator re-measured the moved figures (V14 106, V13 40 pairs = 4+36, V12 1, unowned set exact, AT command verbatim); M-10 = the declared C-55 guard. 0 block / 254 notice / 15 n/a."
+    },
+    {
+      "station": "P3",
+      "date": "2026-08-24",
+      "decision": "operator directive: subagents on Opus 5",
+      "notes": "Operator (verbatim): 'a partir de ahora los agentes desplegados que sean opus5'. Applies from the next dispatch onward; the in-flight Inc-1 software-dev predates it and runs to completion."
     }
   ],
   "standing_authorization": {

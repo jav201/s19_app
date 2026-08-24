@@ -6059,6 +6059,38 @@ threshold, with **0** violations.
   `R-TUI-103` under D-17. Added 2026-08-23 as the first seeding increment of the living-canon
   model (D-VII hybrid).
 
+## screen_workspace information contract — batch-86 IFC surface #2 (R-TUI-114)
+
+- **What.** The corpus's second Information Flow Contract record (control C-54): the
+  workspace container composed by `S19TuiApp._compose_screen_workspace`
+  (`s19_app/tui/app.py:1963-2071`), parent of the pilot surface `loaded_panel` (R-TUI-113),
+  declares its readout flows and addressable outputs in
+  `.dev-flow/2026-08-24-batch-86/01-requirements.md` §5, carrying `SURFACE: Workspace rail
+  screen — S19TuiApp._compose_screen_workspace (s19_app/tui/app.py:1963)`. Canonical text
+  lives in the batch record; ids are mirrored here (coherence obligation C1,
+  `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`). Story: `US-86-1` — a second surface becomes
+  contractually addressable.
+- **HLRs.** `HLR-86.1` `screen_workspace` carries a declared, machine-checked information
+  contract · `HLR-86.2` the pilot's `PARENT` balances: a V12 verdict instead of "NOT
+  checked" · `HLR-86.3` the per-surface retrofit cost gains its second point, with
+  dispersion.
+- **LLRs.** `LLR-86.1` the workspace's two information flows declared node-by-node, every
+  node owned · `LLR-86.2` structural outputs declared with measured consumer sets ·
+  `LLR-86.3` left-pane content outputs likewise · `LLR-86.4` center hex-pane outputs
+  likewise · `LLR-86.5` right context-pane outputs likewise · `LLR-86.6` the pilot's five
+  outputs re-exported verbatim at the parent boundary · `LLR-86.7` the component's INPUTS
+  and PARENT make the pilot balanceable, honestly · `LLR-86.8` surface-#2 cost figures
+  measured, with dispersion replacing extrapolation.
+- **Status: record ACCEPTED at P2 after one iteration** — 1 blocker + 6 major + 7 minor
+  discharged, every moved figure re-measured rather than edited (C-39 rider). Headline
+  outcome: the pilot's `PARENT` balancing is CHECKED — V12's "NOT checked" notice is gone;
+  the workspace's own parent `workspace_body` is the next undeclared PARENT (recorded, not
+  resolved). 30 declared outputs · 106 resolved consumers · pair-based stray census under
+  the M-10 search-width guard.
+- **Allocation.** `R-TUI-114` = monotonic next: `R-TUI-113` defined by the batch-85 canon
+  mirror (2026-08-23), nothing allocated since; no gap-filling. Added 2026-08-24 as
+  batch-86's single canon-seeding increment.
+
 ## Retired ids
 
 A retired id **was** live and its verifier is gone. It is never reused, and it is recorded here
