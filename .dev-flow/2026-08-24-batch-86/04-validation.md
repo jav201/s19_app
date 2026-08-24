@@ -14,7 +14,9 @@
 
 ## ✅ Verdict (read first)
 
-- **Result:** **PASS**, with one half of one pin explicitly **BLOCKED-ON-BASELINE** (G7's
+- **Result:** **PASS.** *(Fold retraction 2026-08-24, final PR pass MEDIUM: this bullet
+  originally read "with one half of one pin BLOCKED-ON-BASELINE" — superseded when the
+  ledger was folded; see the ledger table.)* (G7's
   ledger comparison — see below; it is not counted green).
 - **Requirements:** `11`/`11` pass (3 HLR + 8 LLR) · `0` blocker fails
 - **Black-box acceptance (Layer B):** ✓ all four `AT-B86-*` observe their outcome through the
@@ -262,7 +264,7 @@ the handler-produced record**, never a hand-fed copy (trigger B4).
 | US-86-1 | `AT-B86-01` | `python ~/.claude/docs/tools/devflow-validate.py .` at the worktree root | validator stdout: six counted MESSAGES (V10/V11/V13/V14/V19/V21) whose figures include this component — non-empty and matching §5.6 | ✓ · ✓ · ✓ | **pass** |
 | US-86-1 | `AT-B86-02` | same run, V12 | stdout: exactly one V12 finding, and it names this record's own undeclared parent — the pilot's `:334` line silent | ✓ · ✓ · ✓ | **pass** |
 | US-86-1 | `AT-B86-03` | `--atlas --write` (increment gate) then a plain run | **`.dev-flow/_derived/ATLAS-IFC.md` on disk**: `### COMPONENT \`screen_workspace\`` at line 50 with **30 declaration rows** (one per OUTPUT, no `{id: component}` collapse); V20 `atlas current (4 files, census 2)` | ✓ · ✓ · n/a | **pass** |
-| US-86-1 | `AT-B86-04` | `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml` + the orchestrator's suite run | empty diff (0 files / 0 insertions / 0 deletions), exit 0 | ✓ · ✓ · n/a | **diff half pass · ledger half BLOCKED-ON-BASELINE** |
+| US-86-1 | `AT-B86-04` | `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml` + the orchestrator's suite run | empty diff (0 files / 0 insertions / 0 deletions), exit 0 | ✓ · ✓ · n/a | **diff half pass · ledger half FOLDED at the gate (2702/6/3/3 of 2714, dispositioned)** |
 
 **Arm provenance — where each boundary/negative arm was actually executed** (this is the
 column that stops an AT from being a claim):
@@ -335,7 +337,9 @@ Per C-25 the orchestrator owns the suite run and it is in flight; this phase del
 - The `tests/` tree is byte-identical to merge-base, proved by the source-scope pin below —
   so `post = base` is guaranteed *structurally*, whatever number `base` turns out to be.
 
-**This row is not green and must not be read as green.** QA-F6 stands: the ledger half of the
+**RETRACTED at the fold (final PR pass MEDIUM):** the paragraph below described the pre-fold
+state; the ledger row above now carries the folded figures and disposition. Original text,
+kept for the record: QA-F6 stood while the ledger half of the
 G7 pin is checkable only once the baseline figure lands in `PLAN.md` (currently: "Base: pending
 the in-flight s19env baseline run (2714 selected)"). The orchestrator completes this row.
 
@@ -349,13 +353,13 @@ the in-flight s19env baseline run (2714 selected)"). The orchestrator completes 
 | **G4** | **GREEN** | V13 corpus census parsed from the live run: **40 pairs** = the pilot's 4 at their `…batch-85/…` lines **plus** this record's 36 at its `…batch-86/…` lines (stated as an addition of disjoint per-line sets, per R2-08), plus the 1 no-literal notice for the type-addressed output. Counterfactual: **M4**, which also demonstrates why the file-set form (15, unmoved) would have been vacuous |
 | **G5** | **GREEN** | `grep -c "screen_workspace" .dev-flow/_derived/ATLAS-IFC.md` → **25** (pre-state 0) and the component renders **30 declaration rows** under its own heading at `:50`; `[-] V20 … atlas current (4 files, census 2)` |
 | **G6** | **GREEN at the increment gate** (QA-F2 discharged: P3 carried a live gate attributable to its own deliverable) — **CLOSE re-measurement still owed** | `increment-001.md` §4 Gate 1: the loop's twelve ids (the story id plus the batch's eleven HLR/LLR heading ids) each grep ≥ 1, 12/12. Secondary: V22 **276** of 531 ≤ the 277 batch-open baseline — the P-8 transient has already shrunk back **below** baseline, one id further than owed. Counterfactuals: **M7a/M7b**. CLOSE must re-measure, because V22 moves whenever any batch adds ids |
-| **G7** (PIN) | **diff half GREEN · ledger half BLOCKED-ON-BASELINE** | `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml` → empty output, exit 0 (the VERBATIM §2.6(d) command, R2-02's correction applied: merge-base, and `pyproject.toml` in scope). Ledger: see the row above |
+| **G7** (PIN) | **diff half GREEN · ledger half FOLDED (reconciles, 6 pre-existing flaky dispositioned)** | `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml` → empty output, exit 0 (the VERBATIM §2.6(d) command, R2-02's correction applied: merge-base, and `pyproject.toml` in scope). Ledger: see the row above |
 
 ### Gaps detected
 
 | ID | Requirement | Gap | Severity | Proposed action |
 |----|-------------|-----|----------|-----------------|
-| G4-01 | `AT-B86-04` / G7 | The suite-ledger half of the pin has no baseline yet; the arithmetic cannot be stated | minor (declared, not silent) | Orchestrator folds the `s19env` figure into the ledger row at the gate. `D = 0`/`A = 0` and the byte-identical `tests/` tree are already proved, so only the number is missing |
+| G4-01 | `AT-B86-04` / G7 | The suite-ledger half of the pin had no baseline at authoring; FOLDED at the gate (retraction record) | minor (declared, then closed) | Orchestrator folds the `s19env` figure into the ledger row at the gate. `D = 0`/`A = 0` and the byte-identical `tests/` tree are already proved, so only the number is missing |
 | G4-02 | G6 / P-8 | V22's aggregate is a **corpus-wide** figure: it moves when *any* batch declares ids, so today's 276 is not by itself proof that this batch's tranche is seeded | minor | Already mitigated by design — the per-id grep loop is the primary predicate and the aggregate is explicitly secondary. **M7a is the executed reason** for that ordering. CLOSE re-measures both |
 | G4-03 | canon formatting | The canon mirror packs two ids per line in at least one place, so V22 deltas are not 1-per-id | minor (finding, not a defect in this batch) | Recorded for the postmortem: any future prediction of a V22 delta must count **ids**, not lines. No repair proposed — the packing is compact and harmless once the primary predicate is per-id |
 
@@ -419,9 +423,9 @@ V13's 36 + 4 pair rows are not re-pasted here — they are enumerated row-for-ro
 | 2 | Test cases have explicit Expected, not vague "works" | ✓ | Every Layer A row carries a numeric threshold (20 · 35 · 106 · 2 · 35 · 36+1) and every mutation states its expected line before its transcript |
 | 3 | Edge cases include empty, boundary, invalid, error | ✓ | empty = the M-8 pre-state (`5 OUTPUT(s)`, before this record existed) · boundary = **M4/M5** executed this phase · invalid = **M7a/M7b** · error = selftest `V14 BLOCK-nofile` (`devflow-validate.py:2667`) |
 | 4 | Regression checklist exists | ✓ | the "Supersession-completeness inspection" table (the retired pilot notice, with two positive controls) + G-86's seven rows re-executed at this gate |
-| 5 | Exit criteria stated | ✓ | the Verdict block: all four ATs observed with arm provenance, 0 blocker fails, 0 reachability gaps, ledger explicitly pending |
+| 5 | Exit criteria stated | ✓ | the Verdict block: all four ATs observed with arm provenance, 0 blocker fails, 0 reachability gaps, ledger folded at the gate |
 | 6 | No real PII / secrets | ✓ | artifact contains only repo-relative paths, validator output and git metadata; no credentials, no personal data, and no fixture invented that could carry any |
-| 7 | Results left blank unless actually run | ✓ | the one thing not run — the pytest suite — is the one row left `PENDING` and named as the orchestrator's. Nothing else is asserted without a pasted transcript |
+| 7 | Results left blank unless actually run | ✓ | the pytest suite was run ONCE by the orchestrator (C-25) and folded with its own output; at this artifact's authoring the row was `PENDING`, never blank-asserted |
 | 8 | **Layer B (black-box)** — every output-producing story's deliverable observed through the SHIPPED surface, with boundary + negative evidence | ✓ | Layer B table + the arm-provenance table: `AT-B86-03` observes `ATLAS-IFC.md` **on disk** (30 rows at `:50`), not merely V20's word for it; boundary/negative arms are M4/M5/M7 executed this phase on copies |
 | 9 | **Bidirectional surface-reachability** — every named input AND every named output reached through the handler | ✓ | the 10-row matrix, 0 gaps; the input rows are validated by mutation (M4/M5/M7 each redden a different input dimension), which is what distinguishes "reached" from "present" |
 | 10 | **No unfilled template** | ✓ | 0 `<...>` placeholders, 0 `TC-NNN` stubs, 0 empty required rows. The rows that are `n/a` (Layer 0, UX walkthrough, escaped-bug) say **why** the population is empty; the one `PENDING` row says **who** completes it |

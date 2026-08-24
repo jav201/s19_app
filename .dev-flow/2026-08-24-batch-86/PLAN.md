@@ -147,7 +147,7 @@ and record why.
 
 ## Test ledger
 
-Base: pending the in-flight s19env baseline run (2714 selected). This batch plans **0 source
+Base: LANDED — 2702 passed · 6 failed (pre-existing order-dependent, dispositioned in 04-validation.md) · 3 skipped · 3 xfailed of 2714 selected. This batch plans **0 source
 files**; ledger target `post = base − 0 + A` where A = any new census/guard tests Phase 1
 derives (may legitimately be 0 — the validator, not pytest, is this batch's primary oracle).
 
