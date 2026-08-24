@@ -13,7 +13,7 @@
     }
   ],
   "current_station": "P2",
-  "phase_status": "in-progress",
+  "phase_status": "iterating",
   "stations_active": [
     "P0",
     "P1",
@@ -86,6 +86,12 @@
       "date": "2026-08-24",
       "decision": "approved (autonomous D-87-3)",
       "notes": "Record authored (Opus 5 architect) + qa 01b plan (Opus 5, parallel), qa fold relayed mid-flight as hypotheses (C-43), author confirmed by execution. D-87-A ruled (a) in-place (two executed measurements). THREE records edited, forced by balancing -- measured scope growth, declared in PLAN. workspace_body: 42 outputs, PARENT workspace_shell (SYSTEM refuted app.py:1919). Premises 9 TRUE / 6 FALSE all dispositioned; D-86-E-resolution observable withdrawn (structural, measured). Validator 0 block / 284 notice (+29 V13 + 1 V22 accounted); UNPARSED 2->1 ([IFC] GONE, BATCHES control survives). G-87 8 GREEN, G8 P3-owed. Orchestrator re-verified validator line, census, file set, source pin (0 source files), six-output ids."
+    },
+    {
+      "station": "P2",
+      "date": "2026-08-24",
+      "decision": "iterate (autonomous D-87-4)",
+      "notes": "Two independent Opus 5 reviewers, both verdict iterate. Consolidated: 2 blockers (R2-01 spliced two-state RED-arm transcript, found by BOTH reviewers independently; R2-02 AT-B87-* id fork between record and 01b) + 6 major + 5 minor -- all evidence-artifact defects; the substance survived attack (D-87-A/B, R-87-1 confirmed by kill-mutation; censuses and accounting exact; frozen-history line upheld). Returned to the P1 author as single fold owner; moved figures re-measured, never edited (C-39 rider). 02-review.md carries the full table."
     }
   ],
   "standing_authorization": {
