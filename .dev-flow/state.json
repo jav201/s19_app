@@ -120,13 +120,19 @@
       "date": "2026-08-24",
       "decision": "close batch (autonomous D-86-10)",
       "notes": "CLOSED COMPLETE. Both backlog lanes reconciled (6 flaky nodes, workspace_body=surface #3 candidate, batch-51 phantom range, canon packing -> lane A; evidence-transcript control candidate + P0-scaffold rule -> lane B). Cost n=2 with dispersion, non-extrapolation restated. Landing: push branch, PR #199, stop at CI green per no-merge authorization."
+    },
+    {
+      "station": "P6",
+      "date": "2026-08-24",
+      "decision": "operator granted merge authority (verbatim recorded)",
+      "notes": "Merge gated on: CI green on the final head + final independent PR-level qa-reviewer pass clean over the whole diff vs main. Then squash-merge (house pattern) and /dev-flow-sync."
     }
   ],
   "standing_authorization": {
     "autonomous": true,
-    "merge": false,
+    "merge": true,
     "asked_on": "2026-08-24",
-    "operator_words": "Autónomo, sin merge -- corro las fases de punta a punta auto-aprobando gates intermedios con evidencia, me detengo en 'PR abierto, CI verde' y el operador mergea. Registro de decisiones: 'Confirmo'."
+    "operator_words": "Autónomo, sin merge -- corro las fases de punta a punta auto-aprobando gates intermedios con evidencia, me detengo en 'PR abierto, CI verde' y el operador mergea. Registro de decisiones: 'Confirmo'. || 2026-08-24, post-close: 'Si, terminando haz el merge. Continuemos despues con riezgos y pendientes.' -- merge authority GRANTED for PR #199; final PR-level qa pass still gates it per the kickoff rule."
   },
   "obsidian_synced": false,
   "created_at": "2026-08-24T00:00:00-06:00"
