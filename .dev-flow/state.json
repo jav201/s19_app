@@ -13,7 +13,7 @@
     }
   ],
   "current_station": "P5",
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-sync",
   "stations_active": [
     "P0",
     "P1",
@@ -62,7 +62,9 @@
   "artifacts": {
     "P1": ".dev-flow/2026-08-24-batch-87/01-requirements.md",
     "P2": ".dev-flow/2026-08-24-batch-87/02-review.md",
-    "P3": ".dev-flow/2026-08-24-batch-87/03-increments/increment-001.md"
+    "P3": ".dev-flow/2026-08-24-batch-87/03-increments/increment-001.md",
+    "P4": ".dev-flow/2026-08-24-batch-87/04-validation.md",
+    "P5": ".dev-flow/2026-08-24-batch-87/05-close.md"
   },
   "decisions_log": [
     {
@@ -112,6 +114,12 @@
       "date": "2026-08-24",
       "decision": "approved (autonomous D-87-7); G4-01 ruled: class-membership disposition adopted",
       "notes": "One complete gate run (orchestrator-owned, direct env-python after conda-run destroyed run 1's evidence via cp1252 UnicodeEncodeError -- harness finding G4-03, 01b amended): 2702 passed / 6 failed / 3 skipped / 21 deselected / 3 xfailed in 40:43. PRE-REGISTERED flaky disposition REFUTED by measurement: overlap with the batch-86 list = 1 node; 3 fail ISOLATED (rates 1/10-4/10 at N=10); batch-86's n=1 'passes isolated' diagnosis was vacuous (C-53). Ruling: disposition by CLASS (empty source diff AND N>=10 rates-as-figures AND modal push/mount race family) -- 6/6 pre-existing (4 timing races, 2 order-dependent), 0 product blockers; Before/After amendment in 01b sec-7, refuted text preserved. Carry: 11 distinct node ids (5 unmeasured-rate). Layers A/B: 0 gaps, HLR-87.3/LLR-87.8 owed at P5 close by design. K1/K3b/K7/K8 mutations executed on copies (K3 refuted its own prediction, repaired not overwritten). Ledger 2714=2702+6+3+3 exact, D=A=0 structural. G11 GREEN. Atlas regenerated, figures identical both sides."
+    },
+    {
+      "station": "P5",
+      "date": "2026-08-24",
+      "decision": "close batch (autonomous D-87-8)",
+      "notes": "CLOSED COMPLETE. HLR-87.3/LLR-87.8 discharged clause-by-clause in 05-close.md sec-5 (n=3 cost table: outputs 6->31->42, consumers 18->94->139, stray pairs 4->36->62, duplication 40 of 102 = 39 pct by set subtraction, effort right-censored/1h15m/3h11m; cost tracks tree position not size). G4-02 closed in the conditional-gate table. Both backlog lanes reconciled: lane A 10 in / 3 DONE (incl. D-II, surface #3, one-id-per-line adoption); lane B 4 in / 0 done, every C-45 landing honestly NOT DONE (standing debt: 5 control candidates, 0 landings, 2 batches). Metrics: 30 mutation-arm executions across 4 stations, 1 self-refuting repaired; V22 276 (2 under target); validator 0 block / 284 notice re-measured at close; Atlas fixpoint cell flipped and regenerated (V20 green). Landing: push branch, open PR, STOP at CI green per no-merge authorization; /dev-flow-sync post-merge."
     }
   ],
   "standing_authorization": {

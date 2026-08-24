@@ -4,7 +4,32 @@
 
 ## Where we are
 
-- **Station: P2 (cross-review) — P1 approved (D-87-3), reviewers dispatched.**
+- **BATCH CLOSED COMPLETE (D-87-8). Landing: push + PR, stop at CI green (no-merge auth).**
+- P4: one complete run 2702/6/3/3 of 2714 (40:43). The pre-registered flaky disposition was
+  REFUTED by measurement (overlap 1 of 6; 3 fail isolated at N=10 rates 1/10–4/10; batch-86's
+  n=1 diagnosis vacuous, C-53) and re-ruled G4-01: class-membership (empty source diff AND
+  N≥10 rates-as-figures AND modal push/mount family) — 6/6 pre-existing, 0 product blockers;
+  01b §7 amended Before/After. Harness finding: `conda run` destroyed run 1's evidence
+  (cp1252/U+FFFD) — direct env-python invocation is the rule now. Approved D-87-7 (`05abbb0`).
+- P5: close authored; HLR-87.3/LLR-87.8 discharged clause-by-clause (n=3 cost: outputs
+  6→31→42, consumers 18→94→139, stray pairs 4→36→62, duplication 39%; cost tracks tree
+  position, not size). Both backlog lanes reconciled (A: 10 in/3 done; B: 4 in, C-45 landings
+  honestly NOT DONE — standing debt 5 candidates/0 landings/2 batches).
+- P2: two independent Opus 5 reviewers, both `iterate` — 2 blockers (R2-01 spliced two-state
+  transcript, found by BOTH independently; R2-02 AT-id fork record↔01b) + 6 major + 5 minor.
+  Fold by the original P1 author: 12/13 fixed by re-measurement, 1 refused with executed
+  refutation (R-87-3b). Approved after 1 iteration (D-87-5), commit `fc12e96`.
+- P3 Inc-1 (canon mirror, G8): V22 **289→276 of 544** (−13 term-by-term), 13 ids one-per-line,
+  RED arm sha256-restored + independent validator RED. Code review BLOCKed F1 HIGH (R-TUI-113
+  over-claim — fixed: status scoped to CONTRACT, NOT-discharged enumeration restored) + F2
+  (phantom-feeder token de-mined; pre-existing bare-stem phantom census widened to 8 feeders /
+  3 stems, carried) + F3 (106→251 decomposition) + F4. Approved after fix-first (D-87-6),
+  commit `4e43a4b`. Validator `0 block · 284 notice` at every gate; source pin empty throughout.
+
+### Earlier (P0/P1)
+- P0 approved D-87-1 (`656e5a7` + Atlas regen). P1 approved D-87-3 (`ffa94c7`): D-87-A ruled
+  (a) in-place; three records edited (forced by balancing, declared); workspace_body 42 outputs,
+  PARENT `workspace_shell`; premises 9 TRUE / 6 FALSE dispositioned.
 - P1 outcome: full record authored (Opus 5 architect + qa 01b plan, parallel). D-87-A ruled **(a)
   in-place** by two executed measurements (`_ifc_corpus` extends, census keyed to the pilot's own
   path/line). **Three records edited, forced by balancing** (pilot §5.3→pointer + §8 six-output
