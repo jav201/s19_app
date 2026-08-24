@@ -12,7 +12,7 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P4",
+  "current_station": "P5",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -27,7 +27,7 @@
     "P1": 0,
     "P2": 1,
     "P3": 1,
-    "P4": 0,
+    "P4": 1,
     "P5": 0
   },
   "triggers": {
@@ -106,6 +106,12 @@
       "date": "2026-08-24",
       "decision": "increment 001 approved after fix-first (autonomous D-87-6)",
       "notes": "G8 discharged: V22 289->276 of 544 (-13 term-by-term: HLR -3, LLR -8, US -2), 13 ids seeded one-per-line, per-id greps all >=1, RED arm executed with sha256-proven restore + independent validator RED (277). Code review BLOCKed on F1 HIGH (R-TUI-113 status over-claim erasing undischarged pilot defects) + F2 MED (packet minted a phantom-feeder token -- the C-56 class the gate exists for) + F3 MED (106 false narrowing) + F4 LOW; all four fixed and re-measured, phantom census WIDENED to 8 feeders / 3 stems and registered as carry. Orchestrator re-verified: validator 0 block / 284 notice, scoped headline present, NOT-discharge enumeration present, minting token 0, 251 decomposition in canon. Registry consumer 13 passed; source pin empty."
+    },
+    {
+      "station": "P4",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-87-7); G4-01 ruled: class-membership disposition adopted",
+      "notes": "One complete gate run (orchestrator-owned, direct env-python after conda-run destroyed run 1's evidence via cp1252 UnicodeEncodeError -- harness finding G4-03, 01b amended): 2702 passed / 6 failed / 3 skipped / 21 deselected / 3 xfailed in 40:43. PRE-REGISTERED flaky disposition REFUTED by measurement: overlap with the batch-86 list = 1 node; 3 fail ISOLATED (rates 1/10-4/10 at N=10); batch-86's n=1 'passes isolated' diagnosis was vacuous (C-53). Ruling: disposition by CLASS (empty source diff AND N>=10 rates-as-figures AND modal push/mount race family) -- 6/6 pre-existing (4 timing races, 2 order-dependent), 0 product blockers; Before/After amendment in 01b sec-7, refuted text preserved. Carry: 11 distinct node ids (5 unmeasured-rate). Layers A/B: 0 gaps, HLR-87.3/LLR-87.8 owed at P5 close by design. K1/K3b/K7/K8 mutations executed on copies (K3 refuted its own prediction, repaired not overwritten). Ledger 2714=2702+6+3+3 exact, D=A=0 structural. G11 GREEN. Atlas regenerated, figures identical both sides."
     }
   ],
   "standing_authorization": {

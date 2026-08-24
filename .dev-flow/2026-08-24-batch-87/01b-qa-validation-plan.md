@@ -300,6 +300,100 @@ or file byte that flips it; none is a repo-wide statement.
 
 ## 7 · P4 gate-run protocol (the suite)
 
+> ## ⚠️ AMENDED AT THE P4 GATE, 2026-08-24 — the disposition rule below was REFUTED BY EXECUTION
+>
+> **Nothing in §7 is erased.** Everything from "One complete run" down to the end of this section
+> is the **BEFORE** — the rule as pre-registered, kept verbatim because it is the record of what
+> was refuted and because a rule quietly rewritten to match its result is worth nothing. The
+> **AFTER** is stated here and governs from batch-87's P4 gate onward.
+>
+> ### What refuted it (all measured at the P4 gate; transcripts in `04-validation.md`)
+>
+> 1. **The list under-covers.** Of the six nodes that FAILED the gate run, **five are not on the
+>    pre-registered list**, and one of those five —
+>    `tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row` —
+>    is a node the disambiguation paragraph below **explicitly names and excludes**.
+> 2. **The list over-covers.** **Five of the six pre-registered nodes did not recur at all.**
+>    Overlap between the pre-registered set and the observed set: **exactly one node**.
+> 3. **"Passes in isolation" was a vacuous check (C-53).** It was established at **n = 1** per
+>    node. Re-sampled at **n = 10** isolated runs per node, the single pre-registered node that
+>    did recur —
+>    `tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces`
+>    — **fails 4 of 10 alone**. A single isolated pass on a node that passes about 60 % of the
+>    time is a coin landing heads, not a diagnosis. Two further nodes fail 4 of 10 and 1 of 10
+>    alone.
+> 4. **It is not an ordering effect.** `pytest` runs with `plugins: textual-snapshot-1.1.0,
+>    syrupy-4.8.0` — **no `pytest-randomly`** — so collection order is deterministic and the
+>    run-to-run change in *which* nodes fail is a **timing** race, not an ordering artifact.
+> 5. **The prescribed command cannot complete.** See the invocation amendment below.
+>
+> ---
+>
+> ### BEFORE — the rule as pre-registered (kept verbatim below, superseded here)
+>
+> | # | Clause | As written |
+> |---|---|---|
+> | B-1 | membership | a fixed whitelist of **six exact node ids**, resolved from batch-86's truncations |
+> | B-2 | diagnosis | a FAILED node on the list is pre-existing if **an** isolated re-run shows it passes alone — **n = 1**, and the verdict recorded as the word *"passes"* |
+> | B-3 | off-list | a FAILED node not on the list is a **BLOCKER regardless of how flaky it looks** |
+> | B-4 | invocation | `conda run -n s19env python -m pytest -q -m "not slow"` |
+>
+> ### AFTER — the criterion that governs from this gate onward
+>
+> **Disposition is by CLASS MEMBERSHIP with repeated-isolation evidence, never by node-id
+> whitelist.** A FAILED node is dispositioned **pre-existing** when **all three** hold, each
+> recorded with its own transcript:
+>
+> - **A-1 (structural).** The batch's source-scope diff against merge-base is **empty, exit 0**:
+>   `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml`.
+>   This is what makes the batch incapable of having reddened the node; without it, nothing below
+>   applies.
+> - **A-2 (repeated isolation).** The node is re-run **N ≥ 10** times in isolation on the same
+>   tree and the same interpreter, and **its isolated failure RATE is recorded as a figure** —
+>   `4 of 10`, `0 of 10` — **never as the word "passes"**. An `n = 1` isolated run is not
+>   evidence and may not be cited as any.
+> - **A-3 (family).** The node's failure signature is a member of the **recorded family** for the
+>   corpus. The family recorded at this gate is the **modal push / mount race**: a `NoMatches` on
+>   a modal-screen widget id raised at query time, where the *same node fails on a different
+>   selector on different runs*.
+>
+> **Two sub-classes, tracked separately, because they are not the same defect:**
+>
+> - **order-dependent** — isolated failure rate **0 of 10**. The node needs a polluting neighbour.
+> - **timing race** — isolated failure rate **non-zero**. The node fails alone. **This is the
+>   worse class** and is carried separately; it was invisible to the BEFORE rule by construction,
+>   since that rule stopped sampling at the first isolated pass.
+>
+> **What is still a BLOCKER**, so the rule keeps teeth: a FAILED node that satisfies A-1 but
+> **fails A-3** (a signature outside the recorded family), or one whose A-1 is false. Neither
+> "it looks flaky" nor "it is on a list" discharges anything.
+>
+> **Zero failures is also a result**, not a licence to skip the disposition table — state which
+> nodes did not recur, by id.
+>
+> ### AFTER — invocation (supersedes B-4; the prescribed command destroys the run)
+>
+> ```
+> PYTHONIOENCODING=utf-8 /c/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -m "not slow"
+> ```
+>
+> **`conda run -n s19env` must never be used for a suite invocation on this corpus.** It buffers
+> the child's stdout and re-prints it through a `cp1252` writer; the suite emits `U+FFFD` in at
+> least one assertion diff and the re-print dies with
+> `UnicodeEncodeError: 'charmap' codec can't encode character '�'`. Measured at this gate:
+> it **destroyed the first gate run's evidence entirely** — 8 KB of conda crash diagnostics where
+> a 40-minute suite result should have been, with **no test summary at all**. The rest of the
+> protocol below (redirect the whole run to a file, never pipe through `tail`, strip ANSI before
+> grepping `^FAILED`) is unchanged and was followed exactly.
+>
+> **Ruling.** Adopted by the orchestrator at the batch-87 P4 gate, verbatim as proposed by the
+> P4 `qa-reviewer`, on two grounds stated for the record: **C-53** — the `n = 1` "passes
+> isolated" binary just false-failed correct work — and **the batch's own method**, which is the
+> figure rather than the narration. The three isolated failures observed at this gate are
+> dispositioned **pre-existing timing races of the modal push/mount family, NOT product
+> blockers**; the evidence is the structural argument (0 source files, empty diff, no ordering
+> plugin), not an appeal to their appearance.
+
 **One complete run, owned by the orchestrator (C-25).** This phase does **not** run `pytest`; a
 qa-authored figure would be a second run and a second truth.
 
