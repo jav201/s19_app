@@ -5,17 +5,49 @@
   "batch_objective": "IFC retrofit surface #2 -- clean-start record applying the batch-85 format lessons (pair-based thresholds over (output_id, file) pairs, split heterogeneous populations, scoped statements). Surface selected by measured evidence at Phase 1; leading hypothesis: the workspace screen batch-85 declared as PARENT `screen_workspace`, because declaring it turns V12's 'balancing NOT checked' into a verdict for the pilot record. Canon mirror seeded for the new ids (V22 backlog must not grow). Per-surface cost measured to n=2 with a dispersion note.",
   "mode": "core",
   "mode_history": [
-    {"from": null, "to": "core", "date": "2026-08-24",
-     "reason": "Same ruling as batch-85's promotion: the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for (C-50)."}
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-08-24",
+      "reason": "Same ruling as batch-85's promotion: the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for (C-50)."
+    }
   ],
-  "current_station": "P0",
+  "current_station": "P2",
   "phase_status": "in-progress",
-  "stations_active": ["P0", "P1", "P2", "P3", "P4", "P5"],
-  "iterations_per_station": {"P0": 0, "P1": 0, "P2": 0, "P3": 0, "P4": 0, "P5": 0},
+  "stations_active": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+  ],
+  "iterations_per_station": {
+    "P0": 0,
+    "P1": 1,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "P5": 0
+  },
   "triggers": {
     "evaluated_at": "2026-08-24T00:00:00-06:00",
-    "fired": ["B4"],
-    "not_fired": ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "C", "D", "E", "F"],
+    "fired": [
+      "B4"
+    ],
+    "not_fired": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "B1",
+      "B2",
+      "B3",
+      "C",
+      "D",
+      "E",
+      "F"
+    ],
     "record": ".dev-flow/2026-08-24-batch-86/PLAN.md#triggers"
   },
   "artifact_homes": {
@@ -27,10 +59,28 @@
     "backlog": "repo:.dev-flow/BACKLOG-CODE.md (lane A per docs/engineering-rules.md)",
     "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)"
   },
-  "artifacts": {},
+  "artifacts": {
+    "P1": ".dev-flow/2026-08-24-batch-86/01-requirements.md"
+  },
   "decisions_log": [
-    {"station": "P0", "date": "2026-08-24", "decision": "batch opened",
-     "notes": "RC-1 pass (merge-base a112eeb == origin/main tip); flow rev44 current (C-45 PULL); lane A backlog read; mode core."}
+    {
+      "station": "P0",
+      "date": "2026-08-24",
+      "decision": "batch opened",
+      "notes": "RC-1 pass (merge-base a112eeb == origin/main tip); flow rev44 current (C-45 PULL); lane A backlog read; mode core."
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-86-4)",
+      "notes": "DoR met for US-86-1; no nameable gap on Coverage/Certainty/Evidence; packet presented in-conversation; commit 257922c."
+    },
+    {
+      "station": "P1",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-86-5)",
+      "notes": "Record authored + qa fold; G-86 5/7 GREEN, G6 owed at close (P-8), G7 pin; validator 0 block / 254 notice; commit 202d91c. Surface hypothesis held with corrected location (P-2 FALSE recorded)."
+    }
   ],
   "standing_authorization": {
     "autonomous": true,
