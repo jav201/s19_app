@@ -6030,6 +6030,67 @@ threshold, with **0** violations.
 > third instance landed on the one clause the batch existed to ship. The four `R-TUI-111` citations
 > are re-pointed at `R-TUI-103` under the treatment decision **D-17** already applied to `R-TUI-112`.
 
+## LoadedArtifactsPanel information contract — batch-85 IFC pilot (R-TUI-113)
+
+- **What.** The corpus's first Information Flow Contract record (control C-54): the
+  `LoadedArtifactsPanel` declares its readout flow and addressable outputs as fenced
+  `FLOW:`/`COMPONENT:` blocks in `.dev-flow/2026-08-21-batch-85/01-requirements.md` §5,
+  machine-read by validator rules V10–V14/V19 over the merged corpus. Canonical text lives
+  in the batch record; ids are mirrored here so the living canon reflects the ownership
+  chain (coherence obligation C1, `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`).
+- **HLRs.** `HLR-85.1` declared, machine-checked information contract for the panel ·
+  `HLR-85.2` no in-repo consumer note contradicts the measured dependant set · `HLR-85.3`
+  the address census names unmodelled address forms instead of absorbing them · `HLR-85.4`
+  per-surface retrofit cost reported as measured figures.
+- **LLRs.** `LLR-85.1` readout flow declared node-by-node, every node owned · `LLR-85.2`
+  `artifact_slots` output declares address, arity, ordering and its complete consumer set ·
+  `LLR-85.3` `project_row` output declares its own address and consumer set · `LLR-85.4`
+  record placed where the merged corpus reads it, pre-state recorded · `LLR-85.5` in-repo
+  consumer notes corrected to the measured set · `LLR-85.6` census reports the
+  unmodelled-form difference with an executed RED arm · `LLR-85.7` per-surface cost record.
+- **Status: PILOT, KNOWN-DEFECT — nothing here is claimed green.** Two independent reviews
+  returned BLOCK on the record and batch-85 closed unfinished at P5 (open defects: projection
+  thresholds that erase their signal, an unsatisfiable repo-wide Statement; see the batch-85
+  and Atlas handoffs in `.dev-flow/design/`). Mechanical state: V10/V11/V14/V19 pass, V12
+  cannot check (parent undeclared), V13 carries 3 notices; `TC-B85-07` measured RED on the
+  unmodified tree. **D-II (salvage this record vs clean restart for surface #2) is open.**
+- **Allocation.** `R-TUI-113` = monotonic next: `R-TUI-104` defined (batch-78), `105`–`110`
+  never allocated (no gap-filling), `111`/`112` burned as dangling citations re-pointed to
+  `R-TUI-103` under D-17. Added 2026-08-23 as the first seeding increment of the living-canon
+  model (D-VII hybrid).
+
+## screen_workspace information contract — batch-86 IFC surface #2 (R-TUI-114)
+
+- **What.** The corpus's second Information Flow Contract record (control C-54): the
+  workspace container composed by `S19TuiApp._compose_screen_workspace`
+  (`s19_app/tui/app.py:1963-2071`), parent of the pilot surface `loaded_panel` (R-TUI-113),
+  declares its readout flows and addressable outputs in
+  `.dev-flow/2026-08-24-batch-86/01-requirements.md` §5, carrying `SURFACE: Workspace rail
+  screen — S19TuiApp._compose_screen_workspace (s19_app/tui/app.py:1963)`. Canonical text
+  lives in the batch record; ids are mirrored here (coherence obligation C1,
+  `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`). Story: `US-86-1` — a second surface becomes
+  contractually addressable.
+- **HLRs.** `HLR-86.1` `screen_workspace` carries a declared, machine-checked information
+  contract · `HLR-86.2` the pilot's `PARENT` balances: a V12 verdict instead of "NOT
+  checked" · `HLR-86.3` the per-surface retrofit cost gains its second point, with
+  dispersion.
+- **LLRs.** `LLR-86.1` the workspace's two information flows declared node-by-node, every
+  node owned · `LLR-86.2` structural outputs declared with measured consumer sets ·
+  `LLR-86.3` left-pane content outputs likewise · `LLR-86.4` center hex-pane outputs
+  likewise · `LLR-86.5` right context-pane outputs likewise · `LLR-86.6` the pilot's five
+  outputs re-exported verbatim at the parent boundary · `LLR-86.7` the component's INPUTS
+  and PARENT make the pilot balanceable, honestly · `LLR-86.8` surface-#2 cost figures
+  measured, with dispersion replacing extrapolation.
+- **Status: record ACCEPTED at P2 after one iteration** — 1 blocker + 6 major + 7 minor
+  discharged, every moved figure re-measured rather than edited (C-39 rider). Headline
+  outcome: the pilot's `PARENT` balancing is CHECKED — V12's "NOT checked" notice is gone;
+  the workspace's own parent `workspace_body` is the next undeclared PARENT (recorded, not
+  resolved). 30 declared outputs · 106 resolved consumers · pair-based stray census under
+  the M-10 search-width guard.
+- **Allocation.** `R-TUI-114` = monotonic next: `R-TUI-113` defined by the batch-85 canon
+  mirror (2026-08-23), nothing allocated since; no gap-filling. Added 2026-08-24 as
+  batch-86's single canon-seeding increment.
+
 ## Retired ids
 
 A retired id **was** live and its verifier is gone. It is never reused, and it is recorded here

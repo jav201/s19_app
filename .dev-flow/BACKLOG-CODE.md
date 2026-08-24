@@ -2,7 +2,11 @@
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
 >
-> **Last refresh: 2026-07-31 (batch-76 close — `R-TUI-102` IMPLEMENTED, PR [#184](https://github.com/jav201/s19_app/pull/184)).** `origin/main` tip at its cut = **`291bb76`**. **The P0 owed by batch-75 is CLOSED**: Inc-0…Inc-3 all landed (`5f60ffe` golden · `9ee848d` HLR-108 document gating · `0b51409` HLR-109 `_format_length` · `660c1b0` HLR-110 attribution), plus `REQUIREMENTS.md`, the `TC-610` amendment and the `RESERVED`→`LIVE` flip of **42 ids** (`AT-250`…`AT-264`, `TC-552`…`TC-578`). Gate suite **2482 passed / 2 skipped / 21 deselected / 3 xfailed**, 29 snapshots, exit 0; ledger reconciles EXACTLY `2428 + 27 + 19 + 8 = 2482`. **The four `R-TUI-101` wording carve-outs are DISCHARGED** — folded into the requirement text, which is where they always lived. ⚠ **A NINTH false premise, and the first from the registry lane rather than batch-75:** the note promising the reserved block *"converts to LIVE when Inc-0…Inc-3 write the nodes"* was forbidden by `TC-610`, the guard that shipped WITH it — while `G4` simultaneously required LIVE. Both limbs executed; mutually unsatisfiable. Resolved by operator ruling: `TC-610` is now *reserved-or-spent-by-its-owner*. **Three requirement amendments** (B76-A1 header exemption — the spec's own sketched fix was rejected by measurement; B76-A2 both-budgets gating; B76-A3 shares cut from the remaining budget). **21 counterfactual mutations, INERT none — and all six defects they found were in ACCEPTANCES or in the mutation HARNESS, never in shipped code.**
+> **Last refresh: 2026-08-24 (batch-86 close — IFC surface #2 `screen_workspace`, CLOSED COMPLETE; first batch under flow rev42–rev44).** `origin/main` tip at its cut = **`a112eeb`** (unchanged; batch rides `claude/batch-82-lane-a-scoping`, PR #199). Shipped: the corpus's SECOND IFC record (30 outputs, pair-based census under the M-10 search-width guard, `SURFACE:` field) + canon mirror **`R-TUI-114`** in `REQUIREMENTS.md` (12 ids; V22 seeding debt 288 → **276**, one BELOW the batch-open baseline). **Headline: the pilot's `PARENT` is balanced — V12's "NOT checked" notice at batch-85 `:334` is GONE.** Gate suite (s19env, one complete 39:49 run): **2702 passed · 6 failed · 3 skipped · 21 deselected · 3 xfailed** — the 6 diagnosed by execution as PRE-EXISTING order-dependent flakiness (each passes isolated on pristine `main`; batch touched 0 source files, pin held at every gate). Detail + cost n=2: `.dev-flow/2026-08-24-batch-86/05-close.md`.
+>
+> **New carries from batch-86 (this lane):** (1) **6 order-dependent flaky suite nodes** — `test_at_061a_persistent_control…` (before_after_report) · `test_at006_quarantine…` + `test_at005_dirty_guard…` (flow_persistence_ui) · `test_at023c_issues_legend…` (legend; fails even in a 6-test group, passes alone — cross-test pollution) · `test_at057b_regroup…` + `test_at064b_json_popup…` (patch_editor_v2); repro transcripts referenced from batch-86 `04-validation.md`. (2) **`workspace_body` is the next undeclared PARENT** — surface #3 candidate by the same V12-liveness criterion that chose #2. (3) **batch-51's `06-docs/traceability-matrix.md:115` carries dotted-range id tokens** (zero-padded -086 LLR family) that the Atlas id-scanner adopts as phantom ids — same class as the batch-86 Inc-1 F2 finding, pre-existing. (4) **The canon mirror packs two ids per line** (measured by M7's refuted prediction) — per-id greps stay the primary predicate; a future seeding tranche may prefer one id per line.
+>
+> **Earlier refresh: 2026-07-31 (batch-76 close — `R-TUI-102` IMPLEMENTED, PR [#184](https://github.com/jav201/s19_app/pull/184)).** `origin/main` tip at its cut = **`291bb76`**. **The P0 owed by batch-75 is CLOSED**: Inc-0…Inc-3 all landed (`5f60ffe` golden · `9ee848d` HLR-108 document gating · `0b51409` HLR-109 `_format_length` · `660c1b0` HLR-110 attribution), plus `REQUIREMENTS.md`, the `TC-610` amendment and the `RESERVED`→`LIVE` flip of **42 ids** (`AT-250`…`AT-264`, `TC-552`…`TC-578`). Gate suite **2482 passed / 2 skipped / 21 deselected / 3 xfailed**, 29 snapshots, exit 0; ledger reconciles EXACTLY `2428 + 27 + 19 + 8 = 2482`. **The four `R-TUI-101` wording carve-outs are DISCHARGED** — folded into the requirement text, which is where they always lived. ⚠ **A NINTH false premise, and the first from the registry lane rather than batch-75:** the note promising the reserved block *"converts to LIVE when Inc-0…Inc-3 write the nodes"* was forbidden by `TC-610`, the guard that shipped WITH it — while `G4` simultaneously required LIVE. Both limbs executed; mutually unsatisfiable. Resolved by operator ruling: `TC-610` is now *reserved-or-spent-by-its-owner*. **Three requirement amendments** (B76-A1 header exemption — the spec's own sketched fix was rejected by measurement; B76-A2 both-budgets gating; B76-A3 shares cut from the remaining budget). **21 counterfactual mutations, INERT none — and all six defects they found were in ACCEPTANCES or in the mutation HARNESS, never in shipped code.**
 >
 > **Earlier refresh: 2026-07-31 (D2 re-triage — no batch).** `origin/main` tip = **`038dfd9`**. **D2 dropped MAJOR -> P3 (hardening)** on re-executed measurement: `ChangeSummaryEntry`/`CheckRunEntry` are constructed at **exactly two sites** (`changes/apply.py:342`, `changes/check.py:379`), both from `entry.addressed_range`, so `Length == len(encoded_bytes) <= MF_RUN_LENGTH_CEILING` -> **7 decimal digits vs a 4300 limit**; it is unreachable through any shipped path. **Recommendation is to KEEP it inside the `R-TUI-102` implementation anyway** (ATs already gated in revision 2) - the re-triage changes the counting, not the plan. No other item moved.
 >
@@ -286,6 +290,49 @@ CI only, its own PR).
   - `_CONTEXT_BAR_INSET = 4` is exact at 80/120/160 and **wrong below**: at 20 columns the real inset
     is 6, so the composer budgets 11 against a 9-column cell. Outside the supported set, and
     `TC-B79-02` correctly asserts only the three supported sizes. Related to the carried `N-7`.
+
+- **▸ ✅ (P1 — SHIPPED 2026-08-24 as flow rev42–rev44 + adoption `875cef0`/`0d26e5d`) The HUMAN
+  consolidated view of the Information Flow Contract. Operator ruling 2026-08-21.**
+  **Delivered:** `--atlas --write` derives `ATLAS-IFC/TRACE/BATCHES/ORPHANS.md` into
+  `.dev-flow/_derived/`, guarded by `V20` (digest, both directions, UNPARSED-census rise);
+  D-III ruled as the declared selector taxonomy; D-VII hybrid ruled (Atlas derived / canon
+  authored + coherence rules `V21`–`V23`). Design record: `.dev-flow/design/ATLAS-FIELD-SET-2026-08-23.md`
+  + `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`. Original charter text kept below for the record. The IFC **is** a consolidated view — *for the
+  machine*. `_ifc_corpus` merges all 61 `01-requirements.md` at validation time, and that is the canon:
+  **it is not to be moved or touched.** What does not exist is the view a *human* reads. Operator:
+  *"el IFC es el consolidado para la máquina, tampoco creo que debamos tocarlo, si no más bien debemos
+  tener el consolidado para humanos también"*.
+
+  **The measured problem (batch-85 `F-9`, surfaced by an operator question, not by a guard):** after 27
+  surfaces the contract lives in **27 batch folders, unified only in memory**. No document exists that a
+  person can read to learn how the application is addressed — the reader must assemble a jigsaw.
+  Formally C-50 holds (*one home per artifact*), but only by making the home a **corpus** rather than a
+  file, which is not what a reader means by "one home".
+
+  **The design invariant, and it is the whole of the decision:** the human view is **DERIVED BY COMMAND
+  FROM THE CORPUS, NEVER MAINTAINED BY HAND.** Same relationship `skills/dev-flow/` already has to the
+  manifest table via `--sync-bundle` — **a derived artifact is a build output, not a second home**, so
+  C-50 is satisfied without an exception. A hand-maintained consolidation would reproduce, at project
+  scale, exactly the stale-consumer-list defect this whole programme exists to close.
+
+  **Hard constraint — do not design around it:** `_ifc_corpus` reads **only**
+  `.dev-flow/**/01-requirements.md`. Move a record into a standing document and `V10`–`V14` return to
+  `SKIP`. That is the blocker that closed the fast-lane spec, one level up.
+
+  **Open decisions, enumerated as decisions rather than prose:** one document or a set? · does it cover
+  only the IFC, or requirements + HLR/LLR + test cases + validation as the operator's brief describes? ·
+  how do **batch tags, past revisions and checklists** render, since those are the seams that make
+  completeness auditable (*"la evidencia de que el tejido está completo, no hay huecos"*) ? · which
+  command derives it and in which phase does it run? · how does it relate to `REQUIREMENTS.md`, which is
+  already this project's standing consolidated spec at 6,074 lines?
+
+  **Why BEFORE surface #2:** it is a **one-way door**. 26 records authored in the wrong shape is the cost
+  of deciding it late.
+
+  ⚠️ **C-45 PUSH obligation attached.** Designed here, in the programme where the need is felt — which
+  is the same path `C-54` itself took (discovered in batch-79, encoded to the flow at `rev33`). But the
+  portable half **owes an upstream push once proven**, or every project running this flow re-learns it at
+  full price. Register the Lane B half in `BACKLOG-PROCESS.md` at that point, not before.
 
 - **▸ 🛑 (P1 — BATCH-82 CHARTER) Author the Information Flow Contract for s19's surfaces — the FULL retrofit. LANE A HALF.**
   ⚠️ **Cross-lane item, split per Amendment A.** The **control** (`C-54`: the global flow, template,
