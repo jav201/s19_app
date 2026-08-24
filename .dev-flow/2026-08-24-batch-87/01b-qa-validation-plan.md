@@ -1,5 +1,27 @@
 # QA validation-methods plan — batch-87 Phase 1 (qa-reviewer deliverable, 2026-08-24)
 
+> ## ⚠️ SUPERSESSION NOTE — added at the P2 iteration (R2-02), 2026-08-24
+>
+> **This file is the SOURCE for batch-87's acceptance layer; `01-requirements.md` is where its rows
+> are REALIZED. Where the two disagree on an id, the record's reconciliation table governs.**
+>
+> The two Phase-1 artifacts forked the `AT-B87-*` id space: this plan defines `AT-B87-01` through
+> `AT-B87-06` plus two named pins, while the record's first fold defined only `AT-B87-01` through
+> `AT-B87-04` — and **the same id does not mean the same acceptance in both files.** Specifically:
+> this plan's `AT-B87-03` (counted messages) and `AT-B87-04` (the V13 pair set) are realized in the
+> record as **gates G5 and G6**, and the record REUSES those two id numbers for different
+> acceptances; this plan's `AT-B87-05` and `AT-B87-06` are realized as the record's `AT-B87-03` and
+> `AT-B87-04`; and `P-src` / `P-ledger` become the record's `AT-B87-05` / `AT-B87-06` pins.
+>
+> **Read the mapping table in `01-requirements.md` §3 ("Reconciliation with 01b") before citing any
+> `AT-B87-*` id from this file.** Every row of §2 and §6 here is realized somewhere in the record;
+> none was retired. Two of this file's own measurements were also refuted on re-execution and are
+> corrected in the record rather than here — see the inline markers at §2's `AT-B87-06` row and §6's
+> G6, both of which rest on a pre-state grep that measures **2**, not 0.
+>
+> This file is otherwise **unmodified** — it is the record of what the qa lens returned, and it is
+> not rewritten to agree with what was later measured.
+
 > Returned by the Phase-1 `qa-reviewer` dispatch; persisted verbatim by the orchestrator.
 > To be FOLDED into `01-requirements.md` §3/§4 at the Phase-1 fold, together with the F1–F3
 > corrections to §2.6. **Every threshold below is marked `DERIVE-AT-AUTHORING` and names WHICH
@@ -141,6 +163,15 @@ a derived file.
 | `AT-B87-05` | `VAL "$W"`, V12 filter | stdout: **zero** V12 rows naming `screen_workspace`/`workspace_body`; **exactly one** expected residual naming `workspace_body`/`workspace_shell`; **zero** V12 BLOCK rows | 0 / 1 / 0 — the residual is **enumerated in advance**, which is the only form in which a standing notice may be called green | `DERIVE-AT-AUTHORING` — probe: `VAL "$W" \| grep "V12"`. Depends on F3's ruling and on `D-87-B`. |
 | `AT-B87-06` | `VAL "$W" --atlas --write` then a plain `VAL "$W"` | **`ATLAS-IFC.md` bytes on disk**: a `### COMPONENT \`workspace_body\`` heading with one declaration row per declared field/output, no `{id: component}` collapse; V20 line `atlas current (4 files, census N)` with `N ≤` the committed census | rows ≥ 1 for the new id (pre-state grep = 0, so the grep is its own RED arm); `N` from `AT-B87-01` | `DERIVE-AT-AUTHORING` — probes: `grep -c "workspace_body" .dev-flow/_derived/ATLAS-IFC.md` (pre-state **0**, measured) and the V20 line of the re-run. |
 
+> ⚠️ **`AT-B87-06`'s pre-state is REFUTED (batch-87 R2-06), and the row above is left as written.**
+> Re-measured on the committed pre-state file at the P2 iteration: `grep -c "workspace_body"
+> .dev-flow/_derived/ATLAS-IFC.md` returns **2**, not 0 — batch-86's `- parent : workspace_body` row
+> (`ATLAS-IFC.md:53`) and V12's own finding text (`:93`). A threshold of "rows ≥ 1 for the new id" over
+> that grep is therefore GREEN before any work, and the "pre-state grep = 0, so the grep is its own RED
+> arm" clause describes an arm that does not exist. The discriminating predicate — the `### COMPONENT`
+> heading form, **0** pre / **1** post, with the `screen_workspace` heading returning 1 in BOTH states as
+> the negative control — is measured in `01-requirements.md` §5.6 and realized as its `AT-B87-04` + G10.
+
 ### Cross-story pins (constrain; they do not gate)
 
 - **P-src** — source neutrality: `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/ pyproject.toml` → **empty output, exit 0**. Verbatim command, merge-base form, `pyproject.toml` in scope (batch-86 R2-02's correction).
@@ -251,7 +282,7 @@ or file byte that flips it; none is a repo-wide statement.
 - **G5 (LIVE)** — V13 post-state stated as an **enumerated PAIR set** (pilot pairs redistributed
   by the split, ∪ the new `workspace_body` pairs), written out row-for-row in §3 of the record,
   never a count alone and never a union. Counterfactual **K3**.
-- **G6 (LIVE)** — Atlas: `grep -c "workspace_body" .dev-flow/_derived/ATLAS-IFC.md` ≥ 1 (today
+- **G6 (LIVE)** — ⚠️ *its grep predicate is refuted; see the note above §2's pins and the record's G7/G10 split.* Atlas: `grep -c "workspace_body" .dev-flow/_derived/ATLAS-IFC.md` ≥ 1 (today
   **0**) and a `### COMPONENT` heading with per-declaration rows; V20 `atlas current (4 files,
   census N)` with `N` ≤ committed, **re-checked at EVERY gate** (this artifact and the record are
   themselves corpus input, so the Atlas must reach a fixpoint with them present at shipped

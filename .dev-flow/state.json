@@ -12,8 +12,8 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P2",
-  "phase_status": "iterating",
+  "current_station": "P3",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "P1",
@@ -25,7 +25,7 @@
   "iterations_per_station": {
     "P0": 0,
     "P1": 0,
-    "P2": 0,
+    "P2": 1,
     "P3": 0,
     "P4": 0,
     "P5": 0
@@ -92,6 +92,12 @@
       "date": "2026-08-24",
       "decision": "iterate (autonomous D-87-4)",
       "notes": "Two independent Opus 5 reviewers, both verdict iterate. Consolidated: 2 blockers (R2-01 spliced two-state RED-arm transcript, found by BOTH reviewers independently; R2-02 AT-B87-* id fork between record and 01b) + 6 major + 5 minor -- all evidence-artifact defects; the substance survived attack (D-87-A/B, R-87-1 confirmed by kill-mutation; censuses and accounting exact; frozen-history line upheld). Returned to the P1 author as single fold owner; moved figures re-measured, never edited (C-39 rider). 02-review.md carries the full table."
+    },
+    {
+      "station": "P2",
+      "date": "2026-08-24",
+      "decision": "approved after 1 iteration (autonomous D-87-5)",
+      "notes": "12/13 findings fixed by re-measurement; 1 reviewer remedy REFUSED with executed refutation (R-87-3b: 'nine screens' correct under the ten-screen model -- the C-50 shape working as intended). Notice delta zero (284->284, accounted: fixes touched prose/tables, no declarations). Orchestrator re-executed corrected predicates: validator line, R2-06 heading grep = 1, two labelled fences present, dispersion 6->31->42 at :1433, line 3284 content matches the refusal, AT-B87 sets IDENTICAL across record and 01b. New gates G10/G11; six ATs realized. Batch-85 record needed no change this iteration."
     }
   ],
   "standing_authorization": {

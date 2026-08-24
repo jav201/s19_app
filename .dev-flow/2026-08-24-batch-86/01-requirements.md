@@ -647,9 +647,19 @@ COMPONENT: screen_workspace
 > five-id parent set BLOCK — executed, and the BLOCK text named exactly those two ids
 > (batch-87 §5.6, M-4 arm 2 and the live pre-fix run); (2) `project_row` gained
 > `tests/test_tui_variants.py::_project_label`, keeping LLR-86.6's field-by-field identity with
-> the child after the child's list was re-measured. **The figures in §4 and §5.6 that count
-> outputs and consumer entries were true when measured and are now superseded** — batch-87 §5.6
-> carries the live corpus figures; nothing here was rewritten to agree with them.
+> the child after the child's list was re-measured.
+>
+> **What is superseded is wider than the counts, and naming only the counts was itself too narrow**
+> (corrected at batch-87's P2 iteration, R2-10). Superseded by the amendment above:
+> (a) the figures in §4 and §5.6 that count outputs, consumer entries and literal-greppable
+> addresses — this component now declares **31** outputs and **94** consumer entries where §5.6
+> records 30 and 91; (b) **`LLR-86.6`'s Statement, which names `slot_rows` in its enumerated
+> re-export list** — that id is no longer declared anywhere in the corpus; (c) **`LLR-86.6`'s
+> "VERBATIM ... known-defective included" carry clause and D-86-E's matching rationale**, which
+> deliberately propagated the D-A defect pending D-II — D-II has now ruled, and the defect is gone
+> rather than carried; (d) §5.6's stray-pair row for `slot_rows`. **Nothing here was rewritten to
+> agree with the present.** These sections stand as the record of what was believed and measured
+> when batch-86 closed; batch-87 §5.6 carries the live corpus figures.
 
 **`consumers : none` appears nowhere in this record because it is nowhere true** — measured:
 every declared address has at least one reacher (M-3; the minimum is the stylesheet). The
