@@ -12,8 +12,8 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P0",
-  "phase_status": "awaiting-gate",
+  "current_station": "P2",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "P1",
@@ -74,6 +74,18 @@
       "date": "2026-08-24",
       "decision": "operator directive: delegate to Opus 5 agents",
       "notes": "Operator (verbatim): 'Antes de continuar, quiero que delegues las acciones a agentes opus5'. All Agent dispatches from P1 onward carry model opus; orchestrator does choreography only."
+    },
+    {
+      "station": "P0",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-87-1)",
+      "notes": "DoR met for US-87-1 + US-87-2, both READY with executed probes (UNPARSED [IFC] :372 confirmed; sole V12 finding names screen_workspace/workspace_body; consumer census 24/12 test files). Validator 0 block / 254 notice after V20-driven Atlas regen (open commit 656e5a7 + regen commit). Packet presented in-conversation. No nameable gap on Coverage/Certainty/Evidence at this station."
+    },
+    {
+      "station": "P1",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-87-3)",
+      "notes": "Record authored (Opus 5 architect) + qa 01b plan (Opus 5, parallel), qa fold relayed mid-flight as hypotheses (C-43), author confirmed by execution. D-87-A ruled (a) in-place (two executed measurements). THREE records edited, forced by balancing -- measured scope growth, declared in PLAN. workspace_body: 42 outputs, PARENT workspace_shell (SYSTEM refuted app.py:1919). Premises 9 TRUE / 6 FALSE all dispositioned; D-86-E-resolution observable withdrawn (structural, measured). Validator 0 block / 284 notice (+29 V13 + 1 V22 accounted); UNPARSED 2->1 ([IFC] GONE, BATCHES control survives). G-87 8 GREEN, G8 P3-owed. Orchestrator re-verified validator line, census, file set, source pin (0 source files), six-output ids."
     }
   ],
   "standing_authorization": {

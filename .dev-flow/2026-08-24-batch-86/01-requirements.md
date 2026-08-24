@@ -607,12 +607,19 @@ COMPONENT: screen_workspace
                     tests/test_tui_commandbar.py
                     tests/test_tui_variants.py::_project_label
       owner       : LLR-86.6
-    - id          : slot_rows
-      value       : re-export of loaded_panel's slot_rows, VERBATIM including its D-A-defective cardinality union — the six-output split is D-II territory, inherited with citation, not fixed here
-      address     : query("#loaded_slots > Horizontal"), cells within a row INDEXED POSITIONALLY as kind then detail then optional unload
-      cardinality : 5
-      consumers   : tests/test_tui_variants.py::_project_label
-      owner       : LLR-86.6
+    - id          : artifact_row_set
+      value       : re-export of loaded_panel's artifact_row_set (balancing) — the four loaded-slot rows. Replaces the former slot_rows re-export, whose cardinality union of 5 was the D-A defect this document inherited with a citation; batch-87 D-II split it, so the parent boundary follows (batch-87 LLR-87.5)
+      address     : query(".loaded-slot")
+      cardinality : 4
+      consumers   : s19_app/tui/styles.tcss
+                    tests/test_tui_variants.py::_project_label
+      owner       : LLR-87.5
+    - id          : unload_all_row
+      value       : re-export of loaded_panel's unload_all_row (balancing) — the footer row, whose arity moves independently of the artifact rows
+      address     : query(".loaded-allrow")
+      cardinality : 1
+      consumers   : s19_app/tui/styles.tcss
+      owner       : LLR-87.5
     - id          : artifact_slots
       value       : re-export of loaded_panel's artifact_slots (balancing)
       address     : query(".loaded-detail"), INDEXED POSITIONALLY
@@ -628,8 +635,21 @@ COMPONENT: screen_workspace
       cardinality : 1
       consumers   : s19_app/tui/styles.tcss
                     tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
+                    tests/test_tui_variants.py::_project_label
       owner       : LLR-86.6
 ```
+
+> ⚠️ **AMENDED 2026-08-24 by batch-87 (D-II), contract section only.** The re-export block above
+> is the only part of this document batch-87 touched; §2.7, §3, §4 and §5.6's measured figures are
+> frozen history and read as they were recorded. Two changes, both forced by measurement rather
+> than chosen: (1) `slot_rows` became `artifact_row_set` + `unload_all_row`, because balancing is
+> set containment over output ids and the child's re-authored six-output declaration made the old
+> five-id parent set BLOCK — executed, and the BLOCK text named exactly those two ids
+> (batch-87 §5.6, M-4 arm 2 and the live pre-fix run); (2) `project_row` gained
+> `tests/test_tui_variants.py::_project_label`, keeping LLR-86.6's field-by-field identity with
+> the child after the child's list was re-measured. **The figures in §4 and §5.6 that count
+> outputs and consumer entries were true when measured and are now superseded** — batch-87 §5.6
+> carries the live corpus figures; nothing here was rewritten to agree with them.
 
 **`consumers : none` appears nowhere in this record because it is nowhere true** — measured:
 every declared address has at least one reacher (M-3; the minimum is the stylesheet). The

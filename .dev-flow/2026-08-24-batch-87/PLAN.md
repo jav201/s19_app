@@ -4,7 +4,26 @@
 
 ## Where we are
 
-- **Station: P0 (intake) — scaffold cut, gate packet pending presentation.**
+- **Station: P2 (cross-review) — P1 approved (D-87-3), reviewers dispatched.**
+- P1 outcome: full record authored (Opus 5 architect + qa 01b plan, parallel). D-87-A ruled **(a)
+  in-place** by two executed measurements (`_ifc_corpus` extends, census keyed to the pilot's own
+  path/line). **Three records edited, forced by balancing** (pilot §5.3→pointer + §8 six-output
+  block; batch-86 re-export block updated; batch-87 full record). `workspace_body` declared with
+  42 outputs (31 re-exports; PARENT `workspace_shell`, SYSTEM refuted at app.py:1919). Premises
+  9 TRUE / 6 FALSE (all load-bearing FALSEs recorded; the D-86-E-resolution intake observable
+  WITHDRAWN — the duplication is structural, V13 greps each literal once per declaration).
+  Validator `0 block · 284 notice · 15 n/a` (+29 V13 surface-#3 addresses, +1 V22, all accounted);
+  UNPARSED census 2→1 ([IFC] GONE, BATCHES negative control survives). G-87: 8 GREEN, G8 OPEN
+  (P3-owed canon seeding). Orchestrator re-verified: validator line, census, file set, source pin,
+  six-output ids — all confirmed.
+- **Scope growth, measured and declared (not creep):** the brief anticipated 1 record edit; the
+  balancing rule forces 3, and the honest surface-#3 declaration is 42 outputs. Both stories
+  unchanged; the mechanism cost more than anticipated. Headline R-87-2 (re-export compounding,
+  39% of corpus stray pairs at depth 3) is a corpus-wide convention question deliberately NOT
+  decided unilaterally — routed to close/backlog, to be ruled before surface #4.
+
+### Earlier (P0)
+- Scaffold cut, gate packet presented, approved D-87-1.
 - Branch `claude/batch-87-ifc-reauthor-surface-3` off `origin/main` tip **`943e54a`** (RC-1 PASS,
   executed 2026-08-24: merge-base == tip; fetch clean).
 - Flow **2026.08.24-rev45 · `09bea075fc183f8b`** — C-45 PULL verified (V7 green in the ground-check
@@ -70,7 +89,10 @@ ARQ / PDR / DDR: **not activated** — no trigger in their families fired (see b
 |---|---|---|
 | D-II | 2026-08-24 | **Operator ruled: re-author** the pilot record (evidence: 3 format defects solved by exemplar; last IFC UNPARSED item; D-86-E duplication; D-A prescribes the shape). Measurements stay valid history. |
 | D-87-scope | 2026-08-24 | Operator: one batch for both stories (re-author + surface #3). |
-| D-87-A | **open → P1** | Where the re-authored contract lives (in-place correction of the batch-85 record vs fresh declaration in batch-87's). Decided by the `_ifc_corpus` same-COMPONENT merge probe (UNARMED per pilot handoff §7.2) + D-86-E's fork rationale. |
+| D-87-A | 2026-08-24 (P1) | **Ruled (a) in-place** — two executed measurements (synthetic two-batch corpus: `_ifc_corpus` extends, no removal, V19 collision NOTICE, no parent set balances both declarations; census keyed to the pilot file's own path/line). Full evidence in batch-87 record §2.8/§5. |
+| D-87-B…G | 2026-08-24 (P1) | Ruled in-record (bimodal outputs → 42-output superset; registry question D-87-F recorded, not silently assumed; see record §5 decisions table). P2 attacks D-87-B/D-87-C hardest per author's own flag. |
+| D-87-2 | 2026-08-24 | qa fold relayed to the in-flight author as hypotheses-to-verify (C-43); author confirmed items 1–3, 5 by execution, executed 4 and 6 independently. |
+| D-87-3 | 2026-08-24 | **P1 approved (autonomous)** — no nameable gap: Coverage (both stories realized in the record, dual chains planned, G8 explicitly P3-owed), Certainty (12 live RED arms raised+discharged on the real corpus; 6 FALSE premises caught and dispositioned), Evidence (validator line + census + pin re-verified by orchestrator). Scope growth measured and declared above. |
 
 ## Risks / watch-items
 
