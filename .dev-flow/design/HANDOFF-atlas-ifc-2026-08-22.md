@@ -356,7 +356,7 @@ to a single-line grep for the same reason as the first. · **N7** the C-40 incid
 | **D-IV** | `docs/ARCHITECTURE.md` declares no `path/**` prefixes, so `V8` cannot check it and the **A-family of triggers has no oracle** | **CONFIRMED by execution** — 0 hits, positive control 1 hit. Untouched |
 | **D-V** | The public-repo question | Untouched as instructed. Measured: `.dev-flow` **47,088** lines + `.fast-dev-flow` **3,732** = **50,820** in 994 files. The handoff's *"~47,400"* excludes `.fast-dev-flow/` — the directory `F-3` flags as visible to `V13`. **The Atlas raises the stakes of D-V without changing its content** |
 | **D-VI** *(new)* | `/dev-flow-sync` step 4 orders copying `01-requirements.md` to the vault, **after its own step 0 says never copy an artifact whose declared home is the repo** | The command contradicts the homes rule it cites, and those copies are the 6 that drifted (§5.2) |
-| **D-VII** *(new, and it GATES D-I)* | **Are the living human artifacts DERIVED, or AUTHORED-AND-CHECKED?** — §4.0 | **BLOCKING.** `D-I` says derived; the 2026-08-23 declaration says living documents for human audit. The two readings do not share code. Write no `--atlas` until this is ruled |
+| **D-VII** *(new, and it GATES D-I)* | **Are the living human artifacts DERIVED, or AUTHORED-AND-CHECKED?** — §4.0 | **RULED 2026-08-23: HYBRID, two planes** — the Atlas (index) is DERIVED per D-I; the living canon (REQUIREMENTS.md, TC/checklists/traceability) stays AUTHORED with a coherence rule owed as separate scope. See `DECISION-D-VII-2026-08-23.md`. *(As written 2026-08-22 this row read BLOCKING — kept for the record.)* |
 
 ---
 
