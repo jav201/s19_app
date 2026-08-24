@@ -18,6 +18,7 @@
 cd <worktree>                                              # dev-flow-68a67d
 python ~/.claude/docs/tools/devflow-validate.py            # expect: 0 block · 231 notice · 12 n/a
 python ~/.claude/docs/tools/devflow-validate.py --map --fetch   # V7 V15 V16 V17 green
+#   V7 expects a54f4289184bd018. If V15 BLOCKs, somebody edited skills/dev-flow/ - see 10.2
 python ~/.claude/docs/tools/devflow-validate.py --selftest      # expect exit 0, 152 arms
 python tools/address_origin.py                             # A 14 · B 0 · C 14 · D 13 · U 0
 python -m pytest tests/test_address_origin.py -q           # 21 passed
@@ -32,7 +33,7 @@ State at the cut:
 | `s19_app` `main` | `a112eeb` — unchanged; **nothing merged this session** |
 | working branch | `claude/batch-82-lane-a-scoping`, **PR #199 open** |
 | also open | **PR #198** (D4 — the `AT-B83-06` contradiction) |
-| flow | **`2026.08.22-rev40`**, `flow_hash 5d6c9abaa949b0dd` — shipped and pushed this session |
+| flow | **`2026.08.23-rev41`**, `flow_hash a54f4289184bd018` — rev40 and rev41 both shipped and pushed |
 | all four repos | clean, `0/0` (`~/.claude`, `~/.claude/skills`, `~/kimi/agent-skills`, worktree) |
 | batch-85 | `current_station: P5`, `phase_status: approved` — **CLOSED UNFINISHED** |
 
@@ -50,6 +51,7 @@ State at the cut:
 |---|---|
 | **flow rev40** — `V18` (state.json's four failure modes) + `V19` (duplicate `COMPONENT` id), 140 → **152 arms** | `~/.claude/docs/FLOW-VERSION.md` changelog rev40 · `claude-config 2c6b9b3` · mirror `agent-skills 202cda5` |
 | **Adversarial verification of the batch-85 handoff** — 13 of 15 defects confirmed, 2 mis-described, **7 new** | §6 below |
+| **flow rev41** — `IEEE 830` → `ISO/IEC/IEEE 29148` at all 5 citation sites | changelog rev41 · `claude-config ca23e4f` · mirror `agent-skills 98b8cc7` |
 | **Design proposal for the human Atlas (D-I)** | §4 below |
 
 **rev40 came out of attacking rev38/rev39, which the previous handoff nominated as target #2 with the
@@ -129,6 +131,51 @@ hand-maintained**, covering not only the IFC but requirements, AT/TC and HLR/LLR
 
 **Ruling added this session: the Atlas is primordial, it must WORK, and it must ALWAYS MATCH THE
 IFC.** That last clause is §5, and it is the whole engineering problem.
+
+### 4.0 ⚠️ The model this design must serve — and §4.2's proposal assumed the WRONG one
+
+**Operator declaration, 2026-08-23, recorded as an IN-PROGRESS change to `/dev-flow`:**
+
+> Beyond the IFC, the artifacts for **requirements, test cases, checklists and traceability stop
+> living per batch and become LIVING, INCREMENTAL documents.**
+>
+> Design rule: **the IFC is for MACHINE reading; the others are for HUMAN reading and audit — and
+> both planes must be kept COHERENT.** When touching `/dev-flow` or writing those artifacts, **do
+> not assume the old model in which the spec dies with the batch.**
+
+**This is materially bigger than an index, and §4.2 below was designed against the old model.** The
+proposal treats the per-batch corpus as fixed and adds a derived *report* over it. The declared
+change moves the artifacts themselves: requirements, AT/TC, checklists and traceability become
+standing documents that accumulate, with the batch record becoming their **increment** rather than
+their **home**. **The consolidation IS the artifact, not a report about the artifact.**
+
+**Requirements are the centre-piece of that human plane**, and the other three hang off them —
+AT/TC discharge them, checklists gate them, traceability links them.
+
+**The tension this opens, and it is NOT resolved — do not let a session paper over it:**
+
+| | |
+|---|---|
+| `D-I`'s ruling says | the human view is **DERIVED by command, never hand-maintained** |
+| the 2026-08-23 declaration says | requirements / TC / checklists / traceability are **LIVING documents for human audit** |
+
+Those are compatible under exactly two readings, and **they lead to different machinery:**
+
+- **(a) Derived.** The living documents are *generated* from the batch increments, and authoring
+  happens only in the increments. Then `V20`'s digest guard (§5.2) is the whole design, and §4.3's
+  "no sentences" rule holds.
+- **(b) Authored and CHECKED.** The living documents are hand-authored — `REQUIREMENTS.md` already
+  is, at 6,074 lines — and the machinery *verifies coherence with the IFC* rather than generating
+  them. Then §4.3's non-duplication rule is **wrong**, §5.2's digest guard is **impossible**, and
+  what is owed is a **coherence rule**, not a builder.
+
+**Reading (b) is what "both planes must be kept coherent" most naturally says**, and it is what the
+project already does with `REQUIREMENTS.md`. **Reading (a) is what `D-I` says.** Resolve this BEFORE
+writing a line of `--atlas`, because the two readings do not share code.
+
+**Everything in §4.2, §4.3 and §5.2 is written for reading (a) and must be treated as provisional
+until this is ruled.** §5.1, §5.3 and §5.4 survive both readings — a coherence checker needs the same
+corpus access, the same `UNPARSED` census and the same per-declaration rendering.
 
 ### 4.1 The reframing that must happen first
 
@@ -307,6 +354,7 @@ to a single-line grep for the same reason as the first. · **N7** the C-40 incid
 | **D-IV** | `docs/ARCHITECTURE.md` declares no `path/**` prefixes, so `V8` cannot check it and the **A-family of triggers has no oracle** | **CONFIRMED by execution** — 0 hits, positive control 1 hit. Untouched |
 | **D-V** | The public-repo question | Untouched as instructed. Measured: `.dev-flow` **47,088** lines + `.fast-dev-flow` **3,732** = **50,820** in 994 files. The handoff's *"~47,400"* excludes `.fast-dev-flow/` — the directory `F-3` flags as visible to `V13`. **The Atlas raises the stakes of D-V without changing its content** |
 | **D-VI** *(new)* | `/dev-flow-sync` step 4 orders copying `01-requirements.md` to the vault, **after its own step 0 says never copy an artifact whose declared home is the repo** | The command contradicts the homes rule it cites, and those copies are the 6 that drifted (§5.2) |
+| **D-VII** *(new, and it GATES D-I)* | **Are the living human artifacts DERIVED, or AUTHORED-AND-CHECKED?** — §4.0 | **BLOCKING.** `D-I` says derived; the 2026-08-23 declaration says living documents for human audit. The two readings do not share code. Write no `--atlas` until this is ruled |
 
 ---
 
@@ -339,6 +387,8 @@ decomposition is wrong. **Measured: all three, and the worst one is unnamed.**
 
 ## 9 · Suggested next actions, in order
 
+0. **Rule `D-VII` first (§4.0).** Derived, or authored-and-checked? Every action below assumes an
+   answer, and the two readings do not share code.
 1. **Freeze the field set by execution, not on paper.** Write the `--atlas` parser, run it over the
    corpus as it stands (n=1 IFC record, 62 requirement files, 1,372 registry rows), and **publish
    what it CANNOT produce.** That list *is* the minimum derivable field set, discovered rather than
@@ -376,14 +426,32 @@ reviewers finished, or to hand them a pinned copy.
 
 ---
 
+### 10.2 A third shape: the revision that reached the mirror before the canon
+
+**rev41 was authored directly in `skills/dev-flow/`, which is a BUILD OUTPUT of `--sync-bundle`, not
+a source.** The canon kept `IEEE 830` at all five sites, and the mirror's own header still stamped
+`rev40` while its changelog row claimed `rev41` — so the revision was incomplete on both sides at
+once, and the *only* reason it was not silently erased is that nobody ran `--sync-bundle` in between.
+
+**`V15` caught it — 4 BLOCKs naming the four drifted files.** That is exactly the copy-vs-copy drift
+it was written for at rev13, and it is the one time in this session's record that a guard caught a
+defect *before* a human noticed rather than after. Resolved by porting the five substitutions into
+the canon, bumping there, and regenerating: `--sync-bundle` then wrote **exactly one file**, because
+the other three already matched.
+
+**Edit the source, never the copy.** The flow spent rev15, rev16 and rev20 each deleting one
+duplicated list; this is the same defect wearing a different hat — a duplicated *file*, edited on the
+generated side.
+
+
 ## 11 · Working-file reconciliation (C-44)
 
 | Repo | State |
 |---|---|
-| `s19_app` worktree `dev-flow-68a67d` | clean `0/0` on `claude/batch-82-lane-a-scoping` (**PR #199**) — **except this handoff, if it is still uncommitted when you read it** |
+| `s19_app` worktree `dev-flow-68a67d` | clean `0/0` on `claude/batch-82-lane-a-scoping` (**PR #199**), this handoff included |
 | `s19_app` worktree `flow-diagrams-rescued-11aacc` | clean `0/0` |
-| `~/.claude` | ✅ clean `0/0` — rev40 committed `2c6b9b3` and **pushed** |
-| `~/.claude/skills` | ✅ clean `0/0` — `202cda5`, **pushed** |
+| `~/.claude` | ✅ clean `0/0` — rev40 `2c6b9b3`, rev41 `ca23e4f`, both **pushed** |
+| `~/.claude/skills` | ✅ clean `0/0` — `202cda5`, `98b8cc7`, **pushed**. `3892357` here is the mirror-first rev41 of §10.2 |
 | `~/kimi/agent-skills` | ✅ clean `0/0` — pulled to match |
 | `C:\Users\jjgh8\flow-diagrams-rescued-2026-08-18\` | 📋 staging, 50 MB. The 11 editable sources are safely in `claude-config` at `docs/diagrams/`, **verified byte-identical by md5 this session**. The PNGs + PDF are derivable. **Delete when satisfied** |
 
