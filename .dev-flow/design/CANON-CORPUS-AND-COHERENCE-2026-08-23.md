@@ -72,7 +72,38 @@ Open for the operator: (a) checklists — confirm they stay flow-side instrument
 functionality/executive-summary/decisions join the living corpus; (c) C2's exemption
 convention; (d) seeding scope — all 287 or batch-85-first.
 
+## 4.1 · RULED 2026-08-23 (operator, same day) — the questions above are closed
+
+| Question | Ruling |
+|---|---|
+| Corpus membership | **CLOSED**: requirements · test cases · validation+evidence · traceability · **decisions (succinct ledger — best explained in the fewest words, never verbose)**. Functionality and executive summaries do NOT join (stay per-batch) |
+| **Design reviews — NEW family the operator added** | The flow now has **preliminary and detailed design reviews (PDR/DDR)**. Their records live in the vault, and each **must carry a UNIQUE ID and be traceable to requirements** — a review that links to nothing links the rest of traceability to nothing. ID grammar + linkage rule = flow-side scope (rev42+), to be designed with the coherence rule |
+| Checklists | **Confirmed flow-side**: definitions are flow canon (`phase-checklists.md`); per-gate runs belong to the batch record. No project living doc |
+| C2 convention | **NOTICE census** — LLRs never used as owner are listed, never blocked; hardening waits for census evidence |
+| Seeding scope | **Batch-85 first** (executed same day — see §6); the remaining C3 debt seeds in later tranches |
+
+## 4.2 · C4 re-triaged — the "6 stale citations" were a scoping artifact
+
+Executed before authoring anything: all 6 first-pass body citations of RETIRED ids are
+themselves **retirement records** ("are retired →", "is deleted", "not reused"), not live
+citations. With line-level markers scoped out (probe updated), **bare body citations = 0.
+There was no C4 debt to fix.** C4 stays a NOTICE census, same convention as C2 — an unscoped
+threshold here would have manufactured 6 false defects.
+
 ## 5 · Probe inventory
 
 `tools/coherence_probe.py` — same contract as `atlas_probe.py`: imports the canon validator
 (never a second parser), deterministic, DELETE when the coherence rule ships. Runtime ~1.5 s.
+
+## 6 · Seeding increment 1 — EXECUTED 2026-08-23 (batch-85 first)
+
+`REQUIREMENTS.md` gained the section **"LoadedArtifactsPanel information contract —
+batch-85 IFC pilot (R-TUI-113)"**: the 4 HLRs + 7 LLRs mirrored succinctly with their
+canonical home named, status recorded honestly as **PILOT, KNOWN-DEFECT** (two BLOCK
+reviews, batch closed unfinished, D-II open — the canon must not claim green what is not).
+Allocation basis recorded in the section (`R-TUI-113` = monotonic next; 111/112 burned as
+dangling, re-pointed under D-17).
+
+Oracle (re-run `python tools/coherence_probe.py`): **C1 owners missing from the living
+canon 14 → 0** · C3 debt 287 → 276 (the 11 batch-85 ids left the absence set) · C4 bare
+body citations 0 (re-triage, §4.2). C2 unchanged (`LLR-85.4` never an owner — NOTICE).

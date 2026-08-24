@@ -6030,6 +6030,35 @@ threshold, with **0** violations.
 > third instance landed on the one clause the batch existed to ship. The four `R-TUI-111` citations
 > are re-pointed at `R-TUI-103` under the treatment decision **D-17** already applied to `R-TUI-112`.
 
+## LoadedArtifactsPanel information contract — batch-85 IFC pilot (R-TUI-113)
+
+- **What.** The corpus's first Information Flow Contract record (control C-54): the
+  `LoadedArtifactsPanel` declares its readout flow and addressable outputs as fenced
+  `FLOW:`/`COMPONENT:` blocks in `.dev-flow/2026-08-21-batch-85/01-requirements.md` §5,
+  machine-read by validator rules V10–V14/V19 over the merged corpus. Canonical text lives
+  in the batch record; ids are mirrored here so the living canon reflects the ownership
+  chain (coherence obligation C1, `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`).
+- **HLRs.** `HLR-85.1` declared, machine-checked information contract for the panel ·
+  `HLR-85.2` no in-repo consumer note contradicts the measured dependant set · `HLR-85.3`
+  the address census names unmodelled address forms instead of absorbing them · `HLR-85.4`
+  per-surface retrofit cost reported as measured figures.
+- **LLRs.** `LLR-85.1` readout flow declared node-by-node, every node owned · `LLR-85.2`
+  `artifact_slots` output declares address, arity, ordering and its complete consumer set ·
+  `LLR-85.3` `project_row` output declares its own address and consumer set · `LLR-85.4`
+  record placed where the merged corpus reads it, pre-state recorded · `LLR-85.5` in-repo
+  consumer notes corrected to the measured set · `LLR-85.6` census reports the
+  unmodelled-form difference with an executed RED arm · `LLR-85.7` per-surface cost record.
+- **Status: PILOT, KNOWN-DEFECT — nothing here is claimed green.** Two independent reviews
+  returned BLOCK on the record and batch-85 closed unfinished at P5 (open defects: projection
+  thresholds that erase their signal, an unsatisfiable repo-wide Statement; see the batch-85
+  and Atlas handoffs in `.dev-flow/design/`). Mechanical state: V10/V11/V14/V19 pass, V12
+  cannot check (parent undeclared), V13 carries 3 notices; `TC-B85-07` measured RED on the
+  unmodified tree. **D-II (salvage this record vs clean restart for surface #2) is open.**
+- **Allocation.** `R-TUI-113` = monotonic next: `R-TUI-104` defined (batch-78), `105`–`110`
+  never allocated (no gap-filling), `111`/`112` burned as dangling citations re-pointed to
+  `R-TUI-103` under D-17. Added 2026-08-23 as the first seeding increment of the living-canon
+  model (D-VII hybrid).
+
 ## Retired ids
 
 A retired id **was** live and its verifier is gone. It is never reused, and it is recorded here

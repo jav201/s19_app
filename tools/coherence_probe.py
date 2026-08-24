@@ -177,11 +177,24 @@ def main():
     split = req_text.split("\n## Retired ids", 1)
     body, retired_sec = split[0], (split[1] if len(split) > 1 else "")
     body_stale = sorted(c for c in stale if c in body)
+    # Second scope, measured 2026-08-23: every one of the 6 first-pass body hits was
+    # itself retirement PROSE ("are retired ->", "is deleted", "not reused") -- a record
+    # OF the retirement, not a live citation. Split by line-level markers; the bare
+    # remainder is the only claim of staleness, and it stays a NOTICE census (operator
+    # ruling, same convention as C2), never an unscoped BLOCK.
+    markers = re.compile(r"retired|deleted|not reused|superseded|withdrawn", re.I)
+    bare = []
+    for cid in body_stale:
+        lines = [ln for ln in body.splitlines() if cid in ln]
+        if not all(markers.search(ln) for ln in lines):
+            bare.append(cid)
     print("  cited ids with registry status RETIRED/BURNED: %d total" % len(stale))
     print("    in the `## Retired ids` ledger only (correct bookkeeping): %d"
           % len([c for c in stale if c not in body]))
-    print("    cited in the BODY (real staleness debt)                  : %d  %s"
-          % (len(body_stale), body_stale))
+    print("    body mentions that are themselves retirement records     : %d  %s"
+          % (len(body_stale) - len(bare), [c for c in body_stale if c not in bare]))
+    print("    BARE body citations (the real staleness census)          : %d  %s"
+          % (len(bare), bare))
     if not retired_sec:
         print("    WARNING: no `## Retired ids` section found -- split is vacuous")
     return 0

@@ -43,7 +43,13 @@ CANON = os.path.expanduser(os.path.join("~", ".claude", "docs", "tools", "devflo
 
 AT_TC = re.compile(r"\b(?:AT|TC)-(?:B\d+-)?\d+(?:\.\d+)?(?:[a-z]+)?\b")
 REQ_ID = re.compile(r"\b(?:US|HLR|LLR)-[\w.]+(?:-[\w.]+)*\b")
-R_ID = re.compile(r"\bR-\d+\b")
+# R-<AREA>-<NNN>, e.g. R-TUI-103, R-CDFX-004 -- the canon's own requirement namespace.
+# The first cut of this probe used r"R-\d+", which the area segment defeats: it measured
+# 27 prose collisions, reported "R-* is not a namespace this tree carries", and that
+# false figure shipped in ATLAS-FIELD-SET par.4 P3 before being corrected. Kept here as
+# the reminder that a namespace probe must be derived from a real citizen of the
+# namespace, not guessed.
+R_ID = re.compile(r"\bR-[A-Z]+-\d+\b")
 
 CANNOT = []      # (section, claim measured, consequence for the field set)
 UNPARSED = []    # (section, path-or-row, reason)
@@ -205,8 +211,7 @@ def section_trace(dv, root, corpus):
                    "TRACE can render (id, files that mention it) but NOT a state column "
                    "for the requirement families -- state exists only for AT/TC"))
     n_r = len(set().union(*ids.get("R", {}).values())) if ids.get("R") else 0
-    print("R-* unique across all realms : %d  (the handoff's '149 R-*' is NOT a namespace "
-          "this tree carries)" % n_r)
+    print("R-<AREA>-* unique across all realms : %d" % n_r)
     return ids, rows
 
 

@@ -66,11 +66,15 @@
 - **P2 — a pattern-keyed batch walk silently drops nonconforming dirs.** Measured:
   `2026-07-23-batch-n8` — invisible to `batch-\d+` keying. The census must list what the
   pattern rejects (this is §5.3 applied to BATCHES).
-- **P3 — the handoff's "149 `R-*`" figure is false as written.** `REQUIREMENTS.md` carries
-  no `R-*` namespace (27 unique `R-\d+` matches tree-wide, mostly prose collisions); its id
-  families are US (67 stems) · HLR (74) · LLR (82). The Atlas points into `REQUIREMENTS.md`
-  by US/HLR/LLR, not by `R-*`. (`CLAUDE.md`'s "R-* requirement" wording inherits the same
-  fiction — flagged, not fixed here.)
+- **P3 — CORRECTED 2026-08-23, same day: the first version of this finding was itself the
+  defect.** As written it said *"149 `R-*` is false — `REQUIREMENTS.md` carries no `R-*`
+  namespace"*, measured with the pattern `R-\d+`. The namespace's real grammar is
+  **`R-<AREA>-<NNN>`** (`R-TUI-103`, `R-CDFX-004` — 142 unique across 15 areas, R-TUI alone
+  86), which that pattern cannot see. **The handoff's "149" was essentially right; the
+  probe's regex was wrong** (fixed in `atlas_probe.py`, with the wrong figure kept as a
+  comment). The lesson the correction adds: a namespace probe must derive its pattern from
+  a real citizen of the namespace, not guess it. `REQUIREMENTS.md` id families:
+  `R-<AREA>-*` (canon register rows) + US/HLR/LLR (batch mirror mentions).
 
 ## 5 · Answered by measurement (closes handoff §9 items)
 
