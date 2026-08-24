@@ -287,8 +287,13 @@ CI only, its own PR).
     is 6, so the composer budgets 11 against a 9-column cell. Outside the supported set, and
     `TC-B79-02` correctly asserts only the three supported sizes. Related to the carried `N-7`.
 
-- **▸ 🛑 (P1 — RETROFIT PROGRAMME, OWED BEFORE SURFACE #2) The HUMAN consolidated view of the
-  Information Flow Contract. Operator ruling 2026-08-21.** The IFC **is** a consolidated view — *for the
+- **▸ ✅ (P1 — SHIPPED 2026-08-24 as flow rev42–rev44 + adoption `875cef0`/`0d26e5d`) The HUMAN
+  consolidated view of the Information Flow Contract. Operator ruling 2026-08-21.**
+  **Delivered:** `--atlas --write` derives `ATLAS-IFC/TRACE/BATCHES/ORPHANS.md` into
+  `.dev-flow/_derived/`, guarded by `V20` (digest, both directions, UNPARSED-census rise);
+  D-III ruled as the declared selector taxonomy; D-VII hybrid ruled (Atlas derived / canon
+  authored + coherence rules `V21`–`V23`). Design record: `.dev-flow/design/ATLAS-FIELD-SET-2026-08-23.md`
+  + `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`. Original charter text kept below for the record. The IFC **is** a consolidated view — *for the
   machine*. `_ifc_corpus` merges all 61 `01-requirements.md` at validation time, and that is the canon:
   **it is not to be moved or touched.** What does not exist is the view a *human* reads. Operator:
   *"el IFC es el consolidado para la máquina, tampoco creo que debamos tocarlo, si no más bien debemos
