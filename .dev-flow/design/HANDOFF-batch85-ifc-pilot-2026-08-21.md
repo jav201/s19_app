@@ -30,7 +30,9 @@ State at the cut:
 | also open | **PR #198** (D4 — the `AT-B83-06` contradiction) |
 | flow | `2026.08.21-rev39`, `flow_hash ff40187576df8a2a` |
 | all four repos | clean, `0/0` vs origin (`~/.claude`, `~/.claude/skills`, `~/kimi/agent-skills`, worktree) |
-| batch-85 | `current_station: P2`, `phase_status: iterating` — **BLOCKED, 0 implementation** |
+| batch-85 | `current_station: P5`, `phase_status: approved` — **CLOSED UNFINISHED, 0 implementation** |
+
+> ⚠️ **CORRECTION, 2026-08-23 — the row above originally read `current_station: P2`, `phase_status: iterating` — BLOCKED.** That was false at the moment it was committed, not stale by drift: commit `7cc0390` wrote this document **and** moved `state.json` to `P5 / approved` in the same commit, with an explicit operator decision record (*"CLOSE UNFINISHED on the measurement, rather than iterate to acceptance"*). Verify with `git show 7cc0390 -- .dev-flow/state.json`. The two readings give an opening session **opposite** instructions — *resume the requirements iteration* versus *the batch is closed* — and this document's own title says CLOSED UNFINISHED, agreeing with `state.json` rather than with its own table. Corrected here rather than silently, per the rev36 convention: a record is what was believed, and the belief was wrong. **Note the `flow` row above is NOT corrected — `rev39` was true at this cut; the flow has since moved to `2026.08.23-rev41` / `a54f4289184bd018`.** Found by re-executing §0, which is what §0 asks every reader to do.
 
 ---
 

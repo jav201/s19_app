@@ -41,7 +41,9 @@ State at the cut:
 > that document existed:** commit `7cc0390` wrote the handoff and moved `state.json` to
 > `P5 / approved` **in the same commit**. Verified: `git show 7cc0390 -- .dev-flow/state.json`.
 > The two readings give opposite instructions to an opening session — *resume the requirements
-> iteration* versus *the batch is closed*. **That row is still uncorrected in PR #199.**
+> iteration* versus *the batch is closed*. **CORRECTED 2026-08-23** — that row now reads
+> `P5 / approved`, with a note in that document recording what it said and why it was wrong.
+> The `flow` row there is deliberately NOT corrected: `rev39` was true at that cut.
 
 ---
 
@@ -399,7 +401,8 @@ decomposition is wrong. **Measured: all three, and the worst one is unnamed.**
    exceeds ~10 s, `V20` must degrade to a file-list / mtime check — a weaker guard, and that trade
    should be decided explicitly rather than discovered at the first slow gate.
 5. **Rule D-II** — the format evidence is in, and it argues for a clean start on surface #2.
-6. **Fix the false `P2 / iterating` row** in the previous handoff's §0 (§0 above).
+6. ~~Fix the false `P2 / iterating` row in the previous handoff's §0.~~ **DONE 2026-08-23** —
+   corrected with its record kept, per rev36. Nothing left here.
 
 ---
 
