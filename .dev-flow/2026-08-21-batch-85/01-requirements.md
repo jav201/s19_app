@@ -333,6 +333,7 @@ independently?** ✅ **Yes** — a consumer selects `#loaded_panel` and indexes 
 ```
 COMPONENT: loaded_panel
   PARENT : screen_workspace
+  SURFACE: LoadedArtifactsPanel
   INPUTS : loaded: Optional[LoadedFile] ; project: str
   OUTPUTS:
     - id          : panel_handle
