@@ -13,7 +13,7 @@
     }
   ],
   "current_station": "P2",
-  "phase_status": "in-progress",
+  "phase_status": "iterating",
   "stations_active": [
     "P0",
     "P1",
@@ -25,7 +25,7 @@
   "iterations_per_station": {
     "P0": 0,
     "P1": 1,
-    "P2": 0,
+    "P2": 1,
     "P3": 0,
     "P4": 0,
     "P5": 0
@@ -60,7 +60,8 @@
     "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)"
   },
   "artifacts": {
-    "P1": ".dev-flow/2026-08-24-batch-86/01-requirements.md"
+    "P1": ".dev-flow/2026-08-24-batch-86/01-requirements.md",
+    "P2": ".dev-flow/2026-08-24-batch-86/02-review.md"
   },
   "decisions_log": [
     {
@@ -80,6 +81,12 @@
       "date": "2026-08-24",
       "decision": "approved (autonomous D-86-5)",
       "notes": "Record authored + qa fold; G-86 5/7 GREEN, G6 owed at close (P-8), G7 pin; validator 0 block / 254 notice; commit 202d91c. Surface hypothesis held with corrected location (P-2 FALSE recorded)."
+    },
+    {
+      "station": "P2",
+      "date": "2026-08-24",
+      "decision": "iterate-to-refine (autonomous D-86-6)",
+      "notes": "1 blocker (B86-R2-01: C-55 emptiness refuted - bare-name sweep was app.py-only) + 6 major + 7 minor; all confined to the record; returned to the P1 author with consolidated fixes; moved figures to be re-measured, never edited (C-39 rider)."
     }
   ],
   "standing_authorization": {
