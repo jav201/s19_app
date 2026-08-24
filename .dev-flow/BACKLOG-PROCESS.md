@@ -4,7 +4,13 @@
 >
 > **Control-encode rule:** every control needs its own AskUserQuestion before it is encoded (`feedback_devflow_control_encode_approval`). Global flows stay project-agnostic — stack-specific controls go to `docs/engineering-rules.md` (`feedback_devflow_general_flows_project_agnostic`). Note the global `/dev-flow` command lives OUTSIDE this repo, so that leg is not covered by the project PR flow and needs its own before/after record in the batch artifacts.
 
-> **Last refresh: 2026-08-01 (batch-77 Phase-3 handoff — a CODE-lane batch routing one Lane-B carry here).** `origin/main` tip = **`f8747b8`**. batch-77's own work is reconciled in [`BACKLOG-CODE.md`](BACKLOG-CODE.md); **one item belongs to this lane and is WRITTEN here rather than left as a pointer**, per the routing rule. See the new section immediately below.
+> **Last refresh: 2026-08-24 (batch-86 close — two Lane-B carries WRITTEN here per the routing rule).** `origin/main` tip = **`a112eeb`**. batch-86 (code lane, IFC surface #2) surfaced two PROCESS items:
+>
+> **(1) NEW CONTROL CANDIDATE — an evidence transcript is corpus input.** Origin, measured: the Inc-1 increment packet quoted the RED-counterfactual's corrupted id verbatim and used dotted-range shorthand; the Atlas id-scanner adopted THREE phantom ids, and one `--atlas --write` away they were permanent in the committed derived plane. The C-40 restore obligation must extend to every scannable artifact that QUOTES the mutation (describe mutations by position/operation, never spell the token), and range shorthand is forbidden where an id-scanner reads. Owed: the four C-45 landings (command · template · catalog · push) at a future flow rev — batch-86 discharged only the instance. Needs its AskUserQuestion before encoding, per this lane's control-encode rule.
+>
+> **(2) P0-scaffold rule candidate:** a batch scaffolded WITHOUT its own `01-requirements.md` is judged on batch-01's frozen doc by `_artifacts()`'s walk fallback (measured at batch-86 open: 17 V4 blocks). The Phase-0 artifact (the §2.6 intake block) must be born with the batch — one sentence in the flow's Phase-0 map would close it.
+>
+> **Earlier refresh: 2026-08-01 (batch-77 Phase-3 handoff — a CODE-lane batch routing one Lane-B carry here).** `origin/main` tip = **`f8747b8`**. batch-77's own work is reconciled in [`BACKLOG-CODE.md`](BACKLOG-CODE.md); **one item belongs to this lane and is WRITTEN here rather than left as a pointer**, per the routing rule. See the new section immediately below.
 
 ## ✅ BATCH-82 — `C-54`, the Information Flow Contract · LANE B HALF — **ENCODED 2026-08-15**
 

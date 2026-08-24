@@ -27,9 +27,11 @@
 - **Supersession inspection:** ✓ the one superseded marker of this batch (the pilot's
   "parent … NOT checked" NOTICE for `loaded_panel`) has 0 surviving live references; its only
   surviving assertion is a **negative** one (an absence claim, with its positive control)
-- **Test ledger:** ⚠ **PENDING — orchestrator's `s19env` gate run, folded at the gate.** The
-  diff half of the pin is green and executed; the arithmetic half cannot be stated until the
-  baseline lands. Recorded as pending, never as reconciling.
+- **Test ledger:** ✓ **FOLDED at the gate** — `2702 passed · 6 failed · 3 skipped · 3 xfailed`
+  of 2714 selected, one complete run; the 6 diagnosed by execution as pre-existing
+  order-dependent flakiness (each passes isolated on pristine `main`), carried to the
+  backlog at close. Ledger `post = 2714 − 0 + 0` reconciles; the pin's diff half was
+  already green. Full disposition in the ledger table below.
 - **Evidence checklist (qa-reviewer):** ✓ complete — 11/11 items cited below
 - **Kill mutations owed at Phase 4 (M4 · M5 · M7):** ✓ **all three executed on disposable
   copies**, live tree never mutated (`git status --porcelain` empty after the run)
@@ -309,7 +311,21 @@ absence, and an absence claim needs exactly the two controls above.
 
 | base | − D | + A | = post | actual collected | passed-lean / full | reconciles? |
 |------|-----|-----|--------|------------------|--------------------|-------------|
-| PENDING | 0 | 0 | PENDING | PENDING | PENDING | **PENDING — orchestrator's `s19env` gate run, folded at the gate** |
+| 2714 selected (2735 − 21 deselected) | 0 | 0 | 2714 | 2714 | **2702 passed · 6 failed · 3 skipped · 3 xfailed** (one complete run, 39:49, its own output at the orchestrator's `batch86_baseline.txt`) | **✓ with the 6 dispositioned below** |
+
+**FOLDED AT THE GATE by the orchestrator (C-25/C-19 — one complete `s19env` run, evidence
+read from that run's own output file).** The 6 failures were DIAGNOSED before acceptance,
+by execution on pristine `main` (`a112eeb`, same env): **every one of the 6 passes in
+isolation on main** (`at057b` 1.82 s · `at023c` 1.55 s · the remaining 4 in the 6-test
+group run, `1 failed 5 passed in 16.28 s` — and that one, `at023c`, then passed alone,
+so even a 6-test group exhibits the cross-test pollution). Verdict: **order/state-dependent
+suite flakiness, pre-existing, reproduced entirely OUTSIDE this batch's changes** — the
+batch's source-scope diff is empty and `tests/` is byte-identical to merge-base. The 6
+node ids and both repro transcripts are carried to `BACKLOG-CODE.md` at close (test-hygiene
+carry: order-dependent TUI pilots — `test_at_061a…`, `test_at006…`, `test_at005…`,
+`test_at023c…`, `test_at057b…`, `test_at064b…`). The pin's subject — "this batch changed
+no behavior" — is discharged by the empty diff; the flaky 6 are a property of the base,
+recorded and carried, never swept.
 
 Per C-25 the orchestrator owns the suite run and it is in flight; this phase deliberately did
 **not** run `pytest`. What *is* established here, executed:

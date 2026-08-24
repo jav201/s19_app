@@ -12,8 +12,8 @@
       "reason": "Same ruling as batch-85's promotion: the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for (C-50)."
     }
   ],
-  "current_station": "P4",
-  "phase_status": "in-progress",
+  "current_station": "P5",
+  "phase_status": "approved",
   "stations_active": [
     "P0",
     "P1",
@@ -27,8 +27,8 @@
     "P1": 1,
     "P2": 1,
     "P3": 1,
-    "P4": 0,
-    "P5": 0
+    "P4": 1,
+    "P5": 1
   },
   "triggers": {
     "evaluated_at": "2026-08-24T00:00:00-06:00",
@@ -62,7 +62,9 @@
   "artifacts": {
     "P1": ".dev-flow/2026-08-24-batch-86/01-requirements.md",
     "P2": ".dev-flow/2026-08-24-batch-86/02-review.md",
-    "P3": ".dev-flow/2026-08-24-batch-86/03-increments/increment-001.md"
+    "P3": ".dev-flow/2026-08-24-batch-86/03-increments/increment-001.md",
+    "P4": ".dev-flow/2026-08-24-batch-86/04-validation.md",
+    "P5": ".dev-flow/2026-08-24-batch-86/05-close.md"
   },
   "decisions_log": [
     {
@@ -106,6 +108,18 @@
       "date": "2026-08-24",
       "decision": "increment 001 approved after fix-first (autonomous D-86-8)",
       "notes": "Canon seeded (R-TUI-114); code review 2 HIGH both in the packet (phantom ids incl. the RED-arm token quoted in evidence - new control candidate: an evidence transcript is corpus input); fixpoint proven; orchestrator re-verified proofs. Commit 212b8c0."
+    },
+    {
+      "station": "P4",
+      "date": "2026-08-24",
+      "decision": "approved (autonomous D-86-9)",
+      "notes": "PASS; 3 kill mutations on copies (M4 pair+1/file-union 0 = defect #1 demo; M5 full parse path BLOCK at pilot :334; M7 refuted own prediction, surgical arm confirmed); ledger folded: 2702/6/3/3 of 2714, the 6 diagnosed pre-existing order-dependent (each passes isolated on pristine main). Commit c0c1d27 + fold."
+    },
+    {
+      "station": "P5",
+      "date": "2026-08-24",
+      "decision": "close batch (autonomous D-86-10)",
+      "notes": "CLOSED COMPLETE. Both backlog lanes reconciled (6 flaky nodes, workspace_body=surface #3 candidate, batch-51 phantom range, canon packing -> lane A; evidence-transcript control candidate + P0-scaffold rule -> lane B). Cost n=2 with dispersion, non-extrapolation restated. Landing: push branch, PR #199, stop at CI green per no-merge authorization."
     }
   ],
   "standing_authorization": {
