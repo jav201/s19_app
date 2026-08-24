@@ -12,7 +12,7 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P3",
+  "current_station": "P4",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -26,7 +26,7 @@
     "P0": 0,
     "P1": 0,
     "P2": 1,
-    "P3": 0,
+    "P3": 1,
     "P4": 0,
     "P5": 0
   },
@@ -60,7 +60,9 @@
     "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)"
   },
   "artifacts": {
-    "P1": ".dev-flow/2026-08-24-batch-87/01-requirements.md"
+    "P1": ".dev-flow/2026-08-24-batch-87/01-requirements.md",
+    "P2": ".dev-flow/2026-08-24-batch-87/02-review.md",
+    "P3": ".dev-flow/2026-08-24-batch-87/03-increments/increment-001.md"
   },
   "decisions_log": [
     {
@@ -98,6 +100,12 @@
       "date": "2026-08-24",
       "decision": "approved after 1 iteration (autonomous D-87-5)",
       "notes": "12/13 findings fixed by re-measurement; 1 reviewer remedy REFUSED with executed refutation (R-87-3b: 'nine screens' correct under the ten-screen model -- the C-50 shape working as intended). Notice delta zero (284->284, accounted: fixes touched prose/tables, no declarations). Orchestrator re-executed corrected predicates: validator line, R2-06 heading grep = 1, two labelled fences present, dispersion 6->31->42 at :1433, line 3284 content matches the refusal, AT-B87 sets IDENTICAL across record and 01b. New gates G10/G11; six ATs realized. Batch-85 record needed no change this iteration."
+    },
+    {
+      "station": "P3",
+      "date": "2026-08-24",
+      "decision": "increment 001 approved after fix-first (autonomous D-87-6)",
+      "notes": "G8 discharged: V22 289->276 of 544 (-13 term-by-term: HLR -3, LLR -8, US -2), 13 ids seeded one-per-line, per-id greps all >=1, RED arm executed with sha256-proven restore + independent validator RED (277). Code review BLOCKed on F1 HIGH (R-TUI-113 status over-claim erasing undischarged pilot defects) + F2 MED (packet minted a phantom-feeder token -- the C-56 class the gate exists for) + F3 MED (106 false narrowing) + F4 LOW; all four fixed and re-measured, phantom census WIDENED to 8 feeders / 3 stems and registered as carry. Orchestrator re-verified: validator 0 block / 284 notice, scoped headline present, NOT-discharge enumeration present, minting token 0, 251 decomposition in canon. Registry consumer 13 passed; source pin empty."
     }
   ],
   "standing_authorization": {

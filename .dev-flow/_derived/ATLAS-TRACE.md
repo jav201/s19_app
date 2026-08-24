@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 64 requirement files | corpus digest: cc0d136968f4d3a3 -->
+<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 64 requirement files | corpus digest: 2a35037db2b5abd9 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1566,9 +1566,9 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-86.1` | batches, canon |
 | `HLR-86.2` | batches, canon |
 | `HLR-86.3` | batches, canon |
-| `HLR-87.1` | batches |
-| `HLR-87.2` | batches |
-| `HLR-87.3` | batches |
+| `HLR-87.1` | batches, canon |
+| `HLR-87.2` | batches, canon |
+| `HLR-87.3` | batches, canon |
 | `HLR-A56` | batches, tests |
 | `HLR-B2` | batches |
 | `HLR-B64-1` | batches |
@@ -2392,14 +2392,14 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `LLR-86.8` | batches, canon |
 | `LLR-86.99` | batches |
 | `LLR-87` | batches |
-| `LLR-87.1` | batches |
-| `LLR-87.2` | batches |
-| `LLR-87.3` | batches |
-| `LLR-87.4` | batches |
-| `LLR-87.5` | batches |
-| `LLR-87.6` | batches |
-| `LLR-87.7` | batches |
-| `LLR-87.8` | batches |
+| `LLR-87.1` | batches, canon |
+| `LLR-87.2` | batches, canon |
+| `LLR-87.3` | batches, canon |
+| `LLR-87.4` | batches, canon |
+| `LLR-87.5` | batches, canon |
+| `LLR-87.6` | batches, canon |
+| `LLR-87.7` | batches, canon |
+| `LLR-87.8` | batches, canon |
 | `LLR-99.9` | batches |
 | `LLR-A` | batches |
 | `LLR-A56` | tests |
@@ -2722,8 +2722,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `US-85-3` | batches |
 | `US-85-4` | batches |
 | `US-86-1` | batches, canon |
-| `US-87-1` | batches |
-| `US-87-2` | batches |
+| `US-87-1` | batches, canon |
+| `US-87-2` | batches, canon |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -2989,7 +2989,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `R-TUI-112` | batches, canon |
 | `R-TUI-113` | batches, canon |
 | `R-TUI-114` | batches, canon |
-| `R-TUI-115` | batches |
+| `R-TUI-115` | batches, canon |
 | `R-VAL-001` | batches, canon |
 | `R-VAL-002` | batches, canon |
 | `R-VAR-001` | canon |
