@@ -5,7 +5,14 @@
 
 ## Where we are
 
-- **Station:** P0 (intake) — in progress.
+- **Station:** P1 (requirements) — in progress. P0 approved 2026-08-24 (D-86-4, autonomous
+  self-approval: no nameable gap on Coverage/Certainty/Evidence for intake; packet presented
+  in-conversation; commit `257922c`).
+- **P1 checkpoint 1:** qa-reviewer deliverable landed → `01b-qa-validation-plan.md`
+  (pre-state measured; methods with counted-message thresholds; kill-mutation table M1–M8,
+  M4/M5 batch-local mandatory; gate set G-86 with 6 LIVE gates currently RED + 1 labelled
+  PIN; six §2.6 defects D1–D6 to correct at the fold). Architect dispatch still running —
+  authoring §2.7–§5; its doc edits are folded with D1–D6 when it returns.
 - **Trial batch:** this is the FIRST batch run under flow rev42–rev44 (Atlas + V20 · selector
   taxonomy · coherence V21–V23). Part of its purpose is to exercise that machinery end to end.
 
@@ -23,6 +30,38 @@ Author the IFC record for a SECOND surface, clean-start, applying the batch-85 f
 
 Plus: `SURFACE:` field (rev42 template), canon mirror seeded for the new ids (V22's backlog
 must NOT grow), Atlas regenerated at every gate (V20), per-surface cost to n=2 with dispersion.
+
+## P1 checkpoint 2 — architect landed; fold done (2026-08-24)
+
+- **Surface CONFIRMED by execution:** `screen_workspace` = the anonymous
+  `Container(id="screen_workspace")` composed by `S19TuiApp._compose_screen_workspace`
+  (`s19_app/tui/app.py:1963-2071`), mounter of `#loaded_panel`. The PLAN's candidate FILE was
+  refuted (P-2 ❌: `screens_directionb.py` holds the panels, not the screen container) — the
+  hypothesis held with corrected location.
+- **Record:** 2 FLOWs (11 owned nodes) + 1 COMPONENT with `SURFACE:`, 30 outputs (24 id-addressed,
+  1 type-queried, 5 pilot re-exports for balancing), 82 consumer entries over 15 dependant files,
+  pair-based census throughout. **D-86-A:** shared-class addresses (`.db-pane`/`.db-screen`)
+  EXCLUDED — foreign populations (defect-#12 class). 3 HLR + 8 LLR.
+- **Headline:** V12's pilot "NOT checked" notice is GONE — balancing CHECKED; the one V12
+  finding is the honest recursion (`workspace_body` = the next undeclared PARENT).
+- **Fold applied:** §2.6 outcomes corrected per qa D1–D4; G-86 instantiated in §3 with frozen
+  figures (V10 20 · V11 35 · V14 97 · V19 2 · V21 35 · V13 38-pair set · census 2); M4/M7
+  kill-mutations assigned to Phase 4 (on a copy).
+- **Decisions:** D-86-5 = fold + self-approval pending gate run; D-86-A and D-86-E recorded in
+  the requirements doc.
+
+## Risks / watch-items (updated at P1)
+
+- **Notice volume:** this record adds ~21 notices (validator 233 → 254), 20 of them V13 stray
+  pairs — all classified mention/citation, 0 genuine undeclared dependants. Escalation per
+  surface (project decision R-7) stays open; the 4 re-export pairs duplicate the pilot's
+  findings by construction and would clear with D-II.
+- **V22 unowned-LLR census:** LLR-86.7/LLR-86.8 are constrain-only (never owners) — same class
+  as the pilot's LLR-85.4; expected notices, ruled census-NOTICE by the operator (2026-08-23).
+- **V22 transient growth:** 277 → 288 while the canon mirror is unauthored (P-8); shrink-back
+  owed by the Phase-3 seeding increment; G6 measures at CLOSE.
+- **D-II pointer accumulated:** the pilot's absorbed-owner is now the ONLY remaining IFC glue
+  in the UNPARSED census — a one-line fix for whoever rules D-II (not this batch).
 
 ## Base and flow currency (RC-1 · C-45)
 
