@@ -2,9 +2,12 @@
 
 > Executed 2026-08-24 at this worktree (`claude/batch-82-lane-a-scoping`, base `a112eeb`),
 > Git Bash + `grep`, Python from `~/.claude/docs/tools/devflow-validate.py` imported for the
-> in-memory rule arms. **§2.7 of `01-requirements.md` cites these blocks by id (M-1 … M-9).**
+> in-memory rule arms. **§2.7 of `01-requirements.md` cites these blocks by id (M-1 … M-10).**
 > If a number in the requirements disagrees with a transcript here, the transcript wins —
 > and if a transcript disagrees with re-running its command, the re-run wins.
+> **P2-iteration additions:** M-10 (the systematic bare-literal sweep — blocker B86-R2-01's
+> discharge and the declared C-55 search-width guard), the M-1 line correction (B86-R2-03),
+> the M-4 reclassification note, and M-9's invocation snippet (QA-F5).
 
 ## M-1 · Surface identification — who IS `screen_workspace`, and who mounts `#loaded_panel`
 
@@ -15,7 +18,12 @@ s19_app\tui\app.py:2066:            LoadedArtifactsPanel(),          # inside _c
 s19_app\tui\app.py:8907:  panel = self.query_one("#loaded_panel", LoadedArtifactsPanel)
 
 $ grep -c "screen_workspace" s19_app/tui/screens_directionb.py
-1        # a docstring mention (line 211) — the workspace is NOT in this file
+1        # a docstring mention — the workspace is NOT in this file
+$ grep -n "screen_workspace" s19_app/tui/screens_directionb.py
+1784:            - ``S19TuiApp._compose_screen_workspace`` (mounts the widget).
+# ⚠ CORRECTED at the P2 iteration (B86-R2-03): the first version located the hit at ":211",
+# which its own command contradicts — :211 mentions #workspace_body, not screen_workspace.
+# The count (1) and the verdict (docstring mention, wrong file for the surface) stand.
 
 app.py structure (read, lines 1845-2071):
   compose()                 :1845 — yields #workspace_body holding the 10 rail screens
@@ -128,6 +136,14 @@ quoted-literal grep (`"$L"` / `'$L'`), and by reading the hit line. Result class
 (.db-pane,      tests/test_tui_snapshot.py)               :720 comment
 ```
 
+> ⚠ **RECLASSIFIED at the P2 iteration (blocker B86-R2-01, discharged by M-10):** two of the
+> pairs listed above as mentions are DEPENDANTS — the cited hit line is genuinely a docstring,
+> but the same FILE also couples by BARE id elsewhere, which this probe (first-`#`-hit only)
+> could not see: `(search_button, tests/test_tui_commandbar.py)` — `_B78_SEARCH_SURFACES`
+> drives it at `:686`; `(goto_input, tests/test_tui_directionb.py)` — live assertion at
+> `:6375`. The M-4 classification rule was per-pair; its EVIDENCE channel was `#`-literal
+> only. M-10 is the width guard that closes that channel gap.
+
 ## M-5 · Bare-name couplings — dependants whose grep hit is prose (the F-2 accident mirrored)
 
 ```
@@ -208,7 +224,30 @@ tail: 2 block · 233 notice · 14 not applicable
 ## M-9 · In-memory RED/GREEN arms for the balancing claim (pure rule cores; tree untouched — C-40)
 
 `_v12_outcome` / `_v21_outcome` imported from the validator and fed the pilot's parsed shape
-plus the PLANNED `screen_workspace` declaration:
+plus the PLANNED `screen_workspace` declaration. **Scope of proof (per QA-F3): these arms
+demonstrate RULE SENSITIVITY — they feed pre-parsed dicts and bypass the parse path; the
+parse-path evidence over the real record is the LIVE counted GREEN run (V21's counted
+owners line, V12's single specific finding), and one copy-protocol M5 execution is owed at
+Phase 4 beside M4/M7.** Invocation (re-runnable, QA-F5):
+
+```python
+import importlib.util, os
+spec = importlib.util.spec_from_file_location(
+    "dv", os.path.expanduser("~/.claude/docs/tools/devflow-validate.py"))
+dv = importlib.util.module_from_spec(spec); spec.loader.exec_module(dv)
+pilot = {"id": "loaded_panel", "line": 334, "src": "b85",
+         "outputs": [{"id": i} for i in ("panel_handle", "slots_container",
+                                         "slot_rows", "artifact_slots", "project_row")],
+         "fields": {"parent": "screen_workspace",
+                    "inputs": "loaded: Optional[LoadedFile] ; project: str"}}
+def ws(inputs, outs):
+    return {"id": "screen_workspace", "line": 1, "src": "b86",
+            "outputs": [{"id": o} for o in outs], "fields": {"parent": "workspace_body",
+            "inputs": inputs}}
+# GREEN: dv._v12_outcome([pilot, ws(FULL_IN, OWN + RE)])   # FULL_IN/OWN/RE per section 5.3
+# RED 1: FULL_IN without "loaded: ..."  · RED 2: OWN only (re-export omitted)
+# V21 RED: dv._v21_outcome([comp with owner "LLR-86.99"], {"LLR-86.2"})
+```
 
 ```
 GREEN arm (planned record):
@@ -223,3 +262,55 @@ V21 RED arm (owner names undefined LLR-86.99):
 
 Both directions of the balancing claim and the owner rule are demonstrated live: the planned
 record passes, and each single-field mutation of it BLOCKs.
+
+## M-10 · Systematic bare-literal sweep — ALL 24 ids × BOTH `s19_app/` and `tests/` (P2 iteration, blocker B86-R2-01)
+
+**This transcript IS the declared C-55 search-width guard protecting G4's "0 genuine
+undeclared dependants" conclusion.** The original bare-name probe (M-5) ran over `app.py`
+only; G4's emptiness claim therefore rested on an unswept population — C-55's exact shape.
+This sweep covers every declared id over both roots and both quote styles; any future
+widening of the search (new roots, new coupling channels) re-opens G4, and G4 may not be
+cited without citing this guard.
+
+```
+$ for id in <all 24 ids>; do grep -rn --include='*.py' -e "\"$id\"" -e "'$id'" s19_app tests \
+    | grep -v __pycache__; done          # executed 2026-08-24, P2 iteration
+
+Hits, classified (provider `id=...` assignment lines are the PROVIDER, not consumers — D-D):
+
+ws_load_project_button : app.py:2011 (provider) · app.py:11839 on_button_pressed  [already declared]
+files_title            : app.py:2012 (provider)                                    [no coupling]
+files_list             : app.py:2013 (provider) · app.py:7512 on_list_view_selected  [NEW entry]
+sections_title         : app.py:2014 (provider)                                    [no coupling]
+sections_list          : app.py:2015 (provider) · app.py:7517 on_list_view_selected  [NEW entry]
+                         · tests/test_tui_directionb.py:1047,:1063               [already declared]
+ws_left / hex_title / hex_controls / hex_scroll / ws_center / ws_stats_title / ws_stats /
+a2l_title / a2l_scroll / ws_right / ws_memstrip / hex_view* / a2l_view*
+                       : provider line only (*hex_view/a2l_view also directionb:1047-1063,
+                         already declared)                                        [no new coupling]
+search_input           : app.py:2022 (provider) · app.py:5789 _FIND_GOTO_INPUTS   [NEW entry]
+                         · tests/test_tui_commandbar.py:194,:326,:686,:2118,:2420,:2501
+                         · tests/test_tui_directionb.py:6374,:6450               [files already declared]
+search_button          : app.py:2023 (provider) · app.py:11837                    [already declared]
+                         · tests/test_tui_commandbar.py:686 _B78_SEARCH_SURFACES  [NEW DEPENDANT PAIR — reclassifies the M-4 mention]
+goto_input             : app.py:2024 (provider) · app.py:5789 _FIND_GOTO_INPUTS   [NEW entry]
+                         · tests/test_tui_commandbar.py:422,:686,:2118            [file already declared]
+                         · tests/test_tui_directionb.py:6375 (live assertion)     [NEW DEPENDANT PAIR — reclassifies the M-4 mention]
+goto_button            : app.py:2025 (provider) · app.py:11843                    [already declared]
+                         · tests/test_tui_commandbar.py:686 _B78_SEARCH_SURFACES  [NEW DEPENDANT PAIR]
+workspace_panes        : app.py:2058 (provider) · app.py:6009 _EMPTY_STATE_SCREENS [already declared]
+screen_workspace       : app.py:2069 (provider) · app.py:5749 SCREEN_CONTAINER_IDS [NEW entry]
+                         · app.py:6009 _EMPTY_STATE_SCREENS                        [already declared]
+                         · tests/test_tui_commandbar.py:135 (composes f"#{sid}"), :306,:316,
+                           :329,:481,:491 (assertions)                             [NEW DEPENDANT PAIR]
+                         · tests/test_tui_directionb.py:137,:201                   [already declared]
+```
+
+**Verdict: 4 new dependant PAIRS** — `(search_button, tests/test_tui_commandbar.py)`,
+`(goto_input, tests/test_tui_directionb.py)`, `(goto_button, tests/test_tui_commandbar.py)`,
+`(screen_root, tests/test_tui_commandbar.py)` — **plus 5 new function-granular in-app
+entries** on already-declared `app.py` (`SCREEN_CONTAINER_IDS` → screen_root;
+`_FIND_GOTO_INPUTS` → search_input, goto_input; `on_list_view_selected` → files_list,
+sections_list). **No pair beyond the P2 review's list appeared.** Constant names verified in
+place: `SCREEN_CONTAINER_IDS` `app.py:5748` · `_FIND_GOTO_INPUTS` `app.py:5788` ·
+`_B78_SEARCH_SURFACES` `tests/test_tui_commandbar.py:685`.

@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev44 | flow_hash: 70ac33486b32d024 | corpus: 63 requirement files | corpus digest: f2f8ac9ef4afdbd0 -->
+<!-- flow_version: 2026.08.24-rev44 | flow_hash: 70ac33486b32d024 | corpus: 63 requirement files | corpus digest: dfb3cef58e031080 -->
 
 # ATLAS-IFC — how is the application addressed?
 
@@ -18,7 +18,7 @@
 - node `assert_census_form_membership` — owner LLR-85.6
 - node `measure_per_surface_cost` — owner LLR-85.7
 
-### FLOW `workspace_readout` — .dev-flow/2026-08-24-batch-86/01-requirements.md:305
+### FLOW `workspace_readout` — .dev-flow/2026-08-24-batch-86/01-requirements.md:323
 - node `_apply_loaded_file` — owner LLR-86.1
 - node `refresh_files` — owner LLR-86.3
 - node `update_sections` — owner LLR-86.3
@@ -29,7 +29,7 @@
 - node `_apply_empty_state` — owner LLR-86.2
 - node `_refresh_loaded_panel` — owner LLR-86.6
 
-### FLOW `workspace_find_goto` — .dev-flow/2026-08-24-batch-86/01-requirements.md:347
+### FLOW `workspace_find_goto` — .dev-flow/2026-08-24-batch-86/01-requirements.md:365
 - node `_handle_search` — owner LLR-86.4
 - node `_handle_goto` — owner LLR-86.4
 
@@ -47,7 +47,7 @@
 | `artifact_slots` | `query(".loaded-detail"), INDEXED POSITIONALLY` | 3 | 4 declared | LLR-85.2 |
 | `project_row` | `query(".loaded-project-detail")` | 1 | 2 declared | LLR-85.3 [+ABSORBED] |
 
-### COMPONENT `screen_workspace` — .dev-flow/2026-08-24-batch-86/01-requirements.md:368
+### COMPONENT `screen_workspace` — .dev-flow/2026-08-24-batch-86/01-requirements.md:386
 - inputs : loaded: Optional[LoadedFile] ; project: str ; workarea_files: list[Path] ; search_query: str ; goto_addr: str
 - outputs : 
 - parent : workspace_body
@@ -55,7 +55,7 @@
 
 | output | address | cardinality | consumers | owner |
 |---|---|---|---|---|
-| `screen_root` | `query_one("#screen_workspace")` | 1 | 3 declared | LLR-86.2 |
+| `screen_root` | `query_one("#screen_workspace")` | 1 | 5 declared | LLR-86.2 |
 | `memstrip_band` | `query_one("#ws_memstrip")` | 1 | 4 declared | LLR-86.2 |
 | `panes_container` | `query_one("#workspace_panes")` | 1 | 3 declared | LLR-86.2 |
 | `left_pane` | `query_one("#ws_left")` | 1 | 3 declared | LLR-86.2 |
@@ -64,15 +64,15 @@
 | `empty_state` | `query_one(EmptyStatePanel) scoped to the workspace screen subtree — type selector, computed, carries no quoted literal by design (the widget sets no id)` | 1 | 2 declared | LLR-86.2 |
 | `load_project_button` | `query_one("#ws_load_project_button")` | 1 | 3 declared | LLR-86.3 |
 | `files_title` | `query_one("#files_title")` | 1 | 1 declared | LLR-86.3 |
-| `files_list` | `query_one("#files_list")` | 1 | 3 declared | LLR-86.3 |
+| `files_list` | `query_one("#files_list")` | 1 | 4 declared | LLR-86.3 |
 | `sections_title` | `query_one("#sections_title")` | 1 | 1 declared | LLR-86.3 |
-| `sections_list` | `query_one("#sections_list")` | 1 | 4 declared | LLR-86.3 |
+| `sections_list` | `query_one("#sections_list")` | 1 | 5 declared | LLR-86.3 |
 | `hex_title` | `query_one("#hex_title")` | 1 | 1 declared | LLR-86.4 |
 | `hex_controls` | `query_one("#hex_controls")` | 1 | 1 declared | LLR-86.4 |
-| `search_input` | `query_one("#search_input")` | 1 | 7 declared | LLR-86.4 |
-| `search_button` | `query_one("#search_button")` | 1 | 1 declared | LLR-86.4 |
-| `goto_input` | `query_one("#goto_input")` | 1 | 4 declared | LLR-86.4 |
-| `goto_button` | `query_one("#goto_button")` | 1 | 1 declared | LLR-86.4 |
+| `search_input` | `query_one("#search_input")` | 1 | 8 declared | LLR-86.4 |
+| `search_button` | `query_one("#search_button")` | 1 | 2 declared | LLR-86.4 |
+| `goto_input` | `query_one("#goto_input")` | 1 | 6 declared | LLR-86.4 |
+| `goto_button` | `query_one("#goto_button")` | 1 | 2 declared | LLR-86.4 |
 | `hex_scroll` | `query_one("#hex_scroll")` | 1 | 3 declared | LLR-86.4 |
 | `hex_view` | `query_one("#hex_view")` | 1 | 5 declared | LLR-86.4 |
 | `ws_stats_title` | `query_one("#ws_stats_title")` | 1 | 1 declared | LLR-86.5 |
@@ -90,29 +90,29 @@
 
 - [-] V10  01-requirements.md: 20 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 35 OUTPUT(s), each with an address and a declared consumer list
-- [!] V12  .dev-flow/2026-08-24-batch-86/01-requirements.md:368: COMPONENT screen_workspace: parent `workspace_body` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-08-24-batch-86/01-requirements.md:386: COMPONENT screen_workspace: parent `workspace_body` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:339: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:349: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:363: COMPONENT loaded_panel/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:373: COMPONENT screen_workspace/screen_root: reached by 4 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:381: COMPONENT screen_workspace/memstrip_band: reached by 4 undeclared file(s) — REQUIREMENTS.md, prototypes/legend_n8.INVENTORY.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:398: COMPONENT screen_workspace/left_pane: reached by 3 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:406: COMPONENT screen_workspace/center_pane: reached by 2 undeclared file(s) — REQUIREMENTS.md, prototypes/screen_upgrades.HANDOFF-PLAN.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:414: COMPONENT screen_workspace/right_pane: reached by 2 undeclared file(s) — prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:429: COMPONENT screen_workspace/load_project_button: reached by 1 undeclared file(s) — tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:443: COMPONENT screen_workspace/files_list: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:457: COMPONENT screen_workspace/sections_list: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:472: COMPONENT screen_workspace/hex_controls: reached by 1 undeclared file(s) — s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:478: COMPONENT screen_workspace/search_input: reached by 1 undeclared file(s) — prototypes/cmdbar_a2bdiff.HANDOFF.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:490: COMPONENT screen_workspace/search_button: reached by 2 undeclared file(s) — tests/test_tui_commandbar.py, tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:496: COMPONENT screen_workspace/goto_input: reached by 2 undeclared file(s) — prototypes/cmdbar_a2bdiff.HANDOFF.md, tests/test_tui_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:505: COMPONENT screen_workspace/goto_button: reached by 1 undeclared file(s) — tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:511: COMPONENT screen_workspace/hex_scroll: reached by 3 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/app.py, tests/test_tui_mac_layout.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:519: COMPONENT screen_workspace/hex_view: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md, REQUIREMENTS.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:535: COMPONENT screen_workspace/ws_stats: reached by 2 undeclared file(s) — REQUIREMENTS.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:565: COMPONENT screen_workspace/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:575: COMPONENT screen_workspace/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:589: COMPONENT screen_workspace/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:391: COMPONENT screen_workspace/screen_root: reached by 4 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:401: COMPONENT screen_workspace/memstrip_band: reached by 4 undeclared file(s) — REQUIREMENTS.md, prototypes/legend_n8.INVENTORY.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:418: COMPONENT screen_workspace/left_pane: reached by 3 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:426: COMPONENT screen_workspace/center_pane: reached by 2 undeclared file(s) — REQUIREMENTS.md, prototypes/screen_upgrades.HANDOFF-PLAN.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:434: COMPONENT screen_workspace/right_pane: reached by 2 undeclared file(s) — prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:449: COMPONENT screen_workspace/load_project_button: reached by 1 undeclared file(s) — tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:463: COMPONENT screen_workspace/files_list: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:478: COMPONENT screen_workspace/sections_list: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:494: COMPONENT screen_workspace/hex_controls: reached by 1 undeclared file(s) — s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:500: COMPONENT screen_workspace/search_input: reached by 1 undeclared file(s) — prototypes/cmdbar_a2bdiff.HANDOFF.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:513: COMPONENT screen_workspace/search_button: reached by 1 undeclared file(s) — tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:520: COMPONENT screen_workspace/goto_input: reached by 1 undeclared file(s) — prototypes/cmdbar_a2bdiff.HANDOFF.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:531: COMPONENT screen_workspace/goto_button: reached by 1 undeclared file(s) — tests/test_tui_patch_chips.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:538: COMPONENT screen_workspace/hex_scroll: reached by 3 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/app.py, tests/test_tui_mac_layout.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:546: COMPONENT screen_workspace/hex_view: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md, REQUIREMENTS.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:562: COMPONENT screen_workspace/ws_stats: reached by 2 undeclared file(s) — REQUIREMENTS.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:592: COMPONENT screen_workspace/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:602: COMPONENT screen_workspace/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:616: COMPONENT screen_workspace/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  01-requirements.md: 1 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [-] V14  01-requirements.md: 97 declared consumer(s), every one resolved
+- [-] V14  01-requirements.md: 106 declared consumer(s), every one resolved
 - [-] V19  01-requirements.md: 2 COMPONENT id(s), each declared exactly once

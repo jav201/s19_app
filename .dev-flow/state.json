@@ -12,8 +12,8 @@
       "reason": "Same ruling as batch-85's promotion: the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for (C-50)."
     }
   ],
-  "current_station": "P2",
-  "phase_status": "iterating",
+  "current_station": "P3",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "P1",
@@ -87,6 +87,12 @@
       "date": "2026-08-24",
       "decision": "iterate-to-refine (autonomous D-86-6)",
       "notes": "1 blocker (B86-R2-01: C-55 emptiness refuted - bare-name sweep was app.py-only) + 6 major + 7 minor; all confined to the record; returned to the P1 author with consolidated fixes; moved figures to be re-measured, never edited (C-39 rider)."
+    },
+    {
+      "station": "P2",
+      "date": "2026-08-24",
+      "decision": "approved after 1 iteration (autonomous D-86-7)",
+      "notes": "All 14 findings discharged; orchestrator re-measured the moved figures (V14 106, V13 40 pairs = 4+36, V12 1, unowned set exact, AT command verbatim); M-10 = the declared C-55 guard. 0 block / 254 notice / 15 n/a."
     }
   ],
   "standing_authorization": {
