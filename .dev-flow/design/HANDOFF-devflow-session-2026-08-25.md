@@ -138,11 +138,42 @@ under its own gate — the pattern batch-87's P0 already followed.
    regen + commit** (see §5b). Scope is operator-declared: **US-A + US-B + US-C + US-E**, US-D
    (C-45 reconciliation of 15 half-encoded controls) deferred. **Read §7 first** — the proposal has
    three defects.
-3. **Refresh the vault visual-evidence gallery.** Newest asset is **2026-08-07**; the last commit
-   touching `s19_app/tui/` is **`f198447` (2026-08-13, batch-79)**. All **176** assets predate the
-   last UI change — the exact staleness shape the sync-side reject-check exists to catch. Not caused
-   by batch-87 (0 UI files). Needs `s19env` + the `visual-evidence.md` §5 copy helper.
-4. **batch-85 vault sync gap** — still open, still a gap and not an error.
+3. **Refresh the vault visual-evidence gallery — BLOCKED, and the root cause is new (2026-08-25).**
+   Newest asset is **2026-08-07**; the last commit touching `s19_app/tui/` is **`f198447`
+   (2026-08-13, batch-79)**, so every live asset predates the last UI change. **The refresh was
+   attempted and could not run:**
+
+   ```
+   pytest -m slow tests/test_examples_pilot_gifs.py   (s19env, direct env-python per G4-03)
+   → 15 failed in 32.39s — ModuleNotFoundError: No module named 'PIL'
+   ```
+
+   **`Pillow` is not declared anywhere in `pyproject.toml`** — neither in `[project] dependencies`
+   nor in the `dev` extra — and `test_examples_pilot_gifs.py` imports it **lazily inside a function**
+   (`from PIL import Image, ImageDraw, ImageFont`, `:111`). That combination is why nothing ever
+   shouted: the suite **collects** clean and fails only at run time. Measured both ways:
+   **`s19env` has no PIL; Anaconda base has PIL 12.2.0 but cannot collect the suite** (22
+   pre-existing `tests.conftest` import errors). **Neither env can run the evidence suite today** —
+   that, not neglect, is why the gallery froze.
+
+   **Deliberately not fixed by `pip install pillow`**: papering an undeclared dependency makes the
+   next silence quieter. The fix is to **declare it** (an evidence/dev extra in `pyproject.toml`)
+   and then install — a dependency-contract change that wants an owner and a gate, not a side-effect
+   of a sync.
+
+   Asset decomposition, measured, for whoever does the refresh: **176 total = 90 live**
+   (75 flattened frames + 15 gifs) **+ 80 nested** (16 dirs, historical context, operator ruling
+   2026-07-29 KEEP, 75 @ 2026-08-03 + 5 @ 2026-07-08) **+ 6 retired**
+   (`pv__case_06_large_nested_a2l`: 5 frames + 1 gif). ⚠ The §5 GIF helper is a **blanket glob** and
+   will re-stamp the retired case as fresh unless excluded **by name**; the §5 SVG helper must be the
+   **flattening** loop, never `-Recurse` (a recursive copy already destroyed the nested set once —
+   see `visual-evidence.md` §6's correction block).
+
+4. ✅ **batch-85 vault sync gap — CLOSED 2026-08-25.** Synced retroactively as
+   `dev-flow-batches/2026-08-21-batch-85/`, `verdict: iterate` with 8 honest `null`s (no
+   `02-review.md`, no `03-increments/`, no `04-validation.md` exist — P3/P4/P5 were never reached).
+   Recorded as CLOSED UNFINISHED in the body rather than dressed up: an absent Dashboard row reads
+   as *"this batch never happened"*, a stronger false claim than an honest `iterate` row.
 5. **PDR/DDR id rule** — V23 still reports "no PDR/DDR citations anywhere; the id glue is unused".
    Needs a first real PDR to exist before more machinery is worth building.
 6. **Test-hygiene batch** for the flaky family — now with real rate figures at N=10 (see §4) and the
