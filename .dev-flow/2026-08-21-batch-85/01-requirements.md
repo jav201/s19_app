@@ -302,81 +302,31 @@ FLOW: loaded_artifacts_readout
 
 ### 5.2 Part A — this batch's own authoring flow
 
-```
-FLOW: ifc_pilot_authoring
-  SOURCE : the shipped tree (s19_app, tests, s19_app/tui/styles.tcss, prototypes)
-  NODES  :
-    - fn    : measure_address_consumers
-      owner : LLR-85.2
-      in    : a declared literal address
-      out   : the measured set of files that reach it
-    - fn    : correct_stale_consumer_notes
-      owner : LLR-85.5
-      in    : the measured set
-      out   : five in-repo sites agreeing with it
-    - fn    : assert_census_form_membership
-      owner : LLR-85.6
-      in    : the address census's form column
-      out   : pass, or the name of the unmodelled form
-    - fn    : measure_per_surface_cost
-      owner : LLR-85.7
-      in    : the executed authoring work
-      out   : six labelled per-surface figures
-  SINK   : this record, the corrected notes, and the recorded V10-V14 verdict
-```
+> ⚠️ **The `ifc_pilot_authoring` FLOW block that stood here is DELETED, under batch-87's D-II
+> ruling** (decision D-87-E). It was catalogued defect #11 of the pilot handoff §5: its four `fn`
+> entries were process verbs with no `def` anywhere in the tree, and it supplied 4 of V10's 9
+> nodes. Batch-86 already declined to author an authoring pseudo-FLOW for the same reason
+> (D-86-C); re-authoring the pilot applies the same rule to the pilot. The batch's authoring
+> transforms are recorded as probe transcripts, not as FLOW nodes.
+>
+> **Residual, declared rather than hidden:** `LLR-85.1`'s numeric threshold in §4 still reads
+> *"V10 reports 9 FLOW node(s)"*. That figure was true of the corpus when it was written and is
+> now superseded — §4 is not a contract section and batch-87 did not edit it. The live figure
+> is the one the validator prints; batch-87 §5.6 carries it.
 
 ### 5.3 Part B — boundary decomposition
 
 **Trigger question: does the system's boundary have components a consumer can address
 independently?** ✅ **Yes** — a consumer selects `#loaded_panel` and indexes its children.
 
-```
-COMPONENT: loaded_panel
-  PARENT : screen_workspace
-  SURFACE: LoadedArtifactsPanel
-  INPUTS : loaded: Optional[LoadedFile] ; project: str
-  OUTPUTS:
-    - id          : panel_handle
-      value       : the mounted panel widget itself
-      address     : query_one("#loaded_panel")
-      cardinality : 1
-      consumers   : s19_app/tui/app.py::_refresh_loaded_panel
-                    s19_app/tui/styles.tcss
-                    tests/test_help_toggle_and_a2l_panel.py::_a2l_slot_text
-                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
-                    tests/test_unload_feature.py::_detail_texts
-      owner       : LLR-85.1
-    - id          : slots_container
-      value       : the re-mount target holding every row
-      address     : query_one("#loaded_slots")
-      cardinality : 1
-      consumers   : s19_app/tui/styles.tcss
-                    tests/test_tui_commandbar.py
-                    tests/test_tui_variants.py::_project_label
-      owner       : LLR-85.1
-    - id          : slot_rows
-      value       : project row, then S19/MAC/A2L, then the unload-all footer
-      address     : query("#loaded_slots > Horizontal"), cells within a row INDEXED POSITIONALLY as kind then detail then optional unload
-      cardinality : 5
-      consumers   : tests/test_tui_variants.py::_project_label
-      owner       : LLR-85.1
-    - id          : artifact_slots
-      value       : the three artifact detail texts, in _SLOTS order
-      address     : query(".loaded-detail"), INDEXED POSITIONALLY
-      cardinality : 3
-      consumers   : s19_app/tui/styles.tcss
-                    tests/test_help_toggle_and_a2l_panel.py::_a2l_slot_text
-                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
-                    tests/test_unload_feature.py::_detail_texts
-      owner       : LLR-85.2
-    - id          : project_row
-      value       : the active project string in the caller's display form, or the absent sentinel
-      address     : query(".loaded-project-detail")
-      cardinality : 1
-      consumers   : s19_app/tui/styles.tcss
-                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
-      owner       : LLR-85.3
-```
+> ⚠️ **The COMPONENT block that stood here has been RE-AUTHORED and MOVED to §8 of this
+> document, under batch-87's D-II ruling** (`.dev-flow/2026-08-24-batch-87/01-requirements.md`,
+> decisions D-87-A and D-87-D). Nothing about the pilot's MEASUREMENTS changed: §5.5, §6, §7.3
+> and §7.4 are frozen history and were not edited. What changed is the CONTRACT — five outputs
+> became six (the D-A split), and the block now sits at the end of the file, which is what stops
+> the IFC parser gluing every later indented line onto its last field. The re-authored block is
+> the declaration of record; this section retains the trigger question and the pilot's reasoning
+> so the record still reads in order.
 
 ### 5.4 Design decisions inside the record, and what each costs
 
@@ -527,3 +477,81 @@ the substance, which is this batch's own subject.
 **Stated gap:** the retrofit is *surfaces × per-surface*. This pilot measures the second factor.
 **The first is 27, 31 or ~40** depending on a definition nobody has written (P-9). **No total is
 computed here, and none may be computed until that definition exists.**
+
+---
+
+## 8. The re-authored IFC contract (batch-87 · D-II) — `loaded_panel`, six outputs
+
+> **Authored by batch-87, hosted here.** `.dev-flow/2026-08-24-batch-87/01-requirements.md`
+> carries the requirements, the premises, the probe transcripts and the gate table; this section
+> carries only the block itself, because `_ifc_corpus` resolves a component by id across the
+> whole merged corpus and a SECOND declaration of `loaded_panel` elsewhere would fork one
+> contract into two (measured: batch-87 M-4, arms 1 and 4). **D-87-A ruled (a) in place.**
+>
+> **Why the block sits at the END of the file, and it is not a layout preference.**
+> `_parse_ifc` (`devflow-validate.py:309-341`) has no block terminator: it does not recognise the
+> closing fence, so every INDENTED line after the last field of the last output is appended to
+> that field as a continuation. Measured on this document before the re-author: the `owner` field
+> of `project_row` had absorbed **801 characters over 11 lines** — §5.5's indented pre-state
+> transcript and five indented continuation lines from §6.3 — which is the one `[IFC]` entry the
+> Atlas UNPARSED census carried. With the block last, and no indented line following it, the
+> field ends where it is written.
+>
+> **Owners are `LLR-87.*`.** The retrofit-ownership convention of D-C stands: a re-authored
+> output's owner is the requirement that DECLARES it, which is batch-87's, not the pilot's.
+
+```
+COMPONENT: loaded_panel
+  PARENT : screen_workspace
+  SURFACE: LoadedArtifactsPanel — the Loaded-artifacts panel on the Workspace rail screen (s19_app/tui/screens_directionb.py:1741)
+  INPUTS : loaded: Optional[LoadedFile] ; project: str
+  OUTPUTS:
+    - id          : panel_handle
+      value       : the mounted panel widget itself
+      address     : query_one("#loaded_panel")
+      cardinality : 1
+      consumers   : s19_app/tui/app.py::_refresh_loaded_panel
+                    s19_app/tui/styles.tcss
+                    tests/test_help_toggle_and_a2l_panel.py::_a2l_slot_text
+                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
+                    tests/test_unload_feature.py::_detail_texts
+      owner       : LLR-87.1
+    - id          : slots_container
+      value       : the re-mount target that render_slots clears and refills; every row of this panel is one of its children
+      address     : query_one("#loaded_slots")
+      cardinality : 1
+      consumers   : s19_app/tui/styles.tcss
+                    tests/test_tui_commandbar.py
+                    tests/test_tui_variants.py::_project_label
+      owner       : LLR-87.1
+    - id          : artifact_row_set
+      value       : the four rows that carry the loaded-slot column geometry — the project row first, then one row per _SLOTS artifact in [primary, mac, a2l] order. NOT indexed positionally: the only row-set consumer sweeps the rows linearly and selects by a CONTENT predicate on the row's first cell, so reordering the rows does not break it; what breaks it is the index WITHIN a row (cells[0] kind, cells[1] detail) and the VALUE of LoadedArtifactsPanel._PROJECT_KIND, which is a class attribute and therefore outside this contract by the definition of address (pilot finding F-8, still a declared bound)
+      address     : query(".loaded-slot")
+      cardinality : 4
+      consumers   : s19_app/tui/styles.tcss
+                    tests/test_tui_variants.py::_project_label
+      owner       : LLR-87.2
+    - id          : unload_all_row
+      value       : the footer row, one child while nothing is loaded and two once an artifact is present; its arity moves independently of the artifact rows, which is why it is its own output
+      address     : query(".loaded-allrow")
+      cardinality : 1
+      consumers   : s19_app/tui/styles.tcss
+      owner       : LLR-87.2
+    - id          : artifact_slots
+      value       : the three artifact detail texts, in _SLOTS order [primary, mac, a2l]
+      address     : query(".loaded-detail"), INDEXED POSITIONALLY
+      cardinality : 3
+      consumers   : s19_app/tui/styles.tcss
+                    tests/test_help_toggle_and_a2l_panel.py::_a2l_slot_text
+                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
+                    tests/test_unload_feature.py::_detail_texts
+      owner       : LLR-87.3
+    - id          : project_row
+      value       : the active project string in the caller's display form, or the absent sentinel
+      address     : query(".loaded-project-detail")
+      cardinality : 1
+      consumers   : s19_app/tui/styles.tcss
+                    tests/test_tui_commandbar.py::test_at_b78_09_loaded_panel_names_the_project
+                    tests/test_tui_variants.py::_project_label
+      owner       : LLR-87.3
+```

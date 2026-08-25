@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 63 requirement files | corpus digest: dfb3cef58e031080 -->
+<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 64 requirement files | corpus digest: 2a35037db2b5abd9 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1380,7 +1380,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1422 unique id(s)
+## family US/HLR/LLR — 1436 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1566,6 +1566,9 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-86.1` | batches, canon |
 | `HLR-86.2` | batches, canon |
 | `HLR-86.3` | batches, canon |
+| `HLR-87.1` | batches, canon |
+| `HLR-87.2` | batches, canon |
+| `HLR-87.3` | batches, canon |
 | `HLR-A56` | batches, tests |
 | `HLR-B2` | batches |
 | `HLR-B64-1` | batches |
@@ -2388,6 +2391,15 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `LLR-86.7` | batches, canon |
 | `LLR-86.8` | batches, canon |
 | `LLR-86.99` | batches |
+| `LLR-87` | batches |
+| `LLR-87.1` | batches, canon |
+| `LLR-87.2` | batches, canon |
+| `LLR-87.3` | batches, canon |
+| `LLR-87.4` | batches, canon |
+| `LLR-87.5` | batches, canon |
+| `LLR-87.6` | batches, canon |
+| `LLR-87.7` | batches, canon |
+| `LLR-87.8` | batches, canon |
 | `LLR-99.9` | batches |
 | `LLR-A` | batches |
 | `LLR-A56` | tests |
@@ -2710,6 +2722,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `US-85-3` | batches |
 | `US-85-4` | batches |
 | `US-86-1` | batches, canon |
+| `US-87-1` | batches, canon |
+| `US-87-2` | batches, canon |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -2807,7 +2821,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 169 unique id(s)
+## family R — 170 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2975,13 +2989,14 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `R-TUI-112` | batches, canon |
 | `R-TUI-113` | batches, canon |
 | `R-TUI-114` | batches, canon |
+| `R-TUI-115` | batches, canon |
 | `R-VAL-001` | batches, canon |
 | `R-VAL-002` | batches, canon |
 | `R-VAR-001` | canon |
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1445 unique id(s)
+## family AT/TC — 1459 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3583,6 +3598,12 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-B86-02` | batches |
 | `AT-B86-03` | batches |
 | `AT-B86-04` | batches |
+| `AT-B87-01` | batches |
+| `AT-B87-02` | batches |
+| `AT-B87-03` | batches |
+| `AT-B87-04` | batches |
+| `AT-B87-05` | batches |
+| `AT-B87-06` | batches |
 | `TC-001` | batches, canon, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |
@@ -4430,3 +4451,11 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-B86-06` | batches |
 | `TC-B86-07` | batches |
 | `TC-B86-08` | batches |
+| `TC-B87-01` | batches |
+| `TC-B87-02` | batches |
+| `TC-B87-03` | batches |
+| `TC-B87-04` | batches |
+| `TC-B87-05` | batches |
+| `TC-B87-06` | batches |
+| `TC-B87-07` | batches |
+| `TC-B87-08` | batches |

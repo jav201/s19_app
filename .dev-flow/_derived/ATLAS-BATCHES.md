@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 63 requirement files | corpus digest: dfb3cef58e031080 -->
+<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 64 requirement files | corpus digest: 2a35037db2b5abd9 -->
 
 # ATLAS-BATCHES — what happened, batch by batch?
 
-68 batch dir(s). Keyed on artifact PRESENCE — the only field derivable across the whole history (state.json exists for a fraction of it).
+69 batch dir(s). Keyed on artifact PRESENCE — the only field derivable across the whole history (state.json exists for a fraction of it).
 
 | batch | 01-requirements.md | 02-review.md | 03-increments | 04-validation.md | 05-postmortem.md | 05-close.md | state.json | PLAN.md |
 |---|---|---|---|---|---|---|---|---|
@@ -75,3 +75,4 @@
 | `2026-08-07-batch-79` | · | · | x | · | · | · | · | x |
 | `2026-08-21-batch-85` | x | · | · | · | · | x | · | x |
 | `2026-08-24-batch-86` | x | x | x | x | · | x | · | x |
+| `2026-08-24-batch-87` | x | x | x | x | · | x | · | x |

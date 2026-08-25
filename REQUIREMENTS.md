@@ -6034,7 +6034,8 @@ threshold, with **0** violations.
 
 - **What.** The corpus's first Information Flow Contract record (control C-54): the
   `LoadedArtifactsPanel` declares its readout flow and addressable outputs as fenced
-  `FLOW:`/`COMPONENT:` blocks in `.dev-flow/2026-08-21-batch-85/01-requirements.md` §5,
+  `FLOW:`/`COMPONENT:` blocks in `.dev-flow/2026-08-21-batch-85/01-requirements.md` §8 —
+  **re-authored in place by batch-87 under `D-87-A`**, superseding the original §5 block —
   machine-read by validator rules V10–V14/V19 over the merged corpus. Canonical text lives
   in the batch record; ids are mirrored here so the living canon reflects the ownership
   chain (coherence obligation C1, `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`).
@@ -6048,12 +6049,48 @@ threshold, with **0** violations.
   record placed where the merged corpus reads it, pre-state recorded · `LLR-85.5` in-repo
   consumer notes corrected to the measured set · `LLR-85.6` census reports the
   unmodelled-form difference with an executed RED arm · `LLR-85.7` per-surface cost record.
-- **Status: PILOT, KNOWN-DEFECT — nothing here is claimed green.** Two independent reviews
-  returned BLOCK on the record and batch-85 closed unfinished at P5 (open defects: projection
-  thresholds that erase their signal, an unsatisfiable repo-wide Statement; see the batch-85
-  and Atlas handoffs in `.dev-flow/design/`). Mechanical state: V10/V11/V14/V19 pass, V12
-  cannot check (parent undeclared), V13 carries 3 notices; `TC-B85-07` measured RED on the
-  unmodified tree. **D-II (salvage this record vs clean restart for surface #2) is open.**
+- **Status: CONTRACT RE-AUTHORED (batch-87); the record's other batch-85 defects stand.**
+  Nothing broader than the contract is claimed green — see the enumeration below before
+  reading this row as a clean bill. `D-II` — the open question of this row's previous
+  status — was **ruled re-author** by the operator on
+  2026-08-24 and discharged by batch-87 (`.dev-flow/2026-08-24-batch-87/01-requirements.md`,
+  stories `US-87-1` and requirements `HLR-87.1`, `LLR-87.1` through `LLR-87.5`). What
+  changed: the contract is re-declared **in place**, at §8 of the batch-85 record rather
+  than afresh elsewhere (`D-87-A`, decided by executed probe — `_ifc_corpus` merges
+  declarations by list extension, so a second declaration of one component id does not
+  replace the first, and the UNPARSED census entry is keyed to the pilot's own file and
+  line), and the former union output is **split into six outputs**: `panel_handle`,
+  `slots_container`, `artifact_row_set`, `unload_all_row`, `artifact_slots` and
+  `project_row` — cardinalities re-measured at runtime, and `INDEXED POSITIONALLY` carried
+  only on the one output whose consumers were measured to index. Mechanical state after the
+  re-author: the `[IFC]` UNPARSED entry is gone, V19 sees one declaration of this id, and
+  V12 balancing stays CHECKED. **The pilot's MEASUREMENTS (census, cost figures) stand as
+  history; the re-author replaced the CONTRACT, not the record of what was measured.**
+- **⚠ What batch-87 did NOT discharge — the scope of the line above, enumerated.** `D-II`'s
+  scope was the **contract only** (`.dev-flow/2026-08-24-batch-87/01-requirements.md:14`:
+  *"the batch-85 pilot's IFC contract is RE-AUTHORED"*), and `D-87-A` bounded the edit to
+  the record's contract/IFC sections. These stand open, and this row is not evidence that
+  they closed:
+  - **`HLR-85.2` is still unsatisfiable as written** — its Statement quantifies over the
+    whole repository (*"The repository shall carry no note…"*,
+    `.dev-flow/2026-08-21-batch-85/01-requirements.md:164`) while its own threshold requires
+    *"0 edits to frozen batch records"* (:180) and a frozen record is a hit. Catalogued as
+    pilot defect #7 (`.dev-flow/design/HANDOFF-batch85-ifc-pilot-2026-08-21.md:139`), where
+    the named remedy is an explicit ruling that has not been made. Batch-87's own §5.5 row 7
+    reports this defect class *"not reproduced"* **in the new contract** — a statement about
+    batch-87's text, not a repair of `HLR-85.2`, which lives in a section that batch was not
+    permitted to edit.
+  - **`R-1` is still Open** (`.dev-flow/2026-08-21-batch-85/01-requirements.md:449`): a
+    `styles.tcss` comment edit drifts a structural parser test, dischargeable only by
+    `TC-B85-07`'s differential block parse — which matters because a `{`-in-comment
+    corruption shifts 259 of 284 blocks while both named tests stay GREEN.
+  - **Batch-85 closed UNFINISHED at P5 with 0 implementation** — frozen historical fact
+    (`.dev-flow/design/HANDOFF-batch85-ifc-pilot-2026-08-21.md:33`), and two independent
+    reviews returned BLOCK on the record. Re-authoring the contract does not retroactively
+    finish the batch.
+
+  The batch-85 defect catalogue in `.dev-flow/design/` remains the live list, and the reason
+  this row once said KNOWN-DEFECT is that most of it is still true.
 - **Allocation.** `R-TUI-113` = monotonic next: `R-TUI-104` defined (batch-78), `105`–`110`
   never allocated (no gap-filling), `111`/`112` burned as dangling citations re-pointed to
   `R-TUI-103` under D-17. Added 2026-08-23 as the first seeding increment of the living-canon
@@ -6077,8 +6114,10 @@ threshold, with **0** violations.
 - **LLRs.** `LLR-86.1` the workspace's two information flows declared node-by-node, every
   node owned · `LLR-86.2` structural outputs declared with measured consumer sets ·
   `LLR-86.3` left-pane content outputs likewise · `LLR-86.4` center hex-pane outputs
-  likewise · `LLR-86.5` right context-pane outputs likewise · `LLR-86.6` the pilot's five
-  outputs re-exported verbatim at the parent boundary · `LLR-86.7` the component's INPUTS
+  likewise · `LLR-86.5` right context-pane outputs likewise · `LLR-86.6` the pilot's
+  outputs re-exported verbatim at the parent boundary — **five as batch-86 shipped, six
+  since batch-87 split the child's union output** (see the amendment below) ·
+  `LLR-86.7` the component's INPUTS
   and PARENT make the pilot balanceable, honestly · `LLR-86.8` surface-#2 cost figures
   measured, with dispersion replacing extrapolation.
 - **Status: record ACCEPTED at P2 after one iteration** — 1 blocker + 6 major + 7 minor
@@ -6086,10 +6125,75 @@ threshold, with **0** violations.
   outcome: the pilot's `PARENT` balancing is CHECKED — V12's "NOT checked" notice is gone;
   the workspace's own parent `workspace_body` is the next undeclared PARENT (recorded, not
   resolved). 30 declared outputs · 106 resolved consumers · pair-based stray census under
-  the M-10 search-width guard.
+  the M-10 search-width guard — **the first TWO of those figures are superseded; see the
+  amendment.**
+- **⚠ Amendment (batch-87, `LLR-87.5`) — the parent boundary followed the child's split.**
+  When batch-87 re-authored the pilot (`R-TUI-113`) it split the child's union output in
+  two, and **balancing is transitive set containment**: the parent must re-declare every id
+  its child emits, so this component's §5.3 re-export block was edited in the same batch —
+  not by preference but because the pre-fix validator run BLOCKed on exactly those two ids
+  (`D-87-D`). Effect on the figures above, both of them: **declared outputs 30 → 31**, the
+  pilot's re-export five → six; and **106 → 251 resolved consumers**, because that figure
+  was never this surface's own — it is the **corpus-wide** V14 total, which batch-86 itself
+  decomposed as 15 + 91 (`.dev-flow/2026-08-24-batch-86/01-requirements.md:198`) and which
+  batch-87 re-measured across three surfaces as **251 = 18 + 94 + 139**
+  (`.dev-flow/2026-08-24-batch-87/01-requirements.md:1426`; surface #2's own share moved
+  91 → 94 with the split). Every other field of the batch-86 record is unedited and its
+  superseded figures are left standing there rather than rewritten. **The union output's id
+  is no longer declared anywhere in the corpus, and this canon has never named it.**
 - **Allocation.** `R-TUI-114` = monotonic next: `R-TUI-113` defined by the batch-85 canon
   mirror (2026-08-23), nothing allocated since; no gap-filling. Added 2026-08-24 as
   batch-86's single canon-seeding increment.
+
+## workspace_body information contract — batch-87 IFC surface #3 (R-TUI-115)
+
+- **What.** The corpus's third Information Flow Contract record (control C-54): the shell
+  container composed by `S19TuiApp.compose` (`s19_app/tui/app.py:1906-1918`), parent of
+  surface #2 `screen_workspace` (`R-TUI-114`) and grandparent of the pilot `loaded_panel`
+  (`R-TUI-113`), declares its two information flows and its addressable outputs in
+  `.dev-flow/2026-08-24-batch-87/01-requirements.md` §5. Canonical text lives in the batch
+  record; ids are mirrored here (coherence obligation C1,
+  `CANON-CORPUS-AND-COHERENCE-2026-08-23.md`). **This row mirrors every id the batch-87
+  record declares — both of its stories** — because one batch record declares them all and
+  the mirror is per record; the pilot re-author's own status stays on `R-TUI-113`, which
+  this batch refreshed.
+- **Stories.** One id per line, so a per-id grep is the predicate:
+  - `US-87-1` — re-author the batch-85 pilot IFC record (the `D-II` discharge).
+  - `US-87-2` — declare IFC surface #3, the shell above the workspace screen.
+- **HLRs.** One id per line:
+  - `HLR-87.1` — the pilot's contract is re-authored, parses whole, and exists exactly once.
+  - `HLR-87.2` — surface #3 is contractually addressable, and the retrofit's residual is
+    named rather than absorbed.
+  - `HLR-87.3` — the per-surface cost gains a third point, with the re-export compounding
+    measured rather than argued.
+- **LLRs.** One id per line:
+  - `LLR-87.1` — the pilot's structural handles are re-declared with measured consumer sets.
+  - `LLR-87.2` — the split replaces the union output, at measured arities, with no
+    positional annotation on either half.
+  - `LLR-87.3` — the cell-level outputs keep annotations that were RE-VERIFIED, not
+    inherited.
+  - `LLR-87.4` — the contract block is placed where the parser can terminate it.
+  - `LLR-87.5` — the parent boundary follows the split (the amendment on `R-TUI-114`).
+  - `LLR-87.6` — surface #3's eleven own outputs are declared with measured consumer sets.
+  - `LLR-87.7` — surface #3 re-exports the child boundary in full, and its own PARENT is
+    declared honestly rather than claimed to be the root.
+  - `LLR-87.8` — the cost record at n=3, with the duplication figure derived by subtraction
+    rather than estimated.
+- **Status: record ACCEPTED at P2 after one iteration** — 12 of 13 review findings fixed by
+  re-measurement, 1 refused with an executed refutation. **42 declared outputs** (11 own +
+  31 re-export) · **139 consumer entries** across **20** dependant files · 62 classified
+  stray pairs with **0** undeclared dependants. Two results are load-bearing and neither is
+  comfortable: (1) the re-export cost **compounds with depth** — surface #3 declares fewer
+  outputs of its own than surface #2 and is still the most expensive record in the corpus,
+  so no per-surface average may be multiplied by a surface count; (2) this component's own
+  parent is **not** the root, so one V12 notice stands one level up by design — the honest
+  cost, where the alternative would have bought silence with a false claim. Five in-source
+  claims about this shell's arity were measured FALSE and registered for the next batch that
+  edits those files; this batch is spec-only and did not fix them.
+- **Allocation.** `R-TUI-115` = monotonic next: `R-TUI-113` defined by the batch-85 canon
+  mirror (2026-08-23), `R-TUI-114` by batch-86's (2026-08-24), nothing allocated since; no
+  gap-filling, no reuse — the `AT`/`TC` registry rule applied by hand, since `R-*` ids are
+  not registry-governed. Added 2026-08-24 as batch-87's single canon-seeding increment.
 
 ## Retired ids
 
