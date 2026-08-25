@@ -1,15 +1,16 @@
-# Handoff — after batch-87: D-II discharged, surface #3 declared, and `main` currently shows 5 BLOCK for two known reasons
+# Handoff — after batch-87: D-II discharged, surface #3 declared, and the 4 BLOCKs left on `main` are batch-88's opening move
 
-> **Written 2026-08-25, session "batch-87 landing + batch-88 scoping" (background job, operator Javier).**
+> **Written 2026-08-24 (evening, local -06:00), session "batch-87 landing + batch-88 scoping" (background job, operator Javier).**
 > **Supersedes** [[HANDOFF-devflow-session-2026-08-24]] — that document's §1, §4, §5 and §6 were
 > written before batch-87 and are now FALSE in named ways (D-II is ruled AND discharged; surface #3
 > shipped; the flaky diagnosis it records was refuted by measurement). It is kept, not edited.
 >
 > **Re-derive every figure below; if a command disagrees, the command is right.** Everything here was
-> measured on 2026-08-25 against `main` at `3e96794`.
+> measured on 2026-08-24 against `main` at `3e96794`.
 >
-> ⚠ **Read §5 before you panic at §0.** A clean `main` currently reports **5 block**. Both causes are
-> known, neither is corruption, and neither was caused by batch-87.
+> ⚠ **Read §5 before you panic at §0.** A clean `main` reports **4 block** — all four are V20, all
+> four are one cause, none is corruption, and none was caused by batch-87. They are the first thing
+> batch-88's P0 clears.
 >
 > **Reading order:** §0 (verify ground) → §5 (the two blocks) → §6 (next actions) → §7 (what
 > batch-88's proposal gets wrong). §2/§3/§4 are reference.
@@ -18,7 +19,7 @@
 
 ```bash
 cd <repo-root>                                            # C:\Users\jjgh8\Github\s19_app, branch main
-python ~/.claude/docs/tools/devflow-validate.py .         # expect: 5 block · 284 notice · 13 n/a  ← see §5
+python ~/.claude/docs/tools/devflow-validate.py .         # expect: 4 block · 284 notice · 14 n/a  ← see §5
 #   V20 lines: 4 × "committed copy differs" — the flow rev bumped, NOT a corpus change
 #   V22 line : "276 of 544 batch-declared ids are not reflected in the living canon"
 python ~/.claude/docs/tools/devflow-validate.py --selftest # expect exit 0, SELFTEST PASSED, 192 arms
@@ -30,7 +31,7 @@ git log --oneline -2                                      # expect 3e96794 (sync
 ```
 
 **Two path facts worth knowing.** The validator exists at `~/.claude/docs/tools/devflow-validate.py`
-AND `~/.claude/skills/dev-flow/scripts/devflow-validate.py`. Measured 2026-08-25: **byte-identical**
+AND `~/.claude/skills/dev-flow/scripts/devflow-validate.py`. Measured 2026-08-24: **byte-identical**
 (`sha256` both `f3fe00cc7dc41140…`). It is a deploy, not a fork — `docs/` is the bundle, `skills/` is
 the source repo. `FLOW-VERSION.md` doubles the same way. **`close-template.md` also doubles**
 (`~/.claude/skills/dev-flow/templates/` and `~/.claude/templates/dev-flow/`) — that pair has NOT
@@ -72,9 +73,9 @@ first.
 1. **Subagents on Opus 5** — every Agent dispatch passes `model: "opus"`. Re-stated at batch-87 P0.
 2. **Authorization is PER BATCH — re-ask at every batch open.** batch-86 and batch-87 both ran:
    autonomous, gates self-approved WITH evidence, **merge granted explicitly by the operator at
-   close**. batch-87's merge was granted 2026-08-25 (verbatim: *"mergea el #202 y sincroniza"*).
+   close**. batch-87's merge was granted 2026-08-24 (verbatim: *"mergea el #202 y sincroniza"*).
 3. Artifact language English for dev-flow; conversation Spanish.
-4. **batch-88 scope already declared by the operator** (2026-08-25, verbatim: *"alcance A+B+C+E"*) —
+4. **batch-88 scope already declared by the operator** (2026-08-24, verbatim: *"alcance A+B+C+E"*) —
    see §6/§7. The US-E numeric ceiling is explicitly deferred to Phase 0.
 
 ## 4 · Environment facts the next session needs
@@ -96,9 +97,13 @@ first.
   once); pytest FAILED lines carry ANSI codes (a `grep "^FAILED"` silently returns nothing — strip
   first).
 
-## 5 · Why `main` shows 5 BLOCK — both causes named, neither is corruption
+## 5 · Why `main` blocks — both causes named, one already cleared, neither corruption
 
-Measured 2026-08-25 on `main` at `3e96794`: **5 block · 284 notice · 13 not applicable**.
+Measured 2026-08-24 on `main` at `3e96794`: **5 block · 284 notice · 13 not applicable**.
+**Update, same session: V16 was CLEARED** — the `tui-design/` work was verified complete (all six cited targets resolve, zero broken links, the gallery really holds its twenty-one
+frames), committed as `33e1114` and **pushed** (V16 has a second arm: committed-but-unpushed
+still blocks, which is the C-44 state). **`main` now reports 4 block · 284 notice · 14 n/a** —
+the four V20 only, which belong to batch-88's P0.
 
 **(a) V16 × 1 — `~/.claude/skills: uncommitted changes`.** The FLOW repo's working tree is dirty:
 three modified files, **all under `tui-design/`** (`HIERARCHY.md`, `SKILL.md`,
@@ -138,7 +143,7 @@ under its own gate — the pattern batch-87's P0 already followed.
    regen + commit** (see §5b). Scope is operator-declared: **US-A + US-B + US-C + US-E**, US-D
    (C-45 reconciliation of 15 half-encoded controls) deferred. **Read §7 first** — the proposal has
    three defects.
-3. **Refresh the vault visual-evidence gallery — BLOCKED, and the root cause is new (2026-08-25).**
+3. **Refresh the vault visual-evidence gallery — BLOCKED, and the root cause is new (2026-08-24).**
    Newest asset is **2026-08-07**; the last commit touching `s19_app/tui/` is **`f198447`
    (2026-08-13, batch-79)**, so every live asset predates the last UI change. **The refresh was
    attempted and could not run:**
@@ -169,7 +174,7 @@ under its own gate — the pattern batch-87's P0 already followed.
    **flattening** loop, never `-Recurse` (a recursive copy already destroyed the nested set once —
    see `visual-evidence.md` §6's correction block).
 
-4. ✅ **batch-85 vault sync gap — CLOSED 2026-08-25.** Synced retroactively as
+4. ✅ **batch-85 vault sync gap — CLOSED 2026-08-24.** Synced retroactively as
    `dev-flow-batches/2026-08-21-batch-85/`, `verdict: iterate` with 8 honest `null`s (no
    `02-review.md`, no `03-increments/`, no `04-validation.md` exist — P3/P4/P5 were never reached).
    Recorded as CLOSED UNFINISHED in the body rather than dressed up: an absent Dashboard row reads
@@ -183,7 +188,7 @@ under its own gate — the pattern batch-87's P0 already followed.
 8. Housekeeping: 9 stale worktrees (§1); the foreign memmap2 WIP's fate (its own HANDOFF is in
    `prototypes/`).
 
-## 7 · What batch-88's proposal gets wrong — measured 2026-08-25
+## 7 · What batch-88's proposal gets wrong — measured 2026-08-24
 
 The proposal lives at
 `…/Claude Templates and Flows/Propuesta batch-87 — cierres de auditoría (2026-08-24).md`.

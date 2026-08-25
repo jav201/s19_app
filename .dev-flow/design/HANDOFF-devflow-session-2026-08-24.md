@@ -1,6 +1,6 @@
 # Handoff — the living-artifacts programme after batch-86: four flow revs shipped, the trial passed, D-II is the decision that gates surface #3
 
-> ## ⚠ SUPERSEDED 2026-08-25 — see [[HANDOFF-devflow-session-2026-08-25]]
+> ## ⚠ SUPERSEDED 2026-08-24 (post-batch-87) — see [[HANDOFF-devflow-session-2026-08-24-post-batch-87]]
 >
 > **This document was written BEFORE batch-87.** Its §1, §4, §5 and §6 are now FALSE in named
 > ways: D-II is ruled AND discharged, surface #3 (`workspace_body`) shipped, the flow is rev46 not

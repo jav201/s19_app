@@ -123,7 +123,7 @@
     },
     {
       "station": "P6",
-      "date": "2026-08-25",
+      "date": "2026-08-24",
       "decision": "synced-to-obsidian",
       "notes": "PR #202 squash-merged as 5f49e85 (CI green: snapshot pass, tui-ci pass 56m04s). Light sync (mode core): README-only, artifacts stay in repo and cross by id. Destination: G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-08-24-batch-87/2026-08-24-batch-87-README.md. Template-completeness detect: 0 real blockers (2 candidates checked -- both false positives, '##' immediately followed by a populated '###'). Dashboard.md pre-existing, not overwritten. WARN carried: vault visual-evidence gallery is stale -- newest asset 2026-08-07 predates the last s19_app/tui/ commit f198447 (2026-08-13, batch-79); 176 assets affected; not caused by this batch (0 UI files) and not regenerated here."
     }
