@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-08-24-batch-87",
-  "batch_objective": "D-II discharge (operator-ruled: re-author) + IFC surface #3 in one batch. US-87-1: re-author the batch-85 pilot contract for loaded_panel to the batch-86 exemplar format -- SIX outputs per the D-A analysis (artifact_row_set cardinality 4 + unload_all_row cardinality 1), pair-based thresholds, scoped statements, no absorbed owner -- clearing the last [IFC] UNPARSED census item and the D-86-E duplication under screen_workspace's declared parent boundary. US-87-2: declare the shell workspace_body's Part B contract, retiring the only undeclared PARENT V12 names. Spec-only: 0 source files, canon mirror edits only; V22 debt must not grow (baseline 276).",
+  "batch_id": "2026-08-24-batch-88",
+  "batch_objective": "Close the three cheap gaps from the ASPICE PAM 4.0 / DO-178C Annex A audits, on the living canon, as the SECOND batch over that canon -- the pending incrementality proof. Story A: Layer C component verification, rule V24 (every interface marked Frozen? in ARCHITECTURE.md section 4 has exactly one Layer C node resolvable on disk). Story B: declared limits of assurance, a sibling section to the ISO 9241-210 declaration in close-template.md, plus its CLOSE checklist row. Story C: RC-2 verifiable backup, rule V25 (reachable remote, last push <= 30 days). Story E: canon seeding tranches against the V22 census, baseline 276 of 544, oracle = the census delta pasted from the validator per tranche. Story D (C-45 reconciliation of 15 half-encoded controls) DEFERRED by the operator.",
   "mode": "core",
   "mode_history": [
     {
@@ -12,128 +12,59 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P5",
-  "phase_status": "synced",
+  "current_station": "P0",
+  "phase_status": "approved",
   "stations_active": [
-    "P0",
-    "P1",
-    "P2",
-    "P3",
-    "P4",
-    "P5"
+    "P0"
   ],
   "iterations_per_station": {
-    "P0": 0,
-    "P1": 0,
-    "P2": 1,
-    "P3": 1,
-    "P4": 1,
-    "P5": 0
+    "P0": 0
   },
   "triggers": {
-    "evaluated_at": "2026-08-24T00:00:00-06:00",
+    "evaluated_at": "2026-08-24T21:30:00-06:00",
     "fired": [
-      "B4"
+      "A",
+      "B1",
+      "B4",
+      "C",
+      "E"
     ],
     "not_fired": [
-      "A1",
-      "A2",
-      "A3",
-      "A4",
-      "B1",
       "B2",
       "B3",
-      "C",
       "D",
-      "E",
       "F"
     ],
-    "record": ".dev-flow/2026-08-24-batch-87/PLAN.md#triggers"
+    "record": ".dev-flow/2026-08-24-batch-88/PLAN.md#3--triggers"
   },
   "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-08-24-batch-87/01-requirements.md",
+    "requirements": "repo:.dev-flow/2026-08-24-batch-88/01-requirements.md",
     "traceability": "repo:REQUIREMENTS.md (living canon mirror section)",
     "tests": "repo:tests/",
     "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-08-24-batch-87/03-increments/",
+    "increments": "repo:.dev-flow/2026-08-24-batch-88/03-increments/",
     "backlog": "repo:.dev-flow/BACKLOG-CODE.md (lane A per docs/engineering-rules.md)",
-    "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)"
+    "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)",
+    "design_pdr": "vault:s19_app/design/PDR-<batch>.md",
+    "design_ddr": "vault:s19_app/design/DDR-<batch>.md"
   },
   "artifacts": {
-    "P1": ".dev-flow/2026-08-24-batch-87/01-requirements.md",
-    "P2": ".dev-flow/2026-08-24-batch-87/02-review.md",
-    "P3": ".dev-flow/2026-08-24-batch-87/03-increments/increment-001.md",
-    "P4": ".dev-flow/2026-08-24-batch-87/04-validation.md",
-    "P5": ".dev-flow/2026-08-24-batch-87/05-close.md"
+    "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md"
   },
   "decisions_log": [
     {
       "station": "P0",
       "date": "2026-08-24",
-      "decision": "batch opened",
-      "notes": "RC-1 PASS (merge-base == origin/main tip 943e54a; fresh branch claude/batch-87-ifc-reauthor-surface-3). Flow rev45 current, hash 09bea075fc183f8b (C-45 PULL); selftest 192 arms exit 0. Lane A backlog read (workspace_body = surface #3 candidate). Mode core. D-II ruled by operator: re-author; scope = both stories one batch."
-    },
-    {
-      "station": "P0",
-      "date": "2026-08-24",
-      "decision": "operator directive: delegate to Opus 5 agents",
-      "notes": "Operator (verbatim): 'Antes de continuar, quiero que delegues las acciones a agentes opus5'. All Agent dispatches from P1 onward carry model opus; orchestrator does choreography only."
-    },
-    {
-      "station": "P0",
-      "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-1)",
-      "notes": "DoR met for US-87-1 + US-87-2, both READY with executed probes (UNPARSED [IFC] :372 confirmed; sole V12 finding names screen_workspace/workspace_body; consumer census 24/12 test files). Validator 0 block / 254 notice after V20-driven Atlas regen (open commit 656e5a7 + regen commit). Packet presented in-conversation. No nameable gap on Coverage/Certainty/Evidence at this station."
-    },
-    {
-      "station": "P1",
-      "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-3)",
-      "notes": "Record authored (Opus 5 architect) + qa 01b plan (Opus 5, parallel), qa fold relayed mid-flight as hypotheses (C-43), author confirmed by execution. D-87-A ruled (a) in-place (two executed measurements). THREE records edited, forced by balancing -- measured scope growth, declared in PLAN. workspace_body: 42 outputs, PARENT workspace_shell (SYSTEM refuted app.py:1919). Premises 9 TRUE / 6 FALSE all dispositioned; D-86-E-resolution observable withdrawn (structural, measured). Validator 0 block / 284 notice (+29 V13 + 1 V22 accounted); UNPARSED 2->1 ([IFC] GONE, BATCHES control survives). G-87 8 GREEN, G8 P3-owed. Orchestrator re-verified validator line, census, file set, source pin (0 source files), six-output ids."
-    },
-    {
-      "station": "P2",
-      "date": "2026-08-24",
-      "decision": "iterate (autonomous D-87-4)",
-      "notes": "Two independent Opus 5 reviewers, both verdict iterate. Consolidated: 2 blockers (R2-01 spliced two-state RED-arm transcript, found by BOTH reviewers independently; R2-02 AT-B87-* id fork between record and 01b) + 6 major + 5 minor -- all evidence-artifact defects; the substance survived attack (D-87-A/B, R-87-1 confirmed by kill-mutation; censuses and accounting exact; frozen-history line upheld). Returned to the P1 author as single fold owner; moved figures re-measured, never edited (C-39 rider). 02-review.md carries the full table."
-    },
-    {
-      "station": "P2",
-      "date": "2026-08-24",
-      "decision": "approved after 1 iteration (autonomous D-87-5)",
-      "notes": "12/13 findings fixed by re-measurement; 1 reviewer remedy REFUSED with executed refutation (R-87-3b: 'nine screens' correct under the ten-screen model -- the C-50 shape working as intended). Notice delta zero (284->284, accounted: fixes touched prose/tables, no declarations). Orchestrator re-executed corrected predicates: validator line, R2-06 heading grep = 1, two labelled fences present, dispersion 6->31->42 at :1433, line 3284 content matches the refusal, AT-B87 sets IDENTICAL across record and 01b. New gates G10/G11; six ATs realized. Batch-85 record needed no change this iteration."
-    },
-    {
-      "station": "P3",
-      "date": "2026-08-24",
-      "decision": "increment 001 approved after fix-first (autonomous D-87-6)",
-      "notes": "G8 discharged: V22 289->276 of 544 (-13 term-by-term: HLR -3, LLR -8, US -2), 13 ids seeded one-per-line, per-id greps all >=1, RED arm executed with sha256-proven restore + independent validator RED (277). Code review BLOCKed on F1 HIGH (R-TUI-113 status over-claim erasing undischarged pilot defects) + F2 MED (packet minted a phantom-feeder token -- the C-56 class the gate exists for) + F3 MED (106 false narrowing) + F4 LOW; all four fixed and re-measured, phantom census WIDENED to 8 feeders / 3 stems and registered as carry. Orchestrator re-verified: validator 0 block / 284 notice, scoped headline present, NOT-discharge enumeration present, minting token 0, 251 decomposition in canon. Registry consumer 13 passed; source pin empty."
-    },
-    {
-      "station": "P4",
-      "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-7); G4-01 ruled: class-membership disposition adopted",
-      "notes": "One complete gate run (orchestrator-owned, direct env-python after conda-run destroyed run 1's evidence via cp1252 UnicodeEncodeError -- harness finding G4-03, 01b amended): 2702 passed / 6 failed / 3 skipped / 21 deselected / 3 xfailed in 40:43. PRE-REGISTERED flaky disposition REFUTED by measurement: overlap with the batch-86 list = 1 node; 3 fail ISOLATED (rates 1/10-4/10 at N=10); batch-86's n=1 'passes isolated' diagnosis was vacuous (C-53). Ruling: disposition by CLASS (empty source diff AND N>=10 rates-as-figures AND modal push/mount race family) -- 6/6 pre-existing (4 timing races, 2 order-dependent), 0 product blockers; Before/After amendment in 01b sec-7, refuted text preserved. Carry: 11 distinct node ids (5 unmeasured-rate). Layers A/B: 0 gaps, HLR-87.3/LLR-87.8 owed at P5 close by design. K1/K3b/K7/K8 mutations executed on copies (K3 refuted its own prediction, repaired not overwritten). Ledger 2714=2702+6+3+3 exact, D=A=0 structural. G11 GREEN. Atlas regenerated, figures identical both sides."
-    },
-    {
-      "station": "P5",
-      "date": "2026-08-24",
-      "decision": "close batch (autonomous D-87-8)",
-      "notes": "CLOSED COMPLETE. HLR-87.3/LLR-87.8 discharged clause-by-clause in 05-close.md sec-5 (n=3 cost table: outputs 6->31->42, consumers 18->94->139, stray pairs 4->36->62, duplication 40 of 102 = 39 pct by set subtraction, effort right-censored/1h15m/3h11m; cost tracks tree position not size). G4-02 closed in the conditional-gate table. Both backlog lanes reconciled: lane A 10 in / 3 DONE (incl. D-II, surface #3, one-id-per-line adoption); lane B 4 in / 0 done, every C-45 landing honestly NOT DONE (standing debt: 5 control candidates, 0 landings, 2 batches). Metrics: 30 mutation-arm executions across 4 stations, 1 self-refuting repaired; V22 276 (2 under target); validator 0 block / 284 notice re-measured at close; Atlas fixpoint cell flipped and regenerated (V20 green). Landing: push branch, open PR, STOP at CI green per no-merge authorization; /dev-flow-sync post-merge."
-    },
-    {
-      "station": "P6",
-      "date": "2026-08-24",
-      "decision": "synced-to-obsidian",
-      "notes": "PR #202 squash-merged as 5f49e85 (CI green: snapshot pass, tui-ci pass 56m04s). Light sync (mode core): README-only, artifacts stay in repo and cross by id. Destination: G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-08-24-batch-87/2026-08-24-batch-87-README.md. Template-completeness detect: 0 real blockers (2 candidates checked -- both false positives, '##' immediately followed by a populated '###'). Dashboard.md pre-existing, not overwritten. WARN carried: vault visual-evidence gallery is stale -- newest asset 2026-08-07 predates the last s19_app/tui/ commit f198447 (2026-08-13, batch-79); 176 assets affected; not caused by this batch (0 UI files) and not regenerated here."
+      "decision": "batch opened; approved (autonomous D-88-1)",
+      "notes": "RC-1 PASS: merge-base == origin/main tip 4131a38, recorded in PLAN before deriving; fresh branch claude/batch-88-audit-closures. Flow rev46 hash 9c1449ed815d267c verified against the manifest (C-45 PULL); selftest 192 arms exit 0. Mode core (C-50, unchanged -- no mode_history entry). TRIGGERS: FIVE families fire where batch-87 fired one -- A (parallel lanes + D1 changes the module map itself; judged, family A has no mechanical probe by design), B1 (MAP COVERS-* selftest arms assert _RULE_COVERS, which D4 touches), B4, C (D6 adds a pyproject dependency; re-run over the diff at EVERY gate), E (4 stories and 5+ increments, both over the >=3 threshold). NOT fired with probes: B2 (both close-template copies byte-identical 3e8f07ab9d63fb55 -- also discharges PDR condition 3 at intake), B3 (7 per-batch goldens, none captures a source this batch touches), D (0 files under s19_app/tui/), F (flow_hash == manifest; backlog reconciled at batch-87 close). E FIRING HAS A COST: the proposal declared estimation/schedule out of scope CONDITIONED on family E not firing -- it fires, so MAN.3.BP5/BP8 are obligatory for this batch. Recorded at intake, not discovered at close. FAMILY A FIRING ACTIVATES THE ARQ STATION. V20 tax paid (PDR-2026-08-24-batch-88#D8): 4 block -> 0 by Atlas regen; ledger reconciles (V20's four blocks collapse to one n/a line, 14 -> 15; V16's currency arm flipped to NOTICE on a 1.0-day-stale local ref -- a clock effect, returned by fetch). Final 0 block / 284 notice / 15 n/a, identical to batch-87's close. C-56 INSTANCE, SELF-INFLICTED AND CAUGHT: the opening documents minted one phantom id from a bare proposal label (unique ids 1436 -> 1437). First measurement was WRONG (git restore --staged leaves the working tree, so the grep read the regenerated copy); re-measured from HEAD, exactly one stem was mine, the other four are batch-87's registered carry. Fixed at the SOURCE, never in the derived plane; census verified back to 1436. PDR-2026-08-24-batch-88 sealed in the vault, verdict approved with conditions: authorises Inc 1 and Inc 2, WITHHOLDS Inc 3 and Inc 4 until #D1 lands. Sequencing deviation declared: sealed pre-INTAKE, so it reviewed the PROPOSAL, not the requirements -- it does not discharge the station-4 PDR."
     }
   ],
   "standing_authorization": {
     "autonomous": true,
     "merge": false,
     "asked_on": "2026-08-24",
-    "operator_words": "D-II/alcance: 'Re-autorar + superficie #3 juntos (batch-87)'. Autorizacion: 'Como batch-86: autonomo -- gates auto-aprobados CON evidencia; merge lo concedes tu [operador] explicitamente al cierre.' Subagentes en Opus 5 (directiva en pie + reiterada este batch)."
+    "operator_words": "Scope: 'alcance A+B+C+E'. Pattern: 'y si al patron' confirming batch-86/87 -- autonomous, gates self-approved WITH evidence, merge granted explicitly by the operator at close. Pillow folded into this batch: 'Pillow dentro de batch-88'. Subagents on Opus 5 (standing)."
   },
-  "obsidian_synced": true,
-  "created_at": "2026-08-24T00:00:00-06:00"
+  "obsidian_synced": false,
+  "created_at": "2026-08-24T21:30:00-06:00"
 }

@@ -76,7 +76,7 @@ first.
    close**. batch-87's merge was granted 2026-08-24 (verbatim: *"mergea el #202 y sincroniza"*).
 3. Artifact language English for dev-flow; conversation Spanish.
 4. **batch-88 scope already declared by the operator** (2026-08-24, verbatim: *"alcance A+B+C+E"*) —
-   see §6/§7. The US-E numeric ceiling is explicitly deferred to Phase 0.
+   see §6/§7. The seeding story's numeric ceiling is explicitly deferred to Phase 0.
 
 ## 4 · Environment facts the next session needs
 
@@ -140,7 +140,7 @@ under its own gate — the pattern batch-87's P0 already followed.
 1. **Settle V16** — decide what happens to the three uncommitted `tui-design/` files in the flow
    repo. P0 of batch-88 cannot pass a clean gate until this is resolved.
 2. **Open batch-88** with RC-1 against `origin/main` = `3e96794`; first act of P0 is the **V20 Atlas
-   regen + commit** (see §5b). Scope is operator-declared: **US-A + US-B + US-C + US-E**, US-D
+   regen + commit** (see §5b). Scope is operator-declared: **stories A + B + C + E**; story D
    (C-45 reconciliation of 15 half-encoded controls) deferred. **Read §7 first** — the proposal has
    three defects.
 3. **Refresh the vault visual-evidence gallery — BLOCKED, and the root cause is new (2026-08-24).**
@@ -198,7 +198,7 @@ Three defects, all verified against disk:
 2. **Its sequencing premise is void.** It says *"before surface #3, so V24 debuts on a real consumer
    in the following batch"*. Surface #3 already shipped. The effect is favourable, not harmful: the
    frozen interfaces exist **now**, so V24 can take a real consumer **inside** batch-88 (Inc 4).
-3. **US-A is not implementable as written — this is the load-bearing one.** It anchors rule V24 on
+3. **Story A is not implementable as written — this is the load-bearing one.** It anchors rule V24 on
    *"every interface marked `Frozen?` in `ARCHITECTURE.md §4`"*. Measured: the `Frozen?` column
    exists **only** in the flow's `architecture-template.md:63`
    (`| Interface | Owner module | Consumers | Shape | Frozen? |`). **s19_app never adopted that
@@ -212,7 +212,7 @@ Three defects, all verified against disk:
    state today.
 
 **Premises that DID verify** (do not re-litigate these):
-- `close-template.md:108` carries the ISO 9241-210 "declare what was NOT done" line — US-B's new
+- `close-template.md:108` carries the ISO 9241-210 "declare what was NOT done" line — story B's new
   assurance-limits section is a legitimate sibling. ✅
 - **The V8 side-finding is real.** `_RULE_COVERS["V8"]` (`devflow-validate.py:1946`) reads
   *"requirements name modules the project map declares"*; the implementation `v8_module_map`
@@ -248,7 +248,7 @@ is not an authorisation.
 | `_RULE_COVERS` description must equal implementation | `PDR-2026-08-24-batch-88#D4` | `devflow-validate.py` `_RULE_COVERS` |
 | One canonical `close-template.md` | `PDR-2026-08-24-batch-88#D5` | the copy declared canonical |
 | `Pillow` declared as a dependency | `PDR-2026-08-24-batch-88#D6` | `pyproject.toml` |
-| US-E tranche = the ids of the batches touching US-A's frozen interfaces | `PDR-2026-08-24-batch-88#D7` | `REQUIREMENTS.md` canon mirror |
+| Seeding tranche = the ids of the batches touching story A's frozen interfaces | `PDR-2026-08-24-batch-88#D7` | `REQUIREMENTS.md` canon mirror |
 | The V20 flow-rev tax, budgeted at P0 and at Inc 4 | `PDR-2026-08-24-batch-88#D8` | `.dev-flow/_derived/` · `FLOW-VERSION.md` |
 
 > 🛑 **V23 cannot tell a citation from a FILENAME — found by tripping it, twice, in this very
