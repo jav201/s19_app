@@ -12,15 +12,17 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "ARQ",
+  "current_station": "P1",
   "phase_status": "approved",
   "stations_active": [
     "P0",
-    "ARQ"
+    "ARQ",
+    "P1"
   ],
   "iterations_per_station": {
     "P0": 0,
-    "ARQ": 0
+    "ARQ": 0,
+    "P1": 0
   },
   "triggers": {
     "evaluated_at": "2026-08-24T21:30:00-06:00",
@@ -52,7 +54,9 @@
   },
   "artifacts": {
     "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md",
-    "ARQ": "repo:docs/ARCHITECTURE.md (sections 10-11) + .dev-flow/2026-08-24-batch-88/PLAN.md#station-arq"
+    "ARQ": "repo:docs/ARCHITECTURE.md (sections 10-11) + .dev-flow/2026-08-24-batch-88/PLAN.md#station-arq",
+    "P1": ".dev-flow/2026-08-24-batch-88/01-requirements.md",
+    "P1b": ".dev-flow/2026-08-24-batch-88/01b-qa-validation-plan.md"
   },
   "decisions_log": [
     {
@@ -66,6 +70,12 @@
       "date": "2026-08-24",
       "decision": "module map amended; approved (autonomous D-88-2)",
       "notes": "Family A fired at P0, so ARQ ran. docs/ARCHITECTURE.md gains s10 Composition-by-path and s11 Interfaces-with-Frozen; sections 1-9 untouched (standing artifact, amended not recreated). 266 tracked .py classified into 6 non-overlapping prefixes. V8 flips from 'declares no path/** prefixes -- it cannot be checked' to checkable, reporting EXACTLY ONE orphan, setup.py, which was PREDICTED IN ADVANCE and named in s10 with its mechanism. Notice delta net zero, 284 -> 284. PDR#D1 DISCHARGED WITH A CORRECTION: the template's s4 numbering was REJECTED (s19_app's s4 is 'Patch Editor flow' and is cited elsewhere; renumbering would silently retarget every citation). The table landed at s11, so the Layer C rule MUST key on the table's SHAPE -- the Frozen? column header -- never on a section number. Strictly better than the proposal asked for, and only visible because the anchor was checked against a real repo. PDR condition 2's wording amended accordingly. All three Part B contracts (loaded_panel 6 outputs / screen_workspace 31 / workspace_body 42, chain workspace_shell -> workspace_body -> screen_workspace -> loaded_panel) declared FROZEN for this batch: cited, never touched -- real consumers for V24 instead of a synthetic fixture. FOURTH flow finding: V8 cannot classify a root file (no path/** prefix can match one), and its message asserts 'the map is stale' when the true state is 'the rule cannot express this'."
+    },
+    {
+      "station": "P1",
+      "date": "2026-08-24",
+      "decision": "operator rulings recorded; P1 authoring dispatched (D-88-3)",
+      "notes": "THREE OPERATOR RULINGS. (1) The V22 oracle fix (substring -> token membership) LANDS FIRST, before any canon-seeding evidence is produced, with an explicit re-baseline 276 -> 280 recorded in this objective. Operator verbatim: 'Si aterrizalo primero'. (2) The V23 grammar is STRICT -- a record, a decision inside it, and a VERSION of it must each be distinctly expressible and checkable; the permissive hyphen form that conflates a version with a hyphenated batch dir is REJECTED. Operator verbatim: 'Debe ser estricto, hay que arreglarlo'. The analysis agent had flagged this as a design ruling it would not make; it is now made. (3) A HUMAN REVIEW MARKER is required, and the operator's framing is a REVIEW-DEBT LEDGER rather than a boolean: each batch proceeds autonomously and ACCRUES review debt; the marker discharges it, recording reviewer name 'Javier Granados' (an optional reviewer-id field reserved for organisational context), the DATE, the PHASE at which review happened -- it may be early or immediately before the final commit -- and authored-by beside reviewed-by so a one-sided sign-off is visible. Whatever the review turns up goes to the backlog. The guarding rule must NOT claim to verify the review's QUALITY, only that it occurred, by whom and when. SCOPE ALARM RAISED BY THE ORCHESTRATOR, not by the operator: the batch entered as 4 stories and the session added NINE measured fixes (V22 oracle+message, V23 strict, V5 PASS!=NOOP, _artifacts F-7, V8 casing, V8 root message, V2 substring, V6 line-scoping, Pillow) plus the marker. Family E already fired at 4 stories / 5 increments; thirteen pieces fire everything. RECOMMENDED SPLIT: batch-88 = rule-integrity fixes + stories A/B/C; batch-89 = the canon-seeding story with the corrected oracle. This satisfies ruling (1) -- V22 still lands before seeding evidence exists -- without stacking thirteen pieces behind one gate. The P1 architect was dispatched with an explicit instruction to RULE on whether the scope is authorable in one batch, argued from source-file and increment counts, and to propose the cut if it is not. NON-NEGOTIABLE CARRIED INTO P1, from the V5 finding: every new or patched rule owes a PASS != NOOP arm, and its GREEN arm must assert the PASS SENTENCE rather than the absence of a BLOCK. Acceptance criterion 1 of the original proposal (no new rule on the synthetic-exemption list) is INSUFFICIENT alone and is widened accordingly. V16 resolved: the 11 excalidraw diagrams that dirtied the flow repo are the operator's own parallel session, authoring diagrams for EXTERNAL human audit of the process. Not swept, not this session's."
     }
   ],
   "standing_authorization": {
