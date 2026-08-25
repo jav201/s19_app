@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 64 requirement files | corpus digest: 2a35037db2b5abd9 -->
+<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 65 requirement files | corpus digest: 5b7f63c6b38b0d98 -->
 
 # ATLAS-BATCHES — what happened, batch by batch?
 
@@ -76,4 +76,4 @@
 | `2026-08-21-batch-85` | x | · | · | · | · | x | · | x |
 | `2026-08-24-batch-86` | x | x | x | x | · | x | · | x |
 | `2026-08-24-batch-87` | x | x | x | x | · | x | · | x |
-| `2026-08-24-batch-88` | · | · | · | · | · | · | · | x |
+| `2026-08-24-batch-88` | x | · | · | · | · | · | · | x |
