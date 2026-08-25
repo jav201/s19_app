@@ -379,3 +379,95 @@ content**, and **1 is V16 — the flow repo went dirty mid-session with 11 `.exc
 gaining a `rev46 · 2026-08-24` seal element, `mtime` 22:59, authored by neither this orchestrator nor
 any dispatched agent's brief.** Per C-44 it is **reported, not swept**: foreign work is never
 committed or reverted by the session that finds it.
+
+---
+
+# 🛑 The largest finding of this batch: the test ledger has never been checked
+
+**V5 — "the validation ledger's arithmetic adds up" — has been reporting `SKIP` for 57 of 61
+batches, and that SKIP reads as *nothing to check* rather than *I could not check*.**
+
+## The mechanism
+
+`v5_ledger` (`devflow-validate.py:148`) matches
+`(\d+)\s*=\s*(\d+)\s*[-−]\s*(\d+)\s*\+\s*(\d+)` — **digits on both sides of the `=`**. The form the
+project actually writes is `post = 2714 − 0 + 0`: the word `post`, not a number. It does not match.
+Every non-matching file falls to the same terminal line:
+
+```python
+return out or [F("V5", SKIP, "04-validation.md", "no ledger expression found")]
+```
+
+**A file with a correct ledger and a file with none print the identical sentence.** Verified directly
+against batch-87's real `04-validation.md` — the record whose own close asserts *"Ledger
+2714=2702+6+3+3 exact"*:
+
+| Input | V5 output |
+|---|---|
+| batch-87's real `04-validation.md` | `SKIP: no ledger expression found` |
+| a file containing only `# nada` | `SKIP: no ledger expression found` |
+
+## The scale, swept over the whole history
+
+| | |
+|---|---|
+| `04-validation.md` files in history | **61** |
+| V5 finds a parseable ledger expression | **4** (batches 09, 10, 11, 74) |
+| V5 reports *"no ledger expression found"* | **57** |
+| Files whose prose **claims** a reconciling ledger | **34** |
+
+**At least 30 batches asserted a reconciling ledger while the rule that exists to verify it silently
+found nothing to verify.** The claims are true — the arithmetic in those records does reconcile when
+a human checks it — but they were never *mechanically* true. **Every "ledger reconciles" in this
+project's history is a human assertion wearing a green rule's clothes.**
+
+## Why it survived 61 batches, and why that is the real lesson
+
+The file has diagnosed and fixed this exact shape **five times**: `_v7_outcome`'s own docstring
+records that *"a missing manifest returned SKIP, rendering `[-] no manifest found` identically to
+`[-] flow current`"*, and V7, V15, V20, V22 and V23 each carry a `PASS != NOOP` arm as the remedy.
+**V5 is the only rule with a reachable no-op branch and no such arm.** Its `CLEAN` selftest arm
+passes because it asserts *"not red"* — which the no-op branch satisfies. **The arm cannot fail.**
+
+This is the vacuous-check family at its largest scale here: not one check that cannot fail, but a
+check that could not fail across 61 batches while 34 records cited it.
+
+## Standing on this batch — it changes an acceptance criterion
+
+Story A's criterion #1 — *"no new rule on the selftest's synthetic-exemption list"* — was written to
+stop V24 and V25 becoming unfalsifiable. **V5 proves the exemption list is not the only route.** A
+rule can carry arms, pass them, and still be inert, if the arms assert only *"not red"* over a branch
+that is never red.
+
+**Criterion #1 must be widened before Inc 1 writes a line: every new rule owes a `PASS != NOOP` arm,
+and its GREEN arm must assert the pass SENTENCE, not the absence of a BLOCK.**
+
+## ⚠ A scheduling conflict to resolve before Story E produces evidence
+
+The proposed V22 oracle fix (substring → token membership) moves the census **276 → 280**. This
+batch's own `state.json` `batch_objective` declares:
+
+> *"Story E: canon seeding tranches against the V22 census, **baseline 276 of 544**, oracle = the
+> census delta pasted from the validator per tranche."*
+
+**Landing that fix mid-story silently invalidates the story's declared baseline** — the precise
+failure this codebase exists to prevent. Two exits, operator's choice: land the fix **before** Story
+E produces any tranche evidence and re-baseline to 280 in the objective, or defer the fix past this
+batch. **Do not let the number move under a story whose oracle is that number.**
+
+## The other `_RULE_COVERS` mismatches found by the sweep
+
+All 22 entries checked; 13 consistent. Beyond V5 and the already-recorded V8 inversion:
+
+- **V2** — *"every acceptance id drives a node that exists"* tests **substring** membership against
+  one concatenated string, so `AT-1` resolves because `AT-10` is on disk. The tokenizer with the
+  truncation guard (`_ATLAS_ID_ATTC`) already exists in the same file and is not used here.
+- **V6** — *"no should/debería inside a requirement statement"* requires both the `**Statement`
+  marker **and** the modal on the **same physical line**, so a wrapped statement false-**passes**.
+  `v4_method_without_verification`'s own docstring argues the opposite discipline, in the same file.
+- **V16** — its sentence says *"both flow repos"* over **three** declared checkouts; residue of a
+  hardcoded pair rev24 deleted from the code and left in the prose.
+- **V1** — description narrower than behaviour (it scans every artifact, not only requirements).
+- **V9** — judges every batch of closed history, producing **226 of the run's 284 notices**. Declared
+  rather than hidden, so not a lie — but the single largest source of noise in the tool, reaching by
+  another route the outcome `_artifacts`' docstring forbids for V1–V9.
