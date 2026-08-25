@@ -318,3 +318,64 @@ write "observed" and demanded a CI transcript, listing it as *"predicted, not ob
 failing platform."* It was right, and it was right about a claim its principal had already committed
 to a message. **An independent lens that is allowed to say "you did not measure that" earns its cost
 in one finding.**
+
+---
+
+# Inc 0 — the canon-mirror baseline, frozen and classified
+
+**Artifact: `docs/CENSUS-BASELINE-canon-mirror.md`** — 1004 rows, each attributed to the batch
+directory that first declares it. Home chosen by **measurement, not preference**: any `.md` under
+`.dev-flow/` is read by the Atlas id-scanner (C-56), so the placement was tested in a throwaway copy
+with a **positive control** — a sentinel id existing nowhere else — because the null result alone
+would have been vacuous. `.dev-flow/**/*.md` reaches the census (**+1**); the reserved name
+`01-requirements.md` also moves V22's denominator (**+34**); `_derived/` is a hard V20 BLOCK;
+`docs/` and the repo root are unreachable. **Verified after landing: census figures identical
+(1004 · 280 · 1436 · 276/544) and zero Atlas movement.**
+
+## ⚠ Correction: the claim that V22 "reads only 3 files" was wrong
+
+`_ifc_corpus()` walks all of `.dev-flow/` and collects **64** files named `01-requirements.md`. Only
+**3** carry `FLOW`/`COMPONENT` blocks, and that 3 governs a *different* V22 census — the unowned-LLR
+notices. The `276 of 544` spans all 64. The error came from measuring the FLOW/COMPONENT source set
+and reporting it as the rule's scope. Corrected beside the original, not over it.
+
+## What the single number was hiding — seven classes, not one backlog
+
+| Class | Count | |
+|---|---|---|
+| **A** declared requirement, unmirrored | **269** | the true backlog |
+| **B** heading in a non-`01-requirements` artifact | **51** | **invisible to V22 by construction** — a metric hole, not a seeding hole |
+| **C** citation only, ≥2 occurrences | **426** | judgement zone |
+| **D** retired on every occurrence | **7** | |
+| **E** **not an id at all** | **129** | 97 range notations (`HLR-001..004`) harvested whole + 32 prose compounds (`LLR-level`, `US-less`) |
+| **F** padding variant of a canon id | **11** | `LLR-085.1` vs `LLR-85.1` — a normalisation bug |
+| **G** singleton citation | **111** | |
+
+**A + B = 320 unambiguously owed. E + F + G = 251 (25%) are not requirement debt at all.**
+
+**A hypothesis was FALSIFIED and it removes an argument this batch was leaning on.** *"Much of this
+predates the canon"* is unavailable: `REQUIREMENTS.md` was added **2026-03-29**, the earliest batch
+dir is **2026-05-05**. **Every absent id postdates the canon.**
+
+**Retirement bounded both ways:** 7 ids carry a retirement marker on *every* occurrence; **189** on
+*at least one*. The 182-id gap is unresolvable by regex.
+
+## A seventh flow finding — the Atlas tokenizer harvests non-ids
+
+Class E is not debt, it is **`_ATLAS_ID_REQ` failing**: the pattern requires no digit and carries no
+lookahead guard, so `HLR-001..004` is taken as one id and the English words `LLR-level`, `US-less`,
+`HLR-threshold-vs-LLR` are taken as ids. **129 of the 1004 are this.** Note the asymmetry worth
+recording: the rev45 lookahead fix (`(?![-.]\w)`) was applied to the **AT/TC** tokenizer and **not**
+to the requirement one — so the defect was already understood, and half-fixed.
+
+Also measured: V22's own test is **substring**, not token, so `HLR-007a` reads as present because
+`HLR-007` is. Quantified error: **4 ids** — the whole difference between the published 276 and the
+corrected 280.
+
+## Gate line at this station, accounted
+
+**`15 block · 284 notice · 13 n/a`.** 14 are the F-7 residue (§12), **0 attributable to batch-88's
+content**, and **1 is V16 — the flow repo went dirty mid-session with 11 `.excalidraw` diagrams
+gaining a `rev46 · 2026-08-24` seal element, `mtime` 22:59, authored by neither this orchestrator nor
+any dispatched agent's brief.** Per C-44 it is **reported, not swept**: foreign work is never
+committed or reverted by the session that finds it.
