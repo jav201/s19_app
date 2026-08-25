@@ -1,5 +1,13 @@
 # Handoff — the living-artifacts programme after batch-86: four flow revs shipped, the trial passed, D-II is the decision that gates surface #3
 
+> ## ⚠ SUPERSEDED 2026-08-25 — see [[HANDOFF-devflow-session-2026-08-25]]
+>
+> **This document was written BEFORE batch-87.** Its §1, §4, §5 and §6 are now FALSE in named
+> ways: D-II is ruled AND discharged, surface #3 (`workspace_body`) shipped, the flow is rev46 not
+> rev45, and the six-flaky-node diagnosis recorded in §4 was **refuted by measurement** at batch-87
+> P4 (three fail in isolation at N=10; the `n = 1` reading is recorded as vacuous, C-53). It is kept
+> unedited as the record of that session — read the successor for current ground.
+
 > **Written 2026-08-24, session "dev-flow updates" (background job, operator Javier).**
 > **Re-derive every figure below; if a command disagrees, the command is right** — this
 > project has now retired that lesson into four separate controls and this document still
