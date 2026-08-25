@@ -239,3 +239,40 @@ module — the map is stale, ARQ fires"* asserts a stale map, when the true stat
 express this file"*. Those are different conditions and the message conflates them — the **fourth**
 instance today of the one shape: a rule whose behaviour does not match what its description promises.
 Registered beside `PDR-2026-08-24-batch-88#D4`.
+
+## A fifth finding, and it is the sharpest — the module map is invisible in CI
+
+**Found by a self-inflicted mistake, which is the only reason it surfaced.** The ARQ amendment was
+written with `cat >> docs/ARCHITECTURE.md` and then staged with `git add docs/ARCHITECTURE.md`.
+The write landed; the `add` matched nothing. **Windows resolves the path case-insensitively, git's
+index does not.**
+
+| | |
+|---|---|
+| Tracked path | **`docs/architecture.md`** — lowercase, the only one in the index |
+| Path the validator opens | **`docs/ARCHITECTURE.md`** — `devflow-validate.py:245` |
+| On Windows (NTFS, case-insensitive) | `os.path.exists(...)` → **`True`**; V8 reads the map and works |
+| On a case-sensitive filesystem | `_read()` returns `None` → **`V8 SKIP: "no docs/ARCHITECTURE.md (map not adopted here)"`** |
+| CI runners | **`ubuntu-latest`** — `tui-ci.yml:25` and `:61`, `snapshot-regen.yml:23` |
+
+**Consequence.** The module map — *"the **oracle** the A-family triggers read"*, whose whole reason
+for living in the repo instead of the vault is that a mechanical check can open it — **does not
+exist as far as CI is concerned.** Same repo, same commit, two different V8 verdicts depending on
+the developer's filesystem. Every A-family verdict derived on Windows is unreproducible on Linux.
+
+**This is batch-85's `F-7` wearing a different coat.** F-7 was *"a guard can be green because it is
+reading the wrong file."* This one is *"a guard can be SKIP because it is reading a path only one
+filesystem resolves"* — and SKIP is the quieter failure, because a skipped rule raises nothing at all.
+
+**It also lands directly on this batch's own work.** The Layer C rule will read the same map by the
+same hardcoded path. Written as-is, **V24 would be inert in CI** — the "rule that cannot fail" shape
+that acceptance criterion #1 exists to forbid. **Fixing this is now a precondition of Story A, not a
+side quest.** Two exits, and the choice belongs to the increment: rename the file to match the
+validator (touches every existing citation of `docs/architecture.md`), or make the validator resolve
+the map case-insensitively (touches one line and no citations). **The second is smaller and does not
+retarget anything — the same reasoning that kept the interface table at §11.**
+
+⚠ **Correction to the record.** Commit `01886a1` carries a message describing this map amendment and
+**does not contain it** — the failed `git add` is exactly why. The amendment lands in the commit
+that carries this section. The defective message is **not rewritten**; it is corrected here, beside
+the evidence, per this project's standing discipline of repairing next to a record rather than over it.
