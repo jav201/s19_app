@@ -224,3 +224,52 @@ Three defects, all verified against disk:
 - **The selftest's synthetic-exemption list currently names exactly one rule: V8** (it needs a
   project map on disk). Acceptance criterion #1 — *"no new rule on the synthetic exemption list"* —
   is therefore a real, checkable constraint for V24/V25, not a formality. ✅
+
+## 8 · The first PDR exists — the third traceability lane is now exercised
+
+**Sealed 2026-08-24 in the vault**, in the folder `dev-flow-init` declares for design records
+(`vault:<project>/design/`), in the file named for the record id bound below. It is the project's
+**first design review record**; before it, `V23` reported *"no PDR/DDR citations anywhere — the id
+glue is unused, which is a fact about this project, not a pass."*
+
+> 🛑 **The file is deliberately named by its folder and id above, never written out as a path
+> — and that is a DEFECT in V23, not a style choice.** See the grammar box below.
+
+**Verdict: `approved with conditions`**, and the conditions are measured, not ceremonial. It
+authorises **Inc 1 and Inc 2 to start** (neither depends on the frozen-interface table) and
+**withholds Inc 3 and Inc 4** until `PDR-2026-08-24-batch-88#D1` has landed. A conditional verdict
+is not an authorisation.
+
+| Decision | Id to cite from the repo | Lands in |
+|---|---|---|
+| Adopt the §4 interface table, mark `Frozen?` | `PDR-2026-08-24-batch-88#D1` | `docs/ARCHITECTURE.md` §4 |
+| V24 severity: NOTICE without the table, BLOCK with it | `PDR-2026-08-24-batch-88#D2` | `devflow-validate.py` · `validation-template.md` |
+| V25 threshold `N = 30` days since last push | `PDR-2026-08-24-batch-88#D3` | `devflow-validate.py` · `phase-checklists.md` row 5 |
+| `_RULE_COVERS` description must equal implementation | `PDR-2026-08-24-batch-88#D4` | `devflow-validate.py` `_RULE_COVERS` |
+| One canonical `close-template.md` | `PDR-2026-08-24-batch-88#D5` | the copy declared canonical |
+| `Pillow` declared as a dependency | `PDR-2026-08-24-batch-88#D6` | `pyproject.toml` |
+| US-E tranche = the ids of the batches touching US-A's frozen interfaces | `PDR-2026-08-24-batch-88#D7` | `REQUIREMENTS.md` canon mirror |
+| The V20 flow-rev tax, budgeted at P0 and at Inc 4 | `PDR-2026-08-24-batch-88#D8` | `.dev-flow/_derived/` · `FLOW-VERSION.md` |
+
+> 🛑 **V23 cannot tell a citation from a FILENAME — found by tripping it, twice, in this very
+> section.** The token matcher is `(?:PDR|DDR)-\S+`, which happily swallows a path. So writing the
+> record's own file path in any repo document raises a NOTICE **against the flow's own declared
+> convention**: `dev-flow-init` puts design records at `vault:<project>/design/` under a name that
+> begins with the record id, and naming that file is therefore unrepresentable in the repo. There is
+> no escape — the scan reads every line of every `.md` with **no fence awareness**, so a code block
+> does not protect it either. **Registered as a batch-88 finding**, adjacent to `PDR-2026-08-24-batch-88#D4`
+> (description must equal implementation): a rule whose grammar forbids the convention its own
+> command prescribes is the same class of defect as a `_RULE_COVERS` line that contradicts its code.
+>
+> ⚠ **A grammar fact worth knowing before you cite anything.** `V23`'s token matcher is
+> `\b(?:PDR|DDR)-\S+` and its conformance test is
+> `^(?:PDR|DDR)-\d{4}-\d{2}-\d{2}-batch-[A-Za-z0-9]+#D\d+$`. **The record's own id — without a
+> `#D<n>` suffix — does NOT conform.** Writing the bare record name anywhere under `.dev-flow/` or in
+> `REQUIREMENTS.md` raises a NOTICE against itself. The grammar can express *a decision inside a
+> record*, never *the record*. That is arguably correct (a citation should bind to a decision, not a
+> document) but it is undocumented, and it is the first thing a second reader will trip on. Cite
+> decisions; name the file by **path** when you mean the document.
+
+**`artifact_homes` gap this surfaced:** `state.json` declares no design homes. batch-88 must add
+`"design_pdr"` and `"design_ddr"` — otherwise the record has no declared home and `/dev-flow-sync`
+has no path for it.
