@@ -276,3 +276,45 @@ retarget anything — the same reasoning that kept the interface table at §11.*
 **does not contain it** — the failed `git add` is exactly why. The amendment lands in the commit
 that carries this section. The defective message is **not rewritten**; it is corrected here, beside
 the evidence, per this project's standing discipline of repairing next to a record rather than over it.
+
+### ⚠ Correction to the fifth finding — I made a vacuous claim, and a subagent caught it
+
+The section above states *"the module map is invisible in CI"* and draws from it that *"every
+A-family verdict derived on Windows is unreproducible on Linux."* **The first half is true but
+measures nothing; the second half is wrong.** Corrected here, beside the original, not over it.
+
+**What was actually measured before:** the mechanism (`devflow-validate.py:245` opens
+`docs/ARCHITECTURE.md`, the index holds `docs/architecture.md`, CI images are `ubuntu-latest`).
+**What was inferred and presented as observed:** that CI therefore gets a different V8 verdict.
+
+**What is now measured:**
+
+| Probe | Result |
+|---|---|
+| `grep -rn "devflow-validate\|dev-flow" .github/workflows/*.yml` | **empty — no workflow invokes the validator** |
+| `.github/workflows/tui-ci.yml` steps | checkout · setup-python · install · `pytest -q -m "not slow"` (PRs) / `pytest -q` (pushes) · snapshot suite. **No validator step.** |
+| `.git/hooks/` (non-`.sample`) | **empty** |
+| `devflow-validate` in any `settings.json` hook | **absent** |
+
+**Therefore CI produces no V8 verdict at all**, and "invisible in CI" is invisible the way anything
+CI does not read is invisible. The harm I named does not exist, because the thing I claimed was
+broken is never run there. **This is the vacuous-claim shape — a statement that cannot be false
+because its subject never occurs — which is the same family as C-53 and the rev42 vacuous fixture.
+Finding it in my own record is the point of writing measurements down.**
+
+**What survives, restated honestly and at its true severity:**
+
+- The mechanism is **real and latent**. The validator resolves the map only on a case-insensitive
+  filesystem. It has only ever been run on Windows, where it resolves.
+- It becomes **active the first time the validator runs on Linux** — a CI adoption, a second
+  machine, a Linux contributor, a cloud agent session.
+- It remains a **precondition for Story A**, and the reason is now sharper rather than weaker: a
+  batch whose whole purpose is closing audit gaps is exactly the batch that would put the validator
+  in CI. The day that step lands, V24 goes inert on arrival — a new rule that has never once run in
+  the environment it was written to guard.
+
+**And the correction has its own lesson.** The subagent drafting the catalogue entry refused to
+write "observed" and demanded a CI transcript, listing it as *"predicted, not observed on the
+failing platform."* It was right, and it was right about a claim its principal had already committed
+to a message. **An independent lens that is allowed to say "you did not measure that" earns its cost
+in one finding.**
