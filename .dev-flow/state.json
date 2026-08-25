@@ -12,13 +12,15 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P0",
+  "current_station": "ARQ",
   "phase_status": "approved",
   "stations_active": [
-    "P0"
+    "P0",
+    "ARQ"
   ],
   "iterations_per_station": {
-    "P0": 0
+    "P0": 0,
+    "ARQ": 0
   },
   "triggers": {
     "evaluated_at": "2026-08-24T21:30:00-06:00",
@@ -49,7 +51,8 @@
     "design_ddr": "vault:s19_app/design/DDR-<batch>.md"
   },
   "artifacts": {
-    "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md"
+    "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md",
+    "ARQ": "repo:docs/ARCHITECTURE.md (sections 10-11) + .dev-flow/2026-08-24-batch-88/PLAN.md#station-arq"
   },
   "decisions_log": [
     {
@@ -57,6 +60,12 @@
       "date": "2026-08-24",
       "decision": "batch opened; approved (autonomous D-88-1)",
       "notes": "RC-1 PASS: merge-base == origin/main tip 4131a38, recorded in PLAN before deriving; fresh branch claude/batch-88-audit-closures. Flow rev46 hash 9c1449ed815d267c verified against the manifest (C-45 PULL); selftest 192 arms exit 0. Mode core (C-50, unchanged -- no mode_history entry). TRIGGERS: FIVE families fire where batch-87 fired one -- A (parallel lanes + D1 changes the module map itself; judged, family A has no mechanical probe by design), B1 (MAP COVERS-* selftest arms assert _RULE_COVERS, which D4 touches), B4, C (D6 adds a pyproject dependency; re-run over the diff at EVERY gate), E (4 stories and 5+ increments, both over the >=3 threshold). NOT fired with probes: B2 (both close-template copies byte-identical 3e8f07ab9d63fb55 -- also discharges PDR condition 3 at intake), B3 (7 per-batch goldens, none captures a source this batch touches), D (0 files under s19_app/tui/), F (flow_hash == manifest; backlog reconciled at batch-87 close). E FIRING HAS A COST: the proposal declared estimation/schedule out of scope CONDITIONED on family E not firing -- it fires, so MAN.3.BP5/BP8 are obligatory for this batch. Recorded at intake, not discovered at close. FAMILY A FIRING ACTIVATES THE ARQ STATION. V20 tax paid (PDR-2026-08-24-batch-88#D8): 4 block -> 0 by Atlas regen; ledger reconciles (V20's four blocks collapse to one n/a line, 14 -> 15; V16's currency arm flipped to NOTICE on a 1.0-day-stale local ref -- a clock effect, returned by fetch). Final 0 block / 284 notice / 15 n/a, identical to batch-87's close. C-56 INSTANCE, SELF-INFLICTED AND CAUGHT: the opening documents minted one phantom id from a bare proposal label (unique ids 1436 -> 1437). First measurement was WRONG (git restore --staged leaves the working tree, so the grep read the regenerated copy); re-measured from HEAD, exactly one stem was mine, the other four are batch-87's registered carry. Fixed at the SOURCE, never in the derived plane; census verified back to 1436. PDR-2026-08-24-batch-88 sealed in the vault, verdict approved with conditions: authorises Inc 1 and Inc 2, WITHHOLDS Inc 3 and Inc 4 until #D1 lands. Sequencing deviation declared: sealed pre-INTAKE, so it reviewed the PROPOSAL, not the requirements -- it does not discharge the station-4 PDR."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-08-24",
+      "decision": "module map amended; approved (autonomous D-88-2)",
+      "notes": "Family A fired at P0, so ARQ ran. docs/ARCHITECTURE.md gains s10 Composition-by-path and s11 Interfaces-with-Frozen; sections 1-9 untouched (standing artifact, amended not recreated). 266 tracked .py classified into 6 non-overlapping prefixes. V8 flips from 'declares no path/** prefixes -- it cannot be checked' to checkable, reporting EXACTLY ONE orphan, setup.py, which was PREDICTED IN ADVANCE and named in s10 with its mechanism. Notice delta net zero, 284 -> 284. PDR#D1 DISCHARGED WITH A CORRECTION: the template's s4 numbering was REJECTED (s19_app's s4 is 'Patch Editor flow' and is cited elsewhere; renumbering would silently retarget every citation). The table landed at s11, so the Layer C rule MUST key on the table's SHAPE -- the Frozen? column header -- never on a section number. Strictly better than the proposal asked for, and only visible because the anchor was checked against a real repo. PDR condition 2's wording amended accordingly. All three Part B contracts (loaded_panel 6 outputs / screen_workspace 31 / workspace_body 42, chain workspace_shell -> workspace_body -> screen_workspace -> loaded_panel) declared FROZEN for this batch: cited, never touched -- real consumers for V24 instead of a synthetic fixture. FOURTH flow finding: V8 cannot classify a root file (no path/** prefix can match one), and its message asserts 'the map is stale' when the true state is 'the rule cannot express this'."
     }
   ],
   "standing_authorization": {

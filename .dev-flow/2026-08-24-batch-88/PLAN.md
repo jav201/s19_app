@@ -198,3 +198,44 @@ a real finding rather than this one.
 **Registered as a batch-88 candidate** beside `PDR-2026-08-24-batch-88#D4`. It is the third defect
 this session found in the flow's own rules, and all three share one shape: **a rule whose behaviour
 does not match what its description promises.**
+
+---
+
+# Station ARQ — module map amended *(activated by family A)*
+
+| # | Item | ✓/⚠/✗ | Evidence |
+|---|---|---|---|
+| 1 | Module map updated — or "no architecture change" with its empty diff | ✓ | `docs/ARCHITECTURE.md` gains **§10 Composition (by path)** and **§11 Interfaces (`Frozen?`)**. Sections 1–9 unchanged — the map is a standing artifact and batches amend it. |
+| 2 | Every planned file falls under a declared module | ⚠ | **266 tracked `.py` classified into 6 prefixes; exactly one orphan, `setup.py`, PREDICTED IN ADVANCE and named in §10.** V8 flipped from *"map declares no `path/**` prefixes — it cannot be checked"* to a checkable rule. Notice delta **net zero** (284 → 284): one unusable notice replaced by one true one. |
+| 3 | Interfaces that change, listed | ✓ | **None change.** All three declared Part B contracts are **frozen** for this batch (§11) — batch-88 cites them, never touches them. That is what gives V24 real consumers instead of a synthetic fixture. |
+| 4 | Lanes proposed with **disjoint FILE sets**, not just modules | ✓ | Lane 1 = flow repo + `docs/ARCHITECTURE.md` + `pyproject.toml`; Lane 2 = `REQUIREMENTS.md` and the canon family. Disjoint at file level, not merely module level (§7). |
+| 5 | `rationale` per structural decision | ✓ | Three rationale rows in §10 (six-module cut · `prototypes/**` declared rather than excluded · `tests/**` as one module), each with its rejected alternative and its re-opening condition. |
+
+## ARQ decision — `PDR-2026-08-24-batch-88#D1` is discharged, with a correction to its own wording
+
+`#D1` asked for *"the §4 interface table"*. **Adopting the template's §4 numbering was rejected** and
+the interface table landed at **§11** instead. s19_app's map predates the template: its §4 is
+*"Patch Editor flow"*, cited from elsewhere. Renumbering would silently retarget every existing
+citation — a rewrite masquerading as an amendment.
+
+**Consequence, and it changes the rule this batch is about to write.** The Layer C rule **must key on
+the table's SHAPE — the `Frozen?` column header — never on a section number.** A rule keyed on "§4"
+is broken by every project that had a map before adopting the template, which is every project with
+history. This is a strictly better rule than the proposal asked for, and it is only visible because
+the anchor was checked against a real repo instead of against the template.
+
+⚠ **Therefore the wording of PDR condition 2 is amended here** (*"V24 active over ≥1 interface marked
+`Frozen?` in the table D1 created"* — no section number). The DDR re-reads this paragraph, not the
+proposal's original sentence.
+
+## A fourth flow finding — V8 cannot classify a root file
+
+The staleness check extracts prefixes matching `` `path/**` `` and tests
+`file.startswith(prefix + "/")`. **No declarable prefix can ever match a repository-root file**, so
+`setup.py` is unclassifiable by construction and will report as an orphan forever.
+
+The defect is not the notice; it is that the notice **says the wrong thing**. *"under no declared
+module — the map is stale, ARQ fires"* asserts a stale map, when the true state is *"the rule cannot
+express this file"*. Those are different conditions and the message conflates them — the **fourth**
+instance today of the one shape: a rule whose behaviour does not match what its description promises.
+Registered beside `PDR-2026-08-24-batch-88#D4`.
