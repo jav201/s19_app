@@ -31,8 +31,9 @@ Three orderings are **binding**; the rest is free.
    canon-seeding evidence exists. Story E is in batch-89 and will measure against it.
 2. **Inc 7's flow-version bump is LAST** — `LLR-88.16` re-declares the flow's identity *after* the
    final edit. A bump before the last edit is a hash that lies.
-3. **Inc 6 is withheld until the `security-reviewer` lens runs** on its dependency diff — condition
-   C9, re-scoped to cover `pyproject.toml` **and** `.github/workflows/tui-ci.yml`.
+3. ~~Inc 6 is withheld until the `security-reviewer` lens runs.~~ **DISCHARGED 2026-08-26** — the
+   lens ran over both files and its record is `02-review-security.md`: verdict `safe with
+   conditions`, 0 blocker, 2 medium, **both dispositioned by operator ruling**. Inc 6 is released.
 
 Inc 2 needs no sequencing guard: its oracle was **stilled** by the C-56 de-minting already landed
 in this batch's Phase-1 re-work, so it moves no live verdict. That is why the oracle table now
@@ -103,11 +104,11 @@ counts five moves and finds only two still moving.
 |---|---|
 | Requirements | `LLR-88.12` · `HLR-88.6` |
 | Source files | `pyproject.toml` · `.github/workflows/tui-ci.yml` — **2** |
-| **Withheld until** | the `security-reviewer` lens runs on the dependency diff across **both** files — condition C9 |
+| **Withheld until** | ~~the `security-reviewer` lens~~ — **RELEASED 2026-08-26**, `02-review-security.md`. Two rulings travel with it: the entry is **floored at `>= 10`**, and F2's silent-failure risk is **accepted with its mitigation declined** to hold the edit at 4 lines |
 | Pre-state (M-12) | Manifest declares the library **nowhere**; one ad-hoc `pip install pillow` at `tui-ci.yml:42`. `[project].dependencies` holds **3** entries; the `dev` extra holds **2**, one of which pins `textual==8.2.8`. The `tui-ci` job installs bare `-e .` at `:43` and runs the **full** suite on push; the `snapshot` job already installs `.[dev]` at `:76` |
-| Post-state | A new `evidence` extra holds **1** entry; `tui-ci`'s install is routed through it and the three ad-hoc lines removed; `[project].dependencies`, the `dev` extra and the `snapshot` job's install are **byte-identical** |
+| Post-state | A new `evidence` extra holds **1** entry, **floored at `>= 10`** with a rationale comment (operator ruling 2026-08-26); `tui-ci`'s install is routed through it and the three ad-hoc lines removed; `[project].dependencies`, the `dev` extra and the `snapshot` job's install are **byte-identical** |
 | Gate | `AT-B88-09`: installing `.[evidence]` yields an importable imaging library **and** a `textual` that is `>= 8.0.2` and **not** the `8.2.8` pin; `.[dev]` yields the pin; **bare `-e .` must FAIL** the import. `.github/` shows exactly **1** file and **4** lines |
-| ⚠ | **The negative control is not optional.** The imaging library is already installed on the authoring machine, so the positive check passes **before the fix exists**. Without the bare-`-e .` arm this gate is green on a defect |
+| ⚠ | **The negative control is not optional.** The imaging library is already installed on the authoring machine, so the positive check passes **before the fix exists**. Without the bare-`-e .` arm this gate is green on a defect. **Second, an ACCEPTED RISK the operator ruled on 2026-08-26:** a mistyped or renamed extra exits **0** silently (measured, pip 24.2), and because the GIF test is `slow` while PRs run `-m "not slow"`, a broken extra would keep every PR green and break `main` after merge. The one-line import guard was declined to hold the edit at 4 lines. **Do not 'improve' this in the increment** — it is a ruling, not an oversight |
 
 ### Inc 7 — Story C, the derived exemption set, and the flow's re-declared identity
 
@@ -142,5 +143,5 @@ counts five moves and finds only two still moving.
 | C1 · C2 · C3 · C4 · C5 · C6 · C10-b | **discharged** in the Phase-1 re-work |
 | C7 | **discharged** — `HLR-88.6` / `LLR-88.12` re-authored, criterion 8 and `AT-B88-08` widened, `AT-B88-09` minted |
 | **C8** | **discharged by this file** |
-| C9 | **open** — withholds Inc 6 only |
+| C9 | **DISCHARGED 2026-08-26** — `02-review-security.md`; Inc 6 released |
 | C10-a | **open by design** — travels inside Inc 5, per the review's own instruction |
