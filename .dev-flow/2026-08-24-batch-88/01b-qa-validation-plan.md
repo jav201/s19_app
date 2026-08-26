@@ -1,5 +1,32 @@
 # QA validation-methods plan — batch-88 Phase 1 (qa-reviewer deliverable, 2026-08-24)
 
+> ## ⚠ SWEPT 2026-08-26 — this file was authored BEFORE the scope cut and BEFORE the
+> ## station-4 design review, and nothing had touched it since.
+>
+> **The analysis stands. Its SCOPE and its FIGURES do not.** Found by an adversarial review of
+> the batch's progress, which observed that every prior lens — a security review, a condition
+> audit, a code review, a mutation catalog — took `01-requirements.md` as the world. This is
+> the batch's **third** live Phase-1 artifact and no lane covered it.
+>
+> **What expired, and where it is corrected in place below:**
+>
+> 1. **Stories A and B left the batch** (operator ruling 2026-08-25, `state.json`). This file
+>    still plans arms for `V24` in **8** places and devotes the whole of **§4** to Story B's
+>    review-debt ledger. Both are batch-89 work now. §4 carries its own banner.
+> 2. **The census baseline moved twice.** This file carries `276` ×4, `280` ×4 and `544` ×3,
+>    and **zero** occurrences of the live figures. Re-derived 2026-08-25: shipped **302 of
+>    570**, patched **306 of 570**. The **+4 delta survives** every re-measurement; the
+>    baseline survives none, because every batch declares ids of its own.
+> 3. **§7.5's "decision owed before Inc 5" was taken and shipped.** Banner at §7.5.
+>
+> **⚠ The requirement that forbids a stale declared baseline cannot see this file.**
+> `LLR-88.8`'s threshold reads *"0 occurrences of `276 of 544` or `280 of 544` as a declared
+> baseline"* — but its quantified population is *"the baseline figures of **those two
+> documents**"*, meaning `state.json` and `PLAN.md`. A rule scoped by naming its documents
+> cannot notice a third one. That is the finding, not the typo: **the scope cut swept the two
+> artifacts the ruling named and left the third**, which is the same shape that left
+> `LLR-88.4` demanding `8 of 8` over a seven-member population.
+
 > Returned by the Phase-1 `qa-reviewer` dispatch, run **in parallel** with the architect authoring
 > `01-requirements.md`. Nothing here is an edit to that file. Every finding below is offered as a
 > **HYPOTHESIS to be confirmed by execution at the fold**, never as a correction applied to another
@@ -42,7 +69,7 @@ owned by the orchestrator.
 | the 14 blocks, by rule | `grep '^  \[x\]' \| grep -oE 'V[0-9]+' \| sort \| uniq -c` | **all 14 are `V4`** — see §1.4 |
 | gate line, PATCHED | `PYTHONIOENCODING=utf-8 PY PATCHED W` | **`0 block · 284 notice · 16 not applicable`**, exit **0** |
 | V22 census, ORIG | same run, `grep 'living canon'` | **`276 of 544`** |
-| V22 census, PATCHED | same run | **`280 of 544`** — the scheduling conflict in PLAN §"⚠ A scheduling conflict" is **confirmed by execution**, not predicted |
+| V22 census, PATCHED | same run | ~~**`280 of 544`**~~ — **superseded, see the banner at the head of this file: 306 of 570 measured 2026-08-25**. Original reading preserved: — the scheduling conflict in PLAN §"⚠ A scheduling conflict" is **confirmed by execution**, not predicted |
 | V7 | same run | `flow current (9c1449ed815d267c)` — matches the manifest hash PLAN §1 records |
 | selftest, ORIG | `PY ORIG --selftest` | **192 arms**, `SELFTEST PASSED`, exit 0 |
 | selftest, PATCHED | `PY PATCHED --selftest` | **221 arms**, `SELFTEST PASSED`, exit 0 |
@@ -311,6 +338,12 @@ declared here rather than discovered at the gate.**
 ---
 
 ## 4 · The human-review marker — a REVIEW-DEBT LEDGER
+
+> **⚠ VOID FOR BATCH-88 — Story B moved to batch-89 by operator ruling 2026-08-25.**
+> Kept in full and unedited, because the design is sound and batch-89's own PDR allocates the
+> rule number this section could not mint. **Nothing in §4 is an obligation of this batch**, and
+> the mandatory arm set in §3 is to be read without it. The prior design record's condition 2
+> travelled with the story and is re-owed at batch-89's PDR.
 
 ### 4.1 · What it is, stated so the rule cannot drift from it
 
@@ -630,6 +663,18 @@ resolves the map on a case-sensitive host is `predicted, not observed on the fai
 the exact phrasing PLAN's fifth-finding correction adopted, and it applies again here.
 
 ### 7.5 · The V22 scheduling conflict is confirmed, and it is a Phase-1 blocker
+
+> **⚠ DISCHARGED 2026-08-26. The section was right, and both of its exits were taken.**
+> The operator ruled the V22 oracle fix **lands first**, and Story E moved to batch-89 — so the
+> number can no longer move under the story whose oracle it is. **Increment 1 shipped the fix**
+> and the re-baseline is recorded in `state.json` and `PLAN.md`.
+>
+> **Its figures are superseded twice over.** The move is **302 → 306 of 570** measured
+> 2026-08-25, not 276 → 280 of 544; the **+4 delta is unchanged** and the four ids are named
+> (`HLR-053`, `HLR-056`, `US-064`, `US-068`). And the sentence below directing a re-baseline
+> **to 280** is exactly what `LLR-88.8` now forbids as a declared baseline — preserved here
+> because it was correct when written and because striking it silently would hide that this
+> file sat outside the requirement's declared population.
 
 Measured: the token fix moves the census **276 → 280** on the real repo. `state.json`'s
 `batch_objective` declares Story E's baseline as **276 of 544** and its oracle as *"the census delta

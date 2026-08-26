@@ -167,7 +167,7 @@ BLOCK attributable to this document"* was true over any content whatsoever. `rev
 making `_artifacts()` prefer the batch `state.json` declares.
 
 **The fix is conditional on the active batch having ALREADY AUTHORED the file.** Read the loader
-(`devflow-validate.py:2236`): the bare walk fills every basename first-wins across all 70 batch
+(`devflow-validate.py` `_artifacts`): the bare walk fills every basename first-wins across all 70 batch
 dirs; the active-batch pass then overrides **only the basenames that exist inside it**. At P0 the
 active directory holds `PLAN.md` and nothing else, so `01-requirements.md` keeps the first-wins
 value — batch-01's — and `V1`–`V9` judge a May document. **The pre-rev39 behaviour returns exactly,
@@ -200,7 +200,7 @@ omitted field is a question nobody asked, and the validator treats the two diffe
 
 **Accounting for this station's gate line.** `14 block` is recorded, not hidden and not explained
 away: **0 blocks are attributable to batch-88's content**, 14 are attributable to
-`devflow-validate.py:2236`, and the discriminating mutation is in the table above. The figure will
+`devflow-validate.py` `_artifacts`, and the discriminating mutation is in the table above. The figure will
 fall to its true value the moment Phase 1 authors `01-requirements.md` — and if it does not, that is
 a real finding rather than this one.
 
@@ -259,7 +259,7 @@ index does not.**
 | | |
 |---|---|
 | Tracked path | **`docs/architecture.md`** — lowercase, the only one in the index |
-| Path the validator opens | **`docs/ARCHITECTURE.md`** — `devflow-validate.py:245` |
+| Path the validator opens | **`docs/ARCHITECTURE.md`** — `devflow-validate.py` `v8_module_map` |
 | On Windows (NTFS, case-insensitive) | `os.path.exists(...)` → **`True`**; V8 reads the map and works |
 | On a case-sensitive filesystem | `_read()` returns `None` → **`V8 SKIP: "no docs/ARCHITECTURE.md (map not adopted here)"`** |
 | CI runners | **`ubuntu-latest`** — `tui-ci.yml:25` and `:61`, `snapshot-regen.yml:23` |
@@ -292,7 +292,7 @@ The section above states *"the module map is invisible in CI"* and draws from it
 A-family verdict derived on Windows is unreproducible on Linux."* **The first half is true but
 measures nothing; the second half is wrong.** Corrected here, beside the original, not over it.
 
-**What was actually measured before:** the mechanism (`devflow-validate.py:245` opens
+**What was actually measured before:** the mechanism (`devflow-validate.py` `v8_module_map` opens
 `docs/ARCHITECTURE.md`, the index holds `docs/architecture.md`, CI images are `ubuntu-latest`).
 **What was inferred and presented as observed:** that CI therefore gets a different V8 verdict.
 
@@ -398,7 +398,7 @@ batches, and that SKIP reads as *nothing to check* rather than *I could not chec
 
 ## The mechanism
 
-`v5_ledger` (`devflow-validate.py:148`) matches
+`v5_ledger` (`devflow-validate.py`) matches
 `(\d+)\s*=\s*(\d+)\s*[-−]\s*(\d+)\s*\+\s*(\d+)` — **digits on both sides of the `=`**. The form the
 project actually writes is `post = 2714 − 0 + 0`: the word `post`, not a number. It does not match.
 Every non-matching file falls to the same terminal line:
