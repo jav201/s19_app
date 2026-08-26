@@ -2,8 +2,9 @@
 
 > **VERDICT: `safe with conditions`.** 0 blockers · 0 major · 2 medium, **both dispositioned by
 > operator ruling 2026-08-26**. F1 accepted and specified (`pillow >= 10`, floor + rationale);
-> **F2 accepted as a KNOWN RISK, deliberately, with the mitigation declined** to hold the CI edit at
-> four lines — recorded at the acceptance it weakens, not in a backlog.
+> **F2 MITIGATED** — the one-line import guard is adopted and the CI edit widens to **five** lines.
+> ~~First ruled the same day as an accepted risk with the mitigation declined at four lines~~;
+> **revised**, and the superseded ruling is kept below rather than erased.
 >
 > **This record discharges condition C9** of the station-4 design review sealed **2026-08-25**,
 > which withheld Inc 6 until
@@ -101,8 +102,14 @@ the resolved-version evidence `AT-B88-09` already wants. **It would take the CI 
 5**, colliding with the *"exactly 4 lines, and in no other line"* threshold in `HLR-88.6`,
 `LLR-88.12` and criterion 8.
 
-**Ruling 2026-08-26: hold at 4 lines, accept the risk.** Recorded in `AT-B88-09` beside the
-acceptance it weakens, so the next reader meets it where it matters. **Re-openable at one line.**
+**Ruling 2026-08-26, REVISED the same day: adopt the guard, widen to 5 lines.**
+~~First ruling: hold at 4 lines and accept the risk, recorded beside the acceptance it weakens.~~
+Preserved because the revision turned on a correction rather than a preference — the operator's
+stated reason for the first ruling (*"siempre lo has recomendado y la evidencia parece
+respaldarlo"*) attributed to me a recommendation I had not made: I recommended widening, and so
+did this lens. **The premise was corrected before the decision was re-taken, and the operator
+then said so plainly.** Recording that is the point of the seal rule; a ruling whose stated
+basis was wrong is not the same artifact as a ruling that was simply changed.
 
 **Correction this finding forced.** `AT-B88-09`'s error arm asserted *"an unknown extra name fails
 loudly at install rather than silently installing the base project."* That is the **opposite** of
