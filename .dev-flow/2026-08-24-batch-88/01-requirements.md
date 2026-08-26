@@ -76,7 +76,7 @@ table answers is how many oracles are **still moving today**, after a station of
 |---|---|---|---|---|---|
 | 1 | V22 substring → token | the canon census | **302 → 306 of 570**, delta **+4** — `HLR-053`, `HLR-056`, `US-064`, `US-068`. ~~276 → 280 of 544~~ superseded; the denominator grew because batch-88 declared its own ids | ✅ **yes** | ✅ operator-ruled: lands first |
 | 2 | `_artifacts` F-7 residue | **the batch's own gate line** | **0 block → 0 block.** ~~14 block → 0 block~~ — **the window CLOSED when P1 authored.** Executed: the loader's `01-requirements.md` is now byte-identical to the **active** batch-88 copy and **not** to `.dev-flow/2026-05-05-batch-01/`'s May copy | ❌ **no — stilled by the batch's own progress** | n/a — nothing left to sequence |
-| 3 | V2 substring → token | every acceptance id's resolution | **0 live verdicts here.** V2's pattern requires a digit immediately after the prefix; this project's acceptance ids are letter-initial, so V2 SKIPs (P-7). Corpus under `tests/` re-derived: **915** distinct acceptance/test-case tokens. ~~989~~ — **not reproducible without its tokenizer definition**, so it is retired rather than carried forward | ❌ **no — synthetic by construction** | n/a |
+| 3 | V2 substring → token | every acceptance id's resolution | **0 live verdicts here.** V2's pattern requires a digit immediately after the prefix; this project's acceptance ids are letter-initial, so V2 SKIPs (P-7). Corpus under `tests/` re-derived 2026-08-26 with **the tokenizer M-6 names by line** (`_ATLAS_ID_ATTC`, `devflow-validate.py:1574`): **989** distinct acceptance/test-case tokens, **unchanged and reproducible**. ⚠ **This row briefly published 915 and convicted 989 of being unreproducible. BOTH halves were wrong**, and an independent lens caught it: 989 reproduces exactly under the tokenizer M-6 cites, while 915 came from an ad-hoc expression whose definition was stated **nowhere** — which is precisely the defect 989 was accused of, and which the row below congratulates itself for avoiding. Corrected at the source; the wrong figure is named here rather than quietly removed | ❌ **no — synthetic by construction** | n/a |
 | 4 | V5 · V8 root message | the SKIP/NOTICE **sentences** 57 and 1 records rely on | **57 of 61 confirmed.** The 4 that parse are batches **09, 10, 11, 74**. **36** of the 57 mention a ledger in prose while V5 reports none was found (keyword scan for `ledger` / `post =`; the definition is stated here because the prior figure's was not) | ✅ **yes** | ❌ **not sequenced** |
 | 5 | **V23 shipped → strict grammar** — **THE MISSING FIFTH MOVE** | the V23 notice count, and every design-review citation's resolution | **9 notices → 0** — but **the grammar moves none of it.** All 9 were self-inflicted by this document's constructed-token table, and de-minting alone cleared them. Post-de-minting corpus = **26 citations, 26 / 26 conforming under BOTH the shipped and the strict grammar** | ❌ **no — stilled by the de-minting in `#D2`** | ✅ **sequenced: lands after the de-minting**, which is already done |
 
@@ -960,10 +960,10 @@ resolver's acceptance and tests nothing about a dependency (`PDR-2026-08-25-batc
 ### LLR-88.4 — the arm floor is stated per rule, with a named kill mutation each
 
 - **Traceability:** HLR-88.1
-- **Statement:** The selftest shall print, for each of the eight members of HLR-88.1's population, at least one arm whose assertion is the rule's pass SENTENCE and at least one arm whose assertion is that the pass sentence and the could-not-check sentence are unequal strings, and each new arm block shall name in a comment the mutation that turns it red — the quantified population being the arm blocks of `devflow-validate.py`'s `--selftest` path.
+- **Statement:** The selftest shall print, for each of the **seven** members of HLR-88.1's population, at least one arm whose assertion is the rule's pass SENTENCE and at least one arm whose assertion is that the pass sentence and the could-not-check sentence are unequal strings, and each new arm block shall name in a comment the mutation that turns it red — the quantified population being the arm blocks of `devflow-validate.py`'s `--selftest` path.
 - **Validation:** `inspection`
 - **Executed verification:** read of the selftest source after the edit, one rule at a time; the printed labels of `devflow-validate.py --selftest` enumerated one rule per line into `04-validation.md`.
-- **Numeric pass threshold:** **8 of 8** rules carry both arm kinds; **8 of 8** new arm blocks carry a named kill mutation; total arm lines **≥ 240** against a pre-state of **192**.
+- **Numeric pass threshold:** **7 of 7** rules carry both arm kinds; **7 of 7** new arm blocks carry a named kill mutation; total arm lines **≥ 240** against a pre-state of **192**. ~~8 of 8~~ superseded — this requirement's population is `HLR-88.1`'s **by reference**, and that population moved to seven when the loader `_artifacts` left it. **The stale figure made the batch's flagship anti-vacuity criterion UNSATISFIABLE**: `8 of 8` is unreachable without re-admitting a member `HLR-88.1` forbids. Caught by an independent lens, not by the fix that caused it — a criterion that cannot PASS is the mirror of the defect this batch exists to end, and it is the same failure to sweep an artifact's dependents.
 - **Acceptance criteria (informative):**
   - **The total is a floor, never the criterion.** P-23 measured the 29 arms already written and found **0** of them touch four of the nine fixes; a total threshold is satisfiable by piling arms onto a rule that already had them.
   - Where two branches of one rule share a severity — both module-map notices are NOTICE — a severity assertion cannot see the defect and the **sentences** are the arm. That is the shape the shipped `V18 CAUSES-differ` and `V20 PASS!=NOOP-msg` arms already use.
@@ -1019,7 +1019,7 @@ resolver's acceptance and tests nothing about a dependency (`PDR-2026-08-25-batc
 - **Statement:** The design-review grammar (`_V23_OK`, `devflow-validate.py:1557`) shall admit a batch segment consisting of a date, the literal batch marker and a single alphanumeric component, followed optionally by a version marker of the form `-v` plus a digit sequence, followed optionally by either a decision suffix of the form `#D` plus a digit sequence or the literal Markdown extension — and shall admit no other hyphenated component in the batch segment; **and the citation harvester shall discard every trailing character that no citation can end in, the discard set being derived from the id grammar's own character class rather than enumerated from Markdown delimiters** — the quantified population being every token the citation harvester collects from `REQUIREMENTS.md` and the `.dev-flow/` walk.
 - **Validation:** `test (unit)`
 - **Executed verification:** `devflow-validate.py --selftest`, the grammar arm block over M-3's constructed token table, **and the harvester arm block over M-11's twelve Markdown contexts**; plus the `V23` line of a live run. Pre-state M-3, re-executed 2026-08-25: **26/26** conforming under the shipped grammar, the permissive candidate AND this strict one (~~21/21~~ superseded). Pre-state M-11: **8 of 12** ordinary Markdown contexts mangle a conforming citation into a notice.
-- **Numeric pass threshold** (restated per `PDR-2026-08-25-batch-88#D2`, and widened by the operator ruling of 2026-08-25): the **non-conforming citation set is ∅** over a conforming population of **≥ 26** — a floor with its measurement date, never a target, because this document mints a conforming citation every time it cites a record. **Grammar arms: ≥ 11**; **≥ 2** assert REJECTION of a hyphenated batch-directory token (with and without a trailing decision); **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision); **≥ 4** preserve the shipped rejections (undated, placeholder, bare hash, path-prefixed). **Harvester arms: ≥ 8**, one per failing Markdown context of M-11, each asserting the CLEAN citation is recovered — and **≥ 1 `PASS != NOOP` arm** proving the bare and code-span contexts, which pass today, are not what the new arms measure. **≥ 1 arm must assert that a bare-hash form still FAILS after the widening**, because a discard set that is too greedy would repair the token the grammar is required to reject.
+- **Numeric pass threshold** (restated per `PDR-2026-08-25-batch-88#D2`, and widened by the operator ruling of 2026-08-25): the **non-conforming citation set is ∅** over a conforming population of **≥ 48** — a floor with its measurement date, never a target, because this document mints a conforming citation every time it cites a record; ~~26~~ was stale before the ink dried, for exactly that reason. **Grammar arms: ≥ 11**; **≥ 2** assert REJECTION of a hyphenated batch-directory token (with and without a trailing decision); **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision); **≥ 4** preserve the shipped rejections (undated, placeholder, bare hash, path-prefixed). **Harvester arms: ≥ 8**, one per failing Markdown context of M-11, each asserting the CLEAN citation is recovered — and **≥ 1 `PASS != NOOP` arm** proving the bare and code-span contexts, which pass today, are not what the new arms measure. **≥ 1 arm must assert that a bare-hash form still FAILS after the widening**, because a discard set that is too greedy would repair the token the grammar is required to reject.
 - **Acceptance criteria (informative):**
   - **The measured patch's grammar is REJECTED here and the rejection is not a matter of taste.** Its batch segment admits any number of alphanumeric hyphenated components, so this batch's own directory name parses as a record. Measured, both directions (M-3).
   - **The live corpus cannot discriminate the two candidates** — all three grammars score 21/21. Without the rejection arms, this rule's acceptance is green under the grammar the operator rejected, which is the vacuous-check shape at the level of the *criterion* rather than of the rule.
@@ -1115,12 +1115,12 @@ resolver's acceptance and tests nothing about a dependency (`PDR-2026-08-25-batc
 
 | Requirement | Method | Test case | Notes |
 |---|---|---|---|
-| HLR-88.1 | test | `TC-B88-01` — per-rule arm enumeration, 8 of 8 | the anti-vacuity criterion |
-| HLR-88.2 | test | `TC-B88-02` — loader arms + live gate-line delta | 14 → 0, both sides measured |
-| HLR-88.3 | test | `TC-B88-03` — census oracle arms + the live 276/280 pair | |
+| HLR-88.1 | test | `TC-B88-01` — per-rule arm enumeration, **7 of 7** (~~8 of 8~~) | the anti-vacuity criterion |
+| HLR-88.2 | test | `TC-B88-02` — loader arms + **the loader's RESOLUTION** | ~~14 → 0, both sides measured~~ — **EXPIRED, must not be re-cited**: the window closed when P1 authored. See §0.3 row 2 and Inc 5 |
+| HLR-88.3 | test | `TC-B88-03` — census oracle arms + the live **302/306 of 570** pair | ~~276/280 of 544~~ superseded; the **+4 delta** is what survives re-measurement |
 | HLR-88.4 | test | `TC-B88-04` — grammar arms over the constructed token table | the live corpus is blind (M-3) |
 | HLR-88.5 | test | `TC-B88-05` — resolver arms + two-sentence arms | severity-blind, sentence-keyed |
-| HLR-88.6 | inspection | `TC-B88-06` — manifest table read + empty CI diff | |
+| HLR-88.6 | inspection | `TC-B88-06` — manifest table read + **the CI diff at exactly 1 file** | ~~empty CI diff~~ — **this is the threshold C7 OVERTURNED.** The old form could be met only by leaving the defect in place |
 | HLR-88.7 | test | `TC-B88-07` — backup-rule arms, four states, two boundary sides | |
 | HLR-88.8 | test | `TC-B88-08` — identity + pairing lines after the bump | |
 | LLR-88.1 | test (unit) | `TC-B88-09` — ledger sweep re-run, 4-record regression floor | |
@@ -1169,7 +1169,7 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
 ### 5.3 Batch acceptance criteria
 
 1. **Every rule this batch creates or modifies carries a `PASS != NOOP` arm, and its GREEN arm
-   asserts the PASS SENTENCE rather than the absence of a BLOCK.** **8 of 8**, enumerated per rule
+   asserts the PASS SENTENCE rather than the absence of a BLOCK.** **7 of 7** (~~8 of 8~~), enumerated per rule
    in `04-validation.md`, never claimed as a total. *(This is the widened form of the original
    criterion #1. The original — "no new rule on the selftest's synthetic-exemption list" — is
    retained below as criterion 2 and is **insufficient on its own**: P-5 measured a rule that sat
@@ -1201,7 +1201,7 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
    criterion that measures it. **The date is part of the figure.**
 5. **The non-conforming design-review citation set is ∅** — stated as a SET, because a count
    expires the moment this document cites another record — over a conforming population of
-   **≥ 26** (floor measured 2026-08-25, M-3 re-executed); **AND** the grammar arms reject a
+   **≥ 48** (floor re-measured 2026-08-26; ~~26~~ went stale by the act of citing — the very mechanism this criterion was rewritten to survive, which it then failed to apply to itself); **AND** the grammar arms reject a
    hyphenated batch-directory token. ~~*All 21 live design-review citations still conform*~~ is
    superseded on both halves: the figure was stale, and **the first half is green under the
    grammar the operator rejected**, so it is a regression floor and is not accepted alone. After
@@ -1317,13 +1317,13 @@ requirements, and both are recorded in place rather than applied silently:
 |---|---|---|
 | Constraints stated explicitly | ✓ | §0.1–§0.2: source-file budget, family-E threshold, both measured against the scope |
 | ≥2 alternatives considered | ✓ | §0.5 (proposed vs ruled scope, tabulated); LLR-88.9 (three candidate grammars, M-3); LLR-88.10 (rename vs resolve, with the citation cost of each) |
-| Recommendation tied to constraints | ✓ | §0.3 — four oracle moves against the operator's own already-taken sequencing ruling |
-| Risks listed | ✓ | §6.1 (five findings), §6.2 (five decisions owed), LLR-88.12's CI trap |
+| Recommendation tied to constraints | ✓ | §0.3 — **five** oracle moves (~~four~~; the fifth was found at the station-4 review) against the operator's own already-taken sequencing ruling |
+| Risks listed | ✓ | §6.1 (**six** findings — `R-88-6` added at C7), §6.2 (five decisions owed, **`D-88-3` now CLOSED by operator ruling**), LLR-88.12's CI trap |
 | Cost estimated | ✓ | §0.5 table: 6→4 files, 10→7 increments, 3→2 max per increment |
 | Diagram | ✗ | N/A — the flow is a linear increment sequence; §0.5's table carries it without a diagram earning its place |
 | What would change the recommendation | ✓ | §0.6, three named conditions |
-| Two-layer requirements | ✓ | §3 (8 acceptances, each with a first-class Acceptance block and a boundary catalog) + §4's two traceability tables; both chains complete |
-| Every probe EXECUTED at draft time with pre-state | ✓ | §2.8, M-1 through M-10 — 10 transcripts, all run this session against the live tree; M-10 is the live positive control obtained by authoring this file (`14 block → 4 block`, same tree, minutes apart) |
+| Two-layer requirements | ✓ | §3 (**9** acceptances — ~~8~~; `AT-B88-09` was minted at C7 — each with a first-class Acceptance block and a boundary catalog) + §4's two traceability tables; both chains complete |
+| Every probe EXECUTED at draft time with pre-state | ✓ | §2.8, M-1 through **M-12 — 12** transcripts (~~M-10, 10~~; M-11 and M-12 were added at C2 and C7), all run against the live tree; M-10 is the live positive control obtained by authoring this file (`14 block → 4 block`, same tree, minutes apart) |
 | Premise table, one row per premise, tiered, executed | ✓ | §2.7 — 26 rows, **19 TRUE · 6 FALSE · 1 UNDECIDABLE**, every verdict carrying a command output or a `file:line`; the count itself was re-derived mechanically from the verdict column after a miscount, and the miscount is recorded beneath the table |
 
 ### 8.4 Working-file note (C-44) — foreign work observed, not touched
@@ -1332,6 +1332,9 @@ requirements, and both are recorded in place rather than applied silently:
 appeared in the active batch directory **during this authoring session** and was written by neither
 this session nor its brief — the directory held only `PLAN.md` when this session opened it. Per C-44
 it is **reported, not swept**: it has not been read into this record, edited, committed or removed.
-Its `AT-B88-*` id space may overlap this document's, which is the fork batch-87 §3 had to reconcile
-by mapping; **that reconciliation is owed before the PDR station** and is not attempted here,
-because reconciling against a document this session did not author would mean silently adopting it.
+~~Its acceptance-id space may overlap this document's … that reconciliation is owed before the
+PDR station.~~ **REFUTED BY MEASUREMENT, 2026-08-26.** The hypothesis rode through **two** PDR
+stations without anyone running the one-line check. Swept: `01b-qa-validation-plan.md` holds
+**0** `AT-B88-` and **0** `TC-B88-` tokens. **The debt is nil.** Recorded rather than deleted,
+because a caution that survived two gates unmeasured is itself the finding — an unmeasured
+warning reads exactly like a measured one and costs the reader the same attention.
