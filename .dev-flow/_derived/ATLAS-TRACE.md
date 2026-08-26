@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 65 requirement files | corpus digest: ea192132b487b688 -->
+<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 65 requirement files | corpus digest: a0084c702aeae4a6 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3022,7 +3022,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1480 unique id(s)
+## family AT/TC — 1481 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3638,6 +3638,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-B88-06` | batches |
 | `AT-B88-07` | batches |
 | `AT-B88-08` | batches |
+| `AT-B88-09` | batches |
 | `TC-001` | batches, canon, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |

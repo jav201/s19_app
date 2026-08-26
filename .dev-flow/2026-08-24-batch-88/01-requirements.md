@@ -542,10 +542,13 @@ outdated citation mints a notice against the record for obeying the rule.**
 the shipped, the permissive and the strict grammars all reject the same mangled string, because
 they never see the clean one. Entered into `LLR-88.9` by operator ruling 2026-08-25.
 
-**Recurrence, measured rather than predicted: this session tripped it TWICE, both times while
-documenting it.** Once in §0.3 — which is how it was found — and again in the `PLAN.md`
-supersession banner written *after* this probe existed, in the same bold-sentence-ending-in-a
--citation shape the probe had just catalogued. **A defect that catches the author who is
+**Recurrence, measured rather than predicted: this session tripped it THREE times, every one
+while documenting it.** Once in §0.3 — which is how it was found; again in the `PLAN.md`
+supersession banner written *after* this probe existed; and a third time in the very table row
+that CLOSES the ruling on a different defect. All three are the same shape — a bold sentence
+ending in a citation — the shape catalogued in the table above. **The count is the evidence:
+three trips, by an author who had already written the catalogue, inside the document that
+specifies the repair.** **A defect that catches the author who is
 writing its own specification is not avoided by care.** That is the same argument the handoff
 makes about the filename trap, and it is not a coincidence:
 
@@ -558,6 +561,39 @@ authoring convention that puts a non-space character against a citation — emph
 separator, a table pipe, terminal punctuation — is a fresh instance. Fixing the grammar alone
 leaves the family intact, which is why `LLR-88.9` specifies the harvester's discard set as a
 character CLASS and not as a longer list of delimiters.
+
+### M-12 — the dependency topology, executed before re-authoring against the ruling
+
+The operator ruled 2026-08-25 for a **new `evidence` extra with CI's install line routed through
+it**, against `LLR-88.12`'s `dev`-extra specification. Re-authoring on that ruling requires
+knowing which install line, in which job — read today rather than assumed:
+
+| Surface | What it declares | Read at |
+|---|---|---|
+| `pyproject.toml` `[project].dependencies` | **3** entries: `rich>=13.0`, `textual>=8.0.2`, `markdown-it-py>=3` | manifest |
+| `pyproject.toml` `dev` extra | **2** entries: `pytest-textual-snapshot==1.1.0`, `textual==8.2.8` | manifest |
+| **`requirements.txt`** — **a THIRD surface no record has named** | `rich>=13.0` and a **floorless** `textual`; **omits `markdown-it-py` entirely** | repo root |
+
+**And `tui-ci.yml` has TWO install blocks, not one:**
+
+| Job | Install line | Test step | Needs the imaging library? |
+|---|---|---|---|
+| **`tui-ci`** (`:24`) | `:43` — `pip install -e .`, **no extra**, preceded by the ad-hoc `pip install pillow` at `:42` | `:51` — `pytest -q` on push, **the full suite, slow included** | **✅ yes — this is the job** |
+| `snapshot` (`:60`) | `:76` — `pip install -e ".[dev]"` | `:79` — `tests/test_tui_snapshot.py -m snapshot` only | ❌ no |
+
+**The measurement confirms the ruling rather than merely obeying it.** The `dev` extra is already
+consumed by the two snapshot jobs, which *want* `textual==8.2.8` because SVG baselines are
+renderer-sensitive. The `tui-ci` job installs bare `-e .` **on purpose**, so routing it through
+`dev` to obtain the imaging library would pin the renderer under the **2735** tests `pytest -q`
+collects — contradicting `pyproject.toml`'s own comment at `:38-43`, which scopes the pin to
+*"dev / snapshot env only; runtime stays >=8.0.2"*. A third extra is the only option that
+declares the dependency without moving the runtime.
+
+**⚠ Backlog, not this batch:** `requirements.txt` is a third declaration surface that disagrees
+with the manifest in two ways (no `textual` floor, no `markdown-it-py`). CI installs it *before*
+`pip install -e .`, so the manifest wins by ordering and nothing is currently broken — which is
+exactly the shape of a defect that waits. Recorded as **R-88-6**; **not** repaired here, because
+it is a fourth surface beyond the ruling's scope.
 
 ---
 
@@ -724,8 +760,11 @@ character CLASS and not as a longer list of delimiters.
 
 - **Observable outcome:**
   `git diff --stat $(git merge-base HEAD origin/main) -- s19_app/ tests/ tools/` reports 0 files at
-  every gate. `pyproject.toml` is **excluded from this pin's scope** and covered by LLR-88.12,
-  because it is the one file this batch edits in the product repo.
+  every gate. **TWO files are excluded from this pin's scope, both named rather than hidden by a
+  narrower diff command:** `pyproject.toml` and `.github/workflows/tui-ci.yml`, both covered by
+  `LLR-88.12`. ~~one file~~ superseded — the operator's `evidence`-extra ruling makes the
+  workflow edit **necessary**, because a declaration the installing job never reads declares
+  nothing. The pin's three source paths are unchanged and neither exclusion is under them.
 - **Shipped surface:** git.
 - **Negative control:** the same command with `.dev-flow/` added returns non-empty — proof the diff
   command is not silently a no-op.
@@ -733,6 +772,35 @@ character CLASS and not as a longer list of delimiters.
   paths explicitly, in merge-base form, and names the one exclusion · ☐ invalid / ☐ error — N/A: a
   one-command structural check.
 - **Labelled a PIN, not a gate:** green before any work and invariant under every edit specified.
+
+### AT-B88-09 — the job that needs the imaging library gets it, and does not get a pinned renderer
+
+Minted because the station-4 review found `HLR-88.6` pointing at `AT-B88-05`, which is the map
+resolver's acceptance and tests nothing about a dependency (`PDR-2026-08-25-batch-88#D7`).
+
+- **Observable outcome:** installing the project the way the `tui-ci` job installs it —
+  `pip install -e ".[evidence]"` — yields an environment in which the example-GIF test's imaging
+  import **succeeds**, and in which `textual` resolves to a version **>= 8.0.2 that is not the
+  `8.2.8` the `dev` extra pins**. Installing with `.[dev]` instead yields the pin — which is the
+  contrast that makes this acceptance able to fail.
+- **Shipped surface:** `pip`, and the workflow file as executed by CI.
+- **Deliverable + observation:** the resolved version printed from the installed environment, and
+  `git diff -- .github/` showing exactly one file and four lines.
+- **Negative control — and this acceptance is worthless without it.** The same import against an
+  environment installed with **bare `-e .`** must **FAIL**. Without that arm the outcome is green
+  on any machine where the imaging library happens to be present already — and it **is** present
+  on the authoring machine (M-7 measured PIL 12.2.0 installed locally), so a check run here
+  without the control would pass before the fix exists.
+- **Boundary catalog:** ☑ empty — bare `-e .` provides nothing, measured as the negative control ·
+  ☑ boundary — the `evidence` and `dev` extras are exercised separately and their resolved
+  `textual` versions compared, which is the only observation that distinguishes the operator's
+  ruling from the specification it overturned · ☑ invalid — a `.[evidence]` install must **not**
+  drag in `pytest-textual-snapshot`, or the extras are not disjoint · ☑ error — an unknown extra
+  name fails loudly at install rather than silently installing the base project.
+- **⚠ The GIF suite's own pass is NOT claimed here.** No passing
+  `pytest -m slow tests/test_examples_pilot_gifs.py` transcript exists (prior record's condition
+  4), and this acceptance observes the **environment**, not the suite. Claiming the suite would
+  be asserting an unrun command.
 
 ### Behavioral traceability (US → AT → observed outcome)
 
@@ -743,7 +811,7 @@ character CLASS and not as a longer list of delimiters.
 | US-88-1 | A could-not-check sentence differs from a checked one | validator + selftest | `AT-B88-03` | RED pre-state ✅ M-5 (byte-identical pair) |
 | US-88-1 | Record, version and decision are each expressible; batch-dir is not | validator + selftest | `AT-B88-04` | RED pre-state ✅ M-3 (4 of 7 forms rejected today) |
 | US-88-1 | The map resolves through casing; a root file is not called stale | selftest + validator | `AT-B88-05` | RED pre-state ✅ M-7, M-4 |
-| US-88-1 | The imaging dependency is declared in the project manifest | `pyproject.toml` on disk | `AT-B88-05` boundary + LLR-88.12's inspection | pre-state ✅ M-7 (0 hits in the manifest, 1 in a workflow) |
+| US-88-1 | The imaging dependency is declared in the manifest **and reaches the job that needs it** | `pip` + `pyproject.toml` + the `tui-ci` install step | **`AT-B88-09`** (~~`AT-B88-05` boundary~~ — that is the map resolver's acceptance and tested nothing here) | pre-state ✅ M-12 (0 hits in the manifest; 1 ad-hoc install at `tui-ci.yml:42`; the job installs bare `-e .`) |
 | US-88-2 | RC-2 is a checklist row with a command behind it | checklist + validator | `AT-B88-06` | RED pre-state ✅ M-7 (0 occurrences); GREEN side ✅ M-9 |
 | US-88-1 + US-88-2 | No touched rule can pass without being able to fail | selftest | `AT-B88-07` | RED pre-state ✅ P-5, P-17, P-23 |
 | US-88-1 + US-88-2 | The shipped app is untouched | git | `AT-B88-08` (pin) | measured at gate |
@@ -822,13 +890,13 @@ character CLASS and not as a longer list of delimiters.
 ### HLR-88.6 — the imaging dependency is declared in the project manifest at the tier the project's own convention assigns it
 
 - **Traceability:** US-88-1
-- **Statement:** When the project is installed from its manifest with the development extra, the system shall provide the imaging library the example-GIF test imports, and the shipped runtime dependency list shall remain unchanged — the quantified population being the `[project].dependencies` and `[project.optional-dependencies].dev` tables of `pyproject.toml`.
-- **Rationale (informative):** the dependency is not undeclared; it is declared in a CI workflow with a comment already ruling it dev tooling, which means exactly one of the several ways this project is installed provides it. The manifest's own comment forbids adding a dev-only package to the runtime list, so the tier is settled by the file rather than by preference.
+- **Statement:** When the continuous-integration job that runs the full test suite installs the project, the system shall provide the imaging library the example-GIF test imports **from a declared `evidence` optional-dependency table of `pyproject.toml`**, shall leave the shipped runtime dependency list unchanged, and **shall not pin the renderer for that job** — the quantified population being the `[project].dependencies`, `[project.optional-dependencies].dev` and `[project.optional-dependencies].evidence` tables of `pyproject.toml` together with the install step of the `tui-ci` job.
+- **Rationale (informative):** the dependency is not undeclared; it is declared in a CI workflow with a comment already ruling it dev tooling, which means exactly one of the several ways this project is installed provides it. The manifest's own comment forbids adding a dev-only package to the runtime list, so the tier is settled by the file rather than by preference. **The `dev` extra is equally forbidden, and for a measured reason** (M-12): it pins `textual==8.2.8` for the snapshot environment, so routing the full-suite job through it would silently pin the renderer under the **2735** tests that job collects. A **third** extra is the only tier that declares the dependency without moving the runtime. Operator ruling 2026-08-25, `PDR-2026-08-25-batch-88#D7`.
 - **Validation:** `inspection`
-- **Executed verification:** read of `pyproject.toml` after the edit against M-7's pre-state (0 occurrences in the manifest; 1 ad-hoc install at `.github/workflows/tui-ci.yml:42`; `dev` extra holds 2 entries).
-- **Numeric pass threshold:** `[project].dependencies` holds exactly **3** entries, unchanged; the `dev` extra holds exactly **3** entries, one more than before; `.github/workflows/tui-ci.yml` is modified in **0** lines.
+- **Executed verification:** read of `pyproject.toml` and `.github/workflows/tui-ci.yml` after the edit against the **M-12** pre-state (0 occurrences in the manifest; 1 ad-hoc install at `.github/workflows/tui-ci.yml:42`; `dev` extra holds 2 entries; the `tui-ci` job installs bare `-e .` at `:43`); plus a resolved-environment check that the imaging library is importable and `textual` resolves **>= 8.0.2 and not pinned to 8.2.8** in that job.
+- **Numeric pass threshold:** `[project].dependencies` holds exactly **3** entries, **byte-identical**; the `dev` extra holds exactly **2** entries, **unchanged** — the pin does not travel; a new `evidence` extra holds exactly **1** entry; `.github/workflows/tui-ci.yml` is modified in exactly **4** lines — `:43` rerouted to `.[evidence]` and the three ad-hoc lines `:40-42` removed — and in **no other line**; the `snapshot` job's `:76` `.[dev]` install is **byte-identical**. ~~`dev` extra holds 3 entries; tui-ci.yml modified in 0 lines~~ superseded by the operator ruling.
 - **Priority:** medium
-- **Acceptance (black-box):** the `AT-B88-05` boundary row and LLR-88.12's inspection; `AT-B88-08`'s pin scope explicitly EXCLUDES this file and says so.
+- **Acceptance (black-box):** **`AT-B88-09`**, which observes this requirement's own outcome through the shipped surface. ~~the `AT-B88-05` boundary row~~ superseded: `AT-B88-05` is the **map resolver's** acceptance and tests nothing about a dependency — the station-4 review found this requirement pointing at an acceptance that does not test it (`PDR-2026-08-25-batch-88#D7`). `AT-B88-08`'s pin scope EXCLUDES `pyproject.toml` and now also `.github/workflows/tui-ci.yml`, and says so.
 
 ### HLR-88.7 — the batch records verifiable backup at INTAKE, and a rule states what it measured
 
@@ -983,13 +1051,13 @@ character CLASS and not as a longer list of delimiters.
   - **Both messages are the same severity**, so a severity assertion cannot see this defect. The sentences are the arm.
   - The defect is not the notice; it is that the notice says the wrong thing. *"The map is stale"* and *"the rule cannot express this file"* are different conditions with different remedies, and the map's own §10 already names `setup.py` as the bounded case (M-8).
 
-### LLR-88.12 — the imaging dependency lands in the development extra, and CI is not touched
+### LLR-88.12 — the imaging dependency lands in its own `evidence` extra, and CI is routed through it
 
 - **Traceability:** HLR-88.6
-- **Statement:** The `dev` optional-dependency table of `pyproject.toml` shall declare the imaging library the example-GIF test imports, the `[project].dependencies` table shall remain byte-identical, and `.github/workflows/tui-ci.yml` shall remain byte-identical — the quantified population being those two tables and that workflow file.
+- **Statement:** A new `evidence` optional-dependency table of `pyproject.toml` shall declare the imaging library the example-GIF test imports; the `[project].dependencies` and `dev` tables shall remain byte-identical; the `tui-ci` job's project install shall be routed through that extra and its ad-hoc imaging install removed; and the `snapshot` job's install shall remain byte-identical — the quantified population being those three tables and the two install steps of `.github/workflows/tui-ci.yml`.
 - **Validation:** `inspection`
-- **Executed verification:** read of `pyproject.toml` and `git diff --stat -- .github/` after the edit, against M-7's pre-state.
-- **Numeric pass threshold:** `[project].dependencies` holds exactly **3** entries, unchanged; the `dev` extra holds exactly **3** entries, one more than the **2** measured; `.github/` shows **0** changed files.
+- **Executed verification:** read of `pyproject.toml` and `git diff -- .github/` after the edit, against the **M-12** pre-state; plus an executed `pip install -e ".[evidence]"` into a clean environment, importing the library and printing the resolved `textual` version.
+- **Numeric pass threshold:** `[project].dependencies` holds exactly **3** entries and the `dev` extra exactly **2**, both byte-identical to M-12; the `evidence` extra holds exactly **1** entry; `.github/` shows exactly **1** changed file with exactly **4** changed lines; the resolved `textual` in the `evidence` environment satisfies **>= 8.0.2** and is **not** `8.2.8`-pinned. ~~`.github/` shows 0 changed files~~ superseded — **and the supersession is the point**: the old threshold forbade the only edit that makes the declaration reach the job that needs it.
 - **Acceptance criteria (informative):**
   - **The tier is settled by the file, not by preference.** The manifest's own comment states that the snapshot dependency *"is NEVER added to `[project]` dependencies — it does not affect the s19tui runtime footprint"*, and the workflow comment already rules the imaging library *"dev tooling, not a runtime dep"*.
   - **The workflow line is deliberately left in place, and removing it is a trap this LLR forbids.** Measured at `.github/workflows/tui-ci.yml:43`: CI installs `pip install -e .` **without** the `dev` extra. Deleting the ad-hoc install while the declaration lives only in `dev` would leave CI's **push** job — which runs the full suite including the slow example-GIF test, with **0** import-skip guards (M-7) — without the library. Removing it correctly requires a CI change; that is **D-88-3**.
@@ -1142,9 +1210,13 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
 6. **The 4 historically-parsing validation records still parse** under the modified ledger rule —
    a regression floor beneath the improvement.
 7. **Selftest exit 0, arm lines ≥ 240** against the measured floor of 192.
-8. **0 files changed under `s19_app/`, `tests/`, `tools/`, `.github/`.** The single product-repo
-   edit is `pyproject.toml`, declared as an exclusion in `AT-B88-08`'s scope rather than hidden by
-   a narrower diff command.
+8. **0 files changed under `s19_app/`, `tests/`, `tools/`.** The product-repo edits are **two**,
+   both declared as exclusions in `AT-B88-08`'s scope rather than hidden by a narrower diff
+   command: `pyproject.toml` (the new `evidence` extra) and `.github/workflows/tui-ci.yml`
+   (exactly **4** lines — the install rerouted, the three ad-hoc lines removed).
+   ~~*and `.github/`*~~ **struck by operator ruling** (`PDR-2026-08-25-batch-88#D7`): the old
+   criterion forbade the very edit that makes the declaration reach the installing job, so it
+   was a criterion that could only be met by leaving the defect in place.
 9. **Every user story has ≥ 1 passing acceptance test observing its outcome through the shipped
    surface, with boundary and negative evidence.** 2 of 2.
 10. **Expected unowned-identifier notices, enumerated in advance:** `LLR-88.8` and `LLR-88.4` from
@@ -1164,6 +1236,7 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
 | **R-88-3** | The map-resolution defect is **latent**: no CI job and no git hook runs this validator | P-13, M-7 | Fixed at latent severity (LLR-88.10). The day the validator enters CI is the day it matters, and a batch closing audit gaps is exactly the batch that would put it there |
 | **R-88-4** | The example-GIF test imports an imaging library with **0** import-skip guards and is exercised by CI's full-suite push job | M-7 | Not fixed here. Declaring the dependency (LLR-88.12) is the minimum; adding a skip guard is a `tests/` edit this batch's pin forbids |
 | **R-88-5** | The requirement tokenizer harvests range notation and prose compounds as ids — **129** of 1,004 census rows, per `PLAN.md`'s seventh finding | inherited, **not re-measured this session** | Registered as **inherited and unverified**. It is Story E's territory and re-baselines with it in batch-89 |
+| **R-88-6** | **`requirements.txt` is a third dependency-declaration surface, and it disagrees with the manifest twice**: it declares a **floorless** `textual` where `pyproject.toml` declares `>=8.0.2`, and it **omits `markdown-it-py` entirely** | **measured this session**, M-12 | **Not repaired here** — a fourth surface, beyond the operator's ruling. Currently harmless **by ordering alone**: CI installs it *before* `pip install -e .`, so the manifest wins. That is the shape of a defect that waits for someone to reorder two lines. Batch-89 candidate |
 
 ### 6.2 Decisions owed to the operator — I could not specify these without you
 
@@ -1171,7 +1244,7 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
 |---|---|---|---|
 | **D-88-1** | **A rule number for Story B's review-marker guard.** The scope allocates `V24` and `V25`; the review-debt ledger's guard is a **third** new rule with no allocated number (P-25, ❓ UNDECIDABLE) | Minting a rule id the operator has not allocated is the same class of act as minting a phantom requirement id, and this session already caught one of those | **Story B is deferred to batch-89** (§0.4). Its design is captured in §7 **without ids**, so nothing is lost and nothing is minted |
 | **D-88-2** | **Whether the three Part B interfaces are re-declared frozen for batch-89.** `docs/architecture.md:226-236` freezes all three **for `2026-08-24-batch-88` by string** (P-24, M-8) | If Story A lands in 89 against a freeze naming 88, the Layer C rule has **zero real consumers** and lands on a synthetic fixture — the exact shape acceptance criterion #1 forbids | Recorded as the precondition of Story A in §7. Not assumed either way |
-| **D-88-3** | **Whether CI's ad-hoc imaging install is removed, and how.** `.github/workflows/tui-ci.yml:43` runs `pip install -e .` **without** the development extra (M-7) | Removing the ad-hoc line while the declaration lives only in the `dev` extra **breaks CI's push job**. Fixing it properly is a CI change, and this batch's pin declares `.github/` untouched | LLR-88.12 declares the dependency and **forbids** the workflow edit, with the trap written down |
+| **D-88-3** | ~~Whether CI's ad-hoc imaging install is removed, and how~~ — **RULED BY THE OPERATOR 2026-08-25**, per `PDR-2026-08-25-batch-88#D7` | The trap as written down was real: removing the ad-hoc line while the declaration lived only in `dev` **would have broken CI's push job**, and the first proposed fix did exactly that. The ruling dissolves it — a **new `evidence` extra**, CI's install rerouted through it, the ad-hoc line removed. `dev` is excluded for a measured reason (M-12): it pins `textual==8.2.8` | **CLOSED.** `LLR-88.12` and `HLR-88.6` re-authored; criterion 8 and `AT-B88-08` widened to admit the `.github/` edit; `AT-B88-09` minted to observe it |
 | **D-88-4** | **Whether the batch objective string in `state.json` is corrected.** It declares the superseded baseline **276** (P-4) **and** the refuted *"section 4"* anchor for the Layer C rule (P-19) | It is a declared objective; editing it is an operator act, not a Phase-1 derivation | LLR-88.8 specifies the baseline half as a requirement **conditional on this decision**; the "section 4" half is recorded as refuted and left standing |
 | **D-88-5** | **Whether the ruling in §0 is accepted.** If Story A is kept in batch-88, §0.6 states its minimal safe form and its price: +3 increments, +2 source files, and V24's debut inside four oracle moves | The operator scoped the batch; a Phase-1 record can argue the cut and must not take it unilaterally | §0 argues it from measured counts and names what would change the recommendation. **This document specifies the ruled scope.** If the ruling is overturned, Story A's requirements are additive — continuing from the next free HLR number — and no id below is invalidated. **The successor number is deliberately NOT written here:** a forward reference to an id no heading declares is minted by the Atlas scanner as a citation-only id, which is the largest class in the frozen baseline census (426 of 1004). Caught by the id census at this station, +27 against 26 declared, and fixed at the SOURCE |
 
