@@ -60,22 +60,37 @@ parallelisation proof — `modules(1) ∩ modules(2) = {}` — is true and is ab
 Lane 1 there is no parallelism whatsoever. Lane 1 is a **single-file queue of eight increments on a
 3,176-line file**, and the DDR joins two lanes of which one is empty once Story E leaves.
 
-### 0.3 The binding number the budget cannot see: **four oracle moves, one of them sequenced**
+### 0.3 The binding number the budget cannot see: **five oracle moves, and what re-execution did to them**
 
-The operator has already ruled that **one** moving oracle (V22, 276 → 280) forces a story out of
-the batch, because *"the number moves under the story that measures it."* That ruling is right.
-**It applies with equal force to three more changes in this scope, and none of them is sequenced.**
-All four moves are measured, not argued:
+> **⚠ RE-EXECUTED 2026-08-25** per `PDR-2026-08-25-batch-88#D1`. The station-4 review found this
+> table's derivation refuted: two of its four figures had expired, a **fifth move existed and was
+> missing**, and no row carried the date it was read. Every row below is re-derived on 2026-08-25;
+> **superseded figures are struck beside the corrections, never removed.** The conclusion the scope
+> cut rests on **survives** — its derivation does not, so cite the rows, not the memory of them.
 
-| # | Change | Oracle it moves | Measured pre → post | Sequenced? |
-|---|---|---|---|---|
-| 1 | V22 substring → token | the canon census | **276 → 280** of 544 (M-4) | ✅ operator-ruled: lands first |
-| 2 | `_artifacts` F-7 residue | **the batch's own gate line** | **14 block → 0 block**, `n/a` 14 → 16 (M-2, M-4) | ❌ **not sequenced** |
-| 3 | V2 substring → token | every acceptance id's resolution | 989 distinct acceptance/test tokens on disk; a bare one-digit acceptance id substring-resolves today and token-fails after (M-6) | ❌ **not sequenced** |
-| 4 | V5 · V8 root message | the SKIP/NOTICE **sentences** 57 and 1 records rely on | 57 of 61 validation records change what V5 says about them (M-5) | ❌ **not sequenced** |
+The operator has already ruled that **one** moving oracle forces a story out of the batch, because
+*"the number moves under the story that measures it."* That ruling is right. The question this
+table answers is how many oracles are **still moving today**, after a station of work.
 
-**Move 2 is the sharpest, and it is self-referential.** Today the loader hands V1–V9 a document
-from May: all **14** live BLOCKs are V4 findings naming ids declared in
+| # | Change | Oracle it moves | Measured pre → post (re-derived 2026-08-25) | Still moving? | Sequenced? |
+|---|---|---|---|---|---|
+| 1 | V22 substring → token | the canon census | **302 → 306 of 570**, delta **+4** — `HLR-053`, `HLR-056`, `US-064`, `US-068`. ~~276 → 280 of 544~~ superseded; the denominator grew because batch-88 declared its own ids | ✅ **yes** | ✅ operator-ruled: lands first |
+| 2 | `_artifacts` F-7 residue | **the batch's own gate line** | **0 block → 0 block.** ~~14 block → 0 block~~ — **the window CLOSED when P1 authored.** Executed: the loader's `01-requirements.md` is now byte-identical to the **active** batch-88 copy and **not** to `.dev-flow/2026-05-05-batch-01/`'s May copy | ❌ **no — stilled by the batch's own progress** | n/a — nothing left to sequence |
+| 3 | V2 substring → token | every acceptance id's resolution | **0 live verdicts here.** V2's pattern requires a digit immediately after the prefix; this project's acceptance ids are letter-initial, so V2 SKIPs (P-7). Corpus under `tests/` re-derived: **915** distinct acceptance/test-case tokens. ~~989~~ — **not reproducible without its tokenizer definition**, so it is retired rather than carried forward | ❌ **no — synthetic by construction** | n/a |
+| 4 | V5 · V8 root message | the SKIP/NOTICE **sentences** 57 and 1 records rely on | **57 of 61 confirmed.** The 4 that parse are batches **09, 10, 11, 74**. **36** of the 57 mention a ledger in prose while V5 reports none was found (keyword scan for `ledger` / `post =`; the definition is stated here because the prior figure's was not) | ✅ **yes** | ❌ **not sequenced** |
+| 5 | **V23 shipped → strict grammar** — **THE MISSING FIFTH MOVE** | the V23 notice count, and every design-review citation's resolution | **9 notices → 0** — but **the grammar moves none of it.** All 9 were self-inflicted by this document's constructed-token table, and de-minting alone cleared them. Post-de-minting corpus = **26 citations, 26 / 26 conforming under BOTH the shipped and the strict grammar** | ❌ **no — stilled by the de-minting in `#D2`** | ✅ **sequenced: lands after the de-minting**, which is already done |
+
+**What re-execution changed about the ruling.** At P0, four oracles were moving and one was
+sequenced. Today **two are moving** — V22's census and V5's sentences — and the fifth move, once
+found, turned out to be **already still**. Two were stilled not by design but by ordinary work:
+move 2 by the batch reaching P1, move 5 by fixing a hygiene defect in this very file. **The scope
+cut stands on the two that remain**, and it stands more narrowly than when it was argued — worth
+saying out loud, because a conclusion that survives a refuted derivation is easy to keep citing
+for the wrong reason.
+
+**Move 2 was the sharpest, and it is self-referential — ⚠ its figures have since expired; the
+paragraph is kept for its reasoning, not its numbers (see row 2 above).** At P0 the loader handed
+V1–V9 a document from May: all **14** live BLOCKs were V4 findings naming ids declared in
 `.dev-flow/2026-05-05-batch-01/01-requirements.md` (M-2). The moment the loader is fixed, V1–V9
 begin judging **this document** — and V6's statement-scope fix and V2's token fix are in the same
 batch, so **the first document ever judged by the corrected rules is the requirements record of the
@@ -236,7 +251,7 @@ up"* stops being an assumption and becomes a line with a command behind it.
 | Nine fixes are backed by the measured patch in `full.diff` | **Partly FALSE.** `full.diff` covers **6** of the 9 (V22 oracle, V22 message, V23, `_artifacts`, V8 casing, V8 root message). **V5, V2, V6 and the dependency are NOT in it** and carry **0** of the 29 measured arms | P-23, P-24 |
 | §2 / `state.json`: the imaging dependency is undeclared | **FALSE as framed.** It is declared — as an ad-hoc `pip install pillow` at `.github/workflows/tui-ci.yml:42`, with a comment already ruling it *"dev tooling, not a runtime dep"*. The defect is the **home**, not the absence | P-18 |
 | `state.json` `batch_objective`: V24 keys on *"ARCHITECTURE.md section 4"* | **FALSE — superseded** by the ARQ decision: key on the `Frozen?` column header, never a section number. The objective string still carries the refuted wording | P-19 |
-| The V23 fix in `full.diff` is the fix to adopt | **REJECTED by the operator, and the rejection is measurable.** The diff's grammar accepts `PDR-2026-08-24-batch-88-audit-closures`, conflating a version with a hyphenated batch dir | P-11 |
+| The V23 fix in `full.diff` is the fix to adopt | **REJECTED by the operator, and the rejection is measurable.** The diff's grammar accepts a token whose batch segment carries extra hyphens (`…-batch-88-audit-closures`; prefix elided per the C-56 note above M-3's constructed-token table), conflating a version with a hyphenated batch dir | P-11 |
 
 ---
 
@@ -259,9 +274,9 @@ up"* stops being an assumption and becomes a line with a command behind it.
 | **P-6** | V2 tests **substring** membership against one concatenated `tests/` text, so a short acceptance id resolves because a longer one sharing its prefix exists | premise | ✅ TRUE | M-6: `v2_at_without_node` read at `devflow-validate.py:230-238` (`i not in tests` over `_tree_text`). Executed: a bare **one-digit** acceptance id → `substring_in_tests=True`, `token_in_tests=False`; **989** distinct acceptance/test tokens on disk | LLR-88.2 |
 | **P-7** | V2's fix has **no live instance in this repository** — the rule SKIPs here | premise | ✅ TRUE | M-2: `[-] V2 01-requirements.md: no AT ids declared`. Cause read: V2's pattern requires digits immediately after the prefix, and this project's acceptance ids are letter-initial | **LLR-88.2's arms are necessarily synthetic, and the acceptance says so.** A criterion claiming a live pre-state here would be unfalsifiable |
 | **P-8** | V6 requires the statement marker and the modal on the **same physical line**, so a wrapped statement **false-passes** | premise | ✅ TRUE | M-6: `v6_modal_in_statement` executed on two synthetic records differing only in a line wrap — same line → `BLOCK`; modal on the continuation line → **no finding at all** | LLR-88.3 |
-| **P-9** | The live design-review citation corpus is **21 citations / 8 distinct tokens**, and every one is of the `#D<n>` shape | premise | ✅ TRUE | M-3: V23's own harvest reproduced (walk + `_V23_TOKEN` + the rule's `rstrip`) → 21 citations, 8 distinct, all `PDR-2026-08-24-batch-88#D<n>` | the regression population LLR-88.9 must preserve |
+| **P-9** | The live design-review citation corpus is **21 citations / 8 distinct tokens**, and every one carries a decision suffix | premise | ✅ TRUE WHEN MEASURED · ❌ **REFUTED BY LATER EXECUTION — the superseded figure is kept beside the correction, not overwritten** | M-3: V23's own harvest reproduced (walk + `_V23_TOKEN` + the rule's `rstrip`) → 21 citations, 8 distinct, every one a decision token. **Re-executed 2026-08-25, same harvest: 34 citations · 16 distinct · 9 NON-conforming.** The +13 is **this document**: the constructed-token table in M-3 minted 9 of them against its own record. The cause is a C-56 hygiene failure, not the grammar — see `PDR-2026-08-25-batch-88#D2` | the regression population LLR-88.9 must preserve, **re-stated over the measured corpus rather than the expired one** |
 | **P-10** | The **strict** grammar preserves all 21 live citations while expressing a record, a version and a decision distinctly | hypothesis | ✅ TRUE | M-3: strict pattern → **21/21 conforming**, identical to the shipped rule's 21/21; and it accepts the bare record, the `.md` filename, `-v2`, and `-v2#D1`, each of which the shipped rule **rejects** | LLR-88.9 |
-| **P-11** | The grammar proposed in `full.diff` conflates a **version** with a **hyphenated batch dir** | hypothesis | ❌ **FALSE as a fix — the permissive form is defective** | M-3: the diff's pattern matches `PDR-2026-08-24-batch-88-audit-closures` and `…-audit-closures#D1` → **accepted**. The strict form → **rejected**. Both forms accept all 21 live citations, so the live corpus **cannot** discriminate them | **BLOCKS the diff's V23 half.** Corrected in LLR-88.9 to the strict form; the discriminating arm is mandatory because the live corpus is blind to the difference |
+| **P-11** | The grammar proposed in `full.diff` conflates a **version** with a **hyphenated batch dir** | hypothesis | ❌ **FALSE as a fix — the permissive form is defective** | M-3: the diff's pattern matches `…-batch-88-audit-closures` and `…-audit-closures#D1` (prefixes elided per the C-56 note above M-3's table) → **accepted**. The strict form → **rejected**. Both forms accept all 21 live citations, so the live corpus **cannot** discriminate them | **BLOCKS the diff's V23 half.** Corrected in LLR-88.9 to the strict form; the discriminating arm is mandatory because the live corpus is blind to the difference |
 | **P-12** | The map the validator opens (`docs/ARCHITECTURE.md`, `devflow-validate.py:245`) is tracked in git as `docs/architecture.md` | premise | ✅ TRUE | M-7: `git ls-files \| grep -i architecture` → `docs/architecture.md` (lowercase), and `devflow-validate.py:245` reads `os.path.join(root, "docs", "ARCHITECTURE.md")` | LLR-88.10 |
 | **P-13** | The consequence is **latent, not active**: no CI job and no git hook runs the validator | premise | ✅ TRUE | M-7: `grep -r "devflow-validate" .github/workflows/` → **0**; non-`.sample` entries in `.git/hooks/` → **0**; workflow files are `snapshot-regen.yml` and `tui-ci.yml` | **confirms `PLAN.md`'s own self-correction.** The fix is specified at its true severity — latent — and its arm asserts `_resolve_ci`'s return value, which is platform-independent |
 | **P-14** | A repository-root file is unclassifiable by the staleness check by construction | premise | ✅ TRUE | M-7: `devflow-validate.py:251-259` — prefixes are matched as `f.startswith(p + "/")`, and `setup.py` has no directory segment. Live: `[!] V8 setup.py: under no declared module — the map is stale, ARQ fires` | LLR-88.11 |
@@ -344,27 +359,47 @@ Harvest reproduced exactly as `v23_design_review_citations` does it (`REQUIREMEN
 sorted walk of `.dev-flow/` excluding `_derived/` and `__pycache__`, `_V23_TOKEN.finditer`, then the
 rule's own `rstrip(".,;:)]}` + quotes)`):
 
-| | citations | distinct | conforming |
+| corpus as harvested at P0 (2026-08-24) | citations | distinct | conforming |
 |---|---|---|---|
 | shipped grammar | 21 | 8 | **21 / 21** |
 | `full.diff`'s permissive grammar | 21 | 8 | **21 / 21** |
 | the **strict** grammar specified in LLR-88.9 | 21 | 8 | **21 / 21** |
 
-**The live corpus cannot tell the three apart.** The discrimination is only visible on constructed
-tokens:
+**⚠ Re-executed 2026-08-25 — the figures above expired, and THIS DOCUMENT is why.** The same
+harvest returned **34 citations · 16 distinct · 9 NON-conforming**. All nine were minted by the
+constructed-token table below, which pasted literal non-conforming tokens into a file V23's own
+walk reads. The de-minting is recorded as `PDR-2026-08-25-batch-88#D2`; the superseded figures
+stay above rather than being overwritten.
+
+| corpus after de-minting (2026-08-25, re-executed) | citations | distinct | conforming |
+|---|---|---|---|
+| shipped grammar | 26 | 10 | **26 / 26** |
+| the **strict** grammar specified in LLR-88.9 | 26 | 10 | **26 / 26** |
+
+**The live corpus cannot tell the candidate grammars apart — and after de-minting it cannot tell
+them apart at ZERO notices.** The discrimination is visible only on constructed tokens, which is
+exactly why the table below must **describe** them rather than paste them:
+
+> **C-56 elision, applied at every site in the table below.** This file lives under
+> `.dev-flow/**/*.md`, so V23's walk reads it and any literal design-review token written here
+> becomes a live citation judged by the very rule under specification. Tokens below are written
+> with the prefix elided as `…`; the elided text is the record prefix and the date `2026-08-24`
+> in every row. Pasting them cost this document **9 self-inflicted notices** before the elision
+> was applied — the same discipline `01b-qa-validation-plan.md` already applies to itself at its
+> lines 15–19.
 
 | token | shipped | permissive (`full.diff`) | **strict (specified)** |
 |---|---|---|---|
 | a decision inside a record — `…-batch-88#D3` | ✅ | ✅ | ✅ |
 | a `DDR` decision — `DDR-2026-08-21-batch-85#D1` | ✅ | ✅ | ✅ |
 | an alphanumeric batch segment — `…-batch-n8#D1` | ✅ | ✅ | ✅ |
-| **the record itself** — `PDR-2026-08-24-batch-88` | ❌ | ✅ | ✅ |
-| **the record's filename** — `PDR-2026-08-24-batch-88.md` | ❌ | ✅ | ✅ |
-| **a VERSION of the record** — `PDR-2026-08-24-batch-88-v2` | ❌ | ✅ | ✅ |
-| **a decision inside a version** — `PDR-2026-08-24-batch-88-v2#D1` | ❌ | ✅ | ✅ |
-| **a hyphenated batch DIR** — `PDR-2026-08-24-batch-88-audit-closures` | ❌ | **✅ — the defect** | **❌ — correct** |
+| **the record itself** — `…-batch-88`, no decision suffix | ❌ | ✅ | ✅ |
+| **the record's filename** — `…-batch-88.md` | ❌ | ✅ | ✅ |
+| **a VERSION of the record** — `…-batch-88-v2` | ❌ | ✅ | ✅ |
+| **a decision inside a version** — `…-batch-88-v2#D1` | ❌ | ✅ | ✅ |
+| **a hyphenated batch DIR** — `…-batch-88-audit-closures` | ❌ | **✅ — the defect** | **❌ — correct** |
 | the same, with a decision — `…-audit-closures#D1` | ❌ | **✅ — the defect** | **❌ — correct** |
-| no date — `PDR-85#D3` | ❌ | ❌ | ❌ |
+| no date — the prefix followed straight by `85#D3` | ❌ | ❌ | ❌ |
 | a template placeholder | ❌ | ❌ | ❌ |
 | a bare hash — `…-batch-88#D` | ❌ | ❌ | ❌ |
 | a path-prefixed filename | ❌ | ❌ | ❌ |
@@ -473,6 +508,57 @@ than by constructing a case. It also bounds the loader fix's remaining value hon
 the **window** before that happens — which every batch passes through, and in which the gate is
 judging someone else's document.
 
+### M-11 — the citation harvester, defeated by ordinary Markdown
+
+**Found by tripping it.** While authoring §0.3 this session wrote a **conforming** citation as
+``**… per `<cite>`.**`` and the run returned a V23 NOTICE against it. The token was valid; the
+prose around it was not survivable. Probed with the harvester reproduced exactly — `_V23_TOKEN`'s
+`\S+` plus the rule's own `rstrip(".,;:)]}` + quotes")` — over one conforming citation wrapped in
+twelve ordinary Markdown contexts:
+
+| Markdown context | harvested token | verdict |
+|---|---|---|
+| bare, code span, code span + period, parenthesised | the citation, clean | ✅ ok (4 of 12) |
+| **bold, citation inside** — ``**`<cite>`**`` | citation + `` ` `` + `**` | ❌ **NOTICE** |
+| **bold sentence, citation at the end** | citation + `` ` `` + `.` + `**` | ❌ **NOTICE** |
+| italic · strikethrough · trailing `?` · trailing `!` · trailing `*` | citation + `` ` `` + the delimiter | ❌ **NOTICE** |
+| table cell with no space before the pipe | citation + `\|` | ❌ **NOTICE** |
+
+**8 of 12 ordinary Markdown contexts turn a conforming citation into a notice.**
+
+**⚠ The mechanism is not "the strip set is missing `*`".** `str.rstrip` consumes from the right and
+**halts at the first character not in its set**, so a single unlisted character **shields every
+listed character behind it**. That is why the backtick survives in every failing row above — the
+backtick **is** in the shipped set, and is reached only after the `*` that stops the scan.
+Widening the set by one character fixes one context and leaves the shape intact.
+
+**Why this is expensive here, specifically.** These records are written in emphasis-heavy prose,
+and ``**`<cite>`**`` is the single most common way this project writes a sealed-record citation.
+Worse, the strikethrough row collides head-on with the discipline this very batch adopted —
+*superseded figures are struck beside the correction, never removed* — so **striking an
+outdated citation mints a notice against the record for obeying the rule.**
+
+**The defect is in the HARVESTER, not the grammar**, which is why no grammar repair reaches it:
+the shipped, the permissive and the strict grammars all reject the same mangled string, because
+they never see the clean one. Entered into `LLR-88.9` by operator ruling 2026-08-25.
+
+**Recurrence, measured rather than predicted: this session tripped it TWICE, both times while
+documenting it.** Once in §0.3 — which is how it was found — and again in the `PLAN.md`
+supersession banner written *after* this probe existed, in the same bold-sentence-ending-in-a
+-citation shape the probe had just catalogued. **A defect that catches the author who is
+writing its own specification is not avoided by care.** That is the same argument the handoff
+makes about the filename trap, and it is not a coincidence:
+
+**⚠ The filename trap and the emphasis trap are ONE defect wearing two faces.** The prior
+session hit the filename form three times — writing a sealed record's path raises a notice,
+because the harvester swallows the path and the grammar then demands a decision suffix a
+filename cannot carry. Both faces have the same root: **`_V23_TOKEN` matches `\S+`, so it grabs
+everything up to the next space and the `rstrip` is the ONLY thing narrowing it back.** Every
+authoring convention that puts a non-space character against a citation — emphasis, a path
+separator, a table pipe, terminal punctuation — is a fresh instance. Fixing the grammar alone
+leaves the family intact, which is why `LLR-88.9` specifies the harvester's discard set as a
+character CLASS and not as a longer list of delimiters.
+
 ---
 
 ## 3 · Acceptance (black-box) — the user-verified outcomes
@@ -542,22 +628,39 @@ judging someone else's document.
 
 ### AT-B88-04 — the grammar can say record, version and decision, and refuses to say batch-dir
 
-- **Observable outcome:** all **21** live citations still conform (**0** new notices), and the
-  grammar accepts a bare record, a `.md` record filename, a `-v<n>` version, and a decision inside
-  a version — while **rejecting** a hyphenated batch-directory name in the record position.
+- **Observable outcome, in two halves that carry unequal weight** (restated per
+  `PDR-2026-08-25-batch-88#D2`; the prior phrasing *"all 21 live citations still conform"* was
+  both **stale** and **unfalsifiable**).
+  - **(a) Regression floor — it cannot fail, and is labelled so rather than counted as evidence.**
+    The **non-conforming set is ∅**, and stays ∅. Measured 2026-08-25 after the C-56 de-minting:
+    **26 citations · 10 distinct · 26/26 conforming**, under the shipped **and** the strict grammar
+    alike. **The threshold is the SET, not the count** — this document mints a conforming citation
+    every time it cites a design record, so any fixed population figure expires by the act of
+    writing it. `26` is therefore recorded as a **floor with its measurement date**, never as a
+    target to hit.
+  - **(b) The load-bearing half — synthetic, because nothing else can be.** The grammar accepts a
+    bare record, a `.md` record filename, a `-v<n>` version, and a decision inside a version —
+    while **rejecting** a hyphenated batch-directory name in the record position.
 - **Shipped surface:** the validator run, plus the `--selftest` grammar arms.
 - **Deliverable + observation:** the V23 line in the post-state run, plus the arm block's printed
   labels, compared against M-3's three-pattern table.
-- **⚠ This acceptance exists because the live corpus is blind.** M-3 measured all three candidate
-  grammars at **21/21** over the real repository. A criterion phrased as *"the live citations still
-  conform"* is **GREEN under the rejected grammar too** — it cannot fail. The discriminating arm on
-  the hyphenated-dir token is therefore **not optional decoration; it is the only thing this
-  acceptance actually tests.**
+- **⚠ This acceptance exists because the live corpus is blind — and de-minting made it BLINDER.**
+  M-3 measured all three candidate grammars at 21/21 at P0; re-executed 2026-08-25 they measure
+  **26/26**. A criterion phrased as *"the live citations still conform"* is **GREEN under the
+  grammar the operator rejected** — it cannot fail. And the de-minting removed the last
+  non-conforming tokens from the repository, so there is now **no live token anywhere that
+  discriminates the strict grammar from the permissive one**. The discriminating arm on the
+  hyphenated-dir token is therefore **not optional decoration; it is the only thing this
+  acceptance actually tests** — and after `#D2` it is the only thing that CAN test it.
 - **Boundary catalog:** ☑ empty — the shipped rule rejects 4 of the 7 legitimate forms, measured ·
   ☑ boundary — the version segment is exercised with and without a trailing decision · ☑ invalid —
   the hyphenated-dir token, the path-prefixed filename, the bare hash and the undated form must all
   be rejected · ☑ error — an empty citation set keeps the rule's existing SKIP, which already says
-  *"the id glue is unused, which is a fact about this project, not a pass"*.
+  *"the id glue is unused, which is a fact about this project, not a pass"* · **☑ harvest — the same
+  conforming citation is recovered from each of M-11's 8 failing Markdown contexts (emphasis,
+  strikethrough, terminal punctuation, unspaced table pipe), and the bare-hash form still fails
+  after the widening**, which is the arm that stops an over-greedy discard set from repairing a
+  token the grammar must reject.
 
 ### AT-B88-05 — the map is found through a casing difference, and a root file is not called stale
 
@@ -659,11 +762,11 @@ judging someone else's document.
 ### HLR-88.1 — no rule this batch creates or modifies is able to pass without being able to fail
 
 - **Traceability:** US-88-1, US-88-2
-- **Statement:** When `devflow-validate.py --selftest` runs, the system shall report, for each rule this batch creates or modifies, at least one arm asserting that rule's pass SENTENCE and at least one arm asserting that its pass sentence differs from its could-not-check sentence — the quantified population being the rules `V2`, `V5`, `V6`, `V8`, `V22`, `V23`, `V25` and the loader `_artifacts`, and no other rule.
+- **Statement:** When `devflow-validate.py --selftest` runs, the system shall report, for each rule this batch creates or modifies, at least one arm asserting that rule's pass SENTENCE and at least one arm asserting that its pass sentence differs from its could-not-check sentence — the quantified population being the **seven rules** `V2`, `V5`, `V6`, `V8`, `V22`, `V23`, `V25`, and no other rule. **`_artifacts` is deliberately NOT in this population** (`PDR-2026-08-25-batch-88#D6`): it is a LOADER, it returns a document map rather than a finding, and it therefore has no severity, no pass sentence and no could-not-check sentence for an arm to assert. Its analogous obligation is stated in `LLR-88.5` and is a different assertion — **which document it resolves to**, not what sentence it prints.
 - **Rationale (informative):** P-5 measured a rule that carried arms, passed them, and was inert for 61 batches because its arm asserted only "not red" over a branch that is never red. P-17 measured the synthetic-exemption list at exactly one member, so absence from that list is necessary and not sufficient. This requirement is the widened form of the original acceptance criterion #1.
 - **Validation:** `test`
 - **Executed verification:** `python ~/.claude/docs/tools/devflow-validate.py --selftest`, arm labels enumerated one rule per line; pre-state M-1 (192 arms, exit 0; **0** arms for V2, V5, V6, V25).
-- **Numeric pass threshold:** exit code **0**; arm-result lines **≥ 240**; and, enumerated per rule, **≥ 1** pass-sentence arm and **≥ 1** `PASS != NOOP` arm for each of the **8** members of the population — **8 of 8**, never a total.
+- **Numeric pass threshold:** exit code **0**; arm-result lines **≥ 240**; and, enumerated per rule, **≥ 1** pass-sentence arm and **≥ 1** `PASS != NOOP` arm for each of the **7** members of the population — **7 of 7**, never a total. ~~8 of 8~~ superseded: the loader `_artifacts` left the population because it has no sentence to assert (`PDR-2026-08-25-batch-88#D6`), and a population containing a member the mandate cannot be satisfied for is an unsatisfiable requirement, not a demanding one. **Separately, ≥ 1 arm shall assert `_artifacts` resolves `01-requirements.md` to the ACTIVE batch's copy when the active directory holds one, and ≥ 1 that it does not silently substitute another batch's copy when it does not** — the loader's `PASS != NOOP` analogue, stated over its return value.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome:**
   - **Observable outcome:** the operator reads the selftest block and finds, for every rule this batch touched, a named arm asserting what the rule SAYS when it passes.
@@ -700,8 +803,8 @@ judging someone else's document.
 - **Statement:** When the validator parses design-review citations, the system shall accept exactly four citation forms — the bare record, the record's `.md` filename, a version of the record, and a decision within either the record or a version of it — and shall reject a batch segment carrying any hyphenated component other than a version marker; the quantified population being every token `_V23_TOKEN` (`devflow-validate.py:1556`) harvests from `REQUIREMENTS.md` and the `.dev-flow/` walk.
 - **Rationale (informative):** the seal rule requires a changed record to be a new version with a new id, and the shipped grammar cannot express a version at all. The permissive repair proposed in the measured patch buys that expressiveness by admitting arbitrary hyphens, which makes a batch-directory name parse as a record — the operator has rejected it, and M-3 shows the live corpus cannot tell the two repairs apart.
 - **Validation:** `test`
-- **Executed verification:** `python ~/.claude/docs/tools/devflow-validate.py .`, the `V23` line; plus the `--selftest` grammar arms over the constructed token table of M-3; pre-state M-3 (21/21 conforming under all three candidate grammars — the live corpus is blind).
-- **Numeric pass threshold:** **21** of **21** live citations conform (**0** new notices); **≥ 11** grammar arms, of which **≥ 2** assert REJECTION of a hyphenated batch-directory token, **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision), and **≥ 4** preserve the shipped rejections.
+- **Executed verification:** `python ~/.claude/docs/tools/devflow-validate.py .`, the `V23` line; plus the `--selftest` grammar arms over the constructed token table of M-3. Pre-state re-executed **2026-08-25**: **26 citations, 26/26 conforming** under all three candidate grammars — the live corpus is blind, and after the C-56 de-minting (`PDR-2026-08-25-batch-88#D2`) it holds no discriminating token at all. ~~21/21~~ superseded.
+- **Numeric pass threshold** (restated per `PDR-2026-08-25-batch-88#D2` — the prior form thresholded on a population this document changes by citing anything): the **non-conforming citation set is ∅**, over a conforming population of **≥ 26** (the floor measured 2026-08-25, not a target); **≥ 11** grammar arms, of which **≥ 2** assert REJECTION of a hyphenated batch-directory token, **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision), and **≥ 4** preserve the shipped rejections. **The arm count is the load-bearing half; the set being ∅ is a floor that is green under the rejected grammar too.**
 - **Priority:** high
 - **Acceptance (black-box):** `AT-B88-04`.
 
@@ -778,10 +881,10 @@ judging someone else's document.
 ### LLR-88.3 — the modal check becomes statement-scoped
 
 - **Traceability:** HLR-88.1
-- **Statement:** The modal rule (`v6_modal_in_statement`, `devflow-validate.py:162`) shall evaluate the modal against the whole statement block — the statement marker's line together with its indented continuation lines, terminated by the next requirement heading or the next unindented list item — rather than against a single physical line; the quantified population being the statement blocks of the active batch's requirements document.
+- **Statement:** The modal rule (`v6_modal_in_statement`, `devflow-validate.py:162`) shall evaluate the modal against the whole statement block — the statement marker's line together with its indented continuation lines, terminated by the next requirement heading or the next unindented list item — rather than against a single physical line; **and shall emit a pass SENTENCE naming the number of statement blocks it scanned when it finds no modal, distinct from its could-not-check sentence when no requirements document is present**; the quantified population being the statement blocks of the active batch's requirements document.
 - **Validation:** `test (unit)`
 - **Executed verification:** `devflow-validate.py --selftest`, the V6 arm block, over synthetic records differing only in a line break.
-- **Numeric pass threshold:** **≥ 4** arms; a wrapped statement carrying the modal on a continuation line yields **1** BLOCK where the shipped rule yields **0** findings (pre-state measured, M-6); a modal in the rationale beneath the statement yields **0** BLOCKs; **≥ 1** `PASS != NOOP` arm.
+- **Numeric pass threshold:** **≥ 6** arms; a wrapped statement carrying the modal on a continuation line yields **1** BLOCK where the shipped rule yields **0** findings (pre-state measured, M-6); a modal in the rationale beneath the statement yields **0** BLOCKs; **≥ 1** `PASS != NOOP` arm; and **≥ 2** arms over the new pass sentence — one asserting the sentence itself with its block count, one asserting it differs from the no-document sentence. **Pre-state measured 2026-08-25: V6 emits NOTHING on success** — it returns an empty finding list, so the rule prints no line at all, which is why `HLR-88.1`'s pass-sentence mandate was unsatisfiable for it as written (`PDR-2026-08-25-batch-88#D6`). **This is the LLR that makes it satisfiable**, and without it `HLR-88.1` names a population it cannot be met over.
 - **Acceptance criteria (informative):**
   - The negative arm is the load-bearing one. Widening the scope past the statement's own block would make every rationale paragraph a finding — and the same file's `v4_method_without_verification` docstring (`devflow-validate.py:246`) already argues that a line-scoped version of a block-scoped rule *"false-fails a perfectly correct requirement — which is as expensive as passing a wrong one."* This LLR applies that argument to its neighbour.
   - **Scope note for this batch:** once the loader fix (LLR-88.5) lands, this rule judges **this document**. The statements in §4 were authored with the modal absent from every statement block, checked by the same probe (M-6).
@@ -833,10 +936,11 @@ judging someone else's document.
 ### LLR-88.8 — the re-baseline is recorded before any evidence is measured against it
 
 - **Traceability:** HLR-88.3
-- **Statement:** The batch objective in `.dev-flow/state.json` and the scope section of `PLAN.md` shall state the canon-census baseline as **280 of 544** and shall record the supersession of the previously declared **276 of 544**, and the commit carrying that restatement shall precede in commit order every commit touching `REQUIREMENTS.md` in this batch and the next — the quantified population being the baseline figures of those two documents.
+- **Statement:** The batch objective in `.dev-flow/state.json` and the scope section of `PLAN.md` shall state the canon-census baseline as **306 of 570 measured 2026-08-25**, shall carry that measurement DATE as part of the figure, and shall record the supersession of both previously declared values — **276 of 544** and **280 of 544** — and the commit carrying that restatement shall precede in commit order every commit touching `REQUIREMENTS.md` in this batch and the next — the quantified population being the baseline figures of those two documents.
 - **Validation:** `inspection`
 - **Executed verification:** read of both documents after the edit; `git log --oneline --reverse` over the batch's commits, comparing the position of the restatement commit against any commit whose diff touches `REQUIREMENTS.md`.
-- **Numeric pass threshold:** **0** occurrences of the figure `276` as a declared baseline in either document; **2** documents restating **280**; the restatement commit's ordinal is **strictly less** than that of every `REQUIREMENTS.md`-touching commit, and this batch touches `REQUIREMENTS.md` in **0** commits.
+- **Numeric pass threshold** (re-derived per `PDR-2026-08-25-batch-88#D4`): **0** occurrences of `276 of 544` or `280 of 544` as a **declared baseline** in either document — occurrences inside a supersession note are required, not forbidden, and are counted separately; **2** documents restating **306 of 570** with its measurement date; the restatement commit's ordinal is **strictly less** than that of every `REQUIREMENTS.md`-touching commit, and this batch touches `REQUIREMENTS.md` in **0** commits.
+- **⚠ The baseline carries a date because the DENOMINATOR moves.** Re-executed 2026-08-25: shipped **302 of 570**, patched **306 of 570**, delta **+4** — `HLR-053`, `HLR-056`, `US-064`, `US-068`. ~~276 → 280 of 544~~ was not wrong when measured; it expired because **batch-88 declared 26 ids of its own** and every batch does the same. **The +4 delta survives every re-measurement; the baseline survives none.** A bare figure with no date is therefore not a re-baseline, it is a future refutation, and this requirement forbids writing one.
 - **Acceptance criteria (informative):**
   - The same `state.json` string also carries the refuted "section 4" wording for the deferred Layer C rule (P-19). Correcting the baseline without correcting that phrase would leave one document asserting two superseded things; the correction is **D-88-4** and is an operator decision because it edits a declared objective.
   - This LLR owns no transform. It constrains ordering, and it is expected to appear as an unowned-identifier notice — which is a question per id, never a gate.
@@ -844,14 +948,16 @@ judging someone else's document.
 ### LLR-88.9 — the design-review grammar, in its strict form
 
 - **Traceability:** HLR-88.4
-- **Statement:** The design-review grammar (`_V23_OK`, `devflow-validate.py:1557`) shall admit a batch segment consisting of a date, the literal batch marker and a single alphanumeric component, followed optionally by a version marker of the form `-v` plus a digit sequence, followed optionally by either a decision suffix of the form `#D` plus a digit sequence or the literal Markdown extension — and shall admit no other hyphenated component in the batch segment; the quantified population being every token the citation harvester collects from `REQUIREMENTS.md` and the `.dev-flow/` walk.
+- **Statement:** The design-review grammar (`_V23_OK`, `devflow-validate.py:1557`) shall admit a batch segment consisting of a date, the literal batch marker and a single alphanumeric component, followed optionally by a version marker of the form `-v` plus a digit sequence, followed optionally by either a decision suffix of the form `#D` plus a digit sequence or the literal Markdown extension — and shall admit no other hyphenated component in the batch segment; **and the citation harvester shall discard every trailing character that no citation can end in, the discard set being derived from the id grammar's own character class rather than enumerated from Markdown delimiters** — the quantified population being every token the citation harvester collects from `REQUIREMENTS.md` and the `.dev-flow/` walk.
 - **Validation:** `test (unit)`
-- **Executed verification:** `devflow-validate.py --selftest`, the grammar arm block over M-3's constructed token table; plus the `V23` line of a live run. Pre-state M-3: **21/21** conforming under the shipped grammar, the permissive candidate AND this strict one.
-- **Numeric pass threshold:** **21** of **21** live citations conform, **0** new notices; **≥ 11** arms; **≥ 2** arms assert REJECTION of a hyphenated batch-directory token (with and without a trailing decision); **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision); **≥ 4** preserve the shipped rejections (undated, placeholder, bare hash, path-prefixed).
+- **Executed verification:** `devflow-validate.py --selftest`, the grammar arm block over M-3's constructed token table, **and the harvester arm block over M-11's twelve Markdown contexts**; plus the `V23` line of a live run. Pre-state M-3, re-executed 2026-08-25: **26/26** conforming under the shipped grammar, the permissive candidate AND this strict one (~~21/21~~ superseded). Pre-state M-11: **8 of 12** ordinary Markdown contexts mangle a conforming citation into a notice.
+- **Numeric pass threshold** (restated per `PDR-2026-08-25-batch-88#D2`, and widened by the operator ruling of 2026-08-25): the **non-conforming citation set is ∅** over a conforming population of **≥ 26** — a floor with its measurement date, never a target, because this document mints a conforming citation every time it cites a record. **Grammar arms: ≥ 11**; **≥ 2** assert REJECTION of a hyphenated batch-directory token (with and without a trailing decision); **≥ 2** assert ACCEPTANCE of a version token (with and without a trailing decision); **≥ 4** preserve the shipped rejections (undated, placeholder, bare hash, path-prefixed). **Harvester arms: ≥ 8**, one per failing Markdown context of M-11, each asserting the CLEAN citation is recovered — and **≥ 1 `PASS != NOOP` arm** proving the bare and code-span contexts, which pass today, are not what the new arms measure. **≥ 1 arm must assert that a bare-hash form still FAILS after the widening**, because a discard set that is too greedy would repair the token the grammar is required to reject.
 - **Acceptance criteria (informative):**
   - **The measured patch's grammar is REJECTED here and the rejection is not a matter of taste.** Its batch segment admits any number of alphanumeric hyphenated components, so this batch's own directory name parses as a record. Measured, both directions (M-3).
   - **The live corpus cannot discriminate the two candidates** — all three grammars score 21/21. Without the rejection arms, this rule's acceptance is green under the grammar the operator rejected, which is the vacuous-check shape at the level of the *criterion* rather than of the rule.
   - The Markdown-extension form is admitted because the flow's own initialisation command prescribes exactly that filename shape for a sealed record; a grammar forbidding the convention its own command prescribes is the rule disagreeing with the flow.
+  - **The harvester half was found by tripping it while authoring §0.3 (M-11), and it is a SHIELDING defect, not a missing-character defect.** `rstrip` halts at the first character outside its set, so one unlisted delimiter protects every listed one behind it — the shipped set already contains the backtick and still cannot reach it through a `*`. **The repair is therefore specified as a character CLASS derived from the grammar, not as a longer list of delimiters**, because an enumeration of Markdown punctuation has no closing condition and would owe a new entry at every new authoring convention.
+  - **This half moves 0 live verdicts today** — the de-minting of `PDR-2026-08-25-batch-88#D2` left no mangled citation on disk — so its evidence is necessarily synthetic, exactly as the grammar half's is, and the acceptance says so rather than claiming a live pre-state.
 
 ### LLR-88.10 — the map resolver, kept pure and kept local to its rule
 
@@ -909,7 +1015,9 @@ judging someone else's document.
 - **Statement:** The selftest shall exercise the backup rule with at least one arm asserting its pass SENTENCE, at least one arm asserting that its pass sentence differs from each of its three non-pass sentences, and one arm per boundary side of the age threshold — the quantified population being that rule's arm block.
 - **Validation:** `test (unit)`
 - **Executed verification:** `devflow-validate.py --selftest`, arm labels enumerated into `04-validation.md`.
-- **Numeric pass threshold:** **≥ 6** arms; **≥ 1** `PASS != NOOP`; **2** threshold-boundary arms at 30 and 31 days; the rule does **not** appear on the selftest's synthetic-exemption list, whose membership is **1** today and must remain **1**.
+- **Numeric pass threshold:** **≥ 6** arms; **≥ 1** `PASS != NOOP`; **2** threshold-boundary arms at 30 and 31 days; and the rule does not appear on the **DERIVED** synthetic-exemption set specified in the next bullet, whose membership is **1** (`V8`) today and must remain **1**.
+- **The exemption set shall be COMPUTED, not printed** (`PDR-2026-08-25-batch-88#D3`). The selftest shall derive it as the set difference between the rule names declared in `CHECKS` and the rule names appearing in its own emitted arm labels, shall print the derived set, and shall drive its `ok` flag from a comparison against a declared expected set — so that a rule shipping with no arms makes the selftest **FAIL** rather than making a sentence inaccurate.
+- **The derivation owes its own `PASS != NOOP` arm, or the vacuity has only moved.** **≥ 1** arm shall feed the derivation a corpus in which a rule has no arms and assert the derived set is **non-empty**; **≥ 1** shall assert that over the real arm set it is exactly `{V8}`. Without the first, a derivation that always returned the empty set would pass every check written over it.
 - **Acceptance criteria (informative):**
   - **Both RED sides are synthetic and this document says so.** M-9 measured only the GREEN side live; the repository is reachable and was written 0.003 days ago. A criterion implying a live failure was observed would be false.
   - **Membership of the exemption list is asserted as a count that must not rise.** P-17 measured it at exactly one rule, and the selftest's own tail says the list *"shrank by measurement rather than by assertion"* — a new rule joining it would reverse that, silently.
@@ -999,18 +1107,38 @@ is §4's table (24 rows: 8 HLRs and 16 LLRs, each with a method and a test case)
    retained below as criterion 2 and is **insufficient on its own**: P-5 measured a rule that sat
    off that list, carried arms, passed them, and was inert across 61 batches because its arm
    asserted "not red" over a branch that is never red.)*
-2. **No rule this batch creates joins the synthetic-exemption list.** Its membership is **1**
-   today (measured, P-17) and shall be **1** at close.
+2. **No rule this batch creates joins the synthetic-exemption set, which shall be DERIVED from
+   `CHECKS` and the emitted arm labels rather than asserted in prose.** Membership **1** (`V8`)
+   today and **1** at close, and the derivation carries a `PASS != NOOP` arm (`LLR-88.14`).
+   **⚠ CORRECTION, and it corrects this document twice over.** As shipped there is **no list**:
+   `devflow-validate.py` prints a hardcoded English sentence, nothing computes membership, and
+   the selftest's `ok` flag is never influenced by it — so the criterion as originally written
+   **could not fail**. Executed proof it was already false: the patched validator emits **9**
+   `V8` arm lines where the shipped emits **0**, and *both* still print *"V8 is the ONLY rule
+   this selftest does not prove synthetically"*, and both print `SELFTEST PASSED`. This session
+   twice told the operator that criterion 2 was *"a real, checkable constraint, not a
+   formality"*. **It was a formality.** `PDR-2026-08-25-batch-88#D3`. The remedy is the
+   derivation above; criterion 1's `PASS != NOOP` mandate stands on its own merits and never
+   depended on this one.
 3. **0 BLOCK attributable to this batch's content**, stated **per run** and with its scope. The
    gate line's absolute value **will move inside this batch** — measured, `14 block → 0 block` for
    the loader increment alone (M-2, M-4) — so a single batch-wide number would be a splice of
    mutually exclusive states. Each increment records its own pre-state and post-state.
-4. **The canon census reads 280 of 544**, and the restatement commit precedes every
-   `REQUIREMENTS.md`-touching commit in this batch and the next. This batch touches
-   `REQUIREMENTS.md` in **0** commits.
-5. **All 21 live design-review citations still conform**, AND the grammar arms reject a hyphenated
-   batch-directory token. **Criterion 5 without its second half is green under the grammar the
-   operator rejected** — measured, M-3 — and is not accepted alone.
+4. **The canon census reads 306 of 570 as measured 2026-08-25** (shipped reads 302 of 570; the
+   **+4 delta** is the oracle move, and it is the half that survives re-measurement), and the
+   restatement commit precedes every `REQUIREMENTS.md`-touching commit in this batch and the
+   next. This batch touches `REQUIREMENTS.md` in **0** commits. ~~*reads 280 of 544*~~ superseded
+   per `PDR-2026-08-25-batch-88#D4` — **the figure expired because this batch declared its own
+   ids while the criterion was being written**, which is the denominator hazard biting the very
+   criterion that measures it. **The date is part of the figure.**
+5. **The non-conforming design-review citation set is ∅** — stated as a SET, because a count
+   expires the moment this document cites another record — over a conforming population of
+   **≥ 26** (floor measured 2026-08-25, M-3 re-executed); **AND** the grammar arms reject a
+   hyphenated batch-directory token. ~~*All 21 live design-review citations still conform*~~ is
+   superseded on both halves: the figure was stale, and **the first half is green under the
+   grammar the operator rejected**, so it is a regression floor and is not accepted alone. After
+   the C-56 de-minting (`PDR-2026-08-25-batch-88#D2`) **no live token discriminates the two
+   grammars**, which makes the arms the only evidence this criterion has.
 6. **The 4 historically-parsing validation records still parse** under the modified ledger rule —
    a regression floor beneath the improvement.
 7. **Selftest exit 0, arm lines ≥ 240** against the measured floor of 192.

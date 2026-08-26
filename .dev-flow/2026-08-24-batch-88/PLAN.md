@@ -19,6 +19,15 @@
 
 ## 2 · Scope — operator-declared
 
+> **⚠ CENSUS BASELINE SUPERSEDED — re-measured 2026-08-25**, per `PDR-2026-08-25-batch-88#D4`.
+> Every `276 of 544` and `280 of 544` below is **kept as written and is no longer the
+> baseline.** Re-executed: shipped **302 of 570**, patched **306 of 570**, delta **+4**
+> (`HLR-053`, `HLR-056`, `US-064`, `US-068`). **The +4 delta survives; the baseline does not**
+> — batch-88 declared 26 ids of its own while the figure was being written. The declared
+> baseline now lives in `state.json.batch_objective` and `01-requirements.md` `LLR-88.8`, and
+> **carries its measurement date as part of the figure**. The prose below is preserved as the
+> derivation that was true when it was run, not as a current reading.
+
 **Stories A + B + C + E.** Story D (C-45 reconciliation of 15 half-encoded controls) **deferred** —
 it is reconciliation, not design, and defers without damaging the others.
 
@@ -443,6 +452,14 @@ that is never red.
 and its GREEN arm must assert the pass SENTENCE, not the absence of a BLOCK.**
 
 ## ⚠ A scheduling conflict to resolve before Story E produces evidence
+
+> **⚠ RESOLVED AND RE-MEASURED, 2026-08-25.** Story E moved to batch-89 by operator ruling, so
+> the conflict this section describes cannot occur in batch-88: the V22 fix lands here and the
+> story that measures against it is authored later, over a still oracle — which is exit one of
+> the two offered below, taken. **The figures in this section are superseded**: the move is
+> **302 -> 306 of 570** measured 2026-08-25, not 276 -> 280 of 544. The **+4 delta is
+> unchanged**; only the baseline moved, and it moved because this batch declared its own ids.
+> `PDR-2026-08-25-batch-88#D4`.
 
 The proposed V22 oracle fix (substring → token membership) moves the census **276 → 280**. This
 batch's own `state.json` `batch_objective` declares:
