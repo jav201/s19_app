@@ -178,3 +178,73 @@ The single stack assumption in code is the extension list above (§7.6).
 And the project already met this exact ambiguity: `req-template.md:65`'s **Purity-probe form rule**
 exists because, in batch-09, `rg -c "textual"` matched the *word* "textual" in a docstring. The
 adjective and the package name collided once already, and the collision became a standing rule.
+
+---
+
+## 9 · The station-4 PDR landed — verdict `approved with conditions`, and Certainty is ✗
+
+Sealed in the vault's `s19_app/design/` folder, dated **2026-08-25**, 302 lines. It states in its own
+header that it is a **second record, not an amendment**, and why the date carries that distinction.
+
+**10 conditions, five of which withhold specific increments.** Axes: Coverage ⚠ · **Certainty ✗** ·
+Evidence ⚠ (*met in method, expired in fact*). Not `rejected`, because rejection returns work to
+DESIGN and the design is not what is wrong — the acceptance layer, the measurement layer, and a
+missing increment layer are.
+
+**Prior record's 8 conditions: 2 discharged · 3 open · 3 void** (two voided because Stories A and E
+left the batch; one is open *and unmeasurable*). **Checklist: 3 of 7 items ✓ with a citation**;
+items 1, 2 and 6 are ⚠ with declared reasons; **item 4 is ✗**.
+
+### 🛑 The batch's own anti-vacuity criterion is itself vacuous
+
+This batch widened acceptance criterion 2 — *"no new rule lands on the selftest's
+synthetic-exemption list"* — precisely to stop the new rules becoming unfalsifiable. **There is no
+list.**
+
+`devflow-validate.py:3155-3158` is a bare `print()` with a hardcoded string. **Nothing computes
+membership; `ok` is never influenced by it.** Executed by the reviewer: the shipped selftest prints
+**0** `V8` arm lines, the patched one prints **9**, and *both* print the same sentence —
+`SELFTEST PASSED` either way.
+
+And the sentence reads:
+
+> *"…so the exemption list shrank by measurement rather than by assertion. Said out loud rather than
+> counted as covered."*
+
+**A sentence claiming to be measurement, which is assertion, inside the rule set whose entire
+discipline is measured-not-asserted.** Nobody needs to widen the list, because there is no list.
+
+⚠ **Correction to this handoff's §7.2 and to what this session told the operator twice:** criterion 2
+was called *"a real, checkable constraint, not a formality."* **It is a formality.** The `PASS != NOOP`
+requirement stands on its own merits and is unaffected — but it can no longer be justified by
+appeal to a list that does not exist.
+
+### Two more that block increments as specified
+
+**`HLR-88.4` / `AT-B88-04` / criterion 5 cannot be met.** The live V23 corpus is **34 citations / 16
+distinct**, not the 21/8 this session reported — because `01-requirements.md` pasted a constructed-token
+table and minted **9** V23 notices *against itself*. Under the strict grammar the record mandates, it
+measures **29 of 34 with 5 notices**. **"0 new notices" is reachable only by adopting the permissive
+grammar the operator rejected.**
+
+**The census figures in `state.json` and `LLR-88.8` are already refuted.** It is **302 of 570**, not
+276 of 544 — and the `+26` is exactly the ids batch-88 itself declared. **The baseline went stale the
+moment P1 authored the record**, so the specified fix would write a refuted number into two documents.
+This is the *"denominator grows with every batch"* problem biting in real time, on the very story
+that measures against it.
+
+### And the `_artifacts` justification has expired
+
+Today's gate is **0 block** shipped and **0 block** patched; the whole −7 notice difference is V23
+against the requirements record. The `14 block → 0` move no longer reproduces, because the window
+closed when P1 authored — consistent with the architect's independent bound of *10 of the 14*.
+
+**The scope cut still holds; its derivation does not.** Re-derive it before citing it.
+
+### On method
+
+The reviewer **verified all five of the QA plan's arm rejections itself**, with three single-edit
+mutants each asserted non-no-op: reverting the V22 oracle leaves 221 arms with **zero verdict
+changes** while moving the live census; reverting `_read_ci` leaves `CASE-adopted` green; deleting the
+exact-name preference leaves `CASE-exact-wins` green. **Three independent lenses have now reached the
+same conclusion about those arms by different routes.**
