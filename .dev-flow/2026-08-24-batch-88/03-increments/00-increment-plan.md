@@ -60,7 +60,7 @@ counts five moves and finds only two still moving.
 |---|---|
 | Requirements | `LLR-88.9` (both halves: grammar **and** citation harvester) |
 | Source files | `devflow-validate.py` — **1** |
-| Pre-state | `V23` reports **48 citations, every one conforming** — the corpus was cleaned by the Phase-1 de-minting. Harvester probe M-11: **8 of 12** ordinary Markdown contexts turn a *conforming* citation into a notice |
+| Pre-state (executed 2026-08-26) | `V23` reports **48 citations, every one conforming** — the corpus was cleaned by the Phase-1 de-minting. Harvester probe M-11: **8 of 12** ordinary Markdown contexts turn a *conforming* citation into a notice |
 | Post-state | Grammar expresses a record, a `.md` filename, a `-v<n>` version and a decision inside either, and rejects a hyphenated batch-directory name. Harvester discards trailing characters by a **character class derived from the grammar**, not by an enumeration of Markdown delimiters |
 | Gate | Non-conforming set stays **∅** over a population ≥ 48; **≥ 11** grammar arms (≥ 2 reject the hyphenated dir, ≥ 2 accept a version, ≥ 4 preserve shipped rejections); **≥ 8** harvester arms, one per failing context of M-11; **≥ 1** arm asserting a bare-hash form still FAILS after the widening |
 | ⚠ | **The live corpus cannot discriminate the candidate grammars** — all three score 48/48 — so the arms are the only evidence this increment has. A criterion phrased as "the live citations still conform" is green under the grammar the operator rejected |
@@ -123,6 +123,33 @@ counts five moves and finds only two still moving.
 
 ---
 
+## 2b · Execution ledger — which of the seven have run
+
+> The rows above are **not** rewritten as increments land: this file is the baseline each
+> packet is measured against, and editing it to match what happened would delete the
+> comparison. What was missing is any way to tell which have run at all.
+
+| # | State | Packet | Arms after | What the review pass cost |
+|---|---|---|---|---|
+| **1** | **SHIPPED** 2026-08-26 | `increment-001.md` | 192 → **194** | **BLOCK, 1 HIGH + 5.** The arm asserted the surfaced id by SUBSTRING, inside the arm whose subject IS the substring bug, and survived a total inversion with all 194 arms green |
+| **2** | **SHIPPED** 2026-08-26 | `increment-002.md` | 194 → **244** | **BLOCK, 1 HIGH + 3**, after a pre-implementation catalog had already killed five vacuous arms. The arms SAMPLED one citation instead of SWEEPING the character class; an independent sweep of 3,426 mutants found 137 survivors, 82 harmful |
+| **3** | **SHIPPED** 2026-08-27 | `increment-003.md` | 244 → **298** | **BLOCK twice, by two different lenses on two different axes.** The first found `v8_module_map` had ZERO executing arms; the second found every message pinned to its SYMBOL rather than to typed text, so the wording was free |
+| **4** | next | — | — | — |
+| 5 · 6 · 7 | not started | — | — | — |
+
+**⚠ Three for three, the blind spot was found by a lens the author did not control** — and in
+Increment 3 the three lenses were each blind to the next one's axis: the pure cores, the I/O
+boundary, and the message wording. **Budget a review pass per increment as work, not as a
+formality**; every one so far has returned BLOCK, and none of the findings was cosmetic.
+
+**⚠ Increments 1 and 2 both re-stated a requirement AFTER the catalog or the review read it.**
+`LLR-88.9`'s discard clause, read literally, produced the bug it forbade; `LLR-88.1`'s `≥ 34`
+demanded what its own grammar could not reach; `LLR-88.11`'s positive-claim amendment was
+defeated by a sentence containing the phrase and negating it four words later. **The
+requirement is not a fixed input to an increment in this batch** — plan for it to move.
+
+---
+
 ## 3 · What this plan does NOT authorise
 
 - **Batch-89 work**: Stories A (Layer C, `V24`), B (assurance limits + the review-debt marker) and
@@ -136,7 +163,7 @@ counts five moves and finds only two still moving.
 - **`_ATLAS_ID_REQ`'s 129 non-ids** — 97 range notations, 32 prose compounds. Inherited, not
   re-measured, and it re-baselines with Story E.
 
-## 4 · Condition status at the time this plan was authored
+## 4 · Condition status — authored 2026-08-26, kept current
 
 | Condition | State |
 |---|---|
