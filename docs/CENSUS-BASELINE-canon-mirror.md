@@ -1,5 +1,30 @@
 # Baseline census — the canon-mirror backlog, frozen
 
+> ## ✅ THE NEXT DELTA LANDED, 2026-08-26 — which is the one thing this file exists for
+>
+> **Increment 1 of batch-88 IS the delta this file was frozen to be diffed against**, and it
+> shipped without anyone opening the file. Recorded now, by an adversarial review that noticed
+> the omission — not by the increment.
+>
+> **The move: `302 → 306 of 570`, measured 2026-08-25.** `v22_canon_mirror` stopped testing
+> SUBSTRING containment and now tests TOKEN membership. The `+4` are named rather than sampled:
+> `HLR-053`, `HLR-056`, `US-064`, `US-068` — each present in the canon as a substring of a
+> longer id and absent as a token.
+>
+> **⚠ And the +4 is not four seeding gaps, which is exactly what a frozen attributed list is
+> for.** Two of the four (`HLR-053`, `HLR-056`) surface because the canon writes the range
+> `HLR-053..HLR-056`, which the tokenizer swallows as ONE phantom id — a separate defect this
+> batch does not fix, and the same family as the 129 non-ids this file's own table records. The
+> other two appear in the canon only as their `a`/`b` splits: superseded, not unseeded. **Not
+> one of the four is retired by plain seeding.** A rolling number could not have said that.
+>
+> **The table below is two supersessions old and is preserved, not corrected.** Its `276` and
+> `280` are over a denominator of **544**; the live denominator is **570**, because every batch
+> declares ids of its own — batch-88 declared 26 while the figure was being written. **The +4
+> delta survives every re-measurement; the baseline survives none.** The table's diagnosis of
+> the substring bug, and its quantified error of exactly 4 ids, were both CORRECT and are what
+> Increment 1 confirmed by execution.
+
 > **Frozen 2026-08-24 by `2026-08-24-batch-88`, station P0/ARQ.** Derived by command, not by hand.
 > **Why this file exists:** until now the backlog was a rolling number in validator output. A number
 > that moves cannot answer *"did this increment insert a hole?"* — a `+1` inside a census of 1436 is

@@ -12,17 +12,21 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P1",
+  "current_station": "P3",
   "phase_status": "approved",
   "stations_active": [
     "P0",
     "ARQ",
-    "P1"
+    "P1",
+    "PDR",
+    "P3"
   ],
   "iterations_per_station": {
     "P0": 0,
     "ARQ": 0,
-    "P1": 0
+    "P1": 1,
+    "PDR": 2,
+    "P3": 2
   },
   "triggers": {
     "evaluated_at": "2026-08-24T21:30:00-06:00",
@@ -82,6 +86,42 @@
       "date": "2026-08-25",
       "decision": "scope cut ACCEPTED; objective corrected (D-88-4)",
       "notes": "Operator accepted the P1 architect's cut (D-88-5 'Aceptado'). batch_objective rewritten; the superseded string is PRESERVED verbatim at batch_objective_superseded rather than overwritten, because it carried two claims this batch refuted and the refutations are only legible beside them: (a) 'baseline 276 of 544' -- superseded, V22's oracle fix moves it to 280 by measurement; (b) the 'Frozen? in ARCHITECTURE.md section 4' anchor -- REFUTED at ARQ, since s19_app's section 4 is 'Patch Editor flow' and the interface table landed at section 11, which is why the rule must key on the table's SHAPE and never on a section number. D-88-2 RULED by the operator ('Ok'): the three Part B interfaces ARE re-declared frozen for batch-89. docs/architecture.md freezes them BY STRING for 2026-08-24-batch-88, so that line must be amended when batch-89 opens or V24 debuts with zero real consumers -- the synthetic-fixture shape criterion 1 forbids. Carried as an explicit batch-89 intake obligation. D-88-1 DISSOLVED, not answered: the review marker's guard needed a rule number that Phase 1 could not mint outside the sealed PDR. With Story B moved to batch-89, batch-89's own PDR allocates it. The question was made moot by the cut and should not have been put to the operator as a separate ruling. D-88-3 (Pillow's home) still OPEN -- options and consequences presented, measured: the dev extra pins textual==8.2.8 for the snapshot env only, so routing the main test job through [dev] would silently pin the runtime 2702 tests exercise, contradicting pyproject's own stated scoping. NOTICE DELTA ACCOUNTED at this edit: 293 -> 294. V16's currency arm flipped again on a 1-day-stale local ref (clock, not content). V23 rose from 0 to NINE, and every one is the requirements document's own WORKED EXAMPLES: specifying the strict grammar means writing the shapes the CURRENT grammar rejects (the record id, the .md filename, -v2, -v2#D1, and the deliberately-invalid PDR-85#D3). V23's scan has no code-fence awareness, so a worked example that is MEANT to be checkable is indistinguishable from a real citation. This is the live instance of the ruling the QA plan declined to make -- whether _strip_code should be added to V23's scan -- and it is now owed with evidence rather than in the abstract. Accounted, not silenced: NOTICE by design, gates nothing, and the same disposition V13's 52 already carry."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-08-25",
+      "decision": "station-4 design review sealed: approved with conditions (10 conditions)",
+      "notes": "A SECOND record for this batch, not an amendment -- the pre-intake record reviewed the PROPOSAL and says in terms that it does not discharge the station-4 PDR. Axes: Coverage warn, CERTAINTY fail, Evidence warn (met in method, expired in fact). Three of the ten batch acceptance criteria were unfalsifiable or unsatisfiable as written; five of the ten conditions withheld specific increments. Prior record's 8 conditions: 2 discharged, 3 open, 3 void because the scope changed."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-08-26",
+      "decision": "all ten conditions dispositioned -- C1-C8 and C10-b discharged, C9 discharged, C10-a open by design",
+      "notes": "Phase-1 re-work across four commits. The sharpest finding: batch criterion 2 thresholded on a hardcoded print() literal. There was NO synthetic-exemption list, nothing computed membership, and the selftest's ok flag was never influenced by it, so the criterion could not fail. Not struck -- made COMPUTABLE: derived from CHECKS minus the emitted arm labels, with its own PASS != NOOP arm, because a derivation that always returned the empty set would pass every check written over it. C9 discharged by 02-review-security.md. C10-a travels inside Increment 5, per the review's instruction."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-08-26",
+      "decision": "operator rulings on the imaging dependency: pillow >= 10, and the import guard IS adopted (revised the same day)",
+      "notes": "Ruling 1: a version floor with a rationale, matching the manifest's house style. The hesitation was requires-python >=3.8 -- measured, and it dissolved the hesitation while producing R-88-7: that declaration is FALSE, the real floor is 3.10, refuted by the project's own declared dependencies and by PEP 604 syntax evaluated at runtime in cli.py. Ruling 2 was first given as 'hold at 4 lines, accept the risk', on a stated basis that misattributed a recommendation to the assistant; the premise was corrected and the operator re-took the decision, adopting the guard and widening to 5 lines. BOTH rulings are preserved: a ruling whose stated basis was wrong is not the same artifact as one that was simply changed."
+    },
+    {
+      "station": "P3",
+      "date": "2026-08-26",
+      "decision": "Increment 1 SHIPPED and committed -- the V22 census oracle becomes token membership",
+      "notes": "Live census 302 -> 306 of 570, the +4 verified one id at a time (HLR-053, HLR-056, US-064, US-068) and never as a total. Selftest 194 arms, exit 0. An independent code review returned BLOCK with one HIGH, and it was this batch's own thesis turned on the batch: the new arm asserted the surfaced id by SUBSTRING, inside the arm whose subject IS the substring bug, and survived a total inversion of the rule with all 194 arms green. Five further findings taken. Commits: s19_app af4dc3d, ~/.claude dbcff2d, skills 5d75bdb."
+    },
+    {
+      "station": "P3",
+      "date": "2026-08-26",
+      "decision": "Increment 2 SHIPPED and committed -- the strict design-review grammar and its harvester",
+      "notes": "244 arms. 12 of 12 Markdown contexts recover the citation exactly, and so do 10 of 10 delimiters absent from both the probe table and the superseded strip set. TWO blind spots, neither found by the author. A pre-implementation mutation catalog, written by a lens never shown the arms, killed five vacuous ones -- including one caused by the fixture's own prose SPELLING the id it asserts absent. Then an independent code review returned BLOCK after sweeping 3,426 single-edit mutants: 137 survived the arm set, 82 of them harmful, because the arms SAMPLED one citation instead of SWEEPING the character class. Commits: s19_app 7ec297d, ~/.claude beba431 + e349c28, skills e32cca4 + 1771672."
+    },
+    {
+      "station": "P3",
+      "date": "2026-08-27",
+      "decision": "ledger repaired -- this file had been frozen at the FIRST of ten commits",
+      "notes": "Found by an adversarial review of the batch's progress. The file still declared station P1 with iterations_per_station.P1 = 0 after two commits literally titled 'P1 re-work', and held no record of the PDR, the ten conditions, four operator rulings, or two shipped increments. V18 cannot see this: it checks that the active batch is DECLARED and on disk, and nothing about whether the ledger matches what happened. The same review found the batch's THIRD Phase-1 artifact, 01b-qa-validation-plan.md, equally unswept, and 29 of 34 source line citations broken by the increments' own edits. Flow candidate for batch-89: no rule reads this ledger for currency."
     }
   ],
   "standing_authorization": {
