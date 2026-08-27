@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 65 requirement files | corpus digest: b1b2b8ce0976339b -->
+<!-- flow_version: 2026.08.24-rev46 | flow_hash: 9c1449ed815d267c | corpus: 65 requirement files | corpus digest: 98fcccc8051249e1 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3024,7 +3024,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1481 unique id(s)
+## family AT/TC — 1492 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3138,6 +3138,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-039c` | batches, tests |
 | `AT-039d` | batches, tests |
 | `AT-039e` | batches, tests |
+| `AT-039ez` | batches |
 | `AT-039f` | batches, tests |
 | `AT-039g` | batches, tests |
 | `AT-04` | batches |
@@ -3156,6 +3157,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-042d` | batches, tests |
 | `AT-042e` | batches, tests |
 | `AT-042f` | batches, tests |
+| `AT-043` | batches |
+| `AT-043.2` | batches |
 | `AT-043a` | batches, tests |
 | `AT-043b` | batches, tests |
 | `AT-043c` | batches, tests |
@@ -3500,6 +3503,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-248` | batches, tests |
 | `AT-249` | batches, tests |
 | `AT-250` | batches, canon, tests |
+| `AT-250c` | batches |
 | `AT-251` | batches, canon, tests |
 | `AT-252` | batches, canon, tests |
 | `AT-253` | batches, canon, tests |
@@ -3521,6 +3525,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-3` | batches |
 | `AT-65` | batches |
 | `AT-65b` | batches, tests |
+| `AT-65br` | batches |
 | `AT-B59-01` | batches, tests |
 | `AT-B59-02` | batches, tests |
 | `AT-B59-03` | batches, canon, tests |
@@ -3648,6 +3653,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-001d` | batches, tests |
 | `TC-001e` | batches, tests |
 | `TC-001u` | batches, tests |
+| `TC-001z` | batches |
 | `TC-002` | batches, canon, tests |
 | `TC-002a` | batches, tests |
 | `TC-002b` | batches, tests |
@@ -3659,6 +3665,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-004` | batches, canon, tests |
 | `TC-004a` | batches, tests |
 | `TC-004b` | batches, tests |
+| `TC-004r` | batches |
+| `TC-004z` | batches |
 | `TC-005` | batches, canon, tests |
 | `TC-006` | batches, canon, tests |
 | `TC-007` | batches, canon, tests |
@@ -3911,6 +3919,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-078.2` | batches, tests |
 | `TC-078.3` | batches, tests |
 | `TC-078.4` | batches, tests |
+| `TC-078.4z` | batches |
 | `TC-078.5` | batches, tests |
 | `TC-079` | batches |
 | `TC-079.1` | batches |
@@ -4237,6 +4246,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-458` | batches |
 | `TC-459` | batches |
 | `TC-46.1` | batches, tests |
+| `TC-46.1c` | batches |
+| `TC-46.1r` | batches |
 | `TC-46.2` | batches, canon, tests |
 | `TC-46.3` | batches |
 | `TC-46.4` | batches |
