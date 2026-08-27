@@ -1,5 +1,9 @@
 # Increment 004 — `LLR-88.2` · `LLR-88.3` — the scope family: two rules that read a line where they mean a set
 
+> **⚠ C-56 SUBSTITUTION IN THIS PACKET, and it is here because the first version needed it.** Acceptance ids are written with the prefix `ID-`. The real prefix appears only inside the arms, which the Atlas does not read. The first version of this packet spelled them, and **that re-declared three of them into `_atlas_id_scan`'s `batches` realm** — the census went to **1484** where the corpus is **1481**, and one of the three was a stale-`.pyc` id, so the census this commit regenerates carried *an id present for a reason that is not a test node*: the exact defect `LLR-88.2` exists to close, reinstated by the fix's own paperwork.
+>
+> **The lesson is the shape, not the slip.** De-minting from one rule's population is not removal — it is RELOCATION, and the destination is inside another rule's population unless someone checks. `01-requirements.md` was swept and the record was not. **Fourth distinct C-56 instance in this batch.**
+
 | Field | Value |
 |---|---|
 | Batch | `2026-08-24-batch-88` |
@@ -81,20 +85,33 @@ has walked through it yet.
 
 ## 3 · Test results
 
-**Selftest:** `SELFTEST PASSED`, exit 0, **335** arm lines — **298** before, **+37** here (V2 **18**,
-V6 **19**). `LLR-88.2` demands ≥ 4 V2 arms plus three named `⚠` arms; `LLR-88.3` demands ≥ 6 V6 arms
+**Selftest:** `SELFTEST PASSED`, exit 0, **344** arm lines — **298** before, **+46** here (V2 **22**,
+V6 **24**). `LLR-88.2` demands ≥ 4 V2 arms plus three named `⚠` arms; `LLR-88.3` demands ≥ 6 V6 arms
 plus four named `⚠` arms.
 
-**Gate, live:** `5 block · 287 notice · 13 not applicable`, exit 1 — from a baseline of
-`3 block · 287 notice · 13 not applicable`. The notice count did not move; V2 traded its `[-]` for
-two `[x]` and V6 gained a `[-]`, which is why the *not applicable* figure is also unchanged at 13.
+| arm set | arms | scored mutants | survivors |
+|---|---|---|---|
+| written from the mandatory kill table | 328 | 16 | **0** |
+| + the independent battery's ten gaps | 335 | 37 | **0** |
+| **+ the third review's population axes** | **344** | **50** | **0** |
+
+**Gate, live:** **`3 block · 287 notice · 14 not applicable`**, exit 1 — unchanged in blocks from
+the baseline `3 block · 287 notice · 13 not applicable`; V2 keeps its `[-]` and V6 adds one, which
+is the whole of the `13 → 14` move. The three blocks are the flow-repo lifecycle: `V7` hash drift
+until Inc 7's bump, and `V16` ×2 for this increment's uncommitted edit.
+
+> ~~`5 block · 287 notice · 13 not applicable`, exit 1 … V2 traded its `[-]` for two `[x]`~~ —
+> **superseded, kept beside the correction rather than overwritten.** That reading was true for the
+> hours between this fix and the upstream `C-56` de-minting, and the section below explains why it
+> existed at all. It is the figure the two-BLOCK narrative in *"The two new blocks"* rests on.
+
 **That the counts stayed still is not evidence the change landed** — the arm block is.
 
-### 🛑 The two new blocks, and why the brief expected one
+### 🛑 The two new blocks, and why the brief expected one — ***SUPERSEDED, see the C-56 section at the foot of this packet***
 
 ```
-  [x] V2   tests/: AT-043 has no node on disk
-  [x] V2   tests/: AT-250c has no node on disk
+  [x] V2   tests/: ID-043 has no node on disk
+  [x] V2   tests/: ID-250c has no node on disk
   [-] V6   01-requirements.md: 24 statement block(s) scanned, no modal inside any statement
 ```
 
@@ -114,10 +131,10 @@ already not the one `P-7` recorded:
 **Both blocks are the rule working, and each is a different one of the two defect classes the fix
 was written for:**
 
-- **`AT-043`** — declared as a truncation of `AT-043.2` in the `⚠` prose. Substring said **TRUE**;
-  the only nodes on disk are `AT-043a`, `AT-043b`, `AT-043c`. This is the prefix-shadow defect,
+- **`ID-043`** — declared as a truncation of `ID-043.2` in the `⚠` prose. Substring said **TRUE**;
+  the only nodes on disk are `ID-043a`, `ID-043b`, `ID-043c`. This is the prefix-shadow defect,
   live, in the document that describes it.
-- **`AT-250c`** — resolves under the shipped rule and under a token walk that includes
+- **`ID-250c`** — resolves under the shipped rule and under a token walk that includes
   `__pycache__`, and **only** from a stale `.pyc`. It is one of the nine ids the requirement
   enumerates. Exclude bytecode and it is gone.
 
@@ -136,15 +153,15 @@ which NAMED arm printed FAIL.** A kill with no named arm is scored as a crash. H
 | id | the edit | reddened by |
 |---|---|---|
 | `MV2-07` | declared side swapped to `_ATLAS_ID_ATTC` | **`LIVE-line`**, `DOTTED-on-disk` |
-| `MV2-02` | substring fallback reinstated (2 parts: the helper and the clause) | `PREFIX-shadow`, `PYCACHE-excluded`, `DOTTED-on-disk`, `LIVE-line` |
+| `MV2-02` | substring fallback reinstated (2 parts: the helper and the clause) | `PREFIX-shadow`, `PYCACHE-excluded`, `DOTTED-on-disk` — **it lost `LIVE-line` when the de-minting emptied the live declaration; three synthetic arms still hold it** |
 | `MV2-03` | tokenizer → `\b(?:AT\|TC)-\S+`, truncation guard lost | `PUNCTUATED-ids`, `EXACT-present`, `NESTED-corpus`, `PYCACHE-excluded` |
 | `MV2-04` | corpus restricted to `.py` | **`NON-PY-corpus`** — and only that one |
 | `MV2-05` | walk made non-recursive (guarded against an absent `tests/`) | `NESTED-corpus`, `NON-PY-corpus` |
 | `MV2-08` | token side strips the fraction, `t.split(".")[0]` | **`DOTTED-on-disk`** — and only that one |
 | `MV6-02` | heading terminator dropped | **`NEXT-HEADING`** — and only that one |
 | `MV6-03` | unindented-item terminator dropped | **`RATIONALE-sibling`** — and only that one |
-| `MV6-09` | the block's END line reported instead of its start | **`WRAPPED-modal`** — and only that one |
-| `MV6-12` | `if not blocks: return []` | **`NO-MARKER`** — and only that one |
+| `MV6-09` | the block's END line reported instead of its start | `WRAPPED-modal`, `SUB-BULLETS`, `TWO-MODALS`, `H4-SCOPE`, `BLANK-LINE-SPAN`, `DEEP-BLOCK` — **it was killed by one arm before the third review added multi-line fixtures** |
+| `MV6-12` | `if not blocks: return []` | `NO-MARKER`, `EMPTY-DOCUMENT` |
 | `MV6-13` | blocks anchored on requirement HEADINGS, so the count reports headings | `COUNT-blocks`, `SAME-LINE`, `WRAPPED-modal`, `NEXT-HEADING`, `PASS!=NOOP`, + 2 shipped |
 | `MV6-S1` | pass sentence reworded to assert the OPPOSITE | `WORDING-pass` + every fixture asserting the rendered pass line |
 | `MV6-S2` | mandated phrase kept, then negated four words later | `WORDING-pass` + the same set |
@@ -152,8 +169,9 @@ which NAMED arm printed FAIL.** A kill with no named arm is scored as a crash. H
 | `MV6-S6` | pass sentence emitted at `NOTICE` | **`PASS-severity`** + the generic `V6 GREEN` filter |
 | `MV6-S7` | `where` degraded to `-` | **`PASS-severity`** + every rendered-line arm |
 
-**Nine of the sixteen were killed by exactly one arm**, which is the number worth reading: the
-battery has almost no redundancy, so removing one arm removes one guard.
+**Six of the sixteen are still killed by exactly one arm** (nine were, before the third review's
+fixtures widened four of them): the battery has almost no redundancy, so removing one arm removes
+one guard.
 
 **And zero survivors here proves less than it looks.** These sixteen mutants are the ones the
 requirement named, and my arms were written from that list. A battery that scores the arms it
@@ -180,8 +198,8 @@ Written against the *code* rather than against the list (`kills4b.py`). All ten 
 `NON-REQ-HEADING`, `SUB-BULLETS`, V6 `EMPTY-DOCUMENT`, V2 `EMPTY-DOCUMENT`). `CASED-modal` kills
 `Y4` and `Y5`; `NON-REQ-HEADING` kills `Y1`, `Y8` and `Y13`; `SUB-BULLETS` kills `Y9` and `Y11`.
 
-**Combined: 37 mutants scored · 37 RED · 0 survivors**, each with a named arm, each importing, each
-printing **335** arms (never a handful) and exiting 1.
+**Combined after two batteries: 37 scored · 37 RED · 0 survivors.** That figure did not survive
+contact with a third lens — see below.
 
 **What the two batteries say together.** The mandated list is oriented at the *mechanism* — the
 tokenizer, the corpus, the terminators, the sentences. It contains nothing about the modal's own
@@ -192,20 +210,106 @@ requirement did not write.
 
 ---
 
+### 🛑🛑🛑 A THIRD review, and the axis is neither behaviour nor wording: **POPULATION**
+
+An independent review returned **BLOCK** on 35 fresh mutants under the full crash guard: **15
+survived all 335 green arms.** Its meta-finding is the sharpest of the three, and it is the one my
+own §4 predicted I could not see:
+
+> **The arms sweep VALUES and sample CARDINALITY and EXTENT.** Every fixture in both rules is a
+> 1–3 line document producing at most one finding, so the population axes — how many findings a
+> rule may emit, how far a block reaches, how deep a walk prunes — are each pinned at a single
+> point. Everything about what each rule *says* is well armed; nothing about how much of the
+> document each rule *reaches*.
+
+I reproduced all thirteen classes independently before fixing anything (`kills4c.py`): **13 built,
+13 survivors, each importing, each printing 335 arms, each exiting 0.** Then measured what each
+would cost on the live corpus — because a survivor whose blast radius is unknown is a finding
+without a size.
+
+| # | the single edit that survived 335 green arms | measured cost on the live corpus | now reddened by |
+|---|---|---|---|
+| **F2a HIGH** | `[:1]` on V2's BLOCK comprehension | a gate line saying the document has ONE unresolved id when it has ten | **`TWO-MISSING`** |
+| **F2b HIGH** | `[:1]` on `_v6_outcome`'s comprehension | same, one rule over | **`TWO-MODALS`** |
+| **F3 HIGH** | lookahead capped at 2 continuations | **623 of 1998 block lines (31%) silently unscanned** | **`DEEP-BLOCK`** |
+| **F3′ HIGH** | lookahead capped at 8 continuations | 68 lines unscanned; 32 live blocks run to 9+ | **`DEEP-BLOCK`** |
+| **F4a MED** | `_V6_REQ_HEAD` `#{2,4}` → `#{2,3}` | **78 of 944 blocks (8%) never open a scope** | **`H4-SCOPE`** |
+| **F4a′ MED** | `_V6_ANY_HEAD` `#{1,4}` → `#{1,3}` | a `####` non-requirement section never closes the scope | **`H4-SCOPE`** |
+| **F4b MED** | the marker must carry the colon inside the bold | 21 of 944 blocks lost | **`BOLD-THEN-COLON`** |
+| **F4c MED** | a blank line terminates the block | 50 scanned lines lost | **`BLANK-LINE-SPAN`** |
+| **F5a** | the `__pycache__` prune fires only at the `tests/` root | **zero cost here — this repo has exactly one `__pycache__` and it is at the root.** A shared `~/.claude` tool meets nested ones as the norm | **`PYCACHE-excluded`**, refixtured nested |
+| **F5b** | the corpus predicate drops `.json` | 3 `.json` files under `tests/` (alongside 155 `.py`, 109 `.svg`, 6 `.md`) | **`NON-PY-corpus`**, now two extensions |
+| **F7** | `_v2_why` returns `""` | a bare `FAIL` with no cause — the shape `_v5_why` exists to prevent | **`WHY-no-tree`**, **`WHY-moved`** |
+| **R1** | `set()` dropped from the declared ids | duplicate BLOCK lines per repeated citation | **`TWO-MISSING`** |
+| **R2** | `sorted()` dropped, document order kept | a gate line whose order changes with prose edits | **`TWO-MISSING`** |
+
+**`F3` was not a coverage gap — it was a FALSE SENTENCE inside the anti-vacuity machinery.**
+`SUB-BULLETS`'s comment claimed it reddened *"a lookahead capped at one continuation line"*, but
+its modal sat on the **second** continuation, so a cap of 2 — and of 8 — survived it. `LLR-88.4`
+requires every arm block to name the mutation that turns it red; that comment named one it did not
+turn red, and **a reader auditing the arms would have ticked the lookahead axis as covered.** The
+comment now says what the fixture actually kills, and `DEEP-BLOCK` takes the axis: measured over
+the 944 live blocks, continuations run to a **maximum of 16** (p99 11, p95 7), so the fixture puts
+the modal on the **16th** — the corpus maximum, which makes **any** cap red rather than only the
+shallow ones.
+
+**`R1` and `R2` are mine, not the review's, and they are a regression the upstream `C-56` fix
+caused.** Both were killed in my second battery by `LIVE-line` alone, when it asserted **two BLOCK
+lines**. De-minting the requirement's prose emptied the live declaration, `LIVE-line` became a
+one-line SKIP assertion, and **the cardinality and ordering of V2's finding list silently lost
+their only guard.** Re-measured after the de-minting: 21 scored, **2 survivors**. `TWO-MISSING`
+restores both from a synthetic fixture that no document edit can empty — which is where they
+should have been.
+
+**One mutant is scored as a PROBABILISTIC kill and is reported as such**: `list(set(...))` — sorted
+dropped, set kept. String hashing is randomised per process, so the order is random per run.
+Measured: **red in 10 of 12 runs** (3 ids ⇒ 5/6 expected). `TWO-MISSING` kills the deterministic
+order-dropping variant (`dict.fromkeys`, document order) every time; it kills this one five times
+in six. **That is stated rather than counted as a kill.**
+
+**Also restored: the disk-side walk now executes against a real tree.** On the SKIP path V2 returns
+*before* `_v2_tokens` is reached, and after the de-minting the live document declares no ids — so
+**no arm was executing the harvest against a real filesystem at all**, which is the structural
+reason F5's mutants all survived. `LIVE-corpus` calls `_v2_tokens` on the live `tests/` and asserts
+a **floor** (`≥ 100`, got 980) plus membership of one known-real node, never the exact count.
+
+**Combined across all three batteries: 50 scored · 50 RED · 0 survivors** (`kills4.py` ·
+`kills4b.py` · `kills4c.py`), each importing, each printing **344** arms, each exiting 1, each
+naming the arm that reddened it. One further mutant declared probabilistic and unscored.
+
+**What three lenses on one increment say.** Lens 1 asked what the rules *do* — 16 mutants, 0
+survivors, and it proved almost nothing, because the arms were written from its list. Lens 2 asked
+what the rules *are* — vocabulary, case, boundaries, scope — and found 10. Lens 3 asked *how much
+of the document the rules reach* — cardinality, extent, walk depth — and found 15 more. **Each
+lens was blind to the next one's axis, and the count of survivors went UP with each pass.** The
+useful number in this packet is not 0; it is **25 real gaps found by two lenses that were not the
+requirement's.**
+
+---
+
 ## 4 · Risks, and the things I could NOT arm
 
-- **`LIVE-line` is pinned to today's `01-requirements.md`.** It asserts two typed BLOCK lines
-  character for character, so an operator edit that removes or renames those two `⚠` citations
-  turns the arm red for a *documentation* reason. That is the price of the only arm that can see
-  `MV2-07`; `_v2_why()` prints *"the live line moved — either the fix regressed, or
-  `01-requirements.md` changed which AT ids it declares; read both before editing the arm."*
-- **V2 now BLOCKS on the live tree and the gate exits 1 for a reason this increment created.**
-  Two blocks, not the one the station brief predicted. The cause is `P-7`'s expiry, above. **An
-  operator ruling is owed before Inc 5**, and the packet does not pretend the gate is clean.
-- **A blank line does not terminate a statement block**, so a statement followed by a blank line
-  and then *unindented prose* (neither a heading nor a list item) would swallow that prose.
-  Measured: **15** of the 944 live blocks contain a blank line and **all 15 produce no finding**.
-  `LLR-88.3` names exactly two terminators and I did not add a third. Recorded rather than fixed.
+- **`LIVE-line` is pinned to today's `01-requirements.md`**, and it has already moved once —
+  the upstream `C-56` de-minting turned it from two BLOCK lines into one SKIP line. It failed
+  loudly and `_v2_why()` named both candidate causes, which is what sent the reader to the
+  document rather than to the code. **But the episode is also the risk**: an arm whose input is a
+  living document carries that document's edit rate, and it took `R1`/`R2` down with it when it
+  moved. Everything load-bearing is now armed synthetically as well.
+- **A blank line does not terminate a statement block** — a statement followed by a blank line and
+  then *unindented prose* (neither a heading nor a list item) swallows that prose. `LLR-88.3`
+  names exactly two terminators and I did not add a third. **This is now a DECISION with an arm
+  behind it** (`BLANK-LINE-SPAN`) rather than a judgment defended by prose: the third review
+  agreed the behaviour is correct and noted only that nothing held it. Measured: 15 of the 944
+  live blocks contain a blank line, all 15 produce no finding, and a blank-line terminator would
+  cost 50 scanned lines.
+- **Statement blocks can OVERLAP** where a statement is written as bold prose rather than as a
+  bullet, because such a line does not terminate the previous block. Measured: **12 overlapping
+  pairs** across the 944 live blocks, **0 modals in any of them**, so no duplicate finding exists
+  today — but a modal inside an overlap would be reported twice. `LLR-88.3` does not address it
+  and I did not widen the rule to. Recorded so a later batch does not rediscover it.
+- **`list(set(...))` on the declared ids is a PROBABILISTIC kill, not a kill** — 10 of 12 runs,
+  because Python randomises string hashing per process. The deterministic order-dropping variants
+  die every time. Stated rather than counted.
 - **`_strip_code` is NOT applied to V6 blocks — declared no-op, unscored in either direction.**
   A fenced code block inside a statement would have its modal read as prose. Zero live instances
   across 65 documents.
@@ -223,6 +327,12 @@ requirement did not write.
 - **`MV2-02` and `MV6-S4` are two-part edits and I am saying so rather than calling them
   single-token.** A substring fallback needs both the clause and the helper it calls; "both
   sentences wrong, differing by a trailing period" is a statement about two constants.
+- **`LIVE-corpus` pins one real test node by name.** If that node is renamed the arm reddens for a
+  `tests/` reason, not a validator reason. The alternative — asserting only a count — is what the
+  floor avoids, since 980 churns with every test added. Chosen deliberately; `_v2_why` names it.
+- **F6, unfixed by decision:** overlapping blocks, above. **F5's `.pyc` fixture still writes UTF-8
+  text under a `.pyc` name** — it exercises the directory prune, which is what the rule
+  implements, not bytecode decoding.
 - **No live V6 escape was found and none is claimed.** 944 blocks, 223 of them multi-line, 0 BLOCKs
   before and 0 after.
 
@@ -230,14 +340,15 @@ requirement did not write.
 
 ## 5 · Pending
 
-- **The operator ruling on V2's two live blocks** — amend the `⚠` prose so citations stop reading
-  as declarations, or add the nodes. Blocking for the batch's gate line, not for this increment.
-- **`P-7` should be marked expired in `01-requirements.md`**, beside its measurement, in the same
-  superseded-not-overwritten form `P-9` uses. I did not touch that document.
-- **`LLR-88.2`'s live-line criterion says "the live SKIP line"** and the live line is now two BLOCK
-  lines. The arm satisfies the criterion's *intent* — a real run of the real rule over the real
-  tree, asserted character for character — and contradicts its *letter*. Reported, not
-  unilaterally rewritten.
+- **`P-7` HOLDS after the de-minting** and needs no amendment. `LLR-88.2`'s live-line criterion
+  says *"the live SKIP line"* and the live line is a SKIP again, so arm and criterion agree; the
+  ~~two-BLOCK reading~~ above is kept beside the correction rather than overwritten.
+- **`LLR-88.3` should name what a blank line does.** The requirement names two terminators and is
+  silent on the blank line; the behaviour is now armed and measured, so the sentence is cheap to
+  write and expensive to leave implicit — the exact shape this batch keeps paying for.
+- **`LLR-88.4`'s per-arm-comment obligation has no mechanical check**, which is how
+  `SUB-BULLETS` shipped naming a mutation it did not kill. Nothing in the selftest can read a
+  comment. Raised, not solved here.
 - `V7` stays red until Inc 7's bump, by design. `V16` ×2 — this increment's uncommitted edit to
   both flow repos. **Nothing was committed.**
 - The derived Atlas was regenerated with `--atlas --write` AFTER this packet existed.
@@ -250,13 +361,17 @@ requirement did not write.
 correctly: until it lands, `V5` judges a document from May while `V2` and `V6` judge batch-88's,
 so the gate line mixes two batches. Two carry-overs from here:
 
-1. **Run an independent battery, not only the named one.** 16 mandated kills found 0 survivors;
-   21 invented ones found **10**. The ratio is the lesson, and it reproduced Inc 3's finding along
-   a new axis — Inc 3 learned that arms aimed at cores prove nothing about rules, and this
-   increment learned that arms aimed at a requirement prove nothing about the parts of the rule
-   the requirement never discussed.
-2. **Check the loader fix against `V2`'s new live blocks**, because Inc 5 changes *which document*
-   V2 harvests ids from and therefore which ids it declares.
+1. **Run independent batteries along DIFFERENT axes, and expect the survivor count to rise.**
+   16 mandated kills found 0; 21 invented ones found 10; 35 more along the population axis found
+   15. Inc 3 learned that arms aimed at cores prove nothing about rules; this increment learned
+   that arms aimed at a requirement prove nothing about what the requirement never discussed, and
+   then that arms sweeping VALUES prove nothing about CARDINALITY, EXTENT or DEPTH. **Ask each
+   new rule: how many findings may it emit, how far does it reach, and how deep does it walk?**
+2. **Check the loader fix against V2's declared-id harvest**, because Inc 5 changes *which
+   document* V2 reads and therefore which ids it declares — and `LIVE-line` asserts that document's
+   line character for character.
+3. **Sweep every rule's population, not just the record it names.** The `C-56` relocation that
+   cost `R1`/`R2` happened because a de-mint from one rule's population landed in another's.
 
 ---
 
@@ -265,12 +380,12 @@ so the gate line mixes two batches. Two carry-overs from here:
 | # | Item | ✓ | Evidence |
 |---|---|---|---|
 | 1 | ≤ 4 source files | ✓ | 1 authored + 1 build output (`V15`: *bundle identical*) |
-| 2 | Tests in the same increment | ✓ | 37 arms, 298 → **335**, `SELFTEST PASSED`, exit 0 |
-| 4 | RED counterfactual | ✓ | **37 scored, 37 reddened, 0 survivors** across two batteries (16 mandated + 21 independent); each non-no-op at build time; each kill carries a **named** arm, ≥ 335 printed arms and exit 1, so no crash is scored as a kill |
+| 2 | Tests in the same increment | ✓ | 46 arms, 298 → **344**, `SELFTEST PASSED`, exit 0 |
+| 4 | RED counterfactual | ✓ | **50 scored, 50 reddened, 0 survivors** across three batteries (16 mandated + 21 independent + 13 population-axis); each non-no-op at build time; each kill carries a **named** arm, ≥ 344 printed arms and exit 1, so no crash is scored as a kill. **25 of the 50 survived a green selftest on first contact** and are listed with their measured corpus cost; 1 further mutant declared probabilistic and unscored |
 | 5 | Reverse census | ✓ | `_tree_text` had exactly one consumer (grep, whole file) and was deleted with it; `_v2_tokens` and `_v6_blocks`/`_v6_outcome` have one caller each |
-| 9 | Coverage verified on disk | ✓ | 65-document sweep: 954 markers → 944 in scope, 223 multi-line, **0 → 0** BLOCKs; `tests/` token corpus 989 → 980 excluding `__pycache__`; live `V2` and `V6` lines pasted in §3 |
-| 10 | Load-bearing emptiness | ✓ | `PYCACHE-excluded` asserts an ABSENCE (`AT-101` unresolved) **in the same run** as a presence (`AT-102` resolved); `NO-MARKER` and both `EMPTY-DOCUMENT` arms assert the finding COUNT before comparing any sentence |
-| 11 | Mutation verdicts per arm | ✓ | §3's two tables name, per mutant, which arms reddened — and mark the nine killed by exactly one |
+| 9 | Coverage verified on disk | ✓ | 65-document sweep: 954 markers → 944 in scope, 223 multi-line, 1998 scanned lines, continuations max **16** / p99 11 / p95 7, 12 overlapping pairs, **0 → 0** BLOCKs; `tests/` token corpus 989 → 980 excluding `__pycache__`, 980 re-harvested live by `LIVE-corpus`; every third-review survivor priced against this corpus |
+| 10 | Load-bearing emptiness | ✓ | `PYCACHE-excluded` asserts an ABSENCE (`ID-101` unresolved) **in the same run** as a presence (`ID-102` resolved); `NO-MARKER` and both `EMPTY-DOCUMENT` arms assert the finding COUNT before comparing any sentence |
+| 11 | Mutation verdicts per arm | ✓ | §3's three tables name, per mutant, which arms reddened, and mark the six still killed by exactly one. **`SUB-BULLETS`'s comment named a mutation it did not kill and was corrected**, which is the failure mode this row exists for |
 | — | Secrets | ✓ | no key, token, `.env` or credential read, written or printed |
 | — | Destructive commands | ✓ | none run; `prototypes/`, `build/` and all untracked files untouched; **no commit** |
 
@@ -308,5 +423,6 @@ is what sent the reader to the real cause instead of to the code. Re-verified af
 the declared-side swap (`MV2-07`, the highest-value mutant in the catalog) is still killed, and
 **`LIVE-line` is one of the three arms that kills it**, which is the job `LLR-88.2` assigned it.
 
-Final gate: **3 block · 287 notice · 14 n/a** — the three are the flow-repo lifecycle. Selftest
-**335 arms**, exit 0.
+Final gate: **3 block · 287 notice · 14 n/a** — the three are the flow-repo lifecycle (`V7`
+hash drift until Inc 7's bump, `V16` ×2 for this increment's uncommitted edit). Selftest **344
+arms**, exit 0. **Nothing was committed.**
