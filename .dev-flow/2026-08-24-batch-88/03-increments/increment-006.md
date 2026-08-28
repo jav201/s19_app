@@ -1,5 +1,7 @@
 # Increment 006 — `HLR-88.6` / `LLR-88.12` — the imaging dependency reaches the job that needs it
 
+> **➤ FORWARD POINTER, 2026-08-28.** The guard line quoted **3 times below** is what this increment shipped and is left standing as such. It was widened afterwards, by operator ruling, to assert `features.check('freetype2')` — see `01-requirements.md` at `AT-B88-09`. **Nothing here is struck**, because striking it would misreport what Increment 006 did; the population of the change is recorded there, where the contract lives.
+
 > **⚠ C-56 SUBSTITUTION IN THIS PACKET, inherited from Inc 4 and Inc 5.**
 > Acceptance ids are written with the prefix `ID-`. Spelling the real prefix here would re-declare
 > the id into `_atlas_id_scan`'s `batches` realm — de-minting from one rule's population is

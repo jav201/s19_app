@@ -102,8 +102,8 @@ guards (`R-88-4`).
 ~~`python -c "import PIL; print(PIL.__version__)"`~~.
 ⚠ **SUPERSEDED as a quotation of the SHIPPED line, 2026-08-27.** This is the line the 2026-08-26
 ruling named, and it is **not** the line on disk. `tui-ci.yml:41` now reads
-`python -c "from PIL import Image, ImageDraw, ImageFont; import PIL; print(PIL.__version__)"`,
-widened because `import PIL` loads neither `PIL.Image` nor `PIL.ImageFont` (measured) while the
+`python -c "from PIL import Image, ImageDraw, ImageFont, features; import PIL; assert features.check('freetype2'), 'freetype2 unavailable'; print(PIL.__version__)"`,
+widened **twice** — first because `import PIL` loads neither `PIL.Image` nor `PIL.ImageFont` (measured), then on **2026-08-28** to assert `features.check('freetype2')`, because the three-name import closes ABSENCE and a `DeferredError` binding means a **broken** freetype still imports clean. Both widenings are measurement conclusions. While the
 consumer imports all three. **The widening is a measurement conclusion and carries no ruling
 citation yet** — citation slot, for the operator: ‹ruling id owed›. See `F3` in
 `01-requirements.md`'s guard bullet: the widening closes submodule **absence**, and extension

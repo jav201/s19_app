@@ -38,7 +38,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pytest
           python -m pip install -e ".[evidence]"
-          python -c "from PIL import Image, ImageDraw, ImageFont; import PIL; print(PIL.__version__)"
+          python -c "from PIL import Image, ImageDraw, ImageFont, features; import PIL; assert features.check('freetype2'), 'freetype2 unavailable'; print(PIL.__version__)"
 
       - name: Run lean test suite (pull requests)
         if: github.event_name == 'pull_request'
