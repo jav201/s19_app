@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.24-rev45 | flow_hash: 09bea075fc183f8b | corpus: 64 requirement files | corpus digest: 2a35037db2b5abd9 -->
+<!-- flow_version: 2026.08.27-rev47 | flow_hash: a280beca91743d7c | corpus: 65 requirement files | corpus digest: df754f58ff5534b5 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1380,7 +1380,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1436 unique id(s)
+## family US/HLR/LLR — 1464 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1468,7 +1468,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-051` | batches |
 | `HLR-052` | batches |
 | `HLR-053` | batches, tests |
-| `HLR-053..HLR-056` | canon |
+| `HLR-053..HLR-056` | batches, canon |
 | `HLR-053..HLR-057` | batches |
 | `HLR-054` | batches, tests |
 | `HLR-055` | batches, tests |
@@ -1558,6 +1558,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-124` | batches, tests |
 | `HLR-125` | batches, tests |
 | `HLR-126` | batches, tests |
+| `HLR-6` | batches |
+| `HLR-64` | batches |
 | `HLR-85.1` | batches, canon |
 | `HLR-85.2` | batches, canon |
 | `HLR-85.3` | batches, canon |
@@ -1569,6 +1571,14 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-87.1` | batches, canon |
 | `HLR-87.2` | batches, canon |
 | `HLR-87.3` | batches, canon |
+| `HLR-88.1` | batches |
+| `HLR-88.2` | batches |
+| `HLR-88.3` | batches |
+| `HLR-88.4` | batches |
+| `HLR-88.5` | batches |
+| `HLR-88.6` | batches |
+| `HLR-88.7` | batches |
+| `HLR-88.8` | batches |
 | `HLR-A56` | batches, tests |
 | `HLR-B2` | batches |
 | `HLR-B64-1` | batches |
@@ -2400,6 +2410,22 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `LLR-87.6` | batches, canon |
 | `LLR-87.7` | batches, canon |
 | `LLR-87.8` | batches, canon |
+| `LLR-88.1` | batches |
+| `LLR-88.10` | batches |
+| `LLR-88.11` | batches |
+| `LLR-88.12` | batches |
+| `LLR-88.13` | batches |
+| `LLR-88.14` | batches |
+| `LLR-88.15` | batches |
+| `LLR-88.16` | batches |
+| `LLR-88.2` | batches |
+| `LLR-88.3` | batches |
+| `LLR-88.4` | batches |
+| `LLR-88.5` | batches |
+| `LLR-88.6` | batches |
+| `LLR-88.7` | batches |
+| `LLR-88.8` | batches |
+| `LLR-88.9` | batches |
 | `LLR-99.9` | batches |
 | `LLR-A` | batches |
 | `LLR-A56` | tests |
@@ -2724,6 +2750,8 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `US-86-1` | batches, canon |
 | `US-87-1` | batches, canon |
 | `US-87-2` | batches, canon |
+| `US-88-1` | batches |
+| `US-88-2` | batches |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -2996,7 +3024,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1459 unique id(s)
+## family AT/TC — 1481 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3604,6 +3632,15 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `AT-B87-04` | batches |
 | `AT-B87-05` | batches |
 | `AT-B87-06` | batches |
+| `AT-B88-01` | batches |
+| `AT-B88-02` | batches |
+| `AT-B88-03` | batches |
+| `AT-B88-04` | batches |
+| `AT-B88-05` | batches |
+| `AT-B88-06` | batches |
+| `AT-B88-07` | batches |
+| `AT-B88-08` | batches |
+| `AT-B88-09` | batches |
 | `TC-001` | batches, canon, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |
@@ -4459,3 +4496,16 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-B87-06` | batches |
 | `TC-B87-07` | batches |
 | `TC-B87-08` | batches |
+| `TC-B88-01` | batches |
+| `TC-B88-02` | batches |
+| `TC-B88-03` | batches |
+| `TC-B88-04` | batches |
+| `TC-B88-05` | batches |
+| `TC-B88-06` | batches |
+| `TC-B88-07` | batches |
+| `TC-B88-08` | batches |
+| `TC-B88-09` | batches |
+| `TC-B88-10` | batches |
+| `TC-B88-11` | batches |
+| `TC-B88-12` | batches |
+| `TC-B88-13` | batches |

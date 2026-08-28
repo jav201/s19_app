@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-08-24-batch-87",
-  "batch_objective": "D-II discharge (operator-ruled: re-author) + IFC surface #3 in one batch. US-87-1: re-author the batch-85 pilot contract for loaded_panel to the batch-86 exemplar format -- SIX outputs per the D-A analysis (artifact_row_set cardinality 4 + unload_all_row cardinality 1), pair-based thresholds, scoped statements, no absorbed owner -- clearing the last [IFC] UNPARSED census item and the D-86-E duplication under screen_workspace's declared parent boundary. US-87-2: declare the shell workspace_body's Part B contract, retiring the only undeclared PARENT V12 names. Spec-only: 0 source files, canon mirror edits only; V22 debt must not grow (baseline 276).",
+  "batch_id": "2026-08-24-batch-88",
+  "batch_objective": "SCOPE CUT ACCEPTED BY THE OPERATOR 2026-08-25. batch-88 = the nine rule-integrity fixes + Story C (RC-2 verifiable backup, rule V25). Stories A (Layer C, V24), B (declared limits of assurance + the human review-debt marker) and E (canon seeding) move to batch-89, to be authored over a STILL oracle. The binding constraint was not file count -- 6 source files across 10 increments, max 3 in any one, passes the budget with headroom -- but FIVE ORACLE MOVES OF WHICH EXACTLY ONE WAS SEQUENCED: V22's census, the _artifacts loader, V2's resolution, V5/V8's sentences (57 of 61 records change what V5 says about them), and -- found at the station-4 PDR and MISSING from this list as first written -- the V23 grammar. RE-DERIVED 2026-08-25 (PDR-2026-08-25-batch-88#D1 and #D4): the canon-census baseline is 306 of 570 MEASURED 2026-08-25, shipped reads 302 of 570. The figures 276 -> 280 of 544 are SUPERSEDED and preserved here rather than deleted; the +4 delta survives every re-measurement, the baseline survives none, because batch-88 declared 26 ids of its own while the figure was being written -- the denominator hazard biting the very number that measures it. The _artifacts move is now 0 block -> 0 block: its 14 block -> 0 window CLOSED when P1 authored the requirements record, verified by executing the loader. Of the five moves only TWO are still moving today -- V22's census and V5's sentences; moves 2 and 5 were stilled by ordinary work rather than by design. THE SCOPE CUT STANDS on the two that remain, but its original derivation is refuted: cite the re-executed table at 01-requirements.md section 0.3, never this summary. Story C stays because V25's oracle is `git ls-remote`, external to every number this batch moves. THE NINE FIXES: V22 oracle (substring -> token membership) + its scope-naming message, LANDING FIRST per operator ruling with the re-baseline recorded; V23 STRICT grammar (a record, a decision inside it, and a VERSION each distinctly expressible -- the permissive hyphen form is REJECTED); V5 PASS != NOOP (it has reported 'no ledger expression found' for 57 of 61 batches, identically for a correct ledger and for none); the _artifacts F-7 residue; V8 case-insensitive map resolution; V8 root-file message; V2 substring -> token; V6 line-scoped -> statement-scoped; Pillow's declared home. NON-NEGOTIABLE: every new or patched rule owes a PASS != NOOP arm, and its GREEN arm must assert the PASS SENTENCE, not the absence of a BLOCK. The original acceptance criterion 1 (no new rule on the synthetic-exemption list) is insufficient alone -- V5 proves a rule can carry arms, pass them, and still be inert.",
   "mode": "core",
   "mode_history": [
     {
@@ -12,128 +12,125 @@
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
     }
   ],
-  "current_station": "P5",
-  "phase_status": "synced",
+  "current_station": "P3",
+  "phase_status": "approved",
   "stations_active": [
     "P0",
+    "ARQ",
     "P1",
-    "P2",
-    "P3",
-    "P4",
-    "P5"
+    "PDR",
+    "P3"
   ],
   "iterations_per_station": {
     "P0": 0,
-    "P1": 0,
-    "P2": 1,
-    "P3": 1,
-    "P4": 1,
-    "P5": 0
+    "ARQ": 0,
+    "P1": 1,
+    "PDR": 2,
+    "P3": 2
   },
   "triggers": {
-    "evaluated_at": "2026-08-24T00:00:00-06:00",
+    "evaluated_at": "2026-08-24T21:30:00-06:00",
     "fired": [
-      "B4"
+      "A",
+      "B1",
+      "B4",
+      "C",
+      "E"
     ],
     "not_fired": [
-      "A1",
-      "A2",
-      "A3",
-      "A4",
-      "B1",
       "B2",
       "B3",
-      "C",
       "D",
-      "E",
       "F"
     ],
-    "record": ".dev-flow/2026-08-24-batch-87/PLAN.md#triggers"
+    "record": ".dev-flow/2026-08-24-batch-88/PLAN.md#3--triggers"
   },
   "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-08-24-batch-87/01-requirements.md",
+    "requirements": "repo:.dev-flow/2026-08-24-batch-88/01-requirements.md",
     "traceability": "repo:REQUIREMENTS.md (living canon mirror section)",
     "tests": "repo:tests/",
     "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-08-24-batch-87/03-increments/",
+    "increments": "repo:.dev-flow/2026-08-24-batch-88/03-increments/",
     "backlog": "repo:.dev-flow/BACKLOG-CODE.md (lane A per docs/engineering-rules.md)",
-    "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)"
+    "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)",
+    "design_pdr": "vault:s19_app/design/PDR-<seal-date>-<batch>.md -- ONE RECORD PER SEAL, NOT PER BATCH. A batch may hold several: batch-88 holds PDR-2026-08-24-batch-88 (pre-intake, reviewed the design proposal) and PDR-2026-08-25-batch-88 (station-4, reviewed the authored requirements). The seal rule forbids editing a sealed record, so a second review is a NEW id and never an amendment -- a single-record home cannot express that, and this batch is the first case it could not. (PDR-2026-08-25-batch-88#D10)",
+    "design_ddr": "vault:s19_app/design/DDR-<batch>.md"
   },
   "artifacts": {
-    "P1": ".dev-flow/2026-08-24-batch-87/01-requirements.md",
-    "P2": ".dev-flow/2026-08-24-batch-87/02-review.md",
-    "P3": ".dev-flow/2026-08-24-batch-87/03-increments/increment-001.md",
-    "P4": ".dev-flow/2026-08-24-batch-87/04-validation.md",
-    "P5": ".dev-flow/2026-08-24-batch-87/05-close.md"
+    "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md",
+    "ARQ": "repo:docs/ARCHITECTURE.md (sections 10-11) + .dev-flow/2026-08-24-batch-88/PLAN.md#station-arq",
+    "P1": ".dev-flow/2026-08-24-batch-88/01-requirements.md",
+    "P1b": ".dev-flow/2026-08-24-batch-88/01b-qa-validation-plan.md"
   },
   "decisions_log": [
     {
       "station": "P0",
       "date": "2026-08-24",
-      "decision": "batch opened",
-      "notes": "RC-1 PASS (merge-base == origin/main tip 943e54a; fresh branch claude/batch-87-ifc-reauthor-surface-3). Flow rev45 current, hash 09bea075fc183f8b (C-45 PULL); selftest 192 arms exit 0. Lane A backlog read (workspace_body = surface #3 candidate). Mode core. D-II ruled by operator: re-author; scope = both stories one batch."
+      "decision": "batch opened; approved (autonomous D-88-1)",
+      "notes": "RC-1 PASS: merge-base == origin/main tip 4131a38, recorded in PLAN before deriving; fresh branch claude/batch-88-audit-closures. Flow rev46 hash 9c1449ed815d267c verified against the manifest (C-45 PULL); selftest 192 arms exit 0. Mode core (C-50, unchanged -- no mode_history entry). TRIGGERS: FIVE families fire where batch-87 fired one -- A (parallel lanes + D1 changes the module map itself; judged, family A has no mechanical probe by design), B1 (MAP COVERS-* selftest arms assert _RULE_COVERS, which D4 touches), B4, C (D6 adds a pyproject dependency; re-run over the diff at EVERY gate), E (4 stories and 5+ increments, both over the >=3 threshold). NOT fired with probes: B2 (both close-template copies byte-identical 3e8f07ab9d63fb55 -- also discharges PDR condition 3 at intake), B3 (7 per-batch goldens, none captures a source this batch touches), D (0 files under s19_app/tui/), F (flow_hash == manifest; backlog reconciled at batch-87 close). E FIRING HAS A COST: the proposal declared estimation/schedule out of scope CONDITIONED on family E not firing -- it fires, so MAN.3.BP5/BP8 are obligatory for this batch. Recorded at intake, not discovered at close. FAMILY A FIRING ACTIVATES THE ARQ STATION. V20 tax paid (PDR-2026-08-24-batch-88#D8): 4 block -> 0 by Atlas regen; ledger reconciles (V20's four blocks collapse to one n/a line, 14 -> 15; V16's currency arm flipped to NOTICE on a 1.0-day-stale local ref -- a clock effect, returned by fetch). Final 0 block / 284 notice / 15 n/a, identical to batch-87's close. C-56 INSTANCE, SELF-INFLICTED AND CAUGHT: the opening documents minted one phantom id from a bare proposal label (unique ids 1436 -> 1437). First measurement was WRONG (git restore --staged leaves the working tree, so the grep read the regenerated copy); re-measured from HEAD, exactly one stem was mine, the other four are batch-87's registered carry. Fixed at the SOURCE, never in the derived plane; census verified back to 1436. PDR-2026-08-24-batch-88 sealed in the vault, verdict approved with conditions: authorises Inc 1 and Inc 2, WITHHOLDS Inc 3 and Inc 4 until #D1 lands. Sequencing deviation declared: sealed pre-INTAKE, so it reviewed the PROPOSAL, not the requirements -- it does not discharge the station-4 PDR."
     },
     {
-      "station": "P0",
+      "station": "ARQ",
       "date": "2026-08-24",
-      "decision": "operator directive: delegate to Opus 5 agents",
-      "notes": "Operator (verbatim): 'Antes de continuar, quiero que delegues las acciones a agentes opus5'. All Agent dispatches from P1 onward carry model opus; orchestrator does choreography only."
-    },
-    {
-      "station": "P0",
-      "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-1)",
-      "notes": "DoR met for US-87-1 + US-87-2, both READY with executed probes (UNPARSED [IFC] :372 confirmed; sole V12 finding names screen_workspace/workspace_body; consumer census 24/12 test files). Validator 0 block / 254 notice after V20-driven Atlas regen (open commit 656e5a7 + regen commit). Packet presented in-conversation. No nameable gap on Coverage/Certainty/Evidence at this station."
+      "decision": "module map amended; approved (autonomous D-88-2)",
+      "notes": "Family A fired at P0, so ARQ ran. docs/ARCHITECTURE.md gains s10 Composition-by-path and s11 Interfaces-with-Frozen; sections 1-9 untouched (standing artifact, amended not recreated). 266 tracked .py classified into 6 non-overlapping prefixes. V8 flips from 'declares no path/** prefixes -- it cannot be checked' to checkable, reporting EXACTLY ONE orphan, setup.py, which was PREDICTED IN ADVANCE and named in s10 with its mechanism. Notice delta net zero, 284 -> 284. PDR#D1 DISCHARGED WITH A CORRECTION: the template's s4 numbering was REJECTED (s19_app's s4 is 'Patch Editor flow' and is cited elsewhere; renumbering would silently retarget every citation). The table landed at s11, so the Layer C rule MUST key on the table's SHAPE -- the Frozen? column header -- never on a section number. Strictly better than the proposal asked for, and only visible because the anchor was checked against a real repo. PDR condition 2's wording amended accordingly. All three Part B contracts (loaded_panel 6 outputs / screen_workspace 31 / workspace_body 42, chain workspace_shell -> workspace_body -> screen_workspace -> loaded_panel) declared FROZEN for this batch: cited, never touched -- real consumers for V24 instead of a synthetic fixture. FOURTH flow finding: V8 cannot classify a root file (no path/** prefix can match one), and its message asserts 'the map is stale' when the true state is 'the rule cannot express this'."
     },
     {
       "station": "P1",
       "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-3)",
-      "notes": "Record authored (Opus 5 architect) + qa 01b plan (Opus 5, parallel), qa fold relayed mid-flight as hypotheses (C-43), author confirmed by execution. D-87-A ruled (a) in-place (two executed measurements). THREE records edited, forced by balancing -- measured scope growth, declared in PLAN. workspace_body: 42 outputs, PARENT workspace_shell (SYSTEM refuted app.py:1919). Premises 9 TRUE / 6 FALSE all dispositioned; D-86-E-resolution observable withdrawn (structural, measured). Validator 0 block / 284 notice (+29 V13 + 1 V22 accounted); UNPARSED 2->1 ([IFC] GONE, BATCHES control survives). G-87 8 GREEN, G8 P3-owed. Orchestrator re-verified validator line, census, file set, source pin (0 source files), six-output ids."
+      "decision": "operator rulings recorded; P1 authoring dispatched (D-88-3)",
+      "notes": "THREE OPERATOR RULINGS. (1) The V22 oracle fix (substring -> token membership) LANDS FIRST, before any canon-seeding evidence is produced, with an explicit re-baseline 276 -> 280 recorded in this objective. Operator verbatim: 'Si aterrizalo primero'. (2) The V23 grammar is STRICT -- a record, a decision inside it, and a VERSION of it must each be distinctly expressible and checkable; the permissive hyphen form that conflates a version with a hyphenated batch dir is REJECTED. Operator verbatim: 'Debe ser estricto, hay que arreglarlo'. The analysis agent had flagged this as a design ruling it would not make; it is now made. (3) A HUMAN REVIEW MARKER is required, and the operator's framing is a REVIEW-DEBT LEDGER rather than a boolean: each batch proceeds autonomously and ACCRUES review debt; the marker discharges it, recording reviewer name 'Javier Granados' (an optional reviewer-id field reserved for organisational context), the DATE, the PHASE at which review happened -- it may be early or immediately before the final commit -- and authored-by beside reviewed-by so a one-sided sign-off is visible. Whatever the review turns up goes to the backlog. The guarding rule must NOT claim to verify the review's QUALITY, only that it occurred, by whom and when. SCOPE ALARM RAISED BY THE ORCHESTRATOR, not by the operator: the batch entered as 4 stories and the session added NINE measured fixes (V22 oracle+message, V23 strict, V5 PASS!=NOOP, _artifacts F-7, V8 casing, V8 root message, V2 substring, V6 line-scoping, Pillow) plus the marker. Family E already fired at 4 stories / 5 increments; thirteen pieces fire everything. RECOMMENDED SPLIT: batch-88 = rule-integrity fixes + stories A/B/C; batch-89 = the canon-seeding story with the corrected oracle. This satisfies ruling (1) -- V22 still lands before seeding evidence exists -- without stacking thirteen pieces behind one gate. The P1 architect was dispatched with an explicit instruction to RULE on whether the scope is authorable in one batch, argued from source-file and increment counts, and to propose the cut if it is not. NON-NEGOTIABLE CARRIED INTO P1, from the V5 finding: every new or patched rule owes a PASS != NOOP arm, and its GREEN arm must assert the PASS SENTENCE rather than the absence of a BLOCK. Acceptance criterion 1 of the original proposal (no new rule on the synthetic-exemption list) is INSUFFICIENT alone and is widened accordingly. V16 resolved: the 11 excalidraw diagrams that dirtied the flow repo are the operator's own parallel session, authoring diagrams for EXTERNAL human audit of the process. Not swept, not this session's."
     },
     {
-      "station": "P2",
-      "date": "2026-08-24",
-      "decision": "iterate (autonomous D-87-4)",
-      "notes": "Two independent Opus 5 reviewers, both verdict iterate. Consolidated: 2 blockers (R2-01 spliced two-state RED-arm transcript, found by BOTH reviewers independently; R2-02 AT-B87-* id fork between record and 01b) + 6 major + 5 minor -- all evidence-artifact defects; the substance survived attack (D-87-A/B, R-87-1 confirmed by kill-mutation; censuses and accounting exact; frozen-history line upheld). Returned to the P1 author as single fold owner; moved figures re-measured, never edited (C-39 rider). 02-review.md carries the full table."
+      "station": "P1",
+      "date": "2026-08-25",
+      "decision": "scope cut ACCEPTED; objective corrected (D-88-4)",
+      "notes": "Operator accepted the P1 architect's cut (D-88-5 'Aceptado'). batch_objective rewritten; the superseded string is PRESERVED verbatim at batch_objective_superseded rather than overwritten, because it carried two claims this batch refuted and the refutations are only legible beside them: (a) 'baseline 276 of 544' -- superseded, V22's oracle fix moves it to 280 by measurement; (b) the 'Frozen? in ARCHITECTURE.md section 4' anchor -- REFUTED at ARQ, since s19_app's section 4 is 'Patch Editor flow' and the interface table landed at section 11, which is why the rule must key on the table's SHAPE and never on a section number. D-88-2 RULED by the operator ('Ok'): the three Part B interfaces ARE re-declared frozen for batch-89. docs/architecture.md freezes them BY STRING for 2026-08-24-batch-88, so that line must be amended when batch-89 opens or V24 debuts with zero real consumers -- the synthetic-fixture shape criterion 1 forbids. Carried as an explicit batch-89 intake obligation. D-88-1 DISSOLVED, not answered: the review marker's guard needed a rule number that Phase 1 could not mint outside the sealed PDR. With Story B moved to batch-89, batch-89's own PDR allocates it. The question was made moot by the cut and should not have been put to the operator as a separate ruling. D-88-3 (Pillow's home) still OPEN -- options and consequences presented, measured: the dev extra pins textual==8.2.8 for the snapshot env only, so routing the main test job through [dev] would silently pin the runtime 2702 tests exercise, contradicting pyproject's own stated scoping. NOTICE DELTA ACCOUNTED at this edit: 293 -> 294. V16's currency arm flipped again on a 1-day-stale local ref (clock, not content). V23 rose from 0 to NINE, and every one is the requirements document's own WORKED EXAMPLES: specifying the strict grammar means writing the shapes the CURRENT grammar rejects (the record id, the .md filename, -v2, -v2#D1, and the deliberately-invalid PDR-85#D3). V23's scan has no code-fence awareness, so a worked example that is MEANT to be checkable is indistinguishable from a real citation. This is the live instance of the ruling the QA plan declined to make -- whether _strip_code should be added to V23's scan -- and it is now owed with evidence rather than in the abstract. Accounted, not silenced: NOTICE by design, gates nothing, and the same disposition V13's 52 already carry."
     },
     {
-      "station": "P2",
-      "date": "2026-08-24",
-      "decision": "approved after 1 iteration (autonomous D-87-5)",
-      "notes": "12/13 findings fixed by re-measurement; 1 reviewer remedy REFUSED with executed refutation (R-87-3b: 'nine screens' correct under the ten-screen model -- the C-50 shape working as intended). Notice delta zero (284->284, accounted: fixes touched prose/tables, no declarations). Orchestrator re-executed corrected predicates: validator line, R2-06 heading grep = 1, two labelled fences present, dispersion 6->31->42 at :1433, line 3284 content matches the refusal, AT-B87 sets IDENTICAL across record and 01b. New gates G10/G11; six ATs realized. Batch-85 record needed no change this iteration."
+      "station": "PDR",
+      "date": "2026-08-25",
+      "decision": "station-4 design review sealed: approved with conditions (10 conditions)",
+      "notes": "A SECOND record for this batch, not an amendment -- the pre-intake record reviewed the PROPOSAL and says in terms that it does not discharge the station-4 PDR. Axes: Coverage warn, CERTAINTY fail, Evidence warn (met in method, expired in fact). Three of the ten batch acceptance criteria were unfalsifiable or unsatisfiable as written; five of the ten conditions withheld specific increments. Prior record's 8 conditions: 2 discharged, 3 open, 3 void because the scope changed."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-08-26",
+      "decision": "all ten conditions dispositioned -- C1-C8 and C10-b discharged, C9 discharged, C10-a open by design",
+      "notes": "Phase-1 re-work across four commits. The sharpest finding: batch criterion 2 thresholded on a hardcoded print() literal. There was NO synthetic-exemption list, nothing computed membership, and the selftest's ok flag was never influenced by it, so the criterion could not fail. Not struck -- made COMPUTABLE: derived from CHECKS minus the emitted arm labels, with its own PASS != NOOP arm, because a derivation that always returned the empty set would pass every check written over it. C9 discharged by 02-review-security.md. C10-a travels inside Increment 5, per the review's instruction."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-08-26",
+      "decision": "operator rulings on the imaging dependency: pillow >= 10, and the import guard IS adopted (revised the same day)",
+      "notes": "Ruling 1: a version floor with a rationale, matching the manifest's house style. The hesitation was requires-python >=3.8 -- measured, and it dissolved the hesitation while producing R-88-7: that declaration is FALSE, the real floor is 3.10, refuted by the project's own declared dependencies and by PEP 604 syntax evaluated at runtime in cli.py. Ruling 2 was first given as 'hold at 4 lines, accept the risk', on a stated basis that misattributed a recommendation to the assistant; the premise was corrected and the operator re-took the decision, adopting the guard and widening to 5 lines. BOTH rulings are preserved: a ruling whose stated basis was wrong is not the same artifact as one that was simply changed."
     },
     {
       "station": "P3",
-      "date": "2026-08-24",
-      "decision": "increment 001 approved after fix-first (autonomous D-87-6)",
-      "notes": "G8 discharged: V22 289->276 of 544 (-13 term-by-term: HLR -3, LLR -8, US -2), 13 ids seeded one-per-line, per-id greps all >=1, RED arm executed with sha256-proven restore + independent validator RED (277). Code review BLOCKed on F1 HIGH (R-TUI-113 status over-claim erasing undischarged pilot defects) + F2 MED (packet minted a phantom-feeder token -- the C-56 class the gate exists for) + F3 MED (106 false narrowing) + F4 LOW; all four fixed and re-measured, phantom census WIDENED to 8 feeders / 3 stems and registered as carry. Orchestrator re-verified: validator 0 block / 284 notice, scoped headline present, NOT-discharge enumeration present, minting token 0, 251 decomposition in canon. Registry consumer 13 passed; source pin empty."
+      "date": "2026-08-26",
+      "decision": "Increment 1 SHIPPED and committed -- the V22 census oracle becomes token membership",
+      "notes": "Live census 302 -> 306 of 570, the +4 verified one id at a time (HLR-053, HLR-056, US-064, US-068) and never as a total. Selftest 194 arms, exit 0. An independent code review returned BLOCK with one HIGH, and it was this batch's own thesis turned on the batch: the new arm asserted the surfaced id by SUBSTRING, inside the arm whose subject IS the substring bug, and survived a total inversion of the rule with all 194 arms green. Five further findings taken. Commits: s19_app af4dc3d, ~/.claude dbcff2d, skills 5d75bdb."
     },
     {
-      "station": "P4",
-      "date": "2026-08-24",
-      "decision": "approved (autonomous D-87-7); G4-01 ruled: class-membership disposition adopted",
-      "notes": "One complete gate run (orchestrator-owned, direct env-python after conda-run destroyed run 1's evidence via cp1252 UnicodeEncodeError -- harness finding G4-03, 01b amended): 2702 passed / 6 failed / 3 skipped / 21 deselected / 3 xfailed in 40:43. PRE-REGISTERED flaky disposition REFUTED by measurement: overlap with the batch-86 list = 1 node; 3 fail ISOLATED (rates 1/10-4/10 at N=10); batch-86's n=1 'passes isolated' diagnosis was vacuous (C-53). Ruling: disposition by CLASS (empty source diff AND N>=10 rates-as-figures AND modal push/mount race family) -- 6/6 pre-existing (4 timing races, 2 order-dependent), 0 product blockers; Before/After amendment in 01b sec-7, refuted text preserved. Carry: 11 distinct node ids (5 unmeasured-rate). Layers A/B: 0 gaps, HLR-87.3/LLR-87.8 owed at P5 close by design. K1/K3b/K7/K8 mutations executed on copies (K3 refuted its own prediction, repaired not overwritten). Ledger 2714=2702+6+3+3 exact, D=A=0 structural. G11 GREEN. Atlas regenerated, figures identical both sides."
+      "station": "P3",
+      "date": "2026-08-26",
+      "decision": "Increment 2 SHIPPED and committed -- the strict design-review grammar and its harvester",
+      "notes": "244 arms. 12 of 12 Markdown contexts recover the citation exactly, and so do 10 of 10 delimiters absent from both the probe table and the superseded strip set. TWO blind spots, neither found by the author. A pre-implementation mutation catalog, written by a lens never shown the arms, killed five vacuous ones -- including one caused by the fixture's own prose SPELLING the id it asserts absent. Then an independent code review returned BLOCK after sweeping 3,426 single-edit mutants: 137 survived the arm set, 82 of them harmful, because the arms SAMPLED one citation instead of SWEEPING the character class. Commits: s19_app 7ec297d, ~/.claude beba431 + e349c28, skills e32cca4 + 1771672."
     },
     {
-      "station": "P5",
-      "date": "2026-08-24",
-      "decision": "close batch (autonomous D-87-8)",
-      "notes": "CLOSED COMPLETE. HLR-87.3/LLR-87.8 discharged clause-by-clause in 05-close.md sec-5 (n=3 cost table: outputs 6->31->42, consumers 18->94->139, stray pairs 4->36->62, duplication 40 of 102 = 39 pct by set subtraction, effort right-censored/1h15m/3h11m; cost tracks tree position not size). G4-02 closed in the conditional-gate table. Both backlog lanes reconciled: lane A 10 in / 3 DONE (incl. D-II, surface #3, one-id-per-line adoption); lane B 4 in / 0 done, every C-45 landing honestly NOT DONE (standing debt: 5 control candidates, 0 landings, 2 batches). Metrics: 30 mutation-arm executions across 4 stations, 1 self-refuting repaired; V22 276 (2 under target); validator 0 block / 284 notice re-measured at close; Atlas fixpoint cell flipped and regenerated (V20 green). Landing: push branch, open PR, STOP at CI green per no-merge authorization; /dev-flow-sync post-merge."
-    },
-    {
-      "station": "P6",
-      "date": "2026-08-24",
-      "decision": "synced-to-obsidian",
-      "notes": "PR #202 squash-merged as 5f49e85 (CI green: snapshot pass, tui-ci pass 56m04s). Light sync (mode core): README-only, artifacts stay in repo and cross by id. Destination: G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-08-24-batch-87/2026-08-24-batch-87-README.md. Template-completeness detect: 0 real blockers (2 candidates checked -- both false positives, '##' immediately followed by a populated '###'). Dashboard.md pre-existing, not overwritten. WARN carried: vault visual-evidence gallery is stale -- newest asset 2026-08-07 predates the last s19_app/tui/ commit f198447 (2026-08-13, batch-79); 176 assets affected; not caused by this batch (0 UI files) and not regenerated here."
+      "station": "P3",
+      "date": "2026-08-27",
+      "decision": "ledger repaired -- this file had been frozen at the FIRST of ten commits",
+      "notes": "Found by an adversarial review of the batch's progress. The file still declared station P1 with iterations_per_station.P1 = 0 after two commits literally titled 'P1 re-work', and held no record of the PDR, the ten conditions, four operator rulings, or two shipped increments. V18 cannot see this: it checks that the active batch is DECLARED and on disk, and nothing about whether the ledger matches what happened. The same review found the batch's THIRD Phase-1 artifact, 01b-qa-validation-plan.md, equally unswept, and 29 of 34 source line citations broken by the increments' own edits. Flow candidate for batch-89: no rule reads this ledger for currency."
     }
   ],
   "standing_authorization": {
     "autonomous": true,
     "merge": false,
     "asked_on": "2026-08-24",
-    "operator_words": "D-II/alcance: 'Re-autorar + superficie #3 juntos (batch-87)'. Autorizacion: 'Como batch-86: autonomo -- gates auto-aprobados CON evidencia; merge lo concedes tu [operador] explicitamente al cierre.' Subagentes en Opus 5 (directiva en pie + reiterada este batch)."
+    "operator_words": "Scope: 'alcance A+B+C+E'. Pattern: 'y si al patron' confirming batch-86/87 -- autonomous, gates self-approved WITH evidence, merge granted explicitly by the operator at close. Pillow folded into this batch: 'Pillow dentro de batch-88'. Subagents on Opus 5 (standing)."
   },
-  "obsidian_synced": true,
-  "created_at": "2026-08-24T00:00:00-06:00"
+  "obsidian_synced": false,
+  "created_at": "2026-08-24T21:30:00-06:00",
+  "batch_objective_superseded": "Close the three cheap gaps from the ASPICE PAM 4.0 / DO-178C Annex A audits, on the living canon, as the SECOND batch over that canon -- the pending incrementality proof. Story A: Layer C component verification, rule V24 (every interface marked Frozen? in ARCHITECTURE.md section 4 has exactly one Layer C node resolvable on disk). Story B: declared limits of assurance, a sibling section to the ISO 9241-210 declaration in close-template.md, plus its CLOSE checklist row. Story C: RC-2 verifiable backup, rule V25 (reachable remote, last push <= 30 days). Story E: canon seeding tranches against the V22 census, baseline 276 of 544, oracle = the census delta pasted from the validator per tranche. Story D (C-45 reconciliation of 15 half-encoded controls) DEFERRED by the operator."
 }

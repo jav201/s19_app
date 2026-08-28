@@ -170,3 +170,75 @@ Every feature batch follows GRNDIA's six-phase V-model dev-flow:
 6. **Docs** — executive summary, functionality orientation, traceability matrix, architecture diagrams.
 
 Per-batch artefacts are archived under `.dev-flow/<YYYY-MM-DD>-batch-NN/`. The repo-root [REQUIREMENTS.md](../REQUIREMENTS.md) is the living `R-*` index that absorbs each batch's stable requirements.
+
+---
+
+> **Amended at ARQ by `2026-08-24-batch-88`** (2026-08-24). Family A fired, so this station ran.
+> Sections 1–9 are **unchanged**: this map is a standing project artifact and batches amend it, they
+> do not recreate it. What follows adds the two **mechanical** viewpoints the map was missing — the
+> ones a script can read. **Deliberately NOT renumbered** to the template's viewpoint order
+> (`Composition` is §2 there, `Interfaces` §4): every existing citation of "§4 · Patch Editor flow"
+> would silently retarget. The template's numbering is a scaffold, not a contract; the tables below
+> are self-identifying by their column headers, which is what a checker should key on.
+
+## 10. Composition — the modules, by path
+
+**The `Paths it owns` column is the mechanical part.** It is what makes this a map and not an essay:
+any touched file is classified by path prefix, so the A-family triggers can be evaluated by a script.
+Measured 2026-08-24 over `git ls-files` — **266 tracked source files** (`.py`), every one classified
+below except the single exception named after the table.
+
+| Module | Paths it owns | What it encapsulates | What it EXPOSES | What does NOT belong to it |
+|---|---|---|---|---|
+| **product** | `s19_app/**` | the shipped application: the Direction-B TUI shell and its sub-packages (`tui/cdfx`, `tui/changes`, `tui/operations`, `tui/services`), plus `validation/` — all described in §1–§7 | the TUI entry point, `CdfxService`, the `cdfx` package API, the `W-*` validator | test scaffolding · throwaway prototypes · flow tooling |
+| **tests** | `tests/**` | the whole verification surface: unit, acceptance, snapshot baselines (`__snapshots__/`), goldens (`goldens/`), generated evidence (`_artifacts/`, gitignored) | nothing — it is a consumer, never a dependency of the product | product logic that drifted into a fixture |
+| **tools** | `tools/**` | repository-local developer utilities | command-line entry points | anything the shipped app imports at runtime |
+| **prototypes** | `prototypes/**` | throwaway design probes, kept as evidence of what was tried | nothing — **no product code may import from here** | anything that has graduated: graduating means moving into `s19_app/**` |
+| **flow** | `.dev-flow/**` | the batch record and its local tooling; `_derived/` is DERIVED and guarded by V20 | the batch artifacts, cited by id | product or test code |
+| **docs** | `docs/**` | this map, the diagrams, the orientation notes | the map itself, read as an oracle by the A-family triggers | code with behaviour |
+
+**The one file no module can own, and why that is a finding rather than an omission.** `setup.py`
+sits at the repository root. The staleness check extracts prefixes matching `` `path/**` `` and tests
+`file.startswith(prefix + "/")`, so **a root-level file is unclassifiable by construction** — no
+declarable prefix can ever match it. It is named here so the resulting notice reads as *known and
+bounded* rather than as a stale map. **Registered as flow input for batch-88**: the rule should
+either admit a root sentinel or state that root files are out of its scope; silently reporting them
+as orphans conflates *"the map is stale"* with *"the rule cannot express this"*.
+
+**Rationale for the six-module cut.**
+
+| # | Decision | Alternative rejected | What would re-open it |
+|---|---|---|---|
+| 1 | Six **top-level, non-overlapping** prefixes | Declaring `s19_app/tui/cdfx/**` and friends as separate modules | Overlapping prefixes are a defect of this document, not an ambiguity to resolve case by case — and the sub-packages are already described in §1–§3. Re-open if a sub-package acquires an independently-consumed interface. |
+| 2 | `prototypes/**` is a declared module rather than excluded | Leaving it undeclared | Undeclared means every prototype file reads as *"the map is stale"*. Declaring it with **"no product code may import from here"** turns a permanent false alarm into a stated boundary. |
+| 3 | `tests/**` is one module, not one per layer | Mirroring the product's layering | Nothing reads the split mechanically today. Re-open when a lane plan needs test file sets to be disjoint by layer. |
+
+## 11. Interfaces — the contracts between modules
+
+**Changing one of these is trigger A3** — it fires ARQ, PDR *and* DDR, and it is never done inside a
+lane. A **frozen** interface is one the current batch committed to at PDR: no lane touches it; the
+work returns to the trunk instead.
+
+The rows below are the project's declared **Information Flow Contracts** (C-54 Part B). They are not
+prose: each is a `COMPONENT` block in a batch record, and `V19` confirms all three are declared
+exactly once, `V11` that all **79** outputs carry an address and a consumer list.
+
+| Interface | Owner module | Consumers | Shape | Frozen? |
+|---|---|---|---|---|
+| `loaded_panel` — Part B contract | product | **18** declared | **6** outputs; `PARENT : screen_workspace` | **✅ frozen for `2026-08-24-batch-88`** |
+| `screen_workspace` — Part B contract | product | **94** declared | **31** outputs; `PARENT : workspace_body` | **✅ frozen for `2026-08-24-batch-88`** |
+| `workspace_body` — Part B contract | product | **139** declared | **42** outputs; `PARENT : workspace_shell` | **✅ frozen for `2026-08-24-batch-88`** |
+
+**The containment chain, which is what balancing checks:**
+`workspace_shell` → `workspace_body` → `screen_workspace` → `loaded_panel`.
+`workspace_shell` is the outermost declared parent and is **not** itself a `COMPONENT` — it is the
+shell boundary, and `SYSTEM` was **refuted** as its value by measurement at `app.py:1919`.
+
+**Why all three are frozen for this batch.** batch-88 does not change any contract; it adds Layer C
+verification rows that **cite** them. An interface a batch reads but does not touch is exactly what
+"frozen" means, and it is what gives the new rule real consumers instead of a synthetic fixture.
+
+**Note for whoever implements the Layer C rule.** Key it on **this table's shape** — the column
+header `Frozen?` — and never on a section number. Section numbers differ per project (the template
+calls this viewpoint §4; here it is §11) and a rule that keys on a number is broken by any project
+that numbers its map differently, which is every project that had a map before adopting the template.
