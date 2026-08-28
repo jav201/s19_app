@@ -44,6 +44,30 @@ dev = [
     "textual==8.2.8",
 ]
 
+# Evidence-only imaging extra (batch-88, operator ruling 2026-08-26).
+# tests/test_examples_pilot_gifs.py imports PIL to render the example GIFs.
+# Like the dev extra above, pillow is NEVER added to [project] dependencies
+# — it does not affect the s19tui runtime footprint. It is kept OUT of dev
+# on purpose: dev pins textual==8.2.8 for the snapshot baselines, and the
+# tui-ci job that needs the imaging library collects the FULL suite and must
+# stay on the >=8.0.2 runtime floor. Install with: pip install -e .[evidence]
+evidence = [
+    # Floored, not bare and not pinned (batch-88 F1). This is a MAJOR-VERSION and
+    # reproducibility floor: it excludes 9.x and refuses the specifier-less style
+    # that batch-88 registers as a defect (R-88-6), so CI cannot silently resolve
+    # across a major boundary.
+    #
+    # It does NOT assert a patch level of the C libraries manylinux wheels vendor
+    # (libjpeg-turbo, zlib, libtiff, libwebp, freetype). ">=10" admits 10.0.0, and
+    # every vendored-library bump lands ABOVE it, so the guarantee is empty inside
+    # the admitted range. Measured 2026-08-27: with pillow 10.1.0 already present,
+    # `pip install -e ".[evidence]"` reports "Requirement already satisfied" and
+    # leaves it — pip's only-if-needed strategy does not pull a satisfying old
+    # version forward. >=10.3 is the smallest value that would deliver the
+    # vendored-patch reading; raising it needs an operator ruling (batch-88 F2).
+    "pillow>=10",
+]
+
 [project.scripts]
 s19tui = "s19_app.tui:main"
 

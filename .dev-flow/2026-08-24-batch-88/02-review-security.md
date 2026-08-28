@@ -73,7 +73,11 @@ hesitation dissolved — see `R-88-7`: that declaration is false.** Installed `t
 at runtime with no `__future__` import. **The real floor is 3.10.** Threshold unchanged at exactly
 one entry, so the floor costs the specification nothing.
 
-### F2 — the reroute trades a loud failure for a silent one  [MEDIUM · ACCEPTED AS A KNOWN RISK, mitigation declined]
+### F2 — the reroute trades a loud failure for a silent one  [MEDIUM · **MITIGATED**]
+
+> ⚠ **Heading corrected 2026-08-27.** It read *"ACCEPTED AS A KNOWN RISK, mitigation declined"*,
+> which is the **superseded first ruling** and contradicted this record's own verdict line and the
+> revised ruling below it. A reader who stopped at the heading got the opposite disposition.
 
 **Today** (`tui-ci.yml:42`): a mistyped package name fails the step with a non-zero exit. **After**
 (`:43`, `".[evidence]"`): a mistyped or renamed extra **exits 0**.
@@ -86,9 +90,7 @@ $ pip install --dry-run --no-deps -e ".[definitelynotanextra]"
 Would install s19tool-0.1.0
 EXIT=0
 ```
-`pip 24.2` — **no warning about the extra at all.** Newer pip emits a `does not provide the extra`
-WARNING, but **still exit 0**, and a warning does not fail a CI step. The exit code is the half that
-carries the weight, and it is 0 either way.
+`pip 24.2` — no warning about the extra **on this surface**. ⚠ **REFINED 2026-08-27, and the refinement is about the surface, not the version:** that reading is true of `--dry-run --no-deps`, which is what was measured, and **false of the real install path**, where the same pip 24.2 prints `WARNING: s19tool 0.1.0 does not provide the extra 'evidenc'`. **Exit is 0 on both** — the half this record correctly called decisive — so no ruling changes and F2's disposition stands. Recorded because a claim measured on one surface and stated about the tool is the shape this batch keeps paying for.
 
 **Why it compounds.** The consumer is `@pytest.mark.slow` (`tests/test_examples_pilot_gifs.py:183`)
 and pull requests run `pytest -q -m "not slow"` (`tui-ci.yml:45-47`). So a broken extra **deselects
@@ -97,7 +99,15 @@ the only test that would notice**, every PR stays green, and the failure surface
 guards (`R-88-4`).
 
 **The available mitigation** is one line after the install:
-`python -c "import PIL; print(PIL.__version__)"`. It fails loudly at the install step and doubles as
+~~`python -c "import PIL; print(PIL.__version__)"`~~.
+⚠ **SUPERSEDED as a quotation of the SHIPPED line, 2026-08-27.** This is the line the 2026-08-26
+ruling named, and it is **not** the line on disk. `tui-ci.yml:41` now reads
+`python -c "from PIL import Image, ImageDraw, ImageFont; import PIL; print(PIL.__version__)"`,
+widened because `import PIL` loads neither `PIL.Image` nor `PIL.ImageFont` (measured) while the
+consumer imports all three. **The widening is a measurement conclusion and carries no ruling
+citation yet** — citation slot, for the operator: ‹ruling id owed›. See `F3` in
+`01-requirements.md`'s guard bullet: the widening closes submodule **absence**, and extension
+**breakage** stays open. It fails loudly at the install step and doubles as
 the resolved-version evidence `AT-B88-09` already wants. **It would take the CI edit from 4 lines to
 5**, colliding with the *"exactly 4 lines, and in no other line"* threshold in `HLR-88.6`,
 `LLR-88.12` and criterion 8.
