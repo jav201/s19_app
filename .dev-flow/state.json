@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-08-24-batch-88",
-  "batch_objective": "SCOPE CUT ACCEPTED BY THE OPERATOR 2026-08-25. batch-88 = the nine rule-integrity fixes + Story C (RC-2 verifiable backup, rule V25). Stories A (Layer C, V24), B (declared limits of assurance + the human review-debt marker) and E (canon seeding) move to batch-89, to be authored over a STILL oracle. The binding constraint was not file count -- 6 source files across 10 increments, max 3 in any one, passes the budget with headroom -- but FIVE ORACLE MOVES OF WHICH EXACTLY ONE WAS SEQUENCED: V22's census, the _artifacts loader, V2's resolution, V5/V8's sentences (57 of 61 records change what V5 says about them), and -- found at the station-4 PDR and MISSING from this list as first written -- the V23 grammar. RE-DERIVED 2026-08-25 (PDR-2026-08-25-batch-88#D1 and #D4): the canon-census baseline is 306 of 570 MEASURED 2026-08-25, shipped reads 302 of 570. The figures 276 -> 280 of 544 are SUPERSEDED and preserved here rather than deleted; the +4 delta survives every re-measurement, the baseline survives none, because batch-88 declared 26 ids of its own while the figure was being written -- the denominator hazard biting the very number that measures it. The _artifacts move is now 0 block -> 0 block: its 14 block -> 0 window CLOSED when P1 authored the requirements record, verified by executing the loader. Of the five moves only TWO are still moving today -- V22's census and V5's sentences; moves 2 and 5 were stilled by ordinary work rather than by design. THE SCOPE CUT STANDS on the two that remain, but its original derivation is refuted: cite the re-executed table at 01-requirements.md section 0.3, never this summary. Story C stays because V25's oracle is `git ls-remote`, external to every number this batch moves. THE NINE FIXES: V22 oracle (substring -> token membership) + its scope-naming message, LANDING FIRST per operator ruling with the re-baseline recorded; V23 STRICT grammar (a record, a decision inside it, and a VERSION each distinctly expressible -- the permissive hyphen form is REJECTED); V5 PASS != NOOP (it has reported 'no ledger expression found' for 57 of 61 batches, identically for a correct ledger and for none); the _artifacts F-7 residue; V8 case-insensitive map resolution; V8 root-file message; V2 substring -> token; V6 line-scoped -> statement-scoped; Pillow's declared home. NON-NEGOTIABLE: every new or patched rule owes a PASS != NOOP arm, and its GREEN arm must assert the PASS SENTENCE, not the absence of a BLOCK. The original acceptance criterion 1 (no new rule on the synthetic-exemption list) is insufficient alone -- V5 proves a rule can carry arms, pass them, and still be inert.",
+  "batch_id": "2026-08-28-batch-89",
+  "batch_objective": "batch-89 = THE LEAN READING MECHANISM plus four environment closures. Increment 1 (this record) ships the split: 01-requirements.md is the LIVE CONTRACT holding current state only, 01-requirements-ledger.md is APPEND-ONLY and never edited, every requirement names its ledger entries and every entry names its requirement, and V26 compares the two SETS OF PAIRS both ways. The pairing is load-bearing: a naive split into two editable files rehouses R-88-17 (a correction has a population and nothing enumerates it) instead of closing it. Budget = _LEAN_MAX_CHARS in devflow-validate.py, 55000, the corpus median 55367 rounded down over 65 records measured 2026-08-28; NOTICE, never BLOCK; the ledger is excluded from it because a budget over an append-only file is an instruction to delete history. REMAINING INCREMENTS, NOT IMPLEMENTED: 2 = the --selftest cp1252 crash plus an arm that runs it under cp1252 and demands the verdict line; 3 = python3 -> python at 4 sites and V17 verifying the guard INTERPRETER; 4 = a declared environment contract derived from source (Python 3.7 bound by capture_output= with text=, git 2.28.0 bound by git init -b reached by the selftest alone, zero third-party imports); 5 = a runtime preflight for git, stdout encoding and filesystem case-folding. Previous batch: 2026-08-24-batch-88",
   "mode": "core",
   "mode_history": [
     {
@@ -13,7 +13,7 @@
     }
   ],
   "current_station": "P3",
-  "phase_status": "approved",
+  "phase_status": "in_progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -57,10 +57,8 @@
     "design_ddr": "vault:s19_app/design/DDR-<batch>.md"
   },
   "artifacts": {
-    "P0": ".dev-flow/2026-08-24-batch-88/PLAN.md",
-    "ARQ": "repo:docs/ARCHITECTURE.md (sections 10-11) + .dev-flow/2026-08-24-batch-88/PLAN.md#station-arq",
-    "P1": ".dev-flow/2026-08-24-batch-88/01-requirements.md",
-    "P1b": ".dev-flow/2026-08-24-batch-88/01b-qa-validation-plan.md"
+    "P1": ".dev-flow/2026-08-28-batch-89/01-requirements.md",
+    "P1-ledger": ".dev-flow/2026-08-28-batch-89/01-requirements-ledger.md"
   },
   "decisions_log": [
     {
@@ -131,6 +129,6 @@
     "operator_words": "Scope: 'alcance A+B+C+E'. Pattern: 'y si al patron' confirming batch-86/87 -- autonomous, gates self-approved WITH evidence, merge granted explicitly by the operator at close. Pillow folded into this batch: 'Pillow dentro de batch-88'. Subagents on Opus 5 (standing)."
   },
   "obsidian_synced": false,
-  "created_at": "2026-08-24T21:30:00-06:00",
+  "created_at": "2026-08-28T09:00:00-06:00",
   "batch_objective_superseded": "Close the three cheap gaps from the ASPICE PAM 4.0 / DO-178C Annex A audits, on the living canon, as the SECOND batch over that canon -- the pending incrementality proof. Story A: Layer C component verification, rule V24 (every interface marked Frozen? in ARCHITECTURE.md section 4 has exactly one Layer C node resolvable on disk). Story B: declared limits of assurance, a sibling section to the ISO 9241-210 declaration in close-template.md, plus its CLOSE checklist row. Story C: RC-2 verifiable backup, rule V25 (reachable remote, last push <= 30 days). Story E: canon seeding tranches against the V22 census, baseline 276 of 544, oracle = the census delta pasted from the validator per tranche. Story D (C-45 reconciliation of 15 half-encoded controls) DEFERRED by the operator."
 }
