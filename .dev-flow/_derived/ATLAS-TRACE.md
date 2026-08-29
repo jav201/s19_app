@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.28-rev48 | flow_hash: 3f8bfe4c7e45c265 | corpus: 66 requirement files | corpus digest: 263c68645a7a0b85 -->
+<!-- flow_version: 2026.08.29-rev49 | flow_hash: 61f37a790033c5f1 | corpus: 66 requirement files | corpus digest: bc0fb8c3c811d4c6 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 

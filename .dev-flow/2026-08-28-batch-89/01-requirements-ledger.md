@@ -152,3 +152,98 @@
   removal, never silently deleted, so a reader meeting the gap finds the argument. **The three
   returned fields are mandatory and enforced by no rule — `R-89-8` says so rather than letting
   the word "mandatory" imply a check that does not exist.**
+### LED-89.8 — `P-8` was reproduced before it was repaired, and the reproduction corrected it
+- **Requirement:** HLR-89.2
+- **Date:** 2026-08-29
+- **What changed:** `P-8` moved from ❓ UNDECIDABLE to a measured result, and its figure
+  changed. The premise claimed the crash emits **zero arms**; the crash emits **whatever the
+  encoding allows before it meets a character it cannot carry**.
+- **Why:** repairing an unobserved defect repairs the wrong thing. Two surfaces were run
+  before any code was written. `PYTHONIOENCODING` unset with stdout redirected to a file:
+  exit 1, `UnicodeEncodeError: 'charmap' codec can't encode character '\u2212'`, **12 arm
+  lines on disk**, no verdict. `PYTHONIOENCODING=ascii`: exit 1 on `\u00b7` — the separator
+  in every arm line — inside the FIRST arm, **0 arm lines**, no verdict.
+- **Evidence:** the operator's two conflicting measurements (zero arms; ~12 arms) are **both
+  correct and neither is about buffering**, which was the stated cause. Python flushes the
+  text buffer at interpreter shutdown even after the exception, so the bytes already encoded
+  do reach the file. What differs is the ENCODING: cp1252 carries `\u00b7` and dies later at
+  `\u2212`; ASCII carries neither and dies at the first line. **The load-bearing half of
+  `P-8` — exit 1 with no verdict line, indistinguishable from a genuine failure — held on
+  both.** This is why the arms use a domain of 5 encodings: one encoding is not a domain, and
+  this defect demonstrates that rather than illustrating it.
+
+### LED-89.9 — the repair is at the stream, not at the fixture, and the corpus figure was wrong
+- **Requirement:** HLR-89.2
+- **Date:** 2026-08-29
+- **What changed:** the fix reconfigures stdout/stderr's ERROR HANDLER to `backslashreplace`
+  at `__main__` (`_harden_streams`), rather than ASCII-ing the V5 ledger fixture that holds
+  the `\u2212`. The consumer's ENCODING is deliberately not overridden.
+- **Why:** the fixture's `\u2212` is the character that fires today, not the class. Forcing
+  `encoding=utf-8` would end the crash by writing bytes a cp1252 reader misreads — trading a
+  loud failure for a quiet corruption. Changing only `errors` keeps a capable stream
+  byte-identical (`ENC UTF8-lossless`) and gives an incapable one a readable `\u2212`.
+- **Evidence:** the corpus figure in the increment's brief — **601 non-cp1252 characters of 6
+  kinds** — did not reproduce. Measured 2026-08-29 over the 22 canon rows of
+  `docs/FLOW-VERSION.md`: **534 non-cp1252 characters of 28 distinct kinds**, and against an
+  ASCII stdout the real domain is **2511 non-ASCII characters of 38 kinds**. (Sweeping canon
+  **plus** the generated bundle mirror gives 1310 of 34 kinds, which is the likeliest origin
+  of the 601 — a double count of a duplicated tree.) An arm asserting the fixture contains no
+  `\u2212` would pin one instance of a 38-member class; `ENC VERDICT-domain` harvests its
+  probe FROM the canon instead, so a new character entering any canon file enters the arm
+  with it.
+
+### LED-89.10 — the CI site keeps `python3`, and that asymmetry is the ruling
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `HLR-89.3`'s threshold stopped being *0 remaining `python3` sites*. Three
+  shebangs changed to `python`; `.github/workflows/flow-selftest.yml:40` **keeps** `python3`.
+- **Why:** that job runs on `ubuntu-latest`, where `python3` is the correct name and a bare
+  `python` may not exist. The brief's own caution — do not break CI to fix Windows — is
+  incompatible with a global count of zero. **The GitHub runner's provision of `python` was
+  NOT measured** (no runner is reachable from here), and an unmeasured premise is not a
+  licence to change a working CI line.
+- **Evidence:** the correction has a population, so it was swept (`R-88-17`). Live `python3`
+  claims outside this batch's own new prose: `FLOW-VERSION.md:10` (V17's row) and
+  `flow-selftest.yml:57` (V17's description) — both updated; `flow-selftest.yml:40` — kept,
+  with a comment saying why so a later reader does not "unify" it; `FLOW-VERSION.md:202` —
+  historical changelog prose quoting the lessons catalogue, correctly untouched. **The
+  selftest therefore asserts that the four LOCAL sites agree with each other and never that a
+  given name runs**, which is what makes the asymmetry safe: `INT FOUR-PLACES-agree` is true
+  on both platforms.
+
+### LED-89.11 — "resolves" was the wrong verb, and a surviving mutant is what proved it
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `HLR-89.3` said `V17` must BLOCK on an interpreter that *does not
+  resolve*. It now says *does not start Python when executed*, and `_interpreter_runs`
+  executes the token and reads back a marker.
+- **Why:** resolving is exactly what the defect passes. Measured on this machine: `python3`
+  resolves to the Microsoft Store alias in `WindowsApps` — a real file, on PATH, that
+  `shutil.which` reports and `os.path.isfile` confirms — which prints "Python was not found"
+  and **exits 49**. Executing `hooks/flow-guard.py` through its own shebang exited **49**. A
+  rule written to the old verb would have called that machine green.
+- **Evidence:** the first version of the arm used a temp text file as the dead interpreter.
+  That fixture is not executable, so `_interpreter_runs` refuses it from the `OSError` branch
+  and never evaluates its return expression — and the mutant replacing that expression with
+  `return True`, which restores the original defect exactly, **SURVIVED the full selftest**.
+  `INT RUNS!=IS-PYTHON` was added with a real program discovered at runtime (`git` here), and
+  the collector fixture in `INT WIRING-collects` was switched to it. 13 of 13 mutants killed
+  afterwards, against a GREEN baseline — the first harness run had a red baseline and its
+  "kills" were discarded rather than reported.
+
+### LED-89.12 — getting the interpreter WRONG is the same rule lying in the other direction
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `_cmd_tokens` was added so a QUOTED span in a hook command stays whole,
+  and `_guard_interpreter` uses it. `_guard_path_resolves` is untouched.
+- **Why:** the existing tokenizer splits on whitespace and discards quotes, which is harmless
+  for asking whether some token ends in `flow-guard.py` and not harmless for naming the
+  interpreter. The default Windows install lives under `C:\Program Files\...`, so the
+  correctly quoted command `"C:/Program Files/Py/python.exe" ~/.claude/hooks/flow-guard.py`
+  yielded an interpreter of `Files/Py/python.exe` — which cannot run, so the NEW `V17` would
+  have BLOCKed a perfectly wired machine. That is the `C-53` false fail, on the one rule whose
+  BLOCK stops the flow, for most of Windows.
+- **Evidence:** found by `INT INTERP-parse` failing on its own author's expected value, before
+  the increment closed — the arm was written with `C:/Program` as the expectation and the run
+  returned `Files/Py/python.exe`. A quoted GUARD path was added to the same domain so a space
+  on either side is covered, taking it to 5 command shapes.

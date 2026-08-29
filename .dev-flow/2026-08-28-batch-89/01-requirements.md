@@ -24,8 +24,8 @@ increment**; Stories 2 to 5 are specified here and implemented in later incremen
 | # | Story | Increment |
 |---|---|---|
 | **Story 1** | The requirements record splits into a live contract and an append-only ledger, and a rule enforces the split | 1 — **implemented** |
-| **Story 2** | `--selftest` survives a cp1252 stdout, and an arm proves it | 2 |
-| **Story 3** | The flow invokes `python`, not `python3`, and `V17` verifies the guard's INTERPRETER | 3 |
+| **Story 2** | `--selftest` survives a cp1252 stdout, and an arm proves it | 2 — **implemented** |
+| **Story 3** | The flow invokes `python`, not `python3`, and `V17` verifies the guard's INTERPRETER | 3 — **implemented** |
 | **Story 4** | The flow declares an environment contract, and a rule DERIVES it from source | 4 |
 | **Story 5** | A runtime preflight reports git, stdout encoding and filesystem case-folding | 5 |
 
@@ -45,15 +45,16 @@ Every figure below was produced by a command this session ran, except where the 
 | P-1 | The corpus PREDATING batch-89 holds 65 `01-requirements.md` records with a median of **54,367 CHARACTERS** | premise | ✅ TRUE | `python` over `glob('*/01-requirements.md')`, 2026-08-28, `len(read())`: `n=65 median=54367` (p25 37,006 · p75 87,505 · max 314,621). **The same population in BYTES is median 55,367 (p25 37,789 · p75 89,790 · max 322,289)** — `os.path.getsize`, and the corpus is UTF-8 with multi-byte punctuation, so the two disagree by ~1,000 at the median | budget floor derived from it — `HLR-89.1`. **The unit is load-bearing: the rule measures `len(text)`, so the bytes figure would have set the floor 1,000 too high.** The population EXCLUDES batch-89's own record, the 66th, because it is this rule's subject — see `LED-89.5` |
 | P-2 | batch-88's record is 193,364 chars, of which 8.1% is the findings table and 26.6% forensic prose, leaving 65.3% normative text in the forensic register | inherited | ✅ TRUE (size re-executed) | `wc -c` 2026-08-28: **197,032** bytes on disk today. The 193,364 char figure and the three percentages are the operator's decomposition and were **not re-derived this session** | the decomposition is what justifies "splitting files is not enough"; the ratio is inherited, the conclusion is not load-bearing on its exact value |
 | P-3 | Markdown strikethrough is the only supersession marker with a grammar; the warning glyph is not | premise | ✅ TRUE | measured over all 65 pre-batch-89 records, 2026-08-28: 16 carry the glyph, 10 carry strikethrough. Inspection of the glyph's sites shows it marking current-state warnings as often as amendments | `LLR-89.1.2` checks strikethrough and deliberately not vocabulary |
-| P-4 | `python3` is invoked at 4 sites in the flow | premise | ✅ TRUE | `grep -rn python3` 2026-08-28: `devflow-validate.py:1`, `hooks/flow-guard.py:1`, `hooks/install.py:1` (shebangs) and `.github/workflows/flow-selftest.yml:40` | `HLR-89.3` |
+| P-4 | `python3` is invoked at 4 sites in the flow | premise | ✅ TRUE, with one path corrected | `grep -rn python3` 2026-08-28 found 4 sites; re-measured 2026-08-29, the count holds and one path did not: the CI file is `~/.claude/.github/workflows/flow-selftest.yml:40`, **not** under `s19_app`. Three shebangs now say `python`; the CI site KEEPS `python3` — see `LED-89.10` | `HLR-89.3` |
 | P-5 | `devflow-validate.py` imports zero third-party modules | premise | ✅ TRUE | its only import lines are `from __future__ import annotations` and `import builtins, hashlib, json, os, re, shutil, subprocess, sys, tempfile, textwrap, time` — all stdlib | `HLR-89.4` |
 | P-6 | The Python floor is 3.7, bound by `capture_output=` with `text=` | premise | ✅ TRUE | `subprocess.run(..., capture_output=True, text=True, ...)` inside **`v8_module_map`** (`devflow-validate.py:572-573` at this commit). Both kwargs landed in CPython 3.7 | `HLR-89.4`; cited by SYMBOL, see `LED-89.2` |
 | P-7 | A full `--selftest` needs git ≥ 2.28.0, bound by `git init -b` | premise | ✅ TRUE | `_g(d, "init", "-q", ..., "-b", "main", ...)` inside the **V25 fixture builder in `selftest()`**. `git init -b` landed in git 2.28.0. It is reached only by the selftest, never by the gate | `HLR-89.4`; the operator's citation `:5299` was **correct before this increment and is stale after it** — see `LED-89.2` |
-| P-8 | `--selftest` crashes under a cp1252 stdout, emitting zero arms and no verdict line | inherited | ❓ UNDECIDABLE here | **not reproduced this session.** Every run in this increment set `PYTHONIOENCODING=utf-8`, so the defect was avoided rather than observed | `HLR-89.2` specifies it; reproducing it is Increment 2's first act, and Increment 2 blocks until it is reproduced |
+| P-8 | `--selftest` crashes under a cp1252 stdout, emitting zero arms and no verdict line | inherited | ✅ TRUE in its load-bearing half, ❌ FALSE in its figure | **REPRODUCED 2026-08-29, Increment 2's first act, on two surfaces.** `PYTHONIOENCODING` unset + stdout redirected: exit 1, `UnicodeEncodeError` on `\u2212`, **12 arm lines**, no verdict. `PYTHONIOENCODING=ascii`: exit 1 on `\u00b7` in the FIRST arm line, **0 arm lines**, no verdict. The crash and the missing verdict are real; **"zero arms" is a property of the ENCODING, not of buffering** — see `LED-89.8` | `HLR-89.2` |
 | P-9 | The local toolchain satisfies both floors | premise | ✅ TRUE | `git version 2.49.0.windows.1`, `Python 3.12.7` | this machine cannot demonstrate a floor VIOLATION, which is why `HLR-89.4` obliges derivation from source and not a runtime probe |
 
-**Gate rule:** ❌ and ❓ both block. `P-8` is dispositioned explicitly: it is a premise of
-Story 2 and it gates Story 2's increment, not this one.
+**Gate rule:** ❌ and ❓ both block. `P-8` gated Story 2's increment and **that gate was
+discharged by measurement, not by assumption** — reproduced before a line of the repair was
+written, and its figure corrected in the same act (`LED-89.8`).
 
 ---
 
@@ -91,7 +92,7 @@ Story 2 and it gates Story 2's increment, not this one.
 
 ### HLR-89.2 — the selftest states a verdict under any stdout encoding
 - **Traceability:** Story 2
-- **Ledger:** none
+- **Ledger:** LED-89.8, LED-89.9
 - **Statement:** When stdout cannot encode a character the selftest prints, the selftest shall
   still emit its arm lines and its verdict line.
 - **Rationale (informative):** a crash prints zero arms and no FAIL, which is indistinguishable
@@ -102,10 +103,13 @@ Story 2 and it gates Story 2's increment, not this one.
 - **Numeric pass threshold:** the run emits `SELFTEST PASSED` and its full arm count under
   cp1252, matching the count emitted under utf-8 exactly
 - **Priority:** high
-- **Acceptance test(s):** `owed at Increment 2`
-- **Negative control:** owed at Increment 2, and it is the increment's FIRST act: the RED side
-  is the crash itself, which `P-8` records as NOT yet reproduced. A repair whose failing case
-  was never observed is unverifiable.
+- **Acceptance test(s):** `ENC VERDICT-live` (a child `--selftest` under
+  `PYTHONIOENCODING=cp1252`, asserting one `SELFTEST PASSED` line and an arm count at least
+  this run's) · `ENC VERDICT-domain` (the verdict survives every non-ASCII canon character on
+  5 stdout encodings) · `ENC UTF8-lossless` (utf-8 output stays byte-identical)
+- **Negative control:** `ENC PASS!=NOOP` — the SAME probe text must still KILL an unhardened
+  stream on all 4 non-utf-8 encodings, so the arms above cannot pass by the probe going ASCII.
+  The RED side was observed before the repair: `P-8`, both surfaces.
 - **Boundary catalog:** ☑ empty — stdout with no encoding declared · ☑ boundary — a codec that
   encodes every arm label but not the verdict line · ☑ invalid — cp1252 against `\u2212` · ☑
   error — stdout redirected to a pipe, which is the configuration that hid it.
@@ -114,24 +118,34 @@ Story 2 and it gates Story 2's increment, not this one.
 
 ### HLR-89.3 — the flow names an interpreter that exists on this machine
 - **Traceability:** Story 3
-- **Ledger:** none
-- **Statement:** The flow shall invoke `python`, and `V17` shall verify the guard's declared
-  INTERPRETER in addition to the guard's path.
+- **Ledger:** LED-89.10, LED-89.11, LED-89.12
+- **Statement:** Every flow script executed by shebang shall name `python`, and `V17` shall
+  verify that the guard's declared INTERPRETER **starts Python when executed**, in addition to
+  verifying the guard's path.
 - **Rationale (informative):** `python3` is not on `PATH` on Windows, so a guard wired to it is
   wired to nothing — and `V17` currently reports such a wiring as green.
 - **Validation:** `test`
-- **Executed verification:** `grep -rn python3` over the flow's four sites returns 0; a `V17`
-  arm whose settings fixture names an interpreter that does not resolve
-- **Numeric pass threshold:** 0 remaining `python3` sites; the `V17` arm BLOCKs on an
-  unresolvable interpreter and stays green on a resolvable one
+- **Executed verification:** the three shebangs and `install.py`'s generated hook command
+  compared for agreement; `V17` driven through a real `settings.json` naming an interpreter
+  that executes but is not Python
+- **Numeric pass threshold:** the 3 shebangs and the generated hook command name **1** distinct
+  interpreter; `V17` BLOCKs on an interpreter that runs without starting Python and SKIPs on
+  one that starts Python. The CI site keeps `python3` by ruling (`LED-89.10`), so the threshold
+  is agreement among the four LOCAL sites, not a global count of zero.
 - **Priority:** high
-- **Acceptance test(s):** `owed at Increment 3`
-- **Negative control:** owed at Increment 3 — a settings fixture naming an interpreter that
-  does not resolve must turn `V17` RED; today it stays green, which is the defect.
+- **Acceptance test(s):** `INT FOUR-PLACES-agree` · `INT WIRING-collects` (a real settings.json
+  + on-disk guard + dead interpreter ⇒ 1 unrunnable and BLOCK; a live one ⇒ 0 and SKIP) ·
+  `INT INTERP-parse` (5 command shapes) · `V17 BLOCK-unrunnable`
+- **Negative control:** `INT RUNS!=IS-PYTHON` — a real executable that RUNS but is not Python
+  must be refused. `INT ISFILE!=RUNS` alone is insufficient and was measured so: it reaches
+  only the OSError branch, and a probe returning `True` unconditionally survived it
+  (`LED-89.11`). `INT PASS!=NOOP` holds the other side, so the probe cannot pass by always
+  refusing.
 - **Boundary catalog:** ☑ empty — no interpreter named at all · ☑ boundary — an interpreter
-  that resolves on PATH but is not executable · ☑ invalid — `python3` on a machine without it ·
-  ☐ error — N/A: a malformed settings file is already `V17`'s own BLOCK and is not this
-  requirement's class.
+  that resolves on PATH and executes but is not Python (the Store alias; exit 49) · ☑ invalid —
+  a quoted interpreter path containing a space, which a whitespace split mangles into a false
+  BLOCK (`LED-89.12`) · ☐ error — N/A: a malformed settings file is already `V17`'s own BLOCK
+  and is not this requirement's class.
 - **Acceptance (black-box):** observable outcome — the guard runs on a fresh Windows checkout ·
   shipped surface — the `UserPromptSubmit` hook.
 
@@ -311,4 +325,4 @@ written against a 426-arm baseline — would have rejected all 12 mutants as bro
 | **R-89-8** | **The three fields returned by the 2026-08-28 ruling — `Boundary catalog`, `Acceptance test(s)`, `Negative control` — are template-MANDATORY and checked by NO rule** | Stated rather than implied. `V4` checks that a `test`/`analysis` requirement carries an executed verification and a numeric threshold; it knows nothing of these three. A mandate carried by convention is carried by nobody — which is the measured argument that returned `Negative control` in the first place (inline in 9 of 10 thresholds, so exactly one requirement had no RED side and nothing said so). **The same argument applies to this row**, and a rule for them is a batch-90 candidate |
 | **R-89-5** | `V26` does **not** enforce append-only, and the code once claimed it did. Deleting an entry TOGETHER WITH its pointer leaves both pair sets equal and the gate green | Registered and stated where the claim used to be. What the pairing closes is the failure a split would otherwise ADD — the two documents disagreeing. Append-only is a CONVENTION the template states; enforcing it needs git history and is a separate subject, not attempted here |
 | **R-89-3** | The template's own preamble is 38,687 chars written in the register this batch is removing from records | Out of scope, deliberately. Those blocks are normative rules whose parenthetical origins are their evidence; moving them is a second reform needing its own increment and its own ledger |
-| **R-89-4** | `P-8` — the cp1252 crash — is specified without having been reproduced this session | Gates Increment 2 rather than this one. Increment 2 reproduces it before repairing it |
+| **R-89-4** | **CLOSED 2026-08-29** — `P-8`, the cp1252 crash, has been reproduced | Reproduced on two surfaces before any repair was written, and the premise's figure was corrected by the same measurement (`LED-89.8`) |
