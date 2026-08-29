@@ -12,7 +12,14 @@ authors = [
     { name = "Your Name", email = "your.email@example.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+# Floor = the version CI actually verifies (batch-89). The packaged tree's
+# mechanical floor is 3.10 -- 39 `@dataclass(slots=True)` sites across 16
+# files (slots= landed in 3.10) plus the PEP 604 union at `s19_app/cli.py:220`,
+# which is evaluated at def time because cli.py has no `from __future__ import
+# annotations`. No CI job runs 3.10, so the declared floor stays at 3.11, the
+# only version the suite is green on. Lowering to 3.10 is a non-breaking
+# loosening once a 3.10 CI cell exists.
+requires-python = ">=3.11"
 license = "MIT"
 dependencies = [
     "rich>=13.0",

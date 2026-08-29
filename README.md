@@ -48,9 +48,12 @@ contract — the test suite asserts on them.
 
 ## Install
 
-Requires **Python 3.11 or newer** — that is what CI runs, and
-`s19_app/cli.py` uses PEP 604 unions, which need 3.10+. (`pyproject.toml`
-still declares `requires-python = ">=3.8"`; that bound is stale.)
+Requires **Python 3.11 or newer** — that is what CI runs, and it is the only
+version the suite is verified on. `pyproject.toml` declares
+`requires-python = ">=3.11"` to match. (The packaged tree's *mechanical* floor
+is 3.10: 39 `@dataclass(slots=True)` sites and the PEP 604 union at
+`s19_app/cli.py:220`. Nothing in CI exercises 3.10, so the declared floor stays
+at the tested version.)
 
 ```bash
 git clone https://github.com/jav201/s19_app.git
