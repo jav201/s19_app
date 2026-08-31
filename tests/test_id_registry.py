@@ -67,8 +67,17 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 155
+EXPECTED_SCANNED_TEST_FILES = 156
 """Test modules scanned, including this one.
+
+evidence-sync increment: 155 -> 156. ``tests/test_sync_evidence.py`` was added
+for the checked-in visual-evidence sync helper (``tools/sync_evidence.py``),
+which moves the vault-gallery copy out of prose in ``visual-evidence.md`` §5 and
+into code carrying its own guards. MEASURED, not incremented, and by two paths
+that do not share code: ``scanned_test_files()`` reports 156, and an independent
+re-derivation of the same glob (``tests/**/*.py`` minus the four excluded
+directories) agrees at 156 — 154 ``test_*.py`` modules plus ``conftest.py`` and
+``generate_large_samples.py``.
 
 batch-84 Inc-1: 154 -> 155. ``tests/test_address_origin.py`` was added for the
 bare-name address origin resolver (``AT-B84-01``..``AT-B84-07``). MEASURED, not
