@@ -411,6 +411,41 @@ reformulation, what it costs, and what was refused.
   `design/`, `tools/` and loose HANDOFF files · ☑ error — a real repository, so the git path is
   executed and not modelled.
 
+### LLR-89.6.5 — a declared batch id resolves to a direct child of `.dev-flow/`, or to nothing
+- **Traceability:** HLR-89.6
+- **Ledger:** LED-89.20, LED-89.21
+- **Statement:** `_active_batch_state` shall resolve a declared `batch_id` to an absolute path
+  whose parent directory is `.dev-flow/` itself, shall return no path and a distinct fifth
+  reason code when the declared id names anything else, and shall be the only place in the file
+  where that test is made — the quantified population being every call site that reaches a
+  declared `batch_id`, of which there are seven.
+- **Validation:** `test`
+- **Executed verification:** arms `ART A9-dot`, `ART A9-dotdot`, `ART A9-nested`,
+  `ART A9-trailing-sep`, `ART A9-freeze-noop`, `V18 notchild`, `V18 notchild-SENTENCE`,
+  `V18 CAUSES-differ`, `V18 TRAVERSAL-notice`, `V18 TRAVERSAL-up`, `V27 GUARD-traversal`,
+  `V27 GUARD-currency`
+- **Numeric pass threshold:** 12 arms report `ok`. Three of them carry the whole claim and the
+  other nine are their controls. `A9-freeze-noop` compares the map `_artifacts` returns against
+  the map rev51's caller-side guard produced, over **7** declared ids, values included — it is
+  the arm that had to pass before the freeze could be lifted, because `LLR-88.5`'s acceptance
+  froze `_active_batch_dir` precisely to hold that map still. `V27 GUARD-traversal` reaches the
+  registered rule over a tree whose `03-increments/` sits BESIDE `.dev-flow/`, and asserts the
+  finding COUNT of 3 before asserting that increment 42 is named nowhere. `V27 GUARD-currency`
+  asserts the OTHER half of the same rule: the currency sentence must refuse to check rather
+  than render the whole tree's newest commit.
+- **Negative control:** executed — `M5-code-only` returns the poisoned path alongside the new
+  code, so `V18` announces the traversal while every caller still receives it, and it reddens
+  the packet and `_active_batch_dir` conjuncts while leaving `V18` green; `M2-cheap-dotdot`
+  substitutes the substring test batch-88 measured agreeing by accident; `M3-no-abspath` runs
+  the test on the unnormalised join, where `..` collapses to a direct child; `M1-guard-off`
+  restores rev51 exactly. Full battery and verdicts in `LED-89.21`.
+- **Boundary catalog:** ☑ empty — an id of `"."`, which names `.dev-flow/` itself and is the
+  case that EXISTS and is not a batch · ☑ boundary — `"z/"`, a legitimate batch wearing one
+  trailing separator, which must resolve rather than be refused · ☑ invalid — `"a/03-increments"`,
+  the NESTED id that is the only member of the domain separating a direct-child test from the
+  cheaper `".." in active`; `"."` and `".."` agree with the cheap test by accident · ☑ error —
+  `"../.."`, which walks out of the project.
+
 ---
 
 ## 5 · Validation strategy

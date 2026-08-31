@@ -380,3 +380,115 @@
   the first time on a change it did not anticipate**, and it is the demonstration the increment
   was asked for.
 
+### LED-89.20 — the freeze was lifted, and what pins the behaviour now
+- **Requirement:** LLR-89.6.5
+- **Date:** 2026-08-31
+- **What changed:** the direct-child test moved out of `_artifacts` and into
+  `_active_batch_state`, which gained a fifth resolution code, `notchild`. `_active_batch_dir`'s
+  BODY is unchanged — `LLR-88.5`'s acceptance froze that function and it is still frozen to the
+  letter; what moved is the resolver behind it, which the freeze never named. `_artifacts` lost
+  the two-line guard it had carried since batch-88, because it can no longer fire.
+- **Why the freeze was lifted, and it is not the reason batch-88 offered.** batch-88 registered
+  the amendment as a fork: lift the freeze on `_active_batch_dir` for one line, **or** state the
+  contract as *"whatever `state.json` says, unvalidated"* and audit every caller. **Both branches
+  were measured on 2026-08-31 and both are insufficient, for the same reason.**
+  `_active_batch_dir` is not the leak's only mouth. `_v27_newest_commit` reaches the declared id
+  through `os.path.basename(path)` on `_active_batch_state`'s return value and **never calls
+  `_active_batch_dir` at all** — so a guard placed inside `_active_batch_dir`, the literal
+  amendment on offer, closes `_v27_packets` and leaves the currency half of the SAME RULE reading
+  the whole corpus. The invariant belongs to whatever resolves a declared id against the
+  filesystem. That is `_active_batch_state`, and putting it there closes seven call sites at once
+  instead of three.
+- **And the second branch is `R-88-17` wearing a contract.** *"Validating it is every caller's
+  job"* has no population: it is discharged by auditing today's callers and re-auditing at every
+  future one, forever, with nothing able to tell you when an audit was skipped. `V27` is the
+  proof — batch-88 wrote the prediction down and the eighth day produced the caller.
+- **The freeze turned out to protect nothing, and that is armed rather than asserted.**
+  `LLR-88.5` froze the function so `_artifacts` would read *"exactly as it did at rev39"*, so the
+  question the amendment owed was not whether the new home is tidier but **whether the map
+  moved**. `ART A9-freeze-noop` reproduces rev51's caller-side guard as a reference
+  implementation and compares the two maps over seven declared ids — the three traversals, a
+  legitimate batch, a ghost, a trailing separator, and `../..` — values included. **Identical
+  everywhere.** Had it moved, the honest answer was to report that the freeze protects something
+  real and take the other branch; it does not, and the arm is what makes that a measurement.
+- **Evidence, measured 2026-08-31 on the rev51 code** over a fixture carrying an `03-increments/`
+  BESIDE `.dev-flow/` and another at `.dev-flow/` root:
+  - `batch_id: ".."` → `_v27_packets` returned **`{42}`** — a packet from outside the corpus,
+    which `V27` then NOTICEd as work on disk its ledger had failed to record. **This is worse
+    than the account the defect was reported under.** The prediction was that the `listdir` would
+    raise and `V27` would report zero packets and pass green over a ghost id; that is only what
+    happens when the escaped directory holds no `03-increments/`. When it holds one, the rule
+    does not fall silent — it **names a foreign increment number as this batch's**.
+  - `batch_id: "."` → `_v27_packets` returned `{77}` from `.dev-flow/03-increments/`, and
+    `_v27_newest_commit` ran `git log -- .dev-flow/.` and rendered the newest commit of the
+    **whole `.dev-flow/` tree** as *"the newest commit touching the batch directory"* — then
+    PASSED on it.
+  - `batch_id: "z/"` → a legitimate batch, one trailing separator: the loader read the right
+    directory while `os.path.basename` of the unnormalised join was the **empty string**, so
+    `V18` named batch `''` and `V27` reported that no batch was declared to ask git about. The
+    returned path is now absolute, which closes that form; `ART A9-trailing-sep` pins it and
+    `M4-raw-return` is the only mutant it kills.
+- **What `V18` now says, and it is the visible half.** `.` and `..` were reported `ok` —
+  *"active batch declared and on disk"* — which batch-88 called *"strictly worse than the ghost
+  case, because ghost at least announces itself."* They now resolve to `notchild` and announce
+  themselves. The three `ART A9-*` rows previously asserted `_active_batch_state(d)[1] == "ok"`
+  as a deliberate PAIR decision; **that decision is reversed here on purpose**, and the reversal
+  is recorded rather than quietly re-typed.
+- **The population of the correction, enumerated, because a correction has one.** The claim
+  *"the direct-child test is checked in the caller rather than in `_active_batch_dir`, which
+  `LLR-88.5` freezes"* stood in five places. **Corrected: 2** — `_artifacts`' docstring and the
+  selftest's `A9` block comment, both rewritten to name the new home. **Corrected: 1** —
+  `.dev-flow/BACKLOG-PROCESS.md`'s P1 item, marked closed with a pointer here. **Deliberately
+  NOT corrected: 2** — `.dev-flow/2026-08-24-batch-88/01-requirements.md`'s `LLR-88.5` bullet
+  and `03-increments/increment-005.md`. Those are a CLOSED batch's record; they were true when
+  written, that bullet is the entry which predicted this defect correctly, and rewriting closed
+  history to match today is the failure `V26`'s append-only ledger exists to prevent. The two
+  sites are named here so the population is enumerated rather than merely swept.
+
+### LED-89.21 — the mutation battery for the traversal guard, and the trap it reproduced
+- **Requirement:** LLR-89.6.5
+- **Date:** 2026-08-31
+- **Baseline:** 524 arms, 0 FAIL, `SELFTEST PASSED`, taken from the run's own mirrored tree.
+- **Verdicts — 7 mutants, 6 applicable, 6 KILLED, 0 SURVIVORS, 1 control:**
+
+| mutant | verdict | killed by |
+|---|---|---|
+| `M1-guard-off` (`if False:`) | KILLED | `A9-dot`, `A9-dotdot`, `A9-nested`, `A9-freeze-noop`, `V18 TRAVERSAL-*`, `V27 GUARD-*` |
+| `M2-cheap-dotdot` (`".." in batch`) | KILLED | `A9-dot`, `A9-nested`, `A9-freeze-noop`, `V18 TRAVERSAL-notice`, `V27 GUARD-currency` |
+| `M3-no-abspath` (test on the raw join) | KILLED | `A9-dot`, `A9-dotdot`, `A9-trailing-sep`, `A9-freeze-noop`, `V18 TRAVERSAL-*` |
+| `M4-raw-return` (guard kept, return raw) | KILLED | `A9-trailing-sep` **alone** |
+| `M5-code-only` (`return path, "notchild"`) | KILLED | `A9-dot`, `A9-dotdot`, `A9-nested`, `A9-freeze-noop`, `V27 GUARD-traversal` |
+| `M6-cause-collapse` (fifth cause says the fourth's words) | KILLED | `V18 notchild-SENTENCE`, `V18 TRAVERSAL-*` |
+| `M7-CRASH-control` (undefined name) | **CRASH** | reported CRASH at 0 arms, never SURVIVED |
+
+- **`M5-code-only` is the discriminating mutant and it is why the arms assert the PATH and not
+  only the code.** It reports `notchild` correctly — `V18` stays entirely green, every severity
+  and every sentence — while handing the poisoned path back to all seven callers. An arm block
+  that had asserted the new diagnosis and stopped there would have passed it. The rows assert
+  `_active_batch_dir(d) is None` and `_v27_packets(d) == set()` for exactly this reason.
+- **`M4-raw-return` is killed by ONE arm and that is the point, not a weakness.** Nothing else in
+  524 arms observes the difference between a normalised and an unnormalised return, because every
+  other fixture writes a `batch_id` with no trailing separator. Deleting `A9-trailing-sep` as
+  redundant would restore a live defect silently.
+- **THE rev49 TRAP WAS REPRODUCED, LIVE, ON ALL SIX KILLS.** The harness records, per mutant,
+  whether `SELFTEST PASSED` appears anywhere in the output as well as what the FINAL `SELFTEST`
+  line says. **On every one of the six kills the substring is present while the final line reads
+  `FAILED`** — `ENC VERDICT-live` prints it mid-run from a child process. A harness matching by
+  substring would have scored **6 of 6 as survivors** and this increment would have shipped
+  believing it was unarmed. The verdict is taken from the final line, and the observation is
+  printed per mutant rather than assumed.
+- **The harness corrupted its own baseline once, and the abort is what caught it.** The first
+  sweep opened the target with `open(TARGET, "w", encoding="utf-8")`, and Windows text mode
+  rewrote every LF as CRLF on restore — the baseline came back RED at 2 FAIL and the harness
+  **aborted rather than scoring**, which is the property `LED-89.18` paid for one increment
+  earlier. Both read and write now pass `newline=""`. **A harness that silently corrupts the file
+  it is scoring reports mutants that never ran**, and a red baseline is the only thing standing
+  between that and seven fabricated verdicts.
+- **Mirrored tree, not a flat copy** (`docs/tools/` beside a real `hooks/`), for the reason
+  `LED-89.18` records: `INT FOUR-PLACES-agree` walks up from `__file__` and a flat copy returns
+  a RED baseline that can score nothing.
+- **Not scored, and named rather than left silent:** `M6-cause-collapse` does not redden
+  `V18 CAUSES-differ`, because the substituted string still differs from `ghost`'s by a few
+  characters. `CAUSES-differ` is armed by construction and this battery does not exercise it; the
+  arm that carries the fifth cause's meaning is `notchild-SENTENCE`, which compares the whole
+  sentence as typed text and does redden.
