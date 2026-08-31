@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.29-rev49 | flow_hash: 61f37a790033c5f1 | corpus: 66 requirement files | corpus digest: bc0fb8c3c811d4c6 -->
+<!-- flow_version: 2026.08.30-rev50 | flow_hash: 861b7a7cdba1c459 | corpus: 66 requirement files | corpus digest: 1f124ad2c86ac7d9 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1380,7 +1380,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1474 unique id(s)
+## family US/HLR/LLR — 1479 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1584,6 +1584,7 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `HLR-89.3` | batches |
 | `HLR-89.4` | batches |
 | `HLR-89.5` | batches |
+| `HLR-89.6` | batches |
 | `HLR-A56` | batches, tests |
 | `HLR-B2` | batches |
 | `HLR-B64-1` | batches |
@@ -2436,6 +2437,10 @@ registry: 1372 rows — BURNED 422 · LIVE 893 · RESERVED 36 · RETIRED 21
 | `LLR-89.1.3` | batches |
 | `LLR-89.1.4` | batches |
 | `LLR-89.1.5` | batches |
+| `LLR-89.6.1` | batches |
+| `LLR-89.6.2` | batches |
+| `LLR-89.6.3` | batches |
+| `LLR-89.6.4` | batches |
 | `LLR-99.9` | batches |
 | `LLR-A` | batches |
 | `LLR-A56` | tests |

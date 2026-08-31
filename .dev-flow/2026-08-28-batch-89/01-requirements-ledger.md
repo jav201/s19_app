@@ -247,3 +247,136 @@
   the increment closed — the arm was written with `C:/Program` as the expectation and the run
   returned `Files/Py/python.exe`. A quoted GUARD path was added to the same domain so a space
   on either side is covered, taking it to 5 command shapes.
+
+---
+
+### LED-89.13 — the harvest reads the decision and never the notes, and the real record is why
+- **Requirement:** LLR-89.6.1
+- **What changed:** the coverage harvest was scoped to the `decision` field of each
+  `decisions_log` entry. `notes` is not read.
+- **Why, measured:** the wide harvest is the obvious first cut and it is wrong on the only
+  record that matters. batch-88's P0 entry at `0f40624` carries the notes *"PDR-2026-08-24-
+  batch-88 sealed in the vault, verdict approved with conditions: authorises Inc 1 and Inc 2,
+  WITHHOLDS Inc 3 and Inc 4 until #D1 lands."* — prose about a design review that had not
+  authorised the work yet. Harvesting it reports increments 3 and 4 LOGGED. The narrow harvest
+  reports `{3, 4, 5, 6, 7}` unlogged, which is what `05-close.md` §5 `G5-05` recorded.
+- **What this cost:** a fixture whose `decision` and `notes` agree cannot tell the two
+  harvests apart, so `NOTES-DONT-COUNT` had to be built from that entry rather than typed.
+  `M1-harvest-notes` reddens exactly two arms — `NOTES-DONT-COUNT` and `HISTORIC-b88` — and
+  every other coverage arm stays green under it.
+
+### LED-89.14 — "below P4" is not implementable, and saying so is the deliverable
+- **Requirement:** HLR-89.6
+- **What changed:** the second half of the batch's Story 6 was NOT implemented as asked. The
+  rule that shipped, `V28`, checks closure before SUPERSESSION.
+- **Why, measured:** two merges, both from station P3, both with `04-validation.md` and
+  `05-close.md` absent from the batch directory:
+
+  | | batch-88 | batch-89 |
+  |---|---|---|
+  | merge | `0f40624`, PR #203, 2026-08-28 07:27 | `dde935c`, PR #204, 2026-08-29 12:08 |
+  | station at merge | `P3` | `P3` |
+  | `04` / `05` on disk | absent / absent | absent / absent |
+  | verdict | **defect** | **correct — the batch ships increment by increment** |
+
+  Every field a local rule can read is identical. A rule reading *"any batch commit in `main`
+  while station < P4"* is RED ON BATCH-89 TODAY, on correct work, which is C-53's false-fail
+  and worse than no rule at all.
+- **What separates them, and when:** batch-88's merge was not the defect. The defect was that
+  the batch was ABANDONED at that station and a newer batch directory opened beside it. That
+  is the instant the hole became permanent, mechanically: `state.json` is SINGLE-SLOT, so once
+  `batch_id` moved to batch-89, `/dev-flow-sync` and every other tool that reads *"the batch"*
+  could no longer see batch-88. Its `04-validation.md` and `05-close.md` were written by hand
+  on 2026-08-29, a day late, and both say so at the top.
+- **What it costs, written into the rule rather than discovered later:** `V28` fires ONE
+  STATION LATE — the rollover is the earliest instant at which the two pictures differ, and it
+  is after the merge; it never looks at a commit; and it has a one-batch window (`LED-89.16`).
+  A validator cannot block a merge in any case, so the choice was never between blocking and
+  firing late — it was between firing late and firing on correct work.
+
+### LED-89.15 — NOTICE, and the third reason is the one that decides it
+- **Requirement:** HLR-89.6
+- **What changed:** both rules report at `NOTICE`, never `BLOCK`, in every state.
+- **Why:** (a) `state.json` is the flow's own bookkeeping and no increment owns it, so a BLOCK
+  would stop the very commit whose act of writing clears it — this increment does not own that
+  file and could not have cleared its own block; (b) a project whose log does not use this
+  flow's decision wording would BLOCK at every gate forever; (c) **the defect being closed is
+  INVISIBILITY, not permission.** batch-88's freeze was never blocked by anything and never
+  needed to be. It needed to be SEEN. A line printed at every gate is the whole repair.
+- **The honest limit of that ruling:** `run()` returns non-zero only on BLOCK, so neither rule
+  fails the gate's exit code, and `hooks/flow-guard.py` runs `V7`, `V15` and `V16` alone. What
+  these rules buy is a sentence in front of a reader at every gate — which is exactly what was
+  missing twice — and not an enforcement.
+
+### LED-89.16 — the one-batch window is bought with a measurement
+- **Requirement:** LLR-89.6.3
+- **What changed:** `V28` judges the IMMEDIATE PREDECESSOR of the active batch and no other.
+- **Why, measured 2026-08-30:** of the 72 batch-shaped directories under `.dev-flow/`, **nine**
+  hold neither or only one of `04-validation.md` / `05-close.md` / `05-postmortem.md` —
+  batches 25, 63, 66, 71, 73, 75, 78, 79 and 85. A corpus-wide sweep therefore prints nine
+  notices about closed history at every gate for the rest of the project's life, and a rule
+  nobody can act on is a rule nobody reads.
+- **What it costs:** two unclosed rollovers in a row and the older batch is never judged again.
+  Stated rather than left to be discovered.
+- **Two things the ordering had to get right, and only one of them is visible today:** the
+  predecessor is chosen by `(date, batch NUMBER as an int)`. Over the real corpus lexical order
+  AGREES, because every batch number is two digits — `ORDER-agrees-today` asserts that, and it
+  is why `ORDER-numeric` must be synthetic: `2026-09-01-batch-10` sorts before
+  `2026-09-01-batch-9` lexically, which would make a batch its own successor's predecessor.
+  `05-postmortem.md` counts as the close artifact beside `05-close.md` because both names are
+  live in the corpus; accepting one would report batch-85's real close as absent.
+
+### LED-89.17 — currency needs git, and its two absences are not one absence
+- **Requirement:** LLR-89.6.2
+- **What changed:** the currency half asks git for the newest commit touching
+  `.dev-flow/<batch>/` and compares dates as `YYYY-MM-DD` strings.
+- **Why the pathspec is load-bearing:** without it the question becomes *"when was this
+  repository last committed to"*, which is a different and always-fresher number.
+  `M8-no-pathspec` reddens `E2E-git-date` and nothing else, so that arm is the only thing
+  standing between the rule and a question it was not asked.
+- **Why two absences and not one:** `_git` returns `None` when git is absent, times out or
+  fails, and the EMPTY STRING when it ran and matched nothing. Those are opposite states — an
+  unchecked obligation versus a checked one with nothing to be behind — and Increment 3 of this
+  batch already paid for collapsing two causes into one message. `M9-causes-collapse` reddens
+  the arm that holds them apart.
+- **Why the comparison is `<` and not `<=`:** a ledger written the same day as the commit is
+  CURRENT. `M3-currency-off-by-one` reddens ten arms, which is the widest blast radius in this
+  increment and the reason the boundary is armed at equality rather than inferred.
+- **Why the newest entry is a maximum and not the last row:** an append-only log is written in
+  order by convention and nothing enforces it. `M4-oldest-not-newest` reddens
+  `CURRENCY-MAX-NOT-LAST`, whose fixture inserts one older row after two newer ones.
+
+### LED-89.18 — the mutation battery, its one survivor and its one rewritten mutant
+- **Requirement:** LLR-89.6.4
+- **What changed:** 25 named single-edit mutants were run against `V27` and `V28`.
+- **Result:** baseline 490 arms, zero red. **24 killed, 1 survived, 0 broken.**
+- **The mutants live in a MIRRORED flow tree**, `docs/tools/` plus `hooks/`, under the job's
+  scratch directory. A flat copy was tried first and the baseline came back RED: rev49's
+  `INT FOUR-PLACES-agree` arm reads three sibling scripts by walking three directories up from
+  `__file__`, so outside a flow-shaped tree it reports the layout instead of the interpreters.
+  **A baseline that is already red cannot score anything**, and lowering the bar to accommodate
+  it would have been the vacuous check one level out.
+- **The survivor is recorded EQUIVALENT by execution rather than chased.**
+  `M15-zero-padding-dropped` removes `0*` from the harvest pattern. With it, the quantifier
+  eats the zeros and the group captures `7`; without it the group captures `007` and `int()`
+  eats them instead. No input separates the two, `Increment 0` included. It is left in place
+  because its sibling `_V27_PACKET` reads filenames where the intent is worth stating.
+- **One mutant was REWRITTEN because it was BROKEN, not because it survived.**
+  `M13-nodate-silent` (`if not days:` → `if False:`) crashed at 454 arms with no verdict line,
+  which the harness correctly refused to score: a crash prints no FAIL and reads exactly like a
+  survivor. The guard it removes is what stops an `IndexError` on an empty list, so the mutant
+  could never have been silent. It was replaced by `M13-malformed-date-accepted`, which drops
+  the `_V27_DAY` filter instead — the real defect shape — and reddens `NODATE` alone.
+
+### LED-89.19 — a sixth increment on a record that declared five
+- **Requirement:** HLR-89.6
+- **What changed:** §1's scope table gains **Story 6**, and its opening sentence now says six.
+- **How, and why it matters:** through this ledger. The record that opened on 2026-08-28
+  declared five stories; batch-88's close, written 2026-08-29, then measured two defects no
+  rule could see (`G5-05`, and the merge accounted in `04-validation.md` §6). The scope moved
+  by APPENDING the reason here and amending the current sentence there — never by striking the
+  old one, which `V26` would BLOCK, and never by leaving the table saying five while six were
+  shipped, which nothing would have caught. **This is the mechanism Increment 1 built, used for
+  the first time on a change it did not anticipate**, and it is the demonstration the increment
+  was asked for.
+
