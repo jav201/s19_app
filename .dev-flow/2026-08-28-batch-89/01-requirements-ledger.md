@@ -152,3 +152,231 @@
   removal, never silently deleted, so a reader meeting the gap finds the argument. **The three
   returned fields are mandatory and enforced by no rule — `R-89-8` says so rather than letting
   the word "mandatory" imply a check that does not exist.**
+### LED-89.8 — `P-8` was reproduced before it was repaired, and the reproduction corrected it
+- **Requirement:** HLR-89.2
+- **Date:** 2026-08-29
+- **What changed:** `P-8` moved from ❓ UNDECIDABLE to a measured result, and its figure
+  changed. The premise claimed the crash emits **zero arms**; the crash emits **whatever the
+  encoding allows before it meets a character it cannot carry**.
+- **Why:** repairing an unobserved defect repairs the wrong thing. Two surfaces were run
+  before any code was written. `PYTHONIOENCODING` unset with stdout redirected to a file:
+  exit 1, `UnicodeEncodeError: 'charmap' codec can't encode character '\u2212'`, **12 arm
+  lines on disk**, no verdict. `PYTHONIOENCODING=ascii`: exit 1 on `\u00b7` — the separator
+  in every arm line — inside the FIRST arm, **0 arm lines**, no verdict.
+- **Evidence:** the operator's two conflicting measurements (zero arms; ~12 arms) are **both
+  correct and neither is about buffering**, which was the stated cause. Python flushes the
+  text buffer at interpreter shutdown even after the exception, so the bytes already encoded
+  do reach the file. What differs is the ENCODING: cp1252 carries `\u00b7` and dies later at
+  `\u2212`; ASCII carries neither and dies at the first line. **The load-bearing half of
+  `P-8` — exit 1 with no verdict line, indistinguishable from a genuine failure — held on
+  both.** This is why the arms use a domain of 5 encodings: one encoding is not a domain, and
+  this defect demonstrates that rather than illustrating it.
+
+### LED-89.9 — the repair is at the stream, not at the fixture, and the corpus figure was wrong
+- **Requirement:** HLR-89.2
+- **Date:** 2026-08-29
+- **What changed:** the fix reconfigures stdout/stderr's ERROR HANDLER to `backslashreplace`
+  at `__main__` (`_harden_streams`), rather than ASCII-ing the V5 ledger fixture that holds
+  the `\u2212`. The consumer's ENCODING is deliberately not overridden.
+- **Why:** the fixture's `\u2212` is the character that fires today, not the class. Forcing
+  `encoding=utf-8` would end the crash by writing bytes a cp1252 reader misreads — trading a
+  loud failure for a quiet corruption. Changing only `errors` keeps a capable stream
+  byte-identical (`ENC UTF8-lossless`) and gives an incapable one a readable `\u2212`.
+- **Evidence:** the corpus figure in the increment's brief — **601 non-cp1252 characters of 6
+  kinds** — did not reproduce. Measured 2026-08-29 over the 22 canon rows of
+  `docs/FLOW-VERSION.md`: **534 non-cp1252 characters of 28 distinct kinds**, and against an
+  ASCII stdout the real domain is **2511 non-ASCII characters of 38 kinds**. (Sweeping canon
+  **plus** the generated bundle mirror gives 1310 of 34 kinds, which is the likeliest origin
+  of the 601 — a double count of a duplicated tree.) An arm asserting the fixture contains no
+  `\u2212` would pin one instance of a 38-member class; `ENC VERDICT-domain` harvests its
+  probe FROM the canon instead, so a new character entering any canon file enters the arm
+  with it.
+
+### LED-89.10 — the CI site keeps `python3`, and that asymmetry is the ruling
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `HLR-89.3`'s threshold stopped being *0 remaining `python3` sites*. Three
+  shebangs changed to `python`; `.github/workflows/flow-selftest.yml:40` **keeps** `python3`.
+- **Why:** that job runs on `ubuntu-latest`, where `python3` is the correct name and a bare
+  `python` may not exist. The brief's own caution — do not break CI to fix Windows — is
+  incompatible with a global count of zero. **The GitHub runner's provision of `python` was
+  NOT measured** (no runner is reachable from here), and an unmeasured premise is not a
+  licence to change a working CI line.
+- **Evidence:** the correction has a population, so it was swept (`R-88-17`). Live `python3`
+  claims outside this batch's own new prose: `FLOW-VERSION.md:10` (V17's row) and
+  `flow-selftest.yml:57` (V17's description) — both updated; `flow-selftest.yml:40` — kept,
+  with a comment saying why so a later reader does not "unify" it; `FLOW-VERSION.md:202` —
+  historical changelog prose quoting the lessons catalogue, correctly untouched. **The
+  selftest therefore asserts that the four LOCAL sites agree with each other and never that a
+  given name runs**, which is what makes the asymmetry safe: `INT FOUR-PLACES-agree` is true
+  on both platforms.
+
+### LED-89.11 — "resolves" was the wrong verb, and a surviving mutant is what proved it
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `HLR-89.3` said `V17` must BLOCK on an interpreter that *does not
+  resolve*. It now says *does not start Python when executed*, and `_interpreter_runs`
+  executes the token and reads back a marker.
+- **Why:** resolving is exactly what the defect passes. Measured on this machine: `python3`
+  resolves to the Microsoft Store alias in `WindowsApps` — a real file, on PATH, that
+  `shutil.which` reports and `os.path.isfile` confirms — which prints "Python was not found"
+  and **exits 49**. Executing `hooks/flow-guard.py` through its own shebang exited **49**. A
+  rule written to the old verb would have called that machine green.
+- **Evidence:** the first version of the arm used a temp text file as the dead interpreter.
+  That fixture is not executable, so `_interpreter_runs` refuses it from the `OSError` branch
+  and never evaluates its return expression — and the mutant replacing that expression with
+  `return True`, which restores the original defect exactly, **SURVIVED the full selftest**.
+  `INT RUNS!=IS-PYTHON` was added with a real program discovered at runtime (`git` here), and
+  the collector fixture in `INT WIRING-collects` was switched to it. 13 of 13 mutants killed
+  afterwards, against a GREEN baseline — the first harness run had a red baseline and its
+  "kills" were discarded rather than reported.
+
+### LED-89.12 — getting the interpreter WRONG is the same rule lying in the other direction
+- **Requirement:** HLR-89.3
+- **Date:** 2026-08-29
+- **What changed:** `_cmd_tokens` was added so a QUOTED span in a hook command stays whole,
+  and `_guard_interpreter` uses it. `_guard_path_resolves` is untouched.
+- **Why:** the existing tokenizer splits on whitespace and discards quotes, which is harmless
+  for asking whether some token ends in `flow-guard.py` and not harmless for naming the
+  interpreter. The default Windows install lives under `C:\Program Files\...`, so the
+  correctly quoted command `"C:/Program Files/Py/python.exe" ~/.claude/hooks/flow-guard.py`
+  yielded an interpreter of `Files/Py/python.exe` — which cannot run, so the NEW `V17` would
+  have BLOCKed a perfectly wired machine. That is the `C-53` false fail, on the one rule whose
+  BLOCK stops the flow, for most of Windows.
+- **Evidence:** found by `INT INTERP-parse` failing on its own author's expected value, before
+  the increment closed — the arm was written with `C:/Program` as the expectation and the run
+  returned `Files/Py/python.exe`. A quoted GUARD path was added to the same domain so a space
+  on either side is covered, taking it to 5 command shapes.
+
+---
+
+### LED-89.13 — the harvest reads the decision and never the notes, and the real record is why
+- **Requirement:** LLR-89.6.1
+- **What changed:** the coverage harvest was scoped to the `decision` field of each
+  `decisions_log` entry. `notes` is not read.
+- **Why, measured:** the wide harvest is the obvious first cut and it is wrong on the only
+  record that matters. batch-88's P0 entry at `0f40624` carries the notes *"PDR-2026-08-24-
+  batch-88 sealed in the vault, verdict approved with conditions: authorises Inc 1 and Inc 2,
+  WITHHOLDS Inc 3 and Inc 4 until #D1 lands."* — prose about a design review that had not
+  authorised the work yet. Harvesting it reports increments 3 and 4 LOGGED. The narrow harvest
+  reports `{3, 4, 5, 6, 7}` unlogged, which is what `05-close.md` §5 `G5-05` recorded.
+- **What this cost:** a fixture whose `decision` and `notes` agree cannot tell the two
+  harvests apart, so `NOTES-DONT-COUNT` had to be built from that entry rather than typed.
+  `M1-harvest-notes` reddens exactly two arms — `NOTES-DONT-COUNT` and `HISTORIC-b88` — and
+  every other coverage arm stays green under it.
+
+### LED-89.14 — "below P4" is not implementable, and saying so is the deliverable
+- **Requirement:** HLR-89.6
+- **What changed:** the second half of the batch's Story 6 was NOT implemented as asked. The
+  rule that shipped, `V28`, checks closure before SUPERSESSION.
+- **Why, measured:** two merges, both from station P3, both with `04-validation.md` and
+  `05-close.md` absent from the batch directory:
+
+  | | batch-88 | batch-89 |
+  |---|---|---|
+  | merge | `0f40624`, PR #203, 2026-08-28 07:27 | `dde935c`, PR #204, 2026-08-29 12:08 |
+  | station at merge | `P3` | `P3` |
+  | `04` / `05` on disk | absent / absent | absent / absent |
+  | verdict | **defect** | **correct — the batch ships increment by increment** |
+
+  Every field a local rule can read is identical. A rule reading *"any batch commit in `main`
+  while station < P4"* is RED ON BATCH-89 TODAY, on correct work, which is C-53's false-fail
+  and worse than no rule at all.
+- **What separates them, and when:** batch-88's merge was not the defect. The defect was that
+  the batch was ABANDONED at that station and a newer batch directory opened beside it. That
+  is the instant the hole became permanent, mechanically: `state.json` is SINGLE-SLOT, so once
+  `batch_id` moved to batch-89, `/dev-flow-sync` and every other tool that reads *"the batch"*
+  could no longer see batch-88. Its `04-validation.md` and `05-close.md` were written by hand
+  on 2026-08-29, a day late, and both say so at the top.
+- **What it costs, written into the rule rather than discovered later:** `V28` fires ONE
+  STATION LATE — the rollover is the earliest instant at which the two pictures differ, and it
+  is after the merge; it never looks at a commit; and it has a one-batch window (`LED-89.16`).
+  A validator cannot block a merge in any case, so the choice was never between blocking and
+  firing late — it was between firing late and firing on correct work.
+
+### LED-89.15 — NOTICE, and the third reason is the one that decides it
+- **Requirement:** HLR-89.6
+- **What changed:** both rules report at `NOTICE`, never `BLOCK`, in every state.
+- **Why:** (a) `state.json` is the flow's own bookkeeping and no increment owns it, so a BLOCK
+  would stop the very commit whose act of writing clears it — this increment does not own that
+  file and could not have cleared its own block; (b) a project whose log does not use this
+  flow's decision wording would BLOCK at every gate forever; (c) **the defect being closed is
+  INVISIBILITY, not permission.** batch-88's freeze was never blocked by anything and never
+  needed to be. It needed to be SEEN. A line printed at every gate is the whole repair.
+- **The honest limit of that ruling:** `run()` returns non-zero only on BLOCK, so neither rule
+  fails the gate's exit code, and `hooks/flow-guard.py` runs `V7`, `V15` and `V16` alone. What
+  these rules buy is a sentence in front of a reader at every gate — which is exactly what was
+  missing twice — and not an enforcement.
+
+### LED-89.16 — the one-batch window is bought with a measurement
+- **Requirement:** LLR-89.6.3
+- **What changed:** `V28` judges the IMMEDIATE PREDECESSOR of the active batch and no other.
+- **Why, measured 2026-08-30:** of the 72 batch-shaped directories under `.dev-flow/`, **nine**
+  hold neither or only one of `04-validation.md` / `05-close.md` / `05-postmortem.md` —
+  batches 25, 63, 66, 71, 73, 75, 78, 79 and 85. A corpus-wide sweep therefore prints nine
+  notices about closed history at every gate for the rest of the project's life, and a rule
+  nobody can act on is a rule nobody reads.
+- **What it costs:** two unclosed rollovers in a row and the older batch is never judged again.
+  Stated rather than left to be discovered.
+- **Two things the ordering had to get right, and only one of them is visible today:** the
+  predecessor is chosen by `(date, batch NUMBER as an int)`. Over the real corpus lexical order
+  AGREES, because every batch number is two digits — `ORDER-agrees-today` asserts that, and it
+  is why `ORDER-numeric` must be synthetic: `2026-09-01-batch-10` sorts before
+  `2026-09-01-batch-9` lexically, which would make a batch its own successor's predecessor.
+  `05-postmortem.md` counts as the close artifact beside `05-close.md` because both names are
+  live in the corpus; accepting one would report batch-85's real close as absent.
+
+### LED-89.17 — currency needs git, and its two absences are not one absence
+- **Requirement:** LLR-89.6.2
+- **What changed:** the currency half asks git for the newest commit touching
+  `.dev-flow/<batch>/` and compares dates as `YYYY-MM-DD` strings.
+- **Why the pathspec is load-bearing:** without it the question becomes *"when was this
+  repository last committed to"*, which is a different and always-fresher number.
+  `M8-no-pathspec` reddens `E2E-git-date` and nothing else, so that arm is the only thing
+  standing between the rule and a question it was not asked.
+- **Why two absences and not one:** `_git` returns `None` when git is absent, times out or
+  fails, and the EMPTY STRING when it ran and matched nothing. Those are opposite states — an
+  unchecked obligation versus a checked one with nothing to be behind — and Increment 3 of this
+  batch already paid for collapsing two causes into one message. `M9-causes-collapse` reddens
+  the arm that holds them apart.
+- **Why the comparison is `<` and not `<=`:** a ledger written the same day as the commit is
+  CURRENT. `M3-currency-off-by-one` reddens ten arms, which is the widest blast radius in this
+  increment and the reason the boundary is armed at equality rather than inferred.
+- **Why the newest entry is a maximum and not the last row:** an append-only log is written in
+  order by convention and nothing enforces it. `M4-oldest-not-newest` reddens
+  `CURRENCY-MAX-NOT-LAST`, whose fixture inserts one older row after two newer ones.
+
+### LED-89.18 — the mutation battery, its one survivor and its one rewritten mutant
+- **Requirement:** LLR-89.6.4
+- **What changed:** 25 named single-edit mutants were run against `V27` and `V28`.
+- **Result:** baseline 490 arms, zero red. **24 killed, 1 survived, 0 broken.**
+- **The mutants live in a MIRRORED flow tree**, `docs/tools/` plus `hooks/`, under the job's
+  scratch directory. A flat copy was tried first and the baseline came back RED: rev49's
+  `INT FOUR-PLACES-agree` arm reads three sibling scripts by walking three directories up from
+  `__file__`, so outside a flow-shaped tree it reports the layout instead of the interpreters.
+  **A baseline that is already red cannot score anything**, and lowering the bar to accommodate
+  it would have been the vacuous check one level out.
+- **The survivor is recorded EQUIVALENT by execution rather than chased.**
+  `M15-zero-padding-dropped` removes `0*` from the harvest pattern. With it, the quantifier
+  eats the zeros and the group captures `7`; without it the group captures `007` and `int()`
+  eats them instead. No input separates the two, `Increment 0` included. It is left in place
+  because its sibling `_V27_PACKET` reads filenames where the intent is worth stating.
+- **One mutant was REWRITTEN because it was BROKEN, not because it survived.**
+  `M13-nodate-silent` (`if not days:` → `if False:`) crashed at 454 arms with no verdict line,
+  which the harness correctly refused to score: a crash prints no FAIL and reads exactly like a
+  survivor. The guard it removes is what stops an `IndexError` on an empty list, so the mutant
+  could never have been silent. It was replaced by `M13-malformed-date-accepted`, which drops
+  the `_V27_DAY` filter instead — the real defect shape — and reddens `NODATE` alone.
+
+### LED-89.19 — a sixth increment on a record that declared five
+- **Requirement:** HLR-89.6
+- **What changed:** §1's scope table gains **Story 6**, and its opening sentence now says six.
+- **How, and why it matters:** through this ledger. The record that opened on 2026-08-28
+  declared five stories; batch-88's close, written 2026-08-29, then measured two defects no
+  rule could see (`G5-05`, and the merge accounted in `04-validation.md` §6). The scope moved
+  by APPENDING the reason here and amending the current sentence there — never by striking the
+  old one, which `V26` would BLOCK, and never by leaving the table saying five while six were
+  shipped, which nothing would have caught. **This is the mechanism Increment 1 built, used for
+  the first time on a change it did not anticipate**, and it is the demonstration the increment
+  was asked for.
+
