@@ -492,3 +492,100 @@
   characters. `CAUSES-differ` is armed by construction and this battery does not exercise it; the
   arm that carries the fifth cause's meaning is `notchild-SENTENCE`, which compares the whole
   sentence as typed text and does redden.
+
+### LED-89.22 — a rule that named the wrong cause, and a floor re-derived by the method that can see one
+- **Requirement:** HLR-89.4
+- **Date:** 2026-08-31
+- **What changed:** `v8_module_map`'s enumeration was rewritten (`git ls-files -z`, explicit
+  `encoding="utf-8"`, a returncode branch, and a narrowed `except`), and `HLR-89.4`'s Python
+  floor was RE-DERIVED rather than carried across the predicate that changed.
+
+**The defect: one sentence over three different worlds.** The rule ran
+`subprocess.run(..., capture_output=True, text=True)` under a bare `except Exception`, and
+`text=True` decodes with the locale codepage — cp1252 on this machine, measured on both
+interpreters. The file states the opposing law 725 lines away in `_git`'s own docstring. Three
+faults, none of them loud:
+1. **The wrong cause, named confidently.** A `UnicodeDecodeError` became `tracked = None`,
+   which is the `_V8_NO_GIT` path, so V8 announced *"git could not be run, so NO file was
+   enumerated"* about a run in which git ran fine and returned bytes Python refused to decode.
+   The rule did not fall silent; it testified incorrectly.
+2. **A FALSE PASS that the file's own comment says was "one edit away".** It was not away at
+   all. `subprocess.run` does not raise on a non-zero exit, so a root outside any repository
+   gave `stdout == ""` → `.split() == []` → **not `None`** → V8 printed `N modules, no orphan
+   files`. Reproduced: exit **128**, empty stdout, `fatal: not a git repository`.
+3. **Silent under-enumeration.** `core.quotepath` defaults to TRUE, so git ASCII-quotes
+   non-ASCII paths to `"\304\201.py"` — which does not end in `.py` and was therefore skipped
+   from the orphan check entirely — and whitespace `.split()` cut `two words.py` into `two` and
+   `words.py`: one phantom orphan against a file that does not exist, one real file never
+   checked.
+- **Why quotepath is the whole point:** it is a git config **this flow does not own**, and it
+  is the only reason fault 1 had not fired. Measured both ways on a throwaway repo:
+  `quotepath=true` yields ASCII that cp1252 decodes; `quotepath=false` yields raw UTF-8 whose
+  `c4 81` (U+0101) is **undefined in cp1252** and raises. A defect that waits on someone else's
+  config is still a defect. `-z` emits paths verbatim under either setting, which is why the
+  fix removes the dependency instead of documenting it; `QUOTEPATH-invariant` asserts the
+  verdict does not move when the config does.
+- **The third time this batch:** Increment 3 paid for collapsing two causes into one message,
+  `LED-89.17` held two absences apart in `_git`, and this is the same family a third time. The
+  absence is now carried with its REASON (`absent_reason`, defaulting to `_V8_NO_GIT`, so every
+  pre-existing arm keeps its meaning) and `_V8_GIT_FAILED` says *"git RAN and exited
+  non-zero"*. `ABSENCES-differ` asserts the two do not share a phrase.
+
+**The floor, re-derived by both methods.** `R-88-18` forbids carrying a constant across a
+substituted predicate, and removing `text=` substituted this one.
+- **(a) stdlib-API floor — 3.7.** An AST walk for version-gated constructs. The floor no longer
+  rests on the edited site: it is bound independently by `from __future__ import annotations`
+  and by `capture_output=` at the **9 remaining** `subprocess.run` calls. The constant survived;
+  it was re-derived, not carried, and it is now cited at surfaces this batch does not edit.
+- **(b) SYNTAX floor — and this is the method that was missing.** An AST walk on the running
+  interpreter **structurally cannot see a syntax floor**: it only ever sees what already
+  parsed. That is how rev53's PEP 701 f-string reached the gate env as a `SyntaxError`.
+  `ast.parse(..., feature_version=)` is **not** the fix — measured 2026-08-31, it reports
+  "parses" for that construct at **every** version 3.7 through 3.12, while the real
+  `s19env` 3.11.15 refuses it: `SyntaxError: unterminated string literal`. The documentary
+  method is demonstrably blind to the exact floor it was reached for.
+- **What is executed and what is not, stated plainly:** the file compiles and passes
+  `SELFTEST` on **3.11.15** and **3.12.7**, both executed. **No interpreter below 3.11 exists on
+  this machine**, so 3.7–3.10 is asserted by analysis alone. `HLR-89.4` therefore declares
+  **3.11** — the lowest floor with an interpreter that RUNS it — and records 3.7 as a
+  documentary API lower bound. Declaring 3.7 would repeat rev53 exactly: a number with no
+  interpreter behind it.
+
+**Mutation battery — 9 applied, 7 killed, 2 survivors, both argued.** Mutants ran as copies in
+a **mirrored flow tree** (`docs/tools/` beside a real `hooks/`) because `INT FOUR-PLACES-agree`
+walks three directories up from `__file__`; a flat copy returns a RED baseline, and a red
+baseline scores nothing. Baseline in the mirror: `SELFTEST PASSED`. Verdicts are read from the
+**final line beginning `SELFTEST `** — a substring match instead hits `ENC VERDICT-live`, which
+prints `SELFTEST PASSED` mid-run from a child process at output line 452.
+- **Sentinel first:** `SENTINEL-must-be-RED` corrupts `_V8_NO_GIT` and was **KILLED**, so the
+  detector is proven able to see red before any verdict is trusted.
+- Killed: `M1-restore-text=True` (crashes now instead of lying — the narrowed `except` no
+  longer swallows the decode failure), `M2-drop--z-keep-encoding`, `M3-ignore-returncode` (the
+  false pass), `M4-collapse-two-causes`, `M5-core-ignores-reason`, `M6-reword-git-failed`.
+- **Survivors, named rather than counted as covered.** `M7-errors-strict` and
+  `M8-drop-empty-filter` both survive and both are argued **equivalent on this platform**:
+  NTFS stores names as UTF-16, so git always emits valid UTF-8 and `errors=` is unreachable;
+  and `-z`'s trailing NUL yields an `""` element that no branch can act on. Neither is a
+  coverage gap this battery could close with a fixture, and neither is claimed as a kill.
+
+**Population sweep of the two figures, enumerated.**
+- `01-requirements.md` **P-6** (the floor's predicate), **P-9** (the "cannot demonstrate a
+  violation" rationale), **HLR-89.4** threshold + Ledger field — **all corrected, live**.
+- `devflow-validate.py`'s selftest tail claimed V8's `git ls-files` enumeration was one of two
+  I/O steps "unproven synthetically" — **corrected**: it is now driven end to end, and it had
+  stood named-as-uncovered for seven revisions while holding three defects.
+- `FLOW-VERSION.md` **rev53** states the 3.7 derivation is refuted and reports **524 arms**.
+  **CLOSED HISTORY, true when written, deliberately left**: 524 was the count that day, and a
+  revision row records what a revision found. Named here so the population is enumerated rather
+  than silently partial. **One claim in that row is measurably wrong and is corrected here
+  rather than in it:** rev53 reports "byte-identical arm output" across 3.11.15 and 3.12.7.
+  Measured 2026-08-31, three arm lines (`IFC ids-declared`, `IFC list-named`,
+  `IFC list-multiline`) print a `set` repr whose order varies **run to run on a single
+  interpreter** under default `PYTHONHASHSEED`. No verdict moves — all three read `ok` every
+  time — but the output is not byte-identical between any two runs, let alone between two
+  interpreters, and a future arm that diffed selftest output would fail on noise. Not repaired
+  in this increment: it is `_atlas`-adjacent output hygiene, outside the two figures this entry
+  moves, and it is recorded so it is not rediscovered as a defect.
+- `LED-89.2`'s evidence line cites `capture_output=` with `text=` at `:572-573`. **CLOSED
+  HISTORY, and the ledger is append-only**: it was correct when written, the construct it cites
+  no longer exists, and this entry supersedes it rather than rewriting it.
