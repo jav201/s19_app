@@ -50,10 +50,10 @@ Every figure below was produced by a command this session ran, except where the 
 | P-3 | Markdown strikethrough is the only supersession marker with a grammar; the warning glyph is not | premise | ✅ TRUE | measured over all 65 pre-batch-89 records, 2026-08-28: 16 carry the glyph, 10 carry strikethrough. Inspection of the glyph's sites shows it marking current-state warnings as often as amendments | `LLR-89.1.2` checks strikethrough and deliberately not vocabulary |
 | P-4 | `python3` is invoked at 4 sites in the flow | premise | ✅ TRUE, with one path corrected | `grep -rn python3` 2026-08-28 found 4 sites; re-measured 2026-08-29, the count holds and one path did not: the CI file is `~/.claude/.github/workflows/flow-selftest.yml:40`, **not** under `s19_app`. Three shebangs now say `python`; the CI site KEEPS `python3` — see `LED-89.10` | `HLR-89.3` |
 | P-5 | `devflow-validate.py` imports zero third-party modules | premise | ✅ TRUE | its only import lines are `from __future__ import annotations` and `import builtins, hashlib, json, os, re, shutil, subprocess, sys, tempfile, textwrap, time` — all stdlib | `HLR-89.4` |
-| P-6 | The Python floor is 3.7, bound by `capture_output=` with `text=` | premise | ✅ TRUE | `subprocess.run(..., capture_output=True, text=True, ...)` inside **`v8_module_map`** (`devflow-validate.py:572-573` at this commit). Both kwargs landed in CPython 3.7 | `HLR-89.4`; cited by SYMBOL, see `LED-89.2` |
+| P-6 | The Python floor is 3.7, bound by `capture_output=` with `text=` | premise | ❌ FALSE in its predicate; **3.7 survives as the API floor only** | **RE-DERIVED 2026-08-31 by both methods**, because rev54 removed `text=` from `v8_module_map` and a constant may not be carried across a substituted predicate (`R-88-18`). **API floor 3.7**, now bound independently at two surviving surfaces — `from __future__ import annotations` in the import block, and `capture_output=` at the **9 remaining** `subprocess.run` sites — so the citation no longer rests on the one construct the batch itself edits. **SYNTAX floor is a separate derivation and the AST method is blind to it**: `ast.parse(feature_version=)` accepts the rev53 PEP 701 construct at *every* version 3.7–3.12 while real 3.11.15 refuses it. See `LED-89.22` | `HLR-89.4`; cited by SYMBOL, see `LED-89.2`, `LED-89.22` |
 | P-7 | A full `--selftest` needs git ≥ 2.28.0, bound by `git init -b` | premise | ✅ TRUE | `_g(d, "init", "-q", ..., "-b", "main", ...)` inside the **V25 fixture builder in `selftest()`**. `git init -b` landed in git 2.28.0. It is reached only by the selftest, never by the gate | `HLR-89.4`; the operator's citation `:5299` was **correct before this increment and is stale after it** — see `LED-89.2` |
 | P-8 | `--selftest` crashes under a cp1252 stdout, emitting zero arms and no verdict line | inherited | ✅ TRUE in its load-bearing half, ❌ FALSE in its figure | **REPRODUCED 2026-08-29, Increment 2's first act, on two surfaces.** `PYTHONIOENCODING` unset + stdout redirected: exit 1, `UnicodeEncodeError` on `\u2212`, **12 arm lines**, no verdict. `PYTHONIOENCODING=ascii`: exit 1 on `\u00b7` in the FIRST arm line, **0 arm lines**, no verdict. The crash and the missing verdict are real; **"zero arms" is a property of the ENCODING, not of buffering** — see `LED-89.8` | `HLR-89.2` |
-| P-9 | The local toolchain satisfies both floors | premise | ✅ TRUE | `git version 2.49.0.windows.1`, `Python 3.12.7` | this machine cannot demonstrate a floor VIOLATION, which is why `HLR-89.4` obliges derivation from source and not a runtime probe |
+| P-9 | The local toolchain satisfies both floors | premise | ❌ FALSE in its rationale | `git version 2.49.0.windows.1`. **This machine holds TWO interpreters — conda `s19env` at `3.11.15` and base Anaconda at `3.12.7` — so it CAN demonstrate a floor violation, and rev53's was found by executing 3.11.15, never by analysis.** "Cannot demonstrate a violation" is the belief that left the syntax floor unmeasured while every measurement was taken on 3.12. Derivation from source stays obliged, but it is now the *second* method, not the only one — see `LED-89.22` | `HLR-89.4` |
 
 | P-10 | batch-88's `decisions_log` froze on 2026-08-27 with no entry for increments 3 through 7, after the batch had already found and repaired the identical freeze | inherited from `05-close.md` §5 `G5-05` | ✅ TRUE | **REPRODUCED 2026-08-30 against the record itself.** `git show 0f40624:.dev-flow/state.json` -- the state as it stood at the merge -- holds **10 entries**, newest dated **2026-08-27**, and only two `decision` fields name an increment (1 and 2). Seven packets existed at that commit (`git ls-tree -r 0f40624`), so **increments 3, 4, 5, 6 and 7 were unlogged at merge time** | `HLR-89.6`; the arm `V27 HISTORIC-b88` replays exactly this |
 | P-11 | batch-88 merged to `main` from station P3 with `04-validation.md` and `05-close.md` absent, and batch-89 merged Increment 1 to `main` from station P3 with the same two files absent | premise | ✅ TRUE, and it is the reason `HLR-89.6`'s second half is NOT the property that was asked for | `git ls-tree -r dde935c -- .dev-flow/` (the commit that first put batch-89's directory on disk): batch-88 held `01-requirements.md`, `01b-qa-validation-plan.md`, `02-review-security.md`, `PLAN.md` and seven packets, and **neither closing artifact**. `state.json` at the same commit declares `current_station: P3`. batch-89's own merge is `dde935c` under PR #204, at station P3, and is **correct** | `LED-89.14` -- the two are the same picture on disk, so no rule keyed on "below P4 with commits in `main`" can separate them |
@@ -159,22 +159,40 @@ written, and its figure corrected in the same act (`LED-89.8`).
 
 ### HLR-89.4 — the environment contract is declared and DERIVED, never asserted
 - **Traceability:** Story 4
-- **Ledger:** LED-89.2
+- **Ledger:** LED-89.2, LED-89.22, LED-89.23
 - **Statement:** The flow shall declare its environment contract as a canon row, and a rule
   shall derive that contract's floors from the source constructs that bind them.
 - **Rationale (informative):** a floor written down by hand is a claim; a floor derived from
   the construct that raises it is a measurement that cannot rot.
 - **Validation:** `analysis`
 - **Executed verification:** the rule scans this file set for the binding constructs and
-  compares what it finds against the declared row
-- **Numeric pass threshold:** Python floor **3.7** (bound by `capture_output=` with `text=`),
-  git floor **2.28.0** for a full selftest (bound by `git init -b`, reached by the selftest
-  alone), third-party imports **0**; the rule BLOCKs when the declared row and the derived
-  values disagree
+  compares what it finds against the declared row; **and, separately, the declared floor's
+  interpreter is EXECUTED against the file set**, because the scan cannot see a syntax floor
+- **Numeric pass threshold:** Python floor **3.11** — the declared floor is the lowest version
+  the file set has been EXECUTED to parse and pass on (`3.11.15`, the gate env), not the
+  lowest an AST walk permits. The **API floor is 3.7**, derived and recorded as a lower bound
+  that is *documentary, never executed*: no interpreter below 3.11 exists on this machine, so
+  3.7–3.10 is asserted by analysis alone and must say so. git floor **2.28.0** for a full
+  selftest (bound by `git init -b`, reached by the selftest alone), third-party imports **0**;
+  the rule BLOCKs when the declared row and the derived values disagree
+- **Two derivations, not one (rev54):** the rule owes BOTH — (a) **stdlib-API floor**, an AST
+  walk for version-gated constructs, and (b) **SYNTAX floor**, which an AST walk on the
+  running interpreter *structurally cannot see*, because it only ever sees what already
+  parsed. `ast.parse(feature_version=)` is NOT a substitute: measured 2026-08-31, it accepts
+  the rev53 PEP 701 construct at every version 3.7 through 3.12, while `s19env`'s real 3.11.15
+  refuses it with `SyntaxError: unterminated string literal`. A claimed floor must name the
+  interpreter that REFUSES the version below it, or be labelled documentary. See `LED-89.22`.
 - **Priority:** medium
-- **Acceptance test(s):** `owed at Increment 4`
-- **Negative control:** owed at Increment 4 — a declared row disagreeing with the derived
-  floors must BLOCK; a rule that only ever agrees with the row is the duplicate-oracle defect.
+- **Acceptance test(s):** **built at Increment 4** — `V30`, 23 arms. The two derivations are
+  `V30 LIVE-derived` (API 3.7 by exactly 2 construct kinds, git 2.28.0 at 3 sites) and
+  `V30 SYNTAX-fv-is-blind`. `V30 E2E-live` and the three `E2E-*` fixture arms drive the
+  REGISTERED rule; `V30 LOADER-absent-is-None` arms the loader the core cannot see.
+- **Negative control:** **EXECUTED and each BLOCKs** — `ROW-api-below-BLOCKS` (`3.6`),
+  `ROW-api-above-BLOCKS` (`3.11`), `ROW-git-BLOCKS` (`2.20.0`), `ROW-third-party-BLOCKS`
+  (module NAMED, not counted) and `E2E-fixture-disagrees`, which changes ONE CELL of a
+  fixture manifest and requires the registered rule to go from 0 BLOCKs to 1. The sentinel
+  `SENTINEL-must-be-RED` **survived the first battery** and is why `NO-SECTION` now types its
+  sentence instead of comparing the constant to itself — see `LED-89.23`.
 - **Boundary catalog:** ☑ empty — no binding construct found, which must not read as "floor
   0" · ☑ boundary — a construct raising the floor to exactly the declared value · ☑ invalid — a
   declared floor BELOW what the source binds · ☑ error — a source file that does not parse.
@@ -185,7 +203,7 @@ written, and its figure corrected in the same act (`LED-89.8`).
 
 ### HLR-89.5 — the runtime preflight reports what the gate assumes
 - **Traceability:** Story 5
-- **Ledger:** none
+- **Ledger:** LED-89.24
 - **Statement:** Before the gate's rules run, the flow shall report whether git is present and
   at or above its floor, what encoding stdout carries, and whether the filesystem folds case.
 - **Rationale (informative):** all three are assumed by rules that already ship, and none is
@@ -196,10 +214,16 @@ written, and its figure corrected in the same act (`LED-89.8`).
 - **Numeric pass threshold:** 3 preflight lines, each naming its measured value; git absent
   produces a distinct sentence from git present and below the floor
 - **Priority:** medium
-- **Acceptance test(s):** `owed at Increment 5`
-- **Negative control:** owed at Increment 5 — git removed from `PATH` must produce a different
-  sentence from git present-but-below-floor; collapsing the two is the defect `V25` already
-  paid for with its "no origin configured" third state.
+- **Acceptance test(s):** **built at Increment 5** — the `PRE` family, 12 arms.
+  `PRE THREE-LINES` pins the count; `PRE GIT-six-states`, `ENC-four-states` and
+  `CASE-four-states` pin every sentence; `PRE E2E-git-present` and `E2E-git-blinded` drive a
+  CHILD `run()` and read its three printed lines.
+- **Negative control:** **EXECUTED and it BLOCKs the collapse** — `PRE ABSENCES-differ` gives
+  each of the 5 git states a MARKER PHRASE and requires it in exactly one of the five
+  sentences. Asserted that way, not as inequality: two sentences differing only by a version
+  number are `!=` and say the same thing, and git-absent and git-below-floor legitimately
+  share *"a full `--selftest` cannot run"*. `PRE E2E-git-blinded` proves it end to end, and it
+  asserts `shutil.which` finds no git on the blinded `PATH` **before** trusting the run.
 - **Boundary catalog:** ☑ empty — git absent from `PATH` · ☑ boundary — git at exactly 2.28.0 ·
   ☑ invalid — a version string that does not parse · ☑ error — a case-folding filesystem, which
   the selftest's own tail admits is unproven today.
@@ -410,6 +434,41 @@ reformulation, what it costs, and what was refused.
   `00-increment-plan.md`, which is not a packet · ☑ invalid — a `.dev-flow/` carrying
   `design/`, `tools/` and loose HANDOFF files · ☑ error — a real repository, so the git path is
   executed and not modelled.
+
+### LLR-89.6.5 — a declared batch id resolves to a direct child of `.dev-flow/`, or to nothing
+- **Traceability:** HLR-89.6
+- **Ledger:** LED-89.20, LED-89.21
+- **Statement:** `_active_batch_state` shall resolve a declared `batch_id` to an absolute path
+  whose parent directory is `.dev-flow/` itself, shall return no path and a distinct fifth
+  reason code when the declared id names anything else, and shall be the only place in the file
+  where that test is made — the quantified population being every call site that reaches a
+  declared `batch_id`, of which there are seven.
+- **Validation:** `test`
+- **Executed verification:** arms `ART A9-dot`, `ART A9-dotdot`, `ART A9-nested`,
+  `ART A9-trailing-sep`, `ART A9-freeze-noop`, `V18 notchild`, `V18 notchild-SENTENCE`,
+  `V18 CAUSES-differ`, `V18 TRAVERSAL-notice`, `V18 TRAVERSAL-up`, `V27 GUARD-traversal`,
+  `V27 GUARD-currency`
+- **Numeric pass threshold:** 12 arms report `ok`. Three of them carry the whole claim and the
+  other nine are their controls. `A9-freeze-noop` compares the map `_artifacts` returns against
+  the map rev51's caller-side guard produced, over **7** declared ids, values included — it is
+  the arm that had to pass before the freeze could be lifted, because `LLR-88.5`'s acceptance
+  froze `_active_batch_dir` precisely to hold that map still. `V27 GUARD-traversal` reaches the
+  registered rule over a tree whose `03-increments/` sits BESIDE `.dev-flow/`, and asserts the
+  finding COUNT of 3 before asserting that increment 42 is named nowhere. `V27 GUARD-currency`
+  asserts the OTHER half of the same rule: the currency sentence must refuse to check rather
+  than render the whole tree's newest commit.
+- **Negative control:** executed — `M5-code-only` returns the poisoned path alongside the new
+  code, so `V18` announces the traversal while every caller still receives it, and it reddens
+  the packet and `_active_batch_dir` conjuncts while leaving `V18` green; `M2-cheap-dotdot`
+  substitutes the substring test batch-88 measured agreeing by accident; `M3-no-abspath` runs
+  the test on the unnormalised join, where `..` collapses to a direct child; `M1-guard-off`
+  restores rev51 exactly. Full battery and verdicts in `LED-89.21`.
+- **Boundary catalog:** ☑ empty — an id of `"."`, which names `.dev-flow/` itself and is the
+  case that EXISTS and is not a batch · ☑ boundary — `"z/"`, a legitimate batch wearing one
+  trailing separator, which must resolve rather than be refused · ☑ invalid — `"a/03-increments"`,
+  the NESTED id that is the only member of the domain separating a direct-child test from the
+  cheaper `".." in active`; `"."` and `".."` agree with the cheap test by accident · ☑ error —
+  `"../.."`, which walks out of the project.
 
 ---
 

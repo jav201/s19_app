@@ -9,7 +9,7 @@ Single Python package `s19_app/` (distribution name `s19tool`) plus a `tests/` s
 - `s19tool` → `s19_app.cli:main` (Rich-formatted CLI)
 - `s19tui`  → `s19_app.tui:main` (Textual TUI)
 
-Note: the active build config is `pyproject.toml`. A nearly-identical `project.toml` also lives at the repo root and is only the historical pre-PEP 621 copy — do **not** edit it expecting setuptools to read it. Only `pyproject.toml` is read by the build backend; keep them aligned if you must change one.
+Note: the active build config is `pyproject.toml`, and it is now the **only** one — the historical pre-PEP 621 `project.toml` duplicate was deleted in `1d2e9fe` (batch-89), so there is no longer a second copy to keep aligned. `setup.py` is a bare `setup()` shim that delegates entirely to `pyproject.toml`; it declares nothing. Two stale readers still probe for the removed file as a fallback (`s19_app/tui/workspace.py:508`, `tests/test_changes_schema.py:523` — both `pyproject.toml or project.toml`); the `or` branch is simply dead, so they are harmless, not broken.
 
 ## Common commands
 

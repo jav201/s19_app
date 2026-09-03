@@ -380,3 +380,344 @@
   the first time on a change it did not anticipate**, and it is the demonstration the increment
   was asked for.
 
+### LED-89.20 — the freeze was lifted, and what pins the behaviour now
+- **Requirement:** LLR-89.6.5
+- **Date:** 2026-08-31
+- **What changed:** the direct-child test moved out of `_artifacts` and into
+  `_active_batch_state`, which gained a fifth resolution code, `notchild`. `_active_batch_dir`'s
+  BODY is unchanged — `LLR-88.5`'s acceptance froze that function and it is still frozen to the
+  letter; what moved is the resolver behind it, which the freeze never named. `_artifacts` lost
+  the two-line guard it had carried since batch-88, because it can no longer fire.
+- **Why the freeze was lifted, and it is not the reason batch-88 offered.** batch-88 registered
+  the amendment as a fork: lift the freeze on `_active_batch_dir` for one line, **or** state the
+  contract as *"whatever `state.json` says, unvalidated"* and audit every caller. **Both branches
+  were measured on 2026-08-31 and both are insufficient, for the same reason.**
+  `_active_batch_dir` is not the leak's only mouth. `_v27_newest_commit` reaches the declared id
+  through `os.path.basename(path)` on `_active_batch_state`'s return value and **never calls
+  `_active_batch_dir` at all** — so a guard placed inside `_active_batch_dir`, the literal
+  amendment on offer, closes `_v27_packets` and leaves the currency half of the SAME RULE reading
+  the whole corpus. The invariant belongs to whatever resolves a declared id against the
+  filesystem. That is `_active_batch_state`, and putting it there closes seven call sites at once
+  instead of three.
+- **And the second branch is `R-88-17` wearing a contract.** *"Validating it is every caller's
+  job"* has no population: it is discharged by auditing today's callers and re-auditing at every
+  future one, forever, with nothing able to tell you when an audit was skipped. `V27` is the
+  proof — batch-88 wrote the prediction down and the eighth day produced the caller.
+- **The freeze turned out to protect nothing, and that is armed rather than asserted.**
+  `LLR-88.5` froze the function so `_artifacts` would read *"exactly as it did at rev39"*, so the
+  question the amendment owed was not whether the new home is tidier but **whether the map
+  moved**. `ART A9-freeze-noop` reproduces rev51's caller-side guard as a reference
+  implementation and compares the two maps over seven declared ids — the three traversals, a
+  legitimate batch, a ghost, a trailing separator, and `../..` — values included. **Identical
+  everywhere.** Had it moved, the honest answer was to report that the freeze protects something
+  real and take the other branch; it does not, and the arm is what makes that a measurement.
+- **Evidence, measured 2026-08-31 on the rev51 code** over a fixture carrying an `03-increments/`
+  BESIDE `.dev-flow/` and another at `.dev-flow/` root:
+  - `batch_id: ".."` → `_v27_packets` returned **`{42}`** — a packet from outside the corpus,
+    which `V27` then NOTICEd as work on disk its ledger had failed to record. **This is worse
+    than the account the defect was reported under.** The prediction was that the `listdir` would
+    raise and `V27` would report zero packets and pass green over a ghost id; that is only what
+    happens when the escaped directory holds no `03-increments/`. When it holds one, the rule
+    does not fall silent — it **names a foreign increment number as this batch's**.
+  - `batch_id: "."` → `_v27_packets` returned `{77}` from `.dev-flow/03-increments/`, and
+    `_v27_newest_commit` ran `git log -- .dev-flow/.` and rendered the newest commit of the
+    **whole `.dev-flow/` tree** as *"the newest commit touching the batch directory"* — then
+    PASSED on it.
+  - `batch_id: "z/"` → a legitimate batch, one trailing separator: the loader read the right
+    directory while `os.path.basename` of the unnormalised join was the **empty string**, so
+    `V18` named batch `''` and `V27` reported that no batch was declared to ask git about. The
+    returned path is now absolute, which closes that form; `ART A9-trailing-sep` pins it and
+    `M4-raw-return` is the only mutant it kills.
+- **What `V18` now says, and it is the visible half.** `.` and `..` were reported `ok` —
+  *"active batch declared and on disk"* — which batch-88 called *"strictly worse than the ghost
+  case, because ghost at least announces itself."* They now resolve to `notchild` and announce
+  themselves. The three `ART A9-*` rows previously asserted `_active_batch_state(d)[1] == "ok"`
+  as a deliberate PAIR decision; **that decision is reversed here on purpose**, and the reversal
+  is recorded rather than quietly re-typed.
+- **The population of the correction, enumerated, because a correction has one.** The claim
+  *"the direct-child test is checked in the caller rather than in `_active_batch_dir`, which
+  `LLR-88.5` freezes"* stood in five places. **Corrected: 2** — `_artifacts`' docstring and the
+  selftest's `A9` block comment, both rewritten to name the new home. **Corrected: 1** —
+  `.dev-flow/BACKLOG-PROCESS.md`'s P1 item, marked closed with a pointer here. **Deliberately
+  NOT corrected: 2** — `.dev-flow/2026-08-24-batch-88/01-requirements.md`'s `LLR-88.5` bullet
+  and `03-increments/increment-005.md`. Those are a CLOSED batch's record; they were true when
+  written, that bullet is the entry which predicted this defect correctly, and rewriting closed
+  history to match today is the failure `V26`'s append-only ledger exists to prevent. The two
+  sites are named here so the population is enumerated rather than merely swept.
+
+### LED-89.21 — the mutation battery for the traversal guard, and the trap it reproduced
+- **Requirement:** LLR-89.6.5
+- **Date:** 2026-08-31
+- **Baseline:** 524 arms, 0 FAIL, `SELFTEST PASSED`, taken from the run's own mirrored tree.
+- **Verdicts — 7 mutants, 6 applicable, 6 KILLED, 0 SURVIVORS, 1 control:**
+
+| mutant | verdict | killed by |
+|---|---|---|
+| `M1-guard-off` (`if False:`) | KILLED | `A9-dot`, `A9-dotdot`, `A9-nested`, `A9-freeze-noop`, `V18 TRAVERSAL-*`, `V27 GUARD-*` |
+| `M2-cheap-dotdot` (`".." in batch`) | KILLED | `A9-dot`, `A9-nested`, `A9-freeze-noop`, `V18 TRAVERSAL-notice`, `V27 GUARD-currency` |
+| `M3-no-abspath` (test on the raw join) | KILLED | `A9-dot`, `A9-dotdot`, `A9-trailing-sep`, `A9-freeze-noop`, `V18 TRAVERSAL-*` |
+| `M4-raw-return` (guard kept, return raw) | KILLED | `A9-trailing-sep` **alone** |
+| `M5-code-only` (`return path, "notchild"`) | KILLED | `A9-dot`, `A9-dotdot`, `A9-nested`, `A9-freeze-noop`, `V27 GUARD-traversal` |
+| `M6-cause-collapse` (fifth cause says the fourth's words) | KILLED | `V18 notchild-SENTENCE`, `V18 TRAVERSAL-*` |
+| `M7-CRASH-control` (undefined name) | **CRASH** | reported CRASH at 0 arms, never SURVIVED |
+
+- **`M5-code-only` is the discriminating mutant and it is why the arms assert the PATH and not
+  only the code.** It reports `notchild` correctly — `V18` stays entirely green, every severity
+  and every sentence — while handing the poisoned path back to all seven callers. An arm block
+  that had asserted the new diagnosis and stopped there would have passed it. The rows assert
+  `_active_batch_dir(d) is None` and `_v27_packets(d) == set()` for exactly this reason.
+- **`M4-raw-return` is killed by ONE arm and that is the point, not a weakness.** Nothing else in
+  524 arms observes the difference between a normalised and an unnormalised return, because every
+  other fixture writes a `batch_id` with no trailing separator. Deleting `A9-trailing-sep` as
+  redundant would restore a live defect silently.
+- **THE rev49 TRAP WAS REPRODUCED, LIVE, ON ALL SIX KILLS.** The harness records, per mutant,
+  whether `SELFTEST PASSED` appears anywhere in the output as well as what the FINAL `SELFTEST`
+  line says. **On every one of the six kills the substring is present while the final line reads
+  `FAILED`** — `ENC VERDICT-live` prints it mid-run from a child process. A harness matching by
+  substring would have scored **6 of 6 as survivors** and this increment would have shipped
+  believing it was unarmed. The verdict is taken from the final line, and the observation is
+  printed per mutant rather than assumed.
+- **The harness corrupted its own baseline once, and the abort is what caught it.** The first
+  sweep opened the target with `open(TARGET, "w", encoding="utf-8")`, and Windows text mode
+  rewrote every LF as CRLF on restore — the baseline came back RED at 2 FAIL and the harness
+  **aborted rather than scoring**, which is the property `LED-89.18` paid for one increment
+  earlier. Both read and write now pass `newline=""`. **A harness that silently corrupts the file
+  it is scoring reports mutants that never ran**, and a red baseline is the only thing standing
+  between that and seven fabricated verdicts.
+- **Mirrored tree, not a flat copy** (`docs/tools/` beside a real `hooks/`), for the reason
+  `LED-89.18` records: `INT FOUR-PLACES-agree` walks up from `__file__` and a flat copy returns
+  a RED baseline that can score nothing.
+- **Not scored, and named rather than left silent:** `M6-cause-collapse` does not redden
+  `V18 CAUSES-differ`, because the substituted string still differs from `ghost`'s by a few
+  characters. `CAUSES-differ` is armed by construction and this battery does not exercise it; the
+  arm that carries the fifth cause's meaning is `notchild-SENTENCE`, which compares the whole
+  sentence as typed text and does redden.
+
+### LED-89.22 — a rule that named the wrong cause, and a floor re-derived by the method that can see one
+- **Requirement:** HLR-89.4
+- **Date:** 2026-08-31
+- **What changed:** `v8_module_map`'s enumeration was rewritten (`git ls-files -z`, explicit
+  `encoding="utf-8"`, a returncode branch, and a narrowed `except`), and `HLR-89.4`'s Python
+  floor was RE-DERIVED rather than carried across the predicate that changed.
+
+**The defect: one sentence over three different worlds.** The rule ran
+`subprocess.run(..., capture_output=True, text=True)` under a bare `except Exception`, and
+`text=True` decodes with the locale codepage — cp1252 on this machine, measured on both
+interpreters. The file states the opposing law 725 lines away in `_git`'s own docstring. Three
+faults, none of them loud:
+1. **The wrong cause, named confidently.** A `UnicodeDecodeError` became `tracked = None`,
+   which is the `_V8_NO_GIT` path, so V8 announced *"git could not be run, so NO file was
+   enumerated"* about a run in which git ran fine and returned bytes Python refused to decode.
+   The rule did not fall silent; it testified incorrectly.
+2. **A FALSE PASS that the file's own comment says was "one edit away".** It was not away at
+   all. `subprocess.run` does not raise on a non-zero exit, so a root outside any repository
+   gave `stdout == ""` → `.split() == []` → **not `None`** → V8 printed `N modules, no orphan
+   files`. Reproduced: exit **128**, empty stdout, `fatal: not a git repository`.
+3. **Silent under-enumeration.** `core.quotepath` defaults to TRUE, so git ASCII-quotes
+   non-ASCII paths to `"\304\201.py"` — which does not end in `.py` and was therefore skipped
+   from the orphan check entirely — and whitespace `.split()` cut `two words.py` into `two` and
+   `words.py`: one phantom orphan against a file that does not exist, one real file never
+   checked.
+- **Why quotepath is the whole point:** it is a git config **this flow does not own**, and it
+  is the only reason fault 1 had not fired. Measured both ways on a throwaway repo:
+  `quotepath=true` yields ASCII that cp1252 decodes; `quotepath=false` yields raw UTF-8 whose
+  `c4 81` (U+0101) is **undefined in cp1252** and raises. A defect that waits on someone else's
+  config is still a defect. `-z` emits paths verbatim under either setting, which is why the
+  fix removes the dependency instead of documenting it; `QUOTEPATH-invariant` asserts the
+  verdict does not move when the config does.
+- **The third time this batch:** Increment 3 paid for collapsing two causes into one message,
+  `LED-89.17` held two absences apart in `_git`, and this is the same family a third time. The
+  absence is now carried with its REASON (`absent_reason`, defaulting to `_V8_NO_GIT`, so every
+  pre-existing arm keeps its meaning) and `_V8_GIT_FAILED` says *"git RAN and exited
+  non-zero"*. `ABSENCES-differ` asserts the two do not share a phrase.
+
+**The floor, re-derived by both methods.** `R-88-18` forbids carrying a constant across a
+substituted predicate, and removing `text=` substituted this one.
+- **(a) stdlib-API floor — 3.7.** An AST walk for version-gated constructs. The floor no longer
+  rests on the edited site: it is bound independently by `from __future__ import annotations`
+  and by `capture_output=` at the **9 remaining** `subprocess.run` calls. The constant survived;
+  it was re-derived, not carried, and it is now cited at surfaces this batch does not edit.
+- **(b) SYNTAX floor — and this is the method that was missing.** An AST walk on the running
+  interpreter **structurally cannot see a syntax floor**: it only ever sees what already
+  parsed. That is how rev53's PEP 701 f-string reached the gate env as a `SyntaxError`.
+  `ast.parse(..., feature_version=)` is **not** the fix — measured 2026-08-31, it reports
+  "parses" for that construct at **every** version 3.7 through 3.12, while the real
+  `s19env` 3.11.15 refuses it: `SyntaxError: unterminated string literal`. The documentary
+  method is demonstrably blind to the exact floor it was reached for.
+- **What is executed and what is not, stated plainly:** the file compiles and passes
+  `SELFTEST` on **3.11.15** and **3.12.7**, both executed. **No interpreter below 3.11 exists on
+  this machine**, so 3.7–3.10 is asserted by analysis alone. `HLR-89.4` therefore declares
+  **3.11** — the lowest floor with an interpreter that RUNS it — and records 3.7 as a
+  documentary API lower bound. Declaring 3.7 would repeat rev53 exactly: a number with no
+  interpreter behind it.
+
+**Mutation battery — 9 applied, 7 killed, 2 survivors, both argued.** Mutants ran as copies in
+a **mirrored flow tree** (`docs/tools/` beside a real `hooks/`) because `INT FOUR-PLACES-agree`
+walks three directories up from `__file__`; a flat copy returns a RED baseline, and a red
+baseline scores nothing. Baseline in the mirror: `SELFTEST PASSED`. Verdicts are read from the
+**final line beginning `SELFTEST `** — a substring match instead hits `ENC VERDICT-live`, which
+prints `SELFTEST PASSED` mid-run from a child process at output line 452.
+- **Sentinel first:** `SENTINEL-must-be-RED` corrupts `_V8_NO_GIT` and was **KILLED**, so the
+  detector is proven able to see red before any verdict is trusted.
+- Killed: `M1-restore-text=True` (crashes now instead of lying — the narrowed `except` no
+  longer swallows the decode failure), `M2-drop--z-keep-encoding`, `M3-ignore-returncode` (the
+  false pass), `M4-collapse-two-causes`, `M5-core-ignores-reason`, `M6-reword-git-failed`.
+- **Survivors, named rather than counted as covered.** `M7-errors-strict` and
+  `M8-drop-empty-filter` both survive and both are argued **equivalent on this platform**:
+  NTFS stores names as UTF-16, so git always emits valid UTF-8 and `errors=` is unreachable;
+  and `-z`'s trailing NUL yields an `""` element that no branch can act on. Neither is a
+  coverage gap this battery could close with a fixture, and neither is claimed as a kill.
+
+**Population sweep of the two figures, enumerated.**
+- `01-requirements.md` **P-6** (the floor's predicate), **P-9** (the "cannot demonstrate a
+  violation" rationale), **HLR-89.4** threshold + Ledger field — **all corrected, live**.
+- `devflow-validate.py`'s selftest tail claimed V8's `git ls-files` enumeration was one of two
+  I/O steps "unproven synthetically" — **corrected**: it is now driven end to end, and it had
+  stood named-as-uncovered for seven revisions while holding three defects.
+- `FLOW-VERSION.md` **rev53** states the 3.7 derivation is refuted and reports **524 arms**.
+  **CLOSED HISTORY, true when written, deliberately left**: 524 was the count that day, and a
+  revision row records what a revision found. Named here so the population is enumerated rather
+  than silently partial. **One claim in that row is measurably wrong and is corrected here
+  rather than in it:** rev53 reports "byte-identical arm output" across 3.11.15 and 3.12.7.
+  Measured 2026-08-31, three arm lines (`IFC ids-declared`, `IFC list-named`,
+  `IFC list-multiline`) print a `set` repr whose order varies **run to run on a single
+  interpreter** under default `PYTHONHASHSEED`. No verdict moves — all three read `ok` every
+  time — but the output is not byte-identical between any two runs, let alone between two
+  interpreters, and a future arm that diffed selftest output would fail on noise. Not repaired
+  in this increment: it is `_atlas`-adjacent output hygiene, outside the two figures this entry
+  moves, and it is recorded so it is not rediscovered as a defect.
+- `LED-89.2`'s evidence line cites `capture_output=` with `text=` at `:572-573`. **CLOSED
+  HISTORY, and the ledger is append-only**: it was correct when written, the construct it cites
+  no longer exists, and this entry supersedes it rather than rewriting it.
+
+### LED-89.23 — the sentinel survived, and the arm it exposed was reading its own constant
+- **Requirement:** HLR-89.4
+- **Date:** 2026-08-31
+- **What changed:** `V30` ships — the environment contract is declared as a canon row in
+  `FLOW-VERSION.md` and DERIVED from the constructs that bind it, with 23 arms and 13 of 13
+  mutants killed against a GREEN baseline.
+
+**The two derivations, and what each is worth.** (a) The **stdlib-API floor is 3.7**, derived
+by an AST walk over the 3 Python files the manifest table declares — `docs/tools/devflow-
+validate.py`, `hooks/flow-guard.py`, `hooks/install.py`. Exactly **two construct kinds** bind
+it: `from __future__ import annotations` at `devflow-validate.py:41` and
+`subprocess.run(capture_output=)` at 14 further call sites, 15 catalogued hits in all (**13 when this increment closed; Increment 005 added two of its own, and the census moved with the code while the FLOOR did not** -- `R-88-18` one increment later). Neither
+is on the construct rev54 edited. (b) The **SYNTAX floor cannot be derived at all**, and
+`SYNTAX-fv-is-blind` is the measurement that proves the substitute is useless rather than
+merely weak: for every requested version 3.7 → 3.12, `ast.parse(feature_version=)` returns
+**the running interpreter's own verdict**. Measured this increment: 3.11.15 refuses the PEP 701
+construct at **6 of 6** requested versions and 3.12.7 accepts it at **6 of 6**. A tool whose
+answer never varies with the version you asked about cannot report a floor.
+
+**So the row says both things and labels which is which.** `python-executed` = **3.11**,
+witnessed by execution — the file set parses and `--selftest` passes on 3.11.15 (553 arms) and
+on 3.12.7 (553 arms). `python-api` = **3.7**, and its own finding carries the words
+*"DOCUMENTARY, NEVER EXECUTED"*, because **no interpreter below 3.11 exists on this machine**:
+3.7–3.10 is asserted by analysis alone. Two interpreters are two points, not a range.
+
+**`git` = 2.28.0**, bound by `git init -b` at 3 sites, **all three inside `--selftest`** — the
+finding says so, because a floor the gate never reaches is a different obligation from one it
+does. **Third-party imports = 0, EXECUTED**: the 13 top-level modules the file set imports are
+run under `python -S -E` in a child interpreter, with site-packages off the path.
+`sys.stdlib_module_names` was refused deliberately — it is a **3.10 API**, so using it would
+have raised this file's own floor by a construct the catalog above cannot see, which is the
+exact blindness the rule exists to report.
+
+**🛑 THE SENTINEL SURVIVED THE FIRST BATTERY, AND IT WAS RIGHT TO.** `SENTINEL-must-be-RED`
+corrupts `_V30_NO_SECTION`, and the arm meant to catch that asserted `msg == _V30_NO_SECTION`
+— **the same constant on both sides, which agrees unconditionally.** The detector had been
+proven blind before a single verdict was scored, which is the whole reason the sentinel runs
+first. The arm now types its sentence by hand.
+
+**🛑 AND `M9` SHOWED AN ARM OVER THE CORE IS NOT AN ARM OVER THE LOADER.** `_env_declared`
+returning `{}` instead of `None` for an absent section left **every core arm green** and turned
+the rule into four BLOCKs about a manifest that never claimed a floor — because the NO-SECTION
+arm feeds `_v30_outcome` a **literal `None`** and so can say nothing about the function that
+decides when `None` is the answer. Closed by `LOADER-absent-is-None` (4 manifest shapes) and by
+`E2E-no-section` through the registered rule.
+
+**Mutation battery — 13 applied, 13 killed, 0 survivors**, in a mirrored flow tree
+(`docs/tools/` beside a real `hooks/`), verdicts read from the **final** line beginning
+`SELFTEST `. Killed: the sentinel, `M1-empty-becomes-floor-0` (undetermined must not read as
+floor 0), `M2-row-always-agrees` (the duplicate oracle), `M3-git-drops-call-shape`,
+`M4-git-init-alone-is-enough`, `M5-probe-not-isolated`, `M6-probe-swallows-its-reason`,
+`M7-citation-sorted-lexically`, `M8-catalog-loses-node-kinds`, `M9`, `M10-executed-floor-never-
+unwitnessed`, `M11-registered-noop`, `M12-third-party-counted-not-named`. **`M6` first killed
+by CRASHING the selftest** (`ok &= None` raises `TypeError`) rather than printing a FAIL line;
+the arm was repaired so the kill is readable, because a kill nobody can read is a worse kill.
+
+**A defect the arms found in their own author's code:** `_v30_floor` sorted citations as
+STRINGS, so `:1380` ordered ahead of `:41` and the finding cited `capture_output=` where
+`from __future__ import annotations` binds the floor. Every count stayed correct; only the one
+part a reader follows by hand was wrong. Caught by `LIVE-derived` asserting the citation, not
+the number.
+
+**Population sweep.** `HLR-89.4`'s Acceptance and Negative-control fields — corrected, live.
+`FLOW-VERSION.md` gains a `## Environment contract` section; it is **not** in its own hashed
+table, so `flow_hash` does not move for it. `LED-89.22`'s figures are **closed history, true
+when written, deliberately left**: it reports the API floor bound by `capture_output=` at
+"nine call sites", and this increment's own `capture_output=True` in the import probe makes it
+**12** today. The derivation is unchanged; only the count moved, and it moved because this
+entry's code moved it.
+
+### LED-89.24 — a probe armed only where the machine agrees with the constant is not a probe
+- **Requirement:** HLR-89.5
+- **Date:** 2026-08-31
+- **What changed:** `run()` now prints **three preflight lines before any verdict** — git and
+  its floor, stdout's encoding, and whether this filesystem folds case — with 12 `PRE` arms
+  and 14 of 14 mutants killed against a GREEN baseline.
+
+**All three were already assumed by rules that ship, and none was reported.** `V16`, `V25`,
+`V27` and half the selftest talk to git; a machine without it collected three separate
+absences and never the one sentence explaining them. rev49 hardened the streams because the
+selftest could not state a verdict under a stdout it could not encode, and still never printed
+what the stream IS. And case-folding stood in the selftest's own tail as the **last of two I/O
+steps named as unproven** — this entry closes it.
+
+**The two git absences are held apart, for the fourth time in this file's history.** `V25`
+paid for collapsing states and bought back a third, *"no origin configured"*; `LED-89.17` did
+it in `_git`; `LED-89.22` did it in `V8`. Here there are **five** states — ABSENT from PATH,
+PRESENT and UNUSABLE, an unparseable version string, BELOW the floor, and at-or-above — and
+`ABSENCES-differ` gives each a marker phrase that must appear in **exactly one** of the five.
+
+**The first version of that control was WRONG and was replaced by measurement.** It asserted
+the five sentences share no five-word phrase. They legitimately do: git-absent and
+git-below-floor both end *"a full `--selftest` cannot run"*, because both facts have that
+consequence. And full disjointness is also too weak in the other direction — two at-or-above
+sentences differing only by a version number are `!=` while telling the reader the same thing.
+Exactly-one-of-five is the property the requirement actually names.
+
+**🛑 AND THE PROBE PASSED ITS FIRST BATTERY WHILE BEING AN ASSUMPTION.** `N7-case-probe-is-
+assumed` replaces the entire probe body with `return True, None` — and **SURVIVED** 12 mutants
+and every green arm, because **this machine really does fold case**, so `CASE-live-probe`'s
+assertion that the verdict is `True` is satisfied by the constant `True`. The verdict was
+armed; the MECHANISM was not, and no case-sensitive volume exists here to substitute for real.
+Closed by making the lookup injectable and arming **three substituted filesystems**: the answer
+must FOLLOW the lookup (`False` in → `False` out), and the lookup must ask for the **lowercased**
+name — which is the one thing separating a fold probe from a file-was-written probe. `N12`,
+written after the fix, makes the probe ask for the name it just wrote and dies on that arm.
+
+**The probe names the volume it ran on, and that is not decoration.** It writes where it is
+allowed to write — `tempfile.gettempdir()` — and that is not always the volume of the tree
+under check. A probe reported without saying WHERE it ran is a measurement of one filesystem
+presented as a measurement of another. `N9-volume-never-named` dies on `CASE-four-states`.
+
+**Mutation battery — 14 applied, 14 killed, 0 survivors.** Sentinel first
+(`SENTINEL-must-be-RED`, KILLED). `N1` folds absent into below-floor; `N2` folds unusable into
+absent; `N3` moves the boundary to `<=` so 2.28.0 reads below; `N4` makes an unparseable
+version read as a pass; `N5` drops the `FileNotFoundError` branch; `N6` tells the reader a
+cp1252 stream loses characters it actually transliterates; `N7`, `N12`, `N13` attack the probe;
+`N8` makes an unmeasured filesystem read as measured; `N9` hides the volume; `N10` returns two
+lines instead of three; `N11` stops `run()` printing them at all.
+
+**A cross-contamination hazard, found and closed inside the battery.** `CASE-probe-cleans-up`
+first read the SHARED temp directory, so `N13`'s leaked directories would have reddened the arm
+on the run **after** `N13` and scored the wrong mutant. It now probes a directory of its own.
+
+**Population sweep.** `HLR-89.5`'s Acceptance, Negative-control and Ledger fields — corrected,
+live. `devflow-validate.py`'s selftest tail claimed *"What remains is ONE I/O step: the fact
+that this machine's filesystem folds case"* — **corrected**, and the tail now names what is
+still NOT proven in its place: no interpreter below 3.11 exists here, so `V30`'s 3.7 is
+documentary. `run()`'s header line moved ABOVE the rules so the assumptions are read before the
+first verdict; `hooks/flow-guard.py` is unaffected, because it selects only lines beginning
+`[x]` or `[!]` and the preflight lines begin `git ·`, `stdout ·` and `filesystem ·`.

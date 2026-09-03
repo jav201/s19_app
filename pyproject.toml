@@ -1,7 +1,29 @@
 # S19_APP/pyproject.toml
 
 [build-system]
-requires = ["setuptools>=61.0"]
+# Floor = the oldest setuptools that can actually generate this project's
+# metadata. `[project] license = "MIT"` below is the PEP 639 SPDX-string form;
+# older setuptools validate `project.license` against a schema admitting only
+# `{file = ...}` or `{text = ...}` and abort with
+# `ValueError: invalid pyproject.toml config: 'project.license'` -- before
+# `requires-python` is ever read. The previous `>=61.0` was therefore false:
+# a build honouring it could not build this package.
+#
+# Bracketed by EXECUTION (2026-08-31), not by the packaging record:
+# `prepare_metadata_for_build_wheel` on this file, in throwaway venvs, per
+# setuptools version --
+#   on CPython 3.12: 75.1.0 FAIL, 76.0.0 FAIL, 76.1.0 FAIL, 77.0.1 PASS, 84.0.0 PASS
+#   on CPython 3.11: 61.0.0 FAIL (the OLD floor, at exactly its own value), 77.0.1 PASS
+# The bound is exact, not an interval: PyPI publishes no release between
+# 76.1.0 and 77.0.1 (77.0.0 was never released), so 77.0.1 is the first
+# existing setuptools that builds this project. Do not "simplify" this to
+# `>=77`: that admits a version that does not exist.
+#
+# CI cannot catch a regression here: `pip` builds with isolation and, given
+# only a lower bound, fetches a current setuptools -- so the declared floor is
+# never the version tested. The exposure is `--no-build-isolation`, a pinned
+# toolchain, or any resolver honouring the stated minimum.
+requires = ["setuptools>=77.0.1"]
 build-backend = "setuptools.build_meta"
 
 [project]

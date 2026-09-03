@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.30-rev51 | flow_hash: a8d3c4ce91f1b0c6 | corpus: 66 requirement files | corpus digest: 1f124ad2c86ac7d9 -->
+<!-- flow_version: 2026.09.03-rev56 | flow_hash: 7ebb49bee3b82839 | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-5 FLOW declaration(s) · 3 COMPONENT declaration(s) · 585 declared requirement heading ids — one row per declaration.
+5 FLOW declaration(s) · 3 COMPONENT declaration(s) · 586 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
