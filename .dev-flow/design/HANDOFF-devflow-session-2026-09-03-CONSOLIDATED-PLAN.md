@@ -12,6 +12,31 @@
 > outside this one file. Verification ledger: §7 says exactly which input claims were re-measured
 > today and which are taken on trust.
 
+---
+
+## ✅ STATUS — appended 2026-09-03, later the same day. The plan below is UNCHANGED; this says what has since shipped.
+
+**Steps 1 and 2a are DONE.** Read this block before the plan, or you will execute work that is already merged.
+
+| step | state | evidence |
+|---|---|---|
+| **1 — rev56, tranche 1** | **SHIPPED** | `claude-config` `1fd6748` · `agent-skills` `e825ffd`. 565 arms, 0 FAIL under 3.11.15 **and** 3.12.7 · `--map` 24/24/0/0 · `flow_hash 7ebb49bee3b82839` |
+| **+ the vault leak** | **CLOSED** | `dev-flow-sync.md` no longer names any Drive. `vault:` resolves against a `vault_root` row in `~/.claude/docs/deployment.md`. **`artifact_homes` was rejected as the home** — it is circular (its values *contain* the prefix) and per-project-and-tracked, so N projects would hold N copies of one machine fact. Argued in the tranche-1 packet |
+| **2a — close batch-89** | **DONE, MERGED, SYNCED** | `04-validation.md` + `05-close.md` written **with the gate run before the record**, not after. PRs #207, #208. `main` at `cd2fc00`, then `4beed6e` |
+| **the sync** | **PASSED — a first** | ACTIVE case, `mode: core → P5`. **The first `core` batch ever to clear pre-requisite 2**, which demanded `P6` until rev56. `obsidian_synced: true` verified **on `origin/main`**, not just on disk (the C-44 half) |
+| **housekeeping** | done | primary checkout moved to `main`; `claude/batch-89-lean-contract` pruned local + remote after verifying **0 branch-only objects**; `V20` then caught a stale Atlas over the merged corpus and it was regenerated (`4beed6e`) |
+
+**Two things the execution changed about the plan's own content:**
+
+- **The `core`-mode sync condition shipped as the INPUT's §1.6 correction, not the candidate's.** It derives `P6`/`P5` from `mode` and states in terms why `stations_active` is not consulted. The plan's own note that `stations_active[-1]` is "already the authority" was **over-read**: `dev-flow.md:575` calls it the authority on *which optional stations exist* (`ARQ`/`PDR`/`DDR`), never on which is terminal.
+- **The input's third reason against `stations_active` — "it is not reset at rollover" — is FALSE as a property.** Traced through the state ledger's git history: batch-88 opened at `['P0']` and grew, so the 87→88 rollover reset it correctly and **only** 88→89 did not. The accurate form shipped in the command.
+
+**What remains, unchanged from the plan below:** step **2b** (tranche 2 — P3's remainder, P7's severity sentence, the origin-parenthetical rule) · step **3** (the rev58+ validator series, whose head is the `P0`) · step **4** (decisions **D2, D3, D5** — D1 is executed, D4(iii) is closed by the vault fix, D6 is executed).
+
+**⚠ The hard guard is still in force: no batch-90 directory exists and none may be opened** until the plan says so. `V28`'s window is one batch wide.
+
+---
+
 ## 0 · The plan at a glance
 
 **The critical path is: rev56 (small, verified repairs) → close batch-89 → everything else.**

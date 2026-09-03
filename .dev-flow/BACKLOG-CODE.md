@@ -69,7 +69,7 @@ Not listed individually, by rule 4. Their homes: §*Development flow OF the code
 |---|---|---|
 | `P0` | **`R-89-6` + `R-89-7`** | `V2` has been vacuous on this project all along, on two orthogonal axes. |
 | `P1` | **`G-89-03`** *(opened at the batch-89 close)* | 1163 lines of new `s19_app` source — `tools/sync_evidence.py`, `tests/test_sync_evidence.py`, `tests/test_id_registry.py` — shipped under no requirement and no increment packet. |
-| `P1` | **`code-reviewer-absent`** | No increment of batch-89 had an independent `code-reviewer` pass — 6 of 6 packets say `ABSENT`. |
+| `P1` | **`code-reviewer-absent`** *(= `G-89-04`)* | No increment of batch-89 had an independent `code-reviewer` pass — 6 of 6 packets say `ABSENT`. |
 | `P1` | **`R-88-17`** | A correction has a population and nothing in this flow enumerates it. |
 | `P1` | **`no-canonical-mutation-harness`** | Every increment writes a throwaway; 42 mutants across three revisions are not re-runnable. |
 | `P1` | **`R-88-19`** · **`R-88-12`** · **`F-8`** | A probe is not a constraint · the named-mutation mandate is unverifiable as written · a *fix* is where the dominant defect class reproduces. |
@@ -78,6 +78,10 @@ Not listed individually, by rule 4. Their homes: §*Development flow OF the code
 
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
+>
+> **Last refresh: 2026-09-03 (POST-`rev56`, POST-sync RECONCILIATION — not a batch, not a re-prioritization).** `origin/main` at **`4beed6e`**, clean. **Bands not re-triaged, head not re-ranked** (rule 3). **This lane's head is unchanged and was already correct:** the `P0`, the batch-79 charter Lane 1, remains the next action — the two items that outranked it operationally (`sync-P6`, `batch-89-unclosed`) were already marked closed at the batch-89 close, and re-marking them is exactly the index/item disagreement this file warns about.
+>
+> **One item RECORDED AND DISCHARGED in the same breath — `G-89-06`, appended to §*Development flow OF the code — tests · CI · repo hygiene*.** It appeared in **neither** queue (**0** mentions in both files), but ⚠ **that absence was deliberate and stated, not a routing miss**: the close declined to carry it *"because the merge discharges it by construction: the PR triggers `tui-ci`"*, recording it *"so the discharge is checked rather than assumed."* **This pass is that check**, and it passed — see the entry for the two run ids. **Nothing else opened here, nothing else closed here, and the counts are unmoved.**
 >
 > **Last refresh: 2026-09-03 (`2026-08-28-batch-89` CLOSE).** `origin/main` tip **still `a2a2534`**; the batch's six tail commits are pushed on `claude/batch-89-lean-contract` and the merge SHA is recorded at the merge, not predicted here.
 >
@@ -1203,6 +1207,11 @@ Original entry (batch-69 design) follows: Run a saved flow across multiple image
     what the widget emits, not against the rendered text.
 
 ## Development flow OF the code — tests · CI · repo hygiene
+
+  - **▸ ✅ (`G-89-06` — RECORDED AND DISCHARGED 2026-09-03, opens nothing) SIX COMMITS CARRYING ~1,163 NEW SOURCE LINES HAD NEVER BEEN THROUGH CI.** **What was wrong:** at the batch-89 close, the six tail commits on `claude/batch-89-lean-contract` (`a679ee6` · `c4e6fe5` · `ed03b10` · `c118f6e` · `cf24e29` · `976476d`) carried **all** of the batch's new `s19_app` source — `tools/sync_evidence.py` (628 lines) and `tests/test_sync_evidence.py` (535) at `c4e6fe5`, plus `tests/test_id_registry.py` at `ed03b10` — and **no CI run existed for any of them**. Those are the same 1,163 lines that shipped under no requirement and no increment packet, which is the **separate and still-open** process defect `G-89-03` in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md); **this entry is only about the CI half and closing it does not touch that one.**
+    ⚠ **Why this was in neither queue, stated because the absence looks like a routing miss and is not one.** The close deliberately declined to carry it: *"It is **not** carried to the backlog because the merge discharges it by construction: the PR triggers `tui-ci`. It is recorded here so the discharge is **checked** rather than assumed"* (`05-close.md:235`). **A discharge-by-construction that nobody ever checks is an assumption with a commit id**, so the check is performed here and written down.
+    **What closed it, and how you verify it closed:** `tui-ci` ran and **succeeded twice** — run **`33793154364`** on the merge commit **`cd2fc00`** (PR #208) and run **`33794888717`** on **`4beed6e`**, both `conclusion: success`, both 2026-09-03. Re-verify with `gh run list --json databaseId,name,headSha,conclusion`: the two ids above report `success` against those two SHAs, **and** `4beed6e` is `origin/main`'s tip, so the lines are covered on the branch that matters rather than only on a merge that has since moved. ⚠ **The construction is what discharged it, and the construction was verified rather than trusted** — which is the whole reason the close wrote it down.
+
 
   - **▸ (P3, operator-requested 2026-07-30) `tui-ci` runs the full ~35-min pytest suite on docs-only PRs — add a paths filter.** Measured on PR #164 (diff = `prototypes/` + `.dev-flow/` only): `.github/workflows/tui-ci.yml` triggers on every `pull_request`/`push` to `main`/`main-tui` with **no `paths` filter**, so a prototypes/backlog/docs-only change costs a full suite run. Candidate fix: `paths-ignore` for `prototypes/**`, `.dev-flow/**`, `docs/**`, `**/*.md` (audit the exact set — `REQUIREMENTS.md` edits ride code batches anyway). ⚠ **Known GitHub gotcha to handle in the same change:** if `tui-ci` is a *required* status check, a path-skipped run leaves the PR stuck `pending` — either pair the filter with a no-op success job for skipped paths, or verify the check is not branch-protection-required before filtering. Route: `/fast-dev-flow`, CI-only, 1 file.
 
