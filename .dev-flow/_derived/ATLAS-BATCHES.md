@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.31-rev55 | flow_hash: 1aab42724c6c1b4a | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
+<!-- flow_version: 2026.09.03-rev56 | flow_hash: 7ebb49bee3b82839 | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
 
 # ATLAS-BATCHES — what happened, batch by batch?
 

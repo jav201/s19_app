@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.08.31-rev55 | flow_hash: 1aab42724c6c1b4a | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
+<!-- flow_version: 2026.09.03-rev56 | flow_hash: 7ebb49bee3b82839 | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
 
 # ATLAS-ORPHANS — where are the holes?
 
-- US/HLR/LLR in the batch record, never in the canon: **1048**
+- US/HLR/LLR in the batch record, never in the canon: **1050**
 - US/HLR/LLR in the canon, in no batch record: **4** — `LLR-045A`, `LLR-045D`, `LLR-051.1-.8`, `US-77`
 - corpus heading ids never in the canon: **322**
 - registry ids never mentioned by tests/: **554**
