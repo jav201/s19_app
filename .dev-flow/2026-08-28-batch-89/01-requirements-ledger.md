@@ -589,3 +589,135 @@ prints `SELFTEST PASSED` mid-run from a child process at output line 452.
 - `LED-89.2`'s evidence line cites `capture_output=` with `text=` at `:572-573`. **CLOSED
   HISTORY, and the ledger is append-only**: it was correct when written, the construct it cites
   no longer exists, and this entry supersedes it rather than rewriting it.
+
+### LED-89.23 — the sentinel survived, and the arm it exposed was reading its own constant
+- **Requirement:** HLR-89.4
+- **Date:** 2026-08-31
+- **What changed:** `V30` ships — the environment contract is declared as a canon row in
+  `FLOW-VERSION.md` and DERIVED from the constructs that bind it, with 23 arms and 13 of 13
+  mutants killed against a GREEN baseline.
+
+**The two derivations, and what each is worth.** (a) The **stdlib-API floor is 3.7**, derived
+by an AST walk over the 3 Python files the manifest table declares — `docs/tools/devflow-
+validate.py`, `hooks/flow-guard.py`, `hooks/install.py`. Exactly **two construct kinds** bind
+it: `from __future__ import annotations` at `devflow-validate.py:41` and
+`subprocess.run(capture_output=)` at 14 further call sites, 15 catalogued hits in all (**13 when this increment closed; Increment 005 added two of its own, and the census moved with the code while the FLOOR did not** -- `R-88-18` one increment later). Neither
+is on the construct rev54 edited. (b) The **SYNTAX floor cannot be derived at all**, and
+`SYNTAX-fv-is-blind` is the measurement that proves the substitute is useless rather than
+merely weak: for every requested version 3.7 → 3.12, `ast.parse(feature_version=)` returns
+**the running interpreter's own verdict**. Measured this increment: 3.11.15 refuses the PEP 701
+construct at **6 of 6** requested versions and 3.12.7 accepts it at **6 of 6**. A tool whose
+answer never varies with the version you asked about cannot report a floor.
+
+**So the row says both things and labels which is which.** `python-executed` = **3.11**,
+witnessed by execution — the file set parses and `--selftest` passes on 3.11.15 (553 arms) and
+on 3.12.7 (553 arms). `python-api` = **3.7**, and its own finding carries the words
+*"DOCUMENTARY, NEVER EXECUTED"*, because **no interpreter below 3.11 exists on this machine**:
+3.7–3.10 is asserted by analysis alone. Two interpreters are two points, not a range.
+
+**`git` = 2.28.0**, bound by `git init -b` at 3 sites, **all three inside `--selftest`** — the
+finding says so, because a floor the gate never reaches is a different obligation from one it
+does. **Third-party imports = 0, EXECUTED**: the 13 top-level modules the file set imports are
+run under `python -S -E` in a child interpreter, with site-packages off the path.
+`sys.stdlib_module_names` was refused deliberately — it is a **3.10 API**, so using it would
+have raised this file's own floor by a construct the catalog above cannot see, which is the
+exact blindness the rule exists to report.
+
+**🛑 THE SENTINEL SURVIVED THE FIRST BATTERY, AND IT WAS RIGHT TO.** `SENTINEL-must-be-RED`
+corrupts `_V30_NO_SECTION`, and the arm meant to catch that asserted `msg == _V30_NO_SECTION`
+— **the same constant on both sides, which agrees unconditionally.** The detector had been
+proven blind before a single verdict was scored, which is the whole reason the sentinel runs
+first. The arm now types its sentence by hand.
+
+**🛑 AND `M9` SHOWED AN ARM OVER THE CORE IS NOT AN ARM OVER THE LOADER.** `_env_declared`
+returning `{}` instead of `None` for an absent section left **every core arm green** and turned
+the rule into four BLOCKs about a manifest that never claimed a floor — because the NO-SECTION
+arm feeds `_v30_outcome` a **literal `None`** and so can say nothing about the function that
+decides when `None` is the answer. Closed by `LOADER-absent-is-None` (4 manifest shapes) and by
+`E2E-no-section` through the registered rule.
+
+**Mutation battery — 13 applied, 13 killed, 0 survivors**, in a mirrored flow tree
+(`docs/tools/` beside a real `hooks/`), verdicts read from the **final** line beginning
+`SELFTEST `. Killed: the sentinel, `M1-empty-becomes-floor-0` (undetermined must not read as
+floor 0), `M2-row-always-agrees` (the duplicate oracle), `M3-git-drops-call-shape`,
+`M4-git-init-alone-is-enough`, `M5-probe-not-isolated`, `M6-probe-swallows-its-reason`,
+`M7-citation-sorted-lexically`, `M8-catalog-loses-node-kinds`, `M9`, `M10-executed-floor-never-
+unwitnessed`, `M11-registered-noop`, `M12-third-party-counted-not-named`. **`M6` first killed
+by CRASHING the selftest** (`ok &= None` raises `TypeError`) rather than printing a FAIL line;
+the arm was repaired so the kill is readable, because a kill nobody can read is a worse kill.
+
+**A defect the arms found in their own author's code:** `_v30_floor` sorted citations as
+STRINGS, so `:1380` ordered ahead of `:41` and the finding cited `capture_output=` where
+`from __future__ import annotations` binds the floor. Every count stayed correct; only the one
+part a reader follows by hand was wrong. Caught by `LIVE-derived` asserting the citation, not
+the number.
+
+**Population sweep.** `HLR-89.4`'s Acceptance and Negative-control fields — corrected, live.
+`FLOW-VERSION.md` gains a `## Environment contract` section; it is **not** in its own hashed
+table, so `flow_hash` does not move for it. `LED-89.22`'s figures are **closed history, true
+when written, deliberately left**: it reports the API floor bound by `capture_output=` at
+"nine call sites", and this increment's own `capture_output=True` in the import probe makes it
+**12** today. The derivation is unchanged; only the count moved, and it moved because this
+entry's code moved it.
+
+### LED-89.24 — a probe armed only where the machine agrees with the constant is not a probe
+- **Requirement:** HLR-89.5
+- **Date:** 2026-08-31
+- **What changed:** `run()` now prints **three preflight lines before any verdict** — git and
+  its floor, stdout's encoding, and whether this filesystem folds case — with 12 `PRE` arms
+  and 14 of 14 mutants killed against a GREEN baseline.
+
+**All three were already assumed by rules that ship, and none was reported.** `V16`, `V25`,
+`V27` and half the selftest talk to git; a machine without it collected three separate
+absences and never the one sentence explaining them. rev49 hardened the streams because the
+selftest could not state a verdict under a stdout it could not encode, and still never printed
+what the stream IS. And case-folding stood in the selftest's own tail as the **last of two I/O
+steps named as unproven** — this entry closes it.
+
+**The two git absences are held apart, for the fourth time in this file's history.** `V25`
+paid for collapsing states and bought back a third, *"no origin configured"*; `LED-89.17` did
+it in `_git`; `LED-89.22` did it in `V8`. Here there are **five** states — ABSENT from PATH,
+PRESENT and UNUSABLE, an unparseable version string, BELOW the floor, and at-or-above — and
+`ABSENCES-differ` gives each a marker phrase that must appear in **exactly one** of the five.
+
+**The first version of that control was WRONG and was replaced by measurement.** It asserted
+the five sentences share no five-word phrase. They legitimately do: git-absent and
+git-below-floor both end *"a full `--selftest` cannot run"*, because both facts have that
+consequence. And full disjointness is also too weak in the other direction — two at-or-above
+sentences differing only by a version number are `!=` while telling the reader the same thing.
+Exactly-one-of-five is the property the requirement actually names.
+
+**🛑 AND THE PROBE PASSED ITS FIRST BATTERY WHILE BEING AN ASSUMPTION.** `N7-case-probe-is-
+assumed` replaces the entire probe body with `return True, None` — and **SURVIVED** 12 mutants
+and every green arm, because **this machine really does fold case**, so `CASE-live-probe`'s
+assertion that the verdict is `True` is satisfied by the constant `True`. The verdict was
+armed; the MECHANISM was not, and no case-sensitive volume exists here to substitute for real.
+Closed by making the lookup injectable and arming **three substituted filesystems**: the answer
+must FOLLOW the lookup (`False` in → `False` out), and the lookup must ask for the **lowercased**
+name — which is the one thing separating a fold probe from a file-was-written probe. `N12`,
+written after the fix, makes the probe ask for the name it just wrote and dies on that arm.
+
+**The probe names the volume it ran on, and that is not decoration.** It writes where it is
+allowed to write — `tempfile.gettempdir()` — and that is not always the volume of the tree
+under check. A probe reported without saying WHERE it ran is a measurement of one filesystem
+presented as a measurement of another. `N9-volume-never-named` dies on `CASE-four-states`.
+
+**Mutation battery — 14 applied, 14 killed, 0 survivors.** Sentinel first
+(`SENTINEL-must-be-RED`, KILLED). `N1` folds absent into below-floor; `N2` folds unusable into
+absent; `N3` moves the boundary to `<=` so 2.28.0 reads below; `N4` makes an unparseable
+version read as a pass; `N5` drops the `FileNotFoundError` branch; `N6` tells the reader a
+cp1252 stream loses characters it actually transliterates; `N7`, `N12`, `N13` attack the probe;
+`N8` makes an unmeasured filesystem read as measured; `N9` hides the volume; `N10` returns two
+lines instead of three; `N11` stops `run()` printing them at all.
+
+**A cross-contamination hazard, found and closed inside the battery.** `CASE-probe-cleans-up`
+first read the SHARED temp directory, so `N13`'s leaked directories would have reddened the arm
+on the run **after** `N13` and scored the wrong mutant. It now probes a directory of its own.
+
+**Population sweep.** `HLR-89.5`'s Acceptance, Negative-control and Ledger fields — corrected,
+live. `devflow-validate.py`'s selftest tail claimed *"What remains is ONE I/O step: the fact
+that this machine's filesystem folds case"* — **corrected**, and the tail now names what is
+still NOT proven in its place: no interpreter below 3.11 exists here, so `V30`'s 3.7 is
+documentary. `run()`'s header line moved ABOVE the rules so the assumptions are read before the
+first verdict; `hooks/flow-guard.py` is unaffected, because it selects only lines beginning
+`[x]` or `[!]` and the preflight lines begin `git ·`, `stdout ·` and `filesystem ·`.

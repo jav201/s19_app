@@ -159,7 +159,7 @@ written, and its figure corrected in the same act (`LED-89.8`).
 
 ### HLR-89.4 — the environment contract is declared and DERIVED, never asserted
 - **Traceability:** Story 4
-- **Ledger:** LED-89.2, LED-89.22
+- **Ledger:** LED-89.2, LED-89.22, LED-89.23
 - **Statement:** The flow shall declare its environment contract as a canon row, and a rule
   shall derive that contract's floors from the source constructs that bind them.
 - **Rationale (informative):** a floor written down by hand is a claim; a floor derived from
@@ -183,9 +183,16 @@ written, and its figure corrected in the same act (`LED-89.8`).
   refuses it with `SyntaxError: unterminated string literal`. A claimed floor must name the
   interpreter that REFUSES the version below it, or be labelled documentary. See `LED-89.22`.
 - **Priority:** medium
-- **Acceptance test(s):** `owed at Increment 4`
-- **Negative control:** owed at Increment 4 — a declared row disagreeing with the derived
-  floors must BLOCK; a rule that only ever agrees with the row is the duplicate-oracle defect.
+- **Acceptance test(s):** **built at Increment 4** — `V30`, 23 arms. The two derivations are
+  `V30 LIVE-derived` (API 3.7 by exactly 2 construct kinds, git 2.28.0 at 3 sites) and
+  `V30 SYNTAX-fv-is-blind`. `V30 E2E-live` and the three `E2E-*` fixture arms drive the
+  REGISTERED rule; `V30 LOADER-absent-is-None` arms the loader the core cannot see.
+- **Negative control:** **EXECUTED and each BLOCKs** — `ROW-api-below-BLOCKS` (`3.6`),
+  `ROW-api-above-BLOCKS` (`3.11`), `ROW-git-BLOCKS` (`2.20.0`), `ROW-third-party-BLOCKS`
+  (module NAMED, not counted) and `E2E-fixture-disagrees`, which changes ONE CELL of a
+  fixture manifest and requires the registered rule to go from 0 BLOCKs to 1. The sentinel
+  `SENTINEL-must-be-RED` **survived the first battery** and is why `NO-SECTION` now types its
+  sentence instead of comparing the constant to itself — see `LED-89.23`.
 - **Boundary catalog:** ☑ empty — no binding construct found, which must not read as "floor
   0" · ☑ boundary — a construct raising the floor to exactly the declared value · ☑ invalid — a
   declared floor BELOW what the source binds · ☑ error — a source file that does not parse.
@@ -196,7 +203,7 @@ written, and its figure corrected in the same act (`LED-89.8`).
 
 ### HLR-89.5 — the runtime preflight reports what the gate assumes
 - **Traceability:** Story 5
-- **Ledger:** none
+- **Ledger:** LED-89.24
 - **Statement:** Before the gate's rules run, the flow shall report whether git is present and
   at or above its floor, what encoding stdout carries, and whether the filesystem folds case.
 - **Rationale (informative):** all three are assumed by rules that already ship, and none is
@@ -207,10 +214,16 @@ written, and its figure corrected in the same act (`LED-89.8`).
 - **Numeric pass threshold:** 3 preflight lines, each naming its measured value; git absent
   produces a distinct sentence from git present and below the floor
 - **Priority:** medium
-- **Acceptance test(s):** `owed at Increment 5`
-- **Negative control:** owed at Increment 5 — git removed from `PATH` must produce a different
-  sentence from git present-but-below-floor; collapsing the two is the defect `V25` already
-  paid for with its "no origin configured" third state.
+- **Acceptance test(s):** **built at Increment 5** — the `PRE` family, 12 arms.
+  `PRE THREE-LINES` pins the count; `PRE GIT-six-states`, `ENC-four-states` and
+  `CASE-four-states` pin every sentence; `PRE E2E-git-present` and `E2E-git-blinded` drive a
+  CHILD `run()` and read its three printed lines.
+- **Negative control:** **EXECUTED and it BLOCKs the collapse** — `PRE ABSENCES-differ` gives
+  each of the 5 git states a MARKER PHRASE and requires it in exactly one of the five
+  sentences. Asserted that way, not as inequality: two sentences differing only by a version
+  number are `!=` and say the same thing, and git-absent and git-below-floor legitimately
+  share *"a full `--selftest` cannot run"*. `PRE E2E-git-blinded` proves it end to end, and it
+  asserts `shutil.which` finds no git on the blinded `PATH` **before** trusting the run.
 - **Boundary catalog:** ☑ empty — git absent from `PATH` · ☑ boundary — git at exactly 2.28.0 ·
   ☑ invalid — a version string that does not parse · ☑ error — a case-folding filesystem, which
   the selftest's own tail admits is unproven today.
