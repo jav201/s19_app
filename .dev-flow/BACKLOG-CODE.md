@@ -17,7 +17,7 @@
 
 ### ⚠ Read this before using the band order
 
-**If the next action is CLOSING batch-89 — which it is — then the two items that block it are BOTH in the other lane, and neither is a `P0`.** They are [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s `sync-P6` (the sync a close requires cannot pass for a `core` batch) and `batch-89-unclosed`. **Nothing in THIS lane blocks that close.** Band-first is the declared order, so it is what the index prints — this paragraph is the tension named rather than silently resolved.
+**✅ batch-89 CLOSED 2026-09-03, so the two other-lane items that blocked it are closed too** — [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s `sync-P6` and `batch-89-unclosed`. Nothing in either lane blocks a close now, and **this lane's `P0` (the batch-79 charter) is the actual next action** by the declared band order. *Kept rather than deleted: the tension it names — a band-first index cannot express operational blocking — outlives the pair that demonstrated it.*
 
 ### `P0` — this lane: **1**
 
@@ -63,13 +63,12 @@ Not listed individually, by rule 4. Their homes: §*Development flow OF the code
 
 ### Cross-lane — [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s top, by id
 
-*Cross-referenced, not copied; read them there. That lane holds **1** `P0`, **13** `P1`, **2** `MAJOR`, **19** `P2` and **12** `P3`.*
+*Cross-referenced, not copied; read them there. That lane holds **1** `P0`, **12** `P1`, **2** `MAJOR`, **21** `P2` and **15** `P3` — re-counted at the batch-89 close (2026-09-03): two `P1`s closed, one opened, and six carries filed across `P1`/`P2`/`P3`.*
 
 | band | id / pointer | one line |
 |---|---|---|
 | `P0` | **`R-89-6` + `R-89-7`** | `V2` has been vacuous on this project all along, on two orthogonal axes. |
-| `P1` | **`sync-P6`** *(blocks the batch-89 close)* | `/dev-flow-sync`'s ACTIVE branch demands a last station of `P6`; no `core` batch has one. |
-| `P1` | **`batch-89-unclosed`** *(blocks the batch-89 close)* | Merged and unclosed; `V28` makes the hole permanent when batch-90's directory opens. |
+| `P1` | **`G-89-03`** *(opened at the batch-89 close)* | 1163 lines of new `s19_app` source — `tools/sync_evidence.py`, `tests/test_sync_evidence.py`, `tests/test_id_registry.py` — shipped under no requirement and no increment packet. |
 | `P1` | **`code-reviewer-absent`** | No increment of batch-89 had an independent `code-reviewer` pass — 6 of 6 packets say `ABSENT`. |
 | `P1` | **`R-88-17`** | A correction has a population and nothing in this flow enumerates it. |
 | `P1` | **`no-canonical-mutation-harness`** | Every increment writes a throwaway; 42 mutants across three revisions are not re-runnable. |
@@ -80,7 +79,13 @@ Not listed individually, by rule 4. Their homes: §*Development flow OF the code
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
 >
-> **Last refresh: 2026-09-03 (PRIORITIZATION + CLOSURE PASS — no batch; the head of this file now carries a cross-lane prioritized index)**
+> **Last refresh: 2026-09-03 (`2026-08-28-batch-89` CLOSE).** `origin/main` tip **still `a2a2534`**; the batch's six tail commits are pushed on `claude/batch-89-lean-contract` and the merge SHA is recorded at the merge, not predicted here.
+>
+> **This lane's three batch-89 closures were already marked at the 2026-09-03 prioritization pass and are NOT re-marked here** -- the `setuptools>=61.0` `P2`, the recursive-SVG-copy `P3`, and the vault pilot-gallery `P3`. Re-routing what a measured pass has just routed is how an index and its items start disagreeing.
+>
+> **One finding of this close concerns this lane's work and is filed in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md), not here** (`G-89-03`): `tools/sync_evidence.py` (628 lines, new) and `tests/test_sync_evidence.py` (535 lines, new) landed at `c4e6fe5`, plus `tests/test_id_registry.py` at `ed03b10` -- **the only three `.py` files the whole batch touched** -- under **no requirement and no increment packet**. The closure they produced is real and is recorded in this file; what is missing is the increment gate, and a missing gate is a PROCESS defect. Written there per `docs/engineering-rules.md` rule (4), not left as a pointer.
+
+> **Earlier refresh: 2026-09-03 (PRIORITIZATION + CLOSURE PASS — no batch; the head of this file now carries a cross-lane prioritized index)**
 > — flow **`2026.08.31-rev55`**, four revisions past the `rev51` that refresh cited and three past the `rev52` its header names. `origin/main` tip **unchanged at `a2a2534`**; the work rides `claude/batch-89-lean-contract`, **5 commits ahead and pushed** (`a679ee6` · `c4e6fe5` · `ed03b10` · `c118f6e` · `cf24e29`), **no PR open**. **batch-89 is STILL UNCLOSED** — no `04-validation.md`, no `05-close.md` — so this is again a hand refresh at no batch's close, the second in a row, which is itself the standing `P1` on that subject.
 >
 > **What this pass wrote here.** A **Prioritized index** at the head, derived from the items rather than restating them — band, one line, pointer, **no evidence copied upward** (`NEXT-SESSION.md:4-6`) — with its ordering criterion stated so it can be re-derived, and [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s top items cross-referenced so the whole set reads from either file.
