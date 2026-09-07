@@ -42,7 +42,7 @@
 
 *Tiebreak note: nothing competes with it in-band, but it would win tiebreak (iii) against most of the `P1`s below — a vacuous rule is the one defect that makes the other items' closure evidence unreadable.*
 
-### `P1` — this lane: **10** *(was **12** — `R-89-8` and `code-reviewer-absent` CLOSED at rev63, 2026-09-07; rows kept in place, marked)*, re-derived 2026-09-07 *(membership changed, the count did not: `G-89-03` moved to the code lane and `R-88-17` closed at flow `rev60`, and the two `/dev-flow-init` items opened by this pass took their places)*
+### `P1` — this lane: **11** *(was **12** — `code-reviewer-absent` CLOSED at rev63, 2026-09-07; row kept in place, marked)*, re-derived 2026-09-07 *(membership changed, the count did not: `G-89-03` moved to the code lane and `R-88-17` closed at flow `rev60`, and the two `/dev-flow-init` items opened by this pass took their places)*
 
 *Ordered by the four tiebreaks above. The `(i)`/`(ii)`/`(iii)`/`(iv)` tag on each row says which tiebreak placed it, so a disagreement can be argued at the criterion instead of at the ordering.*
 
@@ -65,7 +65,7 @@
 
 **Reading the two new tags.** 🕒 **rev`nn`** means *a flow revision is already assigned to close it and no ruling is owed*; ⏸ **`Qn`** means *it is waiting on the operator question of that number in the list above*. **A row carries one or the other, never both.**
 
-### `MAJOR`, `P2` and `P3` — this lane: **1**, **13** and **8**, re-derived 2026-09-07 and rolled up
+### `MAJOR`, `P2` and `P3` — this lane: **1**, **12** and **8**, re-derived 2026-09-07 and rolled up *(P2 −1 on 2026-09-07: `R-89-8` CLOSED at rev63)*
 
 **The one remaining `MAJOR`** is §*Registered 2026-07-31 (batch-74) — a phase can pass its gate with NO artifact at all* → *“batch-74 reached MERGE with…”*, deferred as **`Q7`**. It is placed between `P1` and `P2` by rule 1's note. ⚠ **TWO CORRECTIONS TO THIS LINE, both made 2026-09-07.** *(a)* **Its pointer was wrong and had been since the index was built:** it addressed this item as §*flow-manifest drift*, a section the item has never lived in — a pointer whose opening words were right and whose section was not, which is the one failure mode rule 5's address format exists to prevent. *(b)* **The other `MAJOR` — the AT/TC registry — left this band**, not by being closed but because both of **this lane's** halves are discharged: the design was delivered 2026-07-31 and the build half moved to [`BACKLOG-CODE.md`](BACKLOG-CODE.md) the same day. Its own rule that *“neither half closes the item”* still stands and is quoted at its disposition.
 
