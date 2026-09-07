@@ -73,6 +73,52 @@
 
 **➕ 2026-09-06, later — Wave B lanes 1 and 2 landed.** **rev59** shipped (`~/.claude` `9d95647`, bundle `0bf7005`, `flow_hash 45eac0f2f6345fe3`, 592 arms): ruling 1 executed — `_V2_DECLARED` widened to `AT-(B<batch>-)?<n>`, `_strip_code` on the declared side, `WORDING-declared` re-frozen; **`R-89-6` closed** (on a batch-88-active copy `V2` names all nine ids, as nine BLOCKs — none has a node). `TC-B<batch>-<n>` ruled OUT by the operator on measurement (0 of 66 contracts differ). **batch-90 opened through P1** on `claude/batch-90-green-signals`, **PR #209** — the `report_service` item was SATISFIED-EXTERNALLY at `fbc9f2a` (2026-07-26) and dropped at P0; two requirements remain (registry blindness, `TC-497`); the batch stops at P1 until **rev60** (rulings 2+3) lands, so its first packet carries the new declared fields. **Next flow increment = rev60.**
 
+### ➕ APPENDED 2026-09-07 — **rev60 SHIPPED, and every open PROCESS item now has a written disposition.** The flow is not finished; the QUEUE is.
+
+**Read this row before the four-rev plan below.** This append does not change the plan; it records what shipped, what the six readiness checks measure today, and what the backlog now says.
+
+| what | state | evidence |
+|---|---|---|
+| **rev60** | **SHIPPED 2026-09-06** | `claude-config` **`99b77fc`** · `agent-skills` **`0609e46`** · `flow_hash f0f12b04652cfd75` · **623 arms**. **Verified here by reading the shipped files, not the changelog:** the `Instrument RED-proof` and `Correction population` sections, declaration rows and gate-checklist rows 12/13 are in `increment-template.md`; `--map` registers `V31` and `V32` at `[S1]` with `(rev60)` origins; `C-57` and the widened `C-14` carry their own headings in `dev-flow-lessons/SKILL.md`; the supersession-completeness inspection reads **P3** in `validation-template.md` and in the catalog; rev59's `SyntaxWarning` is gone (the file compiles under `-W error::SyntaxWarning` on 3.12.7 while a planted bare-escape docstring **raises** on the same command) and two arms hold it, `INT SOURCE-no-warning` and `INT SOURCE-probe-sees-one`; and `FLOW-VERSION.md`'s `controls:` derivation is repaired — re-run here it returns **25** at heading depths 1–3 against **38** under the old published `#{1,6}` command, with the three planted injections scoring **0 / 1 / 0**. |
+| **the disposition pass** | **DONE 2026-09-07** | [`BACKLOG-PROCESS.md`](../BACKLOG-PROCESS.md) and [`BACKLOG-CODE.md`](../BACKLOG-CODE.md). **51 open markers in, 34 out**, every one of the 51 carrying a dated disposition. |
+
+**The six readiness checks, as they measure TODAY.** Two are green, one was green already, three are red and each red one is assigned.
+
+| # | check | today | who closes it |
+|---|---|---|---|
+| **1** | `--selftest` from a clone, both interpreters, byte-identical twice under default `PYTHONHASHSEED`, and the file compiles clean under `-W error::SyntaxWarning` | **◑ half green.** The compile half is **CLOSED at rev60** and re-verified here with a discriminating planted control. The byte-identical half is still open — three `--selftest` arms print an unsorted `set` repr. | **rev61** |
+| **2** | a project scaffolded by following `/dev-flow-init` literally gates at 0 block / 0 flow notice, and its `state.json` carries every field a rule reads | **❌ RED, and it is the only check red for the user who matters — a project starting today.** | **rev62** (4 items filed) |
+| **3** | no registered rule is known-vacuous; every rule with declared blindness prints that blindness in its own finding | **✅ GREEN, and it moved.** This lane's `P0` — the last known-vacuous rule — **closed at rev58 + rev59** and had never been recorded as closed; the closure and the two-day gap are both written at the item now. `V2` and `V30` both print their declared blindness. | closed |
+| **4** | every template field the flow declares mandatory has a rule that reads it, or a written exemption | **❌ RED.** Re-verified: `Negative control` returns 6 hits in the validator and `Boundary catalog` 3, **all comments about the validator's own arms**; `Acceptance test(s)` returns 0; `Independent review` returns 2, both comments. | **rev63** (2 items) |
+| **5** | no hand-kept inventory sits beside a derived one | **❌ RED, one duplicate.** The ten-key `artifact_homes` default block is written out in full in two command files and **has already drifted** between them. | **rev62** |
+| **6** | every portable lesson from batches 86–89 is encoded with its measured origin or retired with a dated reason | **❌ RED, six remain.** rev60 encoded one of them (instrument-blindness → `C-57`); the counter moves 7 → 6 and does not reset. | **no revision — an operator sitting.** Amended at the `C-45` decision. |
+
+**The dispositions actually written, which differ from the triage that proposed them and the difference is the point.**
+
+| disposition | this pass wrote | the 2026-09-06 triage proposed |
+|---|---:|---:|
+| **CLOSED** | **5** | 2 (as *closing-at-rev60*) |
+| **RETIRED** | **6** | 6 |
+| **MOVED** to the code lane | **13** (12 routed + 1 prior move recorded) | 21 |
+| **DEFERRED** to the operator | **23** markers / **19** questions | 13 rows |
+| **assigned to a flow revision** | **4** existing + **7** newly opened = **11** | 9 |
+
+**Eight of the twenty-one proposed moves were overturned**, each on a measurement or on a standing ruling the triage had not read: three closed instead (a contiguity claim already struck in its own plan; two figure-corrections already delivered in this lane's own registry spec) · three deferred instead (`C-33`, whose normative text is a **flow** file and appears zero times in this project's rules; both `/tui-design` rows, which this file's own scope sentence names as this lane's and which the receiving lane's scope excludes) · one deferred on the receiving file's own words (the unregistered id spaces, which `BACKLOG-CODE.md` already states are *"registered separately in the PROCESS lane"*) · and one re-routed to **rev62** (a `~/.claude` template, which no project-lane batch can edit). **Both are correct classifications of their own reading; the difference is that these were re-measured.**
+
+**Two items the triage dispositioned NOWHERE** were found and disposed of: `map-severity-column` and the vacuous-FIXTURES control candidate — the second of which **carries no band marker and is therefore invisible to every count either backlog publishes**, including the triage's own five bands, whose prose names it.
+
+**The closing plan, unchanged in order and now with its items filed as items:**
+
+- **rev61** — *the instrument prints what it measured*: `ifc-set-repr` · the stale rule census in `commands/dev-flow.md`. ⚠ **The census figure did not survive re-measurement:** the sentence says 28 registered rules and the commissioning brief said 32; `--map` returns **30** today (`V3` and `V24` do not exist). **Verify the reproducibility half under DEFAULT `PYTHONHASHSEED` — pinning it is the vacuous form.**
+- **rev62** — *a project born today passes its own gate*: `init-schema-8-fields` · `init-ledger-blocks` · `init-no-batch-dir` · `req-template-v23-example` · `artifact-homes-duplicated`, plus `origin-batch-06-b-1-unresolved` and two one-line derivations in files it already opens. **The arm must plant the OLD seed and reproduce the ghost, or it is a tautology.**
+- **rev63** — *a mandate nothing reads is a paragraph*: `R-89-8` · `code-reviewer-absent`, both as a declared field plus a rule, on rev60's own pattern. **Four arms, two of them negative controls.**
+- **rev64** — **deferred: it is gated on operator question `Q1`**, which rules the mutation harness's address and, in the same sitting, the named-mutation mandate and the per-node-counterfactual property. **No files are assigned to it here, because assigning them would presume the ruling.**
+
+**The exit criterion is unchanged and is now checkable in one place: the six checks green, re-run from a fresh clone.** Checks 1, 2, 4 and 5 close in revs 61–63. Check 3 is green. **Check 6 closes in no revision at all** — it needs six AskUserQuestions, which is the same sitting as the nineteen questions at the head of [`BACKLOG-PROCESS.md`](../BACKLOG-PROCESS.md). **A queue with a disposition on every row is what “ready” looks like from this side; the operator's list is what stands between it and “finished”.**
+
+⚠ **What this append could NOT verify.** The gate over this project still reports **1 block**, and it is `V16 ~/.claude/skills: uncommitted changes` — a parallel agent mid-edit, an environment fact and not a defect of either repository. **Nothing here was committed**, and rev61's landing is another lane's to confirm.
+
+
 ## 0 · The plan at a glance
 
 **The critical path is: rev56 (small, verified repairs) → close batch-89 → everything else.**
