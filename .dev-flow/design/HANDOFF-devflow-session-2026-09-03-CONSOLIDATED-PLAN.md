@@ -119,6 +119,8 @@
 ⚠ **What this append could NOT verify.** The gate over this project still reports **1 block**, and it is `V16 ~/.claude/skills: uncommitted changes` — a parallel agent mid-edit, an environment fact and not a defect of either repository. **Nothing here was committed**, and rev61's landing is another lane's to confirm.
 
 
+**➕ 2026-09-07 — rev61 and rev62 shipped; readiness checks 1b and 2 are green.** **rev61** (`~/.claude` `3ec2826`, bundle `0d14241`, `flow_hash ee5715dc55cb4a97`, 629 arms): the selftest transcript is byte-reproducible under the DEFAULT hash seed (`ifc-set-repr` closed); the rule-severity sentence re-measured at **30 registered rules** (V3/V24 do not exist). **rev62** (`e4ba398`, bundle `427e284`, `afb4a237ea0a2a21`, 637 arms): `/dev-flow-init` seeds the 17-key schema, the batch DIRECTORY, a `V26`-clean ledger, a conforming `V23` example; `config.json` retired (3 canon sites, 0 elsewhere); eight `DFI` arms scaffold a project from the command's OWN text and gate it — the RED baseline was 2 BLOCK + 3 NOTICE (one BLOCK more than BRIEF-5 found: `V1` on the seeded `<YYYY-MM-DD>`), now `{V27/NOTICE}` only. Existing projects see nothing (batch-90 worktree byte-identical over every non-S0 rule). Both revs committed as separate, recipe-verified revisions. **rev63 in flight** (check 4: `R-89-8`'s three fields + `Independent review` become read fields). After it, what remains for the flow is the operator's: **rev64 (Q1)** and the **`C-45` sitting** (six lessons) — see `BACKLOG-PROCESS.md` §⏸ Operator questions.
+
 ## 0 · The plan at a glance
 
 **The critical path is: rev56 (small, verified repairs) → close batch-89 → everything else.**
