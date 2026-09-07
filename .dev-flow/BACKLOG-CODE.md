@@ -63,9 +63,11 @@
 | **`TC-497` cannot tell an ASSERTION from its REFUTATION** | It greps `REQUIREMENTS.md` for residual figures verbatim, so a refutation reads as the claim. | §*New defects found in passing at batch-65* |
 | **no AT/TC registry** *(and 3 further rows in that section)* | Id collisions keep recurring because nothing registers the ids. | §*MAJOR — there is no AT/TC registry* (cross-lane twin in `BACKLOG-PROCESS.md`) |
 
-### `P2` — **38** · `P3` — **72**, rolled up *(**+6** and **+5** on 2026-09-06 — eleven arrivals from the PROCESS lane)*
+### `P2` — **39** · `P3` — **72**, rolled up *(**+1** `P2` on 2026-09-07 at the D3 sitting — one arrival from the PROCESS lane; **+6** and **+5** on 2026-09-06 — eleven arrivals from that same lane)*
 
 ➕ **UNCHANGED BY THE 2026-09-07 OPERATOR SITTING, AND THE REASON IS THE POINT.** One item arrived from that lane on 2026-09-07 — the registry `space` extension — **and it is deliberately NOT added to `P2`**: it is a **dated charter for batch-91**, not workable until batch-90 lands, and filing it in a band would put it in a queue position that says otherwise. It lives in §*🔁 Chartered 2026-09-07 for batch-91* below. **Stated rather than left as a silent zero-delta**, because a count that does not move for a good reason is indistinguishable from one nobody updated.
+
+➕ **AND THEN IT DID MOVE, LATER THE SAME DAY: `P2` **38 → 39** AT THE D3 CLASSIFICATION SITTING.** The note above is about the twenty-question sitting; the **D3 sitting on that lane's BRIEF-6**, held afterwards on 2026-09-07, routed **one** item here and it **is** workable now, so unlike the batch-91 charter it **is** banded. It lives in §*Received from the PROCESS lane at the D3 sitting*: nothing in this repository runs the flow validator over this repository. **The delta is added to the carried figure, on the same rule the 2026-09-06 arrivals used; this lane's own remainder is unchanged and unreconciled by that arithmetic.** ⚠ **`P3` does not move**: the D3 sitting's other dispositions are either flow-side or have no backlog item in either lane.
 
 ⚠ **The 2026-09-06 figures are the published ones plus a counted ARRIVAL, not a re-derivation of this lane.** Twelve items were routed here from [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) on that pass — **1 `P1` · 6 `P2` · 5 `P3`** — and the deltas are added to the carried figures. **This lane's own remainder, which rule 5 names, is unchanged and unreconciled by that arithmetic**; adding a measured delta to an unreconciled base does not reconcile the base, and this line says so rather than letting the new figures read as freshly derived.
 
@@ -76,6 +78,8 @@ Not listed individually, by rule 4. Their homes: §*Received from the PROCESS la
 ### Cross-lane — [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s top, by id
 
 *Cross-referenced, not copied; read them there.*
+
+➕ **RE-DERIVED 2026-09-07 A SECOND TIME, AFTER THAT LANE'S D3 CLASSIFICATION SITTING ON ITS BRIEF-6 — that lane now holds `P0` **0** · `P1` **8** · `MAJOR` **1** · `P2` **6** · `P3` **6** = **21 open**, down from 22.** The sitting confirmed **18** classifications in bloc (**6 retire · 12 re-scope**) and grouped its **16** execute rows into six flow revisions, **but only two figures moved**: one `P3` retired (a lineage entry registered with no encoded text) and one `P2` retired (a batch-64 QA length check with nothing left in `~/.claude` to weight or to remove), against **one `P2` opened** (a template section the flow mints, mandates in two checklists, and that **0 of 949** artifacts in the whole record have ever filled). **22 − 1 = 21**, re-derived there by the same filtering counter, shown red on planted decoys before the figure was believed. ⚠ **ONE ROW ARRIVES IN THIS LANE** — see §*Received from the PROCESS lane at the D3 sitting* below; it is the only one of the sitting's dispositions this file can act on. ⚠ **A re-scope is invisible to that lane's counter by design and that lane says so at its own index:** a re-scoped row is work that changed address, not work that closed.
 
 ➕ **RE-DERIVED 2026-09-07 AFTER THE OPERATOR SITTING — that lane now holds `P0` **0** · `P1` **8** · `MAJOR` **1** · `P2` **6** · `P3` **7** = **22 open**, down from 32.** The fall is the operator answering all twenty of that lane's questions in one sitting on 2026-09-07: **8 retired · 3 moved · 1 arriving by being BANDED rather than opened** (a candidate that existed all along in no count). **32 − 11 + 1 = 22**, re-derived there by a filtering counter proven red on planted decoys, not decremented. ⚠ **Only ONE of the three moves lands in this lane** — the id-space row, as the dated batch-91 charter in the new section below. **The other two left `s19_app` entirely**, to `~/.claude/skills/tui-design/` in the `agent-skills` repo, so they have **no landing bullet here and cannot be verified from this repository.** ⚠ **That lane's `MAJOR` stays at 1 deliberately:** it is ruled to flow `rev65` and falls to 0 **when rev65 lands**, not when the ruling was written.
 
@@ -105,6 +109,21 @@ Not listed individually, by rule 4. Their homes: §*Received from the PROCESS la
     **Why this lane:** the registry is this repository's own artifact and its guard is this repository's own test, so the extension is project work under a charter, not a flow change. The originating lane cannot edit either.
     **What closes it:** the registry admits the three further spaces; its guard **refuses** a collision across any pair of them; and the collision the originating item demonstrated is replayable as a case.
     **How you verify:** that demonstrated collision **fails** the guard at the post-change ref and **passes** at the pre-change ref — two refs, because a guard that has never refused the case it was written for is a paragraph. ⚠ **A presence check on the field is not a verification** — `space` accepting a new value proves nothing about whether anything reads it.
+
+---
+
+
+## 🔁 Received from the PROCESS lane at the D3 sitting (2026-09-07)
+
+> **One item ARRIVES here from the D3 classification sitting held over [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) on 2026-09-07**, the sitting that ruled that lane's `Q11` against its own BRIEF-6. **Why it arrives:** its remedy is a CI job or a git hook **in this repository**, so no flow revision can perform it — the same test the twelve arrivals of 2026-09-06 were routed on. **Read the evidence there; work the item here.** Address, in this project's own form: §*Routed from batch-88 and batch-89* → *“the whole map-resolution class is LATENT…”*.
+
+> ⚠ **This is a move by POINTER, not by excision**, as the 2026-09-06 section already states: the finding text stays in the PROCESS lane beneath its ↔ **RE-SCOPED** bullet and this file carries the live entry.
+
+> ⚠ **NO ID TOKENS ARE REPRODUCED HERE, deliberately** (`C-56`: writing an id under `.dev-flow/` declares it to the scanners, and this item's own id appears **nowhere** in this file — naming it in order to route it would mint it here). Same posture as §*Received from the PROCESS lane 2026-09-06*.
+
+  - **▸ (P2, NEW here 2026-09-07) NOTHING IN THIS REPOSITORY RUNS THE FLOW VALIDATOR OVER THIS REPOSITORY, SO EVERY PROJECT-SIDE RULE FIRES ONLY WHEN A HUMAN TYPES THE COMMAND.** The flow's invocation hook reports only its three flow rules, **by design** — project findings are the project's own gates — so the map-resolution class and every project-side rule repaired at batch-88 are **latent here**, which is exactly the condition an automated gate exists to replace. *(The control that names that condition is cited at the item in the other lane; it is not declared in this file and is not minted here.)*
+    **Measured at that lane's BRIEF-6 before routing: 0 automation files in this repository or in the batch-90 worktree invoke the validator** — `.github/workflows/` and `.git/hooks/` both swept — and the rule set that would run there reports **1 block · 310 notice · 32 not applicable** on this project today.
+    **What closes it:** a CI job or a git hook **in this repo** that runs the validator over `.dev-flow/`. **How you verify:** the job exists **and has gone red at least once** — a job that has never failed is indistinguishable from one that cannot. ⚠ **310 notices is not a gate anyone will keep:** triage the notice count first, or ship the job **advisory-only**. Either way it is a project act and never was a flow revision, which is the whole of why it is here.
 
 ---
 
