@@ -54,7 +54,7 @@
 | **`carry-input-side`** *(control candidate)* | A deferral born in a prototype, ADR or audit never reaches the queue, because carry-over fires only at batch close. | **(iii)** | §*carries opened by batch-66* → *"a deferral written in a PROTOTYPE…"* |
 | **`tui-design-separability`** | The `/tui-design` skill has no control-separability guard, and user testing found the gap before the skill did. | **(iv)** | §*operator-flagged 2026-07-28* → *"no CONTROL-SEPARABILITY guard…"* |
 
-### `MAJOR`, `P2` and `P3` — this lane: **2**, **20** and **17**, rolled up
+### `MAJOR`, `P2` and `P3` — this lane: **2**, **20** and **18** *(P3 +1 on 2026-09-06: `atlas-derivation-directory-existence`)*, rolled up
 
 **The two `MAJOR`s** are §*MAJOR — there is no AT/TC registry* → *"THERE IS NO AT/TC REGISTRY…"* (batch-63 `OB-2`, operator-identified) and §*flow-manifest drift* → *"batch-74 reached MERGE with…"*. They are placed between `P1` and `P2` by rule 1's note.
 
@@ -209,7 +209,7 @@
 
 ---
 
-## 🆕 Opened 2026-09-03 (post-`rev57` reconciliation) — two `P3`s, both things `rev57` DECLINED to do silently
+## 🆕 Opened 2026-09-03 (post-`rev57` reconciliation) — three `P3`s: two things `rev57` DECLINED to do silently, and one found on 2026-09-06 while landing `rev58`
 
 > **Not a batch.** `rev57` is documentation-only — `~/.claude` `68e27aa` · `~/.claude/skills` `7524a77` · this repo `2f574a1`, `flow_hash 943054294e1ff9de` — and it leaves `devflow-validate.py` **byte-untouched**. Neither item below is a defect that revision introduced; both are things it looked at, measured, and refused to paper over. **They are written here because a declined repair that is not written down is indistinguishable from one nobody noticed.**
 
@@ -226,6 +226,9 @@
     **How you verify:** the marker’s batch/finding pair matches a heading in `SKILL.md`, **or** the marker itself says it does not. **Both are acceptable closes; silence is not** — the same disposition this file already applies to `G5-01`.
 
 ---
+
+  - **▸ (P3, NEW — `atlas-derivation-directory-existence`) THE ATLAS ENCODES WHETHER A DIRECTORY EXISTS, WHICH GIT DOES NOT VERSION — SO A COMMITTED ATLAS CAN BE UNREPRODUCIBLE BY ANY CLONE.** Measured 2026-09-06: the `rev57` Atlas (`2f574a1`) was regenerated on the main checkout, which carried an EMPTY `2026-07-20-batch-56/03-increments/` directory. `ATLAS-BATCHES.md` keys its `03-increments` column on the directory's existence, so the committed copy said `x` where every fresh clone — and a clean worktree, where this was found — derives `·`. `V20` was therefore RED on any checkout but the one that wrote it, and three agents attributed the block to three different causes before the diff was read: **5 changed lines, 4 provenance headers (the in-flight `rev58` hash) and that one row.** The corpus digest was unchanged throughout (`9b4f9b732678a102`) — the digest covers requirement files, not the columns.
+    **Repaired at `ed859d1`** by removing the empty directory and regenerating; **the class is open:** a derived artifact guarded by `V20` should depend only on versioned content, or `V20` should say which of its inputs git cannot see. **How to verify closed:** regenerate the Atlas in a fresh clone and in the working checkout; the two are byte-identical, and an arm proves it by planting an empty directory and requiring the derivation not to move.
 
 ## 🆕 Routed from batch-88 (2026-08-24) and batch-89 (2026-08-28) — routed by hand 2026-08-30, because neither batch closed
 

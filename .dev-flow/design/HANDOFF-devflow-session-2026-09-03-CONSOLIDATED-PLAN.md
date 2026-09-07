@@ -52,6 +52,25 @@
 
 ---
 
+### ➕ APPENDED 2026-09-06 — Wave A landed, and the operator RULED on the four briefs
+
+**Wave A (four parallel Opus 5 lanes, 2026-09-03 → 06) shipped:** the post-`rev57` backlog reconciliation (`a13c079`) · flow **rev58** — `V2`'s node corpus declared via `artifact_homes.tests`, 565 → 585 arms, 19/19 mutants killed, `_V2_DECLARED` untouched (`~/.claude` `82a4a20`, bundle `21d3ee4`, `flow_hash 50d1c2d0191432bf`) · the Atlas regenerated on a clone-reproducible tree (`ed859d1`) · four measured briefs at `C:/Users/jjgh8/.claude/docs/analysis/briefs-2026-09-03/`.
+
+**The code lane's `P0` was already shipped** (batch-79 Lane 1, `f198447` / PR #192, 2026-08-13) and its `IN FLIGHT` twins with it; batch-90 was therefore NOT opened, and the guard in §0 above is moot — its condition (2a complete) was met on 2026-09-03.
+
+**Rulings, 2026-09-06 — "Aprobado", following each brief's recommendation:**
+
+| # | question | ruling | executes as |
+|---|---|---|---|
+| 1 | id grammar (§3.2-1) | **(A)** widen `_V2_DECLARED` to the batch-scoped form, grandfather global-numeric ids, **and ship `_strip_code` on the declared side in the same increment** — widening alone raises 2 BLOCKs over this repo and both are backtick-quoted false positives | step 3, `V2` limb 1 — now unblocked |
+| 2 | instrument-blindness law | **encode as (b)+(c)**: a declared field in the increment packet plus a `V9`-shaped validator rule keyed on that field, never on a phrase; the law is absent from the catalog and 11 of 13 recent packets would go RED today | a flow rev (template + rule + catalog entry) — its own increment |
+| 3 | population rule | **extend `C-14`** (trigger: a path move OR a correction to a multi-artifact claim) rather than mint a control; add the declared field to the increment template; **re-point the supersession-completeness inspection from P4 to P3**; `V9`-shaped rule on the field | a flow rev — its own increment; shares the template edit with ruling 2 |
+| 4 | batch-90 scope | `report_service` markdown escaping · AT/TC registry blindness to batch-scoped ids · `TC-497` cannot tell an assertion from its refutation — three falsified-green-signal items, ~2 source files, no cross-row dependency; **the registry item goes first because batch-90's own id reservation is unsound until it lands** | batch-90, `core` mode |
+
+**Sequencing consequence:** rulings 2 and 3 both edit the increment template, so they ship as ONE flow rev (rev59 or later), after ruling 1's limb-1 rev — the flow repo stays serial. Batch-90 (ruling 4) is independent and may open in parallel; it runs under whatever rev is current at its P0 and records it.
+
+**The four briefs are the arguments; this table is only the verdicts.** Each brief ends with what it could not measure, and none of those gaps was waived.
+
 ## 0 · The plan at a glance
 
 **The critical path is: rev56 (small, verified repairs) → close batch-89 → everything else.**
