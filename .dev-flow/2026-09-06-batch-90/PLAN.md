@@ -47,14 +47,15 @@ flow: 2026.09.06-rev58 (hash verified)
 **Flow.** The manifest recipe (`~/.claude/docs/FLOW-VERSION.md` §"Verify the local flow") derived
 **24 files** from the table and aggregated to **`50d1c2d0191432bf`**, identical to the declared
 `flow_hash` at `docs/FLOW-VERSION.md` line 20. `~/.claude` had **no** dirty files at the moment of
-measurement, so the local flow is exactly rev58 with nothing uncommitted. `V7` is green in the gate
-run below.
+measurement, so the local flow is exactly rev58 with nothing uncommitted. `V7` was green in the
+baseline gate run, and is RED in the after-P1 run because rev59 landed in between — see §7.
 
-⚠ **Known forward divergence, recorded rather than discovered later.** The parallel lane is bumping
-`~/.claude` to **rev59** during this wave. A rev59 landing after this measurement changes the hash
-and reddens `V7`/`V15` in any later run of this batch; that is the other lane's in-flight work and
-is **not** a batch-90 finding. Family **F** did not fire *at evaluation time* and this note is why
-the verdict is timestamped rather than standing.
+⚠ **The forward divergence was predicted here and then OCCURRED during this wave.** rev59 landed in
+`~/.claude` between the P0 measurement and the after-P1 gate: the aggregate moved to
+`45eac0f2f6345fe3` and `V7`, `V15` and `V16` all went red. That is the other lane's in-flight work,
+not a batch-90 finding, and §7 proves the attribution on a clean export rather than asserting it.
+Family **F** did not fire *at evaluation time*, which is why this verdict is timestamped rather
+than standing — and this is what a timestamped verdict is for.
 
 **Base currency.** Measured in this worktree:
 
@@ -331,32 +332,86 @@ proves the reservation is well-formed — not that it is visible.
 
 ## 7 · Executed gates
 
-### `tests/test_id_registry.py` (G1–G7) — after the reservation
+### `tests/test_id_registry.py` (G1-G7) — after the reservation
 
 ```
-(pasted in the review packet; 30 passed)
+tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered            PASSED
+tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes             PASSED
+tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered                 PASSED
+tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live              PASSED
+tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy        PASSED
+tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique                   PASSED
+tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark          PASSED
+tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound       PASSED
+tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases             PASSED
+tests/test_id_registry.py::test_tc609_registry_file_is_well_formed                    PASSED
+tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected         PASSED
+tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions PASSED
+tests/test_id_registry.py::test_at281_every_guard_rule_can_fail                       PASSED
+13 passed
 ```
 
-### `devflow-validate.py` — baseline and after P1
+### `devflow-validate.py`
+
+| run | tool | tree | result |
+|---|---|---|---|
+| baseline | rev58 | untouched worktree | **0 block** · 293 notice · 29 n/a |
+| control | in-flight (rev59) | clean `git archive` export of `origin/main` | **5 block** · 290 notice · 28 n/a |
+| after P1 | in-flight (rev59) | this worktree | **9 block** · 292 notice · 26 n/a |
+
+**The baseline and the after-P1 run were made with DIFFERENT TOOLS, so they are not comparable and
+the control run exists for that reason.** The parallel lane edited `devflow-validate.py` between
+them: `V7` moved from `50d1c2d0191432bf` to `45eac0f2f6345fe3`, which is rev59 landing mid-wave
+exactly as this wave anticipated.
+
+**Attribution of all 9 blocks, measured rather than assumed:**
+
+| block | attributed to | evidence |
+|---|---|---|
+| `V7` ×1 · `V15` ×2 · `V16` ×2 | **the parallel lane** | All five reproduce on a clean `origin/main` export that contains no batch-90 record. Not this batch's work, not chased |
+| `V20` ×4 (`ATLAS-BATCHES`, `ATLAS-IFC`, `ATLAS-ORPHANS`, `ATLAS-TRACE`) | **batch-90's own record** | `V20` is GREEN on that same clean export under the same in-flight tool, so it is NOT the rev59 bump — it is this batch's directory entering the derived corpus |
+
+**`V20` is reported and NOT regenerated, and the reason is not only the charter.** Regenerating now
+would derive the Atlas with a validator that has uncommitted changes, baking unshipped tooling into
+this batch's commit. The regeneration belongs after rev59 and rev60 settle — which is when the batch
+resumes anyway.
+
+**Named `[-]` results that are not passes:**
 
 ```
-baseline (untouched worktree)  0 block · 293 notice · 29 not applicable
-after P1                       (pasted in the review packet)
+[-] V2   01-requirements.md: no AT ids declared
 ```
 
-`V26`, `V6`, `V18`, `V27`, `V28`, `V29` lines are quoted in the packet.
+True and blind, and the rule's own docstring names this case. `V2` strips code spans on the declared
+side, so `AT-282` and `AT-283` — written as citations of the reservation, with the field carrying the
+`owed at <increment>` declared empty — are invisible to it. Writing them bare would make `V2` resolve
+them against `tests/`, where neither node exists yet, and BLOCK. Recorded in the contract's §7 so the
+`[-]` marker is not read as coverage.
 
-**Gate noise that is not batch-90's**, named so it is not read as this batch's work:
+**Gate lines the batch is judged on:**
 
-- `V16` ×3 (`~/.claude`, `~/.claude/skills`, `~/kimi/agent-skills`) — a stale *local* `origin/main`
-  ref, an identity check rather than a currency one. `~/.claude` is the parallel lane's tree.
-- `V7`/`V15` are green at this measurement and will move when rev59 lands. Report, do not chase.
-- `V20` (Atlas currency) is green in this run. If a rev59 bump reddens it, regenerating it belongs
-  to the orchestrator; this lane does not run `--atlas --write`.
-- `V9`, `V13`, `V22`, `V23`, `V8` findings are historical batches' records. The validator is
-  correct to light up on batches closed before those rules existed; that is not a backlog.
+```
+[-] V6   01-requirements.md: 9 statement block(s) scanned, no modal inside any statement
+[-] V26  01-requirements.md: the live contract is 26160 characters, inside the 54000-character budget
+[-] V26  01-requirements.md: no strikethrough delimiter found in the live contract
+[-] V26  01-requirements.md: every requirement declares a `**Ledger:**` field, `none` included
+[-] V26  01-requirements-ledger.md: every ledger entry names at least one requirement
+[-] V26  01-requirements-ledger.md: 12 (requirement, entry) pairing(s) declared on both sides and identical in both directions
+[-] V18  .dev-flow/state.json: active batch `2026-09-06-batch-90` declared and on disk
+[-] V27  .dev-flow/state.json: all 0 increment packet(s) on disk are named by a `decisions_log` decision
+[-] V27  .dev-flow/state.json: the newest `decisions_log` entry is dated 2026-09-06 and the newest commit touching the batch directory is dated 2026-09-06
+[-] V28  .dev-flow/2026-08-28-batch-89/: the batch `2026-09-06-batch-90` superseded holds `04-validation.md` and a close artifact
+[-] V29  .dev-flow/state.json: all 6 `decisions_log` entry(ies) belong to `2026-09-06-batch-90` ... This is the strong pass -- both witnesses were available
+```
 
----
+**`V29`'s strong pass is a direct product of the rollover being done properly.** batch-89's own
+record measured the WEAK pass, because batch-88 held no archived log for the rule to cross-check
+against. Writing the archive before clearing the slot is what turned that into the strong form.
+
+**Other notices, attributed:** `V8`, `V9`, `V13`, `V22`, `V23` findings are historical batches'
+records. The validator is correct to light up on batches closed before those rules existed, and that
+is not a backlog. `V16`'s stale-local-ref notices concern `~/.claude`, `~/.claude/skills` and
+`~/kimi/agent-skills`, none of which is this lane's tree.
 
 ## 8 · Decision log (human-readable mirror of `state.json.decisions_log`)
 
