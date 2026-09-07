@@ -71,6 +71,8 @@
 
 **The four briefs are the arguments; this table is only the verdicts.** Each brief ends with what it could not measure, and none of those gaps was waived.
 
+**➕ 2026-09-06, later — Wave B lanes 1 and 2 landed.** **rev59** shipped (`~/.claude` `9d95647`, bundle `0bf7005`, `flow_hash 45eac0f2f6345fe3`, 592 arms): ruling 1 executed — `_V2_DECLARED` widened to `AT-(B<batch>-)?<n>`, `_strip_code` on the declared side, `WORDING-declared` re-frozen; **`R-89-6` closed** (on a batch-88-active copy `V2` names all nine ids, as nine BLOCKs — none has a node). `TC-B<batch>-<n>` ruled OUT by the operator on measurement (0 of 66 contracts differ). **batch-90 opened through P1** on `claude/batch-90-green-signals`, **PR #209** — the `report_service` item was SATISFIED-EXTERNALLY at `fbc9f2a` (2026-07-26) and dropped at P0; two requirements remain (registry blindness, `TC-497`); the batch stops at P1 until **rev60** (rulings 2+3) lands, so its first packet carries the new declared fields. **Next flow increment = rev60.**
+
 ## 0 · The plan at a glance
 
 **The critical path is: rev56 (small, verified repairs) → close batch-89 → everything else.**
