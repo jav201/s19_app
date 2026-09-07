@@ -202,7 +202,35 @@ shape or ship the measured list.
 *"Severity is BLOCK unless the tool marks the rule NOTICE"* is **not satisfiable from `--map`**:
 **5 of 28** COVERAGE lines carry a severity, and incidentally, in prose. The 23 that don't include
 **V9, V25, V27, V28, V30 — all documented NOTICE elsewhere.** A reader following that sentence
-classifies five NOTICE rules as BLOCK. Either fix the sentence (severity is per-finding on a real
+classifies five NOTICE rules as BLOCK.
+
+> ⚠ **CORRECTED 2026-09-03** — beside the sentence above, which is kept verbatim because the
+> conclusion it reaches (*the sentence is unsatisfiable*) is right and shipped. **Its census is
+> wrong twice, and in opposite directions.**
+>
+> **(a) `V30` is NOT misclassified and does not belong in that list.** `V30` genuinely BLOCKs:
+> `_v30_outcome` contains **11 `BLOCK` constructors and 4 `NOTICE`** ones. Naming it as a rule the
+> sentence wrongly reads as blocking is exactly backwards — the sentence reads it correctly.
+>
+> **(b) Two NOTICE-only rules were MISSED: `V8` and `V29`.** Both are NOTICE-only
+> (`_v8_outcome`: 3 NOTICE, 0 BLOCK; `_v29_outcome`: 2 NOTICE, 0 BLOCK) and neither carries a
+> severity on its `--map` COVERAGE line, so a reader following the sentence misclassifies them.
+>
+> **The correct set is SIX, not five: `V8` `V9` `V25` `V27` `V28` `V29`** — which is what `rev57`
+> shipped in `commands/dev-flow.md` §*“Severity is a property of a FINDING…”*.
+>
+> **The deeper correction, re-derived independently at this pass by an AST walk over every
+> `_vNN_outcome` body and every `F("VNN", …)` constructor, `selftest()` excluded:** of the 28
+> registered rules, **10 can only BLOCK** (`V1` `V2` `V4` `V5` `V6` `V10` `V11` `V14` `V20` `V21`),
+> **11 can only NOTICE** (`V8` `V9` `V13` `V18` `V19` `V22` `V23` `V25` `V27` `V28` `V29`), and
+> **7 raise BOTH** (`V7` `V12` `V15` `V16` `V17` `V26` `V30`). So the section's own proposed
+> remedy — *“teach `--map` to print it”* — **would not have worked either**: there is no
+> per-rule severity to print for those seven. **Severity is a property of a finding.** The
+> detector behind these figures was shown RED first — flipping `_v26_outcome`'s two NOTICE
+> constructors to SKIP in a scratch copy moved `V26` out of the BOTH set (7→6, 10→11).
+>
+> Re-filed as `map-severity-column` (`P3`) in [`../BACKLOG-PROCESS.md`](../BACKLOG-PROCESS.md).
+ Either fix the sentence (severity is per-finding on a real
 run) or **teach `--map` to print it** — the latter is a validator change, out of a doc-only bundle's
 scope, and is the fix that makes documenting-by-reference complete.
 

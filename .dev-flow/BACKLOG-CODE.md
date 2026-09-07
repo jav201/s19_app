@@ -13,19 +13,27 @@
 3. **The bands are NOT re-triaged.** Every band below is the band its own item declares. Only the items the 2026-09-03 pass touched were re-measured; the rest are indexed at the priority they were filed under, however old. **An index is not an audit and this one does not pretend to be one.**
 4. **Scope of the listing:** `P0`, `P1` and `MAJOR / HIGH` are listed **individually and completely**. `P2` (**32**) and `P3` (**67**) are **rolled up by count with a section pointer** — a 100-row index is the artifact nobody reads, which is the problem this index exists to solve.
 5. **Counting note, so a re-derivation matches:** a raw grep for open `▸ (P0` returns **2** and for `▸ (P1` returns **12**; the true counts are **1** and **11**. The extra `P0` is struck through (`~~…~~`, the batch-65 `R-1` merge-gate premise) and the extra `P1` is tagged `✅ SHIPPED` in its own text (Memory Map Variant A, `US-77-1`…`7`). **Neither is open; both are preserved in place.**
+
+   ⚠ **CORRECTED 2026-09-03 (post-`rev57`) — THIS RULE’S ARITHMETIC WAS RIGHT BY COINCIDENCE, AND THE SWEEP IT PRESCRIBES CANNOT SEE THE ITEMS THAT MATTER MOST.** Re-measured: `grep -c "▸ (P0"` does return **2**, but **neither match is the open `P0`** — one is *this bullet*, which quotes its own pattern, and the other is the struck-through batch-65 premise. **The one genuinely open `P0` was written `▸ 🛑 (P0 …)` and the pattern misses it entirely**, so “raw 2, true 1” landed on the right number from the wrong two rows. The same defect is worse for `P1`: `grep -c "▸ (P1"` returns **9**, not the 12 stated — three open `P1`s carry the `🛑` decoration and are invisible to it, one indexed `P1` (`report_service` markdown escaping) carries **no band marker at all**, and of the 9 it does return, one is this bullet and one is tagged `✅ SHIPPED`. **A decorated marker is still a marker; a pattern that assumes an undecorated one is a pattern that under-reports exactly the chartered work.** The fix, when someone takes it, is a sweep that matches `▸` followed by any decoration before `(PN`, then filters `~~`-struck, `✅`/`SHIPPED`/`CLOSED`-prefixed, and this rule’s self-mention. **Proven red before trusted:** appending one struck-through decoy bullet to a scratch copy moves the raw `grep -c` up by exactly 1 while the filtering counter holds and names the decoy.
+
+   ⚠ **THIS CORRECTION IS ITSELF COUNTED BY THE SWEEPS IT DESCRIBES, so the arithmetic is published in final form** — and deliberately without quoting a pattern again. **Measured after this note landed:** the `P0` sweep returns **4** and the `P1` sweep returns **10**; **2 of each are quotations** (rule 5’s original example and this correction). Of the **2** real `P0` markers, one is struck (the batch-65 `R-1` premise) and one is the closed-in-place batch-79 charter — **so `P0` open = 0**, as the header now says. Of the **8** real `P1` markers, two are closed in place (`S-1`…`S-4`, `S-5`…`S-9`) and one is tagged `✅ SHIPPED`; the remaining **5**, plus the **3** carrying the `🛑` decoration this pattern cannot see, plus the **1** indexed `P1` that carries no band marker at all, give **`P1` open = 9**. Both reproduce the headers below. **`P2` (32) and `P3` (67) were not touched by this pass and are not re-derived here** — an index is not an audit (rule 3), and claiming a figure this pass did not measure is the defect these notes exist to prevent.
 6. **Pointers use each item's OWN identifier** where it has one (`R-TUI-098`, `C-77-l`, `R-2`…) and a `§section → "opening words"` address where it does not. **No new id scheme is minted here.**
 
 ### ⚠ Read this before using the band order
 
 **✅ batch-89 CLOSED 2026-09-03, so the two other-lane items that blocked it are closed too** — [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s `sync-P6` and `batch-89-unclosed`. Nothing in either lane blocks a close now, and **this lane's `P0` (the batch-79 charter) is the actual next action** by the declared band order. *Kept rather than deleted: the tension it names — a band-first index cannot express operational blocking — outlives the pair that demonstrated it.*
 
-### `P0` — this lane: **1**
+⚠ **CORRECTED 2026-09-03 (post-`rev57`) — THE SENTENCE ABOVE IS FALSE, AND IT WAS FALSE WHEN IT WAS WRITTEN. THIS LANE HAS NO `P0`.** The batch-79 Lane-1 charter it names as *“the actual next action”* **shipped 2026-08-13**, three weeks before this index was derived: squash **`f198447`** (PR #192, *“delete the command bar, re-home its functions…”*), then `a68d2eb` (records the merge) and `8372382` (lands the sync flag). **Measured at this pass rather than read off the charter:** the two deleted command-bar messages have **0** references under `s19_app/`; the **5** surviving `command_bar_row` hits in `s19_app/` are past-tense deletion comments (`styles.tcss` says the block *“was DELETED… at Inc-10”*); and the **29 snapshot goldens were regenerated inside `f198447` itself**, which also refutes the *“Inc-12 owed”* carry below. **The `P0` count is 0 and this lane’s next action is its `P1` head.**
+
+**THE INDEX’S OWN HEADER CALLS THIS DEFECT THE SEVENTH INSTANCE. THIS IS THE EIGHTH, FOUND THE SAME DAY.** — *a summary beside the thing it summarises goes stale against it*, and **a stale `P0` sorts first**, so this one did not merely go stale: it sat at the head of **both lanes’** queues, was cross-referenced into [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md), and told every reader for three weeks to execute work that was already merged. **The generalisable half:** the band that costs most when wrong is the band nothing re-measures, because *“execute, do not re-derive”* is an instruction not to check. **A `P0` should be the row a refresh measures first, and it is currently the row a refresh copies forward.**
+
+### `P0` — this lane: **0** *(was **1**; corrected 2026-09-03 post-`rev57` — the single row was shipped 2026-08-13 and never closed here)*
 
 | id / pointer | one line | where |
 |---|---|---|
-| **BATCH-79 CHARTER, Lane 1** | Command-bar deletion `Inc-6`…`Inc-12` — fully specified, chartered, and not started: *execute, do not re-derive.* | §*batch-78 — LANE 2 SHIPPED, LANE 1 CHARTERED FORWARD* → *"Lane 1: command-bar deletion…"* |
+| ~~**BATCH-79 CHARTER, Lane 1**~~ ✅ **SHIPPED** | ⚠ **Corrected 2026-09-03:** merged **2026-08-13**, squash **`f198447`** (PR #192) + `a68d2eb` + `8372382`. The row read *“not started: execute, do not re-derive”* for three weeks after the merge. | §*batch-78 — LANE 2 SHIPPED, LANE 1 CHARTERED FORWARD* → *"Lane 1: command-bar deletion…"*, now carrying its closure |
 
-### `P1` — this lane: **11**
+### `P1` — this lane: **9** *(was **11**; corrected 2026-09-03 post-`rev57` — `S-1`…`S-4` and `S-5`…`S-9` both shipped and are struck below)*
 
 *Ordered by the four tiebreaks above; the tag on each row says which tiebreak placed it, so a disagreement can be argued at the criterion instead of at the ordering.*
 
@@ -37,8 +45,8 @@
 | **`report_service` markdown escaping** | `generate_project_report` embeds file-derived text; own batch. | **(iii)** | §*Flow Builder* → *"Carries: `report_service` markdown escaping…"* |
 | **BATCH-82 CHARTER (Lane A half)** | Author the Information Flow Contract for s19's surfaces — the full retrofit. | **(iv)** | §*BATCH-82 charter* → *"Author the Information Flow Contract…"* |
 | **BATCH-81 CHARTER, Lane 3** | Operations staged removal, `S-10`…`S-13` (renumbered 80 → 81 by operator ruling). | **(iv)** | §*batch-78* → *"Lane 3: operations staged removal…"* |
-| **`S-1`…`S-4`** *(IN FLIGHT)* | Command-bar deletion — delete `#command_bar_row`. | **(iv)** | §*Carries returned by batch-79* → *"`S-1`…`S-4` command-bar deletion…"* |
-| **`S-5`…`S-9`** *(IN FLIGHT)* | A2B diff master–detail, variant A (`#diff_range_list`). | **(iv)** | §*Carries returned by batch-79* → *"`S-5`…`S-9` A2B diff…"* |
+| ~~**`S-1`…`S-4`**~~ ✅ **SHIPPED** | ⚠ **Corrected 2026-09-03:** closed by the same squash as the `P0` above, **`f198447`** (2026-08-13). `#command_bar_row` survives in `s19_app/` only as **5 past-tense deletion comments**, and the two deleted messages have **0** references there. | — | §*Carries returned by batch-79* → *"`S-1`…`S-4` command-bar deletion…"* |
+| ~~**`S-5`…`S-9`**~~ ✅ **SHIPPED** | ⚠ **Corrected 2026-09-03:** shipped **earlier still**, at **`ba5f0ca`** (PR #189, **2026-08-07**, *“A2B diff master–detail (Lane 2)”*) — which is what this file’s own section header *“batch-78 — LANE 2 SHIPPED”* has said all along. **Measured:** the carry’s headline transformation is done — `screens_directionb.py` builds `ListView(id="diff_range_list")`, documents it as *“a selectable `ListView`”*, focuses it, and `styles.tcss` carries its wide and fallback width regimes. | — | §*Carries returned by batch-79* → *"`S-5`…`S-9` A2B diff…"* |
 | **CRC Designer: two switches read as one** | Operator-found: *"hay switches que parecen uno sólo"*; root cause measured in `crc_designer_view`. | **(iv)** | §*New carries from batch-72* → *"two adjacent switches render as ONE control…"* |
 | **CRC Designer design pass** | Operator-found: *"faltan agregar guardas de diseño"* — the gap the two switch bullets are symptoms of. | **(iv)** | §*New carries from batch-72* → *"needs a design pass…"* |
 | **Legend pop-ups need reorganization** | Operator-found: the legend pop-up screens need reorganisation and, in places, reimplementation. | **(iv)** | §*New carries from batch-72* → *"Legend pop-up screens need reorganization…"* |
@@ -63,7 +71,7 @@ Not listed individually, by rule 4. Their homes: §*Development flow OF the code
 
 ### Cross-lane — [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md)'s top, by id
 
-*Cross-referenced, not copied; read them there. That lane holds **1** `P0`, **12** `P1`, **2** `MAJOR`, **21** `P2` and **15** `P3` — re-counted at the batch-89 close (2026-09-03): two `P1`s closed, one opened, and six carries filed across `P1`/`P2`/`P3`.*
+*Cross-referenced, not copied; read them there. That lane holds **1** `P0`, **12** `P1`, **2** `MAJOR`, **20** `P2` and **17** `P3` — re-counted at the batch-89 close (2026-09-03), then again after flow `rev57` the same day: `R-89-3` closed out of `P2` (**21 → 20**) and two `P3`s opened (**15 → 17**), `map-severity-column` and `origin-batch-06-b-1-unresolved`. That lane’s `P0` and `P1` are unmoved; **this** lane’s `P0` went to zero at the same pass — see the correction under ‘Read this before using the band order’.*
 
 | band | id / pointer | one line |
 |---|---|---|
@@ -399,6 +407,15 @@ boundary. batch-79 status **as of 2026-08-12**: Inc-6…Inc-11 shipped **includi
 acceptances and the merge-gate response**; **Inc-12 owed** (the 29-golden snapshot regen, canonical
 CI only, its own PR).
 
+⚠ **CORRECTED 2026-09-03 (post-`rev57`) — THE “Inc-12 OWED” CLAUSE IS FALSE, AND IT NEVER NEEDED ITS OWN PR.** The 29
+goldens were regenerated **inside the Lane-1 squash itself**: `git show --name-only f198447 -- 'tests/__snapshots__/*'`
+returns **29 files**, all of them `test_tc016s_density_layout_snapshot[…].svg`. **Lane 1 merged 2026-08-13** as `f198447`
+(PR #192), so the whole of Inc-6…Inc-12 is shipped and the two carries below (`S-1`…`S-4`, `S-5`…`S-9`) are closed —
+`S-5`…`S-9` earlier still, at `ba5f0ca` (PR #189, 2026-08-07). **The status line above is kept verbatim rather than
+rewritten**, because it is dated *as of 2026-08-12* and was true on that date; what was wrong is that nothing re-read it
+afterwards. **Not re-executed here:** whether those 29 goldens pass today. This pass measured that they were **regenerated
+in the merge commit**, which is what refutes *“owed”*; it did not run the snapshot suite, and does not claim a green.
+
 - **▸ (P2) `#status_text` silently drops most of a routine load message at 80×24 — batch-79's eighth merge gate, NON-BLOCKING.**
   Measured with ordinary names and the real `_format_coexistence_status` output:
 
@@ -690,6 +707,10 @@ CI only, its own PR).
 >
 > **❌ NOT STARTED — Lane 1 (Inc-6…Inc-12).** Fully specified in `01-requirements.md` §7; see the
 > charter below. **Do not re-derive the spec — execute it.**
+> ✅ **SUPERSEDED 2026-08-13, recorded here 2026-09-03 (post-`rev57`): Lane 1 SHIPPED.** Squash **`f198447`**
+> (PR #192), then `a68d2eb` and `8372382`. **The banner above is kept rather than deleted** — it is the reason
+> the charter still reads as chartered, and deleting it would hide that the record went three weeks without
+> being re-read. **Do not act on the `❌`.**
 >
 > ⚠️ **ONE OPEN HIGH AT THE CUT (Inc-5 F-1).** `_DIFF_MIN_H = 26` declares heights 26–27 deliverable
 > while painting **zero hex rows**, because line 0 of each window is the header. Strictly worse than
@@ -746,19 +767,22 @@ CI only, its own PR).
 > **Ids: batch-scoped `AT-B78-*` / `TC-B78-*`** — no reservation PR; global `next_free` re-derived
 > as `AT-282` / `TC-613` and left untouched.
 
-  - **▸ (P1 — IN FLIGHT) `S-1`…`S-4` command-bar deletion.** Delete `#command_bar_row` (prompt,
+  - **▸ ✅ CLOSED 2026-08-13, recorded here 2026-09-03 — `S-1`…`S-4` shipped in `f198447` (PR #192)**, the same squash that closed the `P0` charter above. *(Original carry kept verbatim:)*
+  - **▸ (P1, was IN FLIGHT) `S-1`…`S-4` command-bar deletion.** Delete `#command_bar_row` (prompt,
     Project/A2L labels, find/goto inputs) app-wide · re-home `/`·`g` to the active screen's local
     inputs with a notice where there are none and a working `Esc` · re-home the context labels ·
     delete the dead surface (`styles.tcss:55-102`, `CommandBar.Find/Goto`, the two adapters,
     `focus_find/goto`). **Ctrl+K must keep working on all 10 screens**; workspace/A2L/MAC search and
     goto behaviour is the byte-identical control.
-  - **▸ (P1 — IN FLIGHT) `S-5`…`S-9` A2B diff master–detail (variant A).** `#diff_range_list`
+  - **▸ ✅ CLOSED 2026-08-07, recorded here 2026-09-03 — `S-5`…`S-9` shipped in `ba5f0ca` (PR #189), batch-78 Lane 2**, six days BEFORE the Lane-1 squash and before this carry was even registered. **Measured:** `screens_directionb.py` builds `ListView(id="diff_range_list")` and documents it as *“a selectable `ListView`”*, focuses it on entry, and `styles.tcss` carries its `diff-wide` and `diff-fallback` regimes — the `Static` → selectable-list transformation this carry asks for. **This file’s own section header already said “batch-78 — LANE 2 SHIPPED”**, and the index row contradicting it went unread. *(Original carry kept verbatim:)*
+  - **▸ (P1, was IN FLIGHT) `S-5`…`S-9` A2B diff master–detail (variant A).** `#diff_range_list`
     `Static` → selectable list (every run reachable by keyboard **and** mouse, visible focus,
     scrollable past the viewport) · windows follow selection with context rows derived from pane
     height, retiring the `DISPLAY_CONTEXT_BYTES = 16` constant as a constant · two width regimes with
     a **required 120-col fallback** · compact selection rows · discoverability. G-9 display caps and
     the "showing N of M" notice are preserved; **the persisted report stays complete**.
-  - **▸ 🛑 (P0 — BATCH-79 CHARTER) Lane 1: command-bar deletion, `Inc-6`…`Inc-12`. FULLY SPECIFIED — execute, do not re-derive.** `01-requirements.md` §7 carries the file sets, ATs and gates; `HLR-118`…`HLR-121` and `HLR-126` are written, reviewed through **three** Phase-2 rounds and amended. Order and its reason are in the handoff §7. **Findings that reach into these unbuilt increments and must not be rediscovered:**
+  - **▸ ✅ CLOSED 2026-08-13, recorded here 2026-09-03 (post-`rev57`) — Lane 1 SHIPPED as squash `f198447` (PR #192), then `a68d2eb` + `8372382`.** **Verified by measurement, not by the commit subject:** `CommandBar.Find`/`CommandBar.Goto` have **0** references under `s19_app/` (3 remain in `tests/test_tui_commandbar.py`, all past-tense assertions that the messages are gone); the **5** `command_bar_row` hits under `s19_app/` are deletion comments, e.g. `styles.tcss` recording that the block *“was DELETED… at Inc-10”*; and the **29 snapshot goldens were regenerated inside `f198447` itself**, so *“Inc-12 owed”* is refuted too. ⚠ **One artefact still holds the old surface and it is NOT source:** `build/lib/s19_app/tui/command_bar.py` still constructs `Horizontal(id="command_bar_row")` — a stale build tree, untracked, **left untouched at this pass** (`C-44`: it belongs to a parallel session), and named here so nobody greps it and concludes the deletion did not land. *(Original charter kept verbatim beneath — its five “findings that must not be rediscovered” are now history, not instructions:)*
+  - **▸ (P0, was BATCH-79 CHARTER) Lane 1: command-bar deletion, `Inc-6`…`Inc-12`. FULLY SPECIFIED — execute, do not re-derive.** `01-requirements.md` §7 carries the file sets, ATs and gates; `HLR-118`…`HLR-121` and `HLR-126` are written, reviewed through **three** Phase-2 rounds and amended. Order and its reason are in the handoff §7. **Findings that reach into these unbuilt increments and must not be rediscovered:**
     1. ❌ **The command palette has NO `escape`-to-close.** `command_bar.py` declares **no `BINDINGS`** and handles no `escape`; executed, `ctrl+k` then `escape` leaves `palette_is_open` **True**. `LLR-119.3`/`AT-B78-07` asserted *"must not shadow the palette's escape"* — **there was nothing to shadow**, and **both Phase-2 lanes accepted it** because it sounded like a property the widget would obviously have. **Inc-9 chooses a disposition in writing rather than inheriting one.**
     2. ⚠️ **`C-78-vi` BLOCKS Inc-10:** §5.1 rule 1's painted-height metric measures the **border box** and does not clip through intermediate ancestors, so `AT-B78-26`'s 120×30 "≥1 hex row" clause would pass with **three rows of border and zero hex**. Use Inc-1's corrected helper (`content_region` through the **full** ancestor chain).
     3. 💣 **29 of 29 snapshot goldens drift** on the bar deletion — app-level chrome in every full-screen capture. **CI-only regen.** This is the largest mechanical cost in Lane 1 and the reason Lane 2 went first.

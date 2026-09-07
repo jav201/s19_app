@@ -25,6 +25,7 @@
 | **2a — close batch-89** | **DONE, MERGED, SYNCED** | `04-validation.md` + `05-close.md` written **with the gate run before the record**, not after. PRs #207, #208. `main` at `cd2fc00`, then `4beed6e` |
 | **the sync** | **PASSED — a first** | ACTIVE case, `mode: core → P5`. **The first `core` batch ever to clear pre-requisite 2**, which demanded `P6` until rev56. `obsidian_synced: true` verified **on `origin/main`**, not just on disk (the C-44 half) |
 | **housekeeping** | done | primary checkout moved to `main`; `claude/batch-89-lean-contract` pruned local + remote after verifying **0 branch-only objects**; `V20` then caught a stale Atlas over the merged corpus and it was regenerated (`4beed6e`) |
+| **2b — rev57, tranche 2** | **SHIPPED** *(appended 2026-09-03, later the same day)* | `~/.claude` **`68e27aa`** · `~/.claude/skills` **`7524a77`** · `s19_app` **`2f574a1`**. `flow_hash 943054294e1ff9de`. **565 arms, 0 FAIL** under 3.11.15 **and** 3.12.7 — a **carried baseline, not a new result**: `devflow-validate.py` is byte-untouched, exactly as this plan predicted for a doc-only tranche. Gate over `s19_app`: **0 block · 291 notice · 29 not applicable**. Closes **`R-89-3`** in [`BACKLOG-PROCESS.md`](../BACKLOG-PROCESS.md) |
 
 **Two things the execution changed about the plan's own content:**
 
@@ -32,6 +33,20 @@
 - **The input's third reason against `stations_active` — "it is not reset at rollover" — is FALSE as a property.** Traced through the state ledger's git history: batch-88 opened at `['P0']` and grew, so the 87→88 rollover reset it correctly and **only** 88→89 did not. The accurate form shipped in the command.
 
 **What remains, unchanged from the plan below:** step **2b** (tranche 2 — P3's remainder, P7's severity sentence, the origin-parenthetical rule) · step **3** (the rev58+ validator series, whose head is the `P0`) · step **4** (decisions **D2, D3, D5** — D1 is executed, D4(iii) is closed by the vault fix, D6 is executed).
+
+---
+
+### ➕ APPENDED 2026-09-03, later the same day — **step 2b is DONE.** Three things it changed about the plan, and one it did not.
+
+**Read the row added to the table above first.** The sentence *“What remains … step **2b**”* immediately above is **superseded**: 2b shipped as flow **`rev57`**. It is left standing rather than edited, because the plan body is frozen and a struck prediction is more useful than a tidy one.
+
+**(1) P3's population was LARGER than this plan carried, and the correction is the reusable part.** §3.2 (b) instructs *“extract the **remaining 6 origin markers in 3 files**… 5 of 5 files, not 3 of 5.”* **The executed population was 72 sites across 6 files.** Enumerated before anything was touched: **61 `(Origin:` markers in five files** (`dev-flow.md` 41 · `req-template.md` 13 · `dev-flow-sync.md` **4**, not the 3 the input listed · `fast-dev-flow.md` 2 · `validation-template.md` 1) **plus 11 unmarked narrative blocks** (3 · 6 · 2) that carry **no marker at all** — which is how `ifc-template.md`, a **sixth** file at **zero** markers, still held 2.4 KB of origin story. **A marker census is not a population census**, and this is the second time in two passes that the intake’s enumeration came in short.
+
+**(2) P7 was resolved by REWORDING, not by a `--map` change** — which is a real narrowing of step 3, not a rescheduling. The hand-kept `V1`–`V9` table (9 of 28 rules, stale eight revisions) is gone, replaced by documentation-by-reference to `--map`; and the severity sentence was **rewritten in the command** rather than made satisfiable by a tool change. So **step 3's item 4, *“`--map` prints per-rule severity”*, no longer “completes P7” — P7 is complete without it.** ⚠ **And as item 4 is specified, it must not ship:** severity is a property of a **finding**, not of a rule — measured over all 28 registered rules, **10 can only BLOCK**, **11 can only NOTICE**, and **7 raise BOTH** (`V7` `V12` `V15` `V16` `V17` `V26` `V30`; `_v26_outcome` NOTICEs an over-budget live contract and BLOCKs a one-sided pairing). A single-valued column cannot be true for those seven. **Re-filed as a `P3` (`map-severity-column`) in [`BACKLOG-PROCESS.md`](../BACKLOG-PROCESS.md) §*Opened 2026-09-03 (post-`rev57`)*, with the closing condition rewritten:** print the **set** a rule can raise and disclaim per-finding severity, or retire the item.
+
+**(3) One site of the 72 was deliberately NOT extracted**, and it is filed rather than hidden: `(Origin: batch-06 B-1.)` in `req-template.md` resolves to no `dev-flow-lessons` heading, so `rev57` left it verbatim rather than invent an origin story. New `P3`, `origin-batch-06-b-1-unresolved`.
+
+**What this did NOT change:** step **3**'s head is still the `P0` — `R-89-6`/`R-89-7`, `V2`'s vacuity — untouched by a doc-only tranche. ⚠ **But step 3's *other* framing did move:** this plan's `§0` table calls the batch-79 charter the code lane's `P0`; **it shipped 2026-08-13 (`f198447`, PR #192)** and both backlog indexes have been corrected. **The instrument-blindness law and the other two portable lessons are still unencoded** and each still owes its AskUserQuestion — `7524a77` touched the catalog, which is not the same as paying the `C-45` debt.
 
 **⚠ The hard guard is still in force: no batch-90 directory exists and none may be opened** until the plan says so. `V28`'s window is one batch wide.
 
