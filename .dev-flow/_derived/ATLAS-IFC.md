@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026.09.11-rev71 | flow_hash: 22744449c8832561 | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
+<!-- flow_version: 2026.09.11-rev72 | flow_hash: 859fc46a70a3eb95 | corpus: 66 requirement files | corpus digest: 9b4f9b732678a102 -->
 
 # ATLAS-IFC — how is the application addressed?
 
