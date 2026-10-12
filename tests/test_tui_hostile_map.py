@@ -80,7 +80,8 @@ from typing import List, Tuple
 import pytest
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow, safe_text
+from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
+from s19_app.utils import safe_text
 from tests.test_tui_directionb import _two_band_loaded
 
 _SIZES = [(80, 24), (120, 30)]

@@ -269,6 +269,7 @@ def test_at070d_mac_only_unchecked_glyph() -> None:
 
 
 def test_at071_strip() -> None:
+    """AT-291 — black-box node: the coverage strip driven through the shipped app surface."""
     for size in _SIZES:
 
         async def _observe(app: S19TuiApp, pilot: object) -> None:

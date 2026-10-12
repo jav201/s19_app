@@ -1,0 +1,81 @@
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+....................................................x................... [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+.........................F.............................................. [ 72%]
+.................................................................F.F.... [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................F.F............. [ 83%]
+........F...F..F........................................................ [ 85%]
+..............x......................................................... [ 88%]
+.............FFFFFFFFFFFFFFFFFFFFFFFFFFFFF.............................. [ 90%]
+....F................................................................... [ 93%]
+........................................................................ [ 96%]
+...........................................x............................ [ 98%]
+..................................                                       [100%]
+============================== warnings summary ===============================
+..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
+  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+--------------------------- snapshot report summary ---------------------------
+29 snapshots failed.
+Textual Snapshot Report
+
+29 mismatched snapshots
+
+View the failure report.
+
+C:\Users\jjgh8\Github\s19_app-b92\snapshot_report.html
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+FAILED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+FAILED tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces
+FAILED tests/test_tui_legend.py::test_at023b_mac_legend_button_opens - Assert...
+FAILED tests/test_tui_legend.py::test_at023d_close_dismisses_modal - textual....
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_loud_mismatch_notice - ...
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_16_caps_records_and_empties_s0
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+FAILED tests/test_tui_patch_editor_v2.py::test_at064b_json_popup_edit_confirm_cancel_and_geometry
+FAILED tests/test_tui_patch_editor_v2.py::test_tc329_popup_seed_and_load_text_apply_seam
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+FAILED tests/test_tui_variants.py::test_variant_help_modal_fits_at_both_sizes
+40 failed, 2725 passed, 2 skipped, 3 xfailed, 1 warning in 3642.66s (1:00:42)
+EXIT=1

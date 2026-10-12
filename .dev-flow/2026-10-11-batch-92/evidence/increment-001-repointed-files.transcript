@@ -1,0 +1,80 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...............................................................F........ [ 38%]
+........................................................................ [ 77%]
+.....................................F....                               [100%]
+================================== FAILURES ===================================
+_______________ test_tc024_report_trigger_invalid_dest_refused ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18243/test_tc024_report_trigger_inva0')
+
+    def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
+        """A refused report (invalid no-project dest) surfaces the diagnostic (LLR-005.4).
+    
+        Intent: the LLR-004.6 invalid-destination refusal writes 0 files and the
+        status carries the diagnostic; the screen keeps running.
+        """
+        import s19_app.tui.app as app_mod
+        from s19_app.tui.services.diff_report_service import DiffReportResult
+    
+        fake = _diff_result([(0x10, 0x14, "changed")])
+    
+        def _gen_refuse(*_a, **_k):
+            return DiffReportResult(
+                path=None, written=False, diagnostics=["bad destination"]
+            )
+    
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("diff")
+                await pilot.pause()
+                await _b78_press_compare(app, pilot)
+                app.query_one("#diff_report_button").press()
+                # batch-68 N5: the two generators now run on a worker thread, so
+                # the status is written after this handler returns. A bare pause()
+                # passed only because the fake generators are instant — a race this
+                # suite must not depend on.
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                return str(app.query_one("#diff_status").render())
+    
+        monkey = pytest.MonkeyPatch()
+        monkey.setattr(app_mod, "compare_images", lambda *a, **k: fake)
+        monkey.setattr(app_mod, "generate_diff_report", _gen_refuse)
+        try:
+            status = asyncio.run(_drive())
+        finally:
+            monkey.undo()
+    
+>       assert "bad destination" in status
+E       AssertionError: assert 'bad destination' in 'Compared A.s19 vs B.s19: 1 runs.'
+
+tests\test_tui_diff_screen.py:568: AssertionError
+___________ test_a16_canonicaliser_residue_guard_can_actually_fire ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18243/test_a16_canonicaliser_residue0')
+
+    def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> None:
+        """A-16 — the guard inside `canonical_report_bytes` is not decorative.
+    
+        It was measured to fire at ZERO real call sites, which is the point: it
+        should be silent today. But a guard that has never been seen to fail is
+        indistinguishable from one that cannot, so this drives it directly.
+    
+        R-1 is what it defends: escaping a path before it reaches the file makes the
+        run-root substitution MISS, and an absolute operator path gets baked into a
+        golden and committed.
+        """
+>       from conftest import canonical_report_bytes
+E       ModuleNotFoundError: No module named 'conftest'
+
+tests\test_report_field_census.py:847: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_invalid_dest_refused
+FAILED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+2 failed, 184 passed in 215.92s (0:03:35)
+exit=1

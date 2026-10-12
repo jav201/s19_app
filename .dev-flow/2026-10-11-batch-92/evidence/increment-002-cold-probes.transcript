@@ -1,0 +1,11 @@
+[PASS] probe 1: import s19_app.utils (tui absent from sys.modules) (exit 0)
+       tui modules loaded: []
+[PASS] probe 2: from s19_app.utils import safe_text (cold) (exit 0)
+       scrub+literal ok: 'sensor[red][31m_evil'
+[PASS] probe 3a: cold import s19_app.tui.insight_style (shim) (exit 0)
+       shim identity ok (microbar, MICROBAR_EMPTY)
+[PASS] probe 3b: one-directionality — render.format imports tui-free (exit 0)
+       render.format cold-import pulls zero tui modules
+[PASS] probe 4: import s19_app.tui.app (cold) (exit 0)
+       app shell re-exports the same safe_text object from s19_app.utils
+COLD PROBES: 5/5 passed

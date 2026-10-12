@@ -1,0 +1,4 @@
+--- probe over BASE body (known-present case) ---
+tui-style edges found: ['.color_policy', '.insight_style']
+--- probe over MOVED body (absence case) ---
+tui-style edges found: []

@@ -11,10 +11,14 @@ This is the NON-frozen foundation module every screen story of batch-47 consumes
    odd-row → border). ``styles.tcss`` carries the matching ``$``-variables /
    ``.band-*`` rules for CSS-level theming; this module owns the same values as
    Python constants so renderers that build Rich ``Text`` inline (not via CSS
-   classes) can colour from the single source.
+   classes) can colour from the single source. Since batch-92 (US-92-4,
+   module-map R4) the canonical home of ``CYAN``/``DGRAY``/``VALUE``/``GREEN``/
+   ``LABEL``, the ``MICROBAR_*`` glyphs and ``microbar`` is
+   ``s19_app/render/format.py``; this module re-exports those identical objects
+   (the declared presentation shim) so the view consumers stay untouched.
 
-2. Five pure, headless formatting **helpers** — ``human_bytes``,
-   ``label_value``, ``microbar``, ``threshold_style`` (LLR-065.2) and
+2. Four pure, headless formatting **helpers** — ``human_bytes``,
+   ``label_value``, ``threshold_style`` (LLR-065.2) and
    ``cap_gauge_style`` (batch-48, LLR-079.4). Like ``entropy_style``, this
    module imports no Textual symbol, so both the view code and the unit tests
    can consume it without pulling a UI dependency into the test surface.
@@ -39,12 +43,23 @@ from __future__ import annotations
 
 from rich.text import Text
 
-#: Muted label text (form field / stat labels).
-LABEL = "#c5c7d2"
-#: Bright value text (the datum a label describes).
-VALUE = "#e9e9e9"
-#: OK / healthy accent (in-image, full coverage, below-warn threshold).
-GREEN = "#54efae"
+# Re-export shim (batch-92 US-92-4, module-map R4 / PDR #D4): canonical
+# ownership of the 8 symbols below moved to ``s19_app/render/format.py``;
+# this module re-exports the identical objects so the view consumers stay
+# untouched (0 snapshot risk). Services MUST import from ``render.format``
+# directly — LLR-004.3's census fails any ``tui/services/* → insight_style``
+# edge (TC-654).
+from ..render.format import (
+    CYAN,
+    DGRAY,
+    GREEN,
+    LABEL,
+    MICROBAR_EMPTY,
+    MICROBAR_FILLED,
+    VALUE,
+    microbar,
+)
+
 #: Warning accent (partial coverage, warn band).
 YELLOW = "#f6ff8f"
 #: Error / bad accent (schema failure, bad band).
@@ -53,12 +68,8 @@ RED = "#fd8383"
 HILITE = "#91abec"
 #: Pastel light-blue secondary accent.
 LBLUE = "#bbc8e8"
-#: Dim grey (secondary / "not yet checked" text).
-DGRAY = "#969aad"
 #: Purple accent (special markers).
 PURPLE = "#b565f3"
-#: Cyan accent (addresses).
-CYAN = "#7dd3fc"
 #: Magenta accent — **the BUDGET/CAPACITY family, and nothing else** (batch-48
 #: Inc-5, operator-decided 2026-07-16).
 #:
@@ -112,10 +123,6 @@ DEPTH_BG = "#0a0e1b"
 DEPTH_PANEL = "#0f1525"
 DEPTH_ODD_ROW = "#131a2c"
 DEPTH_BORDER = "#1b233a"
-
-#: Filled / empty cell glyphs for :func:`microbar` (deterministic).
-MICROBAR_FILLED = "█"
-MICROBAR_EMPTY = "░"
 
 #: Binary (1024-based) size units for :func:`human_bytes`, ascending.
 _SIZE_UNITS = ("KiB", "MiB", "GiB", "TiB", "PiB")
@@ -213,68 +220,6 @@ def label_value(label: str, value: str, style: str = "") -> Text:
     return text
 
 
-def microbar(frac: float, width: int, style: str = "", floor: bool = False) -> Text:
-    """
-    Summary:
-        Render a proportional bar of ``width`` cells as a Rich ``Text``, filling
-        ``round(frac * width)`` leading cells with :data:`MICROBAR_FILLED` and
-        the remainder with :data:`MICROBAR_EMPTY`. ``frac`` is clamped to
-        ``[0.0, 1.0]`` so an out-of-range ratio neither over- nor under-fills.
-        With ``floor=True`` a positive ``frac`` is guaranteed at least one filled
-        cell, so a small-but-present quantity never renders as an invisible bar.
-
-    Args:
-        frac (float): Fill fraction; clamped to ``[0.0, 1.0]``.
-        width (int): Total cell count (expected ``>= 0``; ``0`` → empty Text).
-        style (str): Optional Rich style/colour applied to the filled cells.
-        floor (bool): When ``True`` and ``frac > 0`` and ``width > 0``, force at
-            least one filled cell. ``frac <= 0`` still renders an empty bar —
-            "present but tiny" and "absent" must stay distinguishable. Opt-in,
-            defaulting to ``False``: the MAC coverage strip legitimately shows an
-            EMPTY bar for ``0 of 2`` / ``0 of 0``, and the Memory-Map region rows
-            keep the unfloored proportion, so only callers whose bar means "this
-            row exists, here is its magnitude" (the Workspace section rows) may
-            floor it (LLR-042.7).
-
-    Returns:
-        rich.text.Text: A ``width``-cell bar. Never a ``str``; the total glyph
-        count always equals ``width``. Filled-cell count is deterministic:
-        ``round(clamp(frac) * width)`` (banker's rounding via ``round``), raised
-        to ``1`` when ``floor`` is set and ``frac > 0``.
-
-    Data Flow:
-        - Pure arithmetic + string build; no I/O, no markup parsing.
-        - Called by section rows (``app.update_sections``, ``floor=True``), the
-          MAC coverage strip (``validation_service``) and the Memory-Map region
-          rows (``screens_directionb``), both unfloored, and by
-          ``tests/test_tui_insight_style.py`` (TC-065.2 / TC-065.2b).
-
-    Dependencies:
-        Uses:
-            - rich.text.Text ; MICROBAR_FILLED ; MICROBAR_EMPTY
-        Used by:
-            - s19_app.tui section rows, MAC coverage strip, Memory-Map region
-              rows (batch-47)
-            - tests/test_tui_insight_style.py
-
-    Example:
-        >>> microbar(0.5, 10).plain
-        '█████░░░░░'
-        >>> microbar(0.0, 4).plain
-        '░░░░'
-        >>> microbar(0.01, 8, floor=True).plain
-        '█░░░░░░░'
-    """
-    clamped = min(1.0, max(0.0, frac))
-    filled = round(clamped * width)
-    if floor and clamped > 0.0 and width > 0:
-        filled = max(1, min(width, filled))
-    text = Text()
-    if filled:
-        text.append(MICROBAR_FILLED * filled, style=style or None)
-    if width - filled:
-        text.append(MICROBAR_EMPTY * (width - filled))
-    return text
 
 
 def threshold_style(pct: float, warn: float, bad: float) -> str:

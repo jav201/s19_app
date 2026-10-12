@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
+registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -548,6 +548,10 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `AT-285` | RESERVED | batch-91 |  |
 | `AT-286` | LIVE | batch-91 |  |
 | `AT-287` | RESERVED | batch-91 |  |
+| `AT-288` | RESERVED | batch-92 |  |
+| `AT-289` | RESERVED | batch-92 |  |
+| `AT-290` | RESERVED | batch-92 |  |
+| `AT-291` | RESERVED | batch-92 |  |
 | `AT-40` | LIVE | seed |  |
 | `AT-80` | LIVE | seed |  |
 | `AT-88` | LIVE | seed |  |
@@ -1419,12 +1423,17 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `TC-648` | LIVE | batch-91 |  |
 | `TC-649` | RESERVED | batch-91 |  |
 | `TC-650` | RESERVED | batch-91 |  |
+| `TC-651` | RESERVED | batch-92 |  |
+| `TC-652` | RESERVED | batch-92 |  |
+| `TC-653` | RESERVED | batch-92 |  |
+| `TC-654` | RESERVED | batch-92 |  |
+| `TC-655` | RESERVED | batch-92 |  |
 | `TC-6xx` | LIVE | seed |  |
 | `TC-79b` | LIVE | seed |  |
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1502 unique id(s)
+## family US/HLR/LLR — 1503 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2833,6 +2842,7 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `US-88-2` | batches |
 | `US-90.1` | batches |
 | `US-90.2` | batches |
+| `US-92-5` | batches |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -3106,7 +3116,7 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1533 unique id(s)
+## family AT/TC — 1541 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3601,6 +3611,9 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `AT-285` | batches |
 | `AT-286` | batches, tests |
 | `AT-287` | batches |
+| `AT-288` | batches, tests |
+| `AT-290` | batches, tests |
+| `AT-291` | batches, tests |
 | `AT-3` | batches |
 | `AT-40` | batches, tests |
 | `AT-43` | batches, canon |
@@ -4509,6 +4522,11 @@ registry: 1416 rows — BURNED 422 · LIVE 927 · RESERVED 46 · RETIRED 21
 | `TC-648` | batches, canon, tests |
 | `TC-649` | batches, tests |
 | `TC-650` | batches |
+| `TC-651` | batches, canon |
+| `TC-652` | batches |
+| `TC-653` | canon |
+| `TC-654` | canon |
+| `TC-655` | batches, canon |
 | `TC-6xx` | tests |
 | `TC-79b` | batches, tests |
 | `TC-79c` | batches, tests |

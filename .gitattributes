@@ -41,3 +41,4 @@ tests/goldens/batch78/** -text
 # Pinning LF keeps that diff line-granular and identical on every host.
 AT-TC-REGISTRY.jsonl text eol=lf
 .dev-flow/2026-10-08-batch-91/evidence/** -text
+.dev-flow/2026-10-11-batch-92/evidence/** -text

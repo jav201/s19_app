@@ -592,7 +592,7 @@ def test_inspection_no_forbidden_symbols() -> None:
     assert "IntelHexFile" not in source
     assert "import textual" not in source
     assert "from textual" not in source
-    assert "from ..hexview import" in source
+    assert "from ...render.hexview import" in source
     assert "render_hex_view" in source
 
 
@@ -1650,3 +1650,117 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
         )
         assert "## Variant inventory" in text
         assert "## Consolidated overview" in text
+
+
+# ---------------------------------------------------------------------------
+# Batch-92 Inc-A — AT-288 (sole byte-identity oracle, F-QA-3 / LED-…92.8/.10/.11)
+# ---------------------------------------------------------------------------
+
+#: The pinned pre-move capture of the AT-288 report — the batch's sole
+#: byte-identity oracle for the hexview move (PDR §1 enabler protocol).
+_AT288_CAPTURE = (
+    Path(__file__).resolve().parent.parent
+    / ".dev-flow"
+    / "2026-10-11-batch-92"
+    / "evidence"
+    / "at288-pre-move-report.bin"
+)
+
+
+def test_at288_report_hex_sections_identical_after_move(
+    tmp_path: Path, large_s19: Path
+) -> None:
+    """AT-288 — report hex sections byte-identical across the hexview move.
+
+    Intent: HLR-001 acceptance — the report service end-to-end over the
+    ``large_s19`` fixture (200 ranges x 4 KB, ``make_large_s19``), driving
+    non-default parameters through the surface per F-QA-5 as re-chartered by
+    QA-PDR-1 (LED-…92.13): a modified region at the tail of fixture range 0
+    with a non-default ``context_bytes`` (0x200, default 0x40) so the emitted
+    ``row_bases`` window spans the fixture gap into disjoint fixture range 1.
+    The report path calls the plain ``render_hex_view`` (report_service:590
+    verifies the Text-variant parameters are NOT driveable), so the oracle
+    exercises the moved functions ``build_mem_map_s19`` (via
+    ``load_service.build_loaded_s19``), ``build_row_bases`` and
+    ``render_hex_view`` themselves. Protocol (PDR §1): on the base tree the
+    capture is ABSENT and the node stores the emitted bytes; after the move
+    the capture EXISTS and the node asserts byte-equality with it.
+    """
+    from s19_app.core import S19File as _Parser
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    # Fixture geometry (conftest.make_large_s19 defaults): range i is
+    # [BASE + i*STRIDE, BASE + i*STRIDE + RANGE_LEN); the ranges are disjoint
+    # with a 0x100-byte unmapped gap between them.
+    base = 0x0800_0000
+    range_len = 0x1000
+    gap = 0x100
+    stride = range_len + gap
+    range0_end = base + range_len  # 0x08001000 (exclusive)
+    range1_start = base + stride  # 0x08001100 (inclusive)
+
+    context_bytes = 0x200  # non-default (REPORT_CONTEXT_BYTES_DEFAULT == 64)
+    region_start = range0_end - 16  # tail 16 bytes of fixture range 0
+
+    loaded = build_loaded_s19(large_s19, _Parser(str(large_s19)), None, None)
+    entries = [_applied_entry(region_start, (0x00, 0x00), (0xAA, 0xBB))]
+    # LLR-007.8: ``mem_map`` rides the result as the POST-change map.
+    post_change_map = dict(loaded.mem_map)
+    post_change_map[region_start] = 0xAA
+    post_change_map[region_start + 1] = 0xBB
+    result = VariantExecutionResult(
+        variant_id="stress",
+        status="ok",
+        change_summaries=[_summary(entries)],
+        mem_map=post_change_map,
+    )
+    path = generate_project_report(
+        tmp_path,
+        [result],
+        ReportOptions(context_bytes=context_bytes),
+        variant_set=_variant_set("stress"),
+        now_fn=_fixed_clock,
+    )
+    emitted = path.read_bytes()
+
+    # --- driveable non-default parameters asserted on the EMITTED form ---
+    low = (region_start - context_bytes) // 16 * 16
+    high = (range0_end + context_bytes + 15) // 16 * 16
+    text = emitted.decode("utf-8")
+    window_header = f"Window 0x{low:08X}-0x{high:08X}:"
+    assert window_header in text, (
+        f"AT-288: the emitted window header {window_header!r} must be present"
+    )
+    assert "- Context bytes: 512" in text  # non-default context drove through
+    # The window must span >=2 disjoint fixture ranges: it ends past the end
+    # of range 0 and reaches into range 1 across the unmapped gap.
+    assert low < range0_end < range1_start < high, (
+        "AT-288: the row_bases window must span the gap between two disjoint "
+        "fixture ranges"
+    )
+    gap_row = f"0x{range0_end:08X}"
+    assert gap_row in text, "AT-288: the unmapped gap row must be emitted"
+    gap_line = next(ln for ln in text.splitlines() if ln.startswith(gap_row))
+    assert gap_line.endswith("|................|"), (
+        "AT-288: the gap row renders 16 unmapped byte cells"
+    )
+    range1_row = f"0x{range1_start:08X}"
+    assert range1_row in text, (
+        "AT-288: mapped rows of disjoint fixture range 1 must be emitted"
+    )
+    # The patched bytes of the region itself are in the dump.
+    region_row = f"0x{region_start:08X}"
+    assert region_row in text
+    region_line = next(ln for ln in text.splitlines() if ln.startswith(region_row))
+    assert "AA BB" in region_line
+
+    # --- the pinned byte-identity oracle ---
+    if _AT288_CAPTURE.exists():
+        pinned = _AT288_CAPTURE.read_bytes()
+        assert emitted == pinned, (
+            "AT-288: post-move report bytes differ from the pinned pre-move "
+            "capture — the hexview move is NOT byte-identical"
+        )
+    else:
+        _AT288_CAPTURE.parent.mkdir(parents=True, exist_ok=True)
+        _AT288_CAPTURE.write_bytes(emitted)

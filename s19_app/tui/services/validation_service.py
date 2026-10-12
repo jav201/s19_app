@@ -14,7 +14,7 @@ from ...validation import (
 )
 from ...validation.model import CoverageMetrics
 from ..a2l_validate import validate_a2l_internal_issues
-from ..insight_style import GREEN, LABEL, VALUE, microbar
+from ...render.format import GREEN, LABEL, VALUE, microbar
 from ..models import LoadedFile
 
 logger = logging.getLogger(__name__)

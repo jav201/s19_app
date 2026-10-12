@@ -613,6 +613,7 @@ def test_at082e_zero_issues_renders_zeros_no_crash(tmp_path: Path) -> None:
 
 
 def test_at082f_hostile_issue_tokens_render_literal(tmp_path: Path) -> None:
+    """AT-290 — black-box node: hostile issue tokens render literally through the shipped screen."""
     """AT-082f (GATE, C-17) / LLR-082.6 — hostile issue code/message render literal, no injection.
 
     Intent: a hostile ``code``/``message`` payload reaches the grouped row cells;

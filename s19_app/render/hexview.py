@@ -13,8 +13,7 @@ from ..range_index import (
     build_sorted_range_index as _build_sorted_range_index,
     range_in_sorted_ranges as _range_in_sorted_ranges,
 )
-from .color_policy import FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
-from .insight_style import CYAN, DGRAY, VALUE
+from .format import CYAN, DGRAY, VALUE, FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
 
 
 MAX_HEX_BYTES = 65536
@@ -56,89 +55,6 @@ def _hex_byte_style(value: int) -> str:
     if 0x20 <= value <= 0x7E:
         return CYAN
     return VALUE
-
-
-def build_sorted_range_index(ranges: List[Tuple[int, int]]) -> RangeIndex:
-    """
-    Summary:
-        Precompute a sorted (starts, ends) index so repeated address-in-ranges checks can
-        use binary search instead of scanning all ranges.
-
-    Args:
-        ranges (List[Tuple[int, int]]): Half-open ``(start, end)`` address ranges, possibly
-            unsorted and possibly overlapping.
-
-    Returns:
-        RangeIndex: Two parallel lists ``(starts, ends)``, both sorted by ``start``.
-
-    Data Flow:
-        - Sort a shallow copy of the input by ``start``.
-        - Split into two parallel lists kept aligned by index.
-
-    Dependencies:
-        Used by:
-            - ``address_in_sorted_ranges``
-            - ``S19TuiApp`` MAC/A2L address membership checks
-            - ``s19_app.validation.engine`` cross-artifact validation
-    """
-    return _build_sorted_range_index(ranges)
-
-
-def address_in_sorted_ranges(addr: int, index: RangeIndex) -> bool:
-    """
-    Summary:
-        Test whether ``addr`` falls inside any half-open range described by ``index``.
-
-    Args:
-        addr (int): Address to test.
-        index (RangeIndex): Output of ``build_sorted_range_index``.
-
-    Returns:
-        bool: True when ``starts[i] <= addr < ends[i]`` for some ``i``.
-
-    Data Flow:
-        - Use ``bisect_right`` on ``starts`` to find the rightmost candidate range whose
-          start is ``<= addr``.
-        - Confirm the candidate is valid and that ``addr`` lies below its end.
-
-    Dependencies:
-        Uses:
-            - ``bisect.bisect_right``
-        Used by:
-            - ``S19TuiApp._mac_address_in_ranges``
-            - ``S19TuiApp._collect_mac_out_of_range_addresses``
-            - ``S19TuiApp._build_mac_view_cache``
-            - ``s19_app.validation.engine.validate_artifact_consistency``
-    """
-    return _address_in_sorted_ranges(addr, index)
-
-
-def range_in_sorted_ranges(addr: int, length: int, index: RangeIndex) -> bool:
-    """
-    Summary:
-        Test whether a contiguous span ``[addr, addr + length)`` fits entirely inside a single
-        range of ``index`` (no spanning across gaps).
-
-    Args:
-        addr (int): Span start address.
-        length (int): Positive length in bytes.
-        index (RangeIndex): Output of ``build_sorted_range_index``.
-
-    Returns:
-        bool: True when one indexed range fully covers the span.
-
-    Data Flow:
-        - Reject zero/negative lengths (matches legacy semantics).
-        - Binary search for the candidate range whose start is ``<= addr``.
-        - Confirm ``addr + length`` does not exceed that range's end.
-
-    Dependencies:
-        Uses:
-            - ``bisect.bisect_right``
-        Used by:
-            - ``s19_app.validation.engine.validate_artifact_consistency``
-    """
-    return _range_in_sorted_ranges(addr, length, index)
 
 
 def build_mem_map_s19(s19: S19File) -> Dict[int, int]:

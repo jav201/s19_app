@@ -1,0 +1,206 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFF....F                                                                [100%]
+================================== FAILURES ===================================
+_____ test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-click] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit0')
+size = (80, 24), drive = 'click'
+
+    @pytest.mark.parametrize("drive", _DRIVES)
+    @pytest.mark.parametrize("size", _SIZES)
+    def test_b77_hostile_symbol_is_literal_and_carries_no_span(
+        tmp_path: Path, size: Tuple[int, int], drive: str
+    ) -> None:
+        """AT-B77-15a \u2014 limb 1 \u2227 limb 2, per limb, per size, per drive.
+    
+        Limb 1 is *every NON-CONTROL character of the payload verbatim*, not
+        *payload verbatim*. Post-scrub the ESC bytes are gone by design, so the
+        stricter wording would go RED on a correct implementation — an earlier
+        revision of this acceptance said exactly that and would have done so.
+    
+        Mutation (executed, Inc-2): ``safe_text`` \u2192 ``Text.from_markup``. Limb 1
+        False (``[red]`` is consumed as a tag and the projection is no longer
+        contiguous in ``.plain``) and limb 2 False (the tag becomes a style span).
+        """
+        plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+        _assert_payload_reached_the_body(size, plain, strip, hit, drive)
+    
+        expected = _noncontrol(_HOSTILE_SYMBOL)
+        limb1 = expected in plain
+        limb2 = spans == []
+        verdicts = {"limb1_noncontrol_verbatim": limb1, "limb2_no_spans": limb2}
+    
+>       assert limb1, (
+            f"{size}/{drive}: LIMB 1 — every non-control character of the hostile "
+            f"symbol must survive verbatim and contiguous. Expected {expected!r} "
+            f"as a substring of the rendered plain text; got {plain!r}. "
+            f"per-limb={verdicts}"
+        )
+E       AssertionError: (80, 24)/click: LIMB 1 — every non-control character of the hostile symbol must survive verbatim and contiguous. Expected 'b77hostilemark[31m_evil[red]1m8;;u' as a substring of the rendered plain text; got 'Status: VALID\nCell: 0x80000000-0x800000FF\nRegion: 0x80000000-0x800000FF (256 bytes, valid) - b77hostilemark[31m_evil1m8;;u\n0 issue(s) in this cell\n0 issue(s) in region\nSize: 256 B\nDominant band: · constant/padding\nPeek @ 0x80000000:\n0x80000000  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000010  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000020  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'. per-limb={'limb1_noncontrol_verbatim': False, 'limb2_no_spans': False}
+E       assert False
+
+tests\test_tui_hostile_map.py:272: AssertionError
+__ test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-autoselect] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit1')
+size = (80, 24), drive = 'autoselect'
+
+    @pytest.mark.parametrize("drive", _DRIVES)
+    @pytest.mark.parametrize("size", _SIZES)
+    def test_b77_hostile_symbol_is_literal_and_carries_no_span(
+        tmp_path: Path, size: Tuple[int, int], drive: str
+    ) -> None:
+        """AT-B77-15a \u2014 limb 1 \u2227 limb 2, per limb, per size, per drive.
+    
+        Limb 1 is *every NON-CONTROL character of the payload verbatim*, not
+        *payload verbatim*. Post-scrub the ESC bytes are gone by design, so the
+        stricter wording would go RED on a correct implementation — an earlier
+        revision of this acceptance said exactly that and would have done so.
+    
+        Mutation (executed, Inc-2): ``safe_text`` \u2192 ``Text.from_markup``. Limb 1
+        False (``[red]`` is consumed as a tag and the projection is no longer
+        contiguous in ``.plain``) and limb 2 False (the tag becomes a style span).
+        """
+        plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+        _assert_payload_reached_the_body(size, plain, strip, hit, drive)
+    
+        expected = _noncontrol(_HOSTILE_SYMBOL)
+        limb1 = expected in plain
+        limb2 = spans == []
+        verdicts = {"limb1_noncontrol_verbatim": limb1, "limb2_no_spans": limb2}
+    
+>       assert limb1, (
+            f"{size}/{drive}: LIMB 1 — every non-control character of the hostile "
+            f"symbol must survive verbatim and contiguous. Expected {expected!r} "
+            f"as a substring of the rendered plain text; got {plain!r}. "
+            f"per-limb={verdicts}"
+        )
+E       AssertionError: (80, 24)/autoselect: LIMB 1 — every non-control character of the hostile symbol must survive verbatim and contiguous. Expected 'b77hostilemark[31m_evil[red]1m8;;u' as a substring of the rendered plain text; got 'Status: VALID\nCell: 0x80000000-0x800000FF\nRegion: 0x80000000-0x800000FF (256 bytes, valid) - b77hostilemark[31m_evil1m8;;u\n0 issue(s) in this cell\n0 issue(s) in region\nSize: 256 B\nDominant band: · constant/padding\nPeek @ 0x80000000:\n0x80000000  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000010  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000020  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'. per-limb={'limb1_noncontrol_verbatim': False, 'limb2_no_spans': False}
+E       assert False
+
+tests\test_tui_hostile_map.py:272: AssertionError
+_____ test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-click] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit2')
+size = (120, 30), drive = 'click'
+
+    @pytest.mark.parametrize("drive", _DRIVES)
+    @pytest.mark.parametrize("size", _SIZES)
+    def test_b77_hostile_symbol_is_literal_and_carries_no_span(
+        tmp_path: Path, size: Tuple[int, int], drive: str
+    ) -> None:
+        """AT-B77-15a \u2014 limb 1 \u2227 limb 2, per limb, per size, per drive.
+    
+        Limb 1 is *every NON-CONTROL character of the payload verbatim*, not
+        *payload verbatim*. Post-scrub the ESC bytes are gone by design, so the
+        stricter wording would go RED on a correct implementation — an earlier
+        revision of this acceptance said exactly that and would have done so.
+    
+        Mutation (executed, Inc-2): ``safe_text`` \u2192 ``Text.from_markup``. Limb 1
+        False (``[red]`` is consumed as a tag and the projection is no longer
+        contiguous in ``.plain``) and limb 2 False (the tag becomes a style span).
+        """
+        plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+        _assert_payload_reached_the_body(size, plain, strip, hit, drive)
+    
+        expected = _noncontrol(_HOSTILE_SYMBOL)
+        limb1 = expected in plain
+        limb2 = spans == []
+        verdicts = {"limb1_noncontrol_verbatim": limb1, "limb2_no_spans": limb2}
+    
+>       assert limb1, (
+            f"{size}/{drive}: LIMB 1 — every non-control character of the hostile "
+            f"symbol must survive verbatim and contiguous. Expected {expected!r} "
+            f"as a substring of the rendered plain text; got {plain!r}. "
+            f"per-limb={verdicts}"
+        )
+E       AssertionError: (120, 30)/click: LIMB 1 — every non-control character of the hostile symbol must survive verbatim and contiguous. Expected 'b77hostilemark[31m_evil[red]1m8;;u' as a substring of the rendered plain text; got 'Status: VALID\nCell: 0x80000000-0x800000FF\nRegion: 0x80000000-0x800000FF (256 bytes, valid) - b77hostilemark[31m_evil1m8;;u\n0 issue(s) in this cell\n0 issue(s) in region\nSize: 256 B\nDominant band: · constant/padding\nPeek @ 0x80000000:\n0x80000000  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000010  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000020  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'. per-limb={'limb1_noncontrol_verbatim': False, 'limb2_no_spans': False}
+E       assert False
+
+tests\test_tui_hostile_map.py:272: AssertionError
+__ test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-autoselect] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18310/test_b77_hostile_symbol_is_lit3')
+size = (120, 30), drive = 'autoselect'
+
+    @pytest.mark.parametrize("drive", _DRIVES)
+    @pytest.mark.parametrize("size", _SIZES)
+    def test_b77_hostile_symbol_is_literal_and_carries_no_span(
+        tmp_path: Path, size: Tuple[int, int], drive: str
+    ) -> None:
+        """AT-B77-15a \u2014 limb 1 \u2227 limb 2, per limb, per size, per drive.
+    
+        Limb 1 is *every NON-CONTROL character of the payload verbatim*, not
+        *payload verbatim*. Post-scrub the ESC bytes are gone by design, so the
+        stricter wording would go RED on a correct implementation — an earlier
+        revision of this acceptance said exactly that and would have done so.
+    
+        Mutation (executed, Inc-2): ``safe_text`` \u2192 ``Text.from_markup``. Limb 1
+        False (``[red]`` is consumed as a tag and the projection is no longer
+        contiguous in ``.plain``) and limb 2 False (the tag becomes a style span).
+        """
+        plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+        _assert_payload_reached_the_body(size, plain, strip, hit, drive)
+    
+        expected = _noncontrol(_HOSTILE_SYMBOL)
+        limb1 = expected in plain
+        limb2 = spans == []
+        verdicts = {"limb1_noncontrol_verbatim": limb1, "limb2_no_spans": limb2}
+    
+>       assert limb1, (
+            f"{size}/{drive}: LIMB 1 — every non-control character of the hostile "
+            f"symbol must survive verbatim and contiguous. Expected {expected!r} "
+            f"as a substring of the rendered plain text; got {plain!r}. "
+            f"per-limb={verdicts}"
+        )
+E       AssertionError: (120, 30)/autoselect: LIMB 1 — every non-control character of the hostile symbol must survive verbatim and contiguous. Expected 'b77hostilemark[31m_evil[red]1m8;;u' as a substring of the rendered plain text; got 'Status: VALID\nCell: 0x80000000-0x800000FF\nRegion: 0x80000000-0x800000FF (256 bytes, valid) - b77hostilemark[31m_evil1m8;;u\n0 issue(s) in this cell\n0 issue(s) in region\nSize: 256 B\nDominant band: · constant/padding\nPeek @ 0x80000000:\n0x80000000  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000010  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|0x80000020  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'. per-limb={'limb1_noncontrol_verbatim': False, 'limb2_no_spans': False}
+E       assert False
+
+tests\test_tui_hostile_map.py:272: AssertionError
+_ test_b77_safe_text_scrubs_the_control_byte_class_without_damaging_identity __
+
+    def test_b77_safe_text_scrubs_the_control_byte_class_without_damaging_identity(
+    ) -> None:
+        """LLR-116.7's executed thresholds, at the function boundary.
+    
+        The e2e arms above prove the sink is safe for one payload. This node pins
+        the *form* of the fix, which is normative: the C1 rows are the ones a
+        ``\\x1b``-anchored regex passes, and the identity rows are what stops the
+        scrub becoming a shape-inference redactor (the batch-62 failure). Both
+        halves are asserted in one node because either alone is satisfiable by a
+        wrong implementation — deleting everything passes the C1 rows, and
+        deleting nothing passes the identity rows.
+        """
+        removed = [
+            # (input, expected) — every threshold LLR-116.7 states.
+            ("sensor\x1b[31m_evil[red]", "sensor[31m_evil[red]"),
+            ("a\x07b\x00c", "abc"),
+            ("a\x9b31mb", "a31mb"),            # C1 single-byte CSI, no ESC present
+            ("a\x9d8;;ub", "a8;;ub"),          # C1 single-byte OSC, no ESC present
+            ("a\x7fb", "ab"),                  # DEL
+            ("a\nb\tc\rd", "abcd"),            # C0 whitespace is C0
+        ]
+        for source, expected in removed:
+            got = safe_text(source).plain
+>           assert got == expected, (
+                f"safe_text({source!r}) must scrub the control byte CLASS -> "
+                f"{expected!r}; got {got!r}"
+            )
+E           AssertionError: safe_text('sensor\x1b[31m_evil[red]') must scrub the control byte CLASS -> 'sensor[31m_evil[red]'; got 'sensor[31m_evil'
+E           assert 'sensor[31m_evil' == 'sensor[31m_evil[red]'
+E             
+E             - sensor[31m_evil[red]
+E             ?                -----
+E             + sensor[31m_evil
+
+tests\test_tui_hostile_map.py:346: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_hostile_map.py::test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-click]
+FAILED tests/test_tui_hostile_map.py::test_b77_hostile_symbol_is_literal_and_carries_no_span[size0-autoselect]
+FAILED tests/test_tui_hostile_map.py::test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-click]
+FAILED tests/test_tui_hostile_map.py::test_b77_hostile_symbol_is_literal_and_carries_no_span[size1-autoselect]
+FAILED tests/test_tui_hostile_map.py::test_b77_safe_text_scrubs_the_control_byte_class_without_damaging_identity
+5 failed, 4 passed in 13.63s

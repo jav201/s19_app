@@ -93,7 +93,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
 from ..changes.display import format_memory_value
-from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_TIMESTAMP_FORMAT,

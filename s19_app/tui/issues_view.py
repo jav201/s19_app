@@ -37,7 +37,7 @@ from textual.widgets import Static
 
 from .color_policy import css_class_for_severity
 from .insight_style import CYAN, RED, YELLOW, microbar
-from .screens_directionb import safe_text
+from ..utils import safe_text
 from ..validation import ValidationIssue, ValidationSeverity
 
 #: Max ``IssueRow`` widgets mounted across all groups on one page (perf/UX cap).

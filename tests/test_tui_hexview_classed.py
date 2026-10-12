@@ -31,7 +31,7 @@ from s19_app.tui import (
     SEARCH_ENCODING,
 )
 from s19_app.tui.color_policy import FOCUS_HIGHLIGHT_STYLE
-from s19_app.tui.hexview import render_hex_view_text
+from s19_app.render.hexview import render_hex_view_text
 from s19_app.tui.insight_style import CYAN, DGRAY, VALUE
 
 

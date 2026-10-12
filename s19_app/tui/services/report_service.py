@@ -55,7 +55,7 @@ from ...range_index import (
 from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..changes.io import READ_SIZE_CAP_BYTES
-from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
 from .markdown_safety import md_code, md_safe
