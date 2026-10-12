@@ -24,8 +24,8 @@
       "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
     }
   ],
-  "current_station": "P0",
-  "phase_status": "not-started",
+  "current_station": "P3",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "P1",
@@ -64,7 +64,14 @@
     "requirements_canon": "repo:REQUIREMENTS.md"
   },
   "artifacts": {},
-  "decisions_log": [],
+  "decisions_log": [
+    {
+      "station": "P2",
+      "date": "2026-10-11",
+      "decision": "P2 approve (0/0/4) — the contract is authored; the hold lifts: batch-92 MERGED to main (PR #210, a67407c), the coordination note is on disk in this batch's dir; P3 starts on the refactored tree (suite collects 2772)",
+      "guided": false
+    }
+  ],
   "standing_authorization": {
     "autonomous": true,
     "merge": false,
