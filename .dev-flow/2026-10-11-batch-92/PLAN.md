@@ -42,7 +42,9 @@ A1+A2+A3 fired ⇒ **ARQ turns on, and with it PDR and DDR** — `stations_activ
 
 ## Where we are
 
-P0 **closed** (2026-11-11 → logged `asked at the gate — approved`). batch-91 **closed at P5 and committed** on `main` (`0ad3277`, `b167828`, `410cde5`), carrying the `tests/` collection repair this batch was waiting on — the worktree rebased onto `410cde5` (base_ref re-stamped per RC-1), gate re-run **exit 0 · 0 block**. Full-suite baseline running as reference evidence. ARQ in progress: the module-map delta for `s19_app/render/` is being prepared by the `architect` role (spawned subagent), with the write to `docs/ARCHITECTURE.md` landing right after the base. Standing authorization: **every gate is asked, merge NOT granted** (commission silent on both).
+**MERGED (2026-10-12).** PR #210 merged to `main` as **`a67407c`** after the final independent qa-reviewer PR-level pass came back CLEAN (`review-pr-merge-qa.md`). The batch record is publishing on the closeout branch `kimi/batch-92-closeout` (worktree `s19_app-b92`). All stations closed: P0 → ARQ → P1 (×2) → P2 (×2) → PDR → P3 (Inc-A/Inc-B) → DDR → P4 → P5; postmortem sealed (`05-postmortem.md`), 06-docs filled at P6. Carries routed to BACKLOG-CODE.md lane A (6 entries, incl. the suite-flakiness sharpening and US-92-5); batch-93 (memmap2) is unblocked and rebases onto the refactored tree per `COORDINATION-batch93-memmap.md`.
+
+**Visual annex (rendered dependency map):** the 2026-10-11 radiography this batch worked from — `s19_app_modulos.png` / `.pdf` / `.excalidraw`, plus `model.json` and its generator — lives at `G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Diagramas/`. Cite it as the batch's visual annex (the record's own `06-docs/diagrams/` stays empty: no new surfaces to draw).
 
 ## Objective
 

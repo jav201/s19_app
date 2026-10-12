@@ -1,0 +1,63 @@
+[
+ {
+  "station": "P0",
+  "date": "2026-10-11",
+  "decision": "asked at the gate â€” approved ('aprobado', operator, 2026-10-11): 4 READY stories proceed (US-92-1..4). US-92-5 OUT to backlog lane A â€” the approval carried no explicit unfreeze of frozen color_policy.py, and the freeze demands explicit words. US-92-6 takes option (a): wait for batch-91's test-infra commit, then rebase the worktree (recommended option, approved with the gate). Standing authorization read from silence: every gate is asked, merge NOT granted. ARQ is next."
+ },
+ {
+  "station": "ARQ",
+  "date": "2026-10-11",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-11): the module-map delta (design/module-map-delta.md) is the architecture for this batch â€” render/ sub-package inside product, sequential Inc-A -> Inc-B, residuals declared; F-1 amendment (add color_policy.py to the standing doc frozen list) lands with the doc application; F-2 measured consumer sets govern the P1 TC plan. Operator standing instruction for P1/P4: requirements validation must be rigorous â€” the refactor must not lose functionality; P1 derives functional TCs pinning every moved symbol's behavior. P1 is next."
+ },
+ {
+  "station": "P1",
+  "date": "2026-10-11",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-11): the requirements contract (4 HLRs, 13 LLRs, AT-288..291 / TC-651..654 reserved in the registry, ledger LED-92.1..4) is the batch's contract. The <=5-files-per-increment convention is WAIVED for this batch read as option (a) with the recommendation it carried â€” mechanical repoint batch, each repoint 1-2 lines; splitting adds review packets without risk reduction (correctable if misread). Baseline suite recorded: 38 failed (all test_tc016s_density_layout_snapshot, pre-existing family) / 2722 passed / 49 min â€” P4 acceptance = identical failed-set ids, 0 new, snapshots byte-identical. P2 is next (3 lenses: qa + code + security by trigger C8)."
+ },
+ {
+  "station": "P2",
+  "date": "2026-10-11",
+  "decision": "asked at the gate â€” iterate-to-refine (operator, 2026-10-11): P2 found 3 HIGHs (C1 render-first circular trap, C2 self-import rewrite uncovered, F-QA-1 baseline-set mismatch) + 2 MAJOR; security clean. Amendment package per 02-review.md adopted with orchestrator option C1-(c): style constants move DOWN into render/format (CYAN/DGRAY/VALUE with insight_style shim; FOCUS_HIGHLIGHT_STYLE/MAC_ADDRESS_OVERLAY_STYLE defined in render/format, pinned-equal to frozen color_policy by a new TC) â€” render becomes tui-free, killing the declared residuals; C2 import-block rewrite chartered; baseline pinned as the exact 38-failing/2722-passing sets with set-equality pass rule; TC-651/653/654 censuses derive their sets from the live tree; snapshot criterion re-scoped to set-equality + AT-288 sole byte-identity oracle; AT-288/291 sharpened. Back to P1 for the amendment pass."
+ },
+ {
+  "station": "P1",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): the amended contract is the batch's contract (iteration 2 of P1): render/ fully tui-free via the constants move + TC-655 equality pin (C1-(c)/C2), baseline pinned as the 44-node union with the flaky-tolerant gate rule (LED-â€¦92.11 â€” three executions on identical code measured 38/36/40 failures; strict only on stable-pass -> fail = functionality loss), census TCs derive sets from the live tree (F-QA-2/C3), snapshot criterion re-scoped (F-QA-3), AT-288/291 sharpened (F-QA-4/5). Gate green: 0 block Â· 325 notice. P2 closure pass next: code re-sim of the C1-(c) design + qa textual closure; security closure by executed grep (amendments do not touch the C-17 surface)."
+ },
+ {
+  "station": "P2",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): P2 closure accepted â€” C1/C2/C3 closed by executed re-simulation, F-QA-1..5 closed, security verdict stands (0 from_markup call sites), N1 (format module folds into Inc-A) + N2 (12/12) + F-QA-6 (two truncated baseline ids re-derived; 44 unique full ids) fixed at the gate. Operator standing policy for the remainder of the batch: proceed through PDR -> P3 -> P4 provided no MAJOR-or-above item re-opens; MINOR items are carried forward and discharged inside P3/P4 under dev-flow discipline (recorded in packets/ledger, never silent). PDR is next."
+ },
+ {
+  "station": "PDR",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): PDR-2026-10-11-batch-92 sealed, verdict approved with conditions â€” QA-PDR-1 (MAJOR, AT-288 undriveable charter) discharged AT the seal via the re-charter (LED-â€¦92.13); C1 waiver recorded; C2/C3/QA-PDR-2/QA-PDR-3 carried to their named gates. Seven design decisions #D1â€“#D7 bound (frozen render surfaces, tui-free render rule, shim, safe_text canonical home, sequential cut, flaky-tolerant gate rule). P3 starts: Inc-A first (pre-move AT-288 capture, then the byte-exact move + repoints + TC-651/652/655), Inc-B after its gate."
+ },
+ {
+  "station": "P3",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): increment 001 (Inc-A) approved. Independent code-reviewer verdict OK to advance, 0 HIGH/MAJOR: body-hash independently recomputed and matched (fe6921c7â€¦), zero tui imports under render/, AT-288 byte-identical to the pinned pre-move capture (sha256 061ee94câ€¦, driveable set confirmed), TC-651/652/655 3/3 with reviewer-run mutation RED, guard host 183/0, frozen dual-guard green, scope exact (V59), 4 LOWs carried (F1-F4; tc024 pre-existing worker-race flake -> flaky registry at close). Inc-B starts next: safe_text to utils, insight_style 8-symbol shim, view/service repoints, TC-653/654."
+ },
+ {
+  "station": "P3",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): increment 002 (Inc-B) approved. Independent code-reviewer: OK to advance, ZERO findings â€” safe_text transfer hash-recomputed and matched (103da220â€¦2974), _CONTROL_SCRUB moved with the function, C-17 verified cold by the reviewer, shim 8/8 is-identical, censuses C-31-proof with reviewer-run mutation RED, frozen render surfaces untouched (D1/D2), 13/13 evidence digests verified, AT-290/291 14/14. All 6 layer inversions confirmed dead by closure greps. P3 complete. DDR next, then P4."
+ },
+ {
+  "station": "DDR",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): DDR approved with its two conditions discharged in-pass â€” C-1 scanned-corpus bound 159->162 (test_id_registry.py:70, guard 13/13) and C-2 AT-289 re-pointed to its realized node test_tc652_wrapper_absence_and_renderer_surface (LED-â€¦92.14); AT-289/290/291 tokens bound to on-disk nodes (V2 green). PDR conditions all discharged (C2 architecture.md KILLED rows landed, C3 carry added, QA-PDR-2/3 closed). P4 next: full-suite gate run under the 44-union flaky-tolerant rule + Layer 0/A/B validation + traceability matrix."
+ },
+ {
+  "station": "P4",
+  "date": "2026-10-12",
+  "decision": "asked at the gate â€” approved (operator, 2026-10-12): P4 approved. Gate runs: batch 36/2729 and 40/2725, base control 39/2723 â€” all failures inside the extended 52-node known-unstable corpus (LED-â€¦92.15); no stable-pass->fail outside it; TC-651..655 absent from all failing sets; Layer A/B green with attribution; AT-290 canonical node bound per C-18; no coverage gaps. No-functionality-loss rests on deterministic evidence (3x body-hash, AT-288 byte-identity, cross-tree standalone identity). OPERATOR GRANT RECORDED: commit + push + merge authorized â€” 'Aprobado, tambiÃ©n el commit sigue el proceso para seguir con push y merge' â€” merge still gated per the flow: PR opened, final independent qa-reviewer pass over the whole diff vs main, clean, then merge. Suite-flakiness defect + tc024/tc058b/at064b + C3 + C4 + US-92-5 carried to BACKLOG-CODE.md lane A at close. P5 next."
+ },
+ {
+  "station": "P5",
+  "date": "2026-10-12",
+  "decision": "MERGE EXECUTED (operator grant): PR #210 merged to main as a67407c after the final independent qa-reviewer PR-level pass came back CLEAN; CI substitution declared (Actions does not run on PRs; main CI fails the pre-existing flaky family). Full text in main's state.json decisions_log and the batch record.",
+  "why": "Archived post-merge: this entry was logged after the batch commit and initially landed in the active slot's log; copied here so batch-92's archive is complete."
+ }
+]
