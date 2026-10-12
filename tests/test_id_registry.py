@@ -67,7 +67,7 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 159
+EXPECTED_SCANNED_TEST_FILES = 160
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds
