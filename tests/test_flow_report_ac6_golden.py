@@ -199,6 +199,8 @@ def test_tc509b_the_golden_is_stored_lf_only_and_non_empty() -> None:
     ``tests/goldens/** text eol=lf`` in ``.gitattributes`` normalises on
     checkout, but a golden is only portable if the bytes on disk really are LF;
     a CRLF golden would compare unequal on one platform and equal on the other.
+
+    # TC-509b
     """
     raw = _AC6_GOLDEN.read_bytes()
 

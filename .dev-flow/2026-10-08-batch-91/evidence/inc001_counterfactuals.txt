@@ -1,0 +1,10 @@
+shipped registry sha256 BEFORE: cf88ca52e4ffd2661f748515f42e4bc686e852860e641dbfc9ad67b86292030f
+arms resolved at baseline: 2 (test_at284_every_batch91_tc_is_live_with_nodes, test_at284_every_named_node_exists_on_disk)
+positive control (unmutated registry): arm (a) GREEN · arm (b) GREEN
+M1 RESERVED-flip TC-617: arm (a) RED — - TC-617 is RESERVED, not LIVE — the adoption is incomplete
+M1 arm (b) stayed GREEN (named, not hidden behind the process exit code)
+M2 phantom node on TC-618: arm (b) RED — - TC-618 names 'tests/test_hexfile.py::test_phantom_node_does_not_exist' but 'test_phantom_node_does_not_exist' is not defined in tests/test_hexfile.py
+M2 arm (a) stayed GREEN
+shipped registry sha256 AFTER:  cf88ca52e4ffd2661f748515f42e4bc686e852860e641dbfc9ad67b86292030f
+restore proven by hash: shipped bytes identical before/after (mutations lived in memory only)
+VERDICT: M1 KILLED by arm (a) · M2 KILLED by arm (b) · 0 SURVIVED

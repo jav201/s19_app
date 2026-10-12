@@ -1099,6 +1099,10 @@ def test_tc016s_density_layout_snapshot(
     comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
     to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
     minimap redesign + narrow-regime reflow at both regimes (4 cells).
+
+    # AT-034a
+    # AT-034b
+    # TC-16s
     """
     width, height = _SIZES[size_key]
     app = S19TuiApp(base_dir=tmp_path)

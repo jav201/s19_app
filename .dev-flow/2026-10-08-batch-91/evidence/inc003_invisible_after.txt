@@ -1,0 +1,4 @@
+AT-43 derived nodes: ['tests/test_tui_a2l_issue_recolor.py::test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal']
+  registry entry id='AT-043' status=LIVE nodes=['tests/test_tui_a2l_issue_recolor.py::test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal']
+
+token-invisible LIVE ids: 0

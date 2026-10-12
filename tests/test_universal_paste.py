@@ -28,6 +28,9 @@ Dependencies:
         - ``s19_app.tui.app.S19TuiApp`` / ``s19_app.tui.os_clipboard_input``
     Used by:
         - the batch-67 acceptance gate (AC-1, AC-2)
+
+Batch-91 contract adoption (HLR-122):
+# TC-633 — this module pins the universal paste behavior (LLR-122.5).
 """
 
 from __future__ import annotations

@@ -40,7 +40,7 @@ from s19_app.tui.services.report_service import (
 from s19_app.tui.services.variant_execution_service import VariantExecutionResult
 from s19_app.validation.model import ValidationIssue, ValidationSeverity
 
-from test_report_markup_safety import (
+from tests.test_report_markup_safety import (
     DEFAULT,
     VIEWER,
     _walk,
@@ -49,7 +49,7 @@ from test_report_markup_safety import (
     rendered_text,
 )
 from s19_app.tui.changes.model import CheckRunEntry
-from test_report_service import _applied_entry, _check, _summary
+from tests.test_report_service import _applied_entry, _check, _summary
 
 # --------------------------------------------------------------------------- #
 # The planted corpus

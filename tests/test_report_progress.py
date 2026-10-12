@@ -7,6 +7,9 @@ now moves to 100 on success and resets to 0 on failure.
 
 RED pre-fix: without the N5 `set_progress` seams a generated report leaves the
 bar at its default 0 (never 100), and a failed report leaves it mid-fill.
+
+Batch-91 contract adoption (HLR-122):
+# TC-644 — this module pins the report logging/progress/off-thread behaviors (LLR-122.5).
 """
 
 from __future__ import annotations
@@ -19,7 +22,7 @@ from textual.widgets import Button, ProgressBar
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ReportViewerScreen
 
-from test_tui_report_seam import (
+from tests.test_tui_report_seam import (
     _flush,
     _generate_through_surface,
     _make_report_project,

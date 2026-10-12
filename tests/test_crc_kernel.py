@@ -9,6 +9,9 @@ Intent (why these matter, not just what):
   - The seed algorithm must equal ``zlib.crc32`` byte-for-byte, or the
     "first template == current implementation" fidelity claim (AT-CRC-DSN-010)
     is false.
+
+Batch-91 contract adoption (HLR-122):
+# TC-629 — this module pins the parameterized Rocksoft CRC kernel, width 8-64, with its catalogue presets (LLR-122.4).
 """
 
 from __future__ import annotations

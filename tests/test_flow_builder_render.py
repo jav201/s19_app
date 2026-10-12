@@ -558,7 +558,10 @@ def test_tc088_7_dropdown_offers_check_and_load_keeps_source_tag() -> None:
 def test_at088_gating_selector_appends_block_own_op_check(tmp_path: Path) -> None:
     """Gating UI (the OPEN flag, LLR-086.1): selecting CHECK + gating
     ``block-own-op`` through the panel Add surface appends a ``CheckBlock`` whose
-    gating is the non-default value — the user-visible gating setter works."""
+    gating is the non-default value — the user-visible gating setter works.
+
+    # AT-88
+    """
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)

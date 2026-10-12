@@ -970,6 +970,8 @@ def test_tc220b_hex_save_unaffected_by_s19_only_kwargs(tmp_path: Path) -> None:
     Intent: LLR-015.3 C1 — the new params are dispatched on the S19 branch
     only; passing them to a HEX save must not TypeError, and the re-parsed
     .hex carries 0 errors with the intended map.
+
+    # TC-220b
     """
     mem_map = _wide_mem_map()
     dest_dir = _project_dir(tmp_path)

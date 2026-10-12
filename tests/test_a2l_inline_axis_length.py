@@ -424,6 +424,8 @@ def test_at107b_synthetic_single_line_curve_length_13(tmp_path: Path) -> None:
     Intent: demo-independence — the byte value is hand-computable from the in-test
     layout string, guarding against token[1]/token[2] confusion regardless of the
     demo's line numbers.
+
+    # AT-107b
     """
     tag = _write_a2l(
         tmp_path, cname="C_SYN", char_type="CURVE", deposit="RL_SYN",

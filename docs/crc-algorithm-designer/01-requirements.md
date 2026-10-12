@@ -1,5 +1,12 @@
 # CRC Algorithm Designer — Requirements (v1 draft)
 
+> **This is the designer's pre-ship DESIGN record** — a draft dated 2026-07-20,
+> written before the CRC Designer shipped. It is kept as the record of what the
+> design set out to do; it is **not** the contract for the shipped behavior. The
+> shipped behavior is the CRC Designer's screen contract in the canon
+> (`REQUIREMENTS.md` and the batch records under `.dev-flow/` — the screen
+> itself lives at `s19_app/tui/crc_designer_view.py`, keyed `0` on the rail).
+
 **Status:** Draft for approval · **Date:** 2026-07-20 · **Worktree:** `crc-algorithm-designer`
 **Author:** requirements pass (pre-/dev-flow). Governs a NEW TUI view + a width-general engine rewrite.
 

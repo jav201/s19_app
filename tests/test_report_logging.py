@@ -13,6 +13,9 @@ The driven AT (`test_before_after_report_generation_logs_to_file`) exercises the
 REAL app surface (`action_before_after_report`) and reads the produced log file
 back — a black-box output-then-consume assertion (C-12/C-31/C-32), not a
 mock-was-called check.
+
+Batch-91 contract adoption (HLR-122):
+# TC-644 — this module pins the report logging/progress/off-thread behaviors (LLR-122.5).
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ from s19_app.tui.app import S19TuiApp, format_report_log_line
 from s19_app.tui.workspace import LOG_FILENAME, LOGS_SUBDIR, setup_logging
 
 # Reuse the proven app-driving scaffold from the before/after AT suite.
-from test_before_after_report import (
+from tests.test_before_after_report import (
     _drive_apply,
     _load_image,
     _make_s19_image,

@@ -34,6 +34,9 @@ Dependencies:
         - ``changes.io.read_change_document`` / ``changes.apply``
     Used by:
         - the batch-67 acceptance gate (AC-7)
+
+Batch-91 contract adoption (HLR-122):
+# TC-641 — this module pins the patch dual entry (LLR-122.5).
 """
 
 from __future__ import annotations

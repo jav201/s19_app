@@ -13,6 +13,9 @@ These tests pin the fixed contract at two layers:
 
 The missing-*address* arm is asserted unchanged so the fix is a strict split, not
 a relaxation of address checking.
+
+Batch-91 contract adoption (HLR-122):
+# TC-623 — this module pins the A2L engine's ASAP2 parse with missing-length records handled (LLR-122.2).
 """
 
 from s19_app.tui.a2l import validate_a2l_tags

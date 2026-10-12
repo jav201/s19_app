@@ -242,6 +242,8 @@ def test_tc043_restore1_related_node_is_markup_safe() -> None:
     ``[link=...]`` token is NOT consumed (built via ``safe_text``, never
     markup-parsed). Pins the C-17 invariant on the restored node so a future
     file-derived ``related_artifacts`` value cannot become a silent injection sink.
+
+    # TC-43
     """
 
     def _related_node(issue: ValidationIssue) -> Static:

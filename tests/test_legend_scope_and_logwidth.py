@@ -15,6 +15,9 @@ N2: `_append_log_line` caps to the app width (was a fixed 50), so long
 
 RED pre-fix: the legend renders all four sections from every screen; the log
 line clips at 50 chars regardless of width.
+
+Batch-91 contract adoption (HLR-122):
+# TC-643 — this module pins the N8 legend and logwidth scope (LLR-122.5).
 """
 
 from __future__ import annotations

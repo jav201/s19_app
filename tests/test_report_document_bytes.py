@@ -36,7 +36,7 @@ import pytest
 from s19_app.tui.services import report_service as rs
 from s19_app.tui.services.report_service import ReportOptions, generate_project_report
 
-from test_report_service import _fixed_clock, _summary, _applied_entry, _variant_set
+from tests.test_report_service import _fixed_clock, _summary, _applied_entry, _variant_set
 
 FIXED_NOW = datetime(2026, 6, 10, 12, 0, 0, tzinfo=timezone.utc)
 LF = chr(10)
@@ -210,6 +210,8 @@ def test_at172b_the_unpatched_report_is_exactly_the_encoder_output(tmp_path: Pat
 
     Platform-independent: it never consults ``os.linesep``. This is the clause
     that fails on a text-mode writer wherever ``os.linesep != LF``.
+
+    # AT-172b
     """
     path = _one_variant_report(tmp_path)
     raw = path.read_bytes()
@@ -250,6 +252,8 @@ def test_at174b_line_bytes_is_partition_invariant() -> None:
     Both halves of this pin are load-bearing and neither implies the other:
     ``+1 -> +2`` IS partition-invariant, so invariance alone would miss it; and a
     single-batch check cannot see the composability loss.
+
+    # AT-174b
     """
     doc = [f"line {i}" for i in range(24)]
     partitions = ([24], [12, 12], [2] * 12, [1, 5, 3, 7, 8])

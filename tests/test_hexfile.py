@@ -1,3 +1,9 @@
+"""Tests for the Intel HEX parser.
+
+Batch-91 contract adoption (HLR-122):
+# TC-618 — this module pins the Intel HEX parser: record types 00-05 with checksums and the memory map (LLR-122.1).
+"""
+
 import pytest
 
 from s19_app.hexfile import IntelHexFile

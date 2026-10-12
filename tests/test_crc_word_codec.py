@@ -4,6 +4,9 @@ Covers AT-CRC-DSN-014 and LLR-E4.1 (encode_word), LLR-E4.2 (decode_word),
 LLR-E4.3 (encode_le/decode_le kept byte-identical). The big-endian /
 wider-field codec is the engine prerequisite a job's ``store_endianness="big"``
 and padded ``store_width`` serialize through.
+
+Batch-91 contract adoption (HLR-122):
+# TC-630 — this module pins the check-word encode/decode per its store width and endianness (LLR-122.4).
 """
 
 from __future__ import annotations

@@ -1475,6 +1475,8 @@ def test_at030a_r2_save_while_open_appears_without_reactivation(
     screen (the C-12 chain relies on the after-save re-scan, LLR-030.3).
     Counterfactual: drop the ``_prefill_patch_change_files`` call in the
     ``save_doc`` arm ⇒ the option set stays empty until re-activation → RED.
+
+    # AT-030a-R2
     """
     from textual.widgets import Select
 
@@ -1929,7 +1931,10 @@ def test_at050a_pilot_mixed_results_via_real_button(tmp_path: Path) -> None:
     """AT-050a (Layer B, real button): a runnable check doc with a collision
     PAIR yields mixed rows — healthy entries checked, only the pair
     uncheckable with the entry-fault reason visible in its rows (RED-first:
-    the pre-change gate rendered all four uncheckable)."""
+    the pre-change gate rendered all four uncheckable).
+
+    # AT-050a-pilot
+    """
     from textual.widgets import Label, Static
 
     check_path = _write_v2_document(

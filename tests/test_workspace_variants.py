@@ -9,6 +9,9 @@ Covers:
 - LLR-005.3: single-S19 projects validate exactly as before (equivalence).
 - LLR-007.7 (partial): a populated ``reports/`` subdirectory is neutral.
 - ``build_variant_set``: ordering, active-id default/override, MAC exclusion.
+
+Batch-91 contract adoption (HLR-122):
+# TC-645 — this module pins the workspace variants (LLR-122.5).
 """
 
 from dataclasses import FrozenInstanceError

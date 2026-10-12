@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-09-06-batch-90",
-  "batch_objective": "batch-90 = the two falsified-green-signal defects that survive an already-shipped check. REQUIREMENT 1 (first, because batch-90's own id reservation is unsound until it lands): the AT/TC id registry is BLIND to batch-scoped ids -- 127 such ids live on 141 test nodes across five batch tags (b77, b78, b79, b83, b84) and the registry holds 0 rows for them, because tools/id_registry.py classifies a letter-initial body as ungoverned, so G1, G3 and G5 all decline to police it silently. REQUIREMENT 2: TC-497 cannot tell an assertion from its refutation -- it searches REQUIREMENTS.md in full (86129 chars from its anchor to EOF, against a true R-TUI-098 section of 13394) for seven residual figures, so a sentence declaring a figure false satisfies it identically to the figure being asserted; executed and confirmed green under that mutation at P0. DROPPED AT P0: report_service markdown escaping, SATISFIED-EXTERNALLY at fbc9f2a (2026-07-26, PR #136) -- the escaper is a leaf module imported at report_service.py:61 with 28 call sites, and the carry was written two days before the fix merged. THIS BATCH STOPS AT P1 IN THIS WAVE BY DESIGN: flow rev60 adds declared fields to the increment-packet template, and holding here makes batch-90's Inc-1 packet the first live exhibit of those fields instead of the first violation. No increment, no source edit, no 03-increments/ in this wave. Previous batch: 2026-08-28-batch-89 (its decisions_log is archived at .dev-flow/2026-08-28-batch-89/decisions-log.json).",
+  "batch_id": "2026-10-08-batch-91",
+  "batch_objective": "Contract-gap closure: the shipped foundation gets the contract it never had -- (1) the S19/HEX/A2L/MAC parsing+validation engines (REQUIREMENTS.md SS1/SS2, prose-only strata) get real US/HLR/LLR/TC ids, adopting the existing 41 unpinned test modules as the TCs' nodes; (2) the doc drift closes (README's CDFX export is gone, docs/overview+architecture describe the batch-02..04 state) -- README and docs/ catch up to the shipped 10-screen app; (3) the registry hygiene: AT-043 declared-but-unregistered resolves, and the 44 LIVE ids whose verifiers are token-invisible get renamed to carry their tokens. Agents: Kimi K2.7-code via opencode under coordinator briefs.",
   "mode": "core",
   "mode_history": [
     {
@@ -10,102 +10,82 @@
       "to": "core",
       "date": "2026-08-24",
       "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-08",
+      "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
     }
   ],
-  "current_station": "P1",
-  "phase_status": "awaiting-gate",
+  "current_station": "P0",
+  "phase_status": "not-started",
   "stations_active": [
     "P0",
     "P1",
+    "P2",
     "P3",
     "P4",
     "P5"
   ],
   "iterations_per_station": {
-    "P0": 1,
-    "P1": 1,
+    "P0": 0,
+    "P1": 0,
+    "P2": 0,
     "P3": 0,
     "P4": 0,
     "P5": 0
   },
   "triggers": {
-    "evaluated_at": "2026-09-06T00:00:00-06:00",
-    "fired": [
-      "A",
-      "B1",
-      "B4",
-      "E"
-    ],
-    "not_fired": [
-      "B2",
-      "B3",
-      "C",
-      "D",
-      "F"
-    ],
-    "record": ".dev-flow/2026-09-06-batch-90/PLAN.md#5--trigger-evaluation--2026-09-06-with-probes"
+    "evaluated_at": null,
+    "fired": [],
+    "not_fired": [],
+    "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
   },
   "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-09-06-batch-90/01-requirements.md",
-    "traceability": "repo:REQUIREMENTS.md (living canon mirror section)",
+    "requirements": "repo:.dev-flow/2026-10-08-batch-91/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-08-batch-91/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-08-batch-91/06-docs/traceability-matrix.md",
     "tests": "repo:tests/",
     "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-09-06-batch-90/03-increments/ (NOT CREATED IN THIS WAVE -- the batch is held at P1 until flow rev60)",
-    "backlog": "repo:.dev-flow/BACKLOG-CODE.md (lane A per docs/engineering-rules.md)",
-    "derived_atlas": "repo:.dev-flow/_derived/ (DERIVED -- regenerated at gates, guarded by V20)",
-    "design_pdr": "vault:s19_app/design/PDR-<seal-date>-<batch>.md -- ONE RECORD PER SEAL, NOT PER BATCH. A batch may hold several: batch-88 holds PDR-2026-08-24-batch-88 (pre-intake, reviewed the design proposal) and PDR-2026-08-25-batch-88 (station-4, reviewed the authored requirements). The seal rule forbids editing a sealed record, so a second review is a NEW id and never an amendment -- a single-record home cannot express that, and this batch is the first case it could not. (PDR-2026-08-25-batch-88#D10)",
-    "design_ddr": "vault:s19_app/design/DDR-<batch>.md",
-    "requirements_ledger": "repo:.dev-flow/2026-09-06-batch-90/01-requirements-ledger.md"
+    "increments": "repo:.dev-flow/2026-10-08-batch-91/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-08-batch-91/evidence/",
+    "backlog": "repo:.dev-flow/BACKLOG.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-08-batch-91.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-08-batch-91.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-08-batch-91/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-08-batch-91/README.md",
+    "requirements_canon": "repo:REQUIREMENTS.md"
   },
-  "artifacts": {
-    "P0": ".dev-flow/2026-09-06-batch-90/PLAN.md",
-    "P1": ".dev-flow/2026-09-06-batch-90/01-requirements.md",
-    "P1-ledger": ".dev-flow/2026-09-06-batch-90/01-requirements-ledger.md"
-  },
+  "artifacts": {},
   "decisions_log": [
     {
-      "station": "P0",
-      "date": "2026-09-06",
-      "decision": "report_service markdown escaping DROPPED from scope as SATISFIED-EXTERNALLY at fbc9f2a (2026-07-26, PR #136).",
-      "why": "RC-1 mandates the reclassification at Phase 0. The brief's OPEN verdict rested on grepping report_service.py for three helper names that were never the shipped spelling; the escaper is the leaf module markdown_safety, imported at report_service.py:61 with 28 md_safe/md_code call sites, and all three classes the item named (variant ids, filenames, declaration errors) are escaped at the composer. The carry was written at the batch-60 close, two days before the fix merged at batch-62."
+      "station": "P3",
+      "date": "2026-10-11",
+      "decision": "increment 001 -- the foundation adoption: 32 RESERVED-to-LIVE conversions, 358 derived nodes, the guard's bounds measured-bumped, AT-284's counterfactuals executed",
+      "guided": false
     },
     {
-      "station": "P0",
-      "date": "2026-09-06",
-      "decision": "Reserved GOVERNED global ids (AT-282, AT-283, TC-613..TC-616) rather than batch-scoped AT-B90-* ids.",
-      "why": "AT-TC-REGISTRY-SPEC.md 2.3 and the registry's own _meta.governed both place letter-initial bodies outside the authority. Reserving AT-B90-* would reserve nothing. Recorded because it deviates from CLAUDE.md's stated preference for batch-scoped ids; requirement 1 is the change that removes the conflict."
+      "station": "P3",
+      "date": "2026-10-11",
+      "decision": "increment 002 -- the docs catch-up: README/overview/architecture/the CRC draft read the shipped 10-screen app, the 38-key reconciliation complete",
+      "guided": false
     },
     {
-      "station": "P0",
-      "date": "2026-09-06",
-      "decision": "batch_objective_superseded DELETED rather than migrated.",
-      "why": "The rollover table names it as an invented key that no rule or command reads. Migrating it would preserve the defect under a new name."
-    },
-    {
-      "station": "P0",
-      "date": "2026-09-06",
-      "decision": "standing_authorization recorded as NOT ASKED with the flow's stated default applied (autonomous false, merge false).",
-      "why": "The field is re-asked per batch and never carried. No operator was reachable in this wave; inventing an authorization would be worse than declaring the default."
-    },
-    {
-      "station": "P1",
-      "date": "2026-09-06",
-      "decision": "The TC-497 requirement is written about what the node must DISTINGUISH, not about editing REQUIREMENTS.md.",
-      "why": "Measured at P0: all seven residual figures already sit inside the true R-TUI-098 section (13394 chars), so binding the search to that section is test-only and cannot false-fail a correct document."
-    },
-    {
-      "station": "P1",
-      "date": "2026-09-06",
-      "decision": "The batch is HELD at P1 in this wave; no increment is opened.",
-      "why": "Flow rev60 adds declared fields to the increment-packet template. Held, batch-90's Inc-1 packet is that template's first live exhibit; unheld, it is its first violation."
+      "station": "P3",
+      "date": "2026-10-11",
+      "decision": "increment 003 -- the registry hygiene: AT-043 resolved LIVE (re-spelled from the seed's AT-43), the 44 token-invisible ids adopted under the token-exact reading, AT-286's three arms",
+      "guided": false
     }
   ],
   "standing_authorization": {
-    "autonomous": false,
+    "autonomous": true,
     "merge": false,
-    "asked_on": null,
-    "operator_words": "NOT ASKED. Authorization is per-batch and never carried; batch-89's block was itself batch-88's (asked_on 2026-08-24) and is not inherited here. This wave was dispatched with a bounded charter and no operator was reachable to ask, so the flow's stated default applies: the operator approves every gate and merges the PR. Re-ask before any station past P1."
+    "asked_on": "2026-10-08",
+    "operator_words": "Operator (Javier), 2026-10-08: 'revisa la funcionalidad de la app y cierra los gaps de user stories, requerimientos y test cases que falten... usa /dev-flow' + 'despliegues agentes kimi 2.8 o 2.7 segun convenga'. Read with the established chain: Gates -- autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each close (no PR); data safeguard -- fixture boards only, never the operator's real files without a copy; implementing agents (Kimi K2.7-code via opencode, per the commission) do NOT commit/push/stash. This batch runs in the MAIN checkout."
   },
   "obsidian_synced": false,
-  "created_at": "2026-09-06T00:00:00-06:00"
+  "created_at": "2026-10-11T15:45:15.446575",
+  "owner": "C:/Users/jjgh8/Github/s19_app",
+  "base_ref": "983f8985f625be368fd6943f8cb1553537e7e3b7"
 }

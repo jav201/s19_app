@@ -68,7 +68,7 @@ from typing import Dict, Optional, Sequence, Tuple
 import pytest
 from textual.widgets import Button, Input, Label, Select
 
-from conftest import canonical_report_bytes
+from tests.conftest import canonical_report_bytes
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ReportViewerScreen
 from s19_app.tui.screens_directionb import PatchEditorPanel

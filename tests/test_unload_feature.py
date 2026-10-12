@@ -21,6 +21,9 @@ Pilots run at ``size=(120, 40)`` so all three slots render (the panel caps to
 two rows under an 80-col width).
 
 Non-frozen test file (touches no engine-frozen module).
+
+Batch-91 contract adoption (HLR-122):
+# TC-631 — this module pins the unload (U) host-surface behavior (LLR-122.5).
 """
 
 from __future__ import annotations

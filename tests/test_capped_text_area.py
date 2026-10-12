@@ -13,6 +13,9 @@ faithful ingress.
 
 Follows the repo's async-test convention: a sync test body wrapping an inner
 ``async def _run()`` driven by ``asyncio.run`` (see ``test_tui_patch_layout.py``).
+
+Batch-91 contract adoption (HLR-122):
+# TC-634 — this module pins the capped text area (LLR-122.5).
 """
 
 from __future__ import annotations

@@ -47,7 +47,7 @@ from s19_app.tui.changes.model import ChangeSummary, ChangeSummaryEntry
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_s19
 
-from conftest import canonical_report_bytes
+from tests.conftest import canonical_report_bytes
 
 #: Black-box pin of the LLR-038.2 filename scheme (module-independent so the
 #: AT never imports the composer; ownership is asserted in TC-038.3).

@@ -88,15 +88,41 @@ A left activity rail switches between ten single-context screens, bound to keys
 | `3` | MAC View — record table + hex pane |
 | `4` | Memory Map — coverage + entropy bands |
 | `5` | Issues Report — validation findings |
-| `6` | Patch Editor — parameter + memory change-set, CDFX export |
+| `6` | Patch Editor — change-set authoring, checks, patched-image emit |
 | `7` | A2B Diff — compare two images, emit a diff report |
-| `8` | Flow Builder |
-| `9` | Checks |
-| `0` | CRC Designer |
+| `8` | Flow Builder — ordered operation chains over project images |
+| `9` | Checks — every check result, grouped by outcome |
+| `0` | CRC Designer — parametric CRC authoring + known-answer proof |
 
-Other bindings: `Ctrl+K` palette · `Ctrl+D` density · `Ctrl+L` load ·
-`Ctrl+S` save project · `/` find · `g` go-to address · `p` load project ·
-`x` operations · `k` legend · `?` help · `q` quit.
+Every other bound key (the full set lives in `S19TuiApp.BINDINGS`,
+`s19_app/tui/app.py`):
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+K` | command palette |
+| `Ctrl+D` | cycle layout density |
+| `Ctrl+L` / `l` | load a file |
+| `Ctrl+S` / `s` | save project |
+| `p` | load project |
+| `U` | unload everything (images, A2L, MAC) |
+| `r` | refresh the workarea file list |
+| `o` | open the workarea folder |
+| `v` | select the active variant |
+| `x` | Operations modal |
+| `j` | dump the enriched A2L as JSON |
+| `t` | report viewer |
+| `b` | before/after report for the applied change-set |
+| `/` | find in memory |
+| `g` | go-to address |
+| `k` | legend (scoped to the active screen) |
+| `?` | help — lists every active binding, including the hidden ones |
+| `+` / `-` | page the focused table/viewer forward / back (also `PgDn` / `PgUp`) |
+| `,` / `.` | page the hex pane back / forward |
+| `Ctrl+Z` / `Ctrl+Y` | undo / redo the Patch Editor change-set |
+| `q` | quit |
+
+Most of these are `show=False` bindings — the footer stays uncrowded, and
+`?` is the in-app way to discover all of them.
 
 ### Workspace
 
@@ -135,6 +161,60 @@ Everything the validation engine found, grouped by severity. For this fixture:
 
 ![Issues Report screen](docs/images/issues-report.png)
 
+### Patch Editor
+
+Authors a **change-set**: address-keyed entries of new bytes, validated
+against the loaded image's ranges, checkable, undoable (`Ctrl+Z`/`Ctrl+Y`).
+The change-set saves and loads as a versioned JSON document
+(`"format": "s19app-changeset"`, `"version": "2.0"` — the v2 change-set
+engine in `s19_app/tui/changes/`); the retired v1 envelope is recognised
+only to be rejected with a `CHG-V1-FORMAT` finding. **Apply** writes the
+entries into a working copy of the image, and **Save patched** emits the
+result as a real `.s19` / `.hex` file into the workarea — the change-set
+JSON plus the patched image emit are the shipped hand-off.
+
+### A↔B Diff
+
+Loads a second image and diffs the two memory maps into classified runs
+(`changed` / `only_a` / `only_b`), then emits a diff report as Markdown or
+self-contained HTML.
+
+### Flow Builder
+
+Composes an ordered chain of typed blocks (`SOURCE` → `PATCH` → `WRITE-OUT`,
+plus CRC) and runs it over a project image — or over every variant of a
+project, producing one fused report rather than one file per variant. Flows
+persist to `flow.json`.
+
+### Checks
+
+A read-only rail mirror of the Patch Editor's check results: every entry of
+the last check run, grouped by outcome (fail → uncheckable → pass) with
+per-group counts.
+
+### CRC Designer
+
+Tailors a CRC from the parametric (Rocksoft) building blocks — width 8–64,
+polynomial, init, reflection, final XOR — seeded from a catalogue of named
+presets. A live known-answer verdict (`MATCH` / `MISMATCH` / `NO-EXPECTED`)
+recomputes on every keystroke, and the algorithm saves/loads as a
+`*.crc.json` template.
+
+### Operations modal
+
+`x` lists the registered operations (the deterministic registry in
+`s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`)
+and executes the selected one against the loaded image, in-app.
+
+### Projects and variants
+
+A saved project is a directory under the workarea holding a `project.json`
+manifest. The manifest can declare **variants** — named image/A2L/MAC
+assignments — with one active variant (`v` switches it). Flows and
+change-set runs can execute variant-scoped: each variant's image is parsed
+in isolation, one failing variant never aborts the rest, and the run leaves
+a single fused report.
+
 ### Workarea
 
 The TUI keeps its own on-disk area next to where you launched it:
@@ -142,18 +222,19 @@ The TUI keeps its own on-disk area next to where you launched it:
 | Path | Holds |
 |------|-------|
 | `.s19tool/workarea/temp/` | transient loads |
-| `.s19tool/workarea/<project>/` | saved projects (one image + one MAC + one A2L) |
+| `.s19tool/workarea/<project>/` | saved projects — a `project.json` manifest plus the image / MAC / A2L artefacts it references, optionally per-variant |
 | `.s19tool/logs/s19tui.log` | TUI log, 5 MB rotating |
 
 ---
 
-## The CLI — deprecated
+## The CLI — legacy, module-only
 
-> **This is not the interface to build on. `s19tui` is.**
-> The CLI is **slated for removal** and is already half-gone: its console script was
-> deleted from `pyproject.toml`, so there is no `s19tool` command. What remains runs only
-> as a module. It is documented here so that anyone who finds a reference to it knows
-> what it is and what replaced it — not as a supported surface.
+> **This is not the interface to build on. `s19tui` — the TUI — is the product
+> surface.** The CLI is the library's legacy command line and is **slated for
+> removal**: its console script was deleted from `pyproject.toml`, so there is no
+> `s19tool` command — what remains runs only as a module. It is documented here so
+> that anyone who finds a reference to it knows what it is and what replaced it —
+> not as a supported surface.
 
 ```bash
 python -m s19_app.cli <subcommand> <file>
@@ -219,7 +300,12 @@ All open, publicly specified formats. None of them is vendor-private.
 | Intel HEX | Intel | `.hex` `.ihex` | `s19_app/hexfile.py` |
 | A2L | **ASAM MCD-2 MC**, also called ASAP2 | `.a2l`, plus its `.aml` companion | `s19_app/tui/a2l.py` |
 | MAC symbol map | no branded standard — see below | `.mac` and equivalents | `s19_app/tui/mac.py` |
-| CDF 2.0 | **ASAM MCD-2 CAL** | `.cdfx` | `s19_app/tui/cdfx/` |
+| Change-set JSON (v2) | this project | `"format": "s19app-changeset"`, `"version": "2.0"` | `s19_app/tui/changes/io.py` |
+
+The earlier CDF 2.0 (ASAM MCD-2 CAL, `.cdfx`) import/export was **removed** —
+the `s19_app/tui/cdfx/` package no longer exists. The shipped replacement for
+the calibration-change hand-off is the v2 change-set JSON above plus the
+patched S19/HEX image emit from the Patch Editor.
 
 **On the S-record family.** `S19`, `S28` and `S37` are the same format at three
 address widths — 16-bit (up to 64 KB), 24-bit (16 MB) and 32-bit (4 GB). The many
@@ -242,8 +328,8 @@ conversion factors, axis definitions and folder structure, and are proprietary.
 `TAG=hexaddr` text form and nothing more.
 
 **A2L belongs to ASAM, not to any tool vendor.** ASAM MCD-2 MC has been public
-since 1999 (current revision 1.7.1, 2018). Vendor tools such as Vector CANape and
-vCDM *consume* A2L and CDFX; they do not own them, and this project is written
+since 1999 (current revision 1.7.1, 2018). Vendor tools such as Vector CANape
+and vCDM *consume* A2L; they do not own it, and this project is written
 against the published standards rather than against any vendor's implementation.
 
 ### Provenance
@@ -298,7 +384,8 @@ pytest -q -m "not slow"      # skip the perf smoke tests
 pytest -q -m "not snapshot"  # skip the layout-drift SVG baselines
 ```
 
-`pytest --collect-only -q` reports **2227 collected tests**. CI
+`pytest --collect-only -q` reports **2760 collected tests** (measured
+2026-10-11). CI
 (`.github/workflows/tui-ci.yml`) runs the lean suite on pull requests and the
 full suite on pushes to `main` / `main-tui`, on Python 3.11.
 
@@ -332,7 +419,7 @@ TUI defects and are not being fixed — the surface is going away:
 | Document | Covers |
 |----------|--------|
 | [docs/overview.md](docs/overview.md) | what it is, who it is for, current capabilities |
-| [docs/architecture.md](docs/architecture.md) | the three layers, TUI shell, `cdfx/` package, safety contracts |
+| [docs/architecture.md](docs/architecture.md) | the three layers, TUI shell, `changes/` + `operations/` packages, safety contracts |
 | [docs/diagrams/architecture.md](docs/diagrams/architecture.md) | living Mermaid architecture diagrams |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | `R-*` requirement traceability |
 | [CLAUDE.md](CLAUDE.md) | conventions, commands, layer rules |

@@ -17,6 +17,9 @@ disk, taken from the record in the vault's `visual-evidence.md`:
   inflated a gallery count and moved its "newest asset" date by 18 days.
 * the nested-layout fixture — `svgs/<case>/`, pruned at batch-47 and re-created
   by a recursive copy three times since.
+
+Batch-91 contract adoption (HLR-122):
+# TC-647 — this module pins the sync-evidence tooling (LLR-122.5).
 """
 
 from __future__ import annotations

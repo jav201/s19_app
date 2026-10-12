@@ -1,4 +1,8 @@
-"""Tests for enriched A2L parsing (headers, Vector IF_DATA, segments)."""
+"""Tests for enriched A2L parsing (headers, Vector IF_DATA, segments).
+
+Batch-91 contract adoption (HLR-122):
+# TC-622 — this module pins the A2L engine's enrichment of raw and physical values via datatype/COMPU_METHOD (LLR-122.2).
+"""
 
 from pathlib import Path
 

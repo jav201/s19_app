@@ -16,6 +16,9 @@ The GIF is intentionally a *narrative* render — not a raster of the SVG —
 because converting Textual SVG → PNG would require ``cairosvg`` (declined by
 the user). The narrative frames travel well in chat and are sufficient to
 prove the pipeline ran end-to-end against each case.
+
+Batch-91 contract adoption (HLR-122):
+# TC-646 — this module pins the evidence packs and the pilot GIFs example (LLR-122.5).
 """
 
 from __future__ import annotations

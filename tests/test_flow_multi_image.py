@@ -334,7 +334,10 @@ def test_at210_unscoped_run_is_unchanged_by_the_variant_dimension(
 
 
 def test_tc501b_model_containers_are_well_formed() -> None:
-    """The fused containers exist with the fields every consumer reads."""
+    """The fused containers exist with the fields every consumer reads.
+
+    # TC-501b
+    """
     fused = FusedFlowRunResult(status=FLOW_STATUS_OK)
     assert fused.variant_outcomes == [] and fused.n_ok == 0
     outcome = VariantRunOutcome("a", FlowRunResult(status=FLOW_STATUS_OK))

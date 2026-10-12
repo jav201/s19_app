@@ -1,3 +1,9 @@
+"""Tests for the A2L structure validator.
+
+Batch-91 contract adoption (HLR-122):
+# TC-626 — this module pins the A2L engine's internal structure validation (LLR-122.2).
+"""
+
 from s19_app.validation import validate_a2l_structure
 
 

@@ -1,0 +1,38 @@
+[
+  {
+    "station": "P0",
+    "date": "2026-09-06",
+    "decision": "report_service markdown escaping DROPPED from scope as SATISFIED-EXTERNALLY at fbc9f2a (2026-07-26, PR #136).",
+    "why": "RC-1 mandates the reclassification at Phase 0. The brief's OPEN verdict rested on grepping report_service.py for three helper names that were never the shipped spelling; the escaper is the leaf module markdown_safety, imported at report_service.py:61 with 28 md_safe/md_code call sites, and all three classes the item named (variant ids, filenames, declaration errors) are escaped at the composer. The carry was written at the batch-60 close, two days before the fix merged at batch-62."
+  },
+  {
+    "station": "P0",
+    "date": "2026-09-06",
+    "decision": "Reserved GOVERNED global ids (AT-282, AT-283, TC-613..TC-616) rather than batch-scoped AT-B90-* ids.",
+    "why": "AT-TC-REGISTRY-SPEC.md 2.3 and the registry's own _meta.governed both place letter-initial bodies outside the authority. Reserving AT-B90-* would reserve nothing. Recorded because it deviates from CLAUDE.md's stated preference for batch-scoped ids; requirement 1 is the change that removes the conflict."
+  },
+  {
+    "station": "P0",
+    "date": "2026-09-06",
+    "decision": "batch_objective_superseded DELETED rather than migrated.",
+    "why": "The rollover table names it as an invented key that no rule or command reads. Migrating it would preserve the defect under a new name."
+  },
+  {
+    "station": "P0",
+    "date": "2026-09-06",
+    "decision": "standing_authorization recorded as NOT ASKED with the flow's stated default applied (autonomous false, merge false).",
+    "why": "The field is re-asked per batch and never carried. No operator was reachable in this wave; inventing an authorization would be worse than declaring the default."
+  },
+  {
+    "station": "P1",
+    "date": "2026-09-06",
+    "decision": "The TC-497 requirement is written about what the node must DISTINGUISH, not about editing REQUIREMENTS.md.",
+    "why": "Measured at P0: all seven residual figures already sit inside the true R-TUI-098 section (13394 chars), so binding the search to that section is test-only and cannot false-fail a correct document."
+  },
+  {
+    "station": "P1",
+    "date": "2026-09-06",
+    "decision": "The batch is HELD at P1 in this wave; no increment is opened.",
+    "why": "Flow rev60 adds declared fields to the increment-packet template. Held, batch-90's Inc-1 packet is that template's first live exhibit; unheld, it is its first violation."
+  }
+]

@@ -22,6 +22,9 @@ C-17 family (markup-injection hardening); mirrors the batch-33 ``#log_line_*``
 scrub precedent. textual==8.2.8 pinned — reading ``Label``'s stored visual is a
 version-locked white-box read of the shipped render, same footing as Inc-1's
 private-symbol dependency.
+
+Batch-91 contract adoption (HLR-122):
+# TC-636 — this module pins filename markup safety (LLR-122.5).
 """
 
 from __future__ import annotations

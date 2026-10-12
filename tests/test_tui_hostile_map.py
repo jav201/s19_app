@@ -66,6 +66,9 @@ Dependencies:
         - ``tests.test_tui_directionb._two_band_loaded``
     Used by:
         - the batch-77 Inc-2 acceptance gate (AT-B77-15a, AT-B77-15b)
+
+Batch-91 contract adoption (HLR-122):
+# TC-637 — this module pins the hostile map arms (LLR-122.5).
 """
 
 from __future__ import annotations

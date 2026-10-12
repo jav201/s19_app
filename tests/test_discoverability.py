@@ -11,6 +11,9 @@ it clips off-screen at 80 cols — the deliberate C-13 decision, see
 `test_tui_legend.py::test_at023e_c13_geometry_at_80_cols` — and is redundant, as
 the A2L legend is already reachable via the footer-visible `k` key, which the help
 panel now surfaces at all widths.)
+
+Batch-91 contract adoption (HLR-122):
+# TC-635 — this module pins the host-surface discoverability arms (LLR-122.5).
 """
 
 import asyncio

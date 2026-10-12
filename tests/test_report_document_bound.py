@@ -61,7 +61,7 @@ from s19_app.tui.services.report_service import (
 )
 from s19_app.tui.services.variant_execution_service import VariantExecutionResult
 
-from conftest import canonical_report_bytes
+from tests.conftest import canonical_report_bytes
 
 _INSTANT = datetime(2026, 7, 31, 12, 0, 0, tzinfo=timezone.utc)
 

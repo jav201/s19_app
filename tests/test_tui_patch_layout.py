@@ -29,6 +29,8 @@ Supersedes the batch-22 2x2 four-pane geometry tests. Verdicts HLR-063/064
 - **TC-46.2** (FOLD-4): the paste editor's first line is in-viewport at its
   window-body scroll 0.
 
+# AT-80
+
 RED counterfactual (recorded, run against the pre-restructure 2x2 tree): the
 three ``#patch_win_*`` ids are ABSENT (AT-063a/b/c cardinality-0 fail), and the
 change-file / entry / variant buttons sit below the starved ``1fr`` grid-cell
@@ -584,6 +586,8 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
     ``display: none`` Label still satisfies ``"patch-window-title" in
     c.classes``, which would have converted this line into a false-confidence
     test that stays green while the window shows nothing.
+
+    # TC-046.1
     """
 
     async def _run() -> dict[str, object]:

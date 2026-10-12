@@ -61,12 +61,12 @@ from s19_app.tui.services.report_service import (
 )
 from s19_app.tui.services.variant_execution_service import read_project_manifest
 
-from conftest import canonical_report_bytes
+from tests.conftest import canonical_report_bytes
 
 # batch-64 Inc-1: AT-200 reuses the addendum-scoped notice oracle rather than
 # re-implementing it. A second copy of the scope predicate is a second place
 # for the "no notice" / "no scope" confusion to reappear (spec §3 US-B64-2).
-from test_report_addendum_bound import _addendum_notices, _cap
+from tests.test_report_addendum_bound import _addendum_notices, _cap
 
 # Two minimal valid S19 images (checksums verified against
 # s19_app.core.S19File) — a 2-variant project per the spec, so the seam is

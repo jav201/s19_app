@@ -14,6 +14,9 @@ Covers two small patch-editor fixes shipped in batch-40 Increment 1:
 
 Helpers are reused from ``test_tui_patch_editor_v2`` so the surface idioms
 (paste-authored seed, entries-table read, Add button) stay identical.
+
+Batch-91 contract adoption (HLR-122):
+# TC-632 — this module pins the undo/redo UX (LLR-122.5).
 """
 
 from __future__ import annotations

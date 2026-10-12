@@ -35,6 +35,9 @@ Dependencies:
         - ``s19_app.tui.screens_directionb.MemoryMapPanel`` / ``RegionRow``
     Used by:
         - the batch-67 acceptance gate (AC-3, AC-4, AC-5)
+
+Batch-91 contract adoption (HLR-122):
+# TC-639 — this module pins the map click chain (LLR-122.5).
 """
 
 from __future__ import annotations

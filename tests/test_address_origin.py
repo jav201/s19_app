@@ -17,6 +17,9 @@ Two populations of test, deliberately separated because they age differently:
 The resolver's answer today is a NEGATIVE one — no candidate is assembled — and a negative
 result is only worth having if the search that produced it was too WIDE. Make the walk
 scope-precise and every such claim silently weakens while every other test stays green.
+
+Batch-91 contract adoption (HLR-122):
+# TC-621 — this module pins the contiguous-range/gap computation over parsed addresses (LLR-122.1).
 """
 
 from __future__ import annotations

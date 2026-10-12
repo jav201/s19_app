@@ -3120,6 +3120,8 @@ def test_tc041_1_cell_status_derivation() -> None:
     only valid range(s) is ``valid``; overlapping no range is ``gap``. This
     is the pure grid-model contract the colour routing binds to — if the
     overlap logic changes, the whole minimap mis-colours.
+
+    # TC-041.1
     """
     from s19_app.tui.screens_directionb import cell_status
 
@@ -3144,6 +3146,8 @@ def test_tc041_2_auto_scale_cell_count_and_zero_span() -> None:
     (version-stable, snapshot-safe — NOT live ``panel.size``) and never
     exceeds the grid capacity nor the byte count. A zero/empty span takes the
     empty path and computes no ratio (no divide-by-zero).
+
+    # TC-041.2
     """
     from s19_app.tui.screens_directionb import (
         bytes_per_cell,
@@ -3176,6 +3180,8 @@ def test_tc041_3_invalid_cell_carries_sev_error_class() -> None:
     Intent: colours are NOT hard-coded — an invalid cell's class must equal
     ``css_class_for_severity(ValidationSeverity.ERROR)``, so the frozen
     severity map stays the single source of truth.
+
+    # TC-041.3
     """
     from s19_app.tui.color_policy import css_class_for_severity
     from s19_app.tui.screens_directionb import status_to_css_class
@@ -3211,6 +3217,8 @@ def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
     still asserted below; only the ANSI clause is amended, from *preserved
     verbatim* to *removed*, and the amendment is asserted positively rather
     than dropped.
+
+    # TC-041.11
     """
     from rich.console import Console
 
@@ -3613,6 +3621,8 @@ def test_tc041_4c_gap_cell_detail_no_region(tmp_path: Path) -> None:
     exercises. Reworked (not retired) because the entropy band view removes the
     gap-cell surface but the assembler branch stays reachable via Inc-3
     region-row selection.
+
+    # TC-41c
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel
 
@@ -3636,6 +3646,8 @@ def test_tc041_4d_hostile_issue_symbol_rendered_literally(tmp_path: Path) -> Non
     literal — never parsed as Rich markup (no injection, no ``MarkupError``).
     Reworked (not retired) so the issue-``symbol`` markup-safety sink stays
     guarded; complements ``test_at_r3_detail_hostile...`` (the A2L-name sink).
+
+    # TC-41d
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel
     from s19_app.validation.model import ValidationIssue, ValidationSeverity
@@ -4880,6 +4892,8 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
     relationship now: the glance sits below the bar, on the same left edge. The
     ``width-narrow`` regime flag is still asserted per size — it still toggles,
     it just no longer changes this row's layout axis.
+
+    # AT-073b
     """
     loaded = _two_band_loaded(tmp_path)
 
@@ -8160,6 +8174,8 @@ def test_at040_workspace_geometry_no_clip_80_and_120(tmp_path: Path) -> None:
     discriminator: a clipped/zero-area pane (including the Context scroll a
     stat-band regression would silently shrink, or the hex the strip could crowd)
     fails.
+
+    # AT-40
     """
 
     async def _drive(size: tuple[int, int]) -> dict[str, tuple[int, int]]:

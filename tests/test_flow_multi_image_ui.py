@@ -7,6 +7,9 @@ Traceability (01-requirements.md §5.2):
 The D-4 arm is an artifact-on-disk acceptance: it counts the files in
 ``reports/`` after a fused run, because "one document" is a claim about the
 filesystem and only the filesystem can settle it.
+
+Batch-91 contract adoption (HLR-122):
+# TC-642 — this module pins the flow execution and multi-image UI arms (LLR-122.5).
 """
 
 from __future__ import annotations

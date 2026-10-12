@@ -495,6 +495,8 @@ def test_tc079_3b_inert_predicate_colour_axis_discriminates() -> None:
     exists to catch: a highlighter that STYLES ``[red]`` without CONSUMING it (a
     regex tokenizer extension that colours bracket runs). Such a renderer paints
     the payload verbatim — passing the verbatim axis — and is caught only here.
+
+    # TC-79b
     """
     control = [('{"control": 1}', Style(color=LBLUE))]
     payload = "[red]PWNED[/red]"
@@ -1008,6 +1010,8 @@ def test_tc079_5c_hue_census_is_complete() -> None:
     ``app.py::_SEVERITY_TO_RICH_STYLE`` and the ``_MAC_GLYPH_*`` pairs, and a new
     named chromatic style would NOT be caught here. Widening the sweep to resolve
     named colours is the honest next step; it is out of Inc-5b's scope.
+
+    # TC-79c
     """
     source_root = pathlib.Path(__file__).resolve().parents[1] / "s19_app"
     assert source_root.is_dir(), f"cannot locate the package at {source_root}"
@@ -1071,6 +1075,8 @@ def test_tc079_5d_flank_rule_has_teeth() -> None:
     that assertion vacuous — the same class of defect as the census omission it
     was written to fix, one level up. Pinned against the two hues the reasoning
     actually rejected, plus MAGENTA's own arc.
+
+    # TC-79d
     """
     # Orange: the worked example in the ruling. 37.7deg, between RED and YELLOW.
     assert _is_verdict_flanked(_hue_degrees("#d78700"))

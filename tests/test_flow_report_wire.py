@@ -121,6 +121,8 @@ def test_at002b_report_renders_inert_through_the_shipped_viewer_parser(
     `list_project_reports` alone only proves the file is visible, not safe.
 
     Hostile text arrives the way it really would: through a block ref.
+
+    # AT-002b
     """
     hostile = "www.evil.com ~~VOID~~ http://evil.example <b>x</b>"
     run_flow(

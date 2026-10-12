@@ -1107,7 +1107,7 @@ def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
 # in both display forms, on BOTH context surfaces (LLR-120.1 .. 120.5)
 # ---------------------------------------------------------------------------
 
-from test_tui_variants import S19_A, S19_B, _flush, _make_project  # noqa: E402
+from tests.test_tui_variants import S19_A, S19_B, _flush, _make_project  # noqa: E402
 
 
 def _b79_status_context(app) -> str:

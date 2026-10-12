@@ -83,7 +83,7 @@ async def _flush(pilot, count: int = 12) -> None:
 # `test_tui_variants` carried BYTE-IDENTICAL copies of this helper, so the
 # observable had two homes and a re-point could have landed in one of them. One
 # definition cannot drift from itself.
-from test_tui_variants import _project_label  # noqa: E402
+from tests.test_tui_variants import _project_label  # noqa: E402
 
 
 def _statuses(app: S19TuiApp) -> list[str]:

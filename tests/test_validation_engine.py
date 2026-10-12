@@ -170,6 +170,8 @@ class TestCrossFileCompatibilityCoEmission:
     the corruption is collected by the parser layer but never piped into the
     engine — the test is marked ``xfail`` and a Finding is logged in the
     increment 5 review packet.
+
+    # TC-062
     """
 
     @staticmethod

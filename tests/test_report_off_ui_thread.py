@@ -32,6 +32,9 @@ Dependencies:
         - ``s19_app.tui.app.S19TuiApp``
     Used by:
         - the batch-68 acceptance gate (AC-1, AC-2, AC-3, AC-4)
+
+Batch-91 contract adoption (HLR-122):
+# TC-644 — this module pins the report logging/progress/off-thread behaviors (LLR-122.5).
 """
 
 from __future__ import annotations

@@ -32,6 +32,9 @@ Harness: the ``asyncio.run`` + ``App.run_test()`` Pilot pattern of
 ``SaveProjectPayload`` and the real ``j`` binding for the A2L dump. Fixture
 data is synthetic / public-only and lives under ``tmp_path`` (F-S-07): the
 test never writes into the repo.
+
+Batch-91 contract adoption (HLR-122):
+# TC-646 — this module pins the evidence packs and the pilot GIFs example (LLR-122.5).
 """
 
 from __future__ import annotations

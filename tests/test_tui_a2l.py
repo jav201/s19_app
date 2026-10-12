@@ -1,3 +1,9 @@
+"""Tests for the TUI A2L viewer surface over the engine.
+
+Batch-91 contract adoption (HLR-122):
+# TC-625 — this module pins the A2L engine's tag extraction behind the TUI viewer (LLR-122.2).
+"""
+
 from pathlib import Path
 
 import pytest

@@ -1,3 +1,9 @@
+"""Tests for the S-record parser's validation arms.
+
+Batch-91 contract adoption (HLR-122):
+# TC-617 — this module pins the S-record parser's per-record checksum validation with overlap and out-of-order detection (LLR-122.1).
+"""
+
 from pathlib import Path
 
 import pytest

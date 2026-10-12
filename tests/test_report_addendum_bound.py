@@ -81,7 +81,7 @@ from s19_app.tui.services.report_service import (
 from s19_app.tui.services.variant_execution_service import VariantExecutionResult
 from s19_app.validation.model import ValidationIssue, ValidationSeverity
 
-from conftest import canonical_report_bytes
+from tests.conftest import canonical_report_bytes
 
 # ---------------------------------------------------------------------------
 # LLR-103.6 constants — read off the MODULE OBJECT at call time

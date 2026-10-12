@@ -9,6 +9,9 @@ so the empty entropy list made ``MemoryMapPanel.render_ranges`` fall into its
   AC-3  an image with ranges but no entropy shows a DISTINCT note, never
         "No file loaded".
 Non-frozen test file (touches no engine-frozen module).
+
+Batch-91 contract adoption (HLR-122):
+# TC-640 — this module pins the memory-map entropy merge (LLR-122.5).
 """
 
 from __future__ import annotations

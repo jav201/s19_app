@@ -1,3 +1,9 @@
+"""Tests for the command-line entry.
+
+Batch-91 contract adoption (HLR-122):
+# TC-648 — this module pins the command-line entry behavior (LLR-122.5).
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

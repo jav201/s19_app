@@ -3,6 +3,9 @@
 Projects are built under a real ``.s19tool/workarea/`` root because the
 WRITE-OUT block stages through the work area (``save_patched_image``
 containment) — the same setup ``test_variant_execution`` uses.
+
+Batch-91 contract adoption (HLR-122):
+# TC-642 — this module pins the flow execution and multi-image UI arms (LLR-122.5).
 """
 
 from __future__ import annotations

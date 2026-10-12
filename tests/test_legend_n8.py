@@ -10,6 +10,9 @@ Batch 2026-07-23-batch-n8. Two layers:
   active screen; each asserts the per-view example card renders above the
   view's colour/band key. ``AT-N8-06/07`` (Static-wrap, painted orange) land in
   Inc-3.
+
+Batch-91 contract adoption (HLR-122):
+# TC-643 — this module pins the N8 legend and logwidth scope (LLR-122.5).
 """
 
 from __future__ import annotations

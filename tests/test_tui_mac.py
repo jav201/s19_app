@@ -1,3 +1,9 @@
+"""Tests for the TUI MAC view over the MAC parser.
+
+Batch-91 contract adoption (HLR-122):
+# TC-627 — this module pins the MAC parser's TAG=hexaddr reading behind the MAC View (LLR-122.3).
+"""
+
 from pathlib import Path
 
 import pytest

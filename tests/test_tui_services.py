@@ -1,3 +1,9 @@
+"""Tests for the TUI services seam.
+
+Batch-91 contract adoption (HLR-122):
+# TC-638 — this module pins the tui helpers/services seams (LLR-122.5).
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

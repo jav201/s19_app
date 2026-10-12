@@ -166,6 +166,7 @@ def test_tc504_issues_wins_only_when_no_variant_errored() -> None:
     assert "- **Outcome counts:** 1 ok / 1 issues / 0 error" in doc
 
 
+# TC-504b
 def test_tc504b_all_clean_rolls_up_clean() -> None:
     fused = _fused(_outcome("a", FLOW_STATUS_OK), _outcome("b", FLOW_STATUS_OK))
 
@@ -259,7 +260,10 @@ def test_tc505_ledger_rows_are_capped_and_the_drop_count_is_named() -> None:
 
 
 def test_tc505b_a_variant_under_the_cap_carries_no_cut_notice() -> None:
-    """The negative control — the notice must not fire when nothing was cut."""
+    """The negative control — the notice must not fire when nothing was cut.
+
+    # TC-505b
+    """
     findings = [Finding("warn", f"f{i}") for i in range(3)]
     fused = _fused(
         _outcome("a", FLOW_STATUS_ISSUES, [_block(0, BLOCK_STATUS_NOTICES, findings)])
@@ -272,7 +276,10 @@ def test_tc505b_a_variant_under_the_cap_carries_no_cut_notice() -> None:
 
 
 def test_tc505c_diagnostics_share_the_variant_budget_with_findings() -> None:
-    """A block's diagnostics are evidence too and are charged to the same cap."""
+    """A block's diagnostics are evidence too and are charged to the same cap.
+
+    # TC-505c
+    """
     block = _block(0, BLOCK_STATUS_ERROR)
     block.diagnostics = [f"diag {i}" for i in range(MAX_FUSED_FINDINGS_PER_VARIANT + 4)]
     fused = _fused(_outcome("a", FLOW_STATUS_ERROR, [block]))
@@ -307,6 +314,7 @@ def test_at210_single_image_composer_is_untouched_by_the_fused_path() -> None:
 # D-8 — the fused report is written through the shipped naming seam
 # ---------------------------------------------------------------------------
 
+# TC-503b
 def test_tc503b_fused_report_is_written_under_the_shipped_report_name(
     tmp_path: Path,
 ) -> None:

@@ -13,6 +13,9 @@ Two guardrails are pinned alongside the win:
   and make the byte-range check falsely pass — a false-green). VALUE only.
 - The fallback is additive: a size-encoded deposit name or an absent layout is
   unchanged.
+
+Batch-91 contract adoption (HLR-122):
+# TC-624 — this module pins the A2L engine's record-layout length handling (LLR-122.2).
 """
 
 from pathlib import Path

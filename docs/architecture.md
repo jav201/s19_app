@@ -1,9 +1,9 @@
 # s19_app — Architecture
 
 **Audience:** a technical contributor about to read or change code.
-**Purpose:** describe the three-layer architecture, the Direction B TUI shell, the `cdfx/` data-processing package, the Patch Editor flow, the path-safety and XML/JSON safety contracts, the engine invariant, the testing architecture, and the dev-flow process that built it.
+**Purpose:** describe the three-layer architecture, the Direction B TUI shell, the `changes/` and `operations/` data-processing packages, the Patch Editor flow, the path-safety and JSON safety contracts, the engine layer, the testing architecture, and the dev-flow process that built it.
 
-For the visual call-graph (system, TUI shell, two-regime layout, CDFX package, memory layer), see [diagrams/architecture.md](./diagrams/architecture.md) — it is the canonical living diagram and is updated whenever a structural change lands. For point-in-time per-batch detail (decisions, test verdicts, post-mortems), follow the per-batch cross-references in [overview.md](./overview.md) §7.
+For the visual call-graph (system, TUI shell, two-regime layout, memory layer), see [diagrams/architecture.md](./diagrams/architecture.md) — it is the canonical living diagram and is updated whenever a structural change lands. For point-in-time per-batch detail (decisions, test verdicts, post-mortems), follow the per-batch cross-references in [overview.md](./overview.md) §7.
 
 ---
 
@@ -15,9 +15,9 @@ For the visual call-graph (system, TUI shell, two-regime layout, CDFX package, m
 |---|---|---|
 | **1 — Parsers** | `s19_app/core.py`, `s19_app/hexfile.py`, `s19_app/tui/a2l.py` (+ `a2l_*` facades), `s19_app/tui/mac.py` | parse one artefact each into a sparse memory map / structured records; **collect** validation failures per record and per file rather than aborting |
 | **2 — Range / validation engine** | `s19_app/range_index.py`, `s19_app/validation/engine.py`, `s19_app/validation/rules.py`, `s19_app/validation/model.py`, `s19_app/tui/color_policy.py` | binary-search range membership; cross-artefact rule evaluation; `ValidationIssue` / `ValidationSeverity` / `CoverageMetrics` model; severity → CSS class single source of truth |
-| **3 — TUI services + view** | `s19_app/tui/services/*` (orchestration seam), `s19_app/tui/cdfx/*` (data-processing package), `s19_app/tui/screens_directionb.py`, `s19_app/tui/app.py` (orchestration only) | service-mediated calls into the engine; pure-Python data-processing of change-sets and CDFX; Textual view layer |
+| **3 — TUI services + view** | `s19_app/tui/services/*` (orchestration seam), `s19_app/tui/changes/*` + `s19_app/tui/operations/*` (data-processing packages), `s19_app/tui/screens_directionb.py`, `s19_app/tui/app.py` (orchestration only) | service-mediated calls into the engine; pure-Python data-processing of change-sets, checks, CRC algorithms and flows; Textual view layer |
 
-**The rule.** Behaviour that crosses a layer boundary is modified in the same commit. Engine modules (layers 1 and 2) stay **read-only consumers** for view-layer / change-set work — the four feature batches that built the TUI shell and the Patch Editor all left the engine byte-for-byte unchanged (see §6).
+**The rule.** Behaviour that crosses a layer boundary is modified in the same commit. Engine modules (layers 1 and 2) stay **read-only consumers** for view-layer / change-set work — the feature batches that built the TUI shell and the Patch Editor treated them as frozen (see §7).
 
 The CLI (`s19_app/cli.py`) is a separate, simpler consumer: it reaches the parsers directly and does not use the TUI services.
 
@@ -25,21 +25,25 @@ The CLI (`s19_app/cli.py`) is a separate, simpler consumer: it reaches the parse
 
 The TUI uses the **Direction B (Rail + Command)** layout introduced by batch `2026-05-20-batch-02`. Two persistent navigation surfaces are mounted on every screen:
 
-- **Activity rail (left).** Exactly eight ordered items bound to keys `1`–`8`, with exactly one active marker, glyph + per-item ASCII fallback. Rail items toggle eight sibling screen containers via the `.hidden` CSS class (not a `push_screen` stack), so the rail and command bar stay persistently mounted.
-- **Command bar (top).** Searchable command palette (`Ctrl+K`), find input (`/` → routes to `find_string_in_mem`), go-to-address input (`g` → routes to `_handle_goto`), plus the project-name / A2L-filename status labels (the `R-TUI-016` content promoted into the persistent bar when the Issues table moved to its own screen).
+- **Activity rail (left).** Exactly ten ordered items bound to keys `1`–`0`, with exactly one active marker, glyph + per-item ASCII fallback. Rail items toggle ten sibling screen containers via the `.hidden` CSS class (not a `push_screen` stack), so the rail and command bar stay persistently mounted.
+- **Command bar (top).** Searchable command palette (`Ctrl+K`), find input (`/` → routes to `find_string_in_mem`), go-to-address input (`g` → routes to `_handle_goto`), plus the project-name / A2L-filename status labels.
 
-### The eight rail screens
+### The ten rail screens
 
 | Key | Container id | Screen | Status |
 |---|---|---|---|
-| 1 | `#screen_workspace` | Workspace (3-pane: ranges/sections · hex · context) | restyle of the pre-batch Main view |
-| 2 | `#screen_a2l` | A2L Explorer (symbol table + hex pane) | restyled; A2L panes use a flat 3/7 hex ÷ 4/7 tags split at all widths (`R-TUI-037`) |
-| 3 | `#screen_mac` | MAC View (record table + hex pane) | restyled |
-| 4 | `#screen_map` | Memory Map | scaffold rendering real coverage from `LoadedFile.ranges` |
-| 5 | `#screen_issues` | Issues Report | promoted to a dedicated screen (`R-TUI-025`) |
-| 6 | `#screen_patch` | Patch Editor | **functional** — parameter + memory change rows, save/load unified, selective export |
-| 7 | `#screen_diff` | A↔B Diff | scaffold (static placeholder; diff logic deferred) |
-| 8 | `#screen_bookmarks` | Bookmarks | placeholder (persistence deferred) |
+| 1 | `#screen_workspace` | Workspace (3-pane: ranges/sections · hex · context) | functional; hosts the Loaded-artifacts panel with per-artifact unload |
+| 2 | `#screen_a2l` | A2L Explorer (symbol table + hex pane) | functional; enriched tags, 19-field filter, windowed rendering |
+| 3 | `#screen_mac` | MAC View (record table + hex pane) | functional; per-row status, malformed lines flagged not dropped |
+| 4 | `#screen_map` | Memory Map | functional — real coverage from `LoadedFile.ranges` plus entropy bands from `services/entropy_service.py` |
+| 5 | `#screen_issues` | Issues Report | functional — grouped, filterable, paged view of the validation engine's findings |
+| 6 | `#screen_patch` | Patch Editor | **functional** — change-set rows, validate/check, save/load v2 JSON, apply + patched-image emit, undo/redo |
+| 7 | `#screen_diff` | A↔B Diff | **functional** — second-image load, classified diff runs, Markdown/HTML report |
+| 8 | `#screen_flow` | Flow Builder | **functional** — typed block chain, `flow.json` persistence, variant-scoped execution with fused report |
+| 9 | `#screen_checks` | Checks | functional — read-only grouped-by-outcome mirror of the last check run |
+| 0 | `#screen_crc_designer` | CRC Designer | functional — parametric CRC form, preset catalogue, live known-answer verdict, `*.crc.json` templates |
+
+Fourteen modal screens complement the rail (load file, save/load project, variant select/help, change-set and entry JSON editors, flow save/load, confirm-discard, confirm-write, legend, report viewer, operations). The batch-02 **Bookmarks** screen no longer exists — the rail's last three slots are Flow Builder, Checks and CRC Designer.
 
 ### Two-regime responsive layout
 
@@ -48,29 +52,40 @@ One layout, width-responsive, governed by a 120-column terminal breakpoint:
 - **Fixed regime — width ≥ 120 columns.** Rail full fixed width; Workspace `left 22 · right 40 · center 1fr`; MAC `hex 40 · table 1fr`.
 - **Proportional regime — width < 120 columns.** Rail collapses to icon-only (~4 cols); Workspace `left 24% · right 30% · center 1fr`; MAC `hex 35% · table 1fr`.
 
-Layout integrity is guarded by the `pytest-textual-snapshot` 27-baseline matrix plus 119/120 boundary tests. The A2L Explorer panes are the **exception** — flat 3/7 hex ÷ 4/7 tags at all widths (the iteration-3 two-regime A2L split rendered the hex view too narrowly at ≥ 120 cols and was superseded; see `R-TUI-037`).
+Layout integrity is guarded by the `pytest-textual-snapshot` SVG baseline matrix (29 baselines) plus 119/120 boundary tests. The A2L Explorer panes are the **exception** — flat 3/7 hex ÷ 4/7 tags at all widths (the iteration-3 two-regime A2L split rendered the hex view too narrowly at ≥ 120 cols and was superseded; see `R-TUI-037`).
 
 The diagrams in [diagrams/architecture.md](./diagrams/architecture.md) §2 and §3 render this visually.
 
-## 3. The `cdfx/` package
+## 3. The `changes/` and `operations/` packages
 
-`s19_app/tui/cdfx/` is the **data-processing layer** added by batch-03 and extended by batch-04. It is **pure Python** — it imports `xml.etree.ElementTree`, `json`, the existing `validation/`, the A2L module and the workspace helpers, but **never `textual`** — so every module is unit-testable without an app instance.
+`s19_app/tui/changes/` and `s19_app/tui/operations/` are the **data-processing layer**. They are **pure Python** — stdlib plus the engine and workspace helpers, but **never `textual`** — so every module is unit-testable without an app instance.
 
-| Module | Added | Purpose |
-|---|---|---|
-| `changelist.py` | batch-03 | `ChangeListEntry`, `ChangeList`, `ResolutionStatus` — parameter change-list model. Entry identity `(parameter_name, array_index)`; `array_index` is `Optional[int]` so a scalar entry and element 0 of an array are distinct identities. **Byte-unchanged in batch-04.** |
-| `resolve.py` | batch-03 | `resolve_against_a2l` — looks up each entry against the **enriched** A2L pipeline (`parse_a2l_file → enrich_a2l_tags_with_values`, not bare `extract_a2l_tags`) and stamps `unresolved` / `index-out-of-range` / `unresolved-no-a2l` without raising. **Byte-unchanged in batch-04** (SHA-256-pinned). |
-| `display.py` | batch-03 | `format_value` — type-driven display form (decimal for unsigned ints with a hex companion when integral; signed decimal for signed ints; fractional decimal for IEEE floats; quoted string for ASCII). Display never mutates stored values. |
-| `writer.py` | batch-03 | `write_cdfx` — emits a CDF 2.0 `.cdfx` backbone (`MSRSW → SW-SYSTEMS → SW-SYSTEM → SW-INSTANCE-SPEC → SW-INSTANCE-TREE`); coalesces array entries into one `VAL_BLK` `SW-INSTANCE` (rejects sparse / non-zero-based groups with `W-ARRAY-SPARSE`, **never gap-fills**); leading `Created with s19_app CDF 2.0 Writer` tool note; full-precision float `V` text. Carries the standalone `validate_w_rules` validator (the eight `W-*` codes). **Byte-frozen post-batch-03** (SHA-256-pinned). |
-| `reader.py` | batch-03 | `read_cdfx` — namespace-tolerant local-name matching; `VAL_BLK` expansion back into `(name, 0…N-1)` entries; decimal / exponential / hex `V` decoding; the nine `R-*` read-time rules; A2L cross-check producing `R-NAME-NOT-IN-A2L` and `R-ARRAY-LEN-MISMATCH` warnings; **collect-don't-abort** — every finding is a `ValidationIssue`, never an exception. |
-| `memory.py` | batch-04 | `MemoryStatus`, `MemoryChange`, `MemoryChangeList` — memory-change model, address-keyed, insertion-ordered. Bytes stored as an **immutable tuple**. `ValueError` on construction with an empty / negative / >255 byte run (the opposite failure mode to the validator). |
-| `memory_validate.py` | batch-04 | `validate_memory_changes` — tests each entry's addressed byte range against `LoadedFile.ranges` (read-only, never re-parses), stamps `inside` / `partial` / `outside` / `unvalidated-no-image`; one warning per partial/outside entry; one warning per inter-entry overlap; message references the address and byte-count summary but **does not embed the raw bytes**. |
-| `memory_display.py` | batch-04 | `format_memory_value` — hex primary, ASCII companion (with the pinned `.` `0x2E` placeholder for non-printables), decimal companion. |
-| `changeset.py` | batch-04 | `UnifiedChangeSet` — **composes** (not subclasses) `ChangeList` + `MemoryChangeList`. Each half is independently inspectable, mutable, counted; empty-state query. |
-| `unified_io.py` | batch-04 | `serialize_unified`, `write_unified_to_workarea`, `read_unified` — single JSON file (stdlib `json`, no new dependency) carrying the format identifier `s19app-unified-changeset`, version `1.0`, the parameter half and the memory half (`address` is an integer-valued field, never an object key). Applies the ten `MF-*` rules (`MF-JSON-PARSE`, `MF-BAD-STRUCTURE`, `MF-NO-ADDRESS`, `MF-EMPTY-BYTES`, `MF-BYTE-RANGE`, `MF-VERSION-UNKNOWN`, `MF-SIZE-CAP`, `MF-ENTRY-LIMIT`, `MF-PATH-UNRESOLVED`, `MF-WRITE-CONTAINMENT`); 256 MB on-disk cap; decoded-structure entry-count / run-length ceiling; explicit `RecursionError` catch; structural-shape check precedes any half-indexing. |
-| `export.py` | batch-04 | `export_unified` — splits the unified change-set into **two** distinct work-area files: re-resolves the parameter half against the loaded A2L at export time (via batch-03 `resolve_against_a2l`), invokes the **unchanged** batch-03 `write_cdfx_to_workarea` for the `.cdfx`, then writes a separate memory-field JSON file. Combines per-half issues onto `ValidationIssue.artifact`; neither half aborts because the other produced issues. |
+*Historic:* batches 03–04 put this layer in `s19_app/tui/cdfx/` (a CDF 2.0 `.cdfx` reader/writer plus the v1 "unified change-set" JSON). That package is **deleted**; the v2 change-set JSON + patched-image emit below is the shipped replacement, and the v1 envelope is rejected by the v2 reader (`CHG-V1-FORMAT`).
 
-**Dependency direction (strict).** `changelist.py` and `memory.py` are leaves. `resolve.py` / `display.py` / `writer.py` / `reader.py` depend on `changelist.py`; `memory_validate.py` / `memory_display.py` / `changeset.py` depend on `memory.py`; `changeset.py` also composes `changelist.py`; `unified_io.py` depends on `changeset.py`; `export.py` depends on `changeset.py`, `unified_io.py`, the batch-03 `writer.py` and `resolve.py`.
+### `tui/changes/` — the v2 change-set engine (`s19app-changeset`, version `2.0`)
+
+| Module | Purpose |
+|---|---|
+| `model.py` | the pure-data half: `ChangeEntry` (address-keyed, `encoded_bytes` as an immutable tuple) composed into a kind-discriminated `ChangeDocument` (`"change"` / `"check"`). |
+| `validate.py` | the intra-document collision rule — every entry's target byte range checked against its siblings. |
+| `io.py` | the wire grammar: strict reader/writer for the v2 JSON (`FORMAT_ID = "s19app-changeset"`, `FORMAT_VERSION = "2.0"`); v1 detection runs before generic format validation and yields exactly one `CHG-V1-FORMAT` with zero entries; collect-don't-abort `CHG-*` findings. Also the emitters `emit_s19_from_mem_map` / `emit_intel_hex_from_mem_map` that serialise a memory map back to records. |
+| `display.py` | change-entry value display (hex primary, companions) — display never mutates stored bytes. |
+| `apply.py` | the apply engine: `classify_containment` stamps each entry against the loaded image's ranges; `apply_change_document` gates on any ERROR issue or `kind != "change"` (zero writes, all dispositions `blocked`) and produces a deterministic `ChangeSummary`; `save_patched_image` emits the patched `.s19` / `.hex` through the staged-containment write path. |
+| `check.py` | the check engine — re-verifies a `kind="check"` document's expectations against the image; one `CheckRunEntry` per entry. |
+| `verify.py` | verify-on-save: re-reads a just-written image with the matching parser and diffs the re-read memory map against intent. |
+
+### `tui/operations/` — the operation registry and the CRC family
+
+| Module | Purpose |
+|---|---|
+| `registry.py` | static, deterministic operation registry (`crc`, `extract`, `split_by_segment`) — no entry points, no reflection. |
+| `crc.py` | the legacy CRC-32 streaming operation (`crc32_stream`), 32-bit-only. |
+| `crc_kernel.py` | the width-general parametric (Rocksoft) CRC kernel — any width in 8..64, independent input/output reflection, with the `PRESETS` catalogue; the seed algorithm reproduces `crc32_stream` / `zlib.crc32` byte-for-byte. |
+| `crc_designer_model.py` | the CRC Designer's model: `*.crc.json` algorithm-template load/save with the collect-don't-abort loader posture, plus the serialization (output address, store width/endianness) fields. |
+| `crc_template.py` | thin re-export facade over `crc_designer_model` (the a2l-facade convention). |
+| `crc_config.py` | the evolved per-firmware CRC job config (algorithm ref + coverage + placement). |
+
+**Dependency direction (strict).** The `changes/` model is a leaf; `validate` / `display` depend on it; `io` reads and writes it; `apply` / `check` consume documents plus read-only `LoadedFile` snapshots; `verify` consumes the emitted image. `operations/` is independent of `changes/`; the Flow Builder (`services/flow_model.py` + `flow_execution_service.py`) threads a working `(mem_map, ranges)` pair through both.
 
 ## 4. Patch Editor flow
 
@@ -82,57 +97,45 @@ PatchEditorPanel  ───emits───►  ActionRequested message
                                        ▼
                           tui/app.py — Patch Editor handler
                                        │  (routing wiring only —
-                                       │   no xml.etree.ElementTree import,
-                                       │   no json import, no model logic;
-                                       │   verified by TC-027)
+                                       │   no json parsing, no model logic)
                                        ▼
-                  tui/services/cdfx_service.py — CdfxService
-                                       │  (owns one UnifiedChangeSet;
-                                       │   parameter + memory ops;
-                                       │   save_unified / load_unified /
-                                       │   export_selective)
+                  tui/services/change_service.py — ChangeService
+                                       │  (owns the ChangeDocument;
+                                       │   add/edit/remove, undo/redo,
+                                       │   validate / run_checks /
+                                       │   apply / save_patched)
                                        ▼
-                       s19_app/tui/cdfx/* (the package)
+                       s19_app/tui/changes/* (the package)
                                        │
                                        ▼
               PatchEditorPanel refreshes its rows / status
 ```
 
-The screen is **presentational**; `app.py` carries only the UI-state wiring that routes the message to `CdfxService`. The XML and JSON model logic lives in the package, never in `app.py`. This contract is asserted by tests — see `tests/test_tui_patch_editor.py::test_tc028_app_py_holds_no_cdfx_xml_logic` and `test_tc028_patch_action_handler_routes_through_the_service`, plus `tests/test_cdfx_unchanged.py::TC-027` for the batch-04 equivalent.
+The screen is **presentational**; `app.py` carries only the UI-state wiring that routes the message to `ChangeService`. The JSON and memory-map model logic lives in the `changes/` package, never in `app.py`. The same pattern repeats for the other layer-3 consumers: the Flow Builder routes through `services/flow_execution_service.py`, variant-scoped runs through `services/variant_execution_service.py`, and the A↔B Diff through `services/compare_service.py` + `diff_report_service.py`.
 
 ## 5. Path-safety contract
 
 Every file write resolves under `.s19tool/workarea/` through `s19_app/tui/workspace.py`. The contract is enforced at the function boundary, not by convention:
 
-- **Writes** go through `copy_into_workarea` (the dedup-suffix path that the project save flow already used) — symbolic-link / NTFS reparse-point traversal is **rejected** (`_path_traverses_reparse_point`); an existing filename is **dedup-suffixed**; the resolved target must be inside `.s19tool/workarea/`. The CDFX writer (`writer.write_cdfx_to_workarea`), the unified writer (`unified_io.write_unified_to_workarea`) and the export writer (`export.write_memory_field_to_workarea`) all share this same path.
-- **Reads** of a user-supplied path go through `resolve_input_path` (the loader path that walks the app cwd and the nearest repo root). The CDFX reader (`reader._resolve_source`) and the unified reader use it.
-- **No new write path** has been added by the CDFX / memory / export work — the writers in `cdfx/` are thin adaptors over the existing workspace primitives.
-- **Failures are surfaced, never raised.** A containment failure, reparse-point rejection, overwrite refusal or path-resolution failure becomes a `ValidationIssue` (`R-PATH-*` for CDFX, `MF-PATH-UNRESOLVED` / `MF-WRITE-CONTAINMENT` for the unified file), not an uncaught exception. Test coverage: `tests/test_cdfx_path_containment.py`, `tests/test_tui_patch_containment.py`, `tests/test_unified_*.py`.
+- **Writes** go through `copy_into_workarea` — symbolic-link / NTFS reparse-point traversal is **rejected** (`_path_traverses_reparse_point`); an existing filename is **dedup-suffixed**; the resolved target must be inside `.s19tool/workarea/`. The patched-image writer (`changes/apply.py::save_patched_image`), the change-set JSON writer (`changes/io.py`) and the project-manifest writer (`services/manifest_writer.py`) all share this staged-containment pattern: stage under `.s19tool/workarea/temp/`, re-run the containment checks against the destination, then place.
+- **Reads** of a user-supplied path go through `resolve_input_path` (the loader path that walks the app cwd and the nearest repo root). The change-set reader, the CRC template loader and the manifest reader use it — with one deliberate exception: `project.json` `batch` / `assignments` entries resolve **against the project directory only** (an absolute or escaping path is one ERROR finding and the entry is skipped).
+- **Failures are surfaced, never raised.** A containment failure, reparse-point rejection, overwrite refusal or path-resolution failure becomes a `ValidationIssue` (the `CHG-*` family for change-sets), not an uncaught exception.
 
-`R-CDFX-018` documents the CDFX side of this contract verbatim; the unified-file side maps to `LLR-006.4 / LLR-006.5` under `R-MEM-004`.
+## 6. JSON safety
 
-## 6. XML / JSON safety
+The change-set reader (`changes/io.py`) treats its input as **untrusted**, stdlib `json` only — no new dependency:
 
-Both readers treat their input as **untrusted**.
+- `json.JSONDecodeError` and `RecursionError` are both caught and surfaced as findings — a deeply-nested input that would exceed the recursion limit is not allowed to crash the load.
+- The shared 256 MB on-disk size cap is probed **before** parsing.
+- A structural-shape check runs **before any field indexing** — no `KeyError` escapes.
+- **v1 hard break:** a document carrying the retired `s19app-unified-changeset` token (or the v1 `parameters`/`memory` shape) is detected before generic format validation and yields exactly one `CHG-V1-FORMAT` finding with zero entries — there is no read-compat shim.
+- Unrecognised `format` / `kind` / `version` values and per-entry faults collect their own `CHG-*` findings; the reader never raises on malformed input.
 
-**CDFX reader (`cdfx/reader.py`).** Uses stdlib `xml.etree.ElementTree` only — no `defusedxml` dependency.
-- A `DOCTYPE` or `<!ENTITY>` declaration is rejected by an `expat`-level handler that raises (`_UnsafeXmlError`) **before any entity is expanded** — no external file read, no entity blow-up. Surfaced as exactly one `R-XML-PARSE` issue with an empty change-list.
-- File size is **probed before parsing** against a 256 MB byte cap (the existing `workspace.DEFAULT_COPY_SIZE_CAP_BYTES`). Over-cap files are rejected.
-- XML element nesting depth is bounded.
-- Malformed XML and producer-specific variation (other vendors' `ADMIN-DATA`, `SW-CS-HISTORY`, `SW-CS-FLAGS`, namespaced root elements, leading writer tool-notes) are tolerated.
-- All findings are `ValidationIssue`s; the reader **never raises** on malformed input.
+*Historic:* the batch-03 CDFX XML reader applied the same posture to XML (DOCTYPE / entity rejection before expansion, 256 MB cap, nesting bound). It was removed with the `cdfx/` package.
 
-**Unified JSON reader (`cdfx/unified_io.py`).** Uses stdlib `json` only — no new dependency.
-- `json.JSONDecodeError` and `RecursionError` are both caught and surfaced as `MF-JSON-PARSE` / `MF-BAD-STRUCTURE`. A deeply-nested input that would exceed the recursion limit is not allowed to crash the load.
-- A 256 MB on-disk size cap (`MF-SIZE-CAP`) and a decoded-structure entry-count / run-length ceiling (`MF-ENTRY-LIMIT`, the `MF_ENTRY_COUNT_CEILING` / `MF_RUN_LENGTH_CEILING` constants) bound what enters memory.
-- A structural-shape check runs **before any half-indexing** — no `KeyError` escapes.
-- Per-entry rules (`MF-NO-ADDRESS`, `MF-EMPTY-BYTES`, `MF-BYTE-RANGE`) and a version-token tolerance rule (`MF-VERSION-UNKNOWN`) collect their own findings.
+## 7. Engine layer stability
 
-Both readers were cleared by a dedicated security review in their respective batches (batch-03 for CDFX, batch-04 for the unified JSON).
-
-## 7. Engine invariant
-
-The parsing / validation engine is **byte-for-byte unchanged across batches 02–04**:
+The parsing / validation engine remains the read-only foundation that layer-3 work consumes but does not modify:
 
 - `s19_app/core.py`
 - `s19_app/hexfile.py`
@@ -141,18 +144,18 @@ The parsing / validation engine is **byte-for-byte unchanged across batches 02�
 - `s19_app/tui/a2l.py`
 - `s19_app/tui/mac.py`
 
-This is asserted by **line-ending-normalised SHA-256** comparisons in `tests/test_cdfx_unchanged.py` (TC-027) and pinned by the writer-freeze test (TC-030) for the batch-03 CDFX writer/resolver in batch-04. Phase-4 `git diff main` over those files has been empty for every batch since batch-02. Adding behaviour that needs to cross into one of those modules is allowed, but it changes the engine invariant and must be called out in the batch's requirements phase.
+*Historic mechanism:* across batches 02–04 this was pinned by line-ending-normalised SHA-256 comparisons (`tests/test_cdfx_unchanged.py`, TC-027) and a writer-freeze test (TC-030); those pinning tests were retired together with the `cdfx/` package they protected. The discipline stands: adding behaviour that needs to cross into one of those modules is allowed, but it changes the engine's stability story and must be called out in the batch's requirements phase.
 
 ## 8. Testing architecture
 
-Roughly **763 tests** under `tests/` at the close of batch-04 (762 pass + 1 boundary), organised by module — `tests/test_core_*`, `tests/test_hexfile.py`, `tests/test_range_index.py`, `tests/test_validation_*`, `tests/test_tui_*`, `tests/test_cdfx_*`, `tests/test_memory_*`, `tests/test_unified_*`, plus the per-example smoke suites (`tests/test_examples_*`).
+Roughly **2760 tests** under `tests/` (collected 2026-10-11), organised by module — `tests/test_core_*`, `tests/test_hexfile.py`, `tests/test_range_index.py`, `tests/test_validation_*`, `tests/test_tui_*`, `tests/test_changes_*`, `tests/test_crc_*`, `tests/test_flow_*`, `tests/test_entropy_*`, `tests/test_compare*`, `tests/test_manifest*`, `tests/test_variant*`, plus the per-example smoke suites (`tests/test_examples_*`). A registry guard (`tests/test_id_registry.py`) keeps every declared requirement/test id traceable to its verifier node.
 
 Markers (registered in `pyproject.toml`):
 
 - **`slow`** — stress / perf smoke tests. `pytest -q -m "not slow"` skips them. No example smoke case is currently pinned `@pytest.mark.slow`: the former ~490s `pv__case_06_large_nested_a2l` duplicate was pruned in batch-36 (US-060), and the large-A2L pipeline is now covered by the retained 36 MB top-level `case_06_large_nested_a2l` in the normal suite.
 - **`snapshot`** — `pytest-textual-snapshot` baselines.
 
-Visual regression: 27 SVG baselines under `tests/__snapshots__/`, generated only against the public synthetic fixtures (`examples/case_00_public/` and the `tests/conftest.py` generators) — **never against client firmware, A2L or MAC artefacts** (`R-TUI-034`, the TC-031 no-leak inspection).
+Visual regression: 29 SVG baselines under `tests/__snapshots__/`, generated only against the public synthetic fixtures (`examples/case_00_public/` and the `tests/conftest.py` generators) — **never against client firmware, A2L or MAC artefacts** (`R-TUI-034`, the TC-031 no-leak inspection).
 
 Per-case Pilot / GIF evidence lives under `tests/test_examples_*`.
 
@@ -190,7 +193,7 @@ below except the single exception named after the table.
 
 | Module | Paths it owns | What it encapsulates | What it EXPOSES | What does NOT belong to it |
 |---|---|---|---|---|
-| **product** | `s19_app/**` | the shipped application: the Direction-B TUI shell and its sub-packages (`tui/cdfx`, `tui/changes`, `tui/operations`, `tui/services`), plus `validation/` — all described in §1–§7 | the TUI entry point, `CdfxService`, the `cdfx` package API, the `W-*` validator | test scaffolding · throwaway prototypes · flow tooling |
+| **product** | `s19_app/**` | the shipped application: the Direction-B TUI shell and its sub-packages (`tui/changes`, `tui/operations`, `tui/services`), plus `validation/` — all described in §1–§7 | the TUI entry point, `ChangeService`, the `changes` package API | test scaffolding · throwaway prototypes · flow tooling |
 | **tests** | `tests/**` | the whole verification surface: unit, acceptance, snapshot baselines (`__snapshots__/`), goldens (`goldens/`), generated evidence (`_artifacts/`, gitignored) | nothing — it is a consumer, never a dependency of the product | product logic that drifted into a fixture |
 | **tools** | `tools/**` | repository-local developer utilities | command-line entry points | anything the shipped app imports at runtime |
 | **prototypes** | `prototypes/**` | throwaway design probes, kept as evidence of what was tried | nothing — **no product code may import from here** | anything that has graduated: graduating means moving into `s19_app/**` |
@@ -209,7 +212,7 @@ as orphans conflates *"the map is stale"* with *"the rule cannot express this"*.
 
 | # | Decision | Alternative rejected | What would re-open it |
 |---|---|---|---|
-| 1 | Six **top-level, non-overlapping** prefixes | Declaring `s19_app/tui/cdfx/**` and friends as separate modules | Overlapping prefixes are a defect of this document, not an ambiguity to resolve case by case — and the sub-packages are already described in §1–§3. Re-open if a sub-package acquires an independently-consumed interface. |
+| 1 | Six **top-level, non-overlapping** prefixes | Declaring `s19_app/tui/changes/**` and friends as separate modules | Overlapping prefixes are a defect of this document, not an ambiguity to resolve case by case — and the sub-packages are already described in §1–§3. Re-open if a sub-package acquires an independently-consumed interface. |
 | 2 | `prototypes/**` is a declared module rather than excluded | Leaving it undeclared | Undeclared means every prototype file reads as *"the map is stale"*. Declaring it with **"no product code may import from here"** turns a permanent false alarm into a stated boundary. |
 | 3 | `tests/**` is one module, not one per layer | Mirroring the product's layering | Nothing reads the split mechanically today. Re-open when a lane plan needs test file sets to be disjoint by layer. |
 

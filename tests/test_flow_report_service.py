@@ -149,7 +149,10 @@ def test_tc013a_record_error_shaped_abort_is_failed() -> None:
 
 def test_tc013b_non_aborting_error_is_issues_not_failed() -> None:
     """NEGATIVE CONTROL: a CHECK own-op error is `error` but does NOT abort —
-    it must read COMPLETED WITH ISSUES, proving the rule is not "any error"."""
+    it must read COMPLETED WITH ISSUES, proving the rule is not "any error".
+
+    # TC-013b
+    """
     state = _state(
         block_results=[BlockResult(0, "check", BLOCK_STATUS_ERROR,
                                    "check operation invalid")],
@@ -362,7 +365,10 @@ def test_diagnostics_are_reported_so_a_failed_run_says_why() -> None:
 def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
     """F2: `_display_path` guards `written_paths`, but an OSError message reaches
     the report through a block's FINDINGS and carries the full host path
-    (username + local layout) into a document meant to be shareable."""
+    (username + local layout) into a document meant to be shareable.
+
+    # TC-16b
+    """
     leaky = (r"FileExistsError: [WinError 183] Cannot create a file when that "
              r"file already exists: 'C:\Users\jjgh8\AppData\Local\Temp\x\reports'")
     # BOTH channels: run_flow puts exception text in `diagnostics` (the real
@@ -487,6 +493,8 @@ def test_at173b_flow_report_bytes_equal_the_encoder_output(tmp_path) -> None:
     Platform-independent: it never consults ``os.linesep``. On a CRLF host the
     text-mode writer expanded every newline, so the file differed from what the
     shared budget had been charged for it.
+
+    # AT-173b
     """
     import s19_app.tui.services.flow_report_service as frs
 

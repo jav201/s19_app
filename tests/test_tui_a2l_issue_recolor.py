@@ -367,6 +367,8 @@ def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
     preserves BOTH hostile tokens verbatim (``issue.symbol ==
     'MAP_Model[bold]'`` and ``'x[link=file:///etc]'``), so no fallback token was
     needed — the strongest hostile tokens the spec names are the ones exercised.
+
+    # AT-043
     """
     s19_path = _write_s19(tmp_path)
     a2l_path = _write_a2l(tmp_path, _HOSTILE_REF_A2L)

@@ -1,0 +1,9 @@
+shipped registry sha256 BEFORE: cf88ca52e4ffd2661f748515f42e4bc686e852860e641dbfc9ad67b86292030f
+arms resolved at baseline: 3 (test_at286_every_live_id_token_occurs_in_its_nodes_file, test_at286_at043_is_resolved_with_a_grammar_valid_status, test_at286_no_declared_id_is_absent_from_the_registry)
+positive control (unmutated): arm (a) GREEN · arm (b) GREEN · arm (c) GREEN
+M1 token TC-062 stripped from the stream: arm (a) RED — - TC-062 is LIVE but its dash token occurs in none of ['tests/test_validation_engine.py']
+M2 AT-043 entry dropped: arm (b) RED — AT-043 must be one thing in the registry; found 0 entries
+M3 AT-065b entry dropped (still declared at REQUIREMENTS.md:460): arm (c) RED — - AT-065b declared at REQUIREMENTS.md:460 is not registered
+shipped registry sha256 AFTER:  cf88ca52e4ffd2661f748515f42e4bc686e852860e641dbfc9ad67b86292030f
+restore proven by hash: shipped bytes identical before/after (mutations lived in memory only; no file under tests/ was written)
+VERDICT: M1 KILLED by arm (a) · M2 KILLED by arm (b) · M3 KILLED by arm (c) (after one BAD aim, declared above) · 0 SURVIVED

@@ -40,3 +40,4 @@ tests/goldens/batch78/** -text
 # state.json hazard the design exists to avoid -- AT-TC-REGISTRY-SPEC.md 4.3).
 # Pinning LF keeps that diff line-granular and identical on every host.
 AT-TC-REGISTRY.jsonl text eol=lf
+.dev-flow/2026-10-08-batch-91/evidence/** -text

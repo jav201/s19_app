@@ -7,6 +7,9 @@ Intent:
     that silently changes what bytes get digested fails here (AT-CRC-DSN-013b).
   - JSON round-trip + collect-don't-abort mirror the shipped crc_config
     contract: a malformed template/job is one error and never a crash.
+
+Batch-91 contract adoption (HLR-122):
+# TC-630 — this module pins the CRC designer model behind the catalogue presets (LLR-122.4).
 """
 
 from __future__ import annotations

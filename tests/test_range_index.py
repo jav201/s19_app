@@ -1,3 +1,9 @@
+"""Tests for the sorted-range membership index.
+
+Batch-91 contract adoption (HLR-122):
+# TC-620 — this module pins the range index answering membership in sorted ranges (LLR-122.1).
+"""
+
 from __future__ import annotations
 
 from s19_app.range_index import (

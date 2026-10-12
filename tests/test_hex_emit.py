@@ -16,6 +16,9 @@ Test → TC → LLR map (provisional TC ids per V-5):
 - test_public_example_roundtrips_as_hex       → TC-001/TC-004 → LLR-001.4
 - test_byte_stability_measure                 → (MEASURE)    → informative,
       records emit(parse(file)) == file (expected canonicalized/False); NOT a gate.
+
+Batch-91 contract adoption (HLR-122):
+# TC-619 — this module pins the emitters round-tripping a parsed image back to records (LLR-122.1).
 """
 from __future__ import annotations
 

@@ -188,6 +188,7 @@ def test_tc347_crc_computed_over_post_patch_image(tmp_path: Path) -> None:
 # AT-124 — grow / no-grow (C-10 both branches)
 # ---------------------------------------------------------------------------
 
+# AT-124a
 def test_at124a_crc_grows_image_when_output_outside_ranges(tmp_path: Path) -> None:
     cfg = _crc_config(output_address="0x2000")  # outside [0x1000,0x1004)
     patch = _patch_doc([{"type": "bytes", "address": "0x1000", "bytes": "AA"}])
@@ -216,6 +217,7 @@ def test_at124a_crc_grows_image_when_output_outside_ranges(tmp_path: Path) -> No
     assert _span(result.pre_crc_ranges) < _span(result.image_ranges)
 
 
+# AT-124b
 def test_at124b_crc_no_grow_when_output_inside_ranges(tmp_path: Path) -> None:
     cfg = _crc_config(output_address="0x1000")  # inside [0x1000,0x1004)
     patch = _patch_doc([{"type": "bytes", "address": "0x1003", "bytes": "AA"}])
@@ -241,6 +243,7 @@ def test_at124b_crc_no_grow_when_output_inside_ranges(tmp_path: Path) -> None:
 # AT-125 — ordering guidance (WARN before PATCH / no warn after)
 # ---------------------------------------------------------------------------
 
+# AT-125a
 def test_at125a_crc_before_patch_warns_but_still_runs(tmp_path: Path) -> None:
     cfg = _crc_config(output_address="0x2000")
     patch = _patch_doc([{"type": "bytes", "address": "0x1000", "bytes": "AA"}])
@@ -269,6 +272,7 @@ def test_at125a_crc_before_patch_warns_but_still_runs(tmp_path: Path) -> None:
     assert len(result.written_paths) == 1
 
 
+# AT-125b
 def test_at125b_crc_after_patch_does_not_warn(tmp_path: Path) -> None:
     cfg = _crc_config(output_address="0x2000")
     patch = _patch_doc([{"type": "bytes", "address": "0x1000", "bytes": "AA"}])
@@ -293,6 +297,7 @@ def test_at125b_crc_after_patch_does_not_warn(tmp_path: Path) -> None:
     assert result.status == FLOW_STATUS_OK
 
 
+# TC-351
 def test_tc351_crc_only_flow_no_patch_warns(tmp_path: Path) -> None:
     cfg = _crc_config(output_address="0x2000")
     project = _make_project(tmp_path, {"prg.s19": _S19_SRC, "crc.json": cfg})
@@ -326,6 +331,7 @@ def test_at126_malformed_config_fails_closed(tmp_path: Path) -> None:
     assert not result.written_paths  # image un-injected, nothing written
 
 
+# TC-346b
 def test_tc346b_empty_config_file_fails_closed(tmp_path: Path) -> None:
     project = _make_project(tmp_path, {"prg.s19": _S19_SRC, "crc.json": ""})
     flow = Flow(name="empty", blocks=[SourceBlock("prg.s19"), CrcBlock("crc.json")])
@@ -342,7 +348,10 @@ def test_tc346b_empty_config_file_fails_closed(tmp_path: Path) -> None:
 
 def test_at127a_absolute_config_ref_rejected(tmp_path: Path) -> None:
     """An ABSOLUTE config_ref pointing at a VALID config OUTSIDE the project is
-    rejected by containment (proving containment, not mere existence)."""
+    rejected by containment (proving containment, not mere existence).
+
+    # AT-127a
+    """
     outside = tmp_path / "outside_crc.json"
     outside.write_text(_crc_config(output_address="0x2000"), encoding="utf-8")
     project = _make_project(tmp_path, {"prg.s19": _S19_SRC})
@@ -364,7 +373,10 @@ def test_at127a_absolute_config_ref_rejected(tmp_path: Path) -> None:
 
 
 def test_at127b_escape_config_ref_rejected(tmp_path: Path) -> None:
-    """A ``..``-escaping config_ref is rejected before any file open."""
+    """A ``..``-escaping config_ref is rejected before any file open.
+
+    # AT-127b
+    """
     project = _make_project(tmp_path, {"prg.s19": _S19_SRC})
     outside = tmp_path / ".s19tool" / "workarea" / "escape_crc.json"
     outside.write_text(_crc_config(output_address="0x2000"), encoding="utf-8")

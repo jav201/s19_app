@@ -15,6 +15,9 @@ Two populations, deliberately separated because they age differently:
 
 **No test asserts a count over the tree.** `== 56` breaks on every legitimate change and
 proves nothing; what is asserted is shape, membership and completeness.
+
+Batch-91 contract adoption (HLR-122):
+# TC-621 — this module pins the contiguous-range/gap computation over parsed addresses (LLR-122.1).
 """
 
 from __future__ import annotations

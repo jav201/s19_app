@@ -10,6 +10,9 @@ Two intents (batch-58 HLR-E5):
   the facade's ``read_template`` over each fault class (malformed JSON, over-cap,
   non-object top level, missing required field) returns ``(None, [one error])``
   and never raises; a valid file returns ``(CrcTemplate, [])``.
+
+Batch-91 contract adoption (HLR-122):
+# TC-630 — this module pins the collect-don't-abort loader for *.crc.json templates (LLR-122.4).
 """
 
 from __future__ import annotations

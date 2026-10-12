@@ -67,8 +67,27 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 156
+EXPECTED_SCANNED_TEST_FILES = 159
 """Test modules scanned, including this one.
+
+batch-91 Inc-3: 158 -> 159. This increment adds
+``tests/test_batch91_registry_hygiene.py`` (AT-286, HLR-124's acceptance).
+MEASURED, not incremented, and by two paths that do not share code:
+``scanned_test_files()`` reports 159, and an independent re-derivation of the
+same glob (``tests/**/*.py`` minus the four excluded directories) agrees at
+159 — 156 ``test_*.py`` modules plus ``conftest.py``,
+``generate_large_samples.py``, and ``__init__.py``.
+
+batch-91 Inc-1: 156 -> 158, in two measured moves. The batch's P0 repair added
+``tests/__init__.py`` (156 -> 157; the base suite could not collect until the
+repo's own ``tests`` package won the import over an editable install's stray
+one — 01-requirements.md premise P-3) without bumping this bound, and this
+increment adds ``tests/test_batch91_adoption.py`` (157 -> 158, AT-284).
+MEASURED, not incremented, and by two paths that do not share code:
+``scanned_test_files()`` reports 158, and an independent re-derivation of the
+same glob (``tests/**/*.py`` minus the four excluded directories) agrees at
+158 — 155 ``test_*.py`` modules plus ``conftest.py``,
+``generate_large_samples.py``, and ``__init__.py``.
 
 evidence-sync increment: 155 -> 156. ``tests/test_sync_evidence.py`` was added
 for the checked-in visual-evidence sync helper (``tools/sync_evidence.py``),

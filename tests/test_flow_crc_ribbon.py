@@ -34,8 +34,8 @@ from s19_app.tui.services.flow_model import (
     WriteOutBlock,
 )
 
-from test_flow_builder_render import _run_in_panel
-from test_flow_execution_service import _make_project
+from tests.test_flow_builder_render import _run_in_panel
+from tests.test_flow_execution_service import _make_project
 
 _S19_SRC = "S107100001020304DE\nS9030000FC\n"
 _FILLED = "█"

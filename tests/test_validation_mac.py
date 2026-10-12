@@ -1,3 +1,9 @@
+"""Tests for the MAC validation diagnostics.
+
+Batch-91 contract adoption (HLR-122):
+# TC-628 — this module pins the MAC parser's collect-don't-abort diagnostics: malformed lines kept and flagged (LLR-122.3).
+"""
+
 from s19_app.validation import ValidationSeverity, validate_mac_records
 
 
