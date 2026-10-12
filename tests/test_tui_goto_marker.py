@@ -25,7 +25,7 @@ from rich.style import Style
 from textual.widgets import Input
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.hexview import HEX_WIDTH, build_row_bases, render_hex_view_text
+from s19_app.render.hexview import HEX_WIDTH, build_row_bases, render_hex_view_text
 from s19_app.tui.models import LoadedFile
 
 
@@ -192,7 +192,7 @@ def _capture_focus_kwarg(app: S19TuiApp, monkeypatch) -> list[object]:
 
     def _spy(*args, **kwargs):
         captured.append(kwargs.get("focus_row_marker_address"))
-        from s19_app.tui.hexview import render_hex_view_text as real
+        from s19_app.render.hexview import render_hex_view_text as real
         return real(*args, **kwargs)
 
     monkeypatch.setattr("s19_app.tui.app.render_hex_view_text", _spy)

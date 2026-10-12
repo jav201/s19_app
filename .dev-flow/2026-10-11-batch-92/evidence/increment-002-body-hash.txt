@@ -1,0 +1,5 @@
+increment-002 body-hash verification: the safe_text + _CONTROL_SCRUB move
+comparator: git show 410cde5:s19_app/tui/screens_directionb.py, lines 869-936
+base span   : 68 lines, sha256 103da22077f27c2d9733c962dbcc77c44602e8f2f1f80b669445b0ec32262974
+utils.py span: 68 lines, sha256 103da22077f27c2d9733c962dbcc77c44602e8f2f1f80b669445b0ec32262974
+BYTE-IDENTITY: True

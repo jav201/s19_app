@@ -39,7 +39,7 @@ from textual.widgets import Button, Label, ListItem, ListView, Static
 
 import s19_app.tui.services.operation_service as operation_service_module
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.hexview import MAX_HEX_ROWS, render_hex_view_text
+from s19_app.render.hexview import MAX_HEX_ROWS, render_hex_view_text
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations import OperationResult
 from s19_app.tui.operations.model import OperationInput

@@ -1169,7 +1169,7 @@ def test_tc018_workspace_hex_render_caps_unchanged() -> None:
     ``FOCUS_CONTEXT_ROWS`` / ``HEX_WIDTH``) must keep their pre-batch values;
     a re-layout that silently changed a cap would change hex render cost.
     """
-    from s19_app.tui import hexview
+    from s19_app.render import hexview
 
     # Pre-batch values — pinned so a re-layout cannot drift a render cap.
     assert hexview.HEX_WIDTH == 16
@@ -1188,7 +1188,7 @@ def test_tc018_workspace_hex_output_bounded_by_max_rows(tmp_path: Path) -> None:
     """
     from textual.widgets import Static
 
-    from s19_app.tui import hexview
+    from s19_app.render import hexview
 
     # A mem_map spanning many more rows than MAX_HEX_ROWS would allow.
     over_cap_rows = hexview.MAX_HEX_ROWS + 200
@@ -3222,7 +3222,7 @@ def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
     """
     from rich.console import Console
 
-    from s19_app.tui.screens_directionb import safe_text
+    from s19_app.utils import safe_text
 
     hostile = "sensor[red]value[/]\x1b[31mANSI\x1b[0m"
     text = safe_text(hostile)

@@ -143,6 +143,7 @@ The parsing / validation engine remains the read-only foundation that layer-3 wo
 - `s19_app/validation/` (entire directory)
 - `s19_app/tui/a2l.py`
 - `s19_app/tui/mac.py`
+- `s19_app/tui/color_policy.py` — **frozen from `2026-10-11-batch-92`** (operator-confirmed 2026-10-11, US-92-5 OUT): the batch's premise freezes it even though it is absent from the older frozen **test-file** lists (the retired pinning tests of the historic mechanism below covered only the six entries above); the severity→CSS policy (`css_class_for_severity`) stays here.
 
 *Historic mechanism:* across batches 02–04 this was pinned by line-ending-normalised SHA-256 comparisons (`tests/test_cdfx_unchanged.py`, TC-027) and a writer-freeze test (TC-030); those pinning tests were retired together with the `cdfx/` package they protected. The discipline stands: adding behaviour that needs to cross into one of those modules is allowed, but it changes the engine's stability story and must be called out in the batch's requirements phase.
 
@@ -184,6 +185,29 @@ Per-batch artefacts are archived under `.dev-flow/<YYYY-MM-DD>-batch-NN/`. The r
 > would silently retarget. The template's numbering is a scaffold, not a contract; the tables below
 > are self-identifying by their column headers, which is what a checker should key on.
 
+> **Amended at DOC by `2026-10-11-batch-92`** (2026-10-11; base `410cde5`, branch
+> `kimi/batch-92-layer-inversions`). Unlike batch-88, this amendment **does touch an earlier
+> section**: §7's frozen list gains `s19_app/tui/color_policy.py` (finding F-1 of the batch
+> record — the batch's premise froze it and the post-gate amendment lands it here). Everything
+> else lands under §10 (sub-module declarations for the new `s19_app/render/` package inside
+> product, changed-module entries, a retired path, dependency-edge amendments, and two flow
+> inputs) and under §11 (four batch-92 surface contracts). §1–§6 and §8–§9 are otherwise
+> unchanged: §1–§3 prose still walks the pre-batch-92 tree, which the retired-path declaration
+> under §10 explains. The batch-88 census line below ("266 tracked source files", measured
+> 2026-08-24) remains that batch's dated measurement; batch-92's net path change is +3 new files
+> under the unchanged `s19_app/**` prefix (`render/__init__.py`, `render/hexview.py`,
+> `render/format.py`) and −1 retired (`s19_app/tui/hexview.py`) — no prefix change, so no
+> checker rule change is required for this batch.
+>
+> **Post-gate amendment (PDR condition C2, discharged at the DDR 2026-10-12).** Three stale
+> "the residuals survive" leftovers from the intake-time draft are flipped to the ratified P1
+> disposition (review C1-(c), operator-ratified): the two residual rows
+> `render/hexview → tui/color_policy` and `render/hexview → tui/insight_style` in the §10
+> dependency table now read **KILLED by batch-92** (TC-655 pins the frozen copies), the
+> `render/hexview.py` "Deps — allowed" row no longer lists the tui constant sources, and
+> rationale R3 records its own P1 reversal. `tui/color_policy.py` remains frozen and untouched;
+> the killed edges are import edges, not the freeze.
+
 ## 10. Composition — the modules, by path
 
 **The `Paths it owns` column is the mechanical part.** It is what makes this a map and not an essay:
@@ -193,7 +217,7 @@ below except the single exception named after the table.
 
 | Module | Paths it owns | What it encapsulates | What it EXPOSES | What does NOT belong to it |
 |---|---|---|---|---|
-| **product** | `s19_app/**` | the shipped application: the Direction-B TUI shell and its sub-packages (`tui/changes`, `tui/operations`, `tui/services`), plus `validation/` — all described in §1–§7 | the TUI entry point, `ChangeService`, the `changes` package API | test scaffolding · throwaway prototypes · flow tooling |
+| **product** | `s19_app/**` | the shipped application: the Direction-B TUI shell and its sub-packages (`tui/changes`, `tui/operations`, `tui/services`), plus `validation/` — all described in §1–§7; the batch-92 `render/` sub-package is declared at file granularity in the sub-module declarations below | the TUI entry point, `ChangeService`, the `changes` package API | test scaffolding · throwaway prototypes · flow tooling |
 | **tests** | `tests/**` | the whole verification surface: unit, acceptance, snapshot baselines (`__snapshots__/`), goldens (`goldens/`), generated evidence (`_artifacts/`, gitignored) | nothing — it is a consumer, never a dependency of the product | product logic that drifted into a fixture |
 | **tools** | `tools/**` | repository-local developer utilities | command-line entry points | anything the shipped app imports at runtime |
 | **prototypes** | `prototypes/**` | throwaway design probes, kept as evidence of what was tried | nothing — **no product code may import from here** | anything that has graduated: graduating means moving into `s19_app/**` |
@@ -215,6 +239,113 @@ as orphans conflates *"the map is stale"* with *"the rule cannot express this"*.
 | 1 | Six **top-level, non-overlapping** prefixes | Declaring `s19_app/tui/changes/**` and friends as separate modules | Overlapping prefixes are a defect of this document, not an ambiguity to resolve case by case — and the sub-packages are already described in §1–§3. Re-open if a sub-package acquires an independently-consumed interface. |
 | 2 | `prototypes/**` is a declared module rather than excluded | Leaving it undeclared | Undeclared means every prototype file reads as *"the map is stale"*. Declaring it with **"no product code may import from here"** turns a permanent false alarm into a stated boundary. |
 | 3 | `tests/**` is one module, not one per layer | Mirroring the product's layering | Nothing reads the split mechanically today. Re-open when a lane plan needs test file sets to be disjoint by layer. |
+
+### Batch-92 sub-module declarations — `s19_app/render/` inside product
+
+*`2026-10-11-batch-92` (layer-inversion kills). The six-module cut above stands: `render/` is declared at **sub-module (file) granularity inside product**, not as a 7th top-level module — carving `s19_app/render/**` out of product would make two prefixes overlap (a defect per rationale #1) and the staleness checker's `startswith(prefix + "/")` rule cannot express a hole in `s19_app/**`; see the flow input below. Full evidence: the batch record's `design/module-map-delta.md`; what follows is the standing-map residue.*
+
+#### NEW `s19_app/render/hexview.py` (+ `s19_app/render/__init__.py` marker)
+
+Relocates `s19_app/tui/hexview.py` (measured 477 LOC, 0 classes — AST census re-confirmed at base).
+
+| Viewpoint | Declaration |
+|---|---|
+| **Encapsulates** | the pure hex-window renderer: `render_hex_view` / `render_hex_view_text`; memory-map builders `build_mem_map_s19`, `build_range_validity_s19`, `build_range_validity_hex`, `build_row_bases`; `find_string_in_mem`; layout constants `HEX_WIDTH`, `MAX_HEX_ROWS`, `MAX_HEX_BYTES`, `FOCUS_CONTEXT_ROWS`, `SEARCH_ENCODING`. |
+| **Boundaries** | pure Python + `rich.text` only. **No Textual import, no widgets, no app state** (verified at base: imports `bisect`, `typing`, `rich.text`, `..core`, `..hexfile`, `..range_index`, two `color_policy` constants, three `insight_style` constants — nothing else). Callable headless: it is the renderer the Markdown/HTML report services already consume as plain strings. |
+| **EXPOSES** | the 9 functions + 5 constants above, imported by views and services directly from `s19_app.render.hexview`. No re-export chain: consumers do NOT source it via `tui/__init__` after US-92-2 (see the `tui/__init__` contract in §11). |
+| **Does NOT belong** | range-membership primitives (`build_sorted_range_index` / `address_in_sorted_ranges` / `range_in_sorted_ranges` re-export wrappers are **deleted**, US-92-2 — ownership stays in the engine `s19_app/range_index.py`); severity→CSS policy (`css_class_for_severity`, stays in `tui/color_policy.py`, US-92-5 OUT); any Textual/window/widget concern. |
+| **Deps — allowed** | `rich.text`; `s19_app.core`, `s19_app.hexfile`, `s19_app.range_index`; style *constants* from in-package `s19_app.render.format` (the two `color_policy`-kin copies pinned by TC-655). **Zero `s19_app.tui.*` deps** — the pre-batch constant imports from `tui/color_policy` / `tui/insight_style` are killed, not residual (P1 amendment; ratified disposition in the dependency table below). |
+| **Deps — forbidden** | every other `s19_app.tui.*` symbol; `textual`; `s19_app.validation`; any `tui/services/*`. (This forbidden set is the entire point of the batch: service→presentation edges die here.) |
+
+Rationale (structural decisions):
+
+| # | Decision | Alternative rejected | What would re-open it |
+|---|---|---|---|
+| R1 | Move the file whole, byte-preserving, into the new package `s19_app/render/` | Gradual copy-and-repoint (old module left as a shim) | A shim would keep the `tui.hexview` import address alive — exactly the inverted edge US-92-1 kills; and 11 test files already pin the new address by repointing. The batch is behaviour-preserving; a coexistence window adds a second source of truth for zero benefit. |
+| R2 | `render/` is a package, not two flat modules dropped into `s19_app/` | Flat `s19_app/hexview.py` + `s19_app/format.py` | The two modules share one boundary rule (pure-Rich, no-Textual, service-consumable). A package states that rule once at the directory level and leaves room for the next renderer (report formatters) without another ARQ cycle. The package marker `__init__.py` is empty of logic. |
+| R3 | Style *constants* are owned by `render/format` (moved THIS batch); style *policy* may not cross into `render/` — **amended at P1** (review C1-(c), operator-ratified): the original "import-as-data residual" posture was superseded once TC-655 existed to pin the frozen copies | Moving the constants into `render/` now — the original rejection, reversed at P1 | `color_policy.py` is frozen (operator-confirmed, US-92-5 OUT — now listed in §7) and `insight_style` carries view-side helpers that must stay put. The freeze is honoured by value-equal copies pinned to the frozen origins, not by edits — drift between `render/format` and the frozen tui origins fails TC-655. |
+
+#### NEW `s19_app/render/format.py`
+
+| Viewpoint | Declaration |
+|---|---|
+| **Encapsulates** | presentation-neutral formatting primitives services need: `microbar` + its private glyphs `MICROBAR_FILLED` / `MICROBAR_EMPTY` + the pure style constants of the `GREEN` / `LABEL` / `VALUE` kin. |
+| **Boundaries** | pure Python + `rich.text` (verified: `microbar` body uses only `Text` + the two glyphs). No Textual, no CSS, no tui imports. |
+| **EXPOSES** | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY`, `GREEN`, `LABEL`, `VALUE`. New service consumers MUST import from here, never from `tui.insight_style`. |
+| **Does NOT belong** | the view-side helpers that stay in `insight_style`: `human_bytes`, `label_value`, `threshold_style`, `cap_gauge_style` and the rest of the palette (`YELLOW/RED/HILITE/LBLUE/DGRAY/PURPLE/CYAN/MAGENTA`, `DEPTH_*`). |
+| **Deps — allowed** | `rich.text` only. |
+| **Deps — forbidden** | `s19_app.tui.*`, `textual`, engine, services. |
+
+Rationale:
+
+| # | Decision | Alternative rejected | What would re-open it |
+|---|---|---|---|
+| R4 | Canonical ownership moves to `render/format.py`; `insight_style` keeps a **re-export shim** | Full repoint of all 7 view consumers (`app`, `checks_view`, `issues_view`, `crc_designer_view`, `json_highlight`, `screens_directionb` — measured) | The increment file budget (≤5 files) and behaviour-preservation: a shim repoints exactly one service edge (`validation_service`) while the view surface is untouched — 0 snapshot risk. The asymmetry with US-92-2 is deliberate and declared: US-92-2 deletes *engine* re-exports (addressing correctness), R4 keeps a *presentation* shim (cosmetic convenience), and the shim's consumer rule ("services use render/format") is written here so it is not mistaken for an edge to "fix". |
+| R5 | `microbar` moves **with** its glyphs and the service-needed constants as one unit | Splitting constants into a third module | `microbar`'s contract includes the glyph pair; splitting them creates a dependency between two tiny modules to save nothing. One module, one boundary rule (R2). |
+
+#### CHANGED `s19_app/utils.py`
+
+| Viewpoint | Declaration |
+|---|---|
+| **Encapsulates** | (existing) `format_bytes`, `is_printable`, `safe_decode`. **Gains `safe_text`** moved from `tui/screens_directionb.py`, together with its private byte-class table `_CONTROL_SCRUB` (C0/DEL/C1 class — the normative, load-bearing shape per the source comment there). |
+| **Boundaries** | stdlib + `rich.text` only. **No Textual.** Stays importable from any layer (currently only `tui/*` consumes it; the address is presentation-neutral by construction). |
+| **EXPOSES** | `safe_text(value, style="") -> Text` as the **canonical markup-/control-safety primitive** (security contract in §11). |
+| **Does NOT belong** | any screen/widget logic; `safe_text`'s previous address is retired — `screens_directionb` becomes a consumer like everyone else. |
+| **Deps — allowed / forbidden** | allowed: `rich.text`; forbidden: `s19_app.tui.*`, `textual`. |
+
+Rationale:
+
+| # | Decision | Alternative rejected | What would re-open it |
+|---|---|---|---|
+| R6 | Canonical home is the app-root `utils.py`, not `render/` | Putting `safe_text` in `render/format.py` | `safe_text` is a *safety* primitive (C-17/B-1, §11), not a formatter: `checks_view`/`issues_view` consume it as a security sink, and a future non-render consumer must not drag presentation deps in. Root `utils` is the address with zero layer meaning. |
+| R7 | `_CONTROL_SCRUB` moves **with** the function, private | Leaving the table in `screens_directionb` as an import | The table is `safe_text`'s single-use private dependency; a cross-module constant import for it recreates the very `screens_directionb`-coupling US-92-3 removes. |
+
+#### CHANGED `s19_app/tui/insight_style.py`
+
+Keeps: full palette, `DEPTH_*`, `human_bytes`, `label_value`, `threshold_style`, `cap_gauge_style`. **Loses canonical ownership** of `microbar` + `MICROBAR_*` + `GREEN`/`LABEL`/`VALUE` (→ `render/format.py`, R4); **gains a re-export shim** for exactly those symbols so the view consumers (`app.py`, `checks_view.py`, `issues_view.py`, `crc_designer_view.py`, `json_highlight.py`, `screens_directionb.py` — all measured at base) are untouched. New edge `insight_style → render/format` is **allowed and declared**: presentation consuming presentation-neutral primitives is the permitted direction. Forbidden (unchanged): Textual, engine internals beyond existing use.
+
+#### CHANGED `s19_app/tui/screens_directionb.py`
+
+Loses `safe_text` + `_CONTROL_SCRUB` (→ `utils.py`, R6/R7); becomes their consumer. Gains nothing. Its other surfaces (screens, panels, the lazy `hexview` imports repointed by Inc-A) are unchanged in ownership. Remains the Direction-B screen shell; still does not own engine primitives (already imports `range_index` directly — the posture US-92-2 generalises).
+
+#### CHANGED consumers (repoint-only, no ownership change)
+
+| Module | Change | Evidence |
+|---|---|---|
+| `tui/app.py` | hexview import → `render.hexview`; range_index wrappers → direct `range_index`; `safe_text` → `utils` | measured (§7.2 of the batch record) |
+| `tui/__init__.py` | drops the 3 range_index wrappers; renderer re-export surface preserved, sourced from `render.hexview` | measured |
+| `tui/screens.py` | hexview import → `render.hexview` | measured — **not named in US-92-1's story text** |
+| `tui/checks_view.py`, `tui/issues_view.py` | `safe_text` → `utils` | measured |
+| `services/load_service.py`, `services/report_service.py`, `services/diff_report_service.py` | hexview imports → `render.hexview` | measured |
+| `services/validation_service.py` | `GREEN, LABEL, VALUE, microbar` → `render.format` | measured |
+
+#### RETIRED path
+
+`s19_app/tui/hexview.py` — **deleted** by batch-92 (Inc-A). Declared here so no reader of §1–§9 prose (which still walks the old tree) mistakes it for drift, and so the post-batch staleness sweep keys correctly.
+
+#### Batch-92 dependency amendments
+
+**Edges killed** (the batch's product; the batch record's intake caption is "6 of 7 measured at intake" — the 7th measured inversion, `services/change_service → tui/color_policy`, survives as a declared residual below):
+
+- `services/load_service → tui/hexview` · `services/report_service → tui/hexview` · `services/diff_report_service → tui/hexview`
+- `services/validation_service → tui/insight_style`
+- `tui/app → tui/hexview` (range_index indirection) · `tui/__init__ → tui/hexview` (wrapper chain) — via US-92-2's direct-to-engine rule
+- `checks_view` / `issues_view → screens_directionb` (the `safe_text` edge)
+
+**New edges (allowed, declared):** `services/* → render.hexview` · `services/validation_service → render.format` · `views → render.hexview` / `render.format` · `insight_style → render/format` (shim, R4) · `any layer → utils.safe_text`.
+
+**Declared residuals** (declared, not hidden):
+
+| Edge | Symbols | Disposition |
+|---|---|---|
+| `render/hexview → tui/color_policy` | `FOCUS_HIGHLIGHT_STYLE`, `MAC_ADDRESS_OVERLAY_STYLE` | **KILLED by batch-92** (P1 amendment, review C1-(c), operator-ratified): the edge is dead — `render/hexview` carries zero `s19_app.tui.*` imports and sources all five style constants from in-package `render/format`, which holds value-equal **pinned copies** of the two `color_policy` styles (TC-655). `tui/color_policy.py` itself stays frozen and untouched (US-92-5 OUT, §7). |
+| `render/hexview → tui/insight_style` | `CYAN`, `DGRAY`, `VALUE` | **KILLED by batch-92** (same P1 amendment): `render/format` is the canonical owner of the 5 constants; `render/hexview` imports them in-package (`from .format import …`) and `tui/insight_style` retains them only as a re-export shim (Inc-B). |
+| `services/change_service → tui/color_policy` | `css_class_for_severity` | US-92-5 OUT (operator freeze) — the 7th measured inversion; deferred to BACKLOG-CODE.md lane A. |
+| `tui/insight_style → render/format` | shim re-exports | **New, deliberate** (R4). Not an inversion — presentation → presentation-neutral is the allowed direction. Declared so a future dependency radiography does not "fix" it. |
+
+**Registered as flow input for batch-92 (from the batch record §6.2 — `tests/**` granularity).** Batch-88 rationale #3 kept `tests/**` as one module, re-open condition *"when a lane plan needs test file sets to be disjoint by layer"*. Batch-92's ARQ is that trigger: the batch's sequential verdict depends on file-level test sets (`test_tui_directionb.py`, `test_tui_hexview_classed.py`, `test_tui_issues_view.py` sit in both lanes' repoint sets — harmless sequential, fatal parallel). For batch-92 the parallelisation rule is applied at file granularity inside `tests/**` (rationale #3's letter honoured, its spirit — nothing mechanically reads the split today — preserved: the staleness checker's prefix classification is untouched). A **permanent** sub-split of `tests/**` is deferred as a flow input; the batch-92 verdict does not depend on it.
+
+**Registered as flow input for batch-92 (from the batch record §6.3 — checker expressiveness).** The staleness checker's `startswith(prefix + "/")` rule cannot express a hole in `s19_app/**` — the same expressive limit as the root-level `setup.py` case named above. The rule should either admit exclusion patterns or state that sub-package carve-outs are expressed as in-product declarations (as `render/` is declared here); otherwise a future genuinely-independent render interface silently reads as *stale map*.
 
 ## 11. Interfaces — the contracts between modules
 
@@ -245,3 +376,14 @@ verification rows that **cite** them. An interface a batch reads but does not to
 header `Frozen?` — and never on a section number. Section numbers differ per project (the template
 calls this viewpoint §4; here it is §11) and a rule that keys on a number is broken by any project
 that numbers its map differently, which is every project that had a map before adopting the template.
+
+**Batch-92 interface amendments** (from `2026-10-11-batch-92`; the table above is the Part B
+contracts, these four are sub-module surface contracts of the same kind — changing any of them is
+trigger A3 and is never done inside a lane):
+
+| Surface | Owner | Contract | Frozen? |
+|---|---|---|---|
+| `render.hexview` surface | product (`s19_app/render/hexview.py`) | the 9 functions + 5 constants declared in §10, consumed as plain data (`Text`/`str`) by both views and report emitters; a name/signature change is trigger A3 | **✅ frozen at PDR for `2026-10-11-batch-92`** once Inc-A lands; Inc-B must not touch it |
+| `render.format` surface | product (`s19_app/render/format.py`) | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY`, `GREEN`, `LABEL`, `VALUE` — same plain-data rule | **✅ frozen at PDR for `2026-10-11-batch-92`** after Inc-B |
+| `utils.safe_text` contract | product (`s19_app/utils.py`) | **security contract** (context viewpoint feeding the security family): delete every C0/DEL/C1 codepoint (`_CONTROL_SCRUB`, LLR-116.7), wrap the remainder as a literal `Text` — never `Text.from_markup` (C-17). The batch-77 precedent stands: the move must not weaken or split the two halves. Oracle: the hostile-input acceptance tests (`tests/test_tui_hostile_map.py`, `test_tui_checks_view.py`, `test_tui_issues_view.py`) | standing contract, carried with the function to its new address |
+| `tui/__init__` re-export surface | product (`s19_app/tui/__init__.py`) | the 3 range_index names are **removed** (US-92-2, breaking-by-design, consumer set fully enumerated in the batch record §5); the renderer names stay, repointed to `render.hexview` | change lands with batch-92 Inc-A |

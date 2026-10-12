@@ -1,0 +1,5 @@
+wrapper AST spans (1-based, base tui/hexview.py): [(61, 84, 'build_sorted_range_index'), (87, 113, 'address_in_sorted_ranges'), (116, 141, 'range_in_sorted_ranges')]
+base-minus-wrappers-minus-import-block sha256: fe6921c79b8f44776e2350db317b8f01150f341b9280f36f26b25ac4a2185f3b
+s19_app/render/hexview.py          sha256: fe6921c79b8f44776e2350db317b8f01150f341b9280f36f26b25ac4a2185f3b
+BYTE-IDENTITY: True
+old file on disk: False

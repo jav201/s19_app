@@ -34,13 +34,9 @@ from ..core import S19File
 from ..hexfile import IntelHexFile
 from .a2l_parse import parse_a2l_file
 from .changes import STATUS_VERIFIED, VerifyResult
-from .hexview import (
-    address_in_sorted_ranges,
-    build_row_bases,
-    build_sorted_range_index,
-    find_string_in_mem,
-    render_hex_view_text,
-)
+from ..range_index import address_in_sorted_ranges, build_sorted_range_index
+from ..render.hexview import build_row_bases, find_string_in_mem, render_hex_view_text
+from ..utils import safe_text
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet
@@ -76,7 +72,6 @@ from .screens_directionb import (
     cell_status,
     coverage_stats,
     derive_image_span,
-    safe_text,
     status_to_css_class,
 )
 from .crc_designer_view import CrcDesignerPanel

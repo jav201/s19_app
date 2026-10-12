@@ -38,7 +38,7 @@ from textual.message import Message
 from textual.widgets import Static
 
 from .insight_style import GREEN, microbar
-from .screens_directionb import safe_text
+from ..utils import safe_text
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .services.change_service import CheckDisplayRow

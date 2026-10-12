@@ -357,7 +357,7 @@ def test_at103_deposit_with_markup_metachars_renders_verbatim() -> None:
     ``.plain``, no ``MarkupError``).
     """
     from s19_app.tui.app import _a2l_detail_card_text
-    from s19_app.tui.screens_directionb import safe_text
+    from s19_app.utils import safe_text
 
     hostile = "RL.CURVE[red]/*x*/SWORD"
     cell = safe_text(hostile)

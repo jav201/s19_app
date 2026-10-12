@@ -14,20 +14,17 @@ from .a2l_parse import parse_a2l_file
 from .a2l_render import render_a2l_view
 from .a2l_validate import validate_a2l_internal_issues, validate_a2l_tags
 from .app import S19TuiApp, main
-from .hexview import (
+from ..render.hexview import (
     FOCUS_CONTEXT_ROWS,
     HEX_WIDTH,
     MAX_HEX_BYTES,
     MAX_HEX_ROWS,
     SEARCH_ENCODING,
-    address_in_sorted_ranges,
     build_mem_map_s19,
     build_range_validity_hex,
     build_range_validity_s19,
     build_row_bases,
-    build_sorted_range_index,
     find_string_in_mem,
-    range_in_sorted_ranges,
     render_hex_view,
     render_hex_view_text,
 )
@@ -78,13 +75,11 @@ __all__ = [
     "WORKAREA_SUBDIR",
     "WORKAREA_TEMP",
     "VariantDescriptor",
-    "address_in_sorted_ranges",
     "build_mem_map_s19",
     "build_variant_set",
     "build_range_validity_hex",
     "build_range_validity_s19",
     "build_row_bases",
-    "build_sorted_range_index",
     "copy_into_workarea",
     "ensure_workarea",
     "extract_a2l_tags",
@@ -92,7 +87,6 @@ __all__ = [
     "find_string_in_mem",
     "main",
     "parse_a2l_file",
-    "range_in_sorted_ranges",
     "render_a2l_view",
     "render_hex_view",
     "render_hex_view_text",

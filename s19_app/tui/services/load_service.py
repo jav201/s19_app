@@ -5,7 +5,7 @@ from typing import Optional
 
 from ...core import S19File
 from ...hexfile import IntelHexFile
-from ..hexview import (
+from ...render.hexview import (
     build_mem_map_s19,
     build_range_validity_hex,
     build_range_validity_s19,

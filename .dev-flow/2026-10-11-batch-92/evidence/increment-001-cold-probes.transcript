@@ -1,0 +1,13 @@
+=== probe 1: import s19_app.render.hexview ===
+tree: C:\Users\jjgh8\Github\s19_app-b92\s19_app\__init__.py
+ok 16
+=== probe 2: from s19_app.render.hexview import render_hex_view ===
+ok True
+=== probe 3: import s19_app.render.format (tui must stay out of sys.modules) ===
+ok
+s19_app.tui in sys.modules: False
+=== probe 4: import s19_app.tui.app ===
+ok S19TuiApp
+=== probe 5: import s19_app.tui.services.load_service ===
+ok True
+exit=0

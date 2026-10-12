@@ -1,0 +1,142 @@
+# Project report: proj
+
+- Project: proj
+- Generated (UTC): 2026-06-10T12:00:00+00:00
+- Tool version: 0.1.0
+- Context bytes: 512
+- Execution mode: batch
+- Assignment source: default
+
+## Variant inventory
+
+| Variant | File | Type | Active |
+|---|---|---|---|
+| stress | stress\.s19 | s19 | yes |
+
+## Consolidated overview
+
+| Variant | Status | Changes applied | Checks passed | Checks failed | Checks uncheckable |
+|---|---|---|---|---|---|
+| stress | ok | 1 | 0 | 0 | 0 |
+
+## Legend
+
+### A2L
+- **Red** — schema/structural failure: malformed required field, invalid required reference, or hard-error duplicate symbol
+- **Green** — memory checked — tag/range fully found in the loaded S19/HEX image
+- **White** — valid A2L record with no hard inconsistency, including valid records not present in the image
+- **Grey** — memory not checked yet, or no primary S19/HEX context loaded
+
+### MAC
+- **Red** — parse failed, invalid/missing name or hex address, or A2L↔MAC same-name address mismatch
+- **Pale yellow** — warning: symbol only in MAC (not A2L), duplicate-address alias, or overlap ambiguity
+- **Green** — exact name + address match with A2L
+- **White** — structurally valid MAC entry, no hard inconsistency, not positively cross-confirmed
+- **Grey** — no A2L loaded, or validation context missing
+
+### Issues
+- **Errors** (Red) — parse/structure errors, empty name, invalid/missing address, duplicate symbol, broken GROUP/FUNCTION references, or A2L↔MAC same-name mismatch
+- **Warnings** (Pale yellow) — address/range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, or warning-policy alias
+- **Optional info** (Cyan) — valid-but-not-image-backed, not-checked-without-primary-image, or virtual/dependent non-memory-backed objects
+
+### Hex
+- **Yellow** — search / goto-focus highlight: the byte span matched by the last in-memory search or goto-address jump in the hex view
+- **Orange3** — MAC address overlay: a hex byte at an address referenced by a loaded MAC record
+
+## Variant: stress
+
+### Modified files
+
+- `chg.json` (applied entries: 1)
+
+### Modifications
+
+| Address | Length | Before | After | Linkage | Symbol |
+|---|---|---|---|---|---|
+| 0x08000FF0 | 2 | 00 00 | AA BB | standalone | - |
+
+### Declaration errors
+
+None.
+
+### Checklists
+
+No checklists were executed for this variant.
+
+### Memory regions
+
+Window 0x08000DF0-0x08001200:
+
+```text
+0x08000DF0  B4 5B 4B 3E 93 96 59 F8 96 7E 7B 27 F4 62 B7 DA  |.[K>..Y..~{'.b..|
+0x08000E00  89 A7 34 47 ED B3 42 20 EB CD F6 A3 9F F7 48 91  |..4G..B ......H.|
+0x08000E10  17 D2 21 ED 5A 22 39 C9 76 95 36 D9 97 0F 19 CE  |..!.Z"9.v.6.....|
+0x08000E20  D3 BC 74 7D 53 37 3B 4A 97 B7 F8 7E DD 4C 5F AE  |..t}S7;J...~.L_.|
+0x08000E30  5C 0B AB 4C 34 A1 7E 34 35 F4 FC 92 AB 2E 6A 15  |\..L4.~45.....j.|
+0x08000E40  CE 84 AE 70 AE 85 21 E6 41 13 31 E0 8F AB 82 E3  |...p..!.A.1.....|
+0x08000E50  09 AF A4 7C B4 B9 B7 C0 67 08 C9 9D CD 0B 3C A0  |...|....g.....<.|
+0x08000E60  0C DE 49 2F 40 19 95 64 B9 7C 2A 72 DD A2 92 0A  |..I/@..d.|*r....|
+0x08000E70  21 EB 8C C3 6D 52 E7 05 50 01 55 19 2F BD 1B 72  |!...mR..P.U./..r|
+0x08000E80  73 FE 82 9F BF A0 FE 19 7C 42 6D 76 32 47 36 15  |s.......|Bmv2G6.|
+0x08000E90  2E DE E8 E6 CA 07 A3 6B 40 99 96 CD 19 EA 7E C9  |.......k@.....~.|
+0x08000EA0  87 9D 3D A0 82 88 E7 E4 34 9F A5 27 DF AE 03 37  |..=.....4..'...7|
+0x08000EB0  A8 35 64 02 09 09 9E EC 38 0A FF 79 8C 9A 87 66  |.5d.....8..y...f|
+0x08000EC0  CD E4 F4 9D A9 07 96 36 AE 2E 4E C5 E9 86 B2 8E  |.......6..N.....|
+0x08000ED0  71 5D E8 EE 84 F3 30 2A 58 1A 80 B8 AA B8 1D C4  |q]....0*X.......|
+0x08000EE0  AE 59 91 F3 16 9B A3 8A A3 26 B2 0A E5 58 B7 96  |.Y.......&...X..|
+0x08000EF0  87 FB 00 E4 50 7C B1 77 3A 18 C2 E3 C1 12 A6 0D  |....P|.w:.......|
+0x08000F00  06 EB 80 6C 5A EE 34 CC 1C 87 35 46 1D 05 83 D8  |...lZ.4...5F....|
+0x08000F10  91 22 AA F6 AD 87 AB 76 18 79 E2 09 C3 A3 15 67  |.".....v.y.....g|
+0x08000F20  3A 7C 0F A0 4C 7B FC FC DD 5C E4 86 58 13 B8 97  |:|..L{...\..X...|
+0x08000F30  AE 8C 75 C8 02 1E 33 45 A9 54 09 15 53 4F 28 47  |..u...3E.T..SO(G|
+0x08000F40  4D 5F D0 C7 09 BD 93 B0 08 79 05 BC BC AF 2C BD  |M_.......y....,.|
+0x08000F50  BB 21 D1 60 B8 81 4C 6C 5E 45 39 A3 31 54 B7 82  |.!.`..Ll^E9.1T..|
+0x08000F60  EF 86 E4 5E CA D6 B8 31 A2 4C 84 5B AC E5 29 BF  |...^...1.L.[..).|
+0x08000F70  BF 89 B4 4C D3 69 66 50 EB DA 7D 00 BB 45 0F E1  |...L.ifP..}..E..|
+0x08000F80  D1 30 1A C6 94 66 DC 01 75 CE F8 FC D9 CE CF 1F  |.0...f..u.......|
+0x08000F90  9E 5A 55 A4 3E E6 51 C7 74 40 82 09 EA A0 F5 B2  |.ZU.>.Q.t@......|
+0x08000FA0  70 9F 0E FB 46 8A 69 BF 07 92 DC 74 03 70 C6 44  |p...F.i....t.p.D|
+0x08000FB0  81 66 40 C7 F5 B8 F0 45 0F CA D8 B0 9E 48 94 FF  |.f@....E.....H..|
+0x08000FC0  85 CB 7B EC 67 5D FE E9 13 D1 67 95 D9 35 9E 8A  |..{.g]....g..5..|
+0x08000FD0  53 4D 6B 9D 42 53 B1 6B 51 1E 35 40 81 92 91 5F  |SMk.BS.kQ.5@..._|
+0x08000FE0  1F 8E BE 37 D3 85 AB 85 37 1C 0F AE D9 F7 A2 75  |...7....7......u|
+0x08000FF0  AA BB D7 2A 80 B0 4C 14 04 40 C5 BA 0E BE AB CC  |...*..L..@......|
+0x08001000                                                   |................|
+0x08001010                                                   |................|
+0x08001020                                                   |................|
+0x08001030                                                   |................|
+0x08001040                                                   |................|
+0x08001050                                                   |................|
+0x08001060                                                   |................|
+0x08001070                                                   |................|
+0x08001080                                                   |................|
+0x08001090                                                   |................|
+0x080010A0                                                   |................|
+0x080010B0                                                   |................|
+0x080010C0                                                   |................|
+0x080010D0                                                   |................|
+0x080010E0                                                   |................|
+0x080010F0                                                   |................|
+0x08001100  38 35 62 6C A5 CE 49 15 2A 10 B5 6A D2 3B D2 6A  |85bl..I.*..j.;.j|
+0x08001110  AD 2E 34 46 8B 78 57 6E C4 DE 65 68 05 8F D6 6E  |..4F.xWn..eh...n|
+0x08001120  34 B9 AA 80 77 FF 6C 1A 37 87 DD 33 13 33 A7 A9  |4...w.l.7..3.3..|
+0x08001130  3A 90 32 7B 9B 21 31 C8 F5 4C A6 73 42 79 46 14  |:.2{.!1..L.sByF.|
+0x08001140  1B EF F4 78 D9 7E 6F 31 AA 59 97 34 E5 E6 67 F3  |...x.~o1.Y.4..g.|
+0x08001150  86 F5 61 E7 51 6D CE B3 DC 86 C7 55 43 FA 38 78  |..a.Qm.....UC.8x|
+0x08001160  B0 8D 03 9C E4 6C CA 73 94 A1 0C B8 11 DA 0C 0B  |.....l.s........|
+0x08001170  18 1B D0 99 E7 A9 0D C3 36 D7 8C 16 AD 16 1F B2  |........6.......|
+0x08001180  3C 07 32 11 6C D2 8F 33 37 5C 3E 4F 7A 76 F7 85  |<.2.l..37\>Ozv..|
+0x08001190  CC 68 1A F9 26 74 42 C9 EA 21 7E 74 3C 4F DE FB  |.h..&tB..!~t<O..|
+0x080011A0  D7 83 62 12 C7 4F FC 47 18 9D C5 F5 E9 D7 AA 76  |..b..O.G.......v|
+0x080011B0  20 99 79 AE 9B 7A DE 8B 95 C2 A5 A3 6A 30 9B 99  | .y..z......j0..|
+0x080011C0  63 34 7C D1 53 A1 6C D6 ED 7D 8C BA C8 21 F3 E1  |c4|.S.l..}...!..|
+0x080011D0  31 55 3D 88 87 04 C7 C9 65 0C 53 1E D4 D9 AA DA  |1U=.....e.S.....|
+0x080011E0  C2 14 88 F2 07 2C 12 4D 79 54 AA D9 47 95 F9 7E  |.....,.MyT..G..~|
+0x080011F0  26 89 4B 63 7E 44 06 0E E2 8D 9A 0A C3 EE 55 13  |&.Kc~D........U.|
+```
+
+### Entropy
+
+- **low**: 1 window(s) (1 low-confidence)
+- **medium**: 2226 window(s)
+- **high/random**: 974 window(s)

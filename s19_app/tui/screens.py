@@ -31,7 +31,7 @@ from markdown_it import MarkdownIt
 from .capped_text_area import CappedTextArea
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
-from .hexview import MAX_HEX_ROWS, render_hex_view_text
+from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
 from .os_clipboard_input import OsClipboardInput
 from .workspace import sanitize_project_name
 from .legend import (

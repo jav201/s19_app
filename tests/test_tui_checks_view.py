@@ -291,6 +291,7 @@ def test_tc084_10_render_groups_caps_mounted_rows() -> None:
 
 
 def test_c17_seed_hostile_linkage_and_reason_render_literal() -> None:
+    """AT-290 — black-box node: hostile payload renders literally through the shipped screen."""
     """C-17 seed / LLR-084.8 — hostile ``linkage_symbol``/``reason`` render literal in their cells.
 
     Intent (widget-level guard; the through-surface AT-084g comes in Inc-4): a

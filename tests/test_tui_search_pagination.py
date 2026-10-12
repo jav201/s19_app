@@ -16,7 +16,7 @@ from pathlib import Path
 
 from textual.widgets import Input
 
-from s19_app.tui import hexview as hexview_module
+from s19_app.render import hexview as hexview_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.models import LoadedFile
 

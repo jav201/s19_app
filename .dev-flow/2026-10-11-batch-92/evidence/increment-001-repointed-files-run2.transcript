@@ -1,0 +1,16 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [ 38%]
+........................................................................ [ 77%]
+.....................................F....                               [100%]
+================================== FAILURES ===================================
+___________ test_a16_canonicaliser_residue_guard_can_actually_fire ____________
+tests\test_report_field_census.py:847: in test_a16_canonicaliser_residue_guard_can_actually_fire
+    from conftest import canonical_report_bytes
+E   ModuleNotFoundError: No module named 'conftest'
+=========================== short test summary info ===========================
+FAILED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+1 failed, 185 passed in 214.69s (0:03:34)
+exit=1

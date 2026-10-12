@@ -1,15 +1,17 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from s19_app.tui.hexview import (
-    _collect_hex_rows,
+from s19_app.range_index import (
     address_in_sorted_ranges,
+    build_sorted_range_index,
+    range_in_sorted_ranges,
+)
+from s19_app.render.hexview import (
+    _collect_hex_rows,
     build_mem_map_s19,
     build_range_validity_hex,
     build_range_validity_s19,
     build_row_bases,
-    build_sorted_range_index,
-    range_in_sorted_ranges,
     render_hex_view_text,
 )
 
@@ -167,7 +169,7 @@ def test_collect_hex_rows_adds_new_bases_when_extras_outside_row_bases():
 
 def test_collect_hex_rows_uses_row_bases_set_without_rebuilding():
     """When extras are covered, the caller-provided membership set must drive the fast path even when ``row_bases`` is not a set."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     mem_map = {0x1000 + i: 0x41 for i in range(32)}
     row_bases = build_row_bases(mem_map)
@@ -199,7 +201,7 @@ def test_collect_hex_rows_uses_row_bases_set_without_rebuilding():
 
 def test_collect_hex_rows_without_row_bases_set_still_rebuilds():
     """Without ``row_bases_set``, ``set(base_row_bases)`` is constructed as before (regression guard)."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     mem_map = {0x1000 + i: 0x41 for i in range(32)}
     row_bases = build_row_bases(mem_map)
@@ -273,7 +275,7 @@ def test_render_hex_view_text_accepts_row_bases_set():
 
 def test_tc_023_search_encoding_is_the_only_knob_for_find_string_in_mem(monkeypatch):
     """Patching SEARCH_ENCODING propagates into find_string_in_mem."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     # ASCII-only by default: a non-ascii needle returns None.
     mem_map = {0x1000 + i: b for i, b in enumerate("café".encode("utf-8"))}
@@ -286,7 +288,7 @@ def test_tc_023_search_encoding_is_the_only_knob_for_find_string_in_mem(monkeypa
 
 def test_tc_023_max_hex_rows_caps_collect_hex_rows(monkeypatch):
     """MAX_HEX_ROWS is the upper bound used by _collect_hex_rows when no max_rows is given."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     # Build enough memory to need many rows.
     mem_map = {0x1000 + i: 0x41 for i in range(hexview.HEX_WIDTH * 32)}
@@ -299,7 +301,7 @@ def test_tc_023_max_hex_rows_caps_collect_hex_rows(monkeypatch):
 
 def test_tc_023_focus_context_rows_drives_focus_window(monkeypatch):
     """FOCUS_CONTEXT_ROWS controls the leading window when a focus_address is given."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     mem_map = {addr: 0x41 for addr in range(0x1000, 0x1000 + hexview.HEX_WIDTH * 80)}
     focus = 0x1000 + (hexview.HEX_WIDTH * 70)
@@ -318,7 +320,7 @@ def test_tc_023_focus_context_rows_drives_focus_window(monkeypatch):
 
 def test_tc_023_max_hex_bytes_truncation_is_governed_by_constant(monkeypatch):
     """MAX_HEX_BYTES is the byte budget that triggers the 'output truncated' line."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     # Pin MAX_HEX_BYTES low (multiple of HEX_WIDTH) so the truncation message wins
     # over the row-count message.
@@ -332,7 +334,7 @@ def test_tc_023_max_hex_bytes_truncation_is_governed_by_constant(monkeypatch):
 
 def test_tc_023_hex_width_governs_row_alignment(monkeypatch):
     """HEX_WIDTH is the only knob that decides the row anchor stride."""
-    import s19_app.tui.hexview as hexview
+    import s19_app.render.hexview as hexview
 
     # Force an 8-byte stride. build_row_bases anchors at addr - (addr % HEX_WIDTH).
     monkeypatch.setattr(hexview, "HEX_WIDTH", 8)

@@ -1,0 +1,29 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc651_import_census_all_consumers_read_render_hexview __________
+
+    def test_tc651_import_census_all_consumers_read_render_hexview() -> None:
+        """TC-651 — live-tree AST census over s19_app/ (LLR-001.4, F-QA-2)."""
+        census = _census(PRODUCT_ROOT, _product_package_of, _product_module_of)
+    
+        importers = census.get(HEXVIEW_MODULE, set())
+>       assert importers == MEASURED_CONSUMERS, (
+            f"hexview importer set drifted from the measured set: "
+            f"extra={sorted(importers - MEASURED_CONSUMERS)} "
+            f"missing={sorted(MEASURED_CONSUMERS - importers)}"
+        )
+E       AssertionError: hexview importer set drifted from the measured set: extra=[] missing=['s19_app.tui.screens']
+E       assert {'s19_app.tui...port_service'} == {'s19_app.tui...service', ...}
+E         
+E         Extra items in the right set:
+E         's19_app.tui.screens'
+E         Use -v to get more diff
+
+tests\test_render_hexview.py:167: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_render_hexview.py::test_tc651_import_census_all_consumers_read_render_hexview
+1 failed in 0.75s

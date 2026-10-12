@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 69 requirement files | corpus digest: 14d96209bc75acd0 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 70 requirement files | corpus digest: ce46b4d3862a5ad0 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-9 FLOW declaration(s) · 3 COMPONENT declaration(s) · 635 declared requirement heading ids — one row per declaration.
+12 FLOW declaration(s) · 6 COMPONENT declaration(s) · 635 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -57,6 +57,15 @@
 - node `the docs catch-up (README + docs/* read the shipped app)` — owner HLR-123
 - node `the AT-043 resolution` — owner LLR-124.1
 - node `the 44 token adoptions` — owner LLR-124.2
+
+### FLOW `F-92-1` — .dev-flow/2026-10-11-batch-92/01-requirements.md:379
+- node `render_hex_view / render_hex_view_text (+ build_mem_map_s19, build_range_validity_s19, [+ABSORBED]` — owner LLR-001.2
+
+### FLOW `F-92-2` — .dev-flow/2026-10-11-batch-92/01-requirements.md:392
+- node `safe_text (+ private _CONTROL_SCRUB)` — owner LLR-003.2
+
+### FLOW `F-92-3` — .dev-flow/2026-10-11-batch-92/01-requirements.md:404
+- node `microbar (+ MICROBAR_FILLED, MICROBAR_EMPTY, GREEN, LABEL, VALUE)` — owner LLR-004.1
 
 ### FLOW `the Memory Map cohesion pass — a presentational re-render of already-computed LoadedFile facts` — .dev-flow/2026-10-11-batch-93/01-requirements.md:587
 - node `pane chrome + subtitles (bordered panes, lit titles, affordance hints)` — owner LLR-125.1
@@ -189,10 +198,41 @@
 | `artifact_slots` | `query(".loaded-detail"), INDEXED POSITIONALLY` | 3 | 4 declared | LLR-87.7 |
 | `project_row` | `query(".loaded-project-detail")` | 1 | 3 declared | LLR-87.7 |
 
+### COMPONENT `C-92-1` — .dev-flow/2026-10-11-batch-92/01-requirements.md:418
+- inputs : loaded image: S19File | IntelHexFile ; ranges: list[tuple[int, int]] ; focus/match params
+- outputs : 
+- parent : SYSTEM
+- surface : render package (s19_app/render/)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `hex-rendered rows` | `s19_app.render.hexview.render_hex_view / render_hex_view_text (+ builder fns)` | None | 17 declared | LLR-001.2 |
+| `layout constants` | `s19_app.render.hexview::<constant name>` | None | 8 declared | LLR-001.3 |
+
+### COMPONENT `C-92-2` — .dev-flow/2026-10-11-batch-92/01-requirements.md:447
+- inputs : value: str ; style: str
+- outputs : 
+- parent : SYSTEM
+- surface : render package (s19_app/render/)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `microbar bar + style constants` | `s19_app.render.format.microbar / ::MICROBAR_FILLED / ::MICROBAR_EMPTY / [+ABSORBED]` | None | 5 declared | LLR-004.1 |
+
+### COMPONENT `C-92-3` — .dev-flow/2026-10-11-batch-92/01-requirements.md:464
+- inputs : value: str ; style: str
+- outputs : 
+- parent : SYSTEM
+- surface : app root utilities (s19_app/utils.py)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `markup-safe Text` | `s19_app.utils.safe_text` | None | 14 declared | LLR-003.2 |
+
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 60 FLOW node(s), every one owned
-- [-] V11  01-requirements.md: 79 OUTPUT(s), each with an address and a declared consumer list
+- [-] V10  01-requirements.md: 63 FLOW node(s), every one owned
+- [-] V11  01-requirements.md: 83 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -245,6 +285,6 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1151: COMPONENT workspace_body/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1161: COMPONENT workspace_body/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  01-requirements.md: 2 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [-] V14  01-requirements.md: 251 declared consumer(s), every one resolved
-- [-] V19  01-requirements.md: 3 COMPONENT id(s), each declared exactly once
+- [!] V13  01-requirements.md: 6 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
+- [-] V14  01-requirements.md: 295 declared consumer(s), every one resolved
+- [-] V19  01-requirements.md: 6 COMPONENT id(s), each declared exactly once

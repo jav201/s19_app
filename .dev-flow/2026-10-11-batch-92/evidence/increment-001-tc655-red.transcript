@@ -1,0 +1,23 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc655_render_format_values_pinned_to_frozen_origins ___________
+
+    def test_tc655_render_format_values_pinned_to_frozen_origins() -> None:
+        """TC-655 — every value at the new address equals its frozen tui origin."""
+        # The 5 style constants the moved hexview consumes (LLR-001.1 import block).
+>       assert render_format.CYAN == "#7dd3fc"
+E       AssertionError: assert '#7dd3fd' == '#7dd3fc'
+E         
+E         - #7dd3fc
+E         ?       ^
+E         + #7dd3fd
+E         ?       ^
+
+tests\test_render_format.py:31: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_render_format.py::test_tc655_render_format_values_pinned_to_frozen_origins
+1 failed in 0.46s

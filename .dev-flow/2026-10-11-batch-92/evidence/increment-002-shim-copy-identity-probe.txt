@@ -1,0 +1,5 @@
+insight_style.microbar is render_format.microbar -> False
+insight_style.MICROBAR_EMPTY is render_format.MICROBAR_EMPTY -> False
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+AssertionError: the copy mutation breaks the is-identity arm

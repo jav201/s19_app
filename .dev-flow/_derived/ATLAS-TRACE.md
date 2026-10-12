@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 69 requirement files | corpus digest: 14d96209bc75acd0 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 70 requirement files | corpus digest: ce46b4d3862a5ad0 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
+registry: 1425 rows — BURNED 422 · LIVE 928 · RESERVED 54 · RETIRED 21
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -547,6 +547,11 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `AT-284` | LIVE | batch-91 |  |
 | `AT-285` | LIVE | batch-91 |  |
 | `AT-286` | LIVE | batch-91 |  |
+| `AT-287` | RESERVED | batch-91 |  |
+| `AT-288` | RESERVED | batch-92 |  |
+| `AT-289` | RESERVED | batch-92 |  |
+| `AT-290` | RESERVED | batch-92 |  |
+| `AT-291` | RESERVED | batch-92 |  |
 | `AT-40` | LIVE | seed |  |
 | `AT-80` | LIVE | seed |  |
 | `AT-88` | LIVE | seed |  |
@@ -1416,12 +1421,19 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `TC-646` | LIVE | batch-91 |  |
 | `TC-647` | LIVE | batch-91 |  |
 | `TC-648` | LIVE | batch-91 |  |
+| `TC-649` | RESERVED | batch-91 |  |
+| `TC-650` | RESERVED | batch-91 |  |
+| `TC-651` | RESERVED | batch-92 |  |
+| `TC-652` | RESERVED | batch-92 |  |
+| `TC-653` | RESERVED | batch-92 |  |
+| `TC-654` | RESERVED | batch-92 |  |
+| `TC-655` | RESERVED | batch-92 |  |
 | `TC-6xx` | LIVE | seed |  |
 | `TC-79b` | LIVE | seed |  |
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1540 unique id(s)
+## family US/HLR/LLR — 1548 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1742,6 +1754,7 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `LLR-003.x` | batches |
 | `LLR-004` | batches |
 | `LLR-004.1` | batches, canon, tests |
+| `LLR-004.1-as-folded` | batches |
 | `LLR-004.1..004.3` | batches |
 | `LLR-004.1..004.4` | batches |
 | `LLR-004.1..004.5` | batches |
@@ -2868,6 +2881,13 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `US-88-2` | batches |
 | `US-90.1` | batches |
 | `US-90.2` | batches |
+| `US-92-1` | batches |
+| `US-92-1..4` | batches |
+| `US-92-2` | batches |
+| `US-92-3` | batches |
+| `US-92-4` | batches |
+| `US-92-5` | batches |
+| `US-92-6` | batches |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -3141,7 +3161,7 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1541 unique id(s)
+## family AT/TC — 1546 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3636,10 +3656,10 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `AT-285` | batches, tests |
 | `AT-286` | batches, tests |
 | `AT-287` | batches |
-| `AT-288` | batches |
-| `AT-289` | batches |
-| `AT-290` | batches |
-| `AT-291` | batches |
+| `AT-288` | batches, tests |
+| `AT-289` | batches, tests |
+| `AT-290` | batches, tests |
+| `AT-291` | batches, tests |
 | `AT-292` | batches |
 | `AT-293` | batches |
 | `AT-294` | batches |
@@ -4552,6 +4572,11 @@ registry: 1413 rows — BURNED 422 · LIVE 928 · RESERVED 42 · RETIRED 21
 | `TC-648` | batches, canon, tests |
 | `TC-649` | batches |
 | `TC-650` | batches |
+| `TC-651` | batches, canon, tests |
+| `TC-652` | batches, tests |
+| `TC-653` | batches, canon, tests |
+| `TC-654` | batches, canon, tests |
+| `TC-655` | batches, canon, tests |
 | `TC-6xx` | tests |
 | `TC-79b` | batches, tests |
 | `TC-79c` | batches, tests |

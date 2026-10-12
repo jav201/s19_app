@@ -2785,7 +2785,7 @@ def _b78_widest_emitted_hex_row() -> int:
     lanes. Importing the same function the panel imports is what makes that
     impossible to get wrong here.
     """
-    from s19_app.tui.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+    from s19_app.render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 
     base = 0x1000
     mem_map = {address: 0xAB for address in range(base, base + 4 * HEX_WIDTH)}

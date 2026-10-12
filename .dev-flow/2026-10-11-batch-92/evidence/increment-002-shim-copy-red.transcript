@@ -1,0 +1,43 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_tc654_format_census_and_shim_identity __________________
+
+    def test_tc654_format_census_and_shim_identity() -> None:
+        """TC-654 — render.format census + the 8-symbol shim identity (LLR-004.2/004.3)."""
+        census = _census(PRODUCT_ROOT, _product_package_of, _product_module_of)
+    
+        # LLR-004.3: the service-layer insight_style importer set is EMPTY — a
+        # service consuming the presentation module via the shim fails by
+        # set-equality (declared measured set, F-QA-2).
+        services_importers = {
+            mod
+            for mod in census.get(INSIGHT_MODULE, set())
+            if mod.startswith("s19_app.tui.services")
+        }
+        assert services_importers == set(), (
+            f"tui/services/* must not import {INSIGHT_MODULE}: "
+            f"{sorted(services_importers)}"
+        )
+    
+        # ...and every render.format importer is in the declared measured set.
+        format_importers = census.get(FORMAT_MODULE, set())
+>       assert format_importers == MEASURED_FORMAT_CONSUMERS, (
+            f"render.format importer set drifted from the measured set: "
+            f"extra={sorted(format_importers - MEASURED_FORMAT_CONSUMERS)} "
+            f"missing={sorted(MEASURED_FORMAT_CONSUMERS - format_importers)}"
+        )
+E       AssertionError: render.format importer set drifted from the measured set: extra=[] missing=['s19_app.tui.insight_style']
+E       assert {'s19_app.ren...tion_service'} == {'s19_app.ren...tion_service'}
+E         
+E         Extra items in the right set:
+E         's19_app.tui.insight_style'
+E         Use -v to get more diff
+
+tests\test_import_census.py:283: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_import_census.py::test_tc654_format_census_and_shim_identity
+1 failed in 0.71s
