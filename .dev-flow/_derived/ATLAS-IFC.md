@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
+<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 69 requirement files | corpus digest: 14d96209bc75acd0 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-8 FLOW declaration(s) · 3 COMPONENT declaration(s) · 604 declared requirement heading ids — one row per declaration.
+9 FLOW declaration(s) · 3 COMPONENT declaration(s) · 635 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -57,6 +57,31 @@
 - node `the docs catch-up (README + docs/* read the shipped app)` — owner HLR-123
 - node `the AT-043 resolution` — owner LLR-124.1
 - node `the 44 token adoptions` — owner LLR-124.2
+
+### FLOW `the Memory Map cohesion pass — a presentational re-render of already-computed LoadedFile facts` — .dev-flow/2026-10-11-batch-93/01-requirements.md:587
+- node `pane chrome + subtitles (bordered panes, lit titles, affordance hints)` — owner LLR-125.1
+- node `left-pane stack order (bar -> ruler -> chips -> list)` — owner LLR-126.1
+- node `inspector aligned field block` — owner LLR-126.2
+- node `multi-row peek sizing` — owner LLR-126.3
+- node `first-region auto-selection + focus` — owner LLR-126.4
+- node `fixed-width region-row fields` — owner LLR-127.1
+- node `display-only short band labels` — owner LLR-127.2
+- node `width-aware microbar drop` — owner LLR-127.3
+- node `RegionRow interaction semantics (N4a split, keyboard path)` — owner LLR-127.4
+- node `8-byte peek row format (33 cells, no ascii, .. unmapped)` — owner LLR-128.1
+- node `one-line always-visible stats strip` — owner LLR-129.1
+- node `width-adaptive stats compact form` — owner LLR-129.2
+- node `glance chips line (shares sum to 100 +/- rounding)` — owner LLR-129.3
+- node `wrap-audit harness at five geometries` — owner LLR-130.1
+- node `the audit counterfactual injection` — owner LLR-130.2
+- node `two-regime stack/side-by-side layout` — owner LLR-131.1
+- node `resize re-apportionment (bar, rows, peek)` — owner LLR-131.2
+- node `bounded width-0 convergence` — owner LLR-131.3
+- node `the four legend boxes (bands / anatomy / region row / keys)` — owner LLR-132.1
+- node `legend no-wrap + Esc close` — owner LLR-132.2
+- node `LegendScreen API + other-view byte-identical control` — owner LLR-132.3
+- node `live-sourced band key` — owner LLR-132.4
+- node `command-bar interlock` — owner LLR-133.1
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -166,7 +191,7 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 37 FLOW node(s), every one owned
+- [-] V10  01-requirements.md: 60 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 79 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
