@@ -18,8 +18,8 @@
       "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
     }
   ],
-  "current_station": "P0",
-  "phase_status": "not-started",
+  "current_station": "P5",
+  "phase_status": "closed",
   "stations_active": [
     "P0",
     "P1",
@@ -29,12 +29,12 @@
     "P5"
   ],
   "iterations_per_station": {
-    "P0": 0,
-    "P1": 0,
-    "P2": 0,
-    "P3": 0,
-    "P4": 0,
-    "P5": 0
+    "P0": 1,
+    "P1": 1,
+    "P2": 1,
+    "P3": 3,
+    "P4": 1,
+    "P5": 1
   },
   "triggers": {
     "evaluated_at": null,
@@ -75,6 +75,12 @@
       "station": "P3",
       "date": "2026-10-11",
       "decision": "increment 003 -- the registry hygiene: AT-043 resolved LIVE (re-spelled from the seed's AT-43), the 44 token-invisible ids adopted under the token-exact reading, AT-286's three arms",
+      "guided": false
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-11",
+      "decision": "batch closed -- fold-canon discharged (10 ids), final validator 0 block, C-25 under the house env (s19env) read 2719 passed + 40 failed, the 40 = the pre-existing snapshot/layout baseline family (CI lane green per batch-89), declared; pushed b167828 (with the previously-unpushed 983f898 riding along)",
       "guided": false
     }
   ],
