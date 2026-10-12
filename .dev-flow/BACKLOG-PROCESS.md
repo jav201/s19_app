@@ -393,10 +393,10 @@
       - The one-liner was not re-measured after `V60`.
       - D-F7: the seeded contract has no IFC pointer.
     - **What closes it.** Each bound is folded with an executed RED and a mutant, or retired with a worded reason.
-  - **▸ (P3, NEW 2026-10-02 — `pub-file-count-unprinted`) `PUB no-leaked-shapes` FAILS SILENTLY ON ITS FILE COUNT.**
+  - **▸ (P3, NEW 2026-10-02 — `pub-file-count-unprinted`) ✅ CLOSED AT flow rev102 (`r102-M04`): the arm's printed line now names `files <got>/<expected>` — a count drift shows BOTH numbers; the off-by-one mutant `r102-M04-pubfile-count-off-by-one` reddens the arm KILLED. `PUB no-leaked-shapes` FAILS SILENTLY ON ITS FILE COUNT.**
     - **The finding.** The arm's conjunction includes `len(_pub82) == _PUBFILES82`, but its line prints neither number. At the rev98 bump it went red with `hits {}`, `stale {}`, `uncaught {}` (closefix 2).
     - **What closes it.** The arm prints `files <got>/<expected>`, or the count is derived rather than hand-kept, with a mutant.
-  - **▸ (P3, NEW 2026-10-02 — `pubmask-region-headroom`) STILL OPEN at rev101: 12,992 of 13,000 (8 characters). THE MASKED `PUBLISH-VOCABULARY` REGION HAD 10 CHARACTERS OF HEADROOM.**
+  - **▸ (P3, NEW 2026-10-02 — `pubmask-region-headroom`) ✅ CLOSED AT flow rev102: the region TRIMMED (the `# rev84` comment block, its content carried by the three entries' own justifications) — 12,779 of 13,000 (221 characters) — and the cap's line now states the rule: at the cap TRIM the region, never raise the cap silently. STILL OPEN at rev101: 12,992 of 13,000 (8 characters). THE MASKED `PUBLISH-VOCABULARY` REGION HAD 10 CHARACTERS OF HEADROOM.**
     - **The finding.** `_PUBMASK_MAX81 = 13000` against 12,990 used. A one-line comment inside the region turned `PUB VOCABULARY-mask-bounded` red twice (closefixes 3 and 4).
     - **What closes it.** A recorded decision: trim the region, or state the headroom where an editor sees it. The cap itself is not raised silently.
   - **▸ (P3, was NEW 2026-10-02 — `home-copy-not-held-to-table`) ✅ CLOSED AT flow rev101 B8 (`a1b1d17`): `MUT HOME-COPY-covers-table` holds `home_copy` to every tabled authoring path and every literal path the selftest reads, with mutants r101-M62/M63. NOTHING CHECKS THAT THE HARNESS'S `home_copy` COVERS EVERY TABLED DIRECTORY.**

@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-10-08-batch-91",
-  "batch_objective": "Contract-gap closure: the shipped foundation gets the contract it never had -- (1) the S19/HEX/A2L/MAC parsing+validation engines (REQUIREMENTS.md SS1/SS2, prose-only strata) get real US/HLR/LLR/TC ids, adopting the existing 41 unpinned test modules as the TCs' nodes; (2) the doc drift closes (README's CDFX export is gone, docs/overview+architecture describe the batch-02..04 state) -- README and docs/ catch up to the shipped 10-screen app; (3) the registry hygiene: AT-043 declared-but-unregistered resolves, and the 44 LIVE ids whose verifiers are token-invisible get renamed to carry their tokens. Agents: Kimi K2.7-code via opencode under coordinator briefs.",
+  "batch_id": "2026-10-11-batch-93",
+  "batch_objective": "The Memory Map cohesion pass (batch-93, the memmap2 charter): variant C -- the inspector cockpit -- carrying the shared cohesion kit, plus legend A -- the spec sheet -- per the operator's 2026-08-06 ruling; re-derived from prototypes/memmap2.HANDOFF.md (not copied); sequenced AFTER batch-92 (the layer-inversions refactor, the other agent's lane) -- P0-P2 now, P3+ after batch-92 merges",
   "mode": "core",
   "mode_history": [
     {
@@ -16,10 +16,16 @@
       "to": "core",
       "date": "2026-10-08",
       "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-11",
+      "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
     }
   ],
-  "current_station": "P5",
-  "phase_status": "closed",
+  "current_station": "P0",
+  "phase_status": "not-started",
   "stations_active": [
     "P0",
     "P1",
@@ -29,12 +35,12 @@
     "P5"
   ],
   "iterations_per_station": {
-    "P0": 1,
-    "P1": 1,
-    "P2": 1,
-    "P3": 3,
-    "P4": 1,
-    "P5": 1
+    "P0": 0,
+    "P1": 0,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "P5": 0
   },
   "triggers": {
     "evaluated_at": null,
@@ -43,55 +49,30 @@
     "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
   },
   "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-10-08-batch-91/01-requirements.md",
-    "requirements_ledger": "repo:.dev-flow/2026-10-08-batch-91/01-requirements-ledger.md",
-    "traceability": "repo:.dev-flow/2026-10-08-batch-91/06-docs/traceability-matrix.md",
+    "requirements": "repo:.dev-flow/2026-10-11-batch-93/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-11-batch-93/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-11-batch-93/06-docs/traceability-matrix.md",
     "tests": "repo:tests/",
     "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-10-08-batch-91/03-increments/",
-    "evidence": "repo:.dev-flow/2026-10-08-batch-91/evidence/",
+    "increments": "repo:.dev-flow/2026-10-11-batch-93/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-11-batch-93/evidence/",
     "backlog": "repo:.dev-flow/BACKLOG.md",
-    "design_pdr": "vault:s19_app/design/PDR-2026-10-08-batch-91.md",
-    "design_ddr": "vault:s19_app/design/DDR-2026-10-08-batch-91.md",
-    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-08-batch-91/",
-    "metrics": "vault:s19_app/dev-flow-batches/2026-10-08-batch-91/README.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-11-batch-93.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-11-batch-93.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-11-batch-93/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-11-batch-93/README.md",
     "requirements_canon": "repo:REQUIREMENTS.md"
   },
   "artifacts": {},
-  "decisions_log": [
-    {
-      "station": "P3",
-      "date": "2026-10-11",
-      "decision": "increment 001 -- the foundation adoption: 32 RESERVED-to-LIVE conversions, 358 derived nodes, the guard's bounds measured-bumped, AT-284's counterfactuals executed",
-      "guided": false
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-11",
-      "decision": "increment 002 -- the docs catch-up: README/overview/architecture/the CRC draft read the shipped 10-screen app, the 38-key reconciliation complete",
-      "guided": false
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-11",
-      "decision": "increment 003 -- the registry hygiene: AT-043 resolved LIVE (re-spelled from the seed's AT-43), the 44 token-invisible ids adopted under the token-exact reading, AT-286's three arms",
-      "guided": false
-    },
-    {
-      "station": "P5",
-      "date": "2026-10-11",
-      "decision": "batch closed -- fold-canon discharged (10 ids), final validator 0 block, C-25 under the house env (s19env) read 2719 passed + 40 failed, the 40 = the pre-existing snapshot/layout baseline family (CI lane green per batch-89), declared; pushed b167828 (with the previously-unpushed 983f898 riding along)",
-      "guided": false
-    }
-  ],
+  "decisions_log": [],
   "standing_authorization": {
     "autonomous": true,
     "merge": false,
-    "asked_on": "2026-10-08",
-    "operator_words": "Operator (Javier), 2026-10-08: 'revisa la funcionalidad de la app y cierra los gaps de user stories, requerimientos y test cases que falten... usa /dev-flow' + 'despliegues agentes kimi 2.8 o 2.7 segun convenga'. Read with the established chain: Gates -- autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each close (no PR); data safeguard -- fixture boards only, never the operator's real files without a copy; implementing agents (Kimi K2.7-code via opencode, per the commission) do NOT commit/push/stash. This batch runs in the MAIN checkout."
+    "asked_on": "2026-10-11",
+    "operator_words": "Operator (Javier), 2026-10-11: 'sigue con memmap. Pero coordina con el otro agente que esta haciendo refactor del codigo para modularizarlo.' Read with the established chain: Gates -- autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each close (no PR); data safeguard -- synthetic boards only; the coordination note lives in the batch-92 lane's dir (COORDINATION-batch93-memmap.md); this batch's P3+ holds until batch-92 merges. Kimi agents under coordinator briefs do NOT commit/push/stash. This batch runs in the MAIN checkout."
   },
   "obsidian_synced": false,
-  "created_at": "2026-10-11T15:45:15.446575",
+  "created_at": "2026-10-11T20:47:13.939249",
   "owner": "C:/Users/jjgh8/Github/s19_app",
-  "base_ref": "983f8985f625be368fd6943f8cb1553537e7e3b7"
+  "base_ref": "55b599776f527e0c1ef2463400ee38fb7d7c0102"
 }
