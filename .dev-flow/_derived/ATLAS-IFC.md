@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 68 requirement files | corpus digest: ac71dae02edd6a81 -->
+<!-- flow_version: 2026-10-10-rev101 | flow_hash: 0504b99f7b8deecf | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
 
 # ATLAS-IFC — how is the application addressed?
 
-7 FLOW declaration(s) · 3 COMPONENT declaration(s) · 604 declared requirement heading ids — one row per declaration.
+8 FLOW declaration(s) · 3 COMPONENT declaration(s) · 604 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -47,6 +47,16 @@
 ### FLOW `residual-guard` — .dev-flow/2026-09-06-batch-90/01-requirements.md:230
 - node `tests/test_report_addendum_bound.py::test_tc497_shipped_requirement_carries_the_residuals_with_their_numbers` — owner LLR-90.2.1
 - node `tests/test_report_addendum_bound.py::_typographic_variants` — owner LLR-90.2.1
+
+### FLOW `the batch's documentation flows (adoption and drift-closure move RECORDS, not data)` — .dev-flow/2026-10-08-batch-91/01-requirements.md:223
+- node `the S19/HEX adoption (contract section -> docstring tokens -> registry LIVE entries)` — owner LLR-122.1
+- node `the A2L adoption` — owner LLR-122.2
+- node `the MAC adoption` — owner LLR-122.3
+- node `the CRC adoption` — owner LLR-122.4
+- node `the TUI host-surface adoption` — owner LLR-122.5
+- node `the docs catch-up (README + docs/* read the shipped app)` — owner HLR-123
+- node `the AT-043 resolution` — owner LLR-124.1
+- node `the 44 token adoptions` — owner LLR-124.2
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -156,7 +166,7 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 29 FLOW node(s), every one owned
+- [-] V10  01-requirements.md: 37 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 79 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention

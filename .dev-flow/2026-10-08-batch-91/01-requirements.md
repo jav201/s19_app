@@ -217,9 +217,32 @@
 
 > Part A in every batch; Part B when the system's boundary has components a consumer can address independently. The block syntax, its fields and the rules that read them are in `templates/ifc-template.md`, which ships with the flow and is not copied into this batch.
 
-- **Part A — flows:** `<one fenced FLOW block per information flow: SOURCE, NODES (each node with exactly one owner, an LLR above — split a node two LLRs own), SINK>`
-- **Part B — boundary decomposition:** `<yes — one fenced COMPONENT block per component | no — and why no component of the boundary is addressable on its own>`
+- **Part A — flows:**
 
+```
+FLOW: the batch's documentation flows (adoption and drift-closure move RECORDS, not data)
+  SOURCE : the shipped engines and screens (the behavior being contracted); the existing test modules (the verifiers); the stale docs (the wrong claims)
+  NODES  :
+    - fn    : the S19/HEX adoption (contract section -> docstring tokens -> registry LIVE entries)
+      owner : LLR-122.1
+    - fn    : the A2L adoption
+      owner : LLR-122.2
+    - fn    : the MAC adoption
+      owner : LLR-122.3
+    - fn    : the CRC adoption
+      owner : LLR-122.4
+    - fn    : the TUI host-surface adoption
+      owner : LLR-122.5
+    - fn    : the docs catch-up (README + docs/* read the shipped app)
+      owner : HLR-123
+    - fn    : the AT-043 resolution
+      owner : LLR-124.1
+    - fn    : the 44 token adoptions
+      owner : LLR-124.2
+  SINK   : the contract (REQUIREMENTS.md canon), the registry (AT-TC-REGISTRY.jsonl), the docs a reader opens
+```
+
+- **Part B — boundary decomposition:** `no — no new addressable component` (the batch moves records; no runtime surface changes).
 ---
 
 ## 5. Validation strategy
