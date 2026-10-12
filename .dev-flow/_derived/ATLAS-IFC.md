@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 70 requirement files | corpus digest: ce46b4d3862a5ad0 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-8 FLOW declaration(s) · 3 COMPONENT declaration(s) · 604 declared requirement heading ids — one row per declaration.
+12 FLOW declaration(s) · 6 COMPONENT declaration(s) · 635 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -57,6 +57,40 @@
 - node `the docs catch-up (README + docs/* read the shipped app)` — owner HLR-123
 - node `the AT-043 resolution` — owner LLR-124.1
 - node `the 44 token adoptions` — owner LLR-124.2
+
+### FLOW `F-92-1` — .dev-flow/2026-10-11-batch-92/01-requirements.md:379
+- node `render_hex_view / render_hex_view_text (+ build_mem_map_s19, build_range_validity_s19, [+ABSORBED]` — owner LLR-001.2
+
+### FLOW `F-92-2` — .dev-flow/2026-10-11-batch-92/01-requirements.md:392
+- node `safe_text (+ private _CONTROL_SCRUB)` — owner LLR-003.2
+
+### FLOW `F-92-3` — .dev-flow/2026-10-11-batch-92/01-requirements.md:404
+- node `microbar (+ MICROBAR_FILLED, MICROBAR_EMPTY, GREEN, LABEL, VALUE)` — owner LLR-004.1
+
+### FLOW `the Memory Map cohesion pass — a presentational re-render of already-computed LoadedFile facts` — .dev-flow/2026-10-11-batch-93/01-requirements.md:587
+- node `pane chrome + subtitles (bordered panes, lit titles, affordance hints)` — owner LLR-125.1
+- node `left-pane stack order (bar -> ruler -> chips -> list)` — owner LLR-126.1
+- node `inspector aligned field block` — owner LLR-126.2
+- node `multi-row peek sizing` — owner LLR-126.3
+- node `first-region auto-selection + focus` — owner LLR-126.4
+- node `fixed-width region-row fields` — owner LLR-127.1
+- node `display-only short band labels` — owner LLR-127.2
+- node `width-aware microbar drop` — owner LLR-127.3
+- node `RegionRow interaction semantics (N4a split, keyboard path)` — owner LLR-127.4
+- node `8-byte peek row format (33 cells, no ascii, .. unmapped)` — owner LLR-128.1
+- node `one-line always-visible stats strip` — owner LLR-129.1
+- node `width-adaptive stats compact form` — owner LLR-129.2
+- node `glance chips line (shares sum to 100 +/- rounding)` — owner LLR-129.3
+- node `wrap-audit harness at five geometries` — owner LLR-130.1
+- node `the audit counterfactual injection` — owner LLR-130.2
+- node `two-regime stack/side-by-side layout` — owner LLR-131.1
+- node `resize re-apportionment (bar, rows, peek)` — owner LLR-131.2
+- node `bounded width-0 convergence` — owner LLR-131.3
+- node `the four legend boxes (bands / anatomy / region row / keys)` — owner LLR-132.1
+- node `legend no-wrap + Esc close` — owner LLR-132.2
+- node `LegendScreen API + other-view byte-identical control` — owner LLR-132.3
+- node `live-sourced band key` — owner LLR-132.4
+- node `command-bar interlock` — owner LLR-133.1
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -164,10 +198,41 @@
 | `artifact_slots` | `query(".loaded-detail"), INDEXED POSITIONALLY` | 3 | 4 declared | LLR-87.7 |
 | `project_row` | `query(".loaded-project-detail")` | 1 | 3 declared | LLR-87.7 |
 
+### COMPONENT `C-92-1` — .dev-flow/2026-10-11-batch-92/01-requirements.md:418
+- inputs : loaded image: S19File | IntelHexFile ; ranges: list[tuple[int, int]] ; focus/match params
+- outputs : 
+- parent : SYSTEM
+- surface : render package (s19_app/render/)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `hex-rendered rows` | `s19_app.render.hexview.render_hex_view / render_hex_view_text (+ builder fns)` | None | 17 declared | LLR-001.2 |
+| `layout constants` | `s19_app.render.hexview::<constant name>` | None | 8 declared | LLR-001.3 |
+
+### COMPONENT `C-92-2` — .dev-flow/2026-10-11-batch-92/01-requirements.md:447
+- inputs : value: str ; style: str
+- outputs : 
+- parent : SYSTEM
+- surface : render package (s19_app/render/)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `microbar bar + style constants` | `s19_app.render.format.microbar / ::MICROBAR_FILLED / ::MICROBAR_EMPTY / [+ABSORBED]` | None | 5 declared | LLR-004.1 |
+
+### COMPONENT `C-92-3` — .dev-flow/2026-10-11-batch-92/01-requirements.md:464
+- inputs : value: str ; style: str
+- outputs : 
+- parent : SYSTEM
+- surface : app root utilities (s19_app/utils.py)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `markup-safe Text` | `s19_app.utils.safe_text` | None | 14 declared | LLR-003.2 |
+
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 37 FLOW node(s), every one owned
-- [-] V11  01-requirements.md: 79 OUTPUT(s), each with an address and a declared consumer list
+- [-] V10  01-requirements.md: 63 FLOW node(s), every one owned
+- [-] V11  01-requirements.md: 83 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -220,6 +285,6 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1151: COMPONENT workspace_body/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1161: COMPONENT workspace_body/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  01-requirements.md: 2 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [-] V14  01-requirements.md: 251 declared consumer(s), every one resolved
-- [-] V19  01-requirements.md: 3 COMPONENT id(s), each declared exactly once
+- [!] V13  01-requirements.md: 6 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
+- [-] V14  01-requirements.md: 295 declared consumer(s), every one resolved
+- [-] V19  01-requirements.md: 6 COMPONENT id(s), each declared exactly once

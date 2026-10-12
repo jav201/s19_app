@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 68 requirement files | corpus digest: 87bb65e8819a78ec -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 201277ec8e654e70 | corpus: 70 requirement files | corpus digest: ce46b4d3862a5ad0 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
+registry: 1425 rows — BURNED 422 · LIVE 928 · RESERVED 54 · RETIRED 21
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -545,7 +545,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `AT-282` | RESERVED | batch-90 |  |
 | `AT-283` | RESERVED | batch-90 |  |
 | `AT-284` | LIVE | batch-91 |  |
-| `AT-285` | RESERVED | batch-91 |  |
+| `AT-285` | LIVE | batch-91 |  |
 | `AT-286` | LIVE | batch-91 |  |
 | `AT-287` | RESERVED | batch-91 |  |
 | `AT-288` | RESERVED | batch-92 |  |
@@ -1433,7 +1433,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1503 unique id(s)
+## family US/HLR/LLR — 1548 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1601,6 +1601,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `HLR-114` | batches, canon, tests |
 | `HLR-115` | batches, canon, tests |
 | `HLR-116` | batches, canon, tests |
+| `HLR-116.2` | batches |
 | `HLR-117` | batches, canon, tests |
 | `HLR-118` | batches, tests |
 | `HLR-119` | batches, tests |
@@ -1611,7 +1612,15 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `HLR-123` | batches, canon, tests |
 | `HLR-124` | batches, canon, tests |
 | `HLR-125` | batches, tests |
+| `HLR-125..133` | batches |
 | `HLR-126` | batches, tests |
+| `HLR-127` | batches |
+| `HLR-128` | batches |
+| `HLR-129` | batches |
+| `HLR-130` | batches |
+| `HLR-131` | batches |
+| `HLR-132` | batches |
+| `HLR-133` | batches |
 | `HLR-6` | batches |
 | `HLR-64` | batches |
 | `HLR-85.1` | batches, canon |
@@ -1745,6 +1754,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `LLR-003.x` | batches |
 | `LLR-004` | batches |
 | `LLR-004.1` | batches, canon, tests |
+| `LLR-004.1-as-folded` | batches |
 | `LLR-004.1..004.3` | batches |
 | `LLR-004.1..004.4` | batches |
 | `LLR-004.1..004.5` | batches |
@@ -2446,10 +2456,32 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `LLR-124.4` | batches, tests |
 | `LLR-124.x` | batches |
 | `LLR-125.1` | batches, tests |
+| `LLR-125.1..133.1` | batches |
 | `LLR-125.2` | batches, tests |
 | `LLR-125.x` | batches |
 | `LLR-126.1` | batches, tests |
+| `LLR-126.2` | batches |
+| `LLR-126.3` | batches |
+| `LLR-126.4` | batches |
 | `LLR-126.x` | batches |
+| `LLR-127.1` | batches |
+| `LLR-127.2` | batches |
+| `LLR-127.3` | batches |
+| `LLR-127.4` | batches |
+| `LLR-128.1` | batches |
+| `LLR-129.1` | batches |
+| `LLR-129.2` | batches |
+| `LLR-129.3` | batches |
+| `LLR-130.1` | batches |
+| `LLR-130.2` | batches |
+| `LLR-131.1` | batches |
+| `LLR-131.2` | batches |
+| `LLR-131.3` | batches |
+| `LLR-132.1` | batches |
+| `LLR-132.2` | batches |
+| `LLR-132.3` | batches |
+| `LLR-132.4` | batches |
+| `LLR-133.1` | batches |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -2629,6 +2661,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `LLR-N8-6.1` | batches |
 | `LLR-N8-6.2` | batches |
 | `LLR-NNN.M` | batches |
+| `LLR-NNN.n` | batches |
 | `LLR-P1b.1` | batches, tests |
 | `LLR-P1b.1-4` | batches |
 | `LLR-P1b.2` | batches, tests |
@@ -2813,6 +2846,12 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `US-102..104` | batches |
 | `US-103` | batches |
 | `US-104` | batches |
+| `US-125` | batches |
+| `US-125..128` | batches |
+| `US-125..US-128` | batches |
+| `US-126` | batches |
+| `US-127` | batches |
+| `US-128` | batches |
 | `US-77` | canon |
 | `US-77-1` | batches |
 | `US-77-2` | batches, canon |
@@ -2842,7 +2881,13 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `US-88-2` | batches |
 | `US-90.1` | batches |
 | `US-90.2` | batches |
+| `US-92-1` | batches |
+| `US-92-1..4` | batches |
+| `US-92-2` | batches |
+| `US-92-3` | batches |
+| `US-92-4` | batches |
 | `US-92-5` | batches |
+| `US-92-6` | batches |
 | `US-A` | batches |
 | `US-A2L` | batches, canon, tests |
 | `US-A56` | batches, tests |
@@ -3116,7 +3161,7 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1541 unique id(s)
+## family AT/TC — 1546 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3608,12 +3653,17 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `AT-282` | batches |
 | `AT-283` | batches |
 | `AT-284` | batches, canon, tests |
-| `AT-285` | batches |
+| `AT-285` | batches, tests |
 | `AT-286` | batches, tests |
 | `AT-287` | batches |
 | `AT-288` | batches, tests |
+| `AT-289` | batches, tests |
 | `AT-290` | batches, tests |
 | `AT-291` | batches, tests |
+| `AT-292` | batches |
+| `AT-293` | batches |
+| `AT-294` | batches |
+| `AT-295` | batches |
 | `AT-3` | batches |
 | `AT-40` | batches, tests |
 | `AT-43` | batches, canon |
@@ -4520,13 +4570,13 @@ registry: 1425 rows — BURNED 422 · LIVE 927 · RESERVED 55 · RETIRED 21
 | `TC-646` | batches, canon, tests |
 | `TC-647` | batches, canon, tests |
 | `TC-648` | batches, canon, tests |
-| `TC-649` | batches, tests |
+| `TC-649` | batches |
 | `TC-650` | batches |
-| `TC-651` | batches, canon |
-| `TC-652` | batches |
-| `TC-653` | canon |
-| `TC-654` | canon |
-| `TC-655` | batches, canon |
+| `TC-651` | batches, canon, tests |
+| `TC-652` | batches, tests |
+| `TC-653` | batches, canon, tests |
+| `TC-654` | batches, canon, tests |
+| `TC-655` | batches, canon, tests |
 | `TC-6xx` | tests |
 | `TC-79b` | batches, tests |
 | `TC-79c` | batches, tests |

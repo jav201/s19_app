@@ -22,7 +22,6 @@ tests/goldens/batch77/at-b77-02-gapless-band-strip.txt -text
 # `text eol=lf`: the stored blob must be exactly what the capture wrote.
 # Overrides the `tests/goldens/**` rule above; last matching pattern wins.
 tests/goldens/batch78/** -text
-
 # Out-of-VCS rollback bytes (batch-66). These are byte-exact copies of files that
 # live OUTSIDE this repo (~/.claude/commands/, ~/.claude/skills/, the course on G:),
 # and their recorded SHA256 IS the rollback check -- there is no git history to fall
@@ -32,7 +31,6 @@ tests/goldens/batch78/** -text
 # (Found the hard way: the first batch-66 commit stored dev-flow.md.PRE as d46bb314...
 # instead of the recorded e103af29..., under core.autocrlf=true.)
 .dev-flow/**/pre-bytes/** -text
-
 # The AT/TC id registry is append-only and one line per id ON PURPOSE: that is
 # what makes a concurrent block reservation a contiguous run of new lines, so two
 # batches reserving overlapping ranges collide as a LOUD git merge conflict that
@@ -42,3 +40,4 @@ tests/goldens/batch78/** -text
 AT-TC-REGISTRY.jsonl text eol=lf
 .dev-flow/2026-10-08-batch-91/evidence/** -text
 .dev-flow/2026-10-11-batch-92/evidence/** -text
+.dev-flow/2026-10-11-batch-93/evidence/** -text

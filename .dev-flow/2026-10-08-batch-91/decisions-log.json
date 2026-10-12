@@ -1,0 +1,26 @@
+[
+  {
+    "station": "P3",
+    "date": "2026-10-11",
+    "decision": "increment 001 -- the foundation adoption: 32 RESERVED-to-LIVE conversions, 358 derived nodes, the guard's bounds measured-bumped, AT-284's counterfactuals executed",
+    "guided": false
+  },
+  {
+    "station": "P3",
+    "date": "2026-10-11",
+    "decision": "increment 002 -- the docs catch-up: README/overview/architecture/the CRC draft read the shipped 10-screen app, the 38-key reconciliation complete",
+    "guided": false
+  },
+  {
+    "station": "P3",
+    "date": "2026-10-11",
+    "decision": "increment 003 -- the registry hygiene: AT-043 resolved LIVE (re-spelled from the seed's AT-43), the 44 token-invisible ids adopted under the token-exact reading, AT-286's three arms",
+    "guided": false
+  },
+  {
+    "station": "P5",
+    "date": "2026-10-11",
+    "decision": "batch closed -- fold-canon discharged (10 ids), final validator 0 block, C-25 under the house env (s19env) read 2719 passed + 40 failed, the 40 = the pre-existing snapshot/layout baseline family (CI lane green per batch-89), declared; pushed b167828 (with the previously-unpushed 983f898 riding along)",
+    "guided": false
+  }
+]

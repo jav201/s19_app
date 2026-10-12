@@ -1,162 +1,78 @@
 {
- "project": "s19_app",
- "language": "en",
- "batch_id": "2026-10-11-batch-92",
- "batch_objective": "batch-92 = kill the 7 layer inversions measured by the 2026-10-11 dependency radiography (AST census of s19_app/ @ 983f898): R1 move the pure renderer tui/hexview.py (477 LOC, 0 classes, no Textual import) to s19_app/render/hexview.py -- eliminates the service->presentation imports from load_service, report_service and diff_report_service; R2 remove hexview's range_index re-exports so app.py and tui/__init__ import those from range_index directly; R3 move safe_text from tui/screens_directionb.py to s19_app/utils.py -- eliminates checks_view/issues_view -> screens_directionb; R4 move css_class_for_severity (color_policy) and microbar (insight_style) into a presentation-neutral format module -- eliminates change_service -> color_policy and validation_service -> insight_style. Behavior-preserving: full pytest suite green and TUI snapshot tests byte-identical. Runs in worktree s19_app-b92 (branch kimi/batch-92-layer-inversions) because batch-91 owns the main checkout (single-slot rule, stations/shared-batch.md).",
- "owner": "C:/Users/jjgh8/Github/s19_app-b92",
- "mode": "full",
- "mode_history": [
-  {
-   "from": null,
-   "to": "core",
-   "date": "2026-08-24",
-   "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
-  },
-  {
-   "from": "core",
-   "to": "full",
-   "date": "2026-10-11",
-   "reason": "operator commissioned 'usa dev.flow full' for this batch (2026-10-11)"
-  }
- ],
- "guided": false,
- "current_station": "P5",
- "phase_status": "in-progress",
- "stations_active": [
-  "P0",
-  "ARQ",
-  "P1",
-  "P2",
-  "PDR",
-  "P3",
-  "DDR",
-  "P4",
-  "P5",
-  "P6"
- ],
- "iterations_per_station": {
-  "P0": 0,
-  "P1": 1,
-  "P2": 0,
-  "P3": 0,
-  "P4": 0,
-  "P5": 0,
-  "P6": 0,
-  "ARQ": 0,
-  "DDR": 0,
-  "PDR": 0
- },
- "triggers": {
-  "evaluated_at": "2026-10-11T18:56:14",
-  "fired": [
-   "A1",
-   "A2",
-   "A3",
-   "B1",
-   "B2",
-   "B3",
-   "C8",
-   "E1"
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-10-11-batch-93",
+  "batch_objective": "The Memory Map cohesion pass (batch-93, the memmap2 charter): variant C -- the inspector cockpit -- carrying the shared cohesion kit, plus legend A -- the spec sheet -- per the operator's 2026-08-06 ruling; re-derived from prototypes/memmap2.HANDOFF.md (not copied); sequenced AFTER batch-92 (the layer-inversions refactor, the other agent's lane) -- P0-P2 now, P3+ after batch-92 merges",
+  "mode": "core",
+  "mode_history": [
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-08-24",
+      "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-08",
+      "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-11",
+      "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    }
   ],
-  "not_fired": [
-   "A4",
-   "B4",
-   "C1",
-   "C2",
-   "C3",
-   "C4",
-   "C5",
-   "C6",
-   "C7",
-   "D1",
-   "D2",
-   "E2",
-   "E3",
-   "F1",
-   "F2"
+  "current_station": "P0",
+  "phase_status": "not-started",
+  "stations_active": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
   ],
-  "record": ".dev-flow/2026-10-11-batch-92/PLAN.md#triggers"
- },
- "artifact_homes": {
-  "requirements": "repo:.dev-flow/2026-10-11-batch-92/01-requirements.md",
-  "requirements_ledger": "repo:.dev-flow/2026-10-11-batch-92/01-requirements-ledger.md",
-  "traceability": "repo:.dev-flow/2026-10-11-batch-92/06-docs/traceability-matrix.md",
-  "tests": "repo:tests/",
-  "module_map": "repo:docs/ARCHITECTURE.md",
-  "increments": "repo:.dev-flow/2026-10-11-batch-92/03-increments/",
-  "evidence": "repo:.dev-flow/2026-10-11-batch-92/evidence/",
-  "backlog": "repo:.dev-flow/BACKLOG-CODE.md (lane A per docs/engineering-rules.md)",
-  "design_pdr": "vault:s19_app/design/PDR-2026-10-11-batch-92.md",
-  "design_ddr": "vault:s19_app/design/DDR-2026-10-11-batch-92.md",
-  "postmortem": "vault:s19_app/dev-flow-batches/2026-10-11-batch-92/",
-  "metrics": "vault:s19_app/dev-flow-batches/2026-10-11-batch-92/README.md",
-  "requirements_canon": "repo:REQUIREMENTS.md"
- },
- "base_ref": "410cde57c99094b89500ab890f919478d39ea999",
- "artifacts": {},
- "decisions_log": [
-  {
-   "station": "P0",
-   "date": "2026-10-11",
-   "decision": "asked at the gate — approved ('aprobado', operator, 2026-10-11): 4 READY stories proceed (US-92-1..4). US-92-5 OUT to backlog lane A — the approval carried no explicit unfreeze of frozen color_policy.py, and the freeze demands explicit words. US-92-6 takes option (a): wait for batch-91's test-infra commit, then rebase the worktree (recommended option, approved with the gate). Standing authorization read from silence: every gate is asked, merge NOT granted. ARQ is next."
+  "iterations_per_station": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "P5": 0
   },
-  {
-   "station": "ARQ",
-   "date": "2026-10-11",
-   "decision": "asked at the gate — approved (operator, 2026-10-11): the module-map delta (design/module-map-delta.md) is the architecture for this batch — render/ sub-package inside product, sequential Inc-A -> Inc-B, residuals declared; F-1 amendment (add color_policy.py to the standing doc frozen list) lands with the doc application; F-2 measured consumer sets govern the P1 TC plan. Operator standing instruction for P1/P4: requirements validation must be rigorous — the refactor must not lose functionality; P1 derives functional TCs pinning every moved symbol's behavior. P1 is next."
+  "triggers": {
+    "evaluated_at": null,
+    "fired": [],
+    "not_fired": [],
+    "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
   },
-  {
-   "station": "P1",
-   "date": "2026-10-11",
-   "decision": "asked at the gate — approved (operator, 2026-10-11): the requirements contract (4 HLRs, 13 LLRs, AT-288..291 / TC-651..654 reserved in the registry, ledger LED-92.1..4) is the batch's contract. The <=5-files-per-increment convention is WAIVED for this batch read as option (a) with the recommendation it carried — mechanical repoint batch, each repoint 1-2 lines; splitting adds review packets without risk reduction (correctable if misread). Baseline suite recorded: 38 failed (all test_tc016s_density_layout_snapshot, pre-existing family) / 2722 passed / 49 min — P4 acceptance = identical failed-set ids, 0 new, snapshots byte-identical. P2 is next (3 lenses: qa + code + security by trigger C8)."
+  "artifact_homes": {
+    "requirements": "repo:.dev-flow/2026-10-11-batch-93/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-11-batch-93/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-11-batch-93/06-docs/traceability-matrix.md",
+    "tests": "repo:tests/",
+    "module_map": "repo:docs/ARCHITECTURE.md",
+    "increments": "repo:.dev-flow/2026-10-11-batch-93/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-11-batch-93/evidence/",
+    "backlog": "repo:.dev-flow/BACKLOG.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-11-batch-93.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-11-batch-93.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-11-batch-93/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-11-batch-93/README.md",
+    "requirements_canon": "repo:REQUIREMENTS.md"
   },
-  {
-   "station": "P2",
-   "date": "2026-10-11",
-   "decision": "asked at the gate — iterate-to-refine (operator, 2026-10-11): P2 found 3 HIGHs (C1 render-first circular trap, C2 self-import rewrite uncovered, F-QA-1 baseline-set mismatch) + 2 MAJOR; security clean. Amendment package per 02-review.md adopted with orchestrator option C1-(c): style constants move DOWN into render/format (CYAN/DGRAY/VALUE with insight_style shim; FOCUS_HIGHLIGHT_STYLE/MAC_ADDRESS_OVERLAY_STYLE defined in render/format, pinned-equal to frozen color_policy by a new TC) — render becomes tui-free, killing the declared residuals; C2 import-block rewrite chartered; baseline pinned as the exact 38-failing/2722-passing sets with set-equality pass rule; TC-651/653/654 censuses derive their sets from the live tree; snapshot criterion re-scoped to set-equality + AT-288 sole byte-identity oracle; AT-288/291 sharpened. Back to P1 for the amendment pass."
+  "artifacts": {},
+  "decisions_log": [],
+  "standing_authorization": {
+    "autonomous": true,
+    "merge": false,
+    "asked_on": "2026-10-11",
+    "operator_words": "Operator (Javier), 2026-10-11: 'sigue con memmap. Pero coordina con el otro agente que esta haciendo refactor del codigo para modularizarlo.' Read with the established chain: Gates -- autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each close (no PR); data safeguard -- synthetic boards only; the coordination note lives in the batch-92 lane's dir (COORDINATION-batch93-memmap.md); this batch's P3+ holds until batch-92 merges. Kimi agents under coordinator briefs do NOT commit/push/stash. This batch runs in the MAIN checkout."
   },
-  {
-   "station": "P1",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): the amended contract is the batch's contract (iteration 2 of P1): render/ fully tui-free via the constants move + TC-655 equality pin (C1-(c)/C2), baseline pinned as the 44-node union with the flaky-tolerant gate rule (LED-…92.11 — three executions on identical code measured 38/36/40 failures; strict only on stable-pass -> fail = functionality loss), census TCs derive sets from the live tree (F-QA-2/C3), snapshot criterion re-scoped (F-QA-3), AT-288/291 sharpened (F-QA-4/5). Gate green: 0 block · 325 notice. P2 closure pass next: code re-sim of the C1-(c) design + qa textual closure; security closure by executed grep (amendments do not touch the C-17 surface)."
-  },
-  {
-   "station": "P2",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): P2 closure accepted — C1/C2/C3 closed by executed re-simulation, F-QA-1..5 closed, security verdict stands (0 from_markup call sites), N1 (format module folds into Inc-A) + N2 (12/12) + F-QA-6 (two truncated baseline ids re-derived; 44 unique full ids) fixed at the gate. Operator standing policy for the remainder of the batch: proceed through PDR -> P3 -> P4 provided no MAJOR-or-above item re-opens; MINOR items are carried forward and discharged inside P3/P4 under dev-flow discipline (recorded in packets/ledger, never silent). PDR is next."
-  },
-  {
-   "station": "PDR",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): PDR-2026-10-11-batch-92 sealed, verdict approved with conditions — QA-PDR-1 (MAJOR, AT-288 undriveable charter) discharged AT the seal via the re-charter (LED-…92.13); C1 waiver recorded; C2/C3/QA-PDR-2/QA-PDR-3 carried to their named gates. Seven design decisions #D1–#D7 bound (frozen render surfaces, tui-free render rule, shim, safe_text canonical home, sequential cut, flaky-tolerant gate rule). P3 starts: Inc-A first (pre-move AT-288 capture, then the byte-exact move + repoints + TC-651/652/655), Inc-B after its gate."
-  },
-  {
-   "station": "P3",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): increment 001 (Inc-A) approved. Independent code-reviewer verdict OK to advance, 0 HIGH/MAJOR: body-hash independently recomputed and matched (fe6921c7…), zero tui imports under render/, AT-288 byte-identical to the pinned pre-move capture (sha256 061ee94c…, driveable set confirmed), TC-651/652/655 3/3 with reviewer-run mutation RED, guard host 183/0, frozen dual-guard green, scope exact (V59), 4 LOWs carried (F1-F4; tc024 pre-existing worker-race flake -> flaky registry at close). Inc-B starts next: safe_text to utils, insight_style 8-symbol shim, view/service repoints, TC-653/654."
-  },
-  {
-   "station": "P3",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): increment 002 (Inc-B) approved. Independent code-reviewer: OK to advance, ZERO findings — safe_text transfer hash-recomputed and matched (103da220…2974), _CONTROL_SCRUB moved with the function, C-17 verified cold by the reviewer, shim 8/8 is-identical, censuses C-31-proof with reviewer-run mutation RED, frozen render surfaces untouched (D1/D2), 13/13 evidence digests verified, AT-290/291 14/14. All 6 layer inversions confirmed dead by closure greps. P3 complete. DDR next, then P4."
-  },
-  {
-   "station": "DDR",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): DDR approved with its two conditions discharged in-pass — C-1 scanned-corpus bound 159->162 (test_id_registry.py:70, guard 13/13) and C-2 AT-289 re-pointed to its realized node test_tc652_wrapper_absence_and_renderer_surface (LED-…92.14); AT-289/290/291 tokens bound to on-disk nodes (V2 green). PDR conditions all discharged (C2 architecture.md KILLED rows landed, C3 carry added, QA-PDR-2/3 closed). P4 next: full-suite gate run under the 44-union flaky-tolerant rule + Layer 0/A/B validation + traceability matrix."
-  },
-  {
-   "station": "P4",
-   "date": "2026-10-12",
-   "decision": "asked at the gate — approved (operator, 2026-10-12): P4 approved. Gate runs: batch 36/2729 and 40/2725, base control 39/2723 — all failures inside the extended 52-node known-unstable corpus (LED-…92.15); no stable-pass->fail outside it; TC-651..655 absent from all failing sets; Layer A/B green with attribution; AT-290 canonical node bound per C-18; no coverage gaps. No-functionality-loss rests on deterministic evidence (3x body-hash, AT-288 byte-identity, cross-tree standalone identity). OPERATOR GRANT RECORDED: commit + push + merge authorized — 'Aprobado, también el commit sigue el proceso para seguir con push y merge' — merge still gated per the flow: PR opened, final independent qa-reviewer pass over the whole diff vs main, clean, then merge. Suite-flakiness defect + tc024/tc058b/at064b + C3 + C4 + US-92-5 carried to BACKLOG-CODE.md lane A at close. P5 next."
-  }
- ],
- "standing_authorization": {
-  "autonomous": false,
-  "merge": true,
-  "asked_on": "2026-10-12",
-  "operator_words": "Operator (Javier), 2026-10-12: 'Aprobado, también el commit sigue el proceso para seguir con push y merge.' — commit, push and merge authorized; the flow's merge gate still applies: PR opened, one final independent qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 diffs to frozen modules, no cross-increment regression, every gate carry discharged), clean, then merge. Gates otherwise remain asked per-gate."
- },
- "obsidian_synced": false,
- "created_at": "2026-10-11T17:33:05.832515"
+  "obsidian_synced": false,
+  "created_at": "2026-10-11T20:47:13.939249",
+  "owner": "C:/Users/jjgh8/Github/s19_app",
+  "base_ref": "55b599776f527e0c1ef2463400ee38fb7d7c0102"
 }

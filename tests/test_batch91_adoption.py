@@ -22,8 +22,9 @@ from tools.id_registry import defined_names, load_registry, read_text, registry_
 
 ROOT = repo_root(Path(__file__))
 
-#: The batch-91 foundation-adoption range (LLR-122.1..122.5). TC-649/650 stay
-#: RESERVED for the batch's later increments and are deliberately out of scope.
+#: The batch-91 foundation-adoption range (LLR-122.1..122.5). The block's two
+#: unspent charter ids were released back to the pool at the batch-91 carry
+#: close and are deliberately out of scope here.
 BATCH91_TC_STEMS = range(617, 649)
 
 

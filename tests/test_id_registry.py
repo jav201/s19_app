@@ -67,7 +67,11 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 162
+# batch-92 merge (2026-10-12): 160 -> 163, measured. batch-91's carry commit added
+# ``tests/test_docs_canon.py`` (160); batch-92 adds ``tests/test_render_hexview.py``,
+# ``tests/test_render_format.py``, ``tests/test_import_census.py`` (163, re-count
+# verified by this guard). MEASURED, not incremented.
+EXPECTED_SCANNED_TEST_FILES = 163
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds
