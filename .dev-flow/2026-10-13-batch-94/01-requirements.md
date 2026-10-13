@@ -93,21 +93,21 @@
 
 ## 3. High-level requirements (HLR)
 
-### HLR-001 — `<Short title>`
-- **Traceability:** US-001
-- **Ledger:** none
-- **Statement:** When `<trigger>`, the system shall `<response>`. *(Current state only. If you are about to write "because measured …", stop: the obligation belongs here, the measurement belongs in a ledger entry.)*
-- **Rationale (informative):** *(why this requirement exists — `should` may technically be used here informally, but avoid it to prevent confusion.)*
-- **Validation:** `test` | `demo` | `inspection` | `analysis`
-- **Executed verification:** *(required if `test`/`analysis`. e.g. `npm run typecheck`, `vitest run TC-001`, `worst-case gain-staging sum analysis`.)*
-- **Numeric pass threshold:** *(required if `test`/`analysis`. e.g. `0 errors`, `peak post-limiter ≤ −6 dBFS`.)*
-- **Priority:** high | medium | low
-- **Acceptance (black-box) — the user-verified outcome (the WHAT):**
-  - **Observable outcome:** *(what the user observes)*
-  - **Shipped surface:** *(the handler / screen / CLI that produces it)*
-  - **Acceptance test(s):** AT-001
-  - **Boundary catalog (QC-3):** `<☐ empty ☐ boundary ☐ invalid ☐ error — tick each class that gets an AT/TC, or: none — and the reason no input class applies>`
-  - **Negative control:** `<the executed input on which this verification GOES RED, or: none — and why it has no executed RED side>`
+### HLR-134 — The legend's key box names what it documents
+- **Traceability:** the operator's feedback 2026-10-13
+- **Ledger:** LED-2026-10-13-batch-94.1
+- **Statement:** the map legend's fourth box shall be titled `Map keys` — naming what its pinned line documents (the MAP's keys), never bare `Keys`, which inside the open modal reads as the modal's own keys (where only Esc closes and the arrows scroll). The pinned `MAP_KEYS_LINE` content is unchanged; the other three boxes and every other view's legend stay byte-identical.
+- **Rationale (informative):** the operator, live-testing: "Veo esto en la leyenda [Keys: j k select...] pero k precisamente abre la leyenda, no es para desplazarse o seleccionar, es esto un error?"
+- **Validation:** `test`
+- **Executed verification:** `python -m pytest tests/test_legend_map_sheet.py tests/test_legend_n8.py tests/test_tui_legend.py -q` (61 passed, house env)
+- **Numeric pass threshold:** the title census asserts `Map keys`; TC-681's byte-identical pins (the other views) hold.
+- **Priority:** low
+- **Acceptance (black-box):**
+  - **Observable outcome:** the open legend's fourth box reads `Map keys`.
+  - **Shipped surface:** the map legend's spec sheet.
+  - **Acceptance test(s):** the title census in `tests/test_legend_map_sheet.py`.
+  - **Boundary catalog (QC-3):** none new.
+  - **Negative control:** a regression to bare `Keys` reddens the census.
 
 ---
 
@@ -116,21 +116,21 @@
 > Each LLR decomposes an HLR into a verifiable property at the implementation level.
 > Same regime: EARS syntax owed in `full`, recommended in `core`. ID format: `LLR-<HLR>.<M>`.
 
-### LLR-001.1 — `<Short title>`
-- **Traceability:** HLR-001
-- **Ledger:** none
-- **Statement:** The `<component>` shall `<verifiable technical response>`.
-- **Validation:** `test (unit)` | `test (integration)` | `test (e2e)` | `inspection` | `analysis`
-- **Executed verification:** *(required if `test`/`analysis`. e.g. `vitest run src/lib/audio/masterBus.test.ts -t TC-001`; `gain-sum analysis vs the compressor threshold`.)*
-- **Numeric pass threshold:** *(required if `test`/`analysis`. e.g. `assert exit code 0`; `peak ≤ −6 dBFS`; `RMS error < 0.01`.)*
-- **Negative control:** `<the executed input on which this verification goes RED, or: none — and why it has no executed RED side>`
-- **Boundary catalog:** `<☐ empty ☐ boundary ☐ invalid ☐ error — tick each class that gets an AT/TC, or: none — and the reason no input class applies>`
-
 ### Information Flow Contract (IFC) — C-54
 
 > Part A in every batch; Part B when the system's boundary has components a consumer can address independently. The block syntax, its fields and the rules that read them are in `templates/ifc-template.md`, which ships with the flow and is not copied into this batch.
 
-- **Part A — flows:** `<one fenced FLOW block per information flow: SOURCE, NODES (each node with exactly one owner, an LLR above — split a node two LLRs own), SINK>`
+- **Part A — flows:**
+
+```
+FLOW: the amendment, from the operator's eye to one word of chrome
+  SOURCE : the operator's live-testing feedback 2026-10-13
+  NODES  :
+    - fn    : the legend spec sheet's fourth box title (screens.py _box)
+      owner : HLR-134
+  SINK   : the rendered spec sheet (the title census pin)
+```
+
 - **Part B — boundary decomposition:** `<yes — one fenced COMPONENT block per component | no — and why no component of the boundary is addressable on its own>`
 
 ---

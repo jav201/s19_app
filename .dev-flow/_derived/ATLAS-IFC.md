@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 70 requirement files | corpus digest: cf0bfc1c2fbbc5d0 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 71 requirement files | corpus digest: 3d949fc69e3ecc03 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-12 FLOW declaration(s) · 6 COMPONENT declaration(s) · 635 declared requirement heading ids — one row per declaration.
+13 FLOW declaration(s) · 6 COMPONENT declaration(s) · 636 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -91,6 +91,9 @@
 - node `LegendScreen API + other-view byte-identical control` — owner LLR-132.3
 - node `live-sourced band key` — owner LLR-132.4
 - node `command-bar interlock` — owner LLR-133.1
+
+### FLOW `the amendment, from the operator's eye to one word of chrome` — .dev-flow/2026-10-13-batch-94/01-requirements.md:136
+- node `the legend spec sheet's fourth box title (screens.py _box)` — owner HLR-134
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -231,7 +234,7 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 63 FLOW node(s), every one owned
+- [-] V10  01-requirements.md: 64 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 83 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
