@@ -1,4 +1,6 @@
-"""batch-93 increment 002 — the wrap audit over the Memory Map surface (HLR-130).
+"""TC-666 · TC-667 · TC-668 · TC-669 -- the wrap-audit limbs they name (batch-93 inc-002).
+
+batch-93 increment 002 — the wrap audit over the Memory Map surface (HLR-130).
 
 Summary:
     The ported wrap audit as a REAL harness (LLR-130.1 / LLR-130.2): render the

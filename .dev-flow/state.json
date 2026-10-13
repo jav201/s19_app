@@ -24,8 +24,8 @@
       "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
     }
   ],
-  "current_station": "P3",
-  "phase_status": "in-progress",
+  "current_station": "P5",
+  "phase_status": "closed",
   "stations_active": [
     "P0",
     "P1",
@@ -35,12 +35,12 @@
     "P5"
   ],
   "iterations_per_station": {
-    "P0": 0,
-    "P1": 0,
-    "P2": 0,
-    "P3": 0,
-    "P4": 0,
-    "P5": 0
+    "P0": 1,
+    "P1": 1,
+    "P2": 1,
+    "P3": 3,
+    "P4": 1,
+    "P5": 1
   },
   "triggers": {
     "evaluated_at": "2026-10-13",
@@ -93,6 +93,12 @@
       "station": "P5",
       "date": "2026-10-13",
       "decision": "batch closed -- the record committed, the fold-canon discharged (33 ids), AT-293's token restored, the two unspent acceptance ids released; the C-25 figures and the operator's visual verdict fold on arrival",
+      "guided": false
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-13",
+      "decision": "batch closed -- the C-25 definitive run read 2796 passed + 35 failed, the census all declared families (27 CI-font snapshots, 6 order-sensitive, the 4 wrap-limb tokens the hygiene guard caught and the coordinator fixed); validator 0 block; the fold-canon discharged; pushed; the operator's visual verdict on veredicto-batch93.html folds on arrival",
       "guided": false
     }
   ],
