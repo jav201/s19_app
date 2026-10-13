@@ -123,7 +123,7 @@ def test_tc676_sheet_four_grouped_boxes(tmp_path: Path) -> None:
     assert titles[0] == (
         f"Entropy bands — {ENTROPY_WINDOW_BYTES} B windows, bits/byte"
     ), titles[0]
-    assert titles[1:] == ["Map anatomy", "Region row", "Keys"], titles
+    assert titles[1:] == ["Map anatomy", "Region row", "Map keys"], titles  # batch-94: the title names what the line documents
 
     n_bands = len(ENTROPY_BANDS)
     assert got["per_box_counts"] == [n_bands + 1, 8, 2, 1], (

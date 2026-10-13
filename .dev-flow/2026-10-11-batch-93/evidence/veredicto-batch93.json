@@ -1,0 +1,23 @@
+{
+  "batch": "2026-10-11-batch-93",
+  "exported": "2026-10-13T12:44:55.694Z",
+  "answers": {
+    "B93-1": {
+      "choice": "accept",
+      "label": "Aceptar"
+    },
+    "B93-2": {
+      "choice": "accept",
+      "label": "Aceptar"
+    },
+    "B93-3": {
+      "choice": "accept",
+      "label": "Aceptar"
+    },
+    "B93-4": {
+      "choice": "accept",
+      "label": "Aceptar"
+    },
+    "notes": "Me parece todo correcto."
+  }
+}

@@ -1299,7 +1299,7 @@ class LegendScreen(ModalScreen[None]):
             ),
             _box("Map anatomy", anatomy_lines),
             _box("Region row", region_lines),
-            _box("Keys", keys_lines),
+            _box("Map keys", keys_lines),  # batch-94: the box documents the MAP's keys; the title says so (operator feedback 2026-10-13)
         ]
 
     def compose(self) -> ComposeResult:

@@ -50,7 +50,7 @@ batch-92's merge (this batch's P3+ holds until then).
 | gap hatch | The `╱` marker for unmapped address space between runs — an app-supplied fold, not a band. |
 | cohesion kit | The shared format fixes that every variant carried: chromed panes, a 1-row band bar, 1-line glance chips, a 1-line always-visible stats strip, a scrollable region list, a non-wrapping peek. |
 | inspector cockpit | Variant C's layout law: left pane (band bar → ruler → glance chips → region list) beside a full-height right Inspector pane (aligned fields + multi-row peek). |
-| spec sheet | Legend A's law: grouped bordered boxes (Entropy bands · Map anatomy · Region row · Keys), zero prose paragraphs, nothing wraps. |
+| spec sheet | Legend A's law: grouped bordered boxes (Entropy bands · Map anatomy · Region row · Map keys), zero prose paragraphs, nothing wraps. |
 | PANEL columns | The measured widget columns of the surface that actually renders the text — never the terminal's columns. All width thresholds in this contract are calibrated on PANEL columns (C-29 both axes measured). |
 | glance chips | The at-a-glance block folded to one line: per-band `glyph count share%` tokens. |
 | short band label | A display-only truncation of a band domain string for the region-row band column (e.g. `high/random` → `high/rand`, `constant/padding` → `const`); the domain string itself is untouched. |
@@ -301,7 +301,7 @@ hard requirement (C-10).
 ### HLR-132 — Legend A: the spec sheet on the map view
 - **Traceability:** US-128
 - **Ledger:** LED-2026-10-11-batch-93.1
-- **Statement:** When the operator opens the legend on the map view (`k`), the system shall render the spec sheet: grouped bordered boxes — **Entropy bands** (the live-sourced `build_band_key_rows()` rows plus the gap-hatch row) · **Map anatomy** (one-line rendered sample → one-line meaning, one line each) · **Region row** (a rendered sample row + its field key) · **Keys** — with zero prose paragraphs and no wrapping line; Esc shall close the modal; the `LegendScreen(sections, view_key)` API shall survive unchanged; and the OTHER views' legends shall render byte-identical to pre-change content (the N8 scoping control).
+- **Statement:** When the operator opens the legend on the map view (`k`), the system shall render the spec sheet: grouped bordered boxes — **Entropy bands** (the live-sourced `build_band_key_rows()` rows plus the gap-hatch row) · **Map anatomy** (one-line rendered sample → one-line meaning, one line each) · **Region row** (a rendered sample row + its field key) · **Map keys** (batch-94: the title names what the pinned line documents — the MAP's keys, not the modal's) — with zero prose paragraphs and no wrapping line; Esc shall close the modal; the `LegendScreen(sections, view_key)` API shall survive unchanged; and the OTHER views' legends shall render byte-identical to pre-change content (the N8 scoping control).
 - **Rationale (informative):** S-8 of the charter — legend A won on drift risk (live band key vs a hand-drawn mini-map); the baseline-legend capture shows today's wrapping prose the operator rejected.
 - **Validation:** `test`
 - **Executed verification:** P1: the legend-A capture reconstruction (rows 5-29: four boxes, the band rows `[0,1) [1,5) [5,7.2) [7.2,8]`, the gap row, four anatomy samples, the region-row sample + field key, the Keys line; zero wrap artifacts); the shipped map legend path (`screens.py:1169-1186`) is the Before. Owed at P4: `python -m pytest tests/test_legend_n8.py tests/test_tui_legend.py -q`.
@@ -530,7 +530,7 @@ hard requirement (C-10).
 ### LLR-132.1 — The four grouped boxes
 - **Traceability:** HLR-132
 - **Ledger:** LED-2026-10-11-batch-93.1
-- **Statement:** The map legend's content shall render as grouped bordered boxes in order: **Entropy bands** (the `build_band_key_rows()` rows — glyph, label, `[lo,hi)` range, meaning — plus the `╱` gap-hatch row) · **Map anatomy** (one rendered sample line per map surface → one meaning line each: band bar, ruler, glance chips, stats line) · **Region row** (one rendered sample row + one field-key line) · **Keys** (one line: `↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close`).
+- **Statement:** The map legend's content shall render as grouped bordered boxes in order: **Entropy bands** (the `build_band_key_rows()` rows — glyph, label, `[lo,hi)` range, meaning — plus the `╱` gap-hatch row) · **Map anatomy** (one rendered sample line per map surface → one meaning line each: band bar, ruler, glance chips, stats line) · **Region row** (one rendered sample row + one field-key line) · **Map keys** (batch-94; the pinned line is unchanged) (one line: `↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close`).
 - **Validation:** `test (integration)`
 - **Executed verification:** P1: the legend-A capture reconstruction (rows 7-29) is the layout oracle. Owed at P4 — `python -m pytest tests/test_legend_n8.py -q`.
 - **Numeric pass threshold:** 4/4 boxes in order; band rows == `len(ENTROPY_BANDS)` (4) + 1 gap row; anatomy == 4 samples; the region-row sample + field key render; the Keys line renders.
