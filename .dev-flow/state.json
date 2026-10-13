@@ -1,121 +1,86 @@
 {
-  "project": "s19_app",
-  "language": "en",
-  "batch_id": "2026-10-13-batch-95",
-  "batch_objective": "The cambios_10_12_2026 batch: (1) the Split / Join / Export screen -- the grafted terminal design (V1 chassis + V2's width-118 band + split-mode per-file gantt), the color/glyph preview visor, split/join/export S19+HEX+BIN with skip/fill gaps (pad 0x00), the span guard, palette-first; (2) project save gathers all used files, artifacts project-scoped (no project -> common homes); (3) open-folder buttons on patch/checks/CRC/reports (cross-platform); (4) per-window usage help sections",
-  "mode": "core",
-  "mode_history": [
-    {
-      "from": null,
-      "to": "core",
-      "date": "2026-08-24",
-      "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
-    },
-    {
-      "from": null,
-      "to": "core",
-      "date": "2026-10-08",
-      "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
-    },
-    {
-      "from": null,
-      "to": "core",
-      "date": "2026-10-11",
-      "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
-    },
-    {
-      "from": null,
-      "to": "core",
-      "date": "2026-10-13",
-      "reason": "batch 2026-10-13-batch-94 opened by rollover from 2026-10-11-batch-93 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
-    },
-    {
-      "from": null,
-      "to": "core",
-      "date": "2026-10-13",
-      "reason": "batch 2026-10-13-batch-95 opened by rollover from 2026-10-13-batch-94 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
-    }
-  ],
-  "current_station": "P5",
-  "phase_status": "closed",
-  "stations_active": [
-    "P0",
-    "P1",
-    "P2",
-    "P3",
-    "P4",
-    "P5"
-  ],
-  "iterations_per_station": {
-    "P0": 1,
-    "P1": 1,
-    "P2": 1,
-    "P3": 3,
-    "P4": 1,
-    "P5": 1
+ "project": "s19_app",
+ "language": "en",
+ "batch_id": "2026-10-12-batch-94",
+ "batch_objective": "Cambio1-7: Flow Builder por bloques (fb_a) + Flow Execution (fx_a) + split Patch/Check Editor (pe_a/ce_b) — A2B configurable por bloque con procedencia en el reporte, check-spec .chk.json (write/validate only), control secuencial(default)/paralelo, ruteo de cables refinado. Design input: 4 SVG ganadores en G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/. Coordination: COORDINACION-batch92.md (overlap screens_directionb.py con batch-93 — second-editor-rebases rule).",
+ "mode": "full",
+ "mode_history": [
+  {
+   "from": null,
+   "to": "core",
+   "date": "2026-08-24",
+   "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
   },
-  "triggers": {
-    "evaluated_at": "2026-10-13",
-    "fired": [],
-    "not_fired": [],
-    "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
+  {
+   "from": null,
+   "to": "core",
+   "date": "2026-10-08",
+   "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
   },
-  "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-10-13-batch-95/01-requirements.md",
-    "requirements_ledger": "repo:.dev-flow/2026-10-13-batch-95/01-requirements-ledger.md",
-    "traceability": "repo:.dev-flow/2026-10-13-batch-95/06-docs/traceability-matrix.md",
-    "tests": "repo:tests/",
-    "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-10-13-batch-95/03-increments/",
-    "evidence": "repo:.dev-flow/2026-10-13-batch-95/evidence/",
-    "backlog": "repo:.dev-flow/BACKLOG.md",
-    "design_pdr": "vault:s19_app/design/PDR-2026-10-13-batch-95.md",
-    "design_ddr": "vault:s19_app/design/DDR-2026-10-13-batch-95.md",
-    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-13-batch-95/",
-    "metrics": "vault:s19_app/dev-flow-batches/2026-10-13-batch-95/README.md",
-    "requirements_canon": "repo:REQUIREMENTS.md"
+  {
+   "from": null,
+   "to": "core",
+   "date": "2026-10-11",
+   "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
   },
-  "artifacts": {},
-  "decisions_log": [
-    {
-      "station": "P2",
-      "date": "2026-10-13",
-      "decision": "P2 approve (0/0/3, the amendment 0/0/2) — the contract is the round's record re-derived (premises P-1..P-23 executed, all TRUE); the change-5 amendment contracted mid-P3 (LED-2026-10-13-batch-95.2); P3 runs in the single lane on the MAIN checkout",
-      "guided": false
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-13",
-      "decision": "increment 001 -- the Split/Join/Export engine (HLR-137, LLR-137.*): the range slicer, the BIN emitter + .addr sidecar, the pad-byte fill emitter (gap-conflict abort, the CRC editor's law), the join from the lowest base, the hardened MEMORY_SEGMENT extractor (quoted names + the offset field); the registry meta repaired",
-      "guided": false
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-13",
-      "decision": "increment 002 + 003 -- the change-1 project gather with the scoped homes (HLR-138, COPY idempotent) and the changes 2/3/5 backend (HLR-139/140/141): the open-folder chips on one cross-platform seam, the per-window usage help (nine authored sections verbatim), the A2L symbol wire + the physical-to-raw encode + the picker + the flow a2l_ref (TC-712..715 + TC-718); the C-25 collateral sweep closed the two pre-existing reds and bound-polled the at064b/tc329 race",
-      "guided": false
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-13",
-      "decision": "increment 004 -- the SJE window (HLR-135/136, the graft + visor + guard two-step + the two-regime reflow + palette-first; TC-708..710) + the change-attribution backend (HLR-143: ChangeSummaryEntry.symbol, the report's change-attribution section, the A2B diff reference-all law; TC-716/717); the gantt pre-layout fallback paint; the registry bound 171->172 measured",
-      "guided": false
-    },
-    {
-      "station": "P5",
-      "date": "2026-10-13",
-      "decision": "batch closed -- the C-25 definitive run read 35 failed + 2988 passed + 3 skipped + 3 xfailed, the census all declared pre-existing Windows-env families (29 snapshot cells, the rotating flakes; none attributable to the batch's diff); the gate commit 6c18d95 fixed a real inc-004 defect (the SJE summary's eager mkdir) + two census-hygiene guards; 6 named mutants ALL RED (sha256-verified restores); the fold-canon discharged IN the close (41 ids: HLR-135..143 + 32 LLRs); verdict PASS-WITH-NOTES (the AT-296..304 reservation stays unminted -- bookkeeping carry); validator 0 block is the coordinator's commit-time check; the operator's visual verdict on veredicto-batch95.html folds on arrival",
-      "guided": false
-    }
-  ],
-  "standing_authorization": {
-    "autonomous": true,
-    "merge": false,
-    "asked_on": "2026-10-13",
-    "operator_words": "Operator (Javier), 2026-10-13: the prototype round for the cambios of 2026-10-12 CLOSED -- all four changes + the six rulings accepted, the join preview visor added, the TUI-native pass shipped the graft as the final screen, a color, both verdicts accepted (veredicto-ronda1 / veredicto-tui-pass / veredicto-final in the round's dir). Implement the batch. Read with the established chain: Gates -- autonomous with the two exceptions; Git -- the COORDINATOR commits and pushes at each close; Kimi agents under coordinator briefs do NOT commit/push/stash. This batch runs in the MAIN checkout."
-  },
-  "obsidian_synced": false,
-  "created_at": "2026-10-13T12:53:25.328364",
-  "owner": "C:/Users/jjgh8/Github/s19_app",
-  "base_ref": "6c18d9554c54b9bea580ae9f1a14c2d7e15c33db"
+  {
+   "from": "core",
+   "to": "full",
+   "date": "2026-10-12",
+   "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
+  }
+ ],
+ "current_station": "P0",
+ "phase_status": "not-started",
+ "stations_active": [
+  "P0",
+  "P1",
+  "P2",
+  "P3",
+  "P4",
+  "P5",
+  "P6"
+ ],
+ "iterations_per_station": {
+  "P0": 0,
+  "P1": 0,
+  "P2": 0,
+  "P3": 0,
+  "P4": 0,
+  "P5": 0,
+  "P6": 0
+ },
+ "triggers": {
+  "evaluated_at": null,
+  "fired": [],
+  "not_fired": [],
+  "record": "NOT EVALUATED — /dev-flow evaluates at P0."
+ },
+ "artifact_homes": {
+  "requirements": "repo:.dev-flow/2026-10-12-batch-94/01-requirements.md",
+  "requirements_ledger": "repo:.dev-flow/2026-10-12-batch-94/01-requirements-ledger.md",
+  "traceability": "repo:.dev-flow/2026-10-12-batch-94/06-docs/traceability-matrix.md",
+  "tests": "repo:tests/",
+  "module_map": "repo:docs/ARCHITECTURE.md",
+  "increments": "repo:.dev-flow/2026-10-12-batch-94/03-increments/",
+  "evidence": "repo:.dev-flow/2026-10-12-batch-94/evidence/",
+  "backlog": "repo:.dev-flow/BACKLOG.md",
+  "design_pdr": "vault:s19_app/design/PDR-2026-10-12-batch-94.md",
+  "design_ddr": "vault:s19_app/design/DDR-2026-10-12-batch-94.md",
+  "postmortem": "vault:s19_app/dev-flow-batches/2026-10-12-batch-94/",
+  "metrics": "vault:s19_app/dev-flow-batches/2026-10-12-batch-94/README.md",
+  "requirements_canon": "repo:REQUIREMENTS.md"
+ },
+ "artifacts": {},
+ "decisions_log": [],
+ "standing_authorization": {
+  "autonomous": false,
+  "merge": false,
+  "asked_on": null,
+  "operator_words": "NOT ASKED — kickoff questions owed at the P0 gate (autonomy/merge + full-mode confirmation)."
+ },
+ "obsidian_synced": false,
+ "created_at": "2026-10-12T23:25:07.007012",
+ "owner": "C:/Users/jjgh8/Github/s19_app-b94",
+ "base_ref": "1a0eff6bad2fa84db96f0a8ec1fe273a57a77a5a"
 }
