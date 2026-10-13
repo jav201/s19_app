@@ -843,8 +843,13 @@ def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> No
     R-1 is what it defends: escaping a path before it reaches the file makes the
     run-root substitution MISS, and an absolute operator path gets baked into a
     golden and committed.
+
+    Changelog (2026-10-13, batch-95 collateral sweep): the conftest import is
+    spelled `from tests.conftest import ...` like every other consumer in the
+    suite (tests/__init__.py documents why the bare `conftest` spelling is not
+    importable under the repo's own pytest config). No assertion changed.
     """
-    from conftest import canonical_report_bytes
+    from tests.conftest import canonical_report_bytes
 
     # Benign: the run root is substituted, nothing survives.
     clean = canonical_report_bytes(f"- saved as `{tmp_path}/a.s19`".encode(), tmp_path)

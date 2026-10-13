@@ -10,6 +10,11 @@ LEGEND_TABLE["Hex"] severity rows), and Workspace is explicitly mapped to `()`
 (example-only) instead of falling back to the full table — so the full-table
 fallback assertion moved from Workspace to `flow`.
 
+Batch-94 (HLR-134, 2026-10-13) amended the map sheet once more: the fourth
+box reads 'Map keys', not 'Keys' (the pinned line documents the MAP's keys —
+operator feedback); the expected sheet_titles in test_n1_legend_scoped_per_screen
+carry that contracted spelling.
+
 N2: `_append_log_line` caps to the app width (was a fixed 50), so long
 `.s19tool/workarea/…` paths render untruncated at a wide viewport.
 
@@ -89,7 +94,7 @@ def test_n1_legend_scoped_per_screen(tmp_path: Path) -> None:
         f"Entropy bands — {ENTROPY_WINDOW_BYTES} B windows, bits/byte",
         "Map anatomy",
         "Region row",
-        "Keys",
+        "Map keys",  # batch-94 HLR-134 amendment (2026-10-13), was "Keys"
     ], scoped["map"]
 
 

@@ -2768,6 +2768,54 @@ def _seed_via_paste(app: S19TuiApp, text: str) -> None:
     app.query_one("#patch_paste_parse_button", Button).press()
 
 
+async def _settled(pilot, predicate, description: str, attempts: int = 50) -> None:
+    """Bounded pump-until: ``pilot.pause()`` until ``predicate()`` holds.
+
+    Batch-95 hardening (2026-10-13): a single fixed pause no longer reliably
+    flushes the press → message → handler → mount/render chain — the
+    WindowSection header compose (batch-95 inc-003b/003c) added ticks to
+    every screen mount, so under load the JSON popup or the entries-table
+    re-render can land one or more pauses late (the repo's bounded-poll
+    precedent — batch-77 "two fixed pauses are not enough under load",
+    batch-93's modal-mount race). Polls up to ``attempts`` pauses, then fails
+    loudly with ``description`` so a genuine regression still REDs instead of
+    hanging the suite.
+    """
+    for _ in range(attempts):
+        await pilot.pause()
+        if predicate():
+            return
+    raise AssertionError(
+        f"{description} did not settle after {attempts} pauses"
+    )
+
+
+def _json_popup_ready(app: S19TuiApp) -> bool:
+    """True once the JSON popup's full editor subtree (TextArea + buttons) mounted.
+
+    ``app.screen`` becomes the :class:`ChangeSetJsonScreen` several ticks
+    before it is usable: each DOM nesting level costs a mount tick, so the
+    dialog container leads the ``#changeset_json_text`` editor, which leads
+    the Confirm/Cancel buttons by one more pause. Waiting on any node
+    except the deepest (the buttons) races the button queries — poll for
+    the buttons themselves (and let the geometry arm AND a ``height > 0``
+    layout check on top).
+    """
+    from textual.css.query import NoMatches
+    from textual.widgets import Button
+
+    from s19_app.tui.screens import ChangeSetJsonScreen
+
+    if not isinstance(app.screen, ChangeSetJsonScreen):
+        return False
+    try:
+        app.screen.query_one("#changeset_json_confirm", Button)
+        app.screen.query_one("#changeset_json_cancel", Button)
+    except NoMatches:
+        return False
+    return True
+
+
 def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
     tmp_path: Path,
 ) -> None:
@@ -2783,6 +2831,13 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
     the popup TextArea's visible editable lines at 80x24 AND 120x30
     (LLR-064b.3, C-23 pilot-measured) — the readable surface the height-
     starved in-panel box cannot give at 80x24.
+
+    Changelog (2026-10-13, batch-95 collateral sweep): the fixed single/double
+    ``pilot.pause()`` flushes were replaced by the bounded ``_settled`` polls
+    — the batch-95 WindowSection header compose deepened the mount chain, so
+    under load the popup / table render could land a pause late (NoMatches /
+    measured-0 flakes). No assertion was weakened or re-measured; the C-23
+    thresholds stand.
     """
     from textual.widgets import Button, TextArea
 
@@ -2806,12 +2861,22 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, seed)
-            await pilot.pause()
+            # The parse_paste -> load_text -> table-render chain must land
+            # before the table is read (see _settled).
+            await _settled(
+                pilot,
+                lambda: len(_entry_addresses(app)) == 1,
+                "paste seed parse render (confirm arm)",
+            )
             outcomes["before"] = _entry_addresses(app)
 
             app.query_one("#patch_edit_json_button", Button).press()
-            await pilot.pause()
             # The popup is a ModalScreen seeded from the paste buffer.
+            await _settled(
+                pilot,
+                lambda: _json_popup_ready(app),
+                "JSON popup mount (confirm arm)",
+            )
             outcomes["is_popup"] = isinstance(app.screen, ChangeSetJsonScreen)
             outcomes["seed_matches"] = (
                 app.screen.query_one("#changeset_json_text", TextArea).text
@@ -2822,8 +2887,12 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
                 "#changeset_json_text", TextArea
             ).text = edited
             app.screen.query_one("#changeset_json_confirm", Button).press()
-            await pilot.pause()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: not isinstance(app.screen, ChangeSetJsonScreen)
+                and "0x777" in _entry_addresses(app),
+                "Confirm apply re-render (0x777 entry)",
+            )
             outcomes["after"] = _entry_addresses(app)
         return outcomes
 
@@ -2835,16 +2904,27 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, seed)
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: len(_entry_addresses(app)) == 1,
+                "paste seed parse render (cancel arm)",
+            )
 
             app.query_one("#patch_edit_json_button", Button).press()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: _json_popup_ready(app),
+                "JSON popup mount (cancel arm)",
+            )
             app.screen.query_one(
                 "#changeset_json_text", TextArea
             ).text = edited
             app.screen.query_one("#changeset_json_cancel", Button).press()
-            await pilot.pause()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: not isinstance(app.screen, ChangeSetJsonScreen),
+                "popup dismiss (cancel arm)",
+            )
             outcomes["after"] = _entry_addresses(app)
         return outcomes
 
@@ -2855,11 +2935,21 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, seed)
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: len(_entry_addresses(app)) == 1,
+                f"paste seed parse render (geometry {width}x{height})",
+            )
             app.query_one("#patch_edit_json_button", Button).press()
-            await pilot.pause()
             from textual.widgets import TextArea as _TA
 
+            await _settled(
+                pilot,
+                lambda: _json_popup_ready(app)
+                and app.screen.query_one("#changeset_json_text", _TA).size.height
+                > 0,
+                f"popup mount + layout at {width}x{height}",
+            )
             return app.screen.query_one("#changeset_json_text", _TA).size.height
 
     confirm = asyncio.run(_confirm())
@@ -3068,8 +3158,19 @@ def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
     EXISTING ``parse_paste`` → ``ChangeService.load_text`` seam (asserted by a
     spy on ``load_text`` counting exactly one call carrying the edited text);
     Cancel calls ``load_text`` zero times and leaves the buffer unchanged.
+
+    Changelog (2026-10-13, batch-95 collateral sweep): the fixed single/double
+    ``pilot.pause()`` flushes were replaced by the bounded ``_settled`` polls
+    — the batch-95 WindowSection header compose deepened the mount chain, so
+    under load the seed parse (a ``load_text`` call the Cancel arm's spy must
+    NOT see) or the popup mount could land a pause late. The seed flush waits
+    for the entries-table render, which the app produces in the same handler
+    pass as ``load_text``, so the spy still cannot observe the seed call. No
+    assertion weakened.
     """
     from textual.widgets import Button, TextArea
+
+    from s19_app.tui.screens import ChangeSetJsonScreen
 
     seed = _changeset_text(
         [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
@@ -3086,7 +3187,15 @@ def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             _seed_via_paste(app, seed)
-            await pilot.pause()
+            # Flush the parse_paste -> load_text -> table-render chain BEFORE
+            # installing the spy: the app renders the entries table in the
+            # same handler pass as load_text, so a rendered row proves the
+            # seed call already ran (the Cancel arm must never spy it).
+            await _settled(
+                pilot,
+                lambda: len(_entry_addresses(app)) == 1,
+                "paste seed parse render",
+            )
 
             calls: list[str] = []
             real_load_text = app._change_service.load_text
@@ -3098,7 +3207,11 @@ def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
             app._change_service.load_text = _spy  # type: ignore[assignment]
 
             app.query_one("#patch_edit_json_button", Button).press()
-            await pilot.pause()
+            await _settled(
+                pilot,
+                lambda: _json_popup_ready(app),
+                "JSON popup mount",
+            )
             outcomes["seed"] = app.screen.query_one(
                 "#changeset_json_text", TextArea
             ).text
@@ -3109,8 +3222,14 @@ def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
                 "#changeset_json_confirm" if confirm else "#changeset_json_cancel"
             )
             app.screen.query_one(button_id, Button).press()
-            await pilot.pause()
-            await pilot.pause()
+            # Confirm must additionally route the edited text through
+            # load_text exactly once; Cancel must route nothing.
+            await _settled(
+                pilot,
+                lambda: not isinstance(app.screen, ChangeSetJsonScreen)
+                and (not confirm or len(calls) == 1),
+                "popup dismiss + load_text routing",
+            )
             outcomes["calls"] = list(calls)
             outcomes["buffer"] = app.query_one(
                 "#patch_paste_text", TextArea

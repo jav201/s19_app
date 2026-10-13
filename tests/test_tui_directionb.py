@@ -5789,6 +5789,12 @@ def test_tc028_no_new_processing_module_added_outside_view_layer() -> None:
     # newer requirement supersedes this batch-04 "nothing new at root"
     # invariant for that one module; the guard still catches any OTHER
     # unexpected root module.
+    # batch-95 inc-001 (HLR-137, US-129): the Split/Join/Export engine
+    # ``segment_ops.py`` (range slicer + BIN emitter + pad-byte fill emitter +
+    # join) is likewise deliberately added at the package root beside the
+    # other headless engines — the newer requirement supersedes the invariant
+    # for this one module too; the guard still flags any OTHER unexpected
+    # root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
@@ -5796,6 +5802,7 @@ def test_tc028_no_new_processing_module_added_outside_view_layer() -> None:
         "hexfile.py",
         "range_index.py",
         "compare.py",
+        "segment_ops.py",
         "utils.py",
         "version.py",
     }
@@ -6214,6 +6221,10 @@ def test_tc028_no_new_processing_module_added_outside_view_layer_inc10() -> None
     # package root by design; newer requirement supersedes the batch-04
     # "nothing new at root" invariant for that module. Guard still flags any
     # OTHER unexpected root module.
+    # batch-95 inc-001 (HLR-137, US-129): ``segment_ops.py`` — the headless
+    # Split/Join/Export engine (range slicer + BIN emitter + pad-byte fill
+    # emitter + join) — added at the package root by design for the same
+    # reason; the guard still flags any OTHER unexpected root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
@@ -6221,6 +6232,7 @@ def test_tc028_no_new_processing_module_added_outside_view_layer_inc10() -> None
         "hexfile.py",
         "range_index.py",
         "compare.py",
+        "segment_ops.py",
         "utils.py",
         "version.py",
     }
