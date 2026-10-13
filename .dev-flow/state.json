@@ -34,9 +34,12 @@
  "phase_status": "not-started",
  "stations_active": [
   "P0",
+  "ARQ",
   "P1",
   "P2",
+  "PDR",
   "P3",
+  "DDR",
   "P4",
   "P5",
   "P6"
@@ -48,13 +51,41 @@
   "P3": 0,
   "P4": 0,
   "P5": 0,
-  "P6": 0
+  "P6": 0,
+  "ARQ": 0,
+  "DDR": 0,
+  "PDR": 0
  },
  "triggers": {
-  "evaluated_at": null,
-  "fired": [],
-  "not_fired": [],
-  "record": "NOT EVALUATED — /dev-flow evaluates at P0."
+  "evaluated_at": "2026-10-13",
+  "fired": [
+   "A1",
+   "A2",
+   "A3",
+   "B1",
+   "B3",
+   "B4",
+   "C6",
+   "C8",
+   "D1",
+   "E1"
+  ],
+  "not_fired": [
+   "A4",
+   "B2",
+   "C1",
+   "C2",
+   "C3",
+   "C4",
+   "C5",
+   "C7",
+   "D2",
+   "E2",
+   "E3",
+   "F1",
+   "F2"
+  ],
+  "record": ".dev-flow/2026-10-12-batch-94/PLAN.md#triggers"
  },
  "artifact_homes": {
   "requirements": "repo:.dev-flow/2026-10-12-batch-94/01-requirements.md",
