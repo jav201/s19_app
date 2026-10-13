@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "PDR",
+ "current_station": "P3",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -123,6 +123,11 @@
    "station": "P2",
    "date": "2026-10-13",
    "decision": "P2 gate self-approved under the standing authorization -- approve (not iterate-to-refine), recorded why: three lenses (architect/qa/security, spawned generic with the role files) returned ZERO blockers; every requirement-class major's correction was prescribed verbatim by the finding lens, so the ledgered P1 amendment (LED .1-.13) discharges them without a second full review; implementation-class findings carried into Phase 3 named (variant observer split -> Inc-001; B2 census + three byte-identity goldens -> Inc-002/003 packets); 12 minors folded or named open with owners; fresh security scan: same five flags, nothing new; gate exit 0 after the V26 pairing repair; PDR (design proposal) is next."
+  },
+  {
+   "station": "PDR",
+   "date": "2026-10-13",
+   "decision": "PDR sealed under the standing authorization -- verdict APPROVED WITH CONDITIONS: the design proposal (490 lines, four outputs each with named consumers, 14-row forward-applicability table) reviewed by three lenses (architect clean-approve; qa and ux approve-with-conditions); R-1 CLOSED by executed probe -- rail keys '=' (Check Editor) and ']' (Flow Execution), show=False, zero collisions, 12-entry order verified at 80x24 and 120x30; five conditions with discharge points (C-1 TC-B94-22 re-arm -> Inc-002; C-2 R-4 membership annotation -> discharged + Inc-002 re-run; C-3 AT-B94-02 pilot sizes -> Inc-003; C-ux-1 discharged pre-seal; C-ux-2 apply-action pin -> Inc-001); freeze set D1-D5 phased per increment; gate exit 0; P3 (Inc-001 editors) is next."
   }
  ],
  "obsidian_synced": false,
