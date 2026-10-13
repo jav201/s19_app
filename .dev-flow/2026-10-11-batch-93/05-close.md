@@ -216,3 +216,10 @@ open_items_next: 2
   disk; the batch pushes under the commission, and the operator's verdict folds on
   arrival (batch C's form) — the batch does not close that read itself.
 
+
+
+---
+
+## The operator's visual verdict — FOLDED 2026-10-13
+
+ALL FOUR ACCEPTED (`Me pareque todo correcto.` — the JSON at `evidence/verdicto-batch93.json`): B93-1 the 120x36 cockpit, B93-2 the 80x24 stack, B93-3 the k-legend spec sheet, B93-4 the charter comparison. The memmap2 charter is operator-verified end to end: design ruling (2026-08-06) -> contract -> increments -> the operator's eye.
