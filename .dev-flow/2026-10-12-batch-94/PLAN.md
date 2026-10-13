@@ -11,8 +11,6 @@
 The living compendium of this batch: where-we-are · objective · per-story/per-station status ·
 roadmap + increment plan · key decisions · risks/watch-items · conventions honored ·
 out-of-scope carries · test ledger · decision log (the human-readable mirror of `state.json`).
-**Create at batch open and update at every gate and significant checkpoint** — the
-orchestrator presents the full plan in-conversation at each phase gate.
 
 ## Header
 
@@ -21,10 +19,10 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-12-batch-94 |
 | Objective | Cambio1-7: Flow Builder por bloques (fb_a) + Flow Execution (fx_a) + split Patch/Check Editor (pe_a/ce_b) -- A2B configurable por bloque con procedencia en el reporte, check-spec .chk.json (write/validate only), control secuencial(default)/paralelo, ruteo de cables refinado. Design input: 4 SVG ganadores en G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/. Coordination: COORDINACION-batch92.md (overlap screens_directionb.py con batch-93 -- second-editor-rebases rule). |
-| Last updated | P0 · 2026-10-13 |
-| Standing authorization | PENDING at this gate — the kickoff questions are put to the operator at the P0 gate presentation (autonomy? merge to main at close? mode `full` confirmed?). Until answered, no gate is self-closed; state.json `standing_authorization.operator_words` records the same pending state. |
-| First gate | Record-seed gate (pre-P0): exit 0 — `0 block · 374 notice · 48 n/a` on the just-seeded record; `V7` manifest-identity arm raised no finding (the run's BLOCK/NOTICE list names V7 nothing; bundle mirror `2026-10-12-rev102` proved self-consistent). This gate proves the TOOL, not the batch. |
-| Premises / RC-1 | Verified `origin/main` tip: **`1a0eff6bad2fa84db96f0a8ec1fe273a57a77a5a`** (fetched 2026-10-13; RC-2 probe answered, newest commit 2026-10-13 06:49 −0600). The batch opened at `ae0ef4f` — 5+1 commits behind — and was rebased (fast-forward) onto the tip BEFORE any derivation, per RC-1; `base_ref` re-stamped. Flow currency (C-45 PULL): this runtime runs the bundle mirror at `C:/Users/jjgh8/.claude/skills/dev-flow`, **not a git checkout** — currency probe = the `V7` bundle-identity line + `FLOW-VERSION.md` → `flow_version 2026-10-12-rev102`. Premises: see `01-requirements.md` §2.7 (6 rows, all TRUE). |
+| Last updated | P0 (gate closed) · 2026-10-13 |
+| Standing authorization | Operator (Javier), 2026-10-13, answering the P0 gate kickoff: *"1.Si, autorizados; 2.autorizo los merges; 3.Modo full."* — read as: **(1) end-to-end autonomy** over the gates this batch commissions; **(2) merge authority granted — and the merge stays gated**: after the PR is opened and CI is green, one final independent PR-level `qa-reviewer` pass over the WHOLE merged diff vs `main` must come back clean before the agent merges; a HIGH finding blocks the merge and returns to the operator; **(3) mode `full` confirmed**. Autonomy is never silent: every autonomous decision is summarized in this PLAN's decision log, `state.json.decisions_log`, the postmortem decisions summary, and carried to the vault at `/dev-flow-sync`. Per `shared-batch.md` §Batch-kickoff authorization: per-batch, never carried from a prior batch; the `standing_authorization` key is deleted from `state.json` with this cell its one record. |
+| First gate | Record-seed gate (pre-P0): exit 0 — `0 block · 374 notice · 48 n/a`; `V7` raised no finding (bundle mirror `2026-10-12-rev102` self-consistent, 57 declared files both directions). Tool-proving run, not the batch. |
+| Premises / RC-1 | Verified `origin/main` tip at intake: **`1a0eff6`** (2026-10-13; RC-2 probe answered). **Second RC-1 at the P0 gate:** the legends batch `2026-10-13-batch-94` closed on main (`f86d754`) while this batch was at its gate — the branch rebased onto it (second fast-forward) and `base_ref` re-stamped to **`f86d75441bc345d7d2dc6ee8915b3010332b0131`** before the next gate, per the RC-1 post-init rule. Flow currency (C-45 PULL): bundle mirror at `C:/Users/jjgh8/.claude/skills/dev-flow`, not a git checkout — probe = the `V7` line + `FLOW-VERSION.md` `2026-10-12-rev102`. Premises: `01-requirements.md` §2.7 (7 rows, all TRUE). |
 
 ## Triggers
 
@@ -50,11 +48,11 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 | F1 | not fired | bundle runtime — cannot recompute `flow_hash`; probe = the `V7` bundle-identity line (`0 block`, manifest self-consistent) + `FLOW-VERSION.md` `2026-10-12-rev102` |
 | F2 | not fired | judged — lane A last refreshed 2026-10-13 at batch-93's close (`BACKLOG-CODE.md:145`); no close has superseded it |
 
-Stations taken up by the fired A-family: **ARQ → PDR → DDR** (chain), inserted at their schema positions; their artifacts are seeded by `devflow-init.py --fired` (architecture map — already on disk, not overwritten; design proposal + PDR/DDR reviews — new).
+Stations taken up by the fired A-family: **ARQ → PDR → DDR** (chain), inserted at their schema positions; their artifacts seeded by `devflow-init.py --fired` (architecture map — already on disk, not overwritten; design proposal + PDR/DDR reviews — new).
 
 ## Where we are
 
-P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane A read, the nine source stories classified (6 READY · 1 REFINE · 2 OUT), triggers evaluated (ARQ/PDR/DDR taken up), premises table filled. What is owed next, on approval: ARQ (the module map update, since ARQ fired) → P1 requirements derivation for US-001..005 + US-007 (US-006 parked, REFINE).
+P0 gate CLOSED 2026-10-13 under the standing grant (decisions_log entry 1). Next station: **ARQ** (the module-map update for the new surfaces, since A1–A3 fired) → then P1 derives the requirements contract for US-001..005 + US-007. The coordination with the parallel legends batch is discharged: it closed (`f86d754`), the file-set intersection is empty, and this branch rebased on top (see Key decisions).
 
 ## Objective
 
@@ -73,8 +71,8 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 | US-007 (Cambio7, Flow Execution) | READY | fx_a; sequential-default/parallel-per-chain ruling |
 | US-008 (Cambio8, BlockTags) | OUT | outside the commission; file to lane A at close |
 | US-009 (Cambio9, README) | OUT | docs-only; file to lane A at close |
-| P0 | gate presented 2026-10-13 | this presentation |
-| ARQ / P1… | pending | on P0 approval |
+| P0 | CLOSED 2026-10-13 | gate approved — asked at the gate; grant recorded in the header cell |
+| ARQ | current | module map update owed (new surfaces + rail entry) |
 
 ## Roadmap + increment plan
 
@@ -88,10 +86,13 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-10-12 | Batch opened `full`, base `ae0ef4f` | rollover from batch-93; mode full per operator's standing preference — confirmation asked at this gate |
-| 2026-10-13 | RC-1 rebase: ff to `1a0eff6` BEFORE derivation; `base_ref` re-stamped | batch-93 closed + operator-verified while the batch was opening |
+| 2026-10-12 | Batch opened `full`, base `ae0ef4f` | rollover from batch-93; mode full per operator's standing preference |
+| 2026-10-13 | RC-1 rebase 1: ff to `1a0eff6` BEFORE derivation; `base_ref` re-stamped | batch-93 closed + operator-verified while the batch was opening |
 | 2026-10-13 | Cambio8/9 recorded OUT | outside the Cambio1–7 commission; filed to lane A at close |
 | 2026-10-13 | Triggers: A1/A2/A3, B1/B3/B4, C6/C8, D1, E1 fired | probes in the table above; ARQ/PDR/DDR taken up |
+| 2026-10-13 | Kickoff answered at the P0 gate: autonomy granted, merge granted (stays gated on the final PR-level qa pass), mode full confirmed | the operator's three answers, quoted in the Standing authorization cell |
+| 2026-10-13 | Second RC-1 rebase onto `f86d754` (the legends batch, closed on main while P0 was open) | disjoint file sets (`screens.py` + `test_legend_map_sheet.py` vs this batch's `screens_directionb.py` / `services/flow_*` / `app.py` — intersection empty); this branch edits second, on top |
+| 2026-10-13 | Batch-number collision declared: TWO batches numbered 94 | `2026-10-12-batch-94` (this, full) and `2026-10-13-batch-94` (legends fix, core, closed) both counted "93+1" from different checkouts on different dates; dirs differ by date; every cross-reference in this record uses the full dated name; the gate's atlas census accepts both |
 
 ## Risks / watch-items
 
@@ -101,11 +102,13 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 - AT/TC ids: re-read `AT-TC-REGISTRY.jsonl` `_meta.next_free` at P1 before reserving (post-merge high-water; batch-scoped ids preferred per `engineering-rules.md`); the batch-93 renumber debt was discharged at its close (high-water repaired to TC-681) — verified, not assumed, at P1.
 - Flow Execution writes chained outputs to disk — bounded to workspace/loaded copies under the existing services precedent; no destructive paths beyond the tool's core purpose.
 - US-006 parked in REFINE: if the operator's answers arrive mid-batch, it re-enters at the next gate; else it files to lane A at close.
+- The legends batch (`2026-10-13-batch-94`) shares the "94" number with this batch — always cite the dated name; if a third lane opens before this closes, re-check the numbering at ITS rollover.
 
 ## Conventions honored
 
+- **Merge gate (from the kickoff grant):** after the PR opens and CI is green, one final independent PR-level `qa-reviewer` pass over the whole merged diff vs `main` (dual traceability intact · 0 diffs to frozen modules · no cross-increment regression · every gate carry discharged) must come back clean before this agent merges; a HIGH finding returns to the operator.
 - Lane routing (`engineering-rules.md`): lane A read at P0; Cambio8/9 + US-006 (if unanswered) file to lane A at close. Router (`BACKLOG.md`) untouched.
-- Coordination note (COORDINACION-batch92.md §BATCH-94): file sets respected; the `screens_directionb.py` overlap resolved by the RC-1 rebase (batch-94 is the second editor, on top of merged batch-93).
+- Coordination note (COORDINACION-batch92.md §BATCH-94 + the 2026-10-13 update): file sets respected; the `screens_directionb.py` overlap with batch-93 resolved by the RC-1 rebase; the legends-batch intersection is empty (declared in the note).
 - Operator rulings from the spike (flow_bench.NOTES.md / editor_bench.NOTES.md): changeset schema UNCHANGED (no `from`/`to`); `.chk.json` by suffix; A2B configurable per block with input provenance in the report; sequential(default)/parallel-per-chain control; refined cable routing.
 - Gate rule (batch-92 post-mortem): the local suite is NOT the sharp gate — 0 NEW fails over the declared baseline, snapshots per-cell (flaky-tolerant union rule) carries into this batch's P4.
 - Batch-scoped vs global AT/TC ids per `engineering-rules.md`; one AT = one on-disk node (C-18); RED counterfactuals mandatory per increment.
@@ -119,8 +122,9 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 
 ## Gate notices and runtime absences
 
-- Record-seed gate (pre-P0, tool-proving run): exit 0 · `0 block · 374 notice · 48 n/a`. Expected notices on a just-seeded record: template placeholders (V31–V49 family), empty ledger/decisions (V27), PDR-station staging (V52), standing-authorization cell (V55 — holds PENDING until the operator answers this gate), historical census notices (V42/V53 — pre-existing, declared).
-- P0 gate run (post-intake): first full run went **exit 1 · 4 BLOCK** — all V20, the derived atlases committed at seed time went stale under the intake commit's new corpus (design seeds, evidence). Repaired by `--atlas --write` + commit (`derived atlases regenerated at the P0 gate`); re-run exit 0 · `0 block · 374 notice · 50 n/a`. Standing notices read at this gate: V52 (design proposal is the untouched template — owed at PDR), V55 (grant pending this gate), V30/V15/V17 (bundle absences below), V27 (no gate decisions yet — this gate writes the first).
+- Record-seed gate (pre-P0, tool-proving run): exit 0 · `0 block · 374 notice · 48 n/a`. Expected notices on a just-seeded record: template placeholders (V31–V49 family), empty ledger/decisions (V27), PDR-station staging (V52), standing-authorization cell (V55 — cleared at the P0 close once the grant landed in the cell and the key was deleted), historical census notices (V42/V53 — pre-existing, declared).
+- P0 gate run (post-intake): first full run went **exit 1 · 4 BLOCK** — all V20, the derived atlases committed at seed time went stale under the intake commit's new corpus. Repaired by `--atlas --write` + commit; re-run exit 0 · `0 block · 374 notice · 50 n/a`.
+- P0-close gate run (post-rebase onto `f86d754`, post decision + station move): exit 0 · `0 block · 374 notice · 50 n/a` — V27 (decision dated), V55 (grant in cell, key deleted), V60/V61 (evaluation + taken-up stations) all silent; the two `batch-94` dated dirs coexist with no finding.
 - Runtime absences (this bundle runtime, recorded once per `SKILL.md` step 5): no named reviewer roles — reviewers are spawned as generic subagents carrying the role files from `agents/`, or self-executed and declared; no hooks/prompt-guard — the validator (`V7`) is the guard; `V15`/`V16`/`V17` not-run (no canon tree / checkout table / wired settings here — recorded with reason); `V30` half (bundle ships 5 Python files of the floor set). The `Independent review` cell of every packet will lead with the role + how it ran.
 - V25: n/a — this project HAS an origin remote and it answered (RC-2 above).
 
@@ -130,4 +134,5 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 |---|---|---|
 | gate: `devflow-validate.py --brief <wt>` (record seed) | 2026-10-13 | exit 0 · 0 block · 374 notice · 48 n/a |
 | gate: full + `--brief` post-intake (the P0 gate run) | 2026-10-13 | exit 0 · 0 block · 374 notice · 50 n/a · `V7`: bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared files) at `2026-10-12-rev102` |
+| gate: `--brief` at the P0 close (post-rebase + decision + station move) | 2026-10-13 | exit 0 · 0 block · 374 notice · 50 n/a |
 | suite baseline (inherited from batch-93 close, premise 3) | 2026-10-13 | 2 796 passed · 35 pre-existing fails (census `c25-failure-census.txt`); re-derived at P4 |

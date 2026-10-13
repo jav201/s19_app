@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P0",
+ "current_station": "ARQ",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -103,15 +103,15 @@
   "requirements_canon": "repo:REQUIREMENTS.md"
  },
  "artifacts": {},
- "decisions_log": [],
- "standing_authorization": {
-  "autonomous": false,
-  "merge": false,
-  "asked_on": null,
-  "operator_words": "NOT ASKED — kickoff questions owed at the P0 gate (autonomy/merge + full-mode confirmation)."
- },
+ "decisions_log": [
+  {
+   "station": "P0",
+   "date": "2026-10-13",
+   "decision": "P0 intake approved -- asked at the gate: the operator authorized end-to-end autonomy AND the merge (merge stays gated: after PR + green CI, one final independent PR-level qa-reviewer pass over the whole merged diff vs main must come back clean; HIGH blocks and returns), and confirmed mode full; US-001..005/007 proceed to ARQ/P1, US-006 stays REFINE-parked, US-008/009 OUT; ARQ is next."
+  }
+ ],
  "obsidian_synced": false,
  "created_at": "2026-10-12T23:25:07.007012",
  "owner": "C:/Users/jjgh8/Github/s19_app-b94",
- "base_ref": "1a0eff6bad2fa84db96f0a8ec1fe273a57a77a5a"
+ "base_ref": "f86d75441bc345d7d2dc6ee8915b3010332b0131"
 }
