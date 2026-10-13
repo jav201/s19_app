@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "ARQ",
+ "current_station": "P1",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -108,6 +108,11 @@
    "station": "P0",
    "date": "2026-10-13",
    "decision": "P0 intake approved -- asked at the gate: the operator authorized end-to-end autonomy AND the merge (merge stays gated: after PR + green CI, one final independent PR-level qa-reviewer pass over the whole merged diff vs main must come back clean; HIGH blocks and returns), and confirmed mode full; US-001..005/007 proceed to ARQ/P1, US-006 stays REFINE-parked, US-008/009 OUT; ARQ is next."
+  },
+  {
+   "station": "ARQ",
+   "date": "2026-10-13",
+   "decision": "ARQ gate self-approved under the standing authorization (operator, 2026-10-13: autonomy granted) -- the module map amendment approves: flow surfaces get their own module s19_app/tui/flow_screens.py (R8, parallelisation-rule exit 2), editors stay in screens_directionb.py, .chk.json is a suffix distinction on the v2 grammar (R10, apply.py's kind-gate already enforces no-apply), rail 10->12 declared with the key-binding question open to P1/PDR (R11), US-004's seam flagged for P1 with the frozen-layer consequence (R12); gate run 0 block; P1 requirements derivation is next."
   }
  ],
  "obsidian_synced": false,
