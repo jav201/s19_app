@@ -860,35 +860,54 @@ def extract_compu_tables(sections: list[dict]) -> dict[str, dict]:
 
 
 def extract_memory_segments(sections: list[dict]) -> list[dict]:
-    """Parse MEMORY_SEGMENT blocks (CODE/DATA FLASH/RAM ROM, base, size)."""
+    """Parse MEMORY_SEGMENT blocks (CODE/DATA FLASH/RAM ROM, base, size, offset).
+
+    Hardened (batch-95, LLR-137.4): the record line is tokenized with
+    :func:`_split_line_respecting_quotes`, and the first line tokenizing into
+    >= 5 parts is the record — a quoted multi-word long identifier on its own
+    line (the shipped ASAP2 demos) collapses to ONE token and is skipped, so
+    quoted blocks yield full rows instead of null base/size. Unquoted blocks
+    tokenize exactly as the old ``str.split()`` and parse byte-identically.
+    Each entry carries the ``offset`` field (record parts[5]) when declared.
+    """
     out: list[dict] = []
 
     def walk(nodes: list[dict]) -> None:
         for sec in nodes:
-            if sec.get("name") == "MEMORY_SEGMENT":
-                first = ""
-                for line in sec.get("lines") or []:
-                    if line.strip():
-                        first = line.strip()
-                        break
-                parts = first.split()
-                entry: dict = {
-                    "block_name": parse_begin_meta(sec.get("meta", "") or "")[0],
-                    "raw_first_line": first,
-                    "usage": None,
-                    "kind": None,
-                    "base": None,
-                    "size": None,
-                }
-                if len(parts) >= 5:
-                    entry["usage"] = parts[0]
-                    entry["kind"] = parts[1]
+            if sec.get("name") != "MEMORY_SEGMENT":
+                walk(sec.get("children") or [])
+                continue
+            entry: dict = {
+                "block_name": parse_begin_meta(sec.get("meta", "") or "")[0],
+                "raw_first_line": "",
+                "usage": None,
+                "kind": None,
+                "base": None,
+                "size": None,
+                "offset": None,
+            }
+            for line in sec.get("lines") or []:
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                parts = _split_line_respecting_quotes(stripped)
+                if len(parts) < 5:
+                    continue  # a quoted long-identifier line collapses to 1 token
+                entry["raw_first_line"] = stripped
+                entry["usage"] = parts[0]
+                entry["kind"] = parts[1]
+                try:
+                    entry["base"] = int(parts[3], 0)
+                    entry["size"] = int(parts[4], 0)
+                except ValueError:
+                    pass
+                if len(parts) >= 6:
                     try:
-                        entry["base"] = int(parts[3], 0)
-                        entry["size"] = int(parts[4], 0)
+                        entry["offset"] = int(parts[5], 0)
                     except ValueError:
-                        pass
-                out.append(entry)
+                        entry["offset"] = None
+                break
+            out.append(entry)
             walk(sec.get("children") or [])
 
     walk(sections)
