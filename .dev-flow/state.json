@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P1",
+ "current_station": "P2",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -113,6 +113,11 @@
    "station": "ARQ",
    "date": "2026-10-13",
    "decision": "ARQ gate self-approved under the standing authorization (operator, 2026-10-13: autonomy granted) -- the module map amendment approves: flow surfaces get their own module s19_app/tui/flow_screens.py (R8, parallelisation-rule exit 2), editors stay in screens_directionb.py, .chk.json is a suffix distinction on the v2 grammar (R10, apply.py's kind-gate already enforces no-apply), rail 10->12 declared with the key-binding question open to P1/PDR (R11), US-004's seam flagged for P1 with the frozen-layer consequence (R12); gate run 0 block; P1 requirements derivation is next."
+  },
+  {
+   "station": "P1",
+   "date": "2026-10-13",
+   "decision": "P1 gate self-approved under the standing authorization -- the requirements contract approves: 21 HLRs / 42 LLRs / 24 ATs (AT-B94-01..24) / 31 TCs (TC-B94-01..31), batch-scoped ids (ungoverned space, no registry reservation needed); IFC Part A 6 flows + Part B 4 rail-screen components re-parented to the shell boundary (V12 could-not-be-tested form, batch-87 precedent); US-004 seam decided view-level (rules.py/a2l.py stay frozen, re-open condition recorded); rail key binding stays OPEN for PDR; C-35/C-39 executed probes pasted (A2L census 1023, chk round-trip, A2B provenance emitted form, rail census); security scan exit 1 security_required:true, five vocabulary collisions answered in 6.3; gate run exit 0 (0 block after V4 x13 + V12 x8 repairs + V20 regen); P2 cross-review is next."
   }
  ],
  "obsidian_synced": false,
