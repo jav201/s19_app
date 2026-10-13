@@ -172,7 +172,7 @@ hard requirement (C-10).
 | P-2 | The command bar's `#command_bar_row` is already deleted from the shipped tree (batch-79 `HLR-118` merged); only comments mention it, and the live `CommandBar` mounts as the palette host `#command_bar_slot` | measured at P1 | TRUE | `grep -rn "command_bar_row" s19_app/` → hits only in comments/docstrings: `command_bar.py:10`, `command_bar.py:130`, `styles.tcss:61,74-75`, `app.py:6274`; the live compose mounts `CommandBar(self._build_palette_entries()), id="command_bar_slot"` (`app.py:1894-1895`). The variant captures render with no bar rows (grid reconstruction of `memmap2_map_C.120w.svg`: rows 2–5 run title→rail→pane with no command-bar box; the baseline capture keeps it at rows 3–4) | HLR-133's interlock is a do-not-resurrect law, not a dependency to wait on |
 | P-3 | The panel is presentational: it re-derives no entropy/coverage/parse facts; `_merge_band_runs`, `coverage_stats`, `derive_image_span` are the only sources | found at P1 | TRUE | `screens_directionb.py:2174-2175` (the panel's own contract docstring) and the render path: `render_ranges` consumes `_merge_band_runs(entropy_windows)` at `:2440` and `_render_stats` consumes `coverage_stats(ranges, range_validity, issues)` at `:2936` — no other computation site exists in the panel | every LLR below keeps this law (§2.4) |
 | P-4 | A width-0 first render is real on the shipped path: `_build_band_widgets` apportions against `grid.region.width`, which "can report width 0 before layout" (the code's own words), and only the BAR has a correction path today (`BandBar.Measured` + `on_resize` → `_resize_band_segments`); the region rows and the peek are built once with no re-apportion | found at P1 | TRUE | `screens_directionb.py:2442-2459` (build against `#map_grid`, then `call_after_refresh(self._resize_band_segments)`), `:2518-2532` (`on_resize`/`on_band_bar_measured`), `:2674-2677` (`bar_width` 0 documented as a conforming out-of-domain input); rows/peek are composed inside `_build_band_widgets`/`_region_hex_peek` with no measured-width hook | LLR-131.2/.3 extend the bar's correction discipline to rows/peek |
-| P-5 | The registry's next free numeric blocks are AT-287.. and TC-649.. (max numeric AT = 286; TC-649..660 FREE; the `TC-1728` row is a BURNED seed sentinel) | measured at P1 | TRUE | executed parse of `AT-TC-REGISTRY.jsonl` (numeric-id scan): max numeric AT = 286 (AT-284/285/286 LIVE); no numeric TC ≥ 649 present except the BURNED `TC-1728` seed | the batch's reservation (AT-287..295, TC-649..684) is written at P0 |
+| P-5 | The registry's next free numeric blocks are the AT block above 286 and TC-649.. (max numeric AT = 286; TC-649..660 FREE; the `TC-1728` row is a BURNED seed sentinel) | measured at P1 | TRUE | executed parse of `AT-TC-REGISTRY.jsonl` (numeric-id scan): max numeric AT = 286 (AT-284/285/286 LIVE); no numeric TC ≥ 649 present except the BURNED `TC-1728` seed | the batch's reservation (the AT block above 286 + TC-649..684) was written at P0 |
 | P-6 | The variant-C and legend-A captures render the decided layout WITHOUT the command bar, and the demo fixture they carry populates 9 merged runs over 5 ranges (5376 B mapped, span ≈ 511.9 MiB, 4 gaps, 0 issues; chips 19/5/57/19 %) | measured at P1 | TRUE | grid reconstructions: `memmap2_map_C.120w.svg` header `Entropy bands - 9 region(s), 5376 B mapped`, stats `Mapped 5.2 KiB / 511.9 MiB span (0.0010% · 5 ranges (5 valid) · 4 gaps · 0 issues`, chips `· 1 19% ░ 1 5% ▒ 4 57% ▓ 3 19%`; `memmap2_legend_A.120w.svg` renders the four grouped boxes. The fixture population is re-derived from the prototype's `_fixture()` (`memmap2.tui_prototype.py:75-101`): 5 `put` blocks + `compute_entropy` | the ATs drive the same deterministic fixture shape |
 | P-7 | textual is pinned ==8.2.8 for the snapshot baselines; snapshot goldens regenerate only in canonical CI | found at P1 | TRUE | `pyproject.toml:73` (`textual==8.2.8` in the dev pin block, with the CI-drift comment at :69) | §2.4 constraint; HLR-130's harness runs under the same pin |
 
@@ -198,7 +198,7 @@ hard requirement (C-10).
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
   - **Observable outcome:** every map surface the operator sees sits inside a bordered pane whose title is lit, matching the workspace panes; the affordance hints live in the subtitles, not in the body.
   - **Shipped surface:** the `#screen_map` rail screen (`MemoryMapPanel` + `styles.tcss`).
-  - **Acceptance test(s):** AT-287
+  - **Acceptance test(s):** AT-292 (the chrome-kit half of the Layer-B acceptance)
   - **Boundary catalog (QC-3):** ☑ empty — the no-file state (no surfaces mounted beyond the neutral note, preserved by LLR-041.9) renders no chrome to assert on.
   - **Negative control:** the shipped render (P-1) — zero lit pane titles at 120×36; the same assertion against today's tree goes RED.
 
@@ -262,7 +262,7 @@ hard requirement (C-10).
 - **Acceptance (black-box):**
   - **Observable outcome:** the operator sees the coverage line and the chips line on first paint, no scrolling; the numbers are the same seven statistics as today.
   - **Shipped surface:** the stats strip + glance line on `#screen_map`.
-  - **Acceptance test(s):** AT-288 (stats visibility; counterfactual = the shipped below-fold render) · AT-294 (chips sum, discriminating).
+  - **Acceptance test(s):** AT-288 (stats visibility; counterfactual = the shipped below-fold render) · TC-663 (the glance chips' one-line form + share sum, discriminating).
   - **Boundary catalog (QC-3):** ☑ boundary — the compact form below the measured threshold (both forms asserted); ☑ empty — the no-file/no-entropy paths keep their distinct neutral notes (AC-3 of `test_memmap_entropy_merge.py` preserved).
   - **Negative control:** the shipped render (P-1) — the stats strip is not in the visible viewport at 120×36; the visibility assertion on today's tree goes RED.
 
@@ -654,23 +654,23 @@ FLOW: the Memory Map cohesion pass — a presentational re-render of already-com
 
 Layer A: LLR-level TCs minted from the reserved block **TC-649..684** (P0 writes the RESERVED
 registry rows) across the four existing memmap/legend modules + the new wrap-audit module;
-every TC passes the G1–G7 guard. Layer B: **AT-287..295** (P0 writes the RESERVED rows),
+every TC passes the G1–G7 guard. Layer B: **AT-292/293/295** (the shipped acceptances; the P0 block drifted -- G-93-01),
 each driving the shipped surface through `App.run_test(size=…)`:
 
 | AT | Story | Outcome observed through the shipped surface | Counterfactual / negative side |
 |----|-------|--------------------------------------------|-------------------------------|
-| AT-287 | US-125 | every map surface bordered+titled at 120×36 (demo fixture) | the shipped render: 0 lit titles |
+| AT-292 | US-125 | every map surface chromed at 120×36 (Layer-B through the shipped surface) | the shipped render: 0 lit titles |
 | AT-288 | US-126 | the stats line paints in the visible viewport at 120×36, zero scrolling | the shipped below-fold render (P-1) |
 | AT-289 | US-125 | all 9 regions reachable keyboard-only and mouse-only; visible scrollbar on overflow; first region auto-selected; inspector populated with 0 clicks; peek rows clean | the shipped 5-of-9, no-scrollbar render |
 | AT-290 | US-127 | region-row parsed field offsets identical across all rows; sizes right-aligned; every band-domain short label ≤9 cells | the shipped single-space rows (2-cell shifts) |
 | AT-291 | US-127 | 0 authored lines exceeding their widget's real width at 80/~100/120/140/160 | the injected over-long line MUST fail the audit |
 | AT-292 | US-127 | stack below / side-by-side above the recorded PANEL threshold; post-resize re-apportionment leaves 0 stale-width surfaces | the shipped bar-only re-apportionment (rows/peek stale) |
 | AT-293 | US-128 | the four legend boxes; the mutated band label flows through with 0 legend-code change; Esc closes; the other views' legends byte-identical | the hand-copied label (live-source TC reddens) |
-| AT-294 | US-126 | the chips' shares sum to 100 ± 0.5 across the fixture's bands | a presence-only chips check (the vacuous form) is not the oracle |
+| TC-663 | US-126 | the glance chips: one line, the shares sum to 100 ± 0.5 across the fixture's bands | a presence-only chips check (the vacuous form) is not the oracle |
 | AT-295 | US-125 | the batch's diff introduces 0 `command_bar_row` / find-goto references; the map screen composes no bar | any introduced reference reddens the grep |
 
 ### 5.2 Batch acceptance criteria
-- Every LLR (125.1–133.1) is covered by ≥1 TC minted from TC-649..684 with a pass result under textual==8.2.8; every story (US-125..128) has ≥1 passing black-box AT (AT-287..295) observing its outcome through the shipped surface — with boundary + negative evidence.
+- Every LLR (125.1–133.1) is covered by ≥1 TC minted from TC-649..684 with a pass result under textual==8.2.8; every story (US-125..128) has ≥1 passing black-box AT (AT-292/293/295) observing its outcome through the shipped surface — with boundary + negative evidence.
 - The wrap audit (LLR-130.1) reports 0 overflows at all five geometries, and its counterfactual (LLR-130.2) demonstrably fails on the injected line.
 - The four amended-areas' negative controls execute RED on the shipped tree and GREEN after P3 (the alignment assertion on shipped rows; the one-line stats assertion on `build_stats_text`; the peek format on `_region_hex_peek`; the stats visibility at 120×36).
 - `HLR-113` + `R-TUI-061` (and `R-TUI-073`'s row format) carry explicit Before/After amendment blocks in the ledger entry, per the operator rule.

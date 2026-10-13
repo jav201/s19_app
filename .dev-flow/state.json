@@ -43,7 +43,7 @@
     "P5": 0
   },
   "triggers": {
-    "evaluated_at": null,
+    "evaluated_at": "2026-10-13",
     "fired": [],
     "not_fired": [],
     "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
@@ -69,6 +69,30 @@
       "station": "P2",
       "date": "2026-10-11",
       "decision": "P2 approve (0/0/4) — the contract is authored; the hold lifts: batch-92 MERGED to main (PR #210, a67407c), the coordination note is on disk in this batch's dir; P3 starts on the refactored tree (suite collects 2772)",
+      "guided": false
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-13",
+      "decision": "increment 001 -- the cockpit core (HLR-125..129): the chrome kit, the inspector layout, the one-line stats + chips, the pilot thresholds; the region-click family root-caused test-side",
+      "guided": false
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-13",
+      "decision": "increment 002 -- the wrap audit as a harness (TC-670 counterfactual) + the regimes anchored to the panel's width (the 86 threshold measured); the audit caught its own first fix (the scrollbar gutter)",
+      "guided": false
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-13",
+      "decision": "increment 003 -- legend A (the spec sheet, the live band key, TC-677's domain mutation) + the interlock arm (TC-678/679) + the AT-023 race fixed at the root",
+      "guided": false
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-13",
+      "decision": "batch closed -- the record committed, the fold-canon discharged (33 ids), AT-293's token restored, the two unspent acceptance ids released; the C-25 figures and the operator's visual verdict fold on arrival",
       "guided": false
     }
   ],
