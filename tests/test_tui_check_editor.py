@@ -38,6 +38,7 @@ from textual.widgets import Button, DataTable, Input, Select, Static
 
 from s19_app.tui import app as app_module
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.rail import Rail
 from s19_app.tui.screens_directionb import (
     CheckEditorPanel,
     PatchEditorPanel,
@@ -162,6 +163,13 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
     the 80x24 boundary arm; the write action routes to the change writer with
     a captured call count of exactly 1. Cross-mounting negative control:
     selecting Patch Editor mounts the patch panel, not the twin.
+
+    FIX ROUND A (C-40): the panel census alone is routing-blind — every rail
+    screen composes eagerly at startup, so the panel sits in the DOM whether
+    or not `=` targets it (the binding mutation SURVIVED). The kill subject
+    is the RAIL TARGET: after `=`, the Check Editor screen must be the
+    visible one and the rail's single active marker must move to
+    ``check_editor`` (LLR-001.2's ``set_active`` seam).
     """
 
     async def _drive(size) -> tuple:
@@ -171,6 +179,13 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
             await pilot.press("equals_sign")
             await pilot.pause()
             await pilot.pause()
+            # The rail-target observation (FIX ROUND A — the kill subject).
+            visible = [
+                sid
+                for sid in ("screen_check_editor", "screen_patch")
+                if "hidden" not in app.query_one(f"#{sid}").classes
+            ]
+            rail_active = app.query_one(Rail).active_key
             panels = list(app.query(CheckEditorPanel))
             # Mount the twin-crossing negative control.
             await pilot.press("6")
@@ -194,9 +209,23 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
                 await pilot.pause()
             finally:
                 app_module.write_change_document = original
-            return len(panels), len(patch_panels), len(calls)
+            return (
+                len(panels),
+                len(patch_panels),
+                len(calls),
+                visible,
+                rail_active,
+            )
 
-    mounted, patch_panels, write_calls = asyncio.run(_drive((120, 30)))
+    mounted, patch_panels, write_calls, visible, rail_active = asyncio.run(
+        _drive((120, 30))
+    )
+    assert visible == ["screen_check_editor"], (
+        f"'=' must make the Check Editor screen visible, got {visible}"
+    )
+    assert rail_active == "check_editor", (
+        f"the rail marker must move to 'check_editor', got {rail_active!r}"
+    )
     assert mounted == 1, f"exactly 1 CheckEditorPanel mounts, got {mounted}"
     assert patch_panels == 1, "the patch twin stays the patch screen's panel"
     assert write_calls == 1, (

@@ -1,0 +1,2470 @@
+==============================================================================
+inc001 mutation battery — batch-94 increment 001 (tip b6f974f)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+
+[phase 0] resolving node ids via pytest --collect-only
+  resolved OK: 28 b94 nodes across 3 files (TC-B94-09 params: 2)
+
+[phase 1] arms: 23 (planned 23); node-runs: 27 (planned 27)
+
+[phase 2] clean-tree baseline (all 27 nodes, ONE pytest run)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0] tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1] tests/test_tui_patch_editor_b94.py::test_at_b94_04_edit_json_valid_merges tests/test_tui_patch_editor_b94.py::test_at_b94_05_edit_json_invalid_keeps_table tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps tests/test_tui_patch_editor_b94.py::test_at_b94_08_variant_machinery_retired tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document tests/test_tui_patch_editor_b94.py::test_at_b94_10_load_reads_path_input_refresh_repupulates tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply tests/test_tui_check_editor.py::test_tc_b94_06_composition_census tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name tests/test_tui_patch_editor_b94.py::test_tc_b94_01_validate_merge_paths tests/test_tui_patch_editor_b94.py::test_tc_b94_02_apply_gate tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding tests/test_tui_patch_editor_b94.py::test_tc_b94_12_apply_label_census tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...........................                                              [100%]
+27 passed in 44.04s
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 01: s19_app/tui/app.py
+    note: rail '=' action target check_editor->patch
+    edit: 'Binding("equals_sign", "show_screen(\'check_editor\')", "Check Editor", show=False),'
+          -> 'Binding("equals_sign", "show_screen(\'patch\')", "Check Editor", show=False),'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_at_b94_01_rail_selects_check_editor_mounts_twin _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18788/test_at_b94_01_rail_selects_ch0')
+
+    def test_at_b94_01_rail_selects_check_editor_mounts_twin(tmp_path: Path) -> None:
+        """AT-B94-01 — rail selection mounts the Check Editor; Patch mounts Patch.
+    
+        Intent (HLR-001): selecting "Check Editor" mounts exactly one Check
+        Editor panel exposing write/validate actions and 0 apply actions;
+        selecting "Patch Editor" mounts the Patch Editor instead. The base-state
+        probe recorded 0 ``checkeditor`` hits (P0 RC-1(b)) — the negative control
+        is the pre-state absence itself.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                check_visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                check_panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+                buttons = {b.id for b in check_panel.query(Button)}
+                apply_controls = {
+                    b.id for b in check_panel.query(Button) if "apply" in (b.id or "")
+                }
+                await pilot.press("6")
+                await pilot.pause()
+                patch_visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                return check_visible, buttons, apply_controls, patch_visible
+    
+        check_visible, buttons, apply_controls, patch_visible = asyncio.run(_drive())
+>       assert check_visible == ["screen_check_editor"], (
+            f"'=' must mount exactly the Check Editor screen, got {check_visible}"
+        )
+E       AssertionError: '=' must mount exactly the Check Editor screen, got ['screen_patch']
+E       assert ['screen_patch'] == ['screen_check_editor']
+E         
+E         At index 0 diff: 'screen_patch' != 'screen_check_editor'
+E         Use -v to get more diff
+
+tests\test_tui_check_editor.py:249: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+1 failed in 1.83s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 01 [tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 2.27s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 01 [tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing]: GREEN (SURVIVED)
+
+--- arm 02: s19_app/tui/screens_directionb.py
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+    edit: '        table.styles.height = 3'
+          -> '        table.styles.height = 30'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_03_expanded_editor_primary_surface ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18790/test_at_b94_03_expanded_editor0')
+
+    def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
+        """AT-B94-03 — table + expanded editor visible at 120x30; reachable at 80x24.
+    
+        Intent (HLR-003): at 120x30 (boxed workspace 96x18) the entries table
+        and the expanded JSON editor are both visible without scroll; at 80x24
+        (boxed 74x12) both are reachable by panel scroll. Geometry is measured,
+        not assumed (C-23/C-29): the A1 inner-split assumption's verification.
+        """
+    
+        async def _drive(size) -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                service.add_entry("0x200", "", "DE AD BE EF")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                editor = app.query_one("#patch_paste_text", TextArea)
+                workspace = app.query_one("#workspace_body").region
+                visible = {
+                    "table_visible": table.region.y >= workspace.y
+                    and table.region.y + table.region.height
+                    <= workspace.y + workspace.height,
+                    "editor_visible": editor.region.y < workspace.y + workspace.height,
+                }
+                if size == (80, 24):
+                    editor.scroll_visible()
+                    await pilot.pause()
+                    visible["editor_reachable"] = (
+                        editor.region.y < app.screen.region.height
+                    )
+                return visible
+    
+        at_120 = asyncio.run(_drive((120, 30)))
+>       assert at_120["table_visible"], "the table is visible at 120x30"
+E       AssertionError: the table is visible at 120x30
+E       assert False
+
+tests\test_tui_patch_editor_b94.py:214: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+1 failed in 1.69s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 1.59s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]]: GREEN (SURVIVED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 1.74s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]]: GREEN (SURVIVED)
+
+--- arm 03: s19_app/tui/app.py
+    note: Edit-JSON validity guard inverted: a VALID confirm is refused
+    edit: '        if parsed.has_errors:'
+          -> '        if not parsed.has_errors:'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_04_edit_json_valid_merges
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_at_b94_04_edit_json_valid_merges ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18793/test_at_b94_04_edit_json_valid0')
+
+    def test_at_b94_04_edit_json_valid_merges(tmp_path: Path) -> None:
+        """AT-B94-04 — confirming valid JSON merges every declared entry (HLR-004).
+    
+        Intent: the expanded editor is the edit surface; the "Edit JSON" popup
+        confirms through the shipped parse seam, and every valid entry lands in
+        ``#patch_doc_entries_table`` in document order (count equality).
+        """
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                await _press_button(app, pilot, "#patch_edit_json_button")
+                await pilot.pause()
+                popup = app.screen.query_one("#changeset_json_text", TextArea)
+                popup.text = VALID_TWO
+                await pilot.pause()
+                await _press_screen_button(app, pilot, "#changeset_json_confirm")
+                await pilot.pause()
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                return [str(c) for row in table.rows for c in table.get_row(row)]
+    
+        cells = asyncio.run(_drive())
+        # Two entries, document order: the bytes entry first, the string second.
+>       assert len([c for c in cells if "0x100" in c]) == 1, cells
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_tui_patch_editor_b94.py:260: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_04_edit_json_valid_merges
+1 failed in 2.43s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 03 [tests/test_tui_patch_editor_b94.py::test_at_b94_04_edit_json_valid_merges]: RED (KILLED)
+
+--- arm 04: s19_app/tui/app.py
+    note: Edit-JSON validity guard disabled: invalid JSON is accepted
+    edit: '        if parsed.has_errors:'
+          -> '        if False:'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_05_edit_json_invalid_keeps_table
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_at_b94_05_edit_json_invalid_keeps_table _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18795/test_at_b94_05_edit_json_inval0')
+
+    def test_at_b94_05_edit_json_invalid_keeps_table(tmp_path: Path) -> None:
+        """AT-B94-05 — invalid JSON shows errors and leaves the table unchanged.
+    
+        Intent (HLR-004 invalid arm): confirming malformed text (and an unknown
+        ``kind``) surfaces >=1 validation error and the entries table is
+        byte-identical (row count before == after).
+        """
+    
+        async def _drive(payload: str) -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                before = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                await _press_button(app, pilot, "#patch_edit_json_button")
+                await pilot.pause()
+                popup = app.screen.query_one("#changeset_json_text", TextArea)
+                popup.text = payload
+                await pilot.pause()
+                await _press_screen_button(app, pilot, "#changeset_json_confirm")
+                await pilot.pause()
+                await pilot.pause()
+                after = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                log_tail = " | ".join(
+                    str(app.query_one(f"#log_line_{i}").render())
+                    for i in (1, 2, 3, 4)
+                )
+                return before, after, log_tail
+    
+        for payload in (INVALID_JSON, INVALID_KIND):
+            before, after, issues = asyncio.run(_drive(payload))
+>           assert before == 1 and after == 1, (
+                f"the table must stay byte-identical ({before} rows), got {after}"
+            )
+E           AssertionError: the table must stay byte-identical (1 rows), got 0
+E           assert (1 == 1 and 0 == 1)
+
+tests\test_tui_patch_editor_b94.py:305: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_05_edit_json_invalid_keeps_table
+1 failed in 2.52s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 04 [tests/test_tui_patch_editor_b94.py::test_at_b94_05_edit_json_invalid_keeps_table]: RED (KILLED)
+
+--- arm 05: s19_app/tui/screens_directionb.py
+    note: dirty-load guard suppressed: no LoadGuard popup
+    edit: '            if self._dirty:'
+          -> '            if False:'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_at_b94_06_dirty_load_accept_loss ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18797/test_at_b94_06_dirty_load_acce0')
+
+    def test_at_b94_06_dirty_load_accept_loss(tmp_path: Path) -> None:
+        """AT-B94-06 — the warning pops; accept loads the target, flag clear.
+    
+        Intent (HLR-005, C-10 branch 1): with unsaved edits, Load raises the
+        guard popup; accepting loses the edits and loads the path input's
+        document — the table shows the target's rows and the dirty flag clears.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "target.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                await _seed_dirty_state(app, pilot)
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                assert panel._dirty, "precondition: the panel is dirty"
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "target.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                popup_shown = len(app.screen.query("#load_guard_title")) == 1
+                await _press_screen_button(app, pilot, "#load_guard_accept")
+                await pilot.pause()
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                return (
+                    popup_shown,
+                    table.row_count,
+                    panel._dirty,
+                    len(app.query_one("#patch_doc_path_input", Input).value),
+                )
+    
+>       popup_shown, rows, dirty, _path_len = asyncio.run(_drive())
+
+tests\test_tui_patch_editor_b94.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_patch_editor_b94.py:362: in _drive
+    await _press_screen_button(app, pilot, "#load_guard_accept")
+tests\test_tui_patch_editor_b94.py:139: in _press_screen_button
+    app.screen.query_one(button_id, Button).focus()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Screen(id='_default'), selector = '#load_guard_accept'
+expect_type = <class 'textual.widgets._button.Button'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#load_guard_accept' on Screen(id='_default')
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+1 failed in 2.38s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 05 [tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss]: RED (KILLED)
+
+--- arm 06: s19_app/tui/screens_directionb.py
+    note: LoadGuard cancel arm dismisses-with-loss (True instead of False)
+    edit: '        elif button_id == "load_guard_cancel":\r\n            event.stop()\r\n            self.dismiss(False)'
+          -> '        elif button_id == "load_guard_cancel":\r\n            event.stop()\r\n            self.dismiss(True)'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________________ test_at_b94_07_dirty_load_cancel_keeps ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18798/test_at_b94_07_dirty_load_canc0')
+
+    def test_at_b94_07_dirty_load_cancel_keeps(tmp_path: Path) -> None:
+        """AT-B94-07 — cancel retains 100% of prior rows and the dirty flag.
+    
+        Intent (HLR-005, C-10 branch 2): cancel aborts the load — the two prior
+        rows survive, the flag stays set, and the target document is not
+        mounted.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "target.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                await _seed_dirty_state(app, pilot)
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "target.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                await _press_screen_button(app, pilot, "#load_guard_cancel")
+                await pilot.pause()
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                bound = len(app._change_service.document.entries)
+                return table.row_count, panel._dirty, bound
+    
+        rows, dirty, bound = asyncio.run(_drive())
+>       assert rows == 2, f"100% of the prior rows are retained, got {rows}"
+E       AssertionError: 100% of the prior rows are retained, got 1
+E       assert 1 == 2
+
+tests\test_tui_patch_editor_b94.py:410: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+1 failed in 2.62s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 06 [tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps]: RED (KILLED)
+
+--- arm 07: s19_app/tui/screens_directionb.py
+    note: retired patch_variant* widget re-composed (0-variant census)
+    edit: '            Horizontal(\r\n                Button("Add", id="patch_entry_add_button", classes="patch-chip"),'
+          -> '            Horizontal(\r\n                Select([], id="patch_variant_select"),\r\n                Button("Add", id="patch_entry_add_button", classes="patch-chip"),'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_08_variant_machinery_retired
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_at_b94_08_variant_machinery_retired ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18799/test_at_b94_08_variant_machine0')
+
+    def test_at_b94_08_variant_machinery_retired(tmp_path: Path) -> None:
+        """AT-B94-08 — 0 variant widgets render; a stale message is a no-op.
+    
+        Intent (HLR-006): the panel composes no ``patch_variant*`` widget, and
+        posting a stale ``VariantSelected``-shaped message to the panel neither
+        crashes nor mutates state (the error arm). The app-level project-variant
+        machinery survives — it is guarded by ``tests/test_tui_variants.py``,
+        which this batch does not touch.
+        """
+    
+        class StaleVariantSelected(Message):
+            def __init__(self, variant_id: str) -> None:
+                super().__init__()
+                self.variant_id = variant_id
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                variant_widgets = [
+                    w.id for w in panel.query("*") if w.id and "variant" in w.id
+                ]
+                rows_before = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                panel.post_message(StaleVariantSelected("b"))
+                await pilot.pause()
+                await pilot.pause()
+                rows_after = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                source = Path(panel.__module__ and __import__(
+                    "s19_app.tui.screens_directionb"
+                ).__file__).read_text(encoding="utf-8")
+                import ast as _ast
+    
+                tree = _ast.parse(source)
+                patch_variant_ids = [
+                    node.value
+                    for node in _ast.walk(tree)
+                    if isinstance(node, _ast.Constant)
+                    and isinstance(node.value, str)
+                    and "patch_variant" in node.value
+                ]
+                return variant_widgets, rows_before, rows_after, patch_variant_ids
+    
+        variant_widgets, before, after, ids = asyncio.run(_drive())
+>       assert variant_widgets == [], f"0 variant widgets, got {variant_widgets}"
+E       AssertionError: 0 variant widgets, got ['patch_variant_select']
+E       assert ['patch_variant_select'] == []
+E         
+E         Left contains one more item: 'patch_variant_select'
+E         Use -v to get more diff
+
+tests\test_tui_patch_editor_b94.py:498: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_08_variant_machinery_retired
+1 failed in 1.82s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 07 [tests/test_tui_patch_editor_b94.py::test_at_b94_08_variant_machinery_retired]: RED (KILLED)
+
+--- arm 08: s19_app/tui/changes/apply.py
+    note: skip disposition counted as applied (skipped->applied flip)
+    edit: '        else:\r\n            disposition = _STATUS_TO_SKIP_DISPOSITION[entry.status]\r\n        counts[disposition] += 1'
+          -> '        else:\r\n            disposition = DISPOSITION_APPLIED\r\n        counts[disposition] += 1'
+    before: 09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 3.81s
+    after:  09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff restore-ok=True
+    arm 08 [tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document]: GREEN (SURVIVED)
+
+--- arm 09: s19_app/tui/app.py
+    note: empty-path load arm loads scan[0] instead of refusing
+    edit: '                if not event.path_text.strip():\r\n                    self.set_status(\r\n                        "Patch Editor: enter a change-file path to load."\r\n                    )\r\n                else:\r\n                    self._patch_editor_load(panel, event.path_text)'
+          -> '                if not event.path_text.strip():\r\n                    _scan = self._scan_patch_change_files()\r\n                    self._patch_editor_load(\r\n                        panel,\r\n                        str(self._patches_dir() / _scan[0])\r\n                        if _scan\r\n                        else event.path_text,\r\n                    )\r\n                else:\r\n                    self._patch_editor_load(panel, event.path_text)'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_10_load_reads_path_input_refresh_repupulates
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_at_b94_10_load_reads_path_input_refresh_repupulates ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18802/test_at_b94_10_load_reads_path0')
+
+    def test_at_b94_10_load_reads_path_input_refresh_repupulates(tmp_path: Path) -> None:
+        """AT-B94-10 — Load reads the adjacent path input; Refresh repopulates.
+    
+        Intent (HLR-008): a valid path mounts the file's entries; an empty or
+        unresolved path surfaces one collected issue and loads nothing; Refresh
+        changes the dropdown options to the folder scan and never mutates the
+        loaded document (identity hash identical before/after).
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "a.json").write_text(VALID_ONE, encoding="utf-8")
+            (patches / "b.json").write_text(VALID_TWO, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                # Valid path -> the file's rows.
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "b.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                await pilot.pause()
+                rows_b = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                bound_id = id(app._change_service.document)
+                # Refresh -> dropdown repopulates; document untouched.
+                (patches / "c.json").write_text(VALID_ONE, encoding="utf-8")
+                await _press_button(app, pilot, "#patch_doc_refresh_button")
+                await pilot.pause()
+                select = app.query_one("#patch_doc_file_select")
+                options = sorted(
+                    str(v) for _l, v in select._options if v is not select.NULL
+                )
+                bound_after = id(app._change_service.document)
+                # Empty path -> one issue, nothing loaded.
+                app.query_one("#patch_doc_path_input", Input).value = ""
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                await pilot.pause()
+                rows_empty = app.query_one(
+                    "#patch_doc_entries_table", DataTable
+                ).row_count
+                bound_empty = id(app._change_service.document)
+                log_tail = " | ".join(
+                    str(app.query_one(f"#log_line_{i}").render())
+                    for i in (1, 2, 3, 4)
+                )
+                return (
+                    rows_b,
+                    options,
+                    bound_id,
+                    bound_after,
+                    rows_empty,
+                    bound_empty,
+                    log_tail,
+                )
+    
+        (
+            rows_b,
+            options,
+            bound_id,
+            bound_after,
+            rows_empty,
+            bound_empty,
+            status,
+        ) = asyncio.run(_drive())
+        assert rows_b == 2, f"the valid path mounts the file's entries, got {rows_b}"
+        assert options == ["a.json", "b.json", "c.json"], (
+            f"Refresh repopulates the dropdown from the scan, got {options}"
+        )
+        assert bound_id == bound_after, "Refresh never mutates the loaded document"
+>       assert rows_empty == 2 and bound_empty == bound_after, (
+            "an empty path loads nothing (target rows survive)"
+        )
+E       AssertionError: an empty path loads nothing (target rows survive)
+E       assert (1 == 2)
+
+tests\test_tui_patch_editor_b94.py:626: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_10_load_reads_path_input_refresh_repupulates
+1 failed in 2.41s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 09 [tests/test_tui_patch_editor_b94.py::test_at_b94_10_load_reads_path_input_refresh_repupulates]: RED (KILLED)
+
+--- arm 10: s19_app/tui/screens_directionb.py
+    note: one actionable apply Button added to the check editor panel
+    edit: '                Static(\r\n                    Text(self._APPLY_GHOST_TEXT, style="strike dim"),\r\n                    id="check_apply_ghost",\r\n                ),'
+          -> '                Button(\r\n                    "Apply",\r\n                    id="check_apply_button",\r\n                    classes="patch-chip",\r\n                ),\r\n                Static(\r\n                    Text(self._APPLY_GHOST_TEXT, style="strike dim"),\r\n                    id="check_apply_ghost",\r\n                ),'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_11_write_validate_chk_json_no_apply _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18803/test_at_b94_11_write_validate_0')
+
+    def test_at_b94_11_write_validate_chk_json_no_apply(tmp_path: Path) -> None:
+        """AT-B94-11 — the collector writes a real ``.chk.json`` and validates it.
+    
+        Intent (HLR-009, C-12 producer arm): with an image loaded, a declared
+        memory row writes a document that re-reads with ``kind == "check"``, the
+        declared entry count, and 0 blocking errors; Validate shows one verdict
+        row per entry (``pass`` — the expected bytes are the loaded image's);
+        the surface exposes 0 apply affordances (the negative control is the
+        apply gate probe: a check document is run-blocked, never written).
+        """
+        from s19_app.tui.changes.io import read_change_document
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            mem = {0x100: 0xDE, 0x101: 0xAD, 0x102: 0xBE, 0x103: 0xEF}
+            app.current_file = _loaded(mem, [(0x100, 0x104)])
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                app.query_one("#check_file_name_input", Input).value = (
+                    "baseline.chk.json"
+                )
+                app.query_one("#check_mem_address_input", Input).value = "0x100"
+                app.query_one("#check_mem_label_input", Input).value = "block0"
+                app.query_one("#check_mem_size_input", Input).value = "4"
+                app.query_one("#check_mem_add_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                app.query_one("#check_write_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                written = list((app.workarea / "patches").glob("*.chk.json"))
+                doc = read_change_document(
+                    str(written[0]), tmp_path
+                ) if written else None
+                app.query_one("#check_validate_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                await pilot.pause()
+                result_rows = list(app.query("#check_results Static"))
+                apply_buttons = [
+                    b.id
+                    for b in app.query("#check_editor_panel Button")
+                    if b.id and "apply" in b.id.lower()
+                ]
+                status = str(
+                    app.query_one("#check_status").render()
+                )
+                return written, doc, result_rows, apply_buttons, status
+    
+        written, doc, result_rows, apply_buttons, status = asyncio.run(_drive())
+        assert len(written) == 1, f"exactly one .chk.json written, got {written}"
+        assert written[0].name == "baseline.chk.json", (
+            f"the .chk.json suffix is preserved, got {written[0].name}"
+        )
+        assert doc is not None and doc.kind == "check", (
+            f"the written file re-reads as kind=check, got {doc and doc.kind!r}"
+        )
+        assert not doc.has_errors, "0 blocking errors on the re-read"
+        assert len(doc.entries) == 1, (
+            f"entry count == collected count, got {len(doc.entries)}"
+        )
+        assert len(result_rows) == 1, (
+            f"one verdict row per entry, got {len(result_rows)}"
+        )
+        assert "pass" in str(result_rows[0].render()), (
+            f"the verdict row passes (expected == image bytes), got "
+            f"{str(result_rows[0].render())!r}"
+        )
+>       assert apply_buttons == [], f"0 apply controls, got {apply_buttons}"
+E       AssertionError: 0 apply controls, got ['check_apply_button']
+E       assert ['check_apply_button'] == []
+E         
+E         Left contains one more item: 'check_apply_button'
+E         Use -v to get more diff
+
+tests\test_tui_check_editor.py:336: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply
+1 failed in 2.50s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 10 [tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_tc_b94_06_composition_census
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b94_06_composition_census ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18804/test_tc_b94_06_composition_cen0')
+
+    def test_tc_b94_06_composition_census(tmp_path: Path) -> None:
+        """The Check Editor composes a collector, a memory table, write+validate,
+        and exactly ZERO apply actions; composes at 80x24 (LLR-001.1).
+    
+        Intent: TC-B94-06 — the ce_a two-column form: >=1 parameter collector,
+        >=1 memory-location table, exactly 1 write action, exactly 1 validate
+        action, 0 apply actions. The no-apply doctrine is the design statement
+        (``editor_bench.NOTES.md``) — the struck APPLY ghost is a STATIC, not an
+        actionable control (C-ux-2: the census counts ACTIONABLE controls only).
+        Invalid arm: composing at the 80x24 floor raises no exception (the
+        smallest measured regime, workspace 74x12).
+        """
+    
+        async def _drive(size) -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+                buttons = [b for b in panel.query(Button)]
+                write_actions = [
+                    b for b in buttons if b.id == "check_write_button"
+                ]
+                validate_actions = [
+                    b for b in buttons if b.id == "check_validate_button"
+                ]
+                apply_actions = [
+                    b
+                    for b in buttons
+                    if b.id and "apply" in b.id.lower()
+                ]
+                ghost = panel.query_one("#check_apply_ghost", Static)
+                return {
+                    "param_tables": len(panel.query("#check_param_table")),
+                    "mem_tables": len(panel.query("#check_mem_table")),
+                    "write": len(write_actions),
+                    "validate": len(validate_actions),
+                    "apply": len(apply_actions),
+                    "ghost_is_static": isinstance(ghost, Static),
+                    "ghost_strike": "strike" in str(ghost.render().spans),
+                    "picker_rows": 1 if panel.query_one(
+                        "#check_param_table", DataTable
+                    ) is not None else 0,
+                }
+    
+        census = asyncio.run(_drive((80, 24)))
+        assert census["param_tables"] >= 1, "a parameter collector composes"
+        assert census["mem_tables"] >= 1, "a memory-location table composes"
+        assert census["write"] == 1, "exactly 1 write action"
+        assert census["validate"] == 1, "exactly 1 validate action"
+>       assert census["apply"] == 0, "0 apply actions (the doctrine)"
+E       AssertionError: 0 apply actions (the doctrine)
+E       assert 1 == 0
+
+tests\test_tui_check_editor.py:147: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_tc_b94_06_composition_census - As...
+1 failed in 1.85s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 10 [tests/test_tui_check_editor.py::test_tc_b94_06_composition_census]: RED (KILLED)
+
+--- arm 11: s19_app/tui/app.py
+    note: check-spec stash dropped on load (declared file screens_directionb/AbDiffPanel; the actual stash seam is the app's on_*_check_file_selected handler, app.py)
+    edit: '        self._diff_check_spec = document'
+          -> '        self._diff_check_spec = None'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_at_b94_12_writer_dropdown_report_chain _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18805/test_at_b94_12_writer_dropdown0')
+
+    def test_at_b94_12_writer_dropdown_report_chain(tmp_path: Path) -> None:
+        """AT-B94-12 — the shipped writer's file reaches the emitted report.
+    
+        Intent (HLR-010, C-12 output-then-consume): the acceptance input is the
+        Check Editor's own output — never a hand-written artifact. The Check
+        Editor writes ``baseline.chk.json``; the A2B Diff dropdown lists it
+        suffix-distinguished; loading THAT file and running the report puts the
+        declared fields into the emitted report.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            mem = {0x0: 0x08, 0x1: 0x00, 0x2: 0x10, 0x3: 0x00}
+            app.current_file = _loaded(mem, [(0x0, 0x4)])
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                # 1. The Check Editor writes the spec through the shipped panel.
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                app.query_one("#check_file_name_input", Input).value = (
+                    "baseline.chk.json"
+                )
+                app.query_one("#check_mem_address_input", Input).value = "0x00000000"
+                app.query_one("#check_mem_label_input", Input).value = "blk0"
+                app.query_one("#check_mem_size_input", Input).value = "4"
+                app.query_one("#check_mem_add_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                app.query_one("#check_write_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                written = list((app.workarea / "patches").glob("*.chk.json"))
+                assert len(written) == 1, f"the writer wrote one spec, got {written}"
+                # 2. The A2B Diff dropdown lists it suffix-distinguished.
+                await pilot.press("7")
+                await pilot.pause()
+                await pilot.pause()
+                select = app.query_one("#diff_check_select", Select)
+                labels = [
+                    (label.plain if hasattr(label, "plain") else str(label))
+                    for label, _v in select._options
+                ]
+                check_labels = [x for x in labels if "baseline.chk.json" in x]
+                assert len(check_labels) == 1 and "CHECK" in check_labels[0], (
+                    f"the written spec is listed with the CHECK distinction, got "
+                    f"{labels!r}"
+                )
+                # 3. Load THAT file through the dropdown's shipped message path.
+                select.value = "baseline.chk.json"
+                await pilot.pause()
+                await pilot.pause()
+                assert app._diff_check_spec is not None, (
+                    "the app stashes the loaded check spec"
+                )
+                assert app._diff_check_spec_name == "baseline.chk.json"
+                # 4. Compare two real fixtures, then report.
+                app.query_one("#diff_path_a", Input).value = str(FIX_A)
+                app.query_one("#diff_path_b", Input).value = str(FIX_B)
+                dest = tmp_path / "reports"
+                dest.mkdir()
+                app.query_one("#diff_report_dest", Input).value = str(dest)
+                app.query_one("#diff_compare_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                app.query_one("#diff_report_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                reports = sorted(dest.glob("*.md"))
+                text = reports[-1].read_text(encoding="utf-8") if reports else ""
+                return labels, text
+    
+>       labels, report_text = asyncio.run(_drive())
+
+tests\test_tui_check_chain_b94.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        mem = {0x0: 0x08, 0x1: 0x00, 0x2: 0x10, 0x3: 0x00}
+        app.current_file = _loaded(mem, [(0x0, 0x4)])
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            # 1. The Check Editor writes the spec through the shipped panel.
+            await pilot.press("equals_sign")
+            await pilot.pause()
+            await pilot.pause()
+            app.query_one("#check_file_name_input", Input).value = (
+                "baseline.chk.json"
+            )
+            app.query_one("#check_mem_address_input", Input).value = "0x00000000"
+            app.query_one("#check_mem_label_input", Input).value = "blk0"
+            app.query_one("#check_mem_size_input", Input).value = "4"
+            app.query_one("#check_mem_add_button").focus()
+            await pilot.press("enter")
+            await pilot.pause()
+            app.query_one("#check_write_button").focus()
+            await pilot.press("enter")
+            await pilot.pause()
+            written = list((app.workarea / "patches").glob("*.chk.json"))
+            assert len(written) == 1, f"the writer wrote one spec, got {written}"
+            # 2. The A2B Diff dropdown lists it suffix-distinguished.
+            await pilot.press("7")
+            await pilot.pause()
+            await pilot.pause()
+            select = app.query_one("#diff_check_select", Select)
+            labels = [
+                (label.plain if hasattr(label, "plain") else str(label))
+                for label, _v in select._options
+            ]
+            check_labels = [x for x in labels if "baseline.chk.json" in x]
+            assert len(check_labels) == 1 and "CHECK" in check_labels[0], (
+                f"the written spec is listed with the CHECK distinction, got "
+                f"{labels!r}"
+            )
+            # 3. Load THAT file through the dropdown's shipped message path.
+            select.value = "baseline.chk.json"
+            await pilot.pause()
+            await pilot.pause()
+>           assert app._diff_check_spec is not None, (
+                "the app stashes the loaded check spec"
+            )
+E           AssertionError: the app stashes the loaded check spec
+E           assert None is not None
+E            +  where None = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'dark', 'focus'})._diff_check_spec
+
+tests\test_tui_check_chain_b94.py:143: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain
+1 failed in 2.55s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 11 [tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain]: RED (KILLED)
+
+--- arm 12: s19_app/tui/screens_directionb.py
+    note: collector name cell rendered via Text.from_markup (hostile arm)
+    edit: '                Text("·", style=DGRAY),\r\n                safe_text(name, VALUE),'
+          -> '                Text("·", style=DGRAY),\r\n                Text.from_markup(name),'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_at_b94_13_hostile_symbol_and_file_name _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18806/test_at_b94_13_hostile_symbol_0')
+
+    def test_at_b94_13_hostile_symbol_and_file_name(tmp_path: Path) -> None:
+        """AT-B94-13 — the batch-77 payload renders literally in collector,
+        dropdown and report addendum (HLR-011 / C-17).
+    
+        Intent: the hostile payload as an A2L symbol name reaches the parameter
+        collector; as a spec file name it reaches the dropdown labels and the
+        report addendum. Every render is literal — 0 markup spans, 0 control
+        bytes, the sentinel visible, no exception. The predicate reads the
+        PAINTED surface (``_render_line`` / ``.render().spans`` per C-32) and
+        the emitted report bytes (C-42).
+        """
+        from s19_app.tui.changes.io import parse_change_document
+        from s19_app.tui.services.diff_report_service import (
+            _check_addendum_lines,
+        )
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            mem = {0x100 + i: 0x11 for i in range(4)}
+            app.current_file = _loaded(mem, [(0x100, 0x104)])
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+                panel.set_a2l_parameters(
+                    [{"name": _HOSTILE, "address": 0x100, "byte_size": 4}]
+                )
+                panel.set_spec_files([f"{_HOSTILE}.chk.json", "hotfix.pch.json"])
+                await pilot.pause()
+                picker = app.query_one("#check_param_table", DataTable)
+                cell = picker.get_row_at(0)[1]
+                cell_text = cell.plain if hasattr(cell, "plain") else str(cell)
+                cell_spans = (
+                    list(cell.spans) if hasattr(cell, "spans") else None
+                )
+                select = app.query_one("#check_spec_file_select", Select)
+                option_labels = [
+                    (label.plain if hasattr(label, "plain") else str(label))
+                    for label, _v in select._options
+                ]
+                return cell_text, cell_spans, option_labels
+    
+        cell_text, cell_spans, option_labels = asyncio.run(_drive())
+        # The collector cell: sentinel visible, brackets literal, no style span.
+        # The cell MUST be a Text (a bare str cell is the live from_markup sink —
+        # C-17/batch-37), so an empty-spans read cannot be vacuous (C-32).
+        assert cell_spans is not None, (
+            "the collector cell must be a Text — a bare str cell is markup-parsed "
+            "by default_cell_formatter (the live sink)"
+        )
+        assert "b77hostilemark" in cell_text, (
+            f"the sentinel must be visible in the collector cell, got {cell_text!r}"
+        )
+>       assert "[red]" in cell_text and "_evil" in cell_text, (
+            "the hostile markup must render as its own characters"
+        )
+E       AssertionError: the hostile markup must render as its own characters
+E       assert ('[red]' in 'b77hostilemark\x1b[31m_evil\x9b1m\x9d8;;u\x00\x7f')
+
+tests\test_tui_check_editor.py:399: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name
+1 failed in 1.67s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 12 [tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name]: RED (KILLED)
+
+--- arm 13: s19_app/tui/services/change_service.py
+    note: ChangeService.rows() drops the last entry
+    edit: '        rendered: list[ChangeEntryRow] = []\r\n        for index, entry in enumerate(self.document.entries):'
+          -> '        rendered: list[ChangeEntryRow] = []\r\n        for index, entry in enumerate(self.document.entries[:-1]):'
+    before: 90fb36782fb853fe72dde6ea08792def6ce60c914db916dc32bf64234d69beca
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_01_validate_merge_paths
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b94_01_validate_merge_paths _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18807/test_tc_b94_01_validate_merge_0')
+
+    def test_tc_b94_01_validate_merge_paths(tmp_path: Path) -> None:
+        """TC-B94-01 — parse collects issues without aborting; the merge adds
+        100% of valid entries in document order; the empty valid doc is a no-op."""
+        from s19_app.tui.services.change_service import ChangeService
+    
+        service = ChangeService()
+        result = service.load_text(VALID_TWO)
+        assert result.ok, result.message
+        rows = service.rows(None)
+>       assert len(rows) == 2, f"100% of the valid entries merge, got {len(rows)}"
+E       AssertionError: 100% of the valid entries merge, got 1
+E       assert 1 == 2
+E        +  where 1 = len([ChangeEntryRow(kind_text='bytes', address_text='0x100', value_text='DE AD BE EF', status_text='unvalidated-no-image', linkage_text='-', check_glyph='·', address=256, encoded_bytes=(222, 173, 190, 239))])
+
+tests\test_tui_patch_editor_b94.py:648: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_01_validate_merge_paths
+1 failed in 0.52s
+    after:  90fb36782fb853fe72dde6ea08792def6ce60c914db916dc32bf64234d69beca restore-ok=True
+    arm 13 [tests/test_tui_patch_editor_b94.py::test_tc_b94_01_validate_merge_paths]: RED (KILLED)
+
+--- arm 14: s19_app/tui/changes/apply.py
+    note: apply gate drops the kind != change term (check specs apply)
+    edit: '    blocked = document.has_errors or document.kind != "change"'
+          -> '    blocked = document.has_errors'
+    before: 09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_02_apply_gate
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_tc_b94_02_apply_gate __________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18808/test_tc_b94_02_apply_gate0')
+
+    def test_tc_b94_02_apply_gate(tmp_path: Path) -> None:
+        """TC-B94-02 — applied counts == applicable; blocking errors block all;
+        a check spec is refused by the kind gate with 0 writes."""
+        mem_map = {
+            0x100: 0x00, 0x101: 0x00, 0x102: 0x00, 0x103: 0x00,
+            0x200: 0x00, 0x201: 0x00, 0x202: 0x00,
+        }
+        ranges = [(0x100, 0x104), (0x200, 0x203)]
+        doc = parse_change_document(VALID_TWO)
+        summary = apply_change_document(
+            doc, dict(mem_map), ranges, [], []
+        )
+        assert summary.counts["applied"] == 2, dict(summary.counts)
+        assert summary.counts["blocked"] == 0
+        # Blocking-errors arm: one entry carries an ERROR finding -> the gate
+        # blocks EVERY entry and writes 0 bytes (LLR-007.1's negative control).
+        faulted = parse_change_document(
+            VALID_TWO.replace(
+                '"address": "0x00000200"', '"address": "not-an-address"'
+            )
+        )
+        assert faulted.has_errors, "precondition: the faulted document has errors"
+        blocked = apply_change_document(
+            faulted, dict(mem_map), ranges, [], []
+        )
+        assert blocked.counts["blocked"] == len(faulted.entries), (
+            f"blocked == len(entries), got {dict(blocked.counts)}"
+        )
+        assert blocked.counts["applied"] == 0
+        # The kind gate: a check spec is never applied (LLR-009.3's seam).
+        check_doc = parse_change_document(
+            VALID_TWO.replace('"kind": "change"', '"kind": "check"')
+        )
+        refused = apply_change_document(
+            check_doc, dict(mem_map), ranges, [], []
+        )
+>       assert refused.counts["applied"] == 0, dict(refused.counts)
+E       AssertionError: {'applied': 2, 'blocked': 0, 'skipped-no-image': 0, 'skipped-outside': 0, ...}
+E       assert 2 == 0
+
+tests\test_tui_patch_editor_b94.py:705: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_02_apply_gate - Assert...
+1 failed in 0.53s
+    after:  09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff restore-ok=True
+    arm 14 [tests/test_tui_patch_editor_b94.py::test_tc_b94_02_apply_gate]: RED (KILLED)
+
+--- arm 15: s19_app/tui/app.py
+    note: Refresh arm re-loads the document instead of repopulating dropdown
+    edit: '                self._prefill_patch_change_files()\r\n                self.set_status("Patch Editor: file list refreshed.")'
+          -> '                if service.document.source_path is not None:\r\n                    self._patch_editor_load(\r\n                        panel, str(service.document.source_path)\r\n                    )\r\n                else:\r\n                    self._prefill_patch_change_files()\r\n                self.set_status("Patch Editor: file list refreshed.")'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 0.44s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 15 [tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics]: GREEN (SURVIVED)
+
+--- arm 16: s19_app/tui/app.py
+    note: save seam drops panel.mark_saved() (dirty flag survives its save)
+    edit: '                    panel.mark_saved()'
+          -> '                    pass  # battery arm 16: mark_saved dropped'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_tc_b94_10_dirty_flag_transitions ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18810/test_tc_b94_10_dirty_flag_tran0')
+
+    def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
+        """TC-B94-10 — edit-table->set, edit-text->set, save->cleared,
+        load-success->cleared; one flag across both regions (LLR-005.1)."""
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "t.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                transitions = [("start", panel._dirty)]
+                # w1: entries-table edit -> set.
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                app.query_one("#patch_entry_add_button", Button).focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                transitions.append(("edit-table", panel._dirty))
+                # w3: save -> cleared.
+                service.document.source_path = None
+                await _press_button(app, pilot, "#patch_doc_save_button")
+                await pilot.pause()
+                transitions.append(("save", panel._dirty))
+                # w2: JSON-text edit -> set.
+                text = app.query_one("#patch_paste_text", TextArea)
+                text.text = text.text + "\n"
+                await pilot.pause()
+                transitions.append(("edit-text", panel._dirty))
+                # w4: load-success -> cleared. The app wiring (load success ->
+                # mark_loaded) is AT-B94-06's assertion; here the writer itself
+                # is driven with the service's real success result.
+                result = service.load(str(patches / "t.json"), tmp_path)
+                assert result.ok, result.message
+                panel.mark_loaded()
+                transitions.append(("load", panel._dirty))
+                # And the real clean-load path clears it through the handler too.
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "t.json"
+                )
+                panel._dirty = False
+                panel._refresh_dirty_indicator()
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "t.json"
+                )
+                app.query_one("#patch_doc_load_button", Button).focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                await pilot.pause()
+                transitions.append(("load-handler", panel._dirty))
+                return transitions
+    
+        transitions = asyncio.run(_drive())
+        assert ("start", False) in transitions
+        assert ("edit-table", True) in transitions, transitions
+>       assert ("save", False) in transitions, transitions
+E       AssertionError: [('start', False), ('edit-table', True), ('save', True), ('edit-text', True), ('load', False), ('load-handler', False)]
+E       assert ('save', False) in [('start', False), ('edit-table', True), ('save', True), ('edit-text', True), ('load', False), ('load-handler', False)]
+
+tests\test_tui_patch_editor_b94.py:805: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions
+1 failed in 2.53s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 16 [tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions]: RED (KILLED)
+
+--- arm 17: s19_app/tui/screens_directionb.py
+    note: DECLARED ANCHOR RETIRED with HLR-006 (batch-94 inc-001): no on_message/variant_id handler exists in screens_directionb.py (pre-increment VariantSelected/select were removed at 7972eda); expected BAD (anchor count 0). NOTE: TC-B94-11's body never posts a stale variant message either — the assertion is inert (C-40).
+    edit: '    def on_message(self, event) -> None:'
+          -> "    def on_message(self, event) -> None:\r\n        if hasattr(event, 'variant_id'):\r\n            self.post_message(self.VariantSelected(str(event.variant_id)))"
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+    !! CRASH/BAD (anchor count 0, expected 1)
+
+--- arm 18: s19_app/tui/screens_directionb.py
+    note: Apply control label Apply loaded changes -> Apply
+    edit: '                    "Apply loaded changes",\r\n                    id="patch_doc_apply_button",'
+          -> '                    "Apply",\r\n                    id="patch_doc_apply_button",'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_12_apply_label_census
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b94_12_apply_label_census ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18811/test_tc_b94_12_apply_label_cen0')
+
+    def test_tc_b94_12_apply_label_census(tmp_path: Path) -> None:
+        """TC-B94-12 — the Apply control reads "Apply loaded changes"; 0 legacy
+        bare-"Apply" labels in the panel (LLR-007.2)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                apply_label = str(
+                    app.query_one("#patch_doc_apply_button", Button).label
+                )
+                bare = [
+                    str(b.label)
+                    for b in panel.query(Button)
+                    if str(b.label).strip() == "Apply"
+                ]
+                return apply_label, bare
+    
+        apply_label, bare = asyncio.run(_drive())
+>       assert "apply" in apply_label.lower() and "loaded" in apply_label.lower(), (
+            f"the control is labeled as applying the LOADED changes, got {apply_label!r}"
+        )
+E       AssertionError: the control is labeled as applying the LOADED changes, got 'Apply'
+E       assert ('apply' in 'apply' and 'loaded' in 'apply')
+E        +  where 'apply' = <built-in method lower of str object at 0x000002682F09CE40>()
+E        +    where <built-in method lower of str object at 0x000002682F09CE40> = 'Apply'.lower
+E        +  and   'apply' = <built-in method lower of str object at 0x000002682F09CE40>()
+E        +    where <built-in method lower of str object at 0x000002682F09CE40> = 'Apply'.lower
+
+tests\test_tui_patch_editor_b94.py:872: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_12_apply_label_census
+1 failed in 1.66s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 18 [tests/test_tui_patch_editor_b94.py::test_tc_b94_12_apply_label_census]: RED (KILLED)
+
+--- arm 19: s19_app/tui/changes/io.py
+    note: _safe_name strips .chk.json -> .json (suffix distinction lost)
+    edit: '    if not bare.lower().endswith(".json"):\r\n        bare = f"{bare}.json"\r\n    return bare'
+          -> '    if not bare.lower().endswith(".json"):\r\n        bare = f"{bare}.json"\r\n    if bare.lower().endswith(".chk.json"):\r\n        bare = bare[: -len(".chk.json")] + ".json"\r\n    return bare'
+    before: 81a121579e7ab84ba2717720fca397f44e15588b6eae6de2711efa2e3de94058
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b94_13_chk_write_round_trip _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18812/test_tc_b94_13_chk_write_round0')
+
+    def test_tc_b94_13_chk_write_round_trip(tmp_path: Path) -> None:
+        """The suffix survives the save boundary; the re-read round-trips."""
+>       assert _safe_name("baseline.chk.json") == "baseline.chk.json", (
+            "the double suffix is preserved (the name-mangling negative control)"
+        )
+E       AssertionError: the double suffix is preserved (the name-mangling negative control)
+E       assert 'baseline.json' == 'baseline.chk.json'
+E         
+E         - baseline.chk.json
+E         ?          ----
+E         + baseline.json
+
+tests\test_tui_check_chain_b94.py:194: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip
+1 failed in 0.51s
+    after:  81a121579e7ab84ba2717720fca397f44e15588b6eae6de2711efa2e3de94058 restore-ok=True
+    arm 19 [tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip]: RED (KILLED)
+
+--- arm 20: s19_app/tui/changes/check.py
+    note: run_check_document iterates entries[:-1] (last entry dropped)
+    edit: '    for entry in document.entries:'
+          -> '    for entry in document.entries[:-1]:'
+    before: 3cd29ed53db51a6a63bff40e7c3fd282fa9c431276f8e34dca35df05228963bc
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b94_14_run_check_document ______________________
+
+    def test_tc_b94_14_run_check_document() -> None:
+        """One verdict row per entry; wrong-kind docs are run-blocked doc-kind."""
+        doc = parse_change_document(SPEC_TEXT)
+        mem_map = {0x0: 0x08, 0x1: 0x00, 0x2: 0x10, 0x3: 0x00, 0x8000: 0xF2}
+        result = run_check_document(doc, mem_map, [(0x0, 0x4), (0x8000, 0x8001)], [], [])
+        assert result.run_blocked_reason_code is None
+>       assert len(result.entries) == 2, (
+            f"verdict row count == entry count, got {len(result.entries)}"
+        )
+E       AssertionError: verdict row count == entry count, got 1
+E       assert 1 == 2
+E        +  where 1 = len([CheckRunEntry(entry_type='bytes', address_start=0, address_end=4, expected_bytes=(8, 0, 16, 0), actual_bytes=(8, 0, 16, 0), result='pass', linkage='standalone', linkage_symbol=None, reason_code=None, reason=None)])
+E        +    where [CheckRunEntry(entry_type='bytes', address_start=0, address_end=4, expected_bytes=(8, 0, 16, 0), actual_bytes=(8, 0, 16, 0), result='pass', linkage='standalone', linkage_symbol=None, reason_code=None, reason=None)] = CheckRunResult(source_path=None, timestamp_utc='2026-10-13T22:58:29.786416+00:00', variant_id=None, aggregates={'passe...linkage_symbol=None, reason_code=None, reason=None)], issues=[], run_blocked_reason_code=None, run_blocked_reason=None).entries
+
+tests\test_tui_check_chain_b94.py:238: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document
+1 failed in 0.50s
+    after:  3cd29ed53db51a6a63bff40e7c3fd282fa9c431276f8e34dca35df05228963bc restore-ok=True
+    arm 20 [tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document]: RED (KILLED)
+
+--- arm 21: s19_app/tui/screens_directionb.py
+    note: diff dropdown drops the CHECK suffix label (spec-kind distinction)
+    edit: '            if is_check_spec_name(name):\r\n                label.append(" CHECK", style=GREEN)\r\n            else:\r\n                label.append(" PATCH", style=CYAN)\r\n            options.append((label, name))\r\n        select = self.query_one("#diff_check_select", Select)'
+          -> '            if is_check_spec_name(name):\r\n                label.append("", style=GREEN)\r\n            else:\r\n                label.append(" PATCH", style=CYAN)\r\n            options.append((label, name))\r\n        select = self.query_one("#diff_check_select", Select)'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b94_15_dropdown_population ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18813/test_tc_b94_15_dropdown_popula0')
+
+    def test_tc_b94_15_dropdown_population(tmp_path: Path) -> None:
+        """The dropdown lists the scan set; CHECK labels carry the distinction;
+        a failing-read spec surfaces its issues on load."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = app.workarea / "patches"
+            patches.mkdir(parents=True, exist_ok=True)
+            (patches / "hotfix.pch.json").write_text(
+                SPEC_TEXT.replace('"kind": "check"', '"kind": "change"'),
+                encoding="utf-8",
+            )
+            (patches / "baseline.chk.json").write_text(SPEC_TEXT, encoding="utf-8")
+            (patches / "broken.chk.json").write_text("{ not json", encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("7")
+                await pilot.pause()
+                await pilot.pause()
+                select = app.query_one("#diff_check_select", Select)
+                scan = app._scan_patch_change_files()
+                labels = [
+                    (label.plain if hasattr(label, "plain") else str(label))
+                    for label, _v in select._options
+                ]
+                # The failing-read arm: loading the broken spec surfaces issues.
+                select.value = "broken.chk.json"
+                await pilot.pause()
+                await pilot.pause()
+                status_broken = str(app.query_one("#diff_status").render())
+                assert app._diff_check_spec is None, (
+                    "a failing spec is never stashed"
+                )
+                return scan, labels, status_broken
+    
+        scan, labels, status_broken = asyncio.run(_drive())
+        listed = sorted(
+            item for item in labels if ".json" in item and "broken" not in item
+        )
+>       assert listed == [
+            "baseline.chk.json CHECK",
+            "hotfix.pch.json PATCH",
+        ], f"the dropdown lists the scan set with distinctions, got {listed}"
+E       AssertionError: the dropdown lists the scan set with distinctions, got ['baseline.chk.json', 'hotfix.pch.json PATCH']
+E       assert ['baseline.ch...h.json PATCH'] == ['baseline.ch...h.json PATCH']
+E         
+E         At index 0 diff: 'baseline.chk.json' != 'baseline.chk.json CHECK'
+E         Use -v to get more diff
+
+tests\test_tui_check_chain_b94.py:305: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+1 failed in 1.75s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 21 [tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population]: RED (KILLED)
+
+--- arm 22: s19_app/tui/services/diff_report_service.py
+    note: check addendum heading ## Checks changed
+    edit: '    out = ["## Checks", ""]'
+          -> '    out = ["## Check specs", ""]'
+    before: 8bf292218ae7e480bf5262ef53d7fc2377ab940a304c1cb1c535cb5f758cf51c
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________________ test_tc_b94_16_report_addendum ________________________
+
+    def test_tc_b94_16_report_addendum() -> None:
+        """100% of the declared names appear in the emitted report; the fixed
+        form matches the increment's own paste."""
+        from s19_app.core import S19File
+        from s19_app.tui.services.compare_service import (
+            SOURCE_EXTERNAL,
+            ImageSource,
+            compare_images,
+        )
+        from s19_app.tui.services.load_service import build_loaded_s19
+    
+        spec = parse_change_document(SPEC_TEXT)
+        # The declared fields are NAMED by the artifact symbol at their address
+        # (the v2 wire grammar carries no names) — two named symbols cover both
+        # declared addresses.
+        symbol_addresses = [(0x00000000, "EngineSpeed"), (0x00008000, "Torque_Pct")]
+        lines = _check_addendum_lines(spec, "baseline.chk.json", symbol_addresses)
+        addendum = "\n".join(lines)
+    
+        # The Phase-3 paste (fixed parts — the C-42 predicate is written against
+        # THIS form, emitted by the shipped producer over the public fixtures):
+        #   ## Checks
+        #   - Check spec: `baseline\.chk\.json`
+        #   - Declared fields: 2 (0 byte changes — image never modified)
+        #   | # | Field | Address | Expected |
+>       assert lines[0] == "## Checks"
+E       AssertionError: assert '## Check specs' == '## Checks'
+E         
+E         - ## Checks
+E         + ## Check specs
+E         ?         + ++++
+
+tests\test_tui_check_chain_b94.py:345: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum - As...
+1 failed in 0.49s
+    after:  8bf292218ae7e480bf5262ef53d7fc2377ab940a304c1cb1c535cb5f758cf51c restore-ok=True
+    arm 22 [tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum]: RED (KILLED)
+
+--- arm 23: s19_app/utils.py
+    note: safe_text scrub table keeps ESC (\x1b drops out of the C0 range)
+    edit: '_CONTROL_SCRUB = dict.fromkeys((*range(0x00, 0x20), *range(0x7F, 0xA0)))'
+          -> '_CONTROL_SCRUB = dict.fromkeys((*range(0x00, 0x1B), *range(0x1C, 0x20), *range(0x7F, 0xA0)))'
+    before: 28b8096d4a2f3551ea2dc87f3d53207aeeff749a7ecb461b34e740a3760858ef
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_tc_b94_17_safe_text_hostile_payload ___________________
+
+    def test_tc_b94_17_safe_text_hostile_payload() -> None:
+        """TC-B94-17 — ``safe_text`` over the hostile payload: 0 control bytes,
+        brackets preserved (LLR-011.1's primitive contract, hostile arm)."""
+        scrubbed = safe_text(_HOSTILE)
+        bad = [ch for ch in scrubbed.plain if ord(ch) < 0x20]
+>       assert bad == [], f"0 control bytes survive the scrub, got {bad!r}"
+E       AssertionError: 0 control bytes survive the scrub, got ['\x1b']
+E       assert ['\x1b'] == []
+E         
+E         Left contains one more item: '\x1b'
+E         Use -v to get more diff
+
+tests\test_tui_check_editor.py:451: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+1 failed in 0.48s
+    after:  28b8096d4a2f3551ea2dc87f3d53207aeeff749a7ecb461b34e740a3760858ef restore-ok=True
+    arm 23 [tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload]: RED (KILLED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 01 | tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+    edit: Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),... | RED (KILLED) | restore-hash OK
+    note: rail '=' action target check_editor->patch
+arm 01 | tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+    edit: Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),... | GREEN (SURVIVED) | restore-hash OK
+    note: rail '=' action target check_editor->patch
+arm 02 | tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+    edit:         table.styles.height = 3... | RED (KILLED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 02 | tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]
+    edit:         table.styles.height = 3... | GREEN (SURVIVED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 02 | tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]
+    edit:         table.styles.height = 3... | GREEN (SURVIVED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 03 | tests/test_tui_patch_editor_b94.py::test_at_b94_04_edit_json_valid_merges
+    edit:         if parsed.has_errors:... | RED (KILLED) | restore-hash OK
+    note: Edit-JSON validity guard inverted: a VALID confirm is refused
+arm 04 | tests/test_tui_patch_editor_b94.py::test_at_b94_05_edit_json_invalid_keeps_table
+    edit:         if parsed.has_errors:... | RED (KILLED) | restore-hash OK
+    note: Edit-JSON validity guard disabled: invalid JSON is accepted
+arm 05 | tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+    edit:             if self._dirty:... | RED (KILLED) | restore-hash OK
+    note: dirty-load guard suppressed: no LoadGuard popup
+arm 06 | tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+    edit:         elif button_id == "load_guard_cancel":... | RED (KILLED) | restore-hash OK
+    note: LoadGuard cancel arm dismisses-with-loss (True instead of False)
+arm 07 | tests/test_tui_patch_editor_b94.py::test_at_b94_08_variant_machinery_retired
+    edit:             Horizontal(... | RED (KILLED) | restore-hash OK
+    note: retired patch_variant* widget re-composed (0-variant census)
+arm 08 | tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document
+    edit:         else:... | GREEN (SURVIVED) | restore-hash OK
+    note: skip disposition counted as applied (skipped->applied flip)
+arm 09 | tests/test_tui_patch_editor_b94.py::test_at_b94_10_load_reads_path_input_refresh_repupulates
+    edit:                 if not event.path_text.strip():... | RED (KILLED) | restore-hash OK
+    note: empty-path load arm loads scan[0] instead of refusing
+arm 10 | tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply
+    edit:                 Static(... | RED (KILLED) | restore-hash OK
+    note: one actionable apply Button added to the check editor panel
+arm 10 | tests/test_tui_check_editor.py::test_tc_b94_06_composition_census
+    edit:                 Static(... | RED (KILLED) | restore-hash OK
+    note: one actionable apply Button added to the check editor panel
+arm 11 | tests/test_tui_check_chain_b94.py::test_at_b94_12_writer_dropdown_report_chain
+    edit:         self._diff_check_spec = document... | RED (KILLED) | restore-hash OK
+    note: check-spec stash dropped on load (declared file screens_directionb/AbDiffPanel; the actual stash seam is the app's on_*_check_file_selected handler, app.py)
+arm 12 | tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name
+    edit:                 Text("·", style=DGRAY),... | RED (KILLED) | restore-hash OK
+    note: collector name cell rendered via Text.from_markup (hostile arm)
+arm 13 | tests/test_tui_patch_editor_b94.py::test_tc_b94_01_validate_merge_paths
+    edit:         rendered: list[ChangeEntryRow] = []... | RED (KILLED) | restore-hash OK
+    note: ChangeService.rows() drops the last entry
+arm 14 | tests/test_tui_patch_editor_b94.py::test_tc_b94_02_apply_gate
+    edit:     blocked = document.has_errors or document.kind != "change"... | RED (KILLED) | restore-hash OK
+    note: apply gate drops the kind != change term (check specs apply)
+arm 15 | tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics
+    edit:                 self._prefill_patch_change_files()... | GREEN (SURVIVED) | restore-hash OK
+    note: Refresh arm re-loads the document instead of repopulating dropdown
+arm 16 | tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions
+    edit:                     panel.mark_saved()... | RED (KILLED) | restore-hash OK
+    note: save seam drops panel.mark_saved() (dirty flag survives its save)
+arm 17 | tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+    edit:     def on_message(self, event) -> None:... | CRASH/BAD (anchor count 0, expected 1) | restore-hash OK
+    note: DECLARED ANCHOR RETIRED with HLR-006 (batch-94 inc-001): no on_message/variant_id handler exists in screens_directionb.py (pre-increment VariantSelected/select were removed at 7972eda); expected BAD (anchor count 0). NOTE: TC-B94-11's body never posts a stale variant message either — the assertion is inert (C-40).
+arm 18 | tests/test_tui_patch_editor_b94.py::test_tc_b94_12_apply_label_census
+    edit:                     "Apply loaded changes",... | RED (KILLED) | restore-hash OK
+    note: Apply control label Apply loaded changes -> Apply
+arm 19 | tests/test_tui_check_chain_b94.py::test_tc_b94_13_chk_write_round_trip
+    edit:     if not bare.lower().endswith(".json"):... | RED (KILLED) | restore-hash OK
+    note: _safe_name strips .chk.json -> .json (suffix distinction lost)
+arm 20 | tests/test_tui_check_chain_b94.py::test_tc_b94_14_run_check_document
+    edit:     for entry in document.entries:... | RED (KILLED) | restore-hash OK
+    note: run_check_document iterates entries[:-1] (last entry dropped)
+arm 21 | tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+    edit:             if is_check_spec_name(name):... | RED (KILLED) | restore-hash OK
+    note: diff dropdown drops the CHECK suffix label (spec-kind distinction)
+arm 22 | tests/test_tui_check_chain_b94.py::test_tc_b94_16_report_addendum
+    edit:     out = ["## Checks", ""]... | RED (KILLED) | restore-hash OK
+    note: check addendum heading ## Checks changed
+arm 23 | tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+    edit: _CONTROL_SCRUB = dict.fromkeys((*range(0x00, 0x20), *range(0x7F, 0xA0)))... | RED (KILLED) | restore-hash OK
+    note: safe_text scrub table keeps ESC (\x1b drops out of the C0 range)
+------------------------------------------------------------------------------
+TOTALS: 27 node-runs | RED 21 | SURVIVED 5 | CRASH/BAD 1
+runner exit: 1 (findings present)
+
+=== FIX ROUND A === re-run of arms 01,02,08,15,17 after the C-40 test fixes (test-only changes; product code frozen for review)
+--- runner: .dev-flow/2026-10-12-batch-94/evidence/inc001_battery.py 01,02,08,15,17
+==============================================================================
+inc001 mutation battery — batch-94 increment 001 (tip b6f974f)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+subset mode: arms ['01', '02', '08', '15', '17']
+
+[phase 0] resolving node ids via pytest --collect-only
+
+[phase 1] arms: 5; node-runs: 8
+
+[phase 2] clean-tree baseline (all 27 nodes, ONE pytest run)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0] tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1] tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........                                                                 [100%]
+8 passed in 20.26s
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 01: s19_app/tui/app.py
+    note: rail '=' action target check_editor->patch
+    edit: 'Binding("equals_sign", "show_screen(\'check_editor\')", "Check Editor", show=False),'
+          -> 'Binding("equals_sign", "show_screen(\'patch\')", "Check Editor", show=False),'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_at_b94_01_rail_selects_check_editor_mounts_twin _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18840/test_at_b94_01_rail_selects_ch0')
+
+    def test_at_b94_01_rail_selects_check_editor_mounts_twin(tmp_path: Path) -> None:
+        """AT-B94-01 — rail selection mounts the Check Editor; Patch mounts Patch.
+    
+        Intent (HLR-001): selecting "Check Editor" mounts exactly one Check
+        Editor panel exposing write/validate actions and 0 apply actions;
+        selecting "Patch Editor" mounts the Patch Editor instead. The base-state
+        probe recorded 0 ``checkeditor`` hits (P0 RC-1(b)) — the negative control
+        is the pre-state absence itself.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                check_visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                check_panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+                buttons = {b.id for b in check_panel.query(Button)}
+                apply_controls = {
+                    b.id for b in check_panel.query(Button) if "apply" in (b.id or "")
+                }
+                await pilot.press("6")
+                await pilot.pause()
+                patch_visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                return check_visible, buttons, apply_controls, patch_visible
+    
+        check_visible, buttons, apply_controls, patch_visible = asyncio.run(_drive())
+>       assert check_visible == ["screen_check_editor"], (
+            f"'=' must mount exactly the Check Editor screen, got {check_visible}"
+        )
+E       AssertionError: '=' must mount exactly the Check Editor screen, got ['screen_patch']
+E       assert ['screen_patch'] == ['screen_check_editor']
+E         
+E         At index 0 diff: 'screen_patch' != 'screen_check_editor'
+E         Use -v to get more diff
+
+tests\test_tui_check_editor.py:278: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+1 failed in 1.86s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 01 [tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b94_07_rail_mounting_and_write_routing ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18841/test_tc_b94_07_rail_mounting_a0')
+
+    def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
+        """Selecting the entry mounts exactly 1 CheckEditorPanel; the write
+        message reaches the service handler (LLR-001.2).
+    
+        Intent: TC-B94-07 — mounting through the shipped rail path at 120x30 and
+        the 80x24 boundary arm; the write action routes to the change writer with
+        a captured call count of exactly 1. Cross-mounting negative control:
+        selecting Patch Editor mounts the patch panel, not the twin.
+    
+        FIX ROUND A (C-40): the panel census alone is routing-blind — every rail
+        screen composes eagerly at startup, so the panel sits in the DOM whether
+        or not `=` targets it (the binding mutation SURVIVED). The kill subject
+        is the RAIL TARGET: after `=`, the Check Editor screen must be the
+        visible one and the rail's single active marker must move to
+        ``check_editor`` (LLR-001.2's ``set_active`` seam).
+        """
+    
+        async def _drive(size) -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                # The rail-target observation (FIX ROUND A — the kill subject).
+                visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                rail_active = app.query_one(Rail).active_key
+                panels = list(app.query(CheckEditorPanel))
+                # Mount the twin-crossing negative control.
+                await pilot.press("6")
+                await pilot.pause()
+                patch_panels = list(app.query(PatchEditorPanel))
+                # Back to the Check Editor for the write drive.
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                # Drive one write through the shipped surface (focus + Enter — a
+                # re-layout after the add shifts the buttons under a raw click).
+                app.query_one("#check_mem_address_input", Input).value = "0x100"
+                app.query_one("#check_mem_label_input", Input).value = "x"
+                app.query_one("#check_mem_size_input", Input).value = "1"
+                app.query_one("#check_mem_add_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                calls, original = _write_calls()
+                try:
+                    app.query_one("#check_write_button").focus()
+                    await pilot.press("enter")
+                    await pilot.pause()
+                finally:
+                    app_module.write_change_document = original
+                return (
+                    len(panels),
+                    len(patch_panels),
+                    len(calls),
+                    visible,
+                    rail_active,
+                )
+    
+        mounted, patch_panels, write_calls, visible, rail_active = asyncio.run(
+            _drive((120, 30))
+        )
+>       assert visible == ["screen_check_editor"], (
+            f"'=' must make the Check Editor screen visible, got {visible}"
+        )
+E       AssertionError: '=' must make the Check Editor screen visible, got ['screen_patch']
+E       assert ['screen_patch'] == ['screen_check_editor']
+E         
+E         At index 0 diff: 'screen_patch' != 'screen_check_editor'
+E         Use -v to get more diff
+
+tests\test_tui_check_editor.py:223: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+1 failed in 2.37s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 01 [tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing]: RED (KILLED)
+
+--- arm 02: s19_app/tui/screens_directionb.py
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+    edit: '        table.styles.height = 3'
+          -> '        table.styles.height = 30'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_03_expanded_editor_primary_surface ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18842/test_at_b94_03_expanded_editor0')
+
+    def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
+        """AT-B94-03 — table + expanded editor visible at 120x30; reachable at 80x24.
+    
+        Intent (HLR-003): at 120x30 (boxed workspace 96x18) the entries table
+        and the expanded JSON editor are both visible without scroll; at 80x24
+        (boxed 74x12) both are reachable by panel scroll. Geometry is measured,
+        not assumed (C-23/C-29): the A1 inner-split assumption's verification.
+        """
+    
+        async def _drive(size) -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                service.add_entry("0x200", "", "DE AD BE EF")
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                editor = app.query_one("#patch_paste_text", TextArea)
+                workspace = app.query_one("#workspace_body").region
+                visible = {
+                    "table_visible": table.region.y >= workspace.y
+                    and table.region.y + table.region.height
+                    <= workspace.y + workspace.height,
+                    "editor_visible": editor.region.y < workspace.y + workspace.height,
+                }
+                if size == (80, 24):
+                    editor.scroll_visible()
+                    await pilot.pause()
+                    visible["editor_reachable"] = (
+                        editor.region.y < app.screen.region.height
+                    )
+                return visible
+    
+        at_120 = asyncio.run(_drive((120, 30)))
+>       assert at_120["table_visible"], "the table is visible at 120x30"
+E       AssertionError: the table is visible at 120x30
+E       assert False
+
+tests\test_tui_patch_editor_b94.py:245: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+1 failed in 1.84s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b94_09_widget_census[size0] _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18843/test_tc_b94_09_widget_census_s0')
+size = (120, 30)
+
+    @pytest.mark.parametrize("size", [(120, 30), (80, 24)])
+    def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
+        """The reworked panel composes 1 JsonHighlightTextArea + 1 entries table,
+        without exception, at 120x30 and 80x24 (LLR-003.1) — and the entries
+        table stays the measured bounded band (the geometry the fold certifies).
+    
+        FIX ROUND A (C-40): the plain widget census is geometry-blind — the
+        `styles.height 3 -> 30` mutation composes the same widgets and passed.
+        The fold's subject is the BAND: per the C-29 boxes
+        (``evidence/p1-pilot-measurements.txt``: workspace 96x18 at 120x30,
+        74x12 at 80x24) the shipped tree measures table 3 + editor 8 = 11 cells,
+        which must fit the boxed workspace together at every shipped regime; a
+        30-row table (38 cells) cannot. The widget-count census below is kept as
+        a labeled regression pin (C-40 corollary — legitimate, but not the arm's
+        kill subject).
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                editors = list(panel.query(JsonHighlightTextArea))
+                tables = list(panel.query("#patch_doc_entries_table"))
+                workspace = app.query_one("#workspace_body").region
+                table = app.query_one("#patch_doc_entries_table", DataTable).region
+                editor = app.query_one("#patch_paste_text", TextArea).region
+                return (
+                    len(editors),
+                    len(tables),
+                    table.height + editor.height,
+                    workspace.height,
+                )
+    
+        editors, tables, band, workspace_h = asyncio.run(_drive())
+        # Regression pin (C-40 corollary): the reworked composition census.
+        assert editors == 1, f"exactly 1 JsonHighlightTextArea, got {editors}"
+        assert tables == 1, f"exactly 1 entries table, got {tables}"
+        # The kill subject: the bounded band fits the boxed workspace (C-29).
+>       assert band <= workspace_h, (
+            f"table({band - 8}) + editor(8) must fit the boxed workspace "
+            f"{workspace_h} tall at {size}, got band {band}"
+        )
+E       AssertionError: table(30) + editor(8) must fit the boxed workspace 18 tall at (120, 30), got band 38
+E       assert 38 <= 18
+
+tests\test_tui_patch_editor_b94.py:195: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]
+1 failed in 1.82s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]]: RED (KILLED)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b94_09_widget_census[size1] _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18844/test_tc_b94_09_widget_census_s0')
+size = (80, 24)
+
+    @pytest.mark.parametrize("size", [(120, 30), (80, 24)])
+    def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
+        """The reworked panel composes 1 JsonHighlightTextArea + 1 entries table,
+        without exception, at 120x30 and 80x24 (LLR-003.1) — and the entries
+        table stays the measured bounded band (the geometry the fold certifies).
+    
+        FIX ROUND A (C-40): the plain widget census is geometry-blind — the
+        `styles.height 3 -> 30` mutation composes the same widgets and passed.
+        The fold's subject is the BAND: per the C-29 boxes
+        (``evidence/p1-pilot-measurements.txt``: workspace 96x18 at 120x30,
+        74x12 at 80x24) the shipped tree measures table 3 + editor 8 = 11 cells,
+        which must fit the boxed workspace together at every shipped regime; a
+        30-row table (38 cells) cannot. The widget-count census below is kept as
+        a labeled regression pin (C-40 corollary — legitimate, but not the arm's
+        kill subject).
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                service = app._change_service
+                service.add_entry("0x100", "", "DE AD BE EF")
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                editors = list(panel.query(JsonHighlightTextArea))
+                tables = list(panel.query("#patch_doc_entries_table"))
+                workspace = app.query_one("#workspace_body").region
+                table = app.query_one("#patch_doc_entries_table", DataTable).region
+                editor = app.query_one("#patch_paste_text", TextArea).region
+                return (
+                    len(editors),
+                    len(tables),
+                    table.height + editor.height,
+                    workspace.height,
+                )
+    
+        editors, tables, band, workspace_h = asyncio.run(_drive())
+        # Regression pin (C-40 corollary): the reworked composition census.
+        assert editors == 1, f"exactly 1 JsonHighlightTextArea, got {editors}"
+        assert tables == 1, f"exactly 1 entries table, got {tables}"
+        # The kill subject: the bounded band fits the boxed workspace (C-29).
+>       assert band <= workspace_h, (
+            f"table({band - 8}) + editor(8) must fit the boxed workspace "
+            f"{workspace_h} tall at {size}, got band {band}"
+        )
+E       AssertionError: table(30) + editor(8) must fit the boxed workspace 12 tall at (80, 24), got band 38
+E       assert 38 <= 12
+
+tests\test_tui_patch_editor_b94.py:195: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]
+1 failed in 2.00s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 02 [tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]]: RED (KILLED)
+
+--- arm 08: s19_app/tui/changes/apply.py
+    note: skip disposition counted as applied (skipped->applied flip)
+    edit: '        else:\r\n            disposition = _STATUS_TO_SKIP_DISPOSITION[entry.status]\r\n        counts[disposition] += 1'
+          -> '        else:\r\n            disposition = DISPOSITION_APPLIED\r\n        counts[disposition] += 1'
+    before: 09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_at_b94_09_apply_applies_loaded_document _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18846/test_at_b94_09_apply_applies_l0')
+
+    def test_at_b94_09_apply_applies_loaded_document(tmp_path: Path) -> None:
+        """AT-B94-09 — ``counts["applied"]`` == applicable entries; the
+        no-image arm reports the skipped disposition with 0 writes; the
+        no-document arm writes 0 bytes and surfaces the no-image notice.
+    
+        FIX ROUND A (C-40): the two original arms produced ZERO skipped
+        entries (the valid document's entries are all INSIDE; the no-document
+        arm has an empty document), so the apply.py skipped->applied mutation
+        was unobservable and SURVIVED. LLR-007.1's boundary catalog pins the
+        missing arm: entries with NO loaded image -> the skipped-no-image
+        census, 0 applied, nothing written.
+        """
+    
+        async def _drive(with_doc: bool) -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            mem = {0x100 + i: 0x00 for i in range(4)}
+            mem.update({0x200 + i: 0x41 for i in range(3)})
+            app.current_file = _loaded(mem, [(0x100, 0x104), (0x200, 0x203)])
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                if with_doc:
+                    result = app._change_service.load_text(VALID_TWO)
+                    assert result.ok, result.message
+                    panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                    panel.refresh_entries(
+                        app._change_service.rows(None), mem_map=mem
+                    )
+                    await pilot.pause()
+                await _press_button(app, pilot, "#patch_doc_apply_button")
+                await pilot.pause()
+                await pilot.pause()
+                summary = app._change_service.last_summary
+                counts = dict(summary.counts) if summary is not None else {}
+                return counts
+    
+        async def _drive_no_image() -> tuple:
+            # FIX ROUND A arm: a document IS loaded but NO image is — every
+            # entry classifies UNVALIDATED_NO_IMAGE and must ride the
+            # skipped-no-image disposition (LLR-007.1's boundary catalog).
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                result = app._change_service.load_text(VALID_TWO)
+                assert result.ok, result.message
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                panel.refresh_entries(app._change_service.rows(None), mem_map=None)
+                await pilot.pause()
+                await _press_button(app, pilot, "#patch_doc_apply_button")
+                await pilot.pause()
+                await pilot.pause()
+                await pilot.pause()
+                summary = app._change_service.last_summary
+                counts = dict(summary.counts) if summary is not None else {}
+                status = " | ".join(
+                    str(app.query_one(f"#log_line_{i}").render())
+                    for i in (1, 2, 3, 4)
+                )
+                return counts, status
+    
+        counts = asyncio.run(_drive(True))
+        assert counts.get("applied", 0) == 2, (
+            f"both applicable entries are applied, got {counts}"
+        )
+        counts_empty = asyncio.run(_drive(False))
+        assert counts_empty.get("applied", 0) == 0, (
+            f"the no-document arm applies nothing, got {counts_empty}"
+        )
+        counts_noimg, status_noimg = asyncio.run(_drive_no_image())
+>       assert counts_noimg.get("applied", 0) == 0, (
+            f"the no-image arm writes nothing, got {counts_noimg}"
+        )
+E       AssertionError: the no-image arm writes nothing, got {'applied': 2, 'skipped-partial': 0, 'skipped-outside': 0, 'skipped-no-image': 0, 'blocked': 0}
+E       assert 2 == 0
+E        +  where 2 = <built-in method get of dict object at 0x000001F3CB7E7C00>('applied', 0)
+E        +    where <built-in method get of dict object at 0x000001F3CB7E7C00> = {'applied': 2, 'blocked': 0, 'skipped-no-image': 0, 'skipped-outside': 0, ...}.get
+
+tests\test_tui_patch_editor_b94.py:611: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document
+1 failed in 5.64s
+    after:  09a447ab935f902792751644cddccf21d02dd4cb9a357fcf3d44224274b133ff restore-ok=True
+    arm 08 [tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document]: RED (KILLED)
+
+--- arm 15: s19_app/tui/app.py
+    note: Refresh arm re-loads the document instead of repopulating dropdown
+    edit: '                self._prefill_patch_change_files()\r\n                self.set_status("Patch Editor: file list refreshed.")'
+          -> '                if service.document.source_path is not None:\r\n                    self._patch_editor_load(\r\n                        panel, str(service.document.source_path)\r\n                    )\r\n                else:\r\n                    self._prefill_patch_change_files()\r\n                self.set_status("Patch Editor: file list refreshed.")'
+    before: 6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_tc_b94_03_load_and_refresh_semantics __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18847/test_tc_b94_03_load_and_refres0')
+
+    def test_tc_b94_03_load_and_refresh_semantics(tmp_path: Path) -> None:
+        """TC-B94-03 — the path input drives the read; empty/unresolved paths
+        collect one issue; Refresh is dropdown-only (LLR-008.1/008.2).
+    
+        FIX ROUND A (C-40), option (a) recorded: the reader unit arms below
+        never exercised the shipped Refresh path — the app.py refresh-arm
+        mutation SURVIVED because this body is ``read_change_document``-only.
+        LLR-008.2's refresh arm is now realized HERE through the shipped
+        surface: load the typed path's document, drop a second file into the
+        patches folder, press Refresh — the dropdown repopulates to the scan
+        set and the loaded document is ONE unchanged document (identity
+        identical before/after; 0 remounts).
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+        patches.mkdir(parents=True)
+        (patches / "doc.json").write_text(VALID_ONE, encoding="utf-8")
+    
+        doc = read_change_document(str(patches / "doc.json"), tmp_path)
+        assert len(doc.entries) == 1 and not doc.has_errors
+        empty = read_change_document("", tmp_path)
+        assert len(empty.entries) == 0
+        assert any(i.code == "MF-PATH-UNRESOLVED" for i in empty.issues), (
+            "an empty path is one MF-PATH-UNRESOLVED issue"
+        )
+        missing = read_change_document(str(patches / "nope.json"), tmp_path)
+        assert len(missing.entries) == 0
+        assert any(i.code == "MF-PATH-UNRESOLVED" for i in missing.issues)
+        non_json = patches / "doc.txt"
+        non_json.write_text("hello", encoding="utf-8")
+        bad = read_change_document(str(non_json), tmp_path)
+        assert any(i.code == "MF-JSON-PARSE" for i in bad.issues)
+    
+        async def _drive_refresh() -> tuple:
+            # LLR-008.2 through the shipped surface (option (a) — the app
+            # drive; the reader arms above stay as the read-path unit pins).
+            app = S19TuiApp(base_dir=tmp_path)
+            (patches / "second.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "doc.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                await pilot.pause()
+                bound_before = id(app._change_service.document)
+                await _press_button(app, pilot, "#patch_doc_refresh_button")
+                await pilot.pause()
+                select = app.query_one("#patch_doc_file_select")
+                options = sorted(
+                    str(v) for _l, v in select._options if v is not select.NULL
+                )
+                return options, bound_before, id(app._change_service.document)
+    
+        options, bound_before, bound_after = asyncio.run(_drive_refresh())
+        assert options == ["doc.json", "second.json"], (
+            f"Refresh repopulates the dropdown from the scan, got {options}"
+        )
+>       assert bound_before == bound_after, (
+            "Refresh leaves the loaded document identical (0 remounts/reloads)"
+        )
+E       AssertionError: Refresh leaves the loaded document identical (0 remounts/reloads)
+E       assert 1593136588128 == 1593137935840
+
+tests\test_tui_patch_editor_b94.py:854: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics
+1 failed in 2.38s
+    after:  6db01493b8d86b486b9d3b45bebd8f83fe4993b8002a65511287c79f3e0ad4f8 restore-ok=True
+    arm 15 [tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics]: RED (KILLED)
+
+--- arm 17: s19_app/tui/screens_directionb.py
+    note: FIX ROUND A re-declaration (the authoring-time on_message/variant_id anchor was retired with HLR-006 and came back BAD): the realized mutation INSERTS a variant_id-reacting on_message into PatchEditorPanel — the retired doctrine's violation. The fixed TC-B94-11 posts the stale VariantSelected-SHAPED message and asserts the dirty flag is untouched; the inserted handler flips it.
+    edit: '    def mark_loaded(self) -> None:\r\n        """Clear the dirty flag after a successful load (LLR-005.1, writer w4).'
+          -> '    def on_message(self, event) -> None:\r\n        if getattr(event, "variant_id", None):\r\n            self._dirty = True\r\n\r\n    def mark_loaded(self) -> None:\r\n        """Clear the dirty flag after a successful load (LLR-005.1, writer w4).'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 1.80s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 17 [tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding]: GREEN (SURVIVED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 01 | tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+    edit: Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),... | RED (KILLED) | restore-hash OK
+    note: rail '=' action target check_editor->patch
+arm 01 | tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+    edit: Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),... | RED (KILLED) | restore-hash OK
+    note: rail '=' action target check_editor->patch
+arm 02 | tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+    edit:         table.styles.height = 3... | RED (KILLED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 02 | tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size0]
+    edit:         table.styles.height = 3... | RED (KILLED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 02 | tests/test_tui_patch_editor_b94.py::test_tc_b94_09_widget_census[size1]
+    edit:         table.styles.height = 3... | RED (KILLED) | restore-hash OK
+    note: reworked entries table 3 -> 30 rows (editor below the fold)
+arm 08 | tests/test_tui_patch_editor_b94.py::test_at_b94_09_apply_applies_loaded_document
+    edit:         else:... | RED (KILLED) | restore-hash OK
+    note: skip disposition counted as applied (skipped->applied flip)
+arm 15 | tests/test_tui_patch_editor_b94.py::test_tc_b94_03_load_and_refresh_semantics
+    edit:                 self._prefill_patch_change_files()... | RED (KILLED) | restore-hash OK
+    note: Refresh arm re-loads the document instead of repopulating dropdown
+arm 17 | tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+    edit:     def mark_loaded(self) -> None:... | GREEN (SURVIVED) | restore-hash OK
+    note: FIX ROUND A re-declaration (the authoring-time on_message/variant_id anchor was retired with HLR-006 and came back BAD): the realized mutation INSERTS a variant_id-reacting on_message into PatchEditorPanel — the retired doctrine's violation. The fixed TC-B94-11 posts the stale VariantSelected-SHAPED message and asserts the dirty flag is untouched; the inserted handler flips it.
+------------------------------------------------------------------------------
+TOTALS: 8 node-runs | RED 7 | SURVIVED 1 | CRASH/BAD 0
+runner exit: 1 (findings present)
+FIX_ROUND_A_BATTERY_EXIT=1
+
+=== FIX ROUND A (arm 17 re-declaration v2 — Textual dispatch fix) ===
+--- the v1 insertion (literal on_message) SURVIVED: Textual dispatches by handler_name=on_<snake class name>;
+--- the test's local class is named VariantSelected (handler on_variant_selected) and the mutation now inserts that handler.
+==============================================================================
+inc001 mutation battery — batch-94 increment 001 (tip b6f974f)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+subset mode: arms ['17']
+
+[phase 0] resolving node ids via pytest --collect-only
+
+[phase 1] arms: 1; node-runs: 1
+
+[phase 2] clean-tree baseline (all 27 nodes, ONE pytest run)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.                                                                        [100%]
+1 passed in 1.79s
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 17: s19_app/tui/screens_directionb.py
+    note: FIX ROUND A re-declaration v2 (v1 inserted a literal on_message and SURVIVED: Textual dispatches by the message's derived handler_name, on_<snake class name>, never to a method named on_message). The realized mutation INSERTS on_variant_selected into PatchEditorPanel — the panel-side handler for the retired VariantSelected shape, exactly what HLR-006 removed. The fixed TC-B94-11 posts the VariantSelected-SHAPED message (handler_name on_variant_selected) and asserts the dirty flag is untouched; the inserted handler flips it.
+    edit: '    def mark_loaded(self) -> None:\r\n        """Clear the dirty flag after a successful load (LLR-005.1, writer w4).'
+          -> '    def on_variant_selected(self, event) -> None:\r\n        self._dirty = True\r\n\r\n    def mark_loaded(self) -> None:\r\n        """Clear the dirty flag after a successful load (LLR-005.1, writer w4).'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b94_11_stale_variant_noop_and_single_binding _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18860/test_tc_b94_11_stale_variant_n0')
+
+    def test_tc_b94_11_stale_variant_noop_and_single_binding(tmp_path: Path) -> None:
+        """TC-B94-11 — two consecutive Loads leave exactly one bound document,
+        0 orphaned entries; a stale variant message does not crash the panel.
+    
+        FIX ROUND A (C-40) re-derivation, recorded per LLR-006.1/.2: the
+        pre-fix body never POSTED the stale message (its docstring claimed the
+        arm but the drive omitted it — the declared battery anchor
+        ``on_message``/``variant_id`` was retired with HLR-006, so arm 17 came
+        back CRASH/BAD and the assertion was inert). LLR-006.1 pins the seam as
+        "posting a stale ``VariantSelected``-SHAPED message to the panel is a
+        no-op": the product class was retired WITH the machinery, so the test
+        defines the shape locally (the AT-B94-08 idiom) and posts it through
+        the shipped message bus — asserting no crash and no state change
+        (rows and the dirty flag untouched). LLR-006.2's binding census is
+        stated exactly: after load-A-then-load-B exactly ONE document is bound
+        (B's two entries, 0 of A's orphaned).
+        """
+    
+        class VariantSelected(Message):
+            """The retired product class's shape (LLR-006.1).
+    
+            The product ``VariantSelected`` was removed WITH the machinery it
+            served (HLR-006), so the test defines the shape locally — the
+            AT-B94-08 idiom. The class name is load-bearing: Textual derives
+            the dispatch handler from it (``handler_name == "on_" + snake
+            class name``), so this shape reaches ``on_variant_selected`` —
+            the handler the panel must NOT define.
+            """
+    
+            def __init__(self, variant_id: str) -> None:
+                super().__init__()
+                self.variant_id = variant_id
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "a.json").write_text(VALID_ONE, encoding="utf-8")
+            (patches / "b.json").write_text(VALID_TWO, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                service = app._change_service
+                service.load(str(patches / "a.json"), tmp_path)
+                service.load(str(patches / "b.json"), tmp_path)
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                panel.refresh_entries(service.rows(None), mem_map=None)
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                rows_before = table.row_count
+                dirty_before = panel._dirty
+                # LLR-006.1's invalid arm, actually posted this time.
+                panel.post_message(VariantSelected("b"))
+                await pilot.pause()
+                await pilot.pause()
+                rows_after = table.row_count
+                dirty_after = panel._dirty
+                return (
+                    rows_before,
+                    rows_after,
+                    len(service.document.entries),
+                    dirty_before,
+                    dirty_after,
+                )
+    
+        rows_before, rows_after, bound, dirty_before, dirty_after = asyncio.run(
+            _drive()
+        )
+        assert rows_before == rows_after == 2, (
+            f"the stale message is a no-op (2 rows kept), got "
+            f"{rows_before} -> {rows_after}"
+        )
+>       assert dirty_before is False and dirty_after is False, (
+            "the stale message never mutates panel state (the dirty flag)"
+        )
+E       AssertionError: the stale message never mutates panel state (the dirty flag)
+E       assert (False is False and True is False)
+
+tests\test_tui_patch_editor_b94.py:1006: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+1 failed in 1.85s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 17 [tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding]: RED (KILLED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 17 | tests/test_tui_patch_editor_b94.py::test_tc_b94_11_stale_variant_noop_and_single_binding
+    edit:     def mark_loaded(self) -> None:... | RED (KILLED) | restore-hash OK
+    note: FIX ROUND A re-declaration v2 (v1 inserted a literal on_message and SURVIVED: Textual dispatches by the message's derived handler_name, on_<snake class name>, never to a method named on_message). The realized mutation INSERTS on_variant_selected into PatchEditorPanel — the panel-side handler for the retired VariantSelected shape, exactly what HLR-006 removed. The fixed TC-B94-11 posts the VariantSelected-SHAPED message (handler_name on_variant_selected) and asserts the dirty flag is untouched; the inserted handler flips it.
+------------------------------------------------------------------------------
+TOTALS: 1 node-runs | RED 1 | SURVIVED 0 | CRASH/BAD 0
+runner exit: 0 (all arms killed)
+ARM17_V2_EXIT=0
+
+=== FIX ROUND A — spot-check: 3 previously-RED arms' nodes on the clean (mutated-then-restored, test-fixed) tree ===
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...                                                                      [100%]
+3 passed in 1.65s
+SPOT_CHECK_EXIT=0
+
+=== FIX ROUND A — final suite run (one complete run, tail read) ===
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...................................................                      [100%]
+51 passed in 86.60s (0:01:26)
+SUITE_EXIT=0

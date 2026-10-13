@@ -69,6 +69,7 @@ from s19_app.tui.changes.io import (
 )
 from s19_app.tui.json_highlight import JsonHighlightTextArea
 from s19_app.tui.models import LoadedFile
+from s19_app.tui.rail import Rail
 from s19_app.tui.screens_directionb import PatchEditorPanel
 
 VALID_TWO = """{
@@ -149,7 +150,19 @@ async def _press_screen_button(app: S19TuiApp, pilot, button_id: str) -> None:
 @pytest.mark.parametrize("size", [(120, 30), (80, 24)])
 def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
     """The reworked panel composes 1 JsonHighlightTextArea + 1 entries table,
-    without exception, at 120x30 and 80x24 (LLR-003.1)."""
+    without exception, at 120x30 and 80x24 (LLR-003.1) — and the entries
+    table stays the measured bounded band (the geometry the fold certifies).
+
+    FIX ROUND A (C-40): the plain widget census is geometry-blind — the
+    `styles.height 3 -> 30` mutation composes the same widgets and passed.
+    The fold's subject is the BAND: per the C-29 boxes
+    (``evidence/p1-pilot-measurements.txt``: workspace 96x18 at 120x30,
+    74x12 at 80x24) the shipped tree measures table 3 + editor 8 = 11 cells,
+    which must fit the boxed workspace together at every shipped regime; a
+    30-row table (38 cells) cannot. The widget-count census below is kept as
+    a labeled regression pin (C-40 corollary — legitimate, but not the arm's
+    kill subject).
+    """
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
@@ -158,13 +171,31 @@ def test_tc_b94_09_widget_census(tmp_path: Path, size) -> None:
             await pilot.press("6")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            service = app._change_service
+            service.add_entry("0x100", "", "DE AD BE EF")
+            panel.refresh_entries(service.rows(None), mem_map=None)
+            await pilot.pause()
             editors = list(panel.query(JsonHighlightTextArea))
             tables = list(panel.query("#patch_doc_entries_table"))
-            return len(editors), len(tables)
+            workspace = app.query_one("#workspace_body").region
+            table = app.query_one("#patch_doc_entries_table", DataTable).region
+            editor = app.query_one("#patch_paste_text", TextArea).region
+            return (
+                len(editors),
+                len(tables),
+                table.height + editor.height,
+                workspace.height,
+            )
 
-    editors, tables = asyncio.run(_drive())
+    editors, tables, band, workspace_h = asyncio.run(_drive())
+    # Regression pin (C-40 corollary): the reworked composition census.
     assert editors == 1, f"exactly 1 JsonHighlightTextArea, got {editors}"
     assert tables == 1, f"exactly 1 entries table, got {tables}"
+    # The kill subject: the bounded band fits the boxed workspace (C-29).
+    assert band <= workspace_h, (
+        f"table({band - 8}) + editor(8) must fit the boxed workspace "
+        f"{workspace_h} tall at {size}, got band {band}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -507,7 +538,16 @@ def test_at_b94_08_variant_machinery_retired(tmp_path: Path) -> None:
 
 def test_at_b94_09_apply_applies_loaded_document(tmp_path: Path) -> None:
     """AT-B94-09 — ``counts["applied"]`` == applicable entries; the
-    no-document arm writes 0 bytes and surfaces the no-image notice."""
+    no-image arm reports the skipped disposition with 0 writes; the
+    no-document arm writes 0 bytes and surfaces the no-image notice.
+
+    FIX ROUND A (C-40): the two original arms produced ZERO skipped
+    entries (the valid document's entries are all INSIDE; the no-document
+    arm has an empty document), so the apply.py skipped->applied mutation
+    was unobservable and SURVIVED. LLR-007.1's boundary catalog pins the
+    missing arm: entries with NO loaded image -> the skipped-no-image
+    census, 0 applied, nothing written.
+    """
 
     async def _drive(with_doc: bool) -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
@@ -533,6 +573,32 @@ def test_at_b94_09_apply_applies_loaded_document(tmp_path: Path) -> None:
             counts = dict(summary.counts) if summary is not None else {}
             return counts
 
+    async def _drive_no_image() -> tuple:
+        # FIX ROUND A arm: a document IS loaded but NO image is — every
+        # entry classifies UNVALIDATED_NO_IMAGE and must ride the
+        # skipped-no-image disposition (LLR-007.1's boundary catalog).
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("6")
+            await pilot.pause()
+            result = app._change_service.load_text(VALID_TWO)
+            assert result.ok, result.message
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.refresh_entries(app._change_service.rows(None), mem_map=None)
+            await pilot.pause()
+            await _press_button(app, pilot, "#patch_doc_apply_button")
+            await pilot.pause()
+            await pilot.pause()
+            await pilot.pause()
+            summary = app._change_service.last_summary
+            counts = dict(summary.counts) if summary is not None else {}
+            status = " | ".join(
+                str(app.query_one(f"#log_line_{i}").render())
+                for i in (1, 2, 3, 4)
+            )
+            return counts, status
+
     counts = asyncio.run(_drive(True))
     assert counts.get("applied", 0) == 2, (
         f"both applicable entries are applied, got {counts}"
@@ -540,6 +606,16 @@ def test_at_b94_09_apply_applies_loaded_document(tmp_path: Path) -> None:
     counts_empty = asyncio.run(_drive(False))
     assert counts_empty.get("applied", 0) == 0, (
         f"the no-document arm applies nothing, got {counts_empty}"
+    )
+    counts_noimg, status_noimg = asyncio.run(_drive_no_image())
+    assert counts_noimg.get("applied", 0) == 0, (
+        f"the no-image arm writes nothing, got {counts_noimg}"
+    )
+    assert counts_noimg.get("skipped-no-image", 0) == 2, (
+        f"both entries ride the skipped-no-image census, got {counts_noimg}"
+    )
+    assert "2 skipped" in status_noimg, (
+        f"the skipped census reaches the operator surface, got {status_noimg!r}"
     )
 
 
@@ -717,7 +793,17 @@ def test_tc_b94_02_apply_gate(tmp_path: Path) -> None:
 
 def test_tc_b94_03_load_and_refresh_semantics(tmp_path: Path) -> None:
     """TC-B94-03 — the path input drives the read; empty/unresolved paths
-    collect one issue; Refresh is dropdown-only (LLR-008.1/008.2)."""
+    collect one issue; Refresh is dropdown-only (LLR-008.1/008.2).
+
+    FIX ROUND A (C-40), option (a) recorded: the reader unit arms below
+    never exercised the shipped Refresh path — the app.py refresh-arm
+    mutation SURVIVED because this body is ``read_change_document``-only.
+    LLR-008.2's refresh arm is now realized HERE through the shipped
+    surface: load the typed path's document, drop a second file into the
+    patches folder, press Refresh — the dropdown repopulates to the scan
+    set and the loaded document is ONE unchanged document (identity
+    identical before/after; 0 remounts).
+    """
     patches = tmp_path / ".s19tool" / "workarea" / "patches"
     patches.mkdir(parents=True)
     (patches / "doc.json").write_text(VALID_ONE, encoding="utf-8")
@@ -736,6 +822,38 @@ def test_tc_b94_03_load_and_refresh_semantics(tmp_path: Path) -> None:
     non_json.write_text("hello", encoding="utf-8")
     bad = read_change_document(str(non_json), tmp_path)
     assert any(i.code == "MF-JSON-PARSE" for i in bad.issues)
+
+    async def _drive_refresh() -> tuple:
+        # LLR-008.2 through the shipped surface (option (a) — the app
+        # drive; the reader arms above stay as the read-path unit pins).
+        app = S19TuiApp(base_dir=tmp_path)
+        (patches / "second.json").write_text(VALID_ONE, encoding="utf-8")
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("6")
+            await pilot.pause()
+            app.query_one("#patch_doc_path_input", Input).value = str(
+                patches / "doc.json"
+            )
+            await _press_button(app, pilot, "#patch_doc_load_button")
+            await pilot.pause()
+            await pilot.pause()
+            bound_before = id(app._change_service.document)
+            await _press_button(app, pilot, "#patch_doc_refresh_button")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select")
+            options = sorted(
+                str(v) for _l, v in select._options if v is not select.NULL
+            )
+            return options, bound_before, id(app._change_service.document)
+
+    options, bound_before, bound_after = asyncio.run(_drive_refresh())
+    assert options == ["doc.json", "second.json"], (
+        f"Refresh repopulates the dropdown from the scan, got {options}"
+    )
+    assert bound_before == bound_after, (
+        "Refresh leaves the loaded document identical (0 remounts/reloads)"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -815,7 +933,36 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
 
 def test_tc_b94_11_stale_variant_noop_and_single_binding(tmp_path: Path) -> None:
     """TC-B94-11 — two consecutive Loads leave exactly one bound document,
-    0 orphaned entries; a stale message does not crash the panel."""
+    0 orphaned entries; a stale variant message does not crash the panel.
+
+    FIX ROUND A (C-40) re-derivation, recorded per LLR-006.1/.2: the
+    pre-fix body never POSTED the stale message (its docstring claimed the
+    arm but the drive omitted it — the declared battery anchor
+    ``on_message``/``variant_id`` was retired with HLR-006, so arm 17 came
+    back CRASH/BAD and the assertion was inert). LLR-006.1 pins the seam as
+    "posting a stale ``VariantSelected``-SHAPED message to the panel is a
+    no-op": the product class was retired WITH the machinery, so the test
+    defines the shape locally (the AT-B94-08 idiom) and posts it through
+    the shipped message bus — asserting no crash and no state change
+    (rows and the dirty flag untouched). LLR-006.2's binding census is
+    stated exactly: after load-A-then-load-B exactly ONE document is bound
+    (B's two entries, 0 of A's orphaned).
+    """
+
+    class VariantSelected(Message):
+        """The retired product class's shape (LLR-006.1).
+
+        The product ``VariantSelected`` was removed WITH the machinery it
+        served (HLR-006), so the test defines the shape locally — the
+        AT-B94-08 idiom. The class name is load-bearing: Textual derives
+        the dispatch handler from it (``handler_name == "on_" + snake
+        class name``), so this shape reaches ``on_variant_selected`` —
+        the handler the panel must NOT define.
+        """
+
+        def __init__(self, variant_id: str) -> None:
+            super().__init__()
+            self.variant_id = variant_id
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
@@ -833,13 +980,36 @@ def test_tc_b94_11_stale_variant_noop_and_single_binding(tmp_path: Path) -> None
             panel.refresh_entries(service.rows(None), mem_map=None)
             await pilot.pause()
             table = app.query_one("#patch_doc_entries_table", DataTable)
-            return table.row_count, len(service.document.entries)
+            rows_before = table.row_count
+            dirty_before = panel._dirty
+            # LLR-006.1's invalid arm, actually posted this time.
+            panel.post_message(VariantSelected("b"))
+            await pilot.pause()
+            await pilot.pause()
+            rows_after = table.row_count
+            dirty_after = panel._dirty
+            return (
+                rows_before,
+                rows_after,
+                len(service.document.entries),
+                dirty_before,
+                dirty_after,
+            )
 
-    rows, bound = asyncio.run(_drive())
-    assert bound == 1 or rows == 2, (
-        "the second load replaces the binding (B's two rows, 0 of A's)"
+    rows_before, rows_after, bound, dirty_before, dirty_after = asyncio.run(
+        _drive()
     )
-    assert rows == 2, f"0 orphaned entries from A survive, got {rows}"
+    assert rows_before == rows_after == 2, (
+        f"the stale message is a no-op (2 rows kept), got "
+        f"{rows_before} -> {rows_after}"
+    )
+    assert dirty_before is False and dirty_after is False, (
+        "the stale message never mutates panel state (the dirty flag)"
+    )
+    assert bound == 2, (
+        f"exactly one document bound after load-A-then-load-B "
+        f"(B's 2 entries, 0 of A's), got {bound}"
+    )
 
 
 # ---------------------------------------------------------------------------
