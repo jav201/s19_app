@@ -102,6 +102,13 @@ class ChangeEntry:
             ``None`` for a bytes entry.
         status (MemoryStatus): Image-containment verdict. Defaults to
             ``UNVALIDATED_NO_IMAGE``; stamped by the E2 containment validator.
+        symbol (Optional[str]): The A2L tag name for a change-5
+            symbol-referenced entry (HLR-141) — ``None`` for a plain
+            address-form entry. Stamped by the reader from the resolved tag
+            map (the canonical tag name, not the as-typed spelling), carried
+            verbatim by the canonical writer alongside the resolved address,
+            and ignored by every shipped v2.0 reader (the wire-leniency law
+            of LLR-141.1, P-19).
 
     Returns:
         None: Dataclass container.
@@ -138,6 +145,7 @@ class ChangeEntry:
     encoded_bytes: tuple[int, ...]
     value: Optional[Union[str, tuple[int, ...]]] = None
     status: MemoryStatus = MemoryStatus.UNVALIDATED_NO_IMAGE
+    symbol: Optional[str] = None
 
     def __post_init__(self) -> None:
         """

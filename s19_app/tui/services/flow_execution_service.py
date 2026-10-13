@@ -38,6 +38,7 @@ from ..changes import (
     save_patched_image,
 )
 from ..changes.check import run_check_document
+from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
 from .flow_model import (
     BLOCK_STATUS_ERROR,
@@ -109,8 +110,13 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     Data Flow:
         - SOURCE → ``build_loaded_s19/hex`` → seed ``mem_map``/``ranges``;
           parser ``errors`` → advisory WARN findings (``notices``, LLR-085.2).
-        - PATCH → ``read_change_document`` → ``apply_change_document`` (mutates
-          ``mem_map``).
+          Change-5 (LLR-142): a declared ``a2l_ref`` resolves through the
+          manifest guard and its tag map becomes the run's symbol-resolution
+          context before any PATCH; a dangling reference refuses the run,
+          naming the reference.
+        - PATCH → ``read_change_document`` (with the patch's effective A2L
+          context — its own ``a2l_ref`` override, else the SOURCE block's) →
+          ``apply_change_document`` (mutates ``mem_map``).
         - CHECK → ``read_change_document`` → ``run_check_document`` (read-only,
           image passed through unchanged; never aborts the chain — LLR-086.4).
         - WRITE-OUT → ``save_patched_image(source_kind=fmt)`` → written path.
@@ -128,6 +134,13 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     ranges: Optional[Sequence[Tuple[int, int]]] = None
     s0_header: Optional[bytes] = None
     a2l_tags = None
+    # batch-95 change-5 (LLR-142): the run-effective A2L payload — the tag
+    # map a declared ``a2l_ref`` resolved to (SOURCE block first; a PATCH
+    # override is parsed per patch arm and never leaks here). Symbol entries
+    # resolve ONLY against a declared reference; with none declared anywhere
+    # this stays ``None`` and the reader refuses them named (no implicit A2L
+    # — ``ctx.a2l_data``, the project's loaded A2L, is never consulted).
+    declared_a2l: Optional[dict] = None
     aborted = False
 
     for index, block in enumerate(flow.blocks):
@@ -180,9 +193,42 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 mem_map = loaded.mem_map
                 ranges = loaded.ranges
                 s0_header = getattr(loaded, "source_s0_header", None)
+                # batch-95 change-5 (LLR-142.1): a SOURCE block declaring an
+                # A2L reference loads its tag map into the run context BEFORE
+                # any PATCH applies; a reference that resolves to no A2L
+                # refuses the run, naming the reference. Resolution rides the
+                # SAME manifest containment guard as every other block ref
+                # (project folder; the no-project home is a FlowContext whose
+                # project_dir IS the workarea containment root, LLR-142.2).
+                if block.a2l_ref:
+                    a2l_issues: List[ValidationIssue] = []
+                    a2l_path = _resolve_manifest_entry(
+                        ctx.project_dir, block.a2l_ref,
+                        "SourceBlock.a2l_ref", a2l_issues,
+                    )
+                    if a2l_path is None or not a2l_path.exists():
+                        aborted = _record_error(
+                            result, index, kind, "a2l reference unresolved",
+                            a2l_issues,
+                            f"a2l reference {block.a2l_ref!r} not found or "
+                            "not inside the project",
+                        )
+                        continue
+                    try:
+                        declared_a2l = parse_a2l_file(a2l_path)
+                    except OSError as exc:
+                        aborted = _record_error(
+                            result, index, kind, "a2l reference unreadable", [],
+                            f"a2l reference {block.a2l_ref!r} could not be "
+                            f"read: {type(exc).__name__}",
+                        )
+                        continue
+                run_a2l_data = (
+                    declared_a2l if declared_a2l is not None else ctx.a2l_data
+                )
                 a2l_tags = (
-                    enrich_tags_and_render(ctx.a2l_data, mem_map)[0]
-                    if ctx.a2l_data else None
+                    enrich_tags_and_render(run_a2l_data, mem_map)[0]
+                    if run_a2l_data else None
                 )
                 load_errors = getattr(loaded, "errors", None) or []
                 if load_errors:
@@ -224,7 +270,42 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         "change document not found or not inside the project",
                     )
                     continue
-                document = read_change_document(str(path), ctx.project_dir)
+                # batch-95 change-5 (LLR-142.1): the PATCH block may carry its
+                # OWN a2l_ref, overriding the SOURCE block's for THIS
+                # change-set only (never leaking to sibling patches — the
+                # override payload stays local to this arm). The change
+                # document is read with that context so its symbol entries
+                # resolve; with NO declared reference anywhere the context is
+                # ``None`` and symbol entries are refused named (no implicit
+                # A2L, even when the project holds a loaded A2L).
+                patch_a2l_context = declared_a2l
+                if block.a2l_ref:
+                    override_issues: List[ValidationIssue] = []
+                    override_path = _resolve_manifest_entry(
+                        ctx.project_dir, block.a2l_ref,
+                        "PatchBlock.a2l_ref", override_issues,
+                    )
+                    if override_path is None or not override_path.exists():
+                        aborted = _record_error(
+                            result, index, kind, "a2l reference unresolved",
+                            override_issues,
+                            f"a2l reference {block.a2l_ref!r} not found or "
+                            "not inside the project",
+                        )
+                        continue
+                    try:
+                        patch_a2l_context = parse_a2l_file(override_path)
+                    except OSError as exc:
+                        aborted = _record_error(
+                            result, index, kind, "a2l reference unreadable", [],
+                            f"a2l reference {block.a2l_ref!r} could not be "
+                            f"read: {type(exc).__name__}",
+                        )
+                        continue
+                document = read_change_document(
+                    str(path), ctx.project_dir,
+                    a2l_context=patch_a2l_context,
+                )
                 summary = apply_change_document(
                     document, mem_map, ranges, ctx.mac_records, a2l_tags
                 )
@@ -290,7 +371,10 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 # exception routes to the NON-aborting own-op path and can never
                 # reach the outer `aborted = True` handler.
                 try:
-                    document = read_change_document(str(path), ctx.project_dir)
+                    document = read_change_document(
+                        str(path), ctx.project_dir,
+                        a2l_context=declared_a2l,
+                    )
                     check_result = run_check_document(
                         document, mem_map, ranges, ctx.mac_records, a2l_tags
                     )

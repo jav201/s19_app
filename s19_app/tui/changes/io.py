@@ -20,6 +20,17 @@ pattern of ``cdfx/unified_io.py::write_unified_to_workarea``.
 - ``value`` — under ``value_mode="text"`` a literal JSON string encoded with
   the document ``encoding``; under ``value_mode="codes"`` a JSON array of
   code points joined and encoded with the document ``encoding``.
+- ``symbol`` — change-5 (batch-95 LLR-141.1): an OPTIONAL A2L tag name,
+  ADDITIVE alongside the address form, never replacing it (P-19 — a form
+  replacing ``address`` still dies on ``CHG-ADDRESS-SYNTAX``). A reader
+  given the declared A2L context (``a2l_context``) resolves the name through
+  the tag map to address + length + datatype, stamps the canonical tag name
+  on the entry, and refuses a symbol that resolves to nothing
+  (``CHG-SYMBOL-UNRESOLVED``) or a symbol entry whose declared address /
+  byte length drifts from the resolved tag (``CHG-SYMBOL-VALUE``); a reader
+  given NO context refuses every symbol entry the same way (no implicit
+  A2L). The canonical writer keeps emitting the resolved address, so the
+  shipped v2.0 reader applies a canonical symbol entry byte-identically.
 
 **Issue-code policy (§6.2 C-5):** the structural ``MF-*`` spellings of
 ``cdfx/unified_io.py`` are preserved as local constants with identical string
@@ -91,6 +102,8 @@ __all__ = [
     "CHG_VALUE_EMPTY",
     "CHG_ENCODE_FAIL",
     "CHG_V1_FORMAT",
+    "CHG_SYMBOL_UNRESOLVED",
+    "CHG_SYMBOL_VALUE",
     "CHG_COLLISION",
     "parse_change_document",
     "read_change_document",
@@ -209,6 +222,16 @@ CHG_ENCODE_FAIL = "CHG-ENCODE-FAIL"
 #: Document: a retired batch-04 v1 unified document — hard break, no shim
 #: (LLR-001.8 / C-3).
 CHG_V1_FORMAT = "CHG-V1-FORMAT"
+#: Entry (change-5, LLR-141.1): a ``symbol`` that resolves to nothing — no
+#: such tag in the declared A2L context, a tag without address or length, or
+#: no A2L context declared at all (the no-implicit-A2L law) — refused at
+#: load, named; the entry is skipped and 0 of its bytes are applied.
+CHG_SYMBOL_UNRESOLVED = "CHG-SYMBOL-UNRESOLVED"
+#: Entry (change-5, LLR-141.1): the VALUE/addressing limb of a
+#: symbol-referenced entry — a symbol entry carrying the string form (a
+#: physical value must encode to bytes), or whose declared address / byte
+#: length drifts from what the symbol resolves to — refused at load, named.
+CHG_SYMBOL_VALUE = "CHG-SYMBOL-VALUE"
 
 # ---------------------------------------------------------------------------
 # Read-path resource bounds (LLR-001.7) — pinned, documented limits. Values
@@ -297,6 +320,7 @@ def read_change_document(
     path_text: str,
     base_dir: Path,
     size_probe: Optional[SizeProbe] = None,
+    a2l_context: Optional[dict] = None,
 ) -> ChangeDocument:
     """
     Summary:
@@ -316,6 +340,13 @@ def read_change_document(
             seam. ``None`` (the default) resolves to a real
             ``Path.stat().st_size`` at call time; injectable so a test can
             report an over-cap size without a real 256 MB file.
+        a2l_context (Optional[dict]): The declared A2L context for change-5
+            symbol resolution (batch-95 LLR-141.1/LLR-142) — the parsed A2L
+            payload whose ``tags`` list resolves ``symbol`` entries at read.
+            ``None`` (the default) is the no-implicit-A2L limb: every
+            symbol-referenced entry is refused named
+            (``CHG-SYMBOL-UNRESOLVED``). Threaded verbatim into
+            :func:`parse_change_document`.
 
     Returns:
         ChangeDocument: The parsed document. ``entries`` is **always empty**
@@ -432,12 +463,12 @@ def read_change_document(
         )
 
     # --- Delegate the json-decode + interpretation to the shared seam -------
-    document = parse_change_document(payload)
+    document = parse_change_document(payload, a2l_context=a2l_context)
     document.source_path = resolved
     return document
 
 
-def parse_change_document(text: str) -> ChangeDocument:
+def parse_change_document(text: str, a2l_context: Optional[dict] = None) -> ChangeDocument:
     """
     Summary:
         Parse an in-memory change/check document (the raw JSON text of an
@@ -453,6 +484,10 @@ def parse_change_document(text: str) -> ChangeDocument:
             (``json.loads`` decodes it) so the file reader can hand its
             on-disk payload straight through; an invalid UTF-8 byte payload is
             one ``MF-JSON-PARSE`` finding (collect-don't-abort).
+        a2l_context (Optional[dict]): The declared A2L context for change-5
+            symbol resolution (batch-95 LLR-141.1) — threaded into the entry
+            parser; ``None`` refuses every symbol entry named (the
+            no-implicit-A2L law).
 
     Returns:
         ChangeDocument: The parsed document with ``source_path=None`` (a string
@@ -559,7 +594,10 @@ def parse_change_document(text: str) -> ChangeDocument:
         return _empty(document)
 
     fmt, version, kind, encoding, value_mode = _document_metadata(document)
-    entries = _parse_entries(document["entries"], encoding, value_mode, issues)
+    entries = _parse_entries(
+        document["entries"], encoding, value_mode, issues,
+        a2l_context=a2l_context,
+    )
 
     # --- Intra-document collision check (LLR-001.5) --------------------------
     issues.extend(collision_issues(entries))
@@ -785,6 +823,7 @@ def _parse_entries(
     encoding: str,
     value_mode: str,
     issues: list[ValidationIssue],
+    a2l_context: Optional[dict] = None,
 ) -> list[ChangeEntry]:
     """
     Summary:
@@ -798,6 +837,9 @@ def _parse_entries(
         value_mode (str): The validated string-value mode
             (``"text"`` / ``"codes"``).
         issues (list[ValidationIssue]): The shared issue list.
+        a2l_context (Optional[dict]): The declared A2L context for change-5
+            symbol resolution (LLR-141.1); ``None`` refuses every symbol
+            entry named (no implicit A2L).
 
     Returns:
         list[ChangeEntry]: The clean entries in document order. A faulty
@@ -832,7 +874,10 @@ def _parse_entries(
 
     entries: list[ChangeEntry] = []
     for index, element in enumerate(in_ceiling):
-        entry = _parse_entry(index, element, encoding, value_mode, issues)
+        entry = _parse_entry(
+            index, element, encoding, value_mode, issues,
+            a2l_context=a2l_context,
+        )
         if entry is not None:
             entries.append(entry)
     return entries
@@ -844,20 +889,27 @@ def _parse_entry(
     encoding: str,
     value_mode: str,
     issues: list[ValidationIssue],
+    a2l_context: Optional[dict] = None,
 ) -> Optional[ChangeEntry]:
     """
     Summary:
         Validate and parse one ``entries`` element under the strict wire
-        grammar, skip-and-continue (LLR-001.2/.4/.7).
+        grammar, skip-and-continue (LLR-001.2/.4/.7) — extended by change-5
+        (batch-95 LLR-141.1) with the additive ``symbol`` reference form.
 
     Args:
         index (int): The element's position in the ``entries`` array — named
             in findings that have no usable address.
         element (object): The parsed array element — expected to be a JSON
-            object carrying ``type``, ``address``, and ``value`` / ``bytes``.
+            object carrying ``type``, ``address``, and ``value`` / ``bytes``,
+            optionally ``symbol``.
         encoding (str): The validated document text codec.
         value_mode (str): The validated string-value mode.
         issues (list[ValidationIssue]): The shared issue list.
+        a2l_context (Optional[dict]): The declared A2L context resolving
+            ``symbol`` entries — the parsed payload's ``tags`` list. ``None``
+            refuses every symbol entry (``CHG-SYMBOL-UNRESOLVED``, the
+            no-implicit-A2L law).
 
     Returns:
         Optional[ChangeEntry]: The parsed entry, or ``None`` when a rule
@@ -866,7 +918,15 @@ def _parse_entry(
     Data Flow:
         - Non-object element / unrecognised ``type`` → ``MF-BAD-STRUCTURE``.
         - ``address`` outside the wire grammar → ``CHG-ADDRESS-SYNTAX``
-          (:func:`_parse_address`).
+          (:func:`_parse_address`) — UNCHANGED by change-5: a symbol form
+          REPLACING ``address`` dies here exactly as before (P-19).
+        - Change-5 ``symbol`` limb (BEFORE the value parse, so a refused
+          symbol never forces an encode): absent → today's path untouched;
+          present but unresolvable (no context / no such tag / tag without
+          address or length) → ``CHG-SYMBOL-UNRESOLVED`` naming the symbol,
+          entry skipped; present on a ``"string"`` entry →
+          ``CHG-SYMBOL-VALUE`` (a symbol entry's value rides the bytes
+          form), naming the symbol.
         - ``"string"`` entry → :func:`_resolve_string_entry` (empty/wrong
           type → ``CHG-VALUE-EMPTY``; pre-encode raw-length guard →
           ``MF-ENTRY-LIMIT``; encode failure → ``CHG-ENCODE-FAIL``;
@@ -874,10 +934,17 @@ def _parse_entry(
         - ``"bytes"`` entry → :func:`_resolve_bytes_entry` (empty →
           ``CHG-VALUE-EMPTY``; non-token spelling → ``CHG-BYTES-SYNTAX``;
           over-ceiling token count → ``MF-ENTRY-LIMIT``).
+        - Change-5 drift limb (AFTER the value parse): a resolved symbol
+          whose tag address / length disagrees with the declared address /
+          encoded byte length → ``CHG-SYMBOL-VALUE`` naming the symbol,
+          entry skipped; a consistent symbol is stamped on the entry
+          (``ChangeEntry.symbol`` = the canonical tag name) so the canonical
+          writer re-emits it.
 
     Dependencies:
         Uses:
             - _parse_address
+            - _resolve_symbol_tag
             - _resolve_string_entry
             - _resolve_bytes_entry
             - _issue
@@ -908,11 +975,136 @@ def _parse_entry(
     if address is None:
         return None
 
+    # --- change-5 symbol limb (LLR-141.1) — resolution BEFORE the value parse
+    resolved_tag: Optional[dict] = None
+    symbol = element.get("symbol")
+    if symbol is not None:
+        if not isinstance(symbol, str) or not symbol.strip():
+            issues.append(
+                _issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    f"entry {index} declares a 'symbol' that is not a tag "
+                    f"name string — the entry was skipped",
+                    address=address,
+                )
+            )
+            return None
+        resolved_tag, reason = _resolve_symbol_tag(symbol, a2l_context)
+        if resolved_tag is None:
+            issues.append(
+                _issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    f"entry {index}: {reason} — the entry was skipped",
+                    address=address,
+                )
+            )
+            return None
+        if entry_type == "string":
+            issues.append(
+                _issue(
+                    CHG_SYMBOL_VALUE,
+                    f"the symbol entry at address 0x{address:X} "
+                    f"({resolved_tag['name']!r}) declares a string 'value' — "
+                    f"symbol-referenced entries carry their value as encoded "
+                    f"bytes — the entry was skipped",
+                    address=address,
+                )
+            )
+            return None
+
     if entry_type == "string":
-        return _resolve_string_entry(
+        entry = _resolve_string_entry(
             index, address, element.get("value"), encoding, value_mode, issues
         )
-    return _resolve_bytes_entry(index, address, element.get("bytes"), issues)
+    else:
+        entry = _resolve_bytes_entry(index, address, element.get("bytes"), issues)
+    if entry is None or resolved_tag is None:
+        return entry
+
+    # --- change-5 drift limb — the resolved tag and the wire must agree -----
+    tag_name = str(resolved_tag.get("name") or symbol)
+    tag_address = resolved_tag.get("address")
+    tag_length = resolved_tag.get("length")
+    length_drift = (
+        isinstance(tag_length, int)
+        and not isinstance(tag_length, bool)
+        and tag_length != len(entry.encoded_bytes)
+    )
+    if tag_address != address or length_drift:
+        issues.append(
+            _issue(
+                CHG_SYMBOL_VALUE,
+                f"the symbol {tag_name!r} resolves to address "
+                f"0x{int(tag_address):X} length {int(tag_length)}, which "
+                f"drifts from the declared address 0x{address:X} / "
+                f"{len(entry.encoded_bytes)} encoded bytes — the entry was "
+                f"skipped",
+                address=address,
+            )
+        )
+        return None
+    entry.symbol = tag_name
+    return entry
+
+
+def _resolve_symbol_tag(
+    symbol: str, a2l_context: Optional[dict]
+) -> tuple[Optional[dict], str]:
+    """
+    Summary:
+        Resolve one change-5 ``symbol`` through the declared A2L context's
+        tag map (batch-95 LLR-141.1) — the read-time half of the
+        symbol-reference form; the physical→raw value encode is the
+        authoring-time half and lives in ``a2l.py``.
+
+    Args:
+        symbol (str): The declared tag name (already known to be a non-empty
+            string; matched case-insensitively, the shipped name-index idiom
+            of ``app.py::_build_a2l_name_index``).
+        a2l_context (Optional[dict]): The parsed A2L payload whose ``tags``
+            list is the resolution source, or ``None`` (no declared context).
+
+    Returns:
+        tuple[Optional[dict], str]: ``(tag, "")`` on success — the tag row
+            carries address + length; ``(None, reason)`` on refusal, the
+            reason naming the symbol / the missing context (consumed verbatim
+            in the ``CHG-SYMBOL-UNRESOLVED`` finding).
+
+    Data Flow:
+        - No context → "no A2L context is declared for this change-set".
+        - Case-insensitive name index over ``a2l_context["tags"]`` (first
+          match wins — ASAP2 tag names are unique per file); a miss →
+          "the symbol ... resolves to no tag".
+        - A tag without address or length → "the symbol ... resolves to a
+          tag without an address or length".
+
+    Dependencies:
+        Used by:
+            - _parse_entry
+    """
+    if not isinstance(a2l_context, dict):
+        return None, (
+            f"the symbol {symbol!r} cannot be resolved — no A2L context is "
+            f"declared for this change-set"
+        )
+    index: dict[str, dict] = {}
+    for tag in a2l_context.get("tags") or []:
+        if not isinstance(tag, dict):
+            continue
+        tag_name = str(tag.get("name") or "").strip()
+        if tag_name:
+            index.setdefault(tag_name.lower(), tag)
+    resolved = index.get(symbol.strip().lower())
+    if resolved is None:
+        return None, (
+            f"the symbol {symbol!r} resolves to no tag in the declared A2L"
+        )
+    if resolved.get("address") is None or resolved.get("length") is None:
+        return None, (
+            f"the symbol {symbol!r} resolves to a tag without an address "
+            f"or length"
+        )
+    return resolved, ""
 
 
 def _parse_address(
@@ -1249,7 +1441,12 @@ def _encode_entry(entry: ChangeEntry) -> dict[str, object]:
     """
     Summary:
         Encode one :class:`ChangeEntry` as its canonical wire-form JSON
-        object (LLR-001.2).
+        object (LLR-001.2) — the change-5 symbol form (batch-95 LLR-141.1)
+        included: a symbol-referenced entry emits the OPTIONAL ``symbol``
+        tag name AFTER the canonical three fields, so the shipped v2.0
+        reader (which reads ``type`` / ``address`` / ``value`` / ``bytes``
+        by ``.get`` and ignores every extra key, P-19) applies the entry
+        byte-identically while the resolved address stays on the wire.
 
     Args:
         entry (ChangeEntry): The entry to encode.
@@ -1259,26 +1456,36 @@ def _encode_entry(entry: ChangeEntry) -> dict[str, object]:
         ``address`` as the canonical ``"0x..."`` uppercase-hex string; a
         string entry's ``value`` as its raw declaration (a code-point tuple
         becomes a JSON array); a bytes entry's ``bytes`` as uppercase
-        space-separated two-hex-digit tokens.
+        space-separated two-hex-digit tokens; plus ``"symbol"`` when
+        ``entry.symbol`` is set (never replacing the address field).
 
     Data Flow:
         - Branch on ``entry_type``; bytes entries re-derive the token string
           from ``encoded_bytes`` (the normalization point of the C-1 grammar
           split — any permissive TUI-input spelling leaves here canonical).
+        - Emit ``symbol`` last, only when set — an address-only entry's wire
+          form is byte-identical to the pre-change-5 canonical form.
 
     Dependencies:
         Used by:
             - serialize_change_document
     """
     address_text = f"0x{entry.address:X}"
+    wire_symbol: dict[str, object] = (
+        {"symbol": entry.symbol} if entry.symbol is not None else {}
+    )
     if entry.entry_type == "string":
         raw = entry.value
         value: object = list(raw) if isinstance(raw, tuple) else raw
-        return {"type": "string", "address": address_text, "value": value}
+        return {
+            "type": "string", "address": address_text, "value": value,
+            **wire_symbol,
+        }
     return {
         "type": "bytes",
         "address": address_text,
         "bytes": " ".join(f"{b:02X}" for b in entry.encoded_bytes),
+        **wire_symbol,
     }
 
 

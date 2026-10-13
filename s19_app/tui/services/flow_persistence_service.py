@@ -107,6 +107,12 @@ _KIND_SPEC: Dict[str, Tuple[Optional[str], Dict[str, Set[str]]]] = {
 #: ``save_patched_image``); ``report`` has neither.
 _READ_REF_FIELDS = {"image_ref", "change_doc_ref", "check_doc_ref", "config_ref"}
 
+#: Change-5 (batch-95 LLR-142.1): block kinds that may carry the OPTIONAL
+#: ``a2l_ref`` — an A2L reference in the same project-relative ref grammar,
+#: containment-checked at load through the SAME reused guard (V6) when
+#: present; absent is the default and round-trips as ``None``.
+_A2L_REF_KINDS = frozenset({BLOCK_SOURCE, BLOCK_PATCH})
+
 #: The complete set of codes the loader can emit as a REJECTION — the "input set
 #: is an oracle" completeness vocabulary (C-31, AMD-6). The security-battery
 #: census asserts every code here is exercised by ≥1 hostile case, so a new
@@ -211,15 +217,22 @@ def flow_to_dict(flow: Flow) -> dict:
     blocks: List[dict] = []
     for block in flow.blocks:
         if isinstance(block, SourceBlock):
-            blocks.append(
-                {
-                    "kind": block.kind,
-                    "image_ref": block.image_ref,
-                    "file_type": block.file_type,
-                }
-            )
+            source: Dict[str, Any] = {
+                "kind": block.kind,
+                "image_ref": block.image_ref,
+                "file_type": block.file_type,
+            }
+            if block.a2l_ref is not None:
+                source["a2l_ref"] = block.a2l_ref
+            blocks.append(source)
         elif isinstance(block, PatchBlock):
-            blocks.append({"kind": block.kind, "change_doc_ref": block.change_doc_ref})
+            patch: Dict[str, Any] = {
+                "kind": block.kind,
+                "change_doc_ref": block.change_doc_ref,
+            }
+            if block.a2l_ref is not None:
+                patch["a2l_ref"] = block.a2l_ref
+            blocks.append(patch)
         elif isinstance(block, WriteOutBlock):
             blocks.append(
                 {"kind": block.kind, "output_name": block.output_name, "fmt": block.fmt}
@@ -363,6 +376,8 @@ def dict_to_flow(
         allowed_keys = {"kind", *enum_fields}
         if ref_field is not None:
             allowed_keys.add(ref_field)
+        if kind in _A2L_REF_KINDS:
+            allowed_keys.add("a2l_ref")
         unknown = set(entry) - allowed_keys
         if unknown:
             findings.append(
@@ -418,6 +433,36 @@ def dict_to_flow(
             resolved = _resolve_manifest_entry(project_root, ref, f"{label}.{ref_field}", findings)
             if resolved is None:
                 continue  # the guard appended its finding — block rejected
+        # V6b — change-5 (LLR-142.1): the OPTIONAL a2l_ref rides the SAME
+        # grammar and guard as every other READ ref (present-only; absent
+        # round-trips as None).
+        a2l_ref: Optional[str] = None
+        if kind in _A2L_REF_KINDS and entry.get("a2l_ref") is not None:
+            a2l_ref = entry.get("a2l_ref")
+            if not isinstance(a2l_ref, str) or not a2l_ref.strip():
+                findings.append(
+                    _finding(
+                        FLOW_BAD_FIELD,
+                        f"{label} ({kind}) field 'a2l_ref' is not a non-empty "
+                        "string",
+                    )
+                )
+                continue
+            if _is_drive_relative(a2l_ref):
+                findings.append(
+                    _finding(
+                        FLOW_UNSAFE_REF,
+                        f"{label} ({kind}) a2l_ref {a2l_ref!r} is a Windows "
+                        "drive-relative path - refs resolve against the project "
+                        "directory only",
+                    )
+                )
+                continue
+            resolved_a2l = _resolve_manifest_entry(
+                project_root, a2l_ref, f"{label}.a2l_ref", findings
+            )
+            if resolved_a2l is None:
+                continue  # the guard appended its finding — block rejected
         # V7 — WRITE-target shape pre-check (runtime authority stays save_patched_image).
         # The drive-relative arm mirrors V6: ``C:foo`` has a drive but is not
         # absolute, so ``is_absolute()`` alone would let it through — reject it
@@ -442,9 +487,9 @@ def dict_to_flow(
 
         # Construct the frozen block (defaults fill optional enums).
         if kind == BLOCK_SOURCE:
-            blocks.append(SourceBlock(image_ref=ref, file_type=entry.get("file_type", WRITE_FMT_S19)))
+            blocks.append(SourceBlock(image_ref=ref, file_type=entry.get("file_type", WRITE_FMT_S19), a2l_ref=a2l_ref))
         elif kind == BLOCK_PATCH:
-            blocks.append(PatchBlock(change_doc_ref=ref))
+            blocks.append(PatchBlock(change_doc_ref=ref, a2l_ref=a2l_ref))
         elif kind == BLOCK_WRITE_OUT:
             blocks.append(WriteOutBlock(output_name=ref, fmt=entry.get("fmt", WRITE_FMT_S19)))
         elif kind == BLOCK_CHECK:

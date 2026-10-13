@@ -42,9 +42,12 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from ...core import S19File
 from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
+from ..a2l import encode_physical_to_raw_bytes
 from ..a2l_parse import parse_a2l_file
 from ..changes import (
     CHG_COLLISION,
+    CHG_SYMBOL_UNRESOLVED,
+    CHG_SYMBOL_VALUE,
     ChangeDocument,
     ChangeEntry,
     ChangeSummary,
@@ -325,6 +328,249 @@ class ChangeEntryRow:
     check_glyph: str = GLYPH_NO_RESULT
     address: int = 0
     encoded_bytes: Tuple[int, ...] = ()
+
+
+@dataclass(slots=True)
+class SymbolPickResult:
+    """
+    Summary:
+        The outcome of one Patch Editor symbol-resolution attempt (batch-95
+        change-5, LLR-141.2) — the picker's BACKEND carrier: the resolution /
+        apply function the entry form composes. On success it carries the
+        resolved bytes-form :class:`ChangeEntry` (the A2L tag name stamped as
+        ``ChangeEntry.symbol``, the resolved address, the physical→raw
+        encoded byte run); on refusal it carries ONE ERROR naming the symbol
+        or the value limb, and ``entry`` stays ``None`` so the add never
+        lands (0 entries added).
+
+    Args:
+        entry (Optional[ChangeEntry]): The resolved entry on success;
+            ``None`` on refusal.
+        issues (list[ValidationIssue]): On refusal exactly one ERROR-severity
+            issue (``CHG-SYMBOL-UNRESOLVED`` / ``CHG-SYMBOL-VALUE``) whose
+            message names the symbol; on success the non-fatal encode flags
+            (value outside limits — the write PROCEEDS), possibly empty.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by :func:`resolve_symbol_entry`; consumed by
+          :meth:`ChangeService.add_symbol_entry` and by the Patch Editor
+          entry form (the UI surface composes this backend; it renders the
+          symbol column / picker list itself).
+
+    Dependencies:
+        Used by:
+            - ChangeService.add_symbol_entry
+    """
+
+    entry: Optional[ChangeEntry]
+    issues: List[ValidationIssue]
+
+    @property
+    def ok(self) -> bool:
+        """Summary: ``True`` when the resolution produced an entry."""
+        return self.entry is not None
+
+
+def _symbol_issue(code: str, message: str) -> ValidationIssue:
+    """Build one change-5 symbol finding — the ``changes`` artifact tag."""
+    return ValidationIssue(
+        code=code,
+        severity=ValidationSeverity.ERROR,
+        message=message,
+        artifact="changes",
+    )
+
+
+def list_a2l_symbol_names(a2l_data: Optional[dict]) -> List[str]:
+    """
+    Summary:
+        The sorted canonical tag names of the loaded A2L — the picker's list
+        source (batch-95 LLR-141.2, the shipped name-index idiom of
+        ``app.py::_build_a2l_name_index``).
+
+    Args:
+        a2l_data (Optional[dict]): The parsed A2L payload (``tags`` list), or
+            ``None`` / empty when no A2L is loaded.
+
+    Returns:
+        List[str]: The sorted tag names; empty when no A2L is loaded (the
+            UI limb: with no A2L the symbol input is absent — never a dead
+            control — so this list staying empty is the honest signal).
+    """
+    names = {
+        str(tag.get("name") or "").strip()
+        for tag in (a2l_data or {}).get("tags") or []
+        if isinstance(tag, dict) and str(tag.get("name") or "").strip()
+    }
+    return sorted(names)
+
+
+def resolve_symbol_entry(
+    symbol_text: str,
+    value_text: str,
+    a2l_data: Optional[dict],
+    *,
+    value_mode: str = "text",
+) -> SymbolPickResult:
+    """
+    Summary:
+        Resolve one Patch Editor symbol add (batch-95 change-5, LLR-141.2) —
+        the picker backend: the operator's symbol + physical-unit value in,
+        either a resolved bytes-form :class:`ChangeEntry` or a REFUSAL naming
+        the symbol / the value limb out. The physical→raw conversion is the
+        net-new encode of ``a2l.py::encode_physical_to_raw_bytes`` composed
+        on the shipped COMPU_METHOD side tables (P-17).
+
+    Args:
+        symbol_text (str): The operator-typed / picked A2L tag name.
+        value_text (str): The operator-typed value in PHYSICAL units —
+            parsed as one decimal number (``float`` grammar); the encode
+            refuses everything else named.
+        a2l_data (Optional[dict]): The loaded A2L payload whose tag map +
+            COMPU_METHOD / COMPU_TAB / RECORD_LAYOUT side tables resolve and
+            convert the value. ``None`` / empty refuses named (no A2L — the
+            UI limb keeps the symbol input absent in that state).
+        value_mode (str): The target document's value mode; ``"codes"``
+            refuses (a physical scalar has no meaning in a code-point
+            document — the codes-mode limb).
+
+    Returns:
+        SymbolPickResult: ``entry`` + the out-of-limits WARNING flags on
+            success; one ERROR issue naming the symbol / limb on refusal.
+
+    Data Flow:
+        - Blank / missing-A2L / unknown symbol / tag without address or
+          length → ``CHG-SYMBOL-UNRESOLVED`` naming the symbol.
+        - ``codes`` mode, non-numeric value, or an encode refusal
+          (unknown conversion, non-integral / out-of-range raw, length
+          drift, arrays, unsupported datatype) → ``CHG-SYMBOL-VALUE``
+          naming the symbol + the limb.
+        - Success → ``ChangeEntry("bytes", tag address, raw bytes,
+          symbol=canonical tag name)``; the out-of-limits limb FLAGs become
+          WARNING issues (proceed).
+
+    Dependencies:
+        Uses:
+            - encode_physical_to_raw_bytes (a2l.py — the encode direction)
+        Used by:
+            - ChangeService.add_symbol_entry
+    """
+    symbol = symbol_text.strip()
+    if not symbol:
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    "enter an A2L symbol to resolve - no symbol was given",
+                )
+            ],
+        )
+    if not a2l_data:
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    f"the symbol {symbol!r} cannot be resolved - no A2L is "
+                    "loaded",
+                )
+            ],
+        )
+    lowered = symbol.lower()
+    matches = [
+        tag
+        for tag in a2l_data.get("tags") or []
+        if isinstance(tag, dict)
+        and str(tag.get("name") or "").strip().lower() == lowered
+    ]
+    if not matches:
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    f"the symbol {symbol!r} is not declared in the loaded "
+                    "A2L",
+                )
+            ],
+        )
+    tag = matches[0]
+    canonical = str(tag.get("name") or "").strip()
+    if tag.get("address") is None or tag.get("length") is None:
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_UNRESOLVED,
+                    f"the symbol {canonical!r} resolves to a tag without an "
+                    "address or length",
+                )
+            ],
+        )
+    if value_mode == "codes":
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_VALUE,
+                    f"the symbol {canonical!r} cannot be added to a "
+                    "'codes'-mode document - symbol values are physical "
+                    "scalars, not code-point arrays",
+                )
+            ],
+        )
+    try:
+        physical = float(value_text.strip())
+    except (AttributeError, TypeError, ValueError):
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_VALUE,
+                    f"the value {value_text.strip()!r} for symbol "
+                    f"{canonical!r} is not a number - enter the value in "
+                    "physical units",
+                )
+            ],
+        )
+    raw_bytes, encode_error, flags = encode_physical_to_raw_bytes(
+        tag,
+        physical,
+        a2l_data.get("compu_methods_by_name"),
+        a2l_data.get("compu_tabs_by_name"),
+        a2l_data.get("record_layouts_by_name"),
+    )
+    if encode_error is not None or raw_bytes is None:
+        return SymbolPickResult(
+            entry=None,
+            issues=[
+                _symbol_issue(
+                    CHG_SYMBOL_VALUE,
+                    f"the value for symbol {canonical!r} was refused - "
+                    f"{encode_error}",
+                )
+            ],
+        )
+    issues = [
+        ValidationIssue(
+            code=CHG_SYMBOL_VALUE,
+            severity=ValidationSeverity.WARNING,
+            message=flag,
+            artifact="changes",
+        )
+        for flag in flags
+    ]
+    entry = ChangeEntry(
+        ENTRY_KIND_BYTES,
+        int(tag["address"]),
+        raw_bytes,
+        symbol=canonical,
+    )
+    return SymbolPickResult(entry=entry, issues=issues)
 
 
 @dataclass(slots=True)
@@ -837,6 +1083,84 @@ class ChangeService:
             f"an entry at address 0x{address:X} already exists - use Edit"
         )
 
+    def add_symbol_entry(
+        self,
+        symbol_text: str,
+        value_text: str,
+        a2l_data: Optional[dict],
+    ) -> ChangeActionResult:
+        """
+        Summary:
+            Append one change-5 symbol-referenced entry (batch-95 LLR-141.2)
+            — the Patch Editor picker's backend entry point: resolve the
+            symbol through the loaded A2L's tag map, interpret the value in
+            physical units via the physical→raw encode, and append the
+            bytes-form entry carrying the canonical tag name. An unknown
+            symbol or an unencodable value REFUSES the add — the status
+            message names the symbol — and 0 entries land.
+
+        Args:
+            symbol_text (str): The operator-typed / picked A2L tag name.
+            value_text (str): The value in physical units.
+            a2l_data (Optional[dict]): The loaded A2L payload (tag map +
+                COMPU_METHOD side tables); ``None`` refuses named.
+
+        Returns:
+            ChangeActionResult: ``ok`` is ``True`` only when the entry was
+                appended; ``issues`` carries the refusal (one ERROR) or the
+                out-of-limits WARNING flags; ``message`` names the symbol on
+                both paths.
+
+        Raises:
+            ValueError: When the resolved address is already taken (the
+                interactive-add duplicate rule, same as :meth:`add_entry`).
+
+        Data Flow:
+            - Delegate to :func:`resolve_symbol_entry` (the pure backend).
+            - On refusal: return the issues, append nothing.
+            - On success: refuse a duplicate address, then snapshot +
+              append (the LLR-068a.1 history discipline of :meth:`add_entry`).
+
+        Dependencies:
+            Uses:
+                - resolve_symbol_entry / _entry_index / _push_history
+            Used by:
+                - the Patch Editor entry form (the change-5 UI surface)
+        """
+        resolved = resolve_symbol_entry(
+            symbol_text, value_text, a2l_data,
+            value_mode=self.document.value_mode,
+        )
+        if not resolved.ok or resolved.entry is None:
+            message = (
+                resolved.issues[0].message
+                if resolved.issues
+                else f"the symbol {symbol_text.strip()!r} was refused"
+            )
+            return ChangeActionResult(
+                message=message, issues=resolved.issues, ok=False
+            )
+        entry = resolved.entry
+        try:
+            self._entry_index(entry.address)
+        except KeyError:
+            pass
+        else:
+            raise ValueError(
+                f"an entry at address 0x{entry.address:X} already exists - "
+                "use Edit"
+            )
+        self._push_history()
+        self.document.entries.append(entry)
+        return ChangeActionResult(
+            message=(
+                f"Added symbol {entry.symbol!r} -> 0x{entry.address:X} "
+                f"({len(entry.encoded_bytes)} bytes)"
+            ),
+            issues=resolved.issues,
+            ok=True,
+        )
+
     def edit_entry(
         self, address_text: str, value_text: str, bytes_text: str
     ) -> ChangeEntry:
@@ -1028,7 +1352,12 @@ class ChangeService:
     # Document lifecycle — load / validate / save (LLR-003.4)
     # ------------------------------------------------------------------
 
-    def load(self, path_text: str, base_dir: Path) -> ChangeActionResult:
+    def load(
+        self,
+        path_text: str,
+        base_dir: Path,
+        a2l_context: Optional[dict] = None,
+    ) -> ChangeActionResult:
         """
         Summary:
             Read a v2 change/check JSON file into the owned document,
@@ -1043,6 +1372,10 @@ class ChangeService:
                 ``workspace.resolve_input_path``.
             base_dir (Path): The directory a relative ``path_text`` resolves
                 against — normally the app working directory.
+            a2l_context (Optional[dict]): The declared A2L context for
+                change-5 symbol resolution (batch-95 LLR-141) — forwarded to
+                ``read_change_document``; ``None`` refuses every symbol
+                entry named (no implicit A2L).
 
         Returns:
             ChangeActionResult: ``ok`` is ``True`` when the document parsed
@@ -1062,7 +1395,9 @@ class ChangeService:
             Used by:
                 - app.py ``load_doc`` action routing
         """
-        document = read_change_document(path_text.strip(), base_dir)
+        document = read_change_document(
+            path_text.strip(), base_dir, a2l_context=a2l_context
+        )
         # US-068a / LLR-068a.1: snapshot the outgoing document before the
         # replace, so an undo can restore the pre-load change-set.
         self._push_history()
@@ -1083,7 +1418,9 @@ class ChangeService:
             ok=not document.has_errors,
         )
 
-    def load_text(self, text: str) -> ChangeActionResult:
+    def load_text(
+        self, text: str, a2l_context: Optional[dict] = None
+    ) -> ChangeActionResult:
         """
         Summary:
             Parse a pasted v2 change/check document (raw JSON text) into the
@@ -1098,6 +1435,10 @@ class ChangeService:
             text (str): The raw change-document text pasted into the Patch
                 Editor paste field — parsed through
                 ``changes.io.parse_change_document`` (collect-don't-abort).
+            a2l_context (Optional[dict]): The declared A2L context for
+                change-5 symbol resolution (batch-95 LLR-141) — forwarded to
+                the parser; ``None`` refuses every symbol entry named (no
+                implicit A2L).
 
         Returns:
             ChangeActionResult: ``ok`` is ``True`` when the document parsed
@@ -1117,7 +1458,7 @@ class ChangeService:
             Used by:
                 - app.py ``parse_paste`` action routing (LLR-014.2)
         """
-        document = parse_change_document(text)
+        document = parse_change_document(text, a2l_context=a2l_context)
         # US-068a / LLR-068a.1: snapshot the outgoing document before the
         # replace, so an undo can restore the pre-paste change-set.
         self._push_history()

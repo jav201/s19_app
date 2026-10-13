@@ -80,7 +80,10 @@ from tools.id_registry import (
 # batch-95 inc-002 (2026-10-13): 167 -> 168, measured — the change-1 increment
 # adds ``tests/test_project_gather.py`` (the HLR-138 save-gather + scoped-homes
 # TCs, TC-699..702).
-EXPECTED_SCANNED_TEST_FILES = 168
+# batch-95 inc-003a (2026-10-13): 168 -> 169, measured — the change-5 BACKEND
+# increment adds ``tests/test_changes_symbol_entries.py`` (the HLR-141/142
+# symbol-wire + picker-backend + flow-a2l-ref TCs, TC-712..715 + TC-718).
+EXPECTED_SCANNED_TEST_FILES = 169
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

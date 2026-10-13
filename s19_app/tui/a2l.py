@@ -1457,6 +1457,296 @@ def _apply_compu_method(raw_value: Any, method: Optional[dict], compu_tables_by_
     return raw_value, "unknown_method", f"unsupported conversion type {conversion_type}"
 
 
+#: The float datatypes the physical→raw encode packs directly (no integrality
+#: or integer-range limb). ``FLOAT16_IEEE`` is deliberately ABSENT — the
+#: shipped decode refuses it too (:func:`_decode_scalar` returns ``None``), so
+#: the encode cannot round-trip a direction the decode does not ship.
+_FLOAT_ENCODE_DATATYPES = frozenset({"FLOAT32_IEEE", "FLOAT64_IEEE"})
+
+
+def _invert_rat_func(physical: float, method: dict) -> tuple[Optional[float], str]:
+    """Invert one RAT_FUNC COMPU_METHOD (physical → raw), quadratic solve.
+
+    Solves ``physical = (a·x² + b·x + c) / (d·x² + e·x + f)`` for ``x`` —
+    i.e. the quadratic ``(a − p·d)x² + (b − p·e)x + (c − p·f) = 0``. Two real
+    roots choose by the smallest absolute value (the shipped decode's domain
+    is calibration monotonicity; the encode documents one deterministic
+    pick). Returns ``(raw, "")`` or ``(None, reason)``.
+    """
+    coeffs = method.get("coeffs") or []
+    padded = [
+        (coeffs[i] if i < len(coeffs) and coeffs[i] is not None else 0.0)
+        for i in range(6)
+    ]
+    a, b, c, d, e, f = padded
+    quad_a = a - physical * d
+    quad_b = b - physical * e
+    quad_c = c - physical * f
+    if math.isclose(quad_a, 0.0):
+        if math.isclose(quad_b, 0.0):
+            return None, "RAT_FUNC has no solution for this value"
+        return -quad_c / quad_b, ""
+    discriminant = quad_b * quad_b - 4.0 * quad_a * quad_c
+    if discriminant < 0.0:
+        return None, "RAT_FUNC has no real root for this value"
+    root = math.sqrt(discriminant)
+    first = (-quad_b + root) / (2.0 * quad_a)
+    second = (-quad_b - root) / (2.0 * quad_a)
+    if abs(second) < abs(first):
+        return second, ""
+    return first, ""
+
+
+def _reverse_table_lookup(
+    physical: float, table: dict, interpolate: bool
+) -> tuple[Optional[float], str]:
+    """Invert one COMPU_TAB (physical → raw): exact/nearest, or interpolated.
+
+    ``TAB_NOINTP`` mirrors the shipped decode's :func:`_table_lookup` fallback
+    (exact y match, else the x of the nearest y). ``TAB_INTP`` inverse-
+    interpolates between the bracketing y's and clamps outside the table's
+    y-range to the nearest endpoint's x (the decode clamps the same way).
+    Non-numeric y entries are skipped; a table with no numeric y refuses.
+    """
+    numeric: list[tuple[float, float]] = []
+    for raw_x, raw_y in table.get("entries") or []:
+        y = _to_float(raw_y)
+        if y is not None:
+            numeric.append((float(raw_x), y))
+    if not numeric:
+        return None, "lookup table has no numeric entries"
+    numeric.sort(key=lambda item: item[0])
+    if not interpolate:
+        for raw_x, y in numeric:
+            if math.isclose(y, physical, rel_tol=0.0, abs_tol=1e-9):
+                return raw_x, ""
+        nearest = min(numeric, key=lambda item: abs(item[1] - physical))
+        return nearest[0], ""
+    numeric.sort(key=lambda item: item[1])
+    if physical <= numeric[0][1]:
+        return numeric[0][0], ""
+    if physical >= numeric[-1][1]:
+        return numeric[-1][0], ""
+    for left, right in zip(numeric, numeric[1:]):
+        lx, ly = left
+        rx, ry = right
+        if ly <= physical <= ry:
+            if math.isclose(ry, ly):
+                return lx, ""
+            ratio = (physical - ly) / (ry - ly)
+            return lx + ratio * (rx - lx), ""
+    return None, "value outside interpolation range"
+
+
+def encode_physical_to_raw_bytes(
+    tag: dict,
+    physical_value: Any,
+    compu_methods_by_name: Optional[dict] = None,
+    compu_tabs_by_name: Optional[dict] = None,
+    record_layouts_by_name: Optional[dict] = None,
+) -> tuple[Optional[tuple[int, ...]], Optional[str], list[str]]:
+    """Encode one physical-unit value to raw wire bytes for an A2L tag.
+
+    Summary:
+        The physical→raw ENCODE direction of the change-5 symbol form
+        (batch-95 LLR-141.1, HLR-141) — net-new composition on the shipped
+        COMPU_METHOD side tables (the DECODE ships since batch-91 as
+        :func:`_apply_compu_method`; P-17). The operator authors a patch
+        value in physical units; this helper converts it to the raw byte run
+        the change-set entry carries, so the canonical writer emits
+        bytes-form + symbol and shipped v2.0 readers apply it byte-identically.
+
+    Args:
+        tag (dict): One row of the tag map (:func:`extract_a2l_tags` shape) —
+            needs ``datatype`` (or a resolvable record layout), ``length``,
+            ``effective_byte_order``, ``compu_method_name`` /
+            ``conversion``, and ``lower_limit`` / ``upper_limit``.
+        physical_value (Any): The value in physical units — a plain int or
+            float (what the picker hands over after parsing the operator's
+            text). Lists/tuples are the arrays limb (refused).
+        compu_methods_by_name (Optional[dict]): The parse payload's
+            COMPU_METHOD side table (``a2l.py``'s ``extract_compu_methods``
+            shape). ``None`` is the no-COMPU_METHOD limb (identity).
+        compu_tabs_by_name (Optional[dict]): The COMPU_TAB side table, the
+            encode input for ``TAB_NOINTP`` / ``TAB_INTP`` conversions.
+        record_layouts_by_name (Optional[dict]): The RECORD_LAYOUT side
+            table — the datatype fallback mirroring the shipped enrichment
+            (``tag["datatype"] or layout["decode_type"]``).
+
+    Returns:
+        tuple[Optional[tuple[int, ...]], Optional[str], list[str]]: ``(raw
+        bytes, None, flags)`` on success — the flags carry non-fatal limbs
+        (value outside limits: the write PROCEEDS, flagged). ``(None,
+        reason, [])`` on refusal — the reason names the limb. Limb table
+        (the settled design):
+          - no COMPU_METHOD / ``NO_COMPU_METHOD`` / method not in the side
+            tables → IDENTITY (raw = physical), mirroring the decode's
+            ``identity_fallback``;
+          - ``IDENTICAL`` → identity;
+          - ``LINEAR`` → raw = (physical − b) / a; ``a == 0`` refuses;
+          - ``RAT_FUNC`` → quadratic inversion
+            (:func:`_invert_rat_func`); no real root refuses;
+          - ``TAB_NOINTP`` / ``TAB_INTP`` → reverse table lookup
+            (:func:`_reverse_table_lookup`); missing/empty/non-numeric table
+            refuses;
+          - ``FORM`` / unknown conversion type on a DEFINED method →
+            REFUSE (``FORM`` is the decode's own unsupported limb);
+          - non-numeric value → REFUSE;
+          - non-finite or non-integral raw (integer datatypes) → REFUSE;
+          - raw outside the datatype's integer range → REFUSE;
+          - length drift (tag ``length`` ≠ datatype size) → REFUSE;
+          - arrays (``MATRIX_DIM`` > 1, a non-VALUE ``char_type``, or a
+            list/tuple value) → REFUSE;
+          - unsupported datatype (incl. ``FLOAT16_IEEE``) → REFUSE;
+          - value outside the tag's limits → FLAG, proceed.
+
+    Raises:
+        None: Every limb is a returned reason; the helper never raises on
+        untrusted tag/value content.
+
+    Dependencies:
+        Uses:
+            - _invert_rat_func / _reverse_table_lookup
+            - DATATYPE_SIZES / DATATYPE_STRUCT_CODES / _to_float
+        Used by:
+            - services.change_service.resolve_symbol_entry (the Patch
+              Editor picker's backend, LLR-141.2)
+    """
+    # --- the arrays limb -----------------------------------------------------
+    if isinstance(physical_value, (list, tuple)):
+        return None, "array values are not supported", []
+    char_type = str(tag.get("char_type") or "").upper()
+    if char_type and char_type != "VALUE":
+        return None, f"characteristic type {char_type!r} is not a scalar VALUE", []
+    matrix_dim = tag.get("matrix_dim")
+    if (
+        isinstance(matrix_dim, int)
+        and not isinstance(matrix_dim, bool)
+        and matrix_dim > 1
+    ):
+        return None, "matrix/array-typed tags are not supported", []
+
+    # --- the non-numeric limb ------------------------------------------------
+    if isinstance(physical_value, bool) or not isinstance(
+        physical_value, (int, float)
+    ):
+        return None, "the value is not numeric", []
+
+    # --- the datatype gate (mirrors the enrichment's decode_type resolution) -
+    layout_meta: Optional[dict] = None
+    layout_name = str(tag.get("record_layout_name") or tag.get("deposit") or "")
+    if layout_name and record_layouts_by_name:
+        layout_meta = _resolve_record_layout(layout_name, record_layouts_by_name)
+    datatype = str(
+        tag.get("datatype") or (layout_meta or {}).get("decode_type") or ""
+    ).upper()
+    if not datatype:
+        return None, "the tag declares no datatype", []
+    if datatype == "FLOAT16_IEEE":
+        return None, "datatype FLOAT16_IEEE is not supported", []
+    code = DATATYPE_STRUCT_CODES.get(datatype)
+    size = DATATYPE_SIZES.get(datatype)
+    if code is None or size is None:
+        return None, f"unsupported datatype {datatype!r}", []
+    element_count = (layout_meta or {}).get("element_count") or 1
+    if element_count > 1:
+        return None, "array-typed tags are not supported", []
+
+    # --- the COMPU_METHOD encode direction -----------------------------------
+    method_name = str(tag.get("compu_method_name") or tag.get("conversion") or "")
+    method: Optional[dict] = None
+    if method_name and method_name != "NO_COMPU_METHOD":
+        method = (compu_methods_by_name or {}).get(method_name)
+    physical = float(physical_value)
+    if method is None:
+        raw = physical  # the identity limb (no COMPU_METHOD)
+    else:
+        conversion_type = str(method.get("conversion_type") or "").upper()
+        if conversion_type == "IDENTICAL":
+            raw = physical
+        elif conversion_type == "LINEAR":
+            coeffs = method.get("coeffs_linear") or []
+            lin_a = coeffs[0] if len(coeffs) > 0 and coeffs[0] is not None else 1.0
+            lin_b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
+            if math.isclose(lin_a, 0.0):
+                return None, "LINEAR conversion coefficient a is zero", []
+            raw = (physical - lin_b) / lin_a
+        elif conversion_type == "RAT_FUNC":
+            raw, rat_error = _invert_rat_func(physical, method)
+            if raw is None:
+                return None, rat_error or "RAT_FUNC inversion failed", []
+        elif conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
+            table = (compu_tabs_by_name or {}).get(
+                str(method.get("compu_tab_ref") or "")
+            )
+            if table is None or not table.get("entries"):
+                return None, "lookup table missing or empty", []
+            raw, tab_error = _reverse_table_lookup(
+                physical, table, conversion_type == "TAB_INTP"
+            )
+            if raw is None:
+                return None, tab_error or "table inversion failed", []
+        else:
+            # FORM (the decode's own unsupported limb) and every unknown
+            # conversion type on a DEFINED method.
+            return None, (
+                f"conversion type {conversion_type!r} is not supported"
+            ), []
+
+    # --- the finite / integral / range limbs ---------------------------------
+    if not math.isfinite(raw):
+        return None, "the converted raw value is not finite", []
+    if datatype in _FLOAT_ENCODE_DATATYPES:
+        packed_value: Any = raw
+    else:
+        nearest = round(raw)
+        if not math.isclose(raw, nearest, rel_tol=0.0, abs_tol=1e-6):
+            return None, f"the converted raw value {raw} is not integral", []
+        bits = size * 8
+        signed = code.islower()
+        lo = -(1 << (bits - 1)) if signed else 0
+        hi = (1 << (bits - 1)) - 1 if signed else (1 << bits) - 1
+        if not lo <= nearest <= hi:
+            return None, (
+                f"the converted raw value {nearest} is outside the "
+                f"{datatype} range"
+            ), []
+        packed_value = nearest
+
+    # --- the length-drift limb ------------------------------------------------
+    tag_length = tag.get("length")
+    if (
+        isinstance(tag_length, int)
+        and not isinstance(tag_length, bool)
+        and tag_length != size
+    ):
+        return None, (
+            f"tag length {tag_length} drifts from the {datatype} size {size}"
+        ), []
+
+    # --- pack in the tag's byte order (mirrors _decode_scalar) ---------------
+    endian = str(tag.get("effective_byte_order") or "little")
+    prefix = ">" if endian == "big" else "<"
+    try:
+        packed = struct.pack(f"{prefix}{code}", packed_value)
+    except (struct.error, OverflowError) as exc:
+        return None, f"the raw value does not pack as {datatype}: {exc}", []
+    raw_bytes = tuple(packed)
+
+    # --- the out-of-limits limb: FLAG + proceed --------------------------------
+    flags: list[str] = []
+    lower_limit = _to_float(tag.get("lower_limit"))
+    upper_limit = _to_float(tag.get("upper_limit"))
+    if (lower_limit is not None and physical < lower_limit) or (
+        upper_limit is not None and physical > upper_limit
+    ):
+        flags.append(
+            f"the value {physical} is outside the tag's declared limits "
+            f"[{lower_limit}, {upper_limit}] - the write proceeds"
+        )
+    return raw_bytes, None, flags
+
+
 def extract_a2l_tags(
     sections: list[dict],
     record_layouts_by_name: Optional[dict[str, dict]] = None,

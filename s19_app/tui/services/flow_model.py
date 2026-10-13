@@ -103,10 +103,17 @@ class SourceBlock:
             the project directory through the manifest containment guard
             before opening (never an absolute/escaping path).
         file_type (str): ``"s19"`` (default) or ``"hex"``.
+        a2l_ref (Optional[str]): Change-5 (batch-95 LLR-142) — an optional
+            PROJECT-RELATIVE A2L filename, resolved through the SAME
+            containment guard; the run loads its tag map as the flow's
+            symbol-resolution context BEFORE any PATCH applies. ``None``
+            (the default) declares no reference — symbol entries are then
+            refused at load (no implicit A2L).
     """
 
     image_ref: str
     file_type: str = WRITE_FMT_S19
+    a2l_ref: Optional[str] = None
     kind: str = BLOCK_SOURCE
 
 
@@ -118,9 +125,15 @@ class PatchBlock:
         change_doc_ref (str): A PROJECT-RELATIVE change-document filename,
             resolved against the project directory through the containment
             guard, then read via the hardened ``read_change_document`` seam.
+        a2l_ref (Optional[str]): Change-5 (batch-95 LLR-142) — an optional
+            per-patch A2L reference overriding the SOURCE block's for THIS
+            change-set only, same grammar and guard; ``None`` (the default)
+            inherits the SOURCE block's declared reference (or refuses
+            symbol entries when none is declared anywhere).
     """
 
     change_doc_ref: str
+    a2l_ref: Optional[str] = None
     kind: str = BLOCK_PATCH
 
 
@@ -236,6 +249,11 @@ class FlowContext:
         mac_records (Optional[Sequence[dict]]): Parsed project MAC records
             (shared linkage source), or ``None``.
         a2l_data (Optional[dict]): Parsed project A2L payload, or ``None``.
+            Change-5 note (batch-95 LLR-142): this is the PROJECT's loaded
+            A2L — the enrichment/linkage source. Symbol-entry RESOLUTION
+            never rides it implicitly; a run resolves symbols only against
+            the A2L a block DECLARES via ``a2l_ref`` (a declared reference
+            becomes the run-effective tag map for the run's duration).
         variant (Optional[VariantDescriptor]): The image this run is bound to
             (batch-70 FB-P2, LLR-104.1). ``None`` — the default — is today's
             unscoped single-image run, in which the SOURCE block's own
