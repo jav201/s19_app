@@ -120,6 +120,7 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 ## Gate notices and runtime absences
 
 - Record-seed gate (pre-P0, tool-proving run): exit 0 · `0 block · 374 notice · 48 n/a`. Expected notices on a just-seeded record: template placeholders (V31–V49 family), empty ledger/decisions (V27), PDR-station staging (V52), standing-authorization cell (V55 — holds PENDING until the operator answers this gate), historical census notices (V42/V53 — pre-existing, declared).
+- P0 gate run (post-intake): first full run went **exit 1 · 4 BLOCK** — all V20, the derived atlases committed at seed time went stale under the intake commit's new corpus (design seeds, evidence). Repaired by `--atlas --write` + commit (`derived atlases regenerated at the P0 gate`); re-run exit 0 · `0 block · 374 notice · 50 n/a`. Standing notices read at this gate: V52 (design proposal is the untouched template — owed at PDR), V55 (grant pending this gate), V30/V15/V17 (bundle absences below), V27 (no gate decisions yet — this gate writes the first).
 - Runtime absences (this bundle runtime, recorded once per `SKILL.md` step 5): no named reviewer roles — reviewers are spawned as generic subagents carrying the role files from `agents/`, or self-executed and declared; no hooks/prompt-guard — the validator (`V7`) is the guard; `V15`/`V16`/`V17` not-run (no canon tree / checkout table / wired settings here — recorded with reason); `V30` half (bundle ships 5 Python files of the floor set). The `Independent review` cell of every packet will lead with the role + how it ran.
 - V25: n/a — this project HAS an origin remote and it answered (RC-2 above).
 
@@ -128,4 +129,5 @@ P0 gate. The record is seeded (full), RC-1/RC-2 verified against `1a0eff6`, lane
 | Suite / command | Last run | Result |
 |---|---|---|
 | gate: `devflow-validate.py --brief <wt>` (record seed) | 2026-10-13 | exit 0 · 0 block · 374 notice · 48 n/a |
+| gate: full + `--brief` post-intake (the P0 gate run) | 2026-10-13 | exit 0 · 0 block · 374 notice · 50 n/a · `V7`: bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared files) at `2026-10-12-rev102` |
 | suite baseline (inherited from batch-93 close, premise 3) | 2026-10-13 | 2 796 passed · 35 pre-existing fails (census `c25-failure-census.txt`); re-derived at P4 |
