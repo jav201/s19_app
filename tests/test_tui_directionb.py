@@ -130,6 +130,7 @@ from s19_app.tui.insight_style import human_bytes
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
+from s19_app.tui.screens_directionb import MemoryMapPanel
 
 
 # The 10 Direction B rail screen container ids, in rail order (keys 1-9 then 0).
@@ -3773,16 +3774,25 @@ def test_tc041_9_empty_state_stats_neutral_no_exception(tmp_path: Path) -> None:
 
 
 def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
-    """The map reflow follows the width-narrow class at 119 vs 120
-    (TC-041.10 / LLR-041.10).
+    """The map reflow reuses ``width-narrow`` — panel-keyed at the measured
+    stack threshold since batch-93 inc-002 (TC-041.10 / LLR-041.10 as amended
+    by HLR-131).
 
     Intent: the two-regime reflow reuses the EXISTING ``width-narrow`` class
-    (no new breakpoint). At width >= 120 the class is absent (wide: detail
-    beside grid); at < 120 it is present (narrow: detail stacked below). Assert
-    the class per regime AND that both `#map_grid` and `#map_detail` are present
-    in both regimes with a positive-width, non-clipping layout.
+    (no new breakpoint), keyed on the PANEL's measured width at
+    ``_MAP_STACK_MIN_WIDTH`` — the workspace-level toggle keeps its
+    120-column TERMINAL breakpoint for the other screens, but the map's own
+    class carries the panel-keyed law: at panel >= 86 the panes render
+    side-by-side, below 86 stacked. Assert the class per regime AND that both
+    `#map_grid` and `#map_detail` are present in both regimes with a
+    positive-width, non-clipping layout — including the trap limb: terminal
+    100 (workspace narrow) hands the panel 88 columns (>= 86), so the map
+    must stay SIDE-BY-SIDE while the workspace class says narrow.
     """
-    from s19_app.tui.screens_directionb import MemoryMapPanel
+    from s19_app.tui.screens_directionb import (
+        MemoryMapPanel,
+        _MAP_STACK_MIN_WIDTH,
+    )
 
     async def _regime(width: int) -> dict[str, object]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -3796,8 +3806,20 @@ def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
             grid = app.query_one("#map_grid")
             detail = app.query_one("#map_detail")
             panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            # The panel's own `width-narrow` toggle rides its Resize message,
+            # which lands one frame after the screen shows — settle the class
+            # before reading the geometry (bounded, like the selection polls).
+            for _ in range(10):
+                if panel.has_class("width-narrow") == (
+                    panel.size.width < _MAP_STACK_MIN_WIDTH
+                ):
+                    break
+                await pilot.pause()
+            for _ in range(2):
+                await pilot.pause()
             return {
                 "narrow": body.has_class("width-narrow"),
+                "panel_narrow": panel.has_class("width-narrow"),
                 "grid_w": grid.size.width,
                 "detail_w": detail.size.width,
                 "grid_x": grid.region.x,
@@ -3808,7 +3830,10 @@ def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
             }
 
     wide = asyncio.run(_regime(120))
-    narrow_100 = asyncio.run(_regime(100))
+    # Terminal 100: the WORKSPACE is narrow (class set at the 120-terminal
+    # breakpoint) but the PANEL measures 88 >= 86 — the map must NOT stack.
+    trap_100 = asyncio.run(_regime(100))
+    narrow_90 = asyncio.run(_regime(90))
     narrow_80 = asyncio.run(_regime(80))
 
     # Wide (>= 120): fixed regime, detail BESIDE the grid (same row, to its
@@ -3824,16 +3849,39 @@ def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
         f"wide regime: detail must be on the SAME row as the grid; got {wide!r}"
     )
 
-    # Narrow (< 120): proportional regime, detail STACKED BELOW the grid.
-    for narrow in (narrow_100, narrow_80):
+    # The trap limb (HLR-131's negative control): workspace narrow, panel wide
+    # — the map's regime reads the PANEL's width and stays side-by-side.
+    assert trap_100["narrow"] is True, (
+        f"the workspace class still toggles at the terminal breakpoint; {trap_100!r}"
+    )
+    assert trap_100["panel_w"] >= _MAP_STACK_MIN_WIDTH, (
+        f"precondition: terminal 100 must hand the panel a wide interior; {trap_100!r}"
+    )
+    assert trap_100["panel_narrow"] is False, (
+        f"the panel's own class must read its measured width; {trap_100!r}"
+    )
+    assert trap_100["detail_y"] == trap_100["grid_y"], (
+        f"panel-wide regime: detail must BESIDE the grid even under a narrow "
+        f"workspace; got {trap_100!r}"
+    )
+
+    # Narrow panel (< 86: terminals 90 -> panel 78, 80 -> panel 68): the
+    # cockpit stacks — detail BELOW the grid, full-width panes.
+    for narrow in (narrow_90, narrow_80):
         assert narrow["narrow"] is True, (
-            f"below 120 the proportional (narrow) regime is active; got {narrow!r}"
+            f"below 120 the workspace's proportional regime is active; got {narrow!r}"
+        )
+        assert narrow["panel_w"] < _MAP_STACK_MIN_WIDTH, (
+            f"precondition: the panel must measure below the stack threshold; {narrow!r}"
+        )
+        assert narrow["panel_narrow"] is True, (
+            f"the panel's own class must carry the stacked regime; {narrow!r}"
         )
         assert narrow["grid_w"] > 0 and narrow["detail_w"] > 0, (
-            f"both map panes must have positive width when narrow; got {narrow!r}"
+            f"both map panes must have positive width when stacked; got {narrow!r}"
         )
         assert narrow["detail_y"] > narrow["grid_y"], (
-            f"narrow regime: detail must stack BELOW the grid; got {narrow!r}"
+            f"stacked regime: detail must stack BELOW the grid; got {narrow!r}"
         )
 
 
@@ -4342,10 +4390,21 @@ async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object
     the row's own ``scroll_visible`` no longer brings it under the pointer.
     Scroll the OWNING viewport (``scroll_to_widget(..., top=True)``), the same
     disambiguation ``tests/test_map_click_chain.py`` applies.
-    """
-    from s19_app.tui.screens_directionb import RegionRow
 
-    target = next(r for r in app.query(RegionRow) if match(r))
+    **batch-93 inc-002:** the target binds from the panel's LIVE rows
+    (``_live_region_rows``), never ``app.query(RegionRow).first`` — a drive
+    that renders twice (e.g. an install path + an explicit update) leaves the
+    superseded render's rows registered during the prune window, and the
+    first panel-wide match can be a widget whose removal is already queued:
+    scrolling/clicking it races the gesture onto whatever the hit map still
+    shows (measured: ``test_b01`` navigating to range A instead of B ~1 in 3
+    runs under pytest). The hit-test poll below then guards the compositor
+    lag on the CORRECT row.
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+    target = next(r for r in panel._live_region_rows() if match(r))
     await _scroll_row_hit_testable(pilot, app, target)
     await pilot.click(target)
     await pilot.pause()
@@ -4402,11 +4461,20 @@ async def _double_click_region_row(
     viewport is gone (``#map_content`` is a plain host now). Scrolling the
     OWNING viewport to the widget (``top=True``) puts the row where the pointer
     hit-test agrees it is — asserted by :func:`_scroll_row_hit_testable`, which
-    also absorbs the nested container's extra compositor pass.
+    also absorbs the nested container's extra compositor pass. The target
+    binds from the panel's LIVE rows (``_live_region_rows``), never
+    ``app.query(RegionRow).first`` — a drive that renders twice leaves the
+    superseded render's rows registered during the prune window, and the
+    first panel-wide match can be a widget whose removal is already queued:
+    scrolling/clicking it races the gesture onto whatever the hit map still
+    shows (measured: ``test_b01`` navigating to range A instead of B ~1 in 3
+    runs under pytest; batch-93 inc-002, same re-aim as
+    :func:`_click_region_row`).
     """
-    from s19_app.tui.screens_directionb import RegionRow
+    from s19_app.tui.screens_directionb import MemoryMapPanel
 
-    target = next(r for r in app.query(RegionRow) if match(r))
+    panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+    target = next(r for r in panel._live_region_rows() if match(r))
     await _scroll_row_hit_testable(pilot, app, target)
     await pilot.double_click(target)
     await pilot.pause()
@@ -4765,6 +4833,18 @@ def test_b01_region_click_snaps_hex_to_far_range(tmp_path: Path) -> None:
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
+            # batch-93 inc-002: settle the deferred auto-selection — and the
+            # focus scroll it schedules — BEFORE the gesture. The scroll rides
+            # a ``call_later`` that can otherwise land between the hit-test
+            # poll and the click, scrolling the target row back off the
+            # pointer (measured: ~1 in 3 runs navigated to range A instead).
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            for _ in range(2):
+                await pilot.pause()
             # (1) Real double-click on the far range-B region (start 0x00100000)
             # — batch-67 N4a made navigation the double-click gesture.
             await _double_click_region_row(

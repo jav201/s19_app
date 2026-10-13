@@ -809,13 +809,21 @@ DataTable > .datatable--odd-row {
 }
 
 /*
- * Two-regime reflow (LLR-041.10) — reuses the existing `width-narrow` class
- * toggled by `_apply_width_regime`/`on_resize`; NOT a new breakpoint.
- *   Wide (>= 120): `#map_body` is horizontal — the grid pane takes the `1fr`
- *   remainder beside a fixed 44-col `#map_detail` inspector (its ~40-col
- *   interior admits the 33-cell 8-byte peek row, HLR-128).
- *   Narrow (< 120): `#map_body` stacks vertically — grid pane 55% over the
- *   inspector 45%, both full width; no horizontal fixed-sibling contention.
+ * Two-regime reflow (LLR-041.10, re-anchored at batch-93 inc-002 per HLR-131) —
+ * reuses the EXISTING `width-narrow` class, NOT a new breakpoint; the rules are
+ * keyed on `#memory_map_panel.width-narrow`, which the PANEL toggles from its
+ * OWN measured width at `_MAP_STACK_MIN_WIDTH` (86 panel columns, re-measured:
+ * side-by-side row widget = panel - 51, the compact row = 35 cells, 51 + 35 =
+ * 86 — the smallest panel at which the compact row still fits its widget).
+ *   Side-by-side (panel >= 86): `#map_body` is horizontal — the grid pane takes
+ *   the `1fr` remainder beside a fixed 44-col `#map_detail` inspector (its
+ *   ~40-col interior admits the 33-cell 8-byte peek row, HLR-128).
+ *   Stacked (panel < 86): `#map_body` stacks vertically — both panes full
+ *   width; no horizontal fixed-sibling contention.
+ * The workspace-level `width-narrow` (toggled at the 120-column TERMINAL
+ * breakpoint for the other screens) no longer drives the map: the regime
+ * decision reads the PANEL's width, never the terminal's — a narrow rail can
+ * hand the map a wide panel and the map correctly stays side-by-side.
  */
 #map_body {
     width: 100%;
@@ -823,7 +831,7 @@ DataTable > .datatable--odd-row {
     layout: horizontal;
 }
 
-#workspace_body.width-narrow #map_body {
+#memory_map_panel.width-narrow #map_body {
     layout: vertical;
 }
 
@@ -837,7 +845,7 @@ DataTable > .datatable--odd-row {
     layout: vertical;
 }
 
-#workspace_body.width-narrow #map_grid {
+#memory_map_panel.width-narrow #map_grid {
     width: 100%;
     height: 55%;
 }
@@ -925,26 +933,27 @@ DataTable > .datatable--odd-row {
     overflow-y: auto;
 }
 
-/* batch-93 narrow regime (the 80x24 floor, LLR-041.10's stacking): the
- * cockpit cannot fit both panes above the always-visible stats strip, so
- * #map_body scrolls as ONE unit — the panes take their natural heights
- * (overview stack + inspector body) and the operator scrolls the body,
- * exactly the shipped pre-batch-93 floor's reachability, while the one-line
- * stats strip still paints without scrolling (HLR-129). A `1fr` child of a
- * height-auto pane collapses to 0 (the shipped Textual trap), so the region
- * list carries a 2-row min-height floor of its own. */
-#workspace_body.width-narrow #map_body {
+/* batch-93 narrow regime (panel < `_MAP_STACK_MIN_WIDTH`, HLR-131's stacking,
+ * class re-anchored to `#memory_map_panel` at inc-002): the cockpit cannot
+ * fit both panes above the always-visible stats strip, so #map_body scrolls
+ * as ONE unit — the panes take their natural heights (overview stack +
+ * inspector body) and the operator scrolls the body, exactly the shipped
+ * pre-batch-93 floor's reachability, while the one-line stats strip still
+ * paints without scrolling (HLR-129). A `1fr` child of a height-auto pane
+ * collapses to 0 (the shipped Textual trap), so the region list carries a
+ * 2-row min-height floor of its own. */
+#memory_map_panel.width-narrow #map_body {
     layout: vertical;
     overflow-y: auto;
 }
 
-#workspace_body.width-narrow #map_grid {
+#memory_map_panel.width-narrow #map_grid {
     width: 100%;
     height: auto;
     min-height: 7;
 }
 
-#workspace_body.width-narrow #map_detail {
+#memory_map_panel.width-narrow #map_detail {
     width: 100%;
     height: auto;
     margin-left: 0;

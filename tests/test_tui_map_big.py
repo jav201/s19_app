@@ -1407,15 +1407,35 @@ def _band_tokens(row):
 
 
 async def _settle_selection(pilot, panel, max_pauses: int = 10) -> bool:
-    """Pause until the deferred resolution has applied, or give up.
+    """Pause until the deferred resolution has applied AND focus rests on a
+    LIVE region row, or give up.
 
-    Returns True once ``_selected_cell_start`` is set, after ONE further pause
-    for ``focus()``'s own ``call_later``. Callers asserting an ABSENCE use a
-    fixed pause count instead — no condition can signal "nothing will happen".
+    batch-93 inc-002 (HLR-131): a render that ran BEFORE the panel's first
+    layout is re-apportioned when the measured width arrives — the microbar
+    gate can flip regimes, rebuilding the rows — and the selection + focus are
+    re-applied to the rebuilt rows at the END of that transition, a frame or
+    two after the FIRST selection application. Settling on the selection
+    address alone can therefore read focus mid-transition (a superseded row,
+    or none after its removal); the settle waits for the focused row to BE
+    one of the currently mounted rows. While the map screen is HIDDEN the
+    focus guard (LLR-116.5) withholds focus by design, so the settled
+    selection alone signals resolution there (AT-B77-12's case).
+
+    Callers asserting an ABSENCE use a fixed pause count instead — no
+    condition can signal "nothing will happen".
     """
     for _ in range(max_pauses):
         await pilot.pause()
-        if panel._selected_cell_start is not None:
+        if panel._selected_cell_start is None:
+            continue
+        if not panel._is_displayed():
+            # The map is not the painted screen: focus is deliberately
+            # withheld (LLR-116.5's display guard - AT-B77-12's case), so
+            # the settled SELECTION alone is the resolution signal here.
+            await pilot.pause()
+            return True
+        focused = panel.app.focused
+        if isinstance(focused, RegionRow) and focused in panel._live_region_rows():
             await pilot.pause()
             return True
     return False
@@ -2876,6 +2896,9 @@ from s19_app.tui.models import LoadedFile
 from s19_app.tui.screens_directionb import (
     _BAND_SHORT_LABELS,
     _INSPECTOR_LABEL_WIDTH,
+    _MAP_PANEL_TO_ROWS_INSET,
+    _MAP_PANEL_TO_ROWS_INSET_STACKED,
+    _MAP_STACK_MIN_WIDTH,
     _REGION_ROW_MICROBAR_MIN_WIDTH,
     _STATS_FULL_MIN_WIDTH,
 )
@@ -3489,3 +3512,355 @@ def test_at292_cockpit_acceptance_at_120x36(tmp_path: Path) -> None:
         for p in (_row_fields(t) for t in got["rows"])
     }
     assert len(got["rows"]) == 9 and len(offsets) == 1, got["rows"]
+
+
+# ---------------------------------------------------------------------------
+# batch-93 increment 002 — the responsive regimes (HLR-131 / LLR-131.1-.3),
+# riding on the wrap audit (HLR-130, tests/test_tui_map_wrap.py). The regime
+# decision reads the PANEL's measured width at the re-measured stack threshold
+# (_MAP_STACK_MIN_WIDTH = 86 panel columns — the row budget 51 inset + 35
+# compact row, executed not copied); the workspace-level width-narrow class
+# keeps its 120-column TERMINAL breakpoint for the other screens.
+# ---------------------------------------------------------------------------
+
+
+# TC-673 — the two regime layouts at the threshold boundary (LLR-131.1)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "terminal,expect_stacked",
+    [
+        (95, True),   # panel 83 — two below
+        (96, True),   # panel 84 — one below
+        (97, True),   # panel 85 — one below
+        (98, False),  # panel 86 — EXACTLY at the recorded threshold
+        (99, False),  # panel 87 — one above
+    ],
+    ids=["panel83", "panel84", "panel85", "panel86-exact", "panel87"],
+)
+def test_tc673_stack_regime_boundary_arms(tmp_path: Path, terminal, expect_stacked) -> None:
+    """LLR-131.1 boundary — below ``_MAP_STACK_MIN_WIDTH`` the inspector
+    stacks under the map pane; at or above it the panes render side-by-side;
+    the decision reads the PANEL's width (terminals 95-99 all carry the
+    workspace-level width-narrow class — the terminal-keyed trap stays
+    discriminated). At exactly the threshold the compact row fits its widget
+    exactly (35 cells in 35 columns) — the derivation the threshold records.
+    The workspace class is asserted SET at every arm (all < 120 terminals) so
+    a regime keyed on the terminal width would read NARROW at every arm —
+    the geometric assertion is what discriminates the panel-keyed law."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(terminal, 30)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            panel = _panel(app)
+            grid = app.query_one("#map_grid")
+            detail = app.query_one("#map_detail")
+            rows = _live_rows(app)
+            return {
+                "workspace_narrow": "width-narrow" in app.query_one(
+                    "#workspace_body"
+                ).classes,
+                "panel_narrow": panel.has_class("width-narrow"),
+                "panel_w": panel.size.width,
+                "stacked_geometry": detail.region.y > grid.region.y,
+                "side_by_side_geometry": (
+                    detail.region.y == grid.region.y
+                    and detail.region.x > grid.region.x
+                ),
+                "row_cells": [len(str(r.render())) for r in rows],
+                "row_widths": [r.region.width for r in rows],
+                "grid_content": grid.content_region.width,
+                "detail_content": detail.content_region.width,
+            }
+
+    got = asyncio.run(_drive())
+    assert got["workspace_narrow"], (
+        f"precondition: terminal {terminal} (<120) must set the workspace "
+        f"width-narrow class: {got}"
+    )
+    assert got["panel_w"] == terminal - 12, (
+        f"precondition: the panel measures terminal-12 in the narrow branch: {got}"
+    )
+    expected_stacked = got["panel_w"] < _MAP_STACK_MIN_WIDTH
+    assert expected_stacked is expect_stacked, (
+        f"terminal {terminal}: panel {got['panel_w']} vs threshold "
+        f"{_MAP_STACK_MIN_WIDTH}: {got}"
+    )
+    assert got["panel_narrow"] is expect_stacked, (
+        f"terminal {terminal}: the panel's own class must carry the regime: {got}"
+    )
+    if expect_stacked:
+        assert got["stacked_geometry"], (
+            f"terminal {terminal}: below the threshold the inspector must "
+            f"stack UNDER the map pane: {got}"
+        )
+    else:
+        assert got["side_by_side_geometry"], (
+            f"terminal {terminal}: at/above the threshold the panes must "
+            f"render side-by-side (this arm runs under a NARROW workspace — "
+            f"a terminal-keyed regime would have stacked): {got}"
+        )
+    # The no-wrap law at the boundary arms: every row fits its widget. The
+    # exactly-at arm is the threshold's own derivation — the 35-cell compact
+    # row must render (86 = 51 inset + 35 row); the widget measures 35 with
+    # the list's scrollbar, 37 without (the inset's 2-column slop is the
+    # scrollbar itself, inc-001's note) — both fit.
+    for cells, width in zip(got["row_cells"], got["row_widths"]):
+        assert cells <= width, (
+            f"terminal {terminal}: a {cells}-cell row in a {width}-column "
+            f"widget wraps — the threshold derivation is broken: {got}"
+        )
+    if got["panel_w"] == _MAP_STACK_MIN_WIDTH:
+        assert all(c == 35 for c in got["row_cells"]), (
+            f"exactly-at: the compact row (35 cells) must render: {got}"
+        )
+        assert all(35 <= w <= 37 for w in got["row_widths"]), (
+            f"exactly-at: the row widget must measure 35 (scrollbar) or 37 "
+            f"(no scrollbar) — 86 minus the 51 inset with its 2-col slop: {got}"
+        )
+    if got["panel_w"] == _MAP_STACK_MIN_WIDTH - 1:
+        # one below: stacked — the rows take the pane's full content width
+        # (the stacked inset 8 the GATE uses assumes the list's 2-column
+        # scrollbar; without it the widget is those 2 columns wider — the
+        # gate's limb is unchanged).
+        assert all(
+            got["grid_content"] - 2 <= w <= got["grid_content"]
+            for w in got["row_widths"]
+        ), (
+            f"one-below: the stacked rows must take the pane content width "
+            f"(scrollbar gutter aside): {got}"
+        )
+
+
+# TC-674 — re-apportionment on a live resize across both thresholds (LLR-131.2)
+# ---------------------------------------------------------------------------
+def test_tc674_reapportion_on_live_resize_across_thresholds(tmp_path: Path) -> None:
+    """LLR-131.2 — piloting 160x48 -> 120x36 -> 96x30 -> 160x48 crosses the
+    microbar threshold (79 -> 39 available) AND the stack threshold (panel 90
+    -> 84). After EVERY leg, every width-driven surface re-apportions against
+    the then-measured width: the bar takes the grid content width, the rows
+    carry the form the microbar gate admits at the settled width (a REBUILD,
+    not a stale build), the stats strip re-renders its width-adaptive form,
+    and the peek re-cuts against the inspector pane's measured height. 0
+    stale surfaces at every settle."""
+    loaded = _demo_loaded()
+
+    async def _facts(app, panel):
+        grid = app.query_one("#map_grid")
+        bar = app.query_one(".map-band-bar")
+        rows = _live_rows(app)
+        body = app.query_one("#map_detail_body").render().plain
+        lines = body.splitlines()
+        painted_peek = len(lines) - lines.index("Peek") - 1 if "Peek" in lines else 0
+        reserved = sum(1 for ln in lines if ln.startswith("  "))
+        stats_text = app.query_one("#map_stats_body").render().plain
+        width = panel.size.width
+        return {
+            "panel_w": width,
+            "stacked": panel._is_stacked_width(width),
+            "bar_w": bar.region.width,
+            "grid_content": grid.content_region.width,
+            "row_cells": [len(str(r.render())) for r in rows],
+            "row_widths": [r.region.width for r in rows],
+            "peek_painted": painted_peek,
+            "peek_cut": panel._inspector_peek_rows(reserved),
+            "stats_text": stats_text,
+            "full_form": "ranges (" in stats_text,
+        }
+
+    async def _settled_facts(app, panel, pilot):
+        # Post-pause fixed point, the _settled_bar_width discipline: two
+        # successive pause boundaries must agree on the row widget width
+        # before the leg is read.
+        previous = None
+        for _ in range(30):
+            await pilot.pause()
+            facts = await _facts(app, panel)
+            key = (tuple(facts["row_widths"]), facts["bar_w"], facts["peek_painted"])
+            if previous is not None and key == previous:
+                return facts
+            previous = key
+        raise AssertionError("the map never settled after a resize leg")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            panel = _panel(app)
+            legs = [await _settled_facts(app, panel, pilot)]
+            for size in [(120, 36), (96, 30), (160, 48)]:
+                await pilot.resize_terminal(*size)
+                legs.append(await _settled_facts(app, panel, pilot))
+            return legs
+
+    legs = asyncio.run(_drive())
+
+    # Leg 0 — 160x48, side-by-side: the full 40-cell row with the microbar.
+    assert legs[0]["panel_w"] == 130 and not legs[0]["stacked"], legs[0]
+    assert all(c == 40 for c in legs[0]["row_cells"]), legs[0]
+    # Leg 1 — 120x36: the microbar dropped (39 < 43) and the rows REBUILT to
+    # the compact 35-cell form; the bar re-apportioned to the narrower grid.
+    assert legs[1]["panel_w"] == 90 and not legs[1]["stacked"], legs[1]
+    assert all(c == 35 for c in legs[1]["row_cells"]), (
+        f"the rows must re-apportion to the compact form after the resize: {legs[1]}"
+    )
+    assert legs[1]["bar_w"] == legs[1]["grid_content"], (
+        f"the bar must take the grid content width (0 stale): {legs[1]}"
+    )
+    # Leg 2 — 96x30: panel 84 crossed BELOW the stack threshold — the panes
+    # stack and the regime-aware inset (8) hands the rows the full width.
+    assert legs[2]["panel_w"] == 84 and legs[2]["stacked"], legs[2]
+    assert all(
+        legs[2]["grid_content"] - 2 <= w <= legs[2]["grid_content"]
+        for w in legs[2]["row_widths"]
+    ), (
+        f"the stacked rows must take the pane content width (the inset "
+        f"{_MAP_PANEL_TO_ROWS_INSET_STACKED} governs the gate, not the "
+        f"painted width): {legs[2]}"
+    )
+    assert all(w >= _REGION_ROW_MICROBAR_MIN_WIDTH for w in legs[2]["row_widths"]), (
+        f"the stacked rows are wide enough for the microbar: {legs[2]}"
+    )
+    # Leg 3 — back to 160x48: every surface re-apportioned UP again.
+    assert legs[3]["panel_w"] == 130 and not legs[3]["stacked"], legs[3]
+    assert all(c == 40 for c in legs[3]["row_cells"]), (
+        f"the rows must re-apportion back to the full form: {legs[3]}"
+    )
+
+    for leg in legs:
+        # The re-apportionment law at every settle: the bar takes the grid
+        # content width, every row widget measures the pane content width
+        # (the list's 2-column scrollbar gutter aside), and the peek paints
+        # exactly the height cut admits (0 stale).
+        assert leg["bar_w"] == leg["grid_content"], leg
+        assert all(
+            leg["grid_content"] - 2 <= w <= leg["grid_content"]
+            for w in leg["row_widths"]
+        ), leg
+        for cells, width in zip(leg["row_cells"], leg["row_widths"]):
+            assert cells <= width, f"a row wraps after the resize: {leg}"
+        assert leg["peek_painted"] == leg["peek_cut"], (
+            f"the peek must re-cut against the measured pane height: {leg}"
+        )
+    # The width-adaptive stats strip re-renders across the 84-panel leg
+    # (panel 84 == the 84-cell full-form threshold: the full form paints).
+    assert legs[2]["full_form"] and "ranges (" in legs[2]["stats_text"], legs[2]
+
+
+# TC-675 — the width-0 first frame: bounded retry, no spin, convergence (LLR-131.3)
+# ---------------------------------------------------------------------------
+def test_tc675_width0_first_frame_bounded_retry_no_spin(tmp_path: Path) -> None:
+    """LLR-131.3 — a width of 0 (pre-layout) is a conforming input: the
+    re-apportionment pass must schedule exactly ONE bounded re-attempt and
+    ship no width-0-derived layout; the retry with the width still 0 re-arms
+    NOTHING (the frame-spin trap); once the real width lands every surface
+    converges against it; and the steady state performs no per-frame churn
+    (a frame-spin detector over the settle window)."""
+    from unittest.mock import PropertyMock, patch
+
+    from textual.geometry import Size
+
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            panel = _panel(app)
+            # Precondition: the settled panel is wide and side-by-side.
+            assert panel.size.width == 90 and not panel.has_class("width-narrow")
+
+            armed = []
+            real_call_after_refresh = panel.call_after_refresh
+
+            def spy_call_after_refresh(callback, *args, **kwargs):
+                armed.append(callback)
+                return real_call_after_refresh(callback, *args, **kwargs)
+
+            panel.call_after_refresh = spy_call_after_refresh
+            regime_calls = []
+            real_apply = panel._apply_stack_regime
+
+            def spy_apply(width):
+                regime_calls.append(width)
+                return real_apply(width)
+
+            panel._apply_stack_regime = spy_apply
+
+            with patch.object(
+                MemoryMapPanel, "size", new_callable=PropertyMock,
+                return_value=Size(0, 30),
+            ):
+                panel._reapportion_width_surfaces()  # width 0: ONE retry armed
+                first_arm_count = len(armed)
+                # The armed re-attempt with the width STILL 0: bounded — it
+                # must re-arm nothing.
+                panel._reapportion_width_surfaces(retry=True)
+                second_arm_count = len(armed)
+
+            panel.call_after_refresh = real_call_after_refresh
+            panel._apply_stack_regime = real_apply
+            regime_calls_after_mock = list(regime_calls)
+
+            # Frame-spin detector: across the settle window the regime toggle
+            # must not churn per frame, and every surface converges against
+            # the real measured width.
+            for _ in range(6):
+                await pilot.pause()
+            grid = app.query_one("#map_grid")
+            bar = app.query_one(".map-band-bar")
+            rows = _live_rows(app)
+            grid_content = grid.content_region.width
+            facts = {
+                "first_arm_count": first_arm_count,
+                "second_arm_count": second_arm_count,
+                "regime_calls_during_mock": regime_calls_after_mock,
+                "panel_w": panel.size.width,
+                "bar_w": bar.region.width,
+                "grid_content": grid_content,
+                "row_widths": [r.region.width for r in rows],
+                "selected": panel._selected_cell_start,
+            }
+            # Let the detector window close, then count regime churn across
+            # steady-state pauses.
+            regime_calls.clear()
+            for _ in range(6):
+                await pilot.pause()
+            facts["steady_state_regime_calls"] = len(regime_calls)
+            return facts
+
+    got = asyncio.run(_drive())
+    # Exactly ONE retry armed on the width-0 pass; the retry re-arms nothing.
+    assert got["first_arm_count"] == 1, (
+        f"the width-0 pass must arm exactly one bounded retry: {got}"
+    )
+    assert got["second_arm_count"] == 1, (
+        f"the bounded retry must re-arm nothing (frame-spin trap): {got}"
+    )
+    # No width-0-derived layout shipped: the regime toggle never ran while
+    # the mocked width was 0 (the class keeps its pre-mock state, and no
+    # surface was touched).
+    assert got["regime_calls_during_mock"] == [], (
+        f"no surface may re-apportion against width 0: {got}"
+    )
+    # Convergence after the real width returned.
+    assert got["panel_w"] == 90, got
+    assert got["bar_w"] == got["grid_content"], (
+        f"the bar must paint the grid content width (0 stale): {got}"
+    )
+    assert all(
+        got["grid_content"] - 2 <= w <= got["grid_content"]
+        for w in got["row_widths"]
+    ), (
+        f"every row widget must measure the pane content width (the list's "
+        f"scrollbar gutter aside — the side-by-side inset {_MAP_PANEL_TO_ROWS_INSET} "
+        f"governs the gate): {got}"
+    )
+    assert got["selected"] is not None, (
+        f"the selection must survive the episode: {got}"
+    )
+    # No per-frame churn in the steady state.
+    assert got["steady_state_regime_calls"] == 0, (
+        f"the regime toggle must not fire per frame once settled: {got}"
+    )

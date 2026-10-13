@@ -58,6 +58,7 @@ from typing import (
     Union,
 )
 
+from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 from textual import events
 from textual.app import ComposeResult
@@ -295,18 +296,56 @@ _STATS_FULL_MIN_WIDTH = 84
 _REGION_ROW_MICROBAR_MIN_WIDTH = 43
 
 #: The panel-width inset from the region row's available width, measured in
-#: the SIDE-BY-SIDE regime: at 120x36 the panel's content is 92 columns wide
-#: while the left pane's content (the row's available width) measures 41
-#: (92 - 41 = 51 — panel padding, the fixed 44-col inspector + 1-col gutter,
-#: and the pane's border + padding). The contract's two capture limbs are both
-#: side-by-side; the STACKED narrow regime (80x24, LLR-041.10) hands the left
-#: pane the full width, so this inset over-subtracts there and the floor rows
-#: render without the microbar — the regime-aware re-derivation is HLR-131's.
-#: A panel that has not been laid out yet reports width 0 (a conforming
-#: first-frame input, P-4); the fallback then renders the narrow form,
-#: matching the 120x36 capture's microbar-free rows.
+#: the SIDE-BY-SIDE regime: at 120x36 the panel measures 90 columns wide
+#: while the row widget's region measures 39 (90 - 39 = 51 — the fixed 44-col
+#: inspector + 1-col gutter, the pane's border + padding, and the region
+#: list's scrollbar; re-measured at batch-93 inc-002, C-29). The STACKED
+#: regime hands the left pane the full width: there the row widget measures
+#: panel - 8 (measured at 60x24, 80x24/30, 90x30, 94x40 — 2 columns of
+#: host chrome + 4 of pane chrome + the list's 2-column scrollbar, exactly 8
+#: at every stacked geometry), so the microbar gate picks its inset per
+#: regime (batch-93 inc-002, HLR-131 / LLR-131.1 — the regime-aware
+#: re-derivation the inc-001 constant note deferred here). A panel that has
+#: not been laid out yet reports width 0 (a conforming first-frame input,
+#: P-4); the fallback then renders the narrow form, matching the 120x36
+#: capture's microbar-free rows.
 _MAP_PANEL_TO_ROWS_INSET = 51
+_MAP_PANEL_TO_ROWS_INSET_STACKED = 8
 _MAP_PANEL_WIDE_FALLBACK = 92
+
+#: The map's stack threshold, in PANEL columns (batch-93 inc-002, HLR-131 /
+#: LLR-131.1 — RE-MEASURED here, C-29, superseding the contract's ~84
+#: estimate). The regime decision reads the PANEL's measured width, never the
+#: terminal's (the app still toggles the workspace-level `width-narrow` at
+#: the 120-column TERMINAL breakpoint for the other screens; the map's own
+#: class carries the panel-keyed law). Derivation, executed: side-by-side,
+#: the row widget's width is ``panel - _MAP_PANEL_TO_ROWS_INSET`` (39 at
+#: panel 90, measured); the compact row (the form the 43-column microbar
+#: gate admits below panel 94) measures 35 cells (inc-001's executed
+#: formatter pilot); the threshold is the smallest panel width at which the
+#: compact row still fits its widget — 51 + 35 = 86. At panel 86 the
+#: side-by-side row widget measures exactly 35 and the compact row fits
+#: exactly (verified by the wrap audit's boundary arm); at 85 it would wrap
+#: (35 cells in a 34-column widget), so 85 and below STACK (the stacked
+#: regime hands the rows the full width: widget 77 at panel 85, measured).
+#: Boundary limbs: exactly 86 -> side-by-side, 85 -> stacked.
+_MAP_STACK_MIN_WIDTH = 86
+
+#: The inspector body's fallback CONTENT width when the pane has not been
+#: laid out yet (a conforming width-0 first frame, P-4): the side-by-side
+#: interior (40 columns at a 44-col pane minus border/padding) — the
+#: binding interior across both regimes, so file-derived symbol names
+#: clipped against it never exceed any painted interior.
+_INSPECTOR_BODY_FALLBACK_WIDTH = 40
+
+#: Columns the inspector pane's vertical scrollbar consumes inside the
+#: body's content box when the body overflows (``overflow-y: auto`` —
+#: measured at 100x30/120x36: the 40-column interior paints a 38-column
+#: text budget). The symbol-name clip subtracts it UNCONDITIONALLY: the
+#: scrollbar appears exactly when a long name overflows the body, so a
+#: budget without it clips against a width the painted line can never
+#: claim (batch-93 inc-002, HLR-130 — the wrap audit's own finding).
+_INSPECTOR_SCROLLBAR_GUTTER = 2
 
 #: The inspector peek renders 8-byte rows of ``ADDR  hh×8`` (batch-93, HLR-128 /
 #: LLR-128.1): an 8-hex address, two spaces, eight 2-hex bytes — 33 cells, no
@@ -335,11 +374,12 @@ _MAP_GAP_HATCH = "╱"
 _OPEN_IN_HEX_GLYPH = "↵"  # ↵
 
 #: Default peek row count when the inspector pane cannot drive the cut:
-#: ``0`` before first layout (a conforming width-0 first frame, P-4) and in
-#: the NARROW stacked regime, where ``#map_detail`` is height-auto and grows
-#: with its content. The 100x30 capture frame shows 2 peek rows there; the
-#: height-derived cut takes over wherever the pane is height-constrained
-#: (the wide regime — LLR-126.3's monotone limb).
+#: ``0`` before first layout (a conforming width-0 first frame, P-4). The
+#: stacked regime (panel < ``_MAP_STACK_MIN_WIDTH``, batch-93 inc-002 HLR-131)
+#: makes ``#map_detail`` height-auto so its measured height drives the cut
+#: from its current content; the fallback covers only the pre-layout case.
+#: The height-derived cut takes over wherever the pane is height-constrained
+#: (the side-by-side regime — LLR-126.3's monotone limb).
 _PEEK_ROWS_FALLBACK = 2
 
 
@@ -1028,6 +1068,44 @@ def covering_range(
             if first_valid is None:
                 first_valid = (start, end, is_valid)
     return first_valid
+
+
+def _clip_to_cells(text: str, cap: int) -> str:
+    """Clip ``text`` to ``cap`` terminal COLUMNS, marking the loss with an ellipsis.
+
+    Summary:
+        The house clip seam (``S19TuiApp._clip_to``, app.py), reimplemented at
+        module scope because ``app.py`` imports this module (a circular import
+        would otherwise pull the whole app into the panel). Columns, not code
+        points: ``cell_len`` / ``set_cell_size`` come from ``rich`` (already a
+        hard dependency via Textual), and ``set_cell_size`` handles a cap
+        falling in the MIDDLE of a double-width character — the correct result
+        there is a pad space, not half a glyph. An over-long authored or
+        file-derived line is shortened AT A CELL BOUNDARY here so the painted
+        line never wraps mid-content (batch-93 inc-002, HLR-130 — the wrap
+        audit asserts the no-wrap law over every authored surface).
+
+    Args:
+        text (str): The line to clip (authored or file-derived).
+        cap (int): The maximum cell width the painted line may claim.
+
+    Returns:
+        str: ``text`` when it already fits; otherwise its first ``cap - 1``
+        columns plus an ellipsis.
+
+    Example:
+        >>> _clip_to_cells("abcdef", 4)
+        'abc…'
+        >>> _clip_to_cells("ab", 4)
+        'ab'
+    """
+    if cap <= 0:
+        return ""
+    if cell_len(text) <= cap:
+        return text
+    if cap == 1:
+        return "…"
+    return set_cell_size(text, cap - 1) + "…"
 
 
 def _tag_address(tag: Mapping[str, Any]) -> Optional[int]:
@@ -2203,8 +2281,11 @@ class MemoryMapPanel(Container):
         - With no ranges / no entropy the header shows the neutral empty note,
           no segments/rows are mounted, and the stats strip is blanked (LLR-041.9).
         - ``#map_grid`` and ``#map_detail`` sit in a ``#map_body`` sub-container
-          laid horizontally when wide and stacked under ``width-narrow`` — the
-          reflow rules live in ``styles.tcss`` (LLR-041.10).
+          laid horizontally at or above the panel-measured stack threshold
+          (``_MAP_STACK_MIN_WIDTH``) and stacked below it — the panel toggles
+          its own ``width-narrow`` class (HLR-131, batch-93 inc-002) and the
+          reflow rules live in ``styles.tcss`` (LLR-041.10's class, re-anchored
+          to the panel).
 
     Dependencies:
         Uses:
@@ -2226,7 +2307,17 @@ class MemoryMapPanel(Container):
     #: span or band-less image) — kept distinct from ``_EMPTY_TEXT`` so a loaded
     #: image is never mislabelled "No file loaded" (fix-memmap-entropy AC-3).
     _NO_ENTROPY_TEXT = "No entropy detail for this image."
-    _DETAIL_HINT = "Click a region to inspect it - double-click to open in hex."
+    #: The pre-selection inspector note, AUTHORED as two lines (batch-93
+    #: inc-002, HLR-130): at side-by-side the inspector interior measures 40
+    #: columns (38 once its scrollbar appears), so the retired one-line form
+    #: (59 cells) wrapped mid-content at every side-by-side geometry — the
+    #: wrap audit's first defect. Both authored lines measure <= 29 cells,
+    #: clearing the narrowest painted interior with margin. The newline is a
+    #: LINE BREAK, never content: the hint renders through ``Text`` directly,
+    #: NOT through ``safe_text`` (whose C0/C1 scrub would delete it — the
+    #: house rule: newlines join ``Text`` lines directly, as in
+    #: ``build_detail_text``).
+    _DETAIL_HINT = "Click a region to inspect it.\nDouble-click to open in hex."
     #: The selection marker class (batch-77, LLR-117.1). Carried in ADDITION to
     #: the row's ``band-*`` token, never in place of it: ``styles.tcss`` sets a
     #: background only, so the band's foreground colour survives selection
@@ -2299,6 +2390,30 @@ class MemoryMapPanel(Container):
         #: retry extends the hook's window by one frame; without the guard a
         #: late retry could re-apply the previous render's resolution).
         self._render_generation = 0
+        #: The merged runs of the last POPULATED render — the populated-path
+        #: sentinel for the resize-driven width re-apportionment (batch-93
+        #: inc-002, HLR-131 / LLR-131.2). ``None`` on the empty paths.
+        self._last_runs: Optional[List[Tuple[str, int, int]]] = None
+        #: The original inputs of the last populated render — carried so the
+        #: resize-driven width re-apportionment can re-run ``render_ranges``
+        #: itself (the single selection authority: generation-guarded hook,
+        #: bounded retry, selection carried across), instead of a second
+        #: remove/mount path with its own selection hook that could bind the
+        #: superseded rows (batch-93 inc-002, HLR-131 / LLR-131.2).
+        self._last_render_inputs: Optional[
+            Tuple[
+                List[Tuple[int, int]],
+                List[bool],
+                List[ValidationIssue],
+                List[Mapping[str, Any]],
+                List[EntropyWindow],
+            ]
+        ] = None
+        #: The microbar-gate decision the CURRENTLY mounted rows were built
+        #: with — the rebuild's change detector. Recorded by
+        #: ``_build_band_widgets`` (the single build path, render and rebuild
+        #: alike); ``None`` before the first populated render.
+        self._rows_show_microbar_last: Optional[bool] = None
 
     def compose(self) -> ComposeResult:
         """Compose the header, the inspector-cockpit body and the stats strip.
@@ -2313,8 +2428,11 @@ class MemoryMapPanel(Container):
             scrollable region list; the ``#map_detail`` ``.db-pane`` (lit title
             ``Inspector — 0x{selected:08X}``, subtitle ``↑↓ · ↵ hex``) carries
             the full-height aligned field block + 8-byte hex peek. The panes
-            render side by side wide and stacked under ``width-narrow`` (the
-            reflow lives in ``styles.tcss``, LLR-041.10). Finally the
+            render side by side at or above the panel-measured stack threshold
+            and stacked below it — the panel toggles its own ``width-narrow``
+            class at ``_MAP_STACK_MIN_WIDTH`` (batch-93 inc-002, HLR-131; the
+            reflow rules live in ``styles.tcss``, reusing the existing class
+            per LLR-041.10). Finally the
             full-width ``#map_stats`` coverage strip renders OUTSIDE any scroll
             region so the one-line stats always paint in the visible viewport
             (batch-93, HLR-129 — defect ④ of premise P-1).
@@ -2331,7 +2449,9 @@ class MemoryMapPanel(Container):
         yield Horizontal(
             Container(id="map_grid", classes="db-pane"),
             Container(
-                Static(safe_text(self._DETAIL_HINT), id="map_detail_body"),
+                # The hint's newline is a line break, not content — ``Text``
+                # joins it directly (``safe_text``'s C0 scrub would eat it).
+                Static(Text(self._DETAIL_HINT), id="map_detail_body"),
                 id="map_detail",
                 classes="db-pane",
             ),
@@ -2445,6 +2565,10 @@ class MemoryMapPanel(Container):
         span = span_end - span_start
         if not ranges or span <= 0 or not entropy_windows:
             self._ordered_ranges = []
+            # The empty paths mount nothing — a resize has nothing to rebuild.
+            self._last_runs = None
+            self._last_render_inputs = None
+            self._rows_show_microbar_last = None
             # The cockpit panes mount no content on the empty paths — clear any
             # chrome a previous render left on them (batch-93, HLR-125; the
             # no-file screen state itself is the EmptyStatePanel, LLR-002.3).
@@ -2477,6 +2601,18 @@ class MemoryMapPanel(Container):
 
         runs = _merge_band_runs(entropy_windows)
         self._run_bands = {start: band for band, _run_bytes, start in runs}
+        # Carried for the resize-driven width re-apportionment (HLR-131 /
+        # LLR-131.2): the runs are the populated-path sentinel; the original
+        # inputs let it re-run THIS method — the single selection authority —
+        # rather than a parallel mount path with a second selection hook.
+        self._last_runs = list(runs)
+        self._last_render_inputs = (
+            list(ranges),
+            list(range_validity),
+            list(issues),
+            list(a2l_tags),
+            list(entropy_windows),
+        )
         # The bar does not exist yet, so its width is measured from ``#map_grid``
         # (LLR-111.9): the CONTENT box (border + padding excluded — the batch-93
         # pane chrome), which is the width the bar takes in full. ``0`` before
@@ -2565,17 +2701,19 @@ class MemoryMapPanel(Container):
         return counts
 
     def on_resize(self, event: events.Resize) -> None:
-        """Re-apportion the band bar — and the width-adaptive stats — on resize.
+        """Re-apportion EVERY width-driven surface on resize (HLR-131).
 
-        The stats strip re-renders from the stored inputs so a live resize
-        across ``_STATS_FULL_MIN_WIDTH`` swaps the full/compact form
+        The stack regime (the panel's own ``width-narrow`` class at
+        ``_MAP_STACK_MIN_WIDTH``), the band bar, the region rows (when the
+        width-aware microbar gate flips), the peek (when the inspector
+        pane's height cut changes) and the width-adaptive stats all
+        re-derive against the then-measured width — the stats strip
+        re-renders from the stored inputs so a live resize across
+        ``_STATS_FULL_MIN_WIDTH`` swaps the full/compact form
         (batch-93, LLR-129.2); a same-width resize re-renders the identical
         line, which ``Static.update`` repaints without a layout change.
         """
-        self._resize_band_segments()
-        if self._stats_state is not None:
-            ranges, range_validity, issues = self._stats_state
-            self._render_stats(ranges, range_validity, issues, empty=False)
+        self._reapportion_width_surfaces()
 
     def on_band_bar_measured(self, event: BandBar.Measured) -> None:
         """Re-apportion when the BAR itself learns its width (LLR-111.1).
@@ -2584,10 +2722,167 @@ class MemoryMapPanel(Container):
         PANEL's own resizes and is blind to the one event that actually carries
         the information. :class:`BandBar` re-emits it as a bubbling message so
         the re-apportionment happens exactly when the width becomes knowable,
-        however many frames that takes.
+        however many frames that takes. The whole surface set re-apportions
+        here, not the bar alone (batch-93 inc-002, HLR-131 / LLR-131.2).
         """
         event.stop()
+        self._reapportion_width_surfaces()
+
+    def _reapportion_width_surfaces(self, retry: bool = False) -> None:
+        """One re-apportionment pass over every width-driven surface (HLR-131).
+
+        Summary:
+            The single funnel behind ``on_resize`` and
+            ``on_band_bar_measured`` (LLR-131.2): the stack-regime class,
+            the band bar, the region rows and the peek re-derive against
+            the panel's MEASURED width, and the stats strip re-renders from
+            its stored inputs. Every step is idempotent in the steady state
+            (writes happen only on an actual change), so a same-width event
+            repaints nothing.
+
+            **The width-0 first frame is a conforming input** (P-4): an
+            unlaid panel reports width 0 and nothing may ship a
+            width-0-derived layout. The pass then schedules exactly ONE
+            re-attempt on the next frame — the shipped bar's bounded-retry
+            discipline — and gives up; a callback that re-armed
+            unconditionally would spin every frame (LLR-131.3).
+
+        Args:
+            retry (bool): True only on the single self-scheduled re-attempt
+                made when the panel measured width 0. Bounds the reschedule
+                to ONE extra frame.
+        """
+        width = self.size.width
+        if width <= 0:
+            if not retry:
+                self.call_after_refresh(self._reapportion_width_surfaces, True)
+            return
+        self._apply_stack_regime(width)
         self._resize_band_segments()
+        self._rebuild_rows_for_width()
+        if self._selected_cell_start is None and self._rows_show_microbar_last is not None:
+            # Rows are mounted but the deferred auto-selection never landed —
+            # its single bounded retry can give up inside a multi-frame
+            # relayout (the width re-apportionment transition re-mounts the
+            # whole stack). The bar's Measured that scheduled THIS pass is
+            # the authoritative re-kick: one idempotent check per event, no
+            # self-rearming, and the stand-down once a selection (this pass's
+            # or an intervening click's) exists is structural.
+            self._apply_auto_selection(None, False, self._render_generation)
+        self._recut_peek_for_height()
+        if self._stats_state is not None:
+            ranges, range_validity, issues = self._stats_state
+            self._render_stats(ranges, range_validity, issues, empty=False)
+
+    def _apply_stack_regime(self, width: int) -> None:
+        """Toggle the panel's own ``width-narrow`` class (HLR-131 / LLR-131.1).
+
+        Summary:
+            The map's stack decision reads the PANEL's measured width —
+            ``width < _MAP_STACK_MIN_WIDTH`` stacks the inspector under the
+            map pane; at or above it the panes render side by side. The
+            class is the EXISTING ``width-narrow`` token and the reflow
+            rules are the shipped LLR-041.10 pair, re-anchored to the panel
+            (styles.tcss) — not a new breakpoint. The workspace-level
+            ``width-narrow`` toggle at the 120-column TERMINAL breakpoint
+            keeps serving the other screens; a narrow rail can therefore
+            hand the map a wide panel (terminal < 120, panel >= 86) and the
+            map correctly stays side-by-side — the shipped terminal-keyed
+            trap the contract's negative control names.
+        """
+        stacked = self._is_stacked_width(width)
+        if self.has_class("width-narrow") != stacked:
+            self.set_class(stacked, "width-narrow")
+
+    def _rebuild_rows_for_width(self) -> None:
+        """Re-render the map when the microbar gate flips (LLR-131.2).
+
+        Summary:
+            The rows' only width-driven field is the 4-cell size microbar
+            (LLR-127.3) — present or absent per ``_rows_show_microbar()`` —
+            but its presence changes every surviving field's offset, so a
+            gate flip across a resize (or across the stack threshold, where
+            the inset itself changes) must re-compose the rows. The flip
+            re-runs :meth:`render_ranges` itself — the SINGLE selection
+            authority: it re-arms the generation-guarded auto-selection hook
+            with the selection address carried across, so the deferred hook
+            can never bind the superseded rows (the prune-window trap a
+            second, parallel mount path would race). When the gate is
+            unchanged (the steady state) this re-renders nothing, so a
+            resize cannot reset the list's scroll.
+        """
+        if self._last_runs is None or self._rows_show_microbar_last is None:
+            # Empty render — nothing mounted to rebuild.
+            return
+        if self._rows_show_microbar() == self._rows_show_microbar_last:
+            return
+        if self._last_render_inputs is None:
+            return
+        ranges, range_validity, issues, a2l_tags, entropy_windows = (
+            self._last_render_inputs
+        )
+        # ``render_ranges`` re-derives the gate at the CURRENT measured width
+        # and records it as the mounted baseline; the fresh render generation
+        # supersedes any selection hook still queued from the pre-flip rows.
+        self.render_ranges(
+            ranges, range_validity, issues, a2l_tags, entropy_windows,
+            self._mem_map,
+        )
+
+    def _recut_peek_for_height(self) -> None:
+        """Re-apply the selection when the peek's height cut changes (LLR-131.2).
+
+        Summary:
+            The peek's row count is cut from the inspector pane's measured
+            height (LLR-126.3), so it changes whenever a resize (or a
+            stack-regime flip) changes that height. The cut re-derives by
+            re-running ``_select_region`` for the CURRENT selection — the
+            single owner of the inspector body — but ONLY when the computed
+            row count differs from what the body already carries: the
+            steady-state resize repaints nothing and never resets the
+            pane's scroll.
+        """
+        start = self._selected_cell_start
+        if start is None:
+            # The hint state owns the body — nothing to re-cut.
+            return
+        end = None
+        for row in self._live_region_rows():
+            if row.region_start == start:
+                end = row.region_end
+                break
+        if end is None:
+            # The selection's run is gone (a newer render owns the body).
+            return
+        reserved = len(symbols_in_window(self._a2l_tags, start, end))
+        want = self._inspector_peek_rows(reserved)
+        try:
+            body = self.query_one("#map_detail_body", Static)
+        except Exception:
+            return
+        lines = body.render().plain.splitlines()
+        try:
+            have = len(lines) - lines.index("Peek") - 1
+        except ValueError:
+            have = -1
+        if have != want:
+            self._select_region(start, end)
+
+    def _wrap_audit_mount_overlong(self, line: str) -> None:
+        """TEST-ONLY injection point for the wrap-audit counterfactual (LLR-130.2).
+
+        Summary:
+            Mount ONE deliberately over-long authored line into the map
+            pane so the wrap-audit harness (tests/test_tui_map_wrap.py) can
+            prove it goes RED exactly there — an audit that cannot fail
+            proves nothing (C-43). No production path calls this; it exists
+            solely as the harness's error-class injection seam.
+        """
+        try:
+            grid = self.query_one("#map_grid", Container)
+        except Exception:
+            return
+        grid.mount(Static(safe_text(line), classes="map-wrap-audit-probe"))
 
     def _resize_band_segments(self, retry: bool = False) -> None:
         """Re-apportion the mounted band segments against the MEASURED bar.
@@ -2758,12 +3053,20 @@ class MemoryMapPanel(Container):
                   ``_region_symbol_counts`` / ``_build_glance_chips`` /
                   ``_allocate_band_widths``
             Used by:
-                - ``render_ranges``
+                - ``render_ranges`` / ``_rebuild_rows_for_width`` (batch-93
+                  inc-002, HLR-131 — the single build path, render and
+                  resize rebuild alike)
         """
         largest_region = max(
             (run_bytes for _band, run_bytes, _start in runs), default=1
         ) or 1
         sym_counts = self._region_symbol_counts(runs)
+        # The microbar gate is width-driven (LLR-127.3) and identical for every
+        # row — decide ONCE here, record the decision as the mounted baseline
+        # (the resize rebuild's change detector, HLR-131 / LLR-131.2), and hand
+        # it to each row.
+        show_microbar = self._rows_show_microbar()
+        self._rows_show_microbar_last = show_microbar
 
         # ONE traversal decides where gaps go, and both the allocation bound and
         # the emission below consume that same list. Counting the gaps in a
@@ -2817,7 +3120,7 @@ class MemoryMapPanel(Container):
                     start,
                     largest_region,
                     sym_counts,
-                    self._rows_show_microbar(),
+                    show_microbar,
                 )
             )
 
@@ -2830,6 +3133,14 @@ class MemoryMapPanel(Container):
         # out yet), so the bar MUST report its own resize or the out-of-domain
         # floor is what ships. See :class:`BandBar`.
         band_bar = BandBar(*segments, classes="map-band-bar")
+        # The list is STAMPED with the render generation that built it
+        # (batch-93 inc-002): ``_apply_auto_selection`` resolves the list
+        # whose stamp matches its hook's generation, so the deferred selection
+        # can never bind the superseded list — with removal AND mount both
+        # deferred, exactly ONE registered list can still be the stale one
+        # (the count alone cannot tell them apart).
+        region_list = Vertical(*region_rows, classes="map-region-list")
+        region_list._map_build_generation = self._render_generation
         return [
             band_bar,
             # The ruler labels what the BAR DRAWS — run starts, not percentiles
@@ -2845,7 +3156,7 @@ class MemoryMapPanel(Container):
             # outer #map_content no longer scrolls, so the stats strip below
             # the cockpit always paints without scrolling (HLR-129).
             ScrollableContainer(
-                Vertical(*region_rows, classes="map-region-list"),
+                region_list,
                 classes="map-region-scroll",
             ),
         ]
@@ -2857,13 +3168,20 @@ class MemoryMapPanel(Container):
             Width-aware microbar gate (batch-93, HLR-127 / LLR-127.3): the
             full row measures 40 cells against the compact row's 35 (executed
             formatter, P3 pilot), and the microbar renders only when the row's
-            available width — the left pane's content width, derived from the
-            panel's own measured width via ``_MAP_PANEL_TO_ROWS_INSET`` — is at
-            least ``_REGION_ROW_MICROBAR_MIN_WIDTH`` (43, pilot-measured
-            against the charter captures: microbar ABSENT at 41 available
-            columns, PRESENT at 81). A panel that has not been laid out yet
-            reports width 0 (a conforming first-frame input, P-4); the wide
-            fallback then renders the full row.
+            available width — the row widget's own width, derived from the
+            panel's measured width via a REGIME-AWARE inset (batch-93 inc-002,
+            HLR-131) — is at least ``_REGION_ROW_MICROBAR_MIN_WIDTH`` (43,
+            pilot-measured against the charter captures: microbar ABSENT at 41
+            available columns, PRESENT at 81). The inset is
+            ``_MAP_PANEL_TO_ROWS_INSET`` (51) in the side-by-side regime and
+            ``_MAP_PANEL_TO_ROWS_INSET_STACKED`` (8) in the stacked regime —
+            the stacked pane hands the rows the full panel width, so the
+            side-by-side inset would over-subtract there and drop the microbar
+            at the 80x24 floor (the inc-001 constant note's recorded
+            limitation; the regime-aware re-derivation was always HLR-131's).
+            A panel that has not been laid out yet reports width 0 (a
+            conforming first-frame input, P-4); the wide fallback then renders
+            the narrow form, matching the 120x36 capture's microbar-free rows.
 
         Returns:
             bool: ``True`` to compose the 4-cell size microbar into each row.
@@ -2871,7 +3189,24 @@ class MemoryMapPanel(Container):
         width = self.size.width
         if width <= 0:
             width = _MAP_PANEL_WIDE_FALLBACK
-        return (width - _MAP_PANEL_TO_ROWS_INSET) >= _REGION_ROW_MICROBAR_MIN_WIDTH
+        inset = (
+            _MAP_PANEL_TO_ROWS_INSET_STACKED
+            if self._is_stacked_width(width)
+            else _MAP_PANEL_TO_ROWS_INSET
+        )
+        return (width - inset) >= _REGION_ROW_MICROBAR_MIN_WIDTH
+
+    @staticmethod
+    def _is_stacked_width(width: int) -> bool:
+        """The stack-regime predicate, shared by the gate and the class toggle.
+
+        Summary:
+            ``True`` below ``_MAP_STACK_MIN_WIDTH`` (batch-93 inc-002,
+            HLR-131) — the SAME predicate drives the ``width-narrow`` class
+            (``_apply_stack_regime``) and the microbar inset, so the rows'
+            form can never disagree with the layout regime.
+        """
+        return width < _MAP_STACK_MIN_WIDTH
 
     def _build_region_row(
         self,
@@ -3185,7 +3520,10 @@ class MemoryMapPanel(Container):
         except Exception:
             return
         self._selected_cell_start = None
-        body.update(safe_text(self._DETAIL_HINT))
+        # ``Text`` joins the hint's newline as a line break; ``safe_text``'s
+        # C0 scrub would delete it (the hint is a developer constant, never
+        # file-derived — the scrub has nothing to do here).
+        body.update(Text(self._DETAIL_HINT))
 
     def build_detail_text(
         self,
@@ -3422,7 +3760,11 @@ class MemoryMapPanel(Container):
             the short labels are display-only on the region rows, never here),
             ``Symbols`` (the count) — then one line per overlapping A2L symbol
             NAME (``safe_text``, so hostile file-derived names render literally,
-            C-17), the ``Peek`` header, and the 8-byte hex peek rows. Every
+            C-17), each CLIPPED to the pane's measured interior via the house
+            cell-boundary seam ``_clip_to_cells`` (batch-93 inc-002, HLR-130 —
+            a long file-derived name used to wrap mid-content and push the
+            peek off the pane; the clip keeps every painted line inside its
+            widget), the ``Peek`` header, and the 8-byte hex peek rows. Every
             value is developer-formatted or carried through the shipped
             markup-safe seams; no statistic or entropy fact is re-derived here
             (P-3 / LLR-041.7).
@@ -3439,7 +3781,8 @@ class MemoryMapPanel(Container):
         Dependencies:
             Uses:
                 - ``band_style`` / ``human_bytes`` / ``symbols_in_window`` /
-                  ``safe_text`` / ``_region_peek_text``
+                  ``safe_text`` / ``_clip_to_cells`` / ``_inspector_body_width``
+                  / ``_region_peek_text``
             Used by:
                 - ``_select_region``
         """
@@ -3465,15 +3808,50 @@ class MemoryMapPanel(Container):
             field("Band", "-")
         region_names = symbols_in_window(self._a2l_tags, start, end)
         field("Symbols", str(len(region_names)))
+        # The 2-space indent plus the clipped name must fit the pane's
+        # measured interior — the audit's no-wrap law is enforced HERE, at
+        # authorship, never by weakening the assertion (batch-93 inc-002,
+        # HLR-130).
+        name_cap = max(1, self._inspector_body_width() - 2)
         for name in region_names:
             # File-derived names go through ``safe_text`` — a hostile
-            # ``sensor[red]`` renders literally, never as markup (C-17).
+            # ``sensor[red]`` renders literally, never as markup (C-17) —
+            # AFTER the cell-boundary clip shortens the painted line.
             text.append("  ")
-            text.append(safe_text(name))
+            text.append(safe_text(_clip_to_cells(name, name_cap)))
             text.append("\n")
         text.append("Peek\n")
         text.append_text(self._region_peek_text(start, len(region_names)))
         return text
+
+    def _inspector_body_width(self) -> int:
+        """The inspector body's measured interior, for the symbol-name clip.
+
+        Summary:
+            The honest budget for the file-derived symbol-name lines
+            (batch-93 inc-002, HLR-130): ``#map_detail_body``'s own measured
+            content width, MINUS the vertical scrollbar's gutter
+            (:data:`_INSPECTOR_SCROLLBAR_GUTTER`) — the gutter is subtracted
+            unconditionally because the scrollbar appears exactly when a long
+            name overflows the body, so budgeting without it clips against a
+            width the painted line can never claim (the wrap audit's finding:
+            a 40-cell line in the 38-column budget the scrollbar leaves).
+            Before first layout (a conforming width-0 first frame, P-4) — or
+            on the headless unit path — the side-by-side interior
+            (:data:`_INSPECTOR_BODY_FALLBACK_WIDTH`, 40 columns) stands in:
+            it is the binding interior across both regimes, so a name clipped
+            against it never exceeds any painted interior.
+
+        Returns:
+            int: ``>= 1`` columns for one clipped name.
+        """
+        try:
+            width = self.query_one("#map_detail_body", Static).content_region.width
+        except Exception:
+            width = 0
+        if width <= 0:
+            width = _INSPECTOR_BODY_FALLBACK_WIDTH
+        return max(1, width - _INSPECTOR_SCROLLBAR_GUTTER)
 
     def _inspector_peek_rows(self, reserved: int) -> int:
         """The 8-byte peek row count the inspector pane height admits.
@@ -3579,10 +3957,20 @@ class MemoryMapPanel(Container):
             mounted by message, and the ``InvokeLater`` this hook runs on may
             fire before the mount messages are processed — measured
             intermittent (the batch-93 cockpit's nested ``ScrollableContainer``
-            changed the frame timing, ~1 in 4 renders at any geometry). When
-            no live rows resolve, ONE bounded retry is scheduled for the next
-            frame — the ``_resize_band_segments`` width-0 discipline — then
-            the hook gives up; it never spins and fabricates no selection.
+            changed the frame timing, ~1 in 4 renders at any geometry). The
+            window is detected STRUCTURALLY, not by row identity (batch-93
+            inc-002): every ``.map-region-list`` is stamped at build time with
+            the render generation that built it, and the hook resolves the
+            list whose stamp equals ITS generation — with
+            ``remove_children()`` and ``mount()`` both deferred, exactly ONE
+            registered list can still be the superseded one (its removal
+            queued, the successor's mount not yet landed), so a count alone
+            cannot tell the survivor from the stale list. Binding the stale
+            list selects and focuses rows that are about to vanish
+            (LLR-116.2) — Textual then re-homes the focus to ``None``. ONE
+            bounded retry is scheduled for the next frame — the
+            ``_resize_band_segments`` width-0 discipline — then the hook gives
+            up; it never spins and fabricates no selection.
 
             Two guards keep the deferred window safe (batch-93):
             ``generation`` ties the hook to the render that scheduled it — a
@@ -3611,12 +3999,12 @@ class MemoryMapPanel(Container):
             None
 
         Data Flow:
-            - Reads the mounted rows via ``_live_region_rows``; writes the
-              inspector, the marker class and the app focus.
+            - Reads the mounted rows via the ``.map-region-list`` census;
+              writes the inspector, the marker class and the app focus.
 
         Dependencies:
             Uses:
-                - ``_live_region_rows`` / ``_select_region``
+                - ``_select_region``
             Used by:
                 - ``render_ranges`` (via ``call_after_refresh``) and itself
                   (one bounded retry)
@@ -3625,12 +4013,36 @@ class MemoryMapPanel(Container):
             # A newer render superseded this hook — the new render's own hook
             # owns the resolution now.
             return
-        rows = self._live_region_rows()
+        generation_now = self._render_generation if generation is None else generation
+        # Resolve the render's OWN list structurally: every list is stamped at
+        # build time with the generation that built it, and with removal AND
+        # mount both deferred, exactly ONE registered list can still be the
+        # superseded one — a count alone cannot tell the survivor from the
+        # stale list (batch-93 inc-002, LLR-116.2). Anything else means this
+        # render's rows are not the sole registered survivors: fabricate no
+        # selection and hand the resolution ONE more frame (the first
+        # attempt), then give up and wait for the next real render.
+        region_lists = [
+            region_list
+            for region_list in self.query(".map-region-list")
+            if getattr(region_list, "_map_build_generation", None) == generation_now
+        ]
+        if len(region_lists) != 1:
+            if not retry:
+                self.call_after_refresh(
+                    self._apply_auto_selection, previous_start, True, generation
+                )
+            return
+        rows = [
+            child
+            for child in region_lists[0].children
+            if isinstance(child, RegionRow)
+        ]
         if not rows:
-            # No image, the render was superseded, or the deferred mount has
-            # not landed yet — fabricate no selection. When this is the first
-            # attempt, hand the resolution ONE more frame; afterwards give up
-            # and wait for the next real render.
+            # The list has mounted but its rows have not (their own mount
+            # messages are still in flight) — fabricate no selection. Hand
+            # the resolution ONE more frame on the first attempt, then give
+            # up and wait for the next real render.
             if not retry:
                 self.call_after_refresh(
                     self._apply_auto_selection, previous_start, True, generation
@@ -3653,8 +4065,22 @@ class MemoryMapPanel(Container):
         # on, so an unguarded focus would move the keyboard to an invisible row
         # on every load, on all nine screens. Focus is taken only when the map
         # is the screen actually being painted.
+        #
+        # The focus is taken SYNCHRONOUSLY through ``Screen.set_focus`` — the
+        # same public API ``Widget.focus()`` defers to — because the deferred
+        # ``call_later`` Callback can be silently dropped when this hook runs
+        # inside the width-re-apportionment transition (batch-93 inc-002,
+        # HLR-131): measured at the 80x24 floor, the deferred focus never
+        # landed and the keyboard stayed on the rail. The guard above is the
+        # precondition; the synchronous call makes the outcome observable in
+        # the same frame.
         if row.focusable and self._is_displayed():
-            row.focus()
+            try:
+                self.app.screen.set_focus(row)
+            except Exception:
+                # NoScreen and friends: the map is not the painted screen —
+                # the selection still applied; focus follows the next render.
+                pass
 
     def _is_displayed(self) -> bool:
         """True while no ancestor (or the panel itself) is ``display: none``."""
