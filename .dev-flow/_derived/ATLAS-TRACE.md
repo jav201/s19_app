@@ -1461,7 +1461,7 @@ registry: 1453 rows — BURNED 422 · LIVE 955 · RESERVED 53 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1562 unique id(s)
+## family US/HLR/LLR — 1564 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1882,6 +1882,7 @@ registry: 1453 rows — BURNED 422 · LIVE 955 · RESERVED 53 · RETIRED 23
 | `LLR-013.2` | batches, tests |
 | `LLR-013.3` | batches, canon, tests |
 | `LLR-013.x` | batches |
+| `LLR-014` | batches |
 | `LLR-014.1` | batches, canon, tests |
 | `LLR-014.2` | batches, tests |
 | `LLR-014.3` | batches, canon, tests |
@@ -1909,6 +1910,7 @@ registry: 1453 rows — BURNED 422 · LIVE 955 · RESERVED 53 · RETIRED 23
 | `LLR-019.2` | batches |
 | `LLR-020.1` | batches, canon, tests |
 | `LLR-020.2` | batches |
+| `LLR-021` | batches |
 | `LLR-021.1` | batches, canon |
 | `LLR-021.2` | batches |
 | `LLR-022.1` | batches, canon, tests |
@@ -3203,7 +3205,7 @@ registry: 1453 rows — BURNED 422 · LIVE 955 · RESERVED 53 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1630 unique id(s)
+## family AT/TC — 1631 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4199,6 +4201,7 @@ registry: 1453 rows — BURNED 422 · LIVE 955 · RESERVED 53 · RETIRED 23
 | `TC-088.5` | batches |
 | `TC-088.6` | batches |
 | `TC-088.7` | batches, tests |
+| `TC-09` | batches |
 | `TC-090` | batches, tests |
 | `TC-094` | batches, tests |
 | `TC-095` | batches |

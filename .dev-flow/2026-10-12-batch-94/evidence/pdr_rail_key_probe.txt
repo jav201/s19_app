@@ -1,0 +1,49 @@
+textual 8.2.8
+=== static census — occupied keys (S19TuiApp.BINDINGS, app.py:1334-1388)
+  occupied (38): 0 1 2 3 4 5 6 7 8 9 U b comma ctrl+d ctrl+k ctrl+l ctrl+s ctrl+y ctrl+z g j k l minus o p pagedown pageup period plus q question_mark r s slash t v x
+  [ok] equals_sign (chosen) not occupied
+  [ok] right_square_bracket (chosen) not occupied
+  [ok] f1 (rejected class) not occupied
+  [ok] f2 (rejected class) not occupied
+  [ok] exclamation_mark (rejected class) not occupied
+  [ok] at_sign (rejected class) not occupied
+  terminal-side canonicalization (textual.keys):
+    KEY_TO_UNICODE_NAME['equals_sign'] = 'EQUALS SIGN'
+    KEY_TO_UNICODE_NAME['right_square_bracket'] = 'RIGHT SQUARE BRACKET'
+    KEY_TO_UNICODE_NAME['f1'] = None
+=== run_test 120x30 — reachability
+  [ok] rail mounts 12 entries — order=['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+  [ok] order: check_editor after patch, flow_execution after flow
+  [ok] equals_sign resolves to show_screen('check_editor')
+  [ok] right_square_bracket resolves to show_screen('flow_execution')
+  [ok] ten digit bindings intact
+  [ok] key '6' mounts Patch Editor
+  [ok] '=' mounts #screen_check_editor
+  [ok] '=' hides the Patch Editor
+  [ok] rail marker follows '='
+  [ok] ']' mounts #screen_flow_execution
+  [ok] '=' screen hidden after ']'
+  [ok] rail marker follows ']'
+  [ok] key '0' still mounts CRC Designer (regression)
+=== run_test 80x24 — reachability
+  [ok] rail mounts 12 entries — order=['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+  [ok] order: check_editor after patch, flow_execution after flow
+  [ok] equals_sign resolves to show_screen('check_editor')
+  [ok] right_square_bracket resolves to show_screen('flow_execution')
+  [ok] ten digit bindings intact
+  [ok] key '6' mounts Patch Editor
+  [ok] '=' mounts #screen_check_editor
+  [ok] '=' hides the Patch Editor
+  [ok] rail marker follows '='
+  [ok] ']' mounts #screen_flow_execution
+  [ok] '=' screen hidden after ']'
+  [ok] rail marker follows ']'
+  [ok] key '0' still mounts CRC Designer (regression)
+=== chrome — footer stays uncrowded (C-13), help-panel source lists new apps
+  [ok] new bindings are show=False (footer renders show=True only)
+  [ok] no show=True binding names the new surfaces — show=True set: ['Density', 'Find', 'Go-to', 'Help', 'Hex+', 'Hex-', 'Legend', 'Load', 'Operations', 'Page+', 'Page-', 'Palette', 'Quit', 'Save']
+  [ok] help-panel source lists Check Editor binding
+  [ok] help-panel source lists Flow Execution binding
+  [ok] no Textual binding collision/conflict/duplicate warning — captured=[]
+
+PROBE: PASS — '=' / ']' scheme: no collision, reachable, discoverable
