@@ -48,7 +48,10 @@ written; an escape attempt is a per-artifact refusal finding
 
 Headless by contract (mirroring ``manifest_writer``): stdlib + sibling-service
 imports only, no ``textual`` symbol and no ``logging`` — the gather stays
-reusable and testable without a running app.
+reusable and testable without a running app. Change 2 (HLR-139, the
+open-folder chips) reuses the same ruling through :func:`scoped_home_target`
+(resolve-only) and :func:`scoped_home` (create-on-press) — one home-resolution
+seam for both changes.
 """
 from __future__ import annotations
 
@@ -549,3 +552,51 @@ def scoped_home(
     home = _check_home_contained(project_dir / subdir)
     home.mkdir(parents=True, exist_ok=True)
     return home
+
+
+def scoped_home_target(
+    project_dir: Optional[Path],
+    subdir: str,
+    common_home: Path,
+) -> Path:
+    """
+    Summary:
+        Resolve the change-1 scoped home's PATH without creating anything
+        (batch-95 change 2, HLR-139): the exact home :func:`scoped_home`
+        would return — with a project ``project_dir / subdir``, without one
+        the COMMON ``common_home`` — but observed, not made. The open-folder
+        chips need the missing-folder state to stay observable (a chip whose
+        target was resolved by calling :func:`scoped_home` could never dim:
+        the mkdir inside would have just created it), so the one-line
+        project-vs-COMMON ruling lives here, beside its creating twin, and
+        the chips ride it with no per-file guessing (LLR-139.1). The
+        create-on-press offer still calls :func:`scoped_home`, so the
+        containment law holds at every byte-writing seam.
+
+    Args:
+        project_dir (Optional[Path]): The active project's directory, or
+            ``None`` without a project.
+        subdir (str): The per-artifact project subfolder
+            (:data:`PROJECT_PATCHES_DIR` / :data:`PROJECT_CHECKS_DIR` /
+            :data:`PROJECT_TEMPLATES_DIR`).
+        common_home (Path): The COMMON home kept when no project is
+            active.
+
+    Returns:
+        Path: The resolved home path. Not created, not containment-checked
+            (the chip opens or offers to create it; creation re-runs
+            :func:`scoped_home`'s checks).
+
+    Data Flow:
+        - ``project_dir`` present → ``project_dir / subdir``; absent →
+          ``common_home`` verbatim. Pure path arithmetic — no IO.
+
+    Dependencies:
+        Uses:
+            - (path arithmetic only)
+        Used by:
+            - s19_app.tui.services.folder_open_service.resolve_chip_target
+    """
+    if project_dir is None:
+        return common_home
+    return project_dir / subdir

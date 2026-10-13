@@ -32,6 +32,7 @@ from .capped_text_area import CappedTextArea
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
+from .open_folder_chip import OpenFolderChip, titled_header
 from .os_clipboard_input import OsClipboardInput
 from .workspace import sanitize_project_name
 from .legend import (
@@ -1649,9 +1650,10 @@ class ReportViewerScreen(ModalScreen[None]):
         else:
             listing = Static(self.EMPTY_TEXT, id="report_empty_state", markup=False)
         yield Container(
-            Label(
+            titled_header(
                 f"Reports (project '{self.project_name}'):",
-                classes="modal-title",
+                OpenFolderChip("reports"),
+                title_classes="modal-title",
             ),
             listing,
             ScrollableContainer(

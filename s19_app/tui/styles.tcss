@@ -137,6 +137,41 @@ Screen {
     text-style: bold;
 }
 
+/* --- Open-folder chip (batch-95 change 2, HLR-139) ----------------------
+ * One ghost chip per window header row, seated header-right by
+ * ``titled_header`` (open_folder_chip.py): the compact 1-tall borderless
+ * chip shape of ``.patch-chip`` (LLR-076), in the one accent hue, on a
+ * transparent background. The missing-target state is an EXPLICIT
+ * ``-dimmed`` class (NOT ``disabled`` — the create-offer IS a press,
+ * LLR-139.2); the dim reuses textual's own disabled cue
+ * (``text-opacity: 0.6``, Button DEFAULT_CSS) so a dimmed chip and a
+ * disabled one read identically. The no-project Reports chip is the one
+ * genuinely ``disabled`` limb (its press is swallowed — the 0-open
+ * contract) and carries ``-dimmed`` so the state stays class-visible. */
+.db-screen-header {
+    width: 1fr;
+    height: auto;
+}
+
+.db-screen-header .db-screen-title,
+.db-screen-header .modal-title {
+    width: 1fr;
+}
+
+.open-folder-chip {
+    height: 1;
+    min-width: 8;
+    border: none;
+    text-style: bold;
+    background: transparent;
+    color: $accent-calm;
+    margin-bottom: 1;
+}
+
+.open-folder-chip.-dimmed {
+    text-opacity: 0.6;
+}
+
 /* LLR-002.3 empty-state panel — neutral no-file-loaded prompt. */
 #empty_state_panel {
     width: 100%;

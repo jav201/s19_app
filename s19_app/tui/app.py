@@ -143,6 +143,8 @@ from .services.project_gather_service import (
     gather_project_artifacts,
     scoped_home,
 )
+from .services import folder_open_service
+from .open_folder_chip import OpenFolderChip, titled_header
 from .services.validation_service import (
     build_mac_coverage_strip,
     build_validation_report,
@@ -2219,7 +2221,8 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_checks`` holding the ``Checks`` title label, a
+            Container: ``#screen_checks`` holding the ``Checks`` header row
+            (title + the ``📂 Open folder`` chip, HLR-139), a
             ``#checks_content`` container (the ``#checks_aggregate_strip``
             ``Static`` above a ``#checks_columns`` horizontal split whose left
             ``GroupedChecksPanel`` (``#checks_grouped``) sits beside the hex
@@ -2256,7 +2259,7 @@ class S19TuiApp(App):
             id="checks_content",
         )
         return Container(
-            Label("Checks", classes="db-screen-title"),
+            titled_header("Checks", OpenFolderChip("checks")),
             _checks_content,
             EmptyStatePanel(),
             id="screen_checks",
@@ -2354,7 +2357,8 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_crc_designer`` holding a title label and the
+            Container: ``#screen_crc_designer`` holding the header row
+            (title + the ``📂 Open folder`` chip, HLR-139) and the
             ``CrcDesignerPanel``. Hidden at startup.
 
         Data Flow:
@@ -2369,7 +2373,7 @@ class S19TuiApp(App):
                 - ``compose``
         """
         return Container(
-            Label("CRC Designer", classes="db-screen-title"),
+            titled_header("CRC Designer", OpenFolderChip("templates")),
             CrcDesignerPanel(),
             id="screen_crc_designer",
             classes="db-screen hidden",
@@ -2571,8 +2575,9 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_patch`` holding a title label and a
-            ``PatchEditorPanel``. Hidden at startup.
+            Container: ``#screen_patch`` holding the header row (title + the
+            ``📂 Open folder`` chip, HLR-139) and a ``PatchEditorPanel``.
+            Hidden at startup.
 
         Data Flow:
             - Composition only. The ``PatchEditorPanel`` is presentational —
@@ -2588,7 +2593,7 @@ class S19TuiApp(App):
                 - ``compose``
         """
         return Container(
-            Label("Patch Editor", classes="db-screen-title"),
+            titled_header("Patch Editor", OpenFolderChip("patch")),
             PatchEditorPanel(),
             id="screen_patch",
             classes="db-screen hidden",
@@ -5551,16 +5556,25 @@ class S19TuiApp(App):
         self.push_screen(LoadFileScreen(), self._handle_load_dialog)
 
     def action_open_workarea(self) -> None:
-        """Open the workarea directory in Explorer."""
-        try:
-            import subprocess
+        """Open the workarea directory in the platform's file manager.
 
-            subprocess.Popen(["explorer", str(self.workarea)])
-            self.set_status(f"Opened workarea: {self.workarea}")
+        Rides the one cross-platform open seam (LLR-139.3,
+        ``folder_open_service.open_folder_in_file_manager``) — the shipped
+        ``subprocess.Popen(["explorer", …])`` idiom generalized per platform —
+        with ``label="workarea"`` so the ``o``-key status text stays
+        byte-identical (``Opened workarea: …`` / ``Failed to open workarea:
+        …``). The seam lands its own failures on the status line; only the
+        log tail stays here.
+        """
+        opened = folder_open_service.open_folder_in_file_manager(
+            self.workarea,
+            set_status=self.set_status,
+            label="workarea",
+        )
+        if opened:
             self.logger.info("Opened workarea in explorer: %s", self.workarea)
-        except Exception as exc:
-            self.set_status(f"Failed to open workarea: {exc}")
-            self.logger.exception("Failed to open workarea.")
+        else:
+            self.logger.error("Failed to open workarea.")
 
     def action_save_project(self) -> None:
         """
@@ -11780,6 +11794,12 @@ class S19TuiApp(App):
         # either one, and no increment ever had to choose between a green gate
         # and an honest one.
         self._refresh_patch_variant_select()
+        # batch-95 change 2 (HLR-139): the open-folder chips dim/enabled state
+        # keys off the same project context, so the one project-refresh seam
+        # re-resolves every mounted chip (the modal Reports chip re-resolves on
+        # its own mount). Chips not mounted yet refresh at their on_mount.
+        for chip in self.query(OpenFolderChip):
+            chip.refresh_target()
 
     #: The separator between the two halves of `#status_context`.
     _CONTEXT_SEPARATOR = "  |  "
