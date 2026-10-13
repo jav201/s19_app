@@ -41,3 +41,5 @@ AT-TC-REGISTRY.jsonl text eol=lf
 .dev-flow/2026-10-08-batch-91/evidence/** -text
 .dev-flow/2026-10-11-batch-92/evidence/** -text
 .dev-flow/2026-10-11-batch-93/evidence/** -text
+.dev-flow/2026-10-13-batch-94/evidence/** -text
+.dev-flow/2026-10-13-batch-95/evidence/** -text
