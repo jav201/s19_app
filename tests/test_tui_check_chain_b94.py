@@ -9,8 +9,11 @@ Coverage map (test -> AT/TC -> LLR):
   (HLR-010).
 - TC-B94-13 — ``test_tc_b94_13_chk_write_round_trip``: the ``.chk.json``
   write round-trip — suffix preserved by ``_safe_name``, re-read
-  ``kind == "check"``, 0 blocking errors, entry count == collected count;
-  the containment refusal arm (LLR-009.1/009.3).
+  ``kind == "check"``, 0 blocking errors, entry count == collected count
+  (LLR-009.1/009.3). The containment-refusal arm itself lives with its
+  pre-existing owners, ``tests/test_unified_write.py:416-420`` and
+  ``tests/test_project_gather.py:639-662`` — this file pins the round-trip
+  and the suffix only.
 - TC-B94-14 — ``test_tc_b94_14_run_check_document``: one verdict row per
   entry, each exactly one of pass/fail/uncheckable; a ``kind="change"``
   document is run-blocked with reason ``doc-kind`` (LLR-009.2).

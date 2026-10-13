@@ -1,0 +1,11 @@
+ACCEPT arm: ['Screen', 'LoadGuardScreen'] -> ['Screen']
+  LoadGuardScreen count before answer: 1
+  LoadGuardScreen count after answer:  0
+  dirty after: False (expect False)
+  rows after:  1 (expect 1 = target loaded)
+CANCEL arm: ['Screen', 'LoadGuardScreen'] -> ['Screen']
+  LoadGuardScreen count before answer: 1
+  LoadGuardScreen count after answer:  0
+  dirty after: True (expect True)
+  rows after:  2 (expect 2 = edits kept)
+PROBE: PASS — exactly one popup, stack drains empty (both arms)

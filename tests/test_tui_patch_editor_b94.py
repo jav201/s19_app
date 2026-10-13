@@ -70,7 +70,7 @@ from s19_app.tui.changes.io import (
 from s19_app.tui.json_highlight import JsonHighlightTextArea
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.rail import Rail
-from s19_app.tui.screens_directionb import PatchEditorPanel
+from s19_app.tui.screens_directionb import LoadGuardScreen, PatchEditorPanel
 
 VALID_TWO = """{
   "format": "s19app-changeset",
@@ -399,12 +399,16 @@ def test_at_b94_06_dirty_load_accept_loss(tmp_path: Path) -> None:
                 table.row_count,
                 panel._dirty,
                 len(app.query_one("#patch_doc_path_input", Input).value),
+                any(isinstance(s, LoadGuardScreen) for s in app.screen_stack),
             )
 
-    popup_shown, rows, dirty, _path_len = asyncio.run(_drive())
+    popup_shown, rows, dirty, _path_len, guard_left = asyncio.run(_drive())
     assert popup_shown, "the warning popup must appear on a dirty load"
     assert rows == 1, f"the target's single row is loaded, got {rows}"
     assert dirty is False, "the dirty flag clears after a successful load"
+    assert guard_left is False, (
+        "accepting the guard must drain the popup stack (AT-B94-06 fold, F1)"
+    )
 
 
 def test_at_b94_07_dirty_load_cancel_keeps(tmp_path: Path) -> None:
@@ -435,13 +439,21 @@ def test_at_b94_07_dirty_load_cancel_keeps(tmp_path: Path) -> None:
             await pilot.pause()
             table = app.query_one("#patch_doc_entries_table", DataTable)
             bound = len(app._change_service.document.entries)
-            return table.row_count, panel._dirty, bound
+            return (
+                table.row_count,
+                panel._dirty,
+                bound,
+                any(isinstance(s, LoadGuardScreen) for s in app.screen_stack),
+            )
 
-    rows, dirty, bound = asyncio.run(_drive())
+    rows, dirty, bound, guard_left = asyncio.run(_drive())
     assert rows == 2, f"100% of the prior rows are retained, got {rows}"
     assert dirty is True, "the dirty flag survives the cancelled load"
     assert bound == 2, (
         f"the target document is not mounted (2 bound entries), got {bound}"
+    )
+    assert guard_left is False, (
+        "cancelling the guard must drain the popup stack (AT-B94-07 fold, F1)"
     )
 
 
@@ -865,7 +877,14 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
     """TC-B94-10 — edit-table->set, edit-text->set, save->cleared,
     load-success->cleared; one flag across both regions (LLR-005.1)."""
 
-    async def _drive() -> list:
+    def _script_marker(panel: PatchEditorPanel) -> bool:
+        # ux#3: the painted reader (_refresh_dirty_indicator's surface) must
+        # carry the " ●" marker exactly when the flag is set — asserting the
+        # flag alone would pass if the writer stopped painting.
+        subtitle = panel.query_one("#patch_win_script").border_subtitle
+        return subtitle is not None and " ●" in subtitle
+
+    async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
         patches = _patches_dir(app)
         (patches / "t.json").write_text(VALID_ONE, encoding="utf-8")
@@ -875,6 +894,7 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             transitions = [("start", panel._dirty)]
+            markers = [("start", _script_marker(panel))]
             # w1: entries-table edit -> set.
             service = app._change_service
             service.add_entry("0x100", "", "DE AD BE EF")
@@ -884,16 +904,19 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
             await pilot.press("enter")
             await pilot.pause()
             transitions.append(("edit-table", panel._dirty))
+            markers.append(("edit-table", _script_marker(panel)))
             # w3: save -> cleared.
             service.document.source_path = None
             await _press_button(app, pilot, "#patch_doc_save_button")
             await pilot.pause()
             transitions.append(("save", panel._dirty))
+            markers.append(("save", _script_marker(panel)))
             # w2: JSON-text edit -> set.
             text = app.query_one("#patch_paste_text", TextArea)
             text.text = text.text + "\n"
             await pilot.pause()
             transitions.append(("edit-text", panel._dirty))
+            markers.append(("edit-text", _script_marker(panel)))
             # w4: load-success -> cleared. The app wiring (load success ->
             # mark_loaded) is AT-B94-06's assertion; here the writer itself
             # is driven with the service's real success result.
@@ -901,6 +924,7 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
             assert result.ok, result.message
             panel.mark_loaded()
             transitions.append(("load", panel._dirty))
+            markers.append(("load", _script_marker(panel)))
             # And the real clean-load path clears it through the handler too.
             app.query_one("#patch_doc_path_input", Input).value = str(
                 patches / "t.json"
@@ -915,15 +939,34 @@ def test_tc_b94_10_dirty_flag_transitions(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.pause()
             transitions.append(("load-handler", panel._dirty))
-            return transitions
+            markers.append(("load-handler", _script_marker(panel)))
+            return transitions, markers
 
-    transitions = asyncio.run(_drive())
+    transitions, markers = asyncio.run(_drive())
     assert ("start", False) in transitions
     assert ("edit-table", True) in transitions, transitions
     assert ("save", False) in transitions, transitions
     assert ("edit-text", True) in transitions, transitions
     assert ("load", False) in transitions, transitions
     assert ("load-handler", False) in transitions, transitions
+    # ux#3: the painted marker rides the same transitions (LLR-005.1 reader).
+    painted = dict(markers)
+    assert painted["start"] is False, markers
+    assert painted["edit-table"] is True, (
+        f"the dirty marker must paint after an edit-table write, got {markers}"
+    )
+    assert painted["save"] is False, (
+        f"the dirty marker must clear on save, got {markers}"
+    )
+    assert painted["edit-text"] is True, (
+        f"the dirty marker must repaint after a JSON-text edit, got {markers}"
+    )
+    assert painted["load"] is False, (
+        f"the dirty marker must clear on load-success, got {markers}"
+    )
+    assert painted["load-handler"] is False, (
+        f"the dirty marker must stay clear through the load handler, got {markers}"
+    )
 
 
 # ---------------------------------------------------------------------------

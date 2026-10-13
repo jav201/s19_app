@@ -448,13 +448,15 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
 # Reconciled per the proposal's own clause ("reconciliation against the
 # contract's named list happens per file at the Inc-001 cut, not by silent
 # reassignment"): ONLY these three nodes were rewritten, to observe the
-# retirement; the file's twenty app-level machinery tests are untouched.
-# Recorded as a deviation in the increment packet — the P1 group assignment
-# under-counted this file.
+# retirement; the file's other eight app-level machinery tests are untouched
+# (11 total - 3 rewritten). Recorded as a deviation in the increment packet —
+# the P1 group assignment under-counted this file.
 #
 # The help TEXT tokens are kept as the retirement census reference: the
-# modal's subject (the selector) no longer exists, so the surface must not
-# render.
+# modal's subject (the selector) no longer exists, so the shipped surface
+# must not render. The tokens are asserted in the orphan-modal geometry
+# node's direct-push arm — the only surviving reach — restoring the content
+# assertion the retired surface owed (fold round, F6).
 _VARIANT_HELP_TOKENS = (
     "picks which firmware image loads",
     "at least two firmware images",
@@ -568,10 +570,12 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
     batch-94 retires the surface's only reach path; the modal class still
     composes (orphaned), but the shipped surface must not open it. This node
     now guards the retirement geometry: the orphan is recorded by direct
-    push (the only surviving reach), and the dialog still fits at both
-    sizes. (This node was RED at the batch-93 base census; the rewrite
-    resolves it as a side effect of the retirement census, recorded in the
-    increment packet — not chased as a baseline failure.)
+    push (the only surviving reach), the dialog still fits at both sizes,
+    and the pushed orphan still paints the help-text census tokens (the
+    content assertion the retired surface owed — fold round F6). (This node
+    was RED at the batch-93 base census; the rewrite resolves it as a side
+    effect of the retirement census, recorded in the increment packet — not
+    chased as a baseline failure.)
     """
 
     async def _measure(width: int, height: int) -> dict[str, object]:
@@ -586,6 +590,14 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
             await pilot.pause()
             dialog = app.screen.query_one("#variant_help_dialog")
             region = dialog.region
+            # F6: the orphan still carries its content — the retired
+            # surface's owed content assertion, kept via the census tokens.
+            body_text = str(
+                app.screen.query_one("#variant_help_body", Static).content
+            )
+            tokens_painted = all(
+                token in body_text for token in _VARIANT_HELP_TOKENS
+            )
             return {
                 "region": (
                     region.x,
@@ -593,6 +605,8 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
                     region.right,
                     region.bottom,
                 ),
+                "tokens_painted": tokens_painted,
+                "body_text": body_text,
             }
 
     for width, height in ((80, 24), (120, 30)):
@@ -606,4 +620,8 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
         )
         assert bottom <= height, (
             f"dialog overflows height at {width}x{height}: bottom={bottom}"
+        )
+        assert m["tokens_painted"] is True, (
+            "the orphan modal must still paint the census tokens; "
+            f"body={m['body_text']!r}"
         )

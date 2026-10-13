@@ -4961,19 +4961,6 @@ class S19TuiApp(App):
 
         self.push_screen(LoadGuardScreen(), _answer)
 
-        def _answer(accepted: bool) -> None:
-            if not accepted:
-                self.set_status("Patch Editor: load cancelled — changes kept.")
-                return
-            if not path_text.strip():
-                self.set_status(
-                    "Patch Editor: enter a change-file path to load."
-                )
-                return
-            self._patch_editor_load(panel, path_text)
-
-        self.push_screen(LoadGuardScreen(), _answer)
-
     # ------------------------------------------------------------------
     # Check Editor (batch-94, US-003 — the ce_a collector)
     # ------------------------------------------------------------------

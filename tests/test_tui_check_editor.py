@@ -21,6 +21,9 @@ Coverage map (test -> AT/TC -> LLR):
   selection mounts exactly 1 ``CheckEditorPanel``; its write message reaches
   the service handler (captured call count 1); boundary arm at 80x24
   (LLR-001.2).
+- TC-B94-07b — ``test_tc_b94_07b_help_panel_lists_check_editor_binding``:
+  the real `?` key mounts the built-in help panel and its painted rows list
+  the ``=`` -> Check Editor binding; the second `?` dismisses (ux#6).
 - TC-B94-17 — ``test_tc_b94_17_safe_text_hostile_payload``: the primitive
   contract — 0 control bytes in ``.plain``, brackets preserved (LLR-011.1).
 
@@ -230,6 +233,63 @@ def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
     assert patch_panels == 1, "the patch twin stays the patch screen's panel"
     assert write_calls == 1, (
         f"the write message reaches the writer exactly once, got {write_calls}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# ux#6 — the painted `?` help panel lists the Check Editor `=` binding
+# ---------------------------------------------------------------------------
+
+
+def _painted_text(app: S19TuiApp, widget) -> str:
+    """The text actually PAINTED in a widget's region, read from the compositor.
+
+    The ``test_tui_diff_screen.py`` ``_b79_painted_text`` idiom: the HelpPanel
+    renders a Rich table, so ``str(widget.render())`` is a repr and every
+    ``in`` assertion over it would be vacuous. The composited strips are what
+    the operator sees.
+    """
+    strips = app.screen._compositor.render_strips()
+    region = widget.region
+    lines = []
+    for y in range(region.y, min(region.y + region.height, len(strips))):
+        row = "".join(segment.text for segment in strips[y])
+        lines.append(row[region.x : region.x + region.width].rstrip())
+    return "\n".join(lines)
+
+
+def test_tc_b94_07b_help_panel_lists_check_editor_binding(
+    tmp_path: Path,
+) -> None:
+    """ux#6 — pressing the real `?` key paints the `=` -> Check Editor row.
+
+    Intent: discoverability of the `=` rail binding (R-1 closure) is owed by
+    the `?` help panel, not the footer (C-13). This drives the REAL key
+    (``question_mark``), reads the REAL mounted panel's painted rows (the
+    ``pdr_rail_key_probe.py`` source-of-truth check upgraded from
+    ``active_bindings`` to the painted surface), and dismisses with a second
+    `?` (the app's on/off toggle, N6).
+    """
+    from textual.widgets import HelpPanel
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 60)) as pilot:
+            await pilot.pause()
+            await pilot.press("question_mark")
+            await pilot.pause()
+            panel = app.query_one(HelpPanel)
+            painted = _painted_text(app, panel)
+            await pilot.press("question_mark")  # the override is an on/off toggle
+            await pilot.pause()
+            dismissed = len(app.query(HelpPanel)) == 0
+        return painted, dismissed
+
+    painted, dismissed = asyncio.run(_drive())
+    assert dismissed, "the second `?` must hide the HelpPanel again (N6)"
+    assert "=" in painted and "Check Editor" in painted, (
+        "the painted help panel must list the '=' -> Check Editor binding; "
+        f"panel painted:\n{painted}"
     )
 
 
