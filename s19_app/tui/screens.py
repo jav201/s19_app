@@ -35,16 +35,19 @@ from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
 from .os_clipboard_input import OsClipboardInput
 from .workspace import sanitize_project_name
 from .legend import (
-    BAND_DOMAIN_NOTE,
-    BAND_GAP_HATCH_NOTE,
+    BAND_GAP_FIELDS,
     COLOUR_SEVERITY,
     LEGEND_EXAMPLES,
     LEGEND_TABLE,
+    MAP_KEYS_LINE,
+    MAP_REGION_ROW_FIELD_KEY,
+    MAP_REGION_ROW_SAMPLE,
     ROLE_CAPTION,
     ROLE_LINE,
     ROLE_SUB,
     ROLE_WARNING_SAMPLE,
     build_band_key_rows,
+    build_map_anatomy_samples,
 )
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
@@ -55,6 +58,7 @@ from .operations.crc_config import (
 )
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
+from .services.entropy_service import ENTROPY_WINDOW_BYTES
 from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -1040,20 +1044,25 @@ class LegendScreen(ModalScreen[None]):
     """Read-only classification-legend modal (HLR-023 / LLR-023.1; N8 cards).
 
     Summary:
-        Renders every :data:`s19_app.tui.legend.LEGEND_TABLE` row — one
-        bold sub-heading per artifact (A2L / MAC / Issues), one Label per
-        classification giving ``<classification> — <meaning>`` — and
-        colours each row through ``color_policy.css_class_for_severity``
-        (the ``sev-*`` classes) so the in-app legend shows the same colours
-        the views use. Shared single source with the report legend
-        (``report_service._legend_lines``); the modal copies no literal
-        text. The body scrolls so the full table fits the 80- and 120-col
-        regimes (C-13). Opened by the per-view Legend buttons and dismissed
-        by Close (self-handled, no app-side dispatch).
+        Per-view legend modal. The non-map views render their N8 annotated
+        example card + the ``LEGEND_TABLE`` severity key (one bold sub-heading
+        per artifact — A2L / MAC / Issues — one row per classification
+        ``<classification> — <meaning>``, coloured through
+        ``color_policy.css_class_for_severity`` so the in-app legend shows the
+        same colours the views use). The MAP view renders its spec sheet
+        instead (batch-93 HLR-132 — four grouped bordered boxes,
+        :meth:`_render_map_sheet`). The body scrolls so the full content fits
+        the 80- and 120-col regimes (C-13). Opened by the per-view Legend
+        buttons / the ``k`` binding and dismissed by Close, by Esc
+        (:meth:`action_close_legend` — HLR-132 / LLR-132.2) or the app-side
+        pop; the ``LegendScreen(sections, view_key)`` constructor signature is
+        unchanged since batch-51 (LLR-132.3).
 
     Data Flow:
-        - Reads ``LEGEND_TABLE`` + ``COLOUR_SEVERITY`` (s19_app.tui.legend)
-          and ``css_class_for_severity`` (color_policy, READ-only).
+        - Reads ``LEGEND_EXAMPLES`` / ``LEGEND_TABLE`` + ``COLOUR_SEVERITY``
+          (s19_app.tui.legend) and, for the map sheet, the HLR-132 authored
+          data + ``build_band_key_rows`` (live); colours via
+          ``css_class_for_severity``.
         - Pushed by ``S19TuiApp.action_show_legend``, reached from the
           ``k`` binding (A2L, which has no button — C-13) and the
           ``#mac_legend_button`` / ``#issues_legend_button`` ids via
@@ -1061,12 +1070,17 @@ class LegendScreen(ModalScreen[None]):
 
     Dependencies:
         Uses:
-            - s19_app.tui.legend.LEGEND_TABLE / COLOUR_SEVERITY
+            - s19_app.tui.legend (LEGEND_EXAMPLES / LEGEND_TABLE / COLOUR_SEVERITY
+              / the HLR-132 sheet data / build_band_key_rows)
             - s19_app.tui.color_policy.css_class_for_severity
         Used by:
             - S19TuiApp.on_button_pressed
             - tests/test_tui_legend.py
     """
+
+    BINDINGS = [
+        Binding("escape", "close_legend", "Close", show=False),
+    ]
 
     def __init__(
         self,
@@ -1083,8 +1097,8 @@ class LegendScreen(ModalScreen[None]):
                 example-only view such as Workspace — N8 LLR-N8-1.2).
             view_key (Optional[str]): The active screen key (``workspace`` /
                 ``a2l`` / ``map`` / ``mac`` / ``issues``) selecting the N8
-                example card and the key type (band key for ``map``). ``None``
-                preserves the exact pre-N8 render (no card).
+                example card, or — for ``map`` — the batch-93 HLR-132 spec
+                sheet. ``None`` preserves the exact pre-N8 render (no card).
         """
         super().__init__()
         self._sections = tuple(sections) if sections is not None else None
@@ -1141,49 +1155,30 @@ class LegendScreen(ModalScreen[None]):
     def _render_key(self) -> List[Widget]:
         """
         Summary:
-            Render the colour/band key below the card. For ``view_key == "map"``
-            this is the entropy band key derived from ``ENTROPY_BANDS`` via
-            ``build_band_key_rows`` (``band-*`` classes — an entropy domain,
-            LLR-N8-3.2), rendered ``markup=False`` since each range reads
-            ``[lo,hi)`` (a literal bracket). For every other view it is the
-            ``LEGEND_TABLE`` severity key filtered by ``self._sections`` and
-            painted through ``css_class_for_severity`` — the pre-N8 rows, now
-            ``Static`` so long meanings wrap instead of truncating (HLR-N8-6).
+            Render the colour key below the card: the ``LEGEND_TABLE`` severity
+            key filtered by ``self._sections`` and painted through
+            ``css_class_for_severity`` — the pre-N8 rows, now ``Static`` so
+            long meanings wrap instead of truncating (HLR-N8-6). The map view
+            never reaches this path: its ``k``-legend is the spec sheet
+            (batch-93 HLR-132), rendered entirely by
+            :meth:`_render_map_sheet` — band facts included, so this helper
+            stays severity-only.
 
         Returns:
-            List[Widget]: artifact-header + classification/band rows; possibly
+            List[Widget]: artifact-header + classification rows; possibly
             empty (an example-only view passed ``sections=()``).
 
         Data Flow:
-            - Reads ``LEGEND_TABLE`` + ``COLOUR_SEVERITY`` and, for the map,
-              ``build_band_key_rows``; colours via ``css_class_for_severity``.
+            - Reads ``LEGEND_TABLE`` + ``COLOUR_SEVERITY``; colours via
+              ``css_class_for_severity``.
             - Consumed by :meth:`compose`, placed below the example card.
 
         Dependencies:
             Uses:
                 - LEGEND_TABLE / COLOUR_SEVERITY / css_class_for_severity
-                - build_band_key_rows / BAND_GAP_HATCH_NOTE / BAND_DOMAIN_NOTE
             Used by:
                 - LegendScreen.compose
         """
-        if self._view_key == "map":
-            rows: List[Widget] = [
-                Label("Entropy bands", classes="legend-artifact")
-            ]
-            for band in build_band_key_rows():
-                rows.append(
-                    Static(
-                        f"{band.glyph}  {band.label}  {band.range_text} — "
-                        f"{band.meaning}",
-                        markup=False,
-                        classes=f"legend-row {band.css_class}".strip(),
-                    )
-                )
-            rows.append(
-                Static(BAND_GAP_HATCH_NOTE, markup=False, classes="legend-row")
-            )
-            rows.append(Static(BAND_DOMAIN_NOTE, classes="legend-card-caption"))
-            return rows
         rows = []
         for artifact, table in LEGEND_TABLE.items():
             if self._sections is not None and artifact not in self._sections:
@@ -1200,34 +1195,162 @@ class LegendScreen(ModalScreen[None]):
                 rows.append(Static(f"{classification} — {meaning}", classes=classes))
         return rows
 
-    def compose(self) -> ComposeResult:
+    def _render_map_sheet(self) -> List[Widget]:
         """
         Summary:
-            Build the modal as a title, a two-pane body (example card left,
-            colour/band key right — batch-72 LLR-072-5.1) and the Close row, so
-            the key stays visible without scrolling past the card.
+            Render the map view's spec sheet (batch-93 HLR-132 / LLR-132.1) —
+            the operator ruling of 2026-08-06 (legend A): four grouped,
+            bordered boxes in ONE full-width scrolling column:
+
+            1. **Entropy bands** — the band key DERIVED AT RENDER TIME from
+               ``build_band_key_rows()`` (LLR-132.4's live-source law — never
+               a hand-copied label list, so the sheet cannot drift from the
+               band domain), each row column-aligned under the live-derived
+               label/range widths, painted with its ``band-*`` class, plus the
+               ``╱`` gap pseudo-row (:data:`BAND_GAP_FIELDS`) through the same
+               alignment — and the box title carrying the live entropy window
+               size from ``ENTROPY_WINDOW_BYTES``.
+            2. **Map anatomy** — one rendered sample line per map surface →
+               one dim meaning line each (band bar, ruler, glance chips, stats
+               line), the samples' band glyphs derived live from
+               ``band_style``.
+            3. **Region row** — one shipped-fixed-width sample row
+               (:data:`MAP_REGION_ROW_SAMPLE`, LLR-127.1's format) + its one-
+               line field key.
+            4. **Keys** — one line (:data:`MAP_KEYS_LINE`).
+
+            Every line renders ``markup=False`` — the ``[lo,hi)`` ranges carry
+            literal brackets (TC-N8-11's precedent) and no line needs markup.
 
         Returns:
-            ComposeResult: the single ``#legend_dialog`` container; its
-            ``#legend_body`` wrapper holds the ``#legend_card_pane`` and
-            ``#legend_key_pane`` scroll panes in that order (the WIDE order —
-            the floor order is produced at runtime by
-            :meth:`_apply_width_regime`, textual 8.2.8 having no CSS ordering
-            property).
+            List[Widget]: the four ``.legend-sheet-box`` containers, in box
+            order, each carrying its border title + line Statics.
 
         Data Flow:
-            - ``_render_card()`` / ``_render_key()`` are called unchanged; their
-              widgets are re-parented into the two panes, never reconstructed
-              (LLR-072-7.1 — the data layer ``legend.py`` is untouched).
-            - ``#legend_body`` is preserved as the wrapper id: 9 descendant
-              query sites across the legend test files select through it.
+            - Reads ``build_band_key_rows`` (live), ``BAND_GAP_FIELDS``,
+              ``build_map_anatomy_samples``, ``MAP_REGION_ROW_SAMPLE``,
+              ``MAP_REGION_ROW_FIELD_KEY``, ``MAP_KEYS_LINE`` and
+              ``ENTROPY_WINDOW_BYTES`` — all READ-only (legend.py data +
+              entropy_service).
+            - Consumed by :meth:`compose`, which gives the sheet its own
+              full-width single-pane dialog branch.
 
         Dependencies:
             Uses:
+                - build_band_key_rows / BAND_GAP_FIELDS
+                - build_map_anatomy_samples / MAP_REGION_ROW_SAMPLE
+                - MAP_REGION_ROW_FIELD_KEY / MAP_KEYS_LINE
+                - ENTROPY_WINDOW_BYTES
+            Used by:
+                - LegendScreen.compose (map ``view_key`` branch)
+                - tests/test_legend_map_sheet.py
+        """
+        band_rows = build_band_key_rows()
+        gap_glyph, gap_label, gap_range, gap_meaning = BAND_GAP_FIELDS
+        # Column alignment DERIVED from the live rows (never hard-coded
+        # widths): label/range columns wide enough for the longest live value
+        # plus the gap pseudo-row, separated by two blanks.
+        label_w = max([len(row.label) for row in band_rows] + [len(gap_label)]) + 2
+        range_w = (
+            max([len(row.range_text) for row in band_rows] + [len(gap_range)]) + 2
+        )
+
+        def _box(title: str, lines: List[Widget]) -> Container:
+            box = Container(*lines, classes="legend-sheet-box")
+            box.border_title = title
+            return box
+
+        def _line(text: str, classes: str = "legend-sheet-line") -> Static:
+            return Static(text, markup=False, classes=classes)
+
+        band_lines: List[Widget] = [
+            _line(
+                f"{row.glyph}  {row.label:<{label_w}}"
+                f"{row.range_text:<{range_w}}{row.meaning}",
+                classes=f"legend-row {row.css_class}".strip(),
+            )
+            for row in band_rows
+        ]
+        band_lines.append(
+            _line(
+                f"{gap_glyph}  {gap_label:<{label_w}}"
+                f"{gap_range:<{range_w}}{gap_meaning}",
+                classes="legend-row",
+            )
+        )
+        anatomy_lines: List[Widget] = []
+        for sample, meaning in build_map_anatomy_samples():
+            anatomy_lines.append(_line(sample))
+            anatomy_lines.append(
+                _line(meaning, classes="legend-sheet-line legend-sheet-meaning")
+            )
+        region_lines = [
+            _line(MAP_REGION_ROW_SAMPLE),
+            _line(
+                MAP_REGION_ROW_FIELD_KEY,
+                classes="legend-sheet-line legend-sheet-meaning",
+            ),
+        ]
+        keys_lines = [_line(MAP_KEYS_LINE)]
+        return [
+            _box(
+                f"Entropy bands — {ENTROPY_WINDOW_BYTES} B windows, bits/byte",
+                band_lines,
+            ),
+            _box("Map anatomy", anatomy_lines),
+            _box("Region row", region_lines),
+            _box("Keys", keys_lines),
+        ]
+
+    def compose(self) -> ComposeResult:
+        """
+        Summary:
+            Two layouts from one constructor (the ``LegendScreen(sections,
+            view_key)`` API survives unchanged — LLR-132.3). The MAP view
+            renders its spec sheet (batch-93 HLR-132): a SINGLE full-width
+            scrolling column of four bordered boxes — the sheet must not split
+            across the two-pane split (its boxes span the dialog width, and
+            the contract's no-wrap limb at the 80x24 floor needs every column
+            the dialog can give: ``#legend_dialog.legend-sheet`` in
+            ``styles.tcss`` carries the measured budget). Every OTHER view
+            keeps the batch-72 two-pane body (example card left, colour key
+            right — LLR-072-5.1).
+
+        Returns:
+            ComposeResult: the single ``#legend_dialog`` container; the map
+            branch's ``#legend_body`` is the sheet's own scroll pane, the
+            other views' is the two-pane wrapper (both preserve the
+            ``#legend_body`` id the 9 descendant query sites select through).
+
+        Data Flow:
+            - Map: ``_render_map_sheet()`` widgets are re-parented into the
+              sheet pane, never reconstructed.
+            - Other views: ``_render_card()`` / ``_render_key()`` are called
+              unchanged; their widgets are re-parented into the two panes,
+              never reconstructed (LLR-072-7.1).
+
+        Dependencies:
+            Uses:
+                - LegendScreen._render_map_sheet (map branch)
                 - LegendScreen._render_card / LegendScreen._render_key
             Used by:
                 - S19TuiApp.action_show_legend (screen push)
         """
+        if self._view_key == "map":
+            yield Container(
+                Label("Classification legend", classes="modal-title"),
+                ScrollableContainer(
+                    *self._render_map_sheet(), id="legend_body"
+                ),
+                Container(
+                    Button("Close", id="legend_close", classes="modal-confirm"),
+                    id="legend_buttons",
+                    classes="modal-buttons",
+                ),
+                id="legend_dialog",
+                classes="modal-dialog legend-sheet",
+            )
+            return
         yield Container(
             Label("Classification legend", classes="modal-title"),
             Horizontal(
@@ -1249,7 +1372,9 @@ class LegendScreen(ModalScreen[None]):
         Summary:
             Put the two-pane body in the regime ``width`` calls for: side by
             side above the breakpoint, stacked key-above-card below it
-            (batch-72 LLR-072-6.1).
+            (batch-72 LLR-072-6.1). The map spec-sheet branch has NO two-pane
+            body — a single full-width column — so the regime hook is a no-op
+            there (``#legend_card_pane`` / ``#legend_key_pane`` do not exist).
 
         Args:
             width (int): The terminal width in columns — the caller passes
@@ -1270,6 +1395,8 @@ class LegendScreen(ModalScreen[None]):
                 - LegendScreen.on_mount
                 - LegendScreen.on_resize
         """
+        if self._view_key == "map":
+            return
         narrow = width < _LEGEND_NARROW_WIDTH
         self.query_one("#legend_dialog").set_class(narrow, "legend-narrow")
         body = self.query_one("#legend_body")
@@ -1286,6 +1413,15 @@ class LegendScreen(ModalScreen[None]):
     def on_resize(self, event: events.Resize) -> None:
         """Re-apply the width regime when the terminal is resized."""
         self._apply_width_regime(self.app.size.width)
+
+    def action_close_legend(self) -> None:
+        """Dismiss the modal on ``Esc`` (HLR-132 / LLR-132.2) — the map spec
+        sheet's contract-pinned close key; the binding is screen-level, so it
+        serves every view's legend without an app-wide escape law (the app's
+        ``on_key`` escape handling is gated on the six find/goto Inputs and is
+        untouched by this)."""
+        logger.info("LegendScreen dismissed by Esc.")
+        self.dismiss(None)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "legend_close":

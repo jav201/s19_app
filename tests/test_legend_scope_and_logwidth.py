@@ -38,6 +38,12 @@ def _artifact_headings(screen: LegendScreen) -> list[str]:
     ]
 
 
+def _sheet_titles(screen: LegendScreen) -> list[str]:
+    """The map spec sheet's grouped box titles (batch-93 HLR-132) — border
+    titles, not `.legend-artifact` Labels."""
+    return [box.border_title for box in screen.query(".legend-sheet-box")]
+
+
 async def _open_legend_on(app: S19TuiApp, pilot, screen_key: str) -> LegendScreen:
     app.action_show_screen(screen_key)
     await pilot.pause()
@@ -54,26 +60,37 @@ async def _open_legend_on(app: S19TuiApp, pilot, screen_key: str) -> LegendScree
 # ---------------------------------------------------------------------------
 
 def test_n1_legend_scoped_per_screen(tmp_path: Path) -> None:
-    async def _drive() -> dict[str, list[str]]:
+    async def _drive() -> dict[str, dict[str, list[str]]]:
         app = S19TuiApp(base_dir=tmp_path)
-        out: dict[str, list[str]] = {}
+        out: dict[str, dict[str, list[str]]] = {}
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             for key in ("a2l", "mac", "issues", "map"):
                 legend = await _open_legend_on(app, pilot, key)
-                out[key] = _artifact_headings(legend)
+                out[key] = {
+                    "headings": _artifact_headings(legend),
+                    "sheet_titles": _sheet_titles(legend),
+                }
                 app.pop_screen()
                 await pilot.pause()
         return out
 
-    headings = asyncio.run(_drive())
-    assert headings["a2l"] == ["A2L"], headings["a2l"]
-    assert headings["mac"] == ["MAC"], headings["mac"]
-    assert headings["issues"] == ["Issues"], headings["issues"]
-    # N8 AMD-4: Map now renders the entropy band key (header "Entropy bands"),
-    # not the LEGEND_TABLE["Hex"] severity/overlay rows.
-    assert headings["map"] == ["Entropy bands"], headings["map"]
-    assert "Hex" not in headings["map"], headings["map"]
+    scoped = asyncio.run(_drive())
+    assert scoped["a2l"]["headings"] == ["A2L"], scoped["a2l"]
+    assert scoped["mac"]["headings"] == ["MAC"], scoped["mac"]
+    assert scoped["issues"]["headings"] == ["Issues"], scoped["issues"]
+    # N8 AMD-4 (superseded by batch-93 HLR-132): Map renders the SPEC SHEET —
+    # no `.legend-artifact` severity headers at all ("Hex" included); its
+    # grouped boxes carry border titles instead.
+    from s19_app.tui.services.entropy_service import ENTROPY_WINDOW_BYTES
+
+    assert scoped["map"]["headings"] == [], scoped["map"]
+    assert scoped["map"]["sheet_titles"] == [
+        f"Entropy bands — {ENTROPY_WINDOW_BYTES} B windows, bits/byte",
+        "Map anatomy",
+        "Region row",
+        "Keys",
+    ], scoped["map"]
 
 
 def test_n1_workspace_is_example_only(tmp_path: Path) -> None:

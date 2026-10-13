@@ -267,15 +267,20 @@ def test_at216_key_pane_shows_warning_row_without_scrolling(tmp_path: Path) -> N
 # TC-515 — pane ids + per-pane widget counts vs 00-measurements M-6.
 # --------------------------------------------------------------------------- #
 #: ``view_key -> (card widgets, key widgets)`` — M-6, re-executed at Inc-1.
-_M6_PANE_COUNTS: Dict[str, Tuple[int, int]] = {"mac": (17, 6), "map": (20, 7)}
+#: AMENDED at batch-93 inc-003 (HLR-132): the map view left the two-pane body
+#: (its `k`-legend is the spec sheet — a single full-width column,
+#: ``tests/test_legend_map_sheet.py`` owns it), so the count pin keeps the
+#: mac view only.
+_M6_PANE_COUNTS: Dict[str, Tuple[int, int]] = {"mac": (17, 6)}
 
 
 def test_tc515_panes_hold_the_unmodified_render_output(tmp_path: Path) -> None:
     """TC-515 — both panes resolve and hold exactly the widgets
-    ``_render_card()`` / ``_render_key()`` return (M-6: mac 17/6, map 20/7).
+    ``_render_card()`` / ``_render_key()`` return (M-6: mac 17/6).
 
     A count mismatch means the split reconstructed rows instead of re-parenting
-    them (LLR-072-7.1 forbids reconstruction).
+    them (LLR-072-7.1 forbids reconstruction). The map view's sheet is asserted
+    in ``tests/test_legend_map_sheet.py`` (TC-676's box census).
     """
 
     async def _drive() -> Dict[str, Tuple[int, int]]:
@@ -437,8 +442,10 @@ def test_at218_pipeline_preserved_regression_pin(tmp_path: Path) -> None:
        with its inline orange read off ``render().spans`` — NOT ``render_line``,
        which returns the theme foreground ``#e9e9e9`` (project C-37) — and
        coupled to the live ``app`` style, never a hex literal;
-    2. map: the band-key rows render in the KEY pane and still report
-       ``_render_markup is False`` (they read ``[lo,hi)`` — a literal bracket);
+    2. map (AMENDED at batch-93 inc-003, HLR-132): the band-key rows render in
+       the SPEC SHEET's Entropy-bands box (the map view left the two-pane
+       body) and still report ``_render_markup is False`` (they read
+       ``[lo,hi)`` — a literal bracket);
     3. all 9 ``#legend_body``-rooted sites resolve as their own tests expect
        (shares TC-516's census helper).
     """
@@ -463,16 +470,19 @@ def test_at218_pipeline_preserved_regression_pin(tmp_path: Path) -> None:
             app.pop_screen()
             await pilot.pause()
 
+            # clause 2 (amended at batch-93 inc-003, HLR-132): the map band
+            # key now lives in the spec sheet's first box — under #legend_body,
+            # still markup=False, still painted band-*.
             legend = await _open_legend(app, pilot, "map")
-            band_rows = list(legend.query("#legend_key_pane .legend-row"))
+            band_rows = list(legend.query("#legend_body .legend-row"))
             markup_flags = [row._render_markup for row in band_rows]
-            in_key = [
-                bool(legend.query(f"#legend_key_pane .{cls}"))
+            in_sheet = [
+                bool(legend.query(f".legend-sheet-box .{cls}"))
                 for cls in ("band-constant", "band-low", "band-medium", "band-high")
             ]
-            return spans, in_card, markup_flags, in_key
+            return spans, in_card, markup_flags, in_sheet
 
-    spans, sample_in_card, markup_flags, bands_in_key = asyncio.run(_drive())
+    spans, sample_in_card, markup_flags, bands_in_sheet = asyncio.run(_drive())
 
     # clause 1
     assert warning_style in spans, (
@@ -482,14 +492,16 @@ def test_at218_pipeline_preserved_regression_pin(tmp_path: Path) -> None:
         "#legend_mac_warning_sample must stay a CARD widget after the split"
     )
 
-    # clause 2
+    # clause 2 — the band rows render in the sheet's Entropy-bands box:
+    # markup=False preserved (the [lo,hi) literal brackets), all four band
+    # classes present, and nothing in the (nonexistent) key pane.
     assert len(markup_flags) >= 5, (
-        f"expected the map band-key rows in the key pane, got {len(markup_flags)}"
+        f"expected the map band-key rows in the sheet, got {len(markup_flags)}"
     )
     assert all(flag is False for flag in markup_flags), (
         f"a band-key row lost markup=False: {markup_flags}"
     )
-    assert all(bands_in_key), f"a band class left the key pane: {bands_in_key}"
+    assert all(bands_in_sheet), f"a band class left the sheet: {bands_in_sheet}"
 
     # clause 3
     expected = {site: non_empty for site, _, _, non_empty in _LEGEND_BODY_QUERY_SITES}
@@ -746,9 +758,15 @@ def test_tc519_legend_module_unchanged_vs_main() -> None:
     (``*[Static(str(w.render())) for w in self._render_card()]``) makes the
     starred value a comprehension rather than the call, and reddens here.
 
-    **Arm B — the PRODUCERS return widgets, not text.** A helper returning
+    **Arm B — the producers return widgets, not text.** A helper returning
     strings would FORCE ``compose`` to reconstruct, so this is the same
     invariant one layer up, asserted behaviourally rather than over source.
+
+    *AMENDED at batch-93 inc-003 (HLR-132): the assertion drives the two
+    two-pane helpers on the mac view (the views that still use them) and the
+    map view's spec-sheet producer ``_render_map_sheet`` — the map path's
+    widget source since the map card retired. The invariant is unchanged:
+    every producer hands widgets to compose, never text.*
 
     *A hash of the two helpers was considered and rejected: it reddens on any
     edit to the producers while staying GREEN on the consumer defect, which is
@@ -783,17 +801,24 @@ def test_tc519_legend_module_unchanged_vs_main() -> None:
         )
 
     # Arm B — the helpers hand back widgets, so there is nothing to rebuild.
-    screen = LegendScreen(view_key="map")
-    for helper in ("_render_card", "_render_key"):
-        produced = getattr(screen, helper)()
-        assert produced, f"{helper}() produced nothing for view_key='map'"
-        non_widgets = sorted(
-            {type(item).__name__ for item in produced if not isinstance(item, Widget)}
-        )
-        assert not non_widgets, (
-            f"{helper}() must return WIDGETS for compose to re-parent, not text "
-            f"for it to rebuild (LLR-072-7.1); got {non_widgets}"
-        )
+    # batch-93 inc-003 (HLR-132): the map card retired, so the two-pane
+    # helpers are driven on the mac view (which still uses them) and the map
+    # sheet's producer is driven on the map view — every producer, both paths.
+    for view_key, helpers in (
+        ("mac", ("_render_card", "_render_key")),
+        ("map", ("_render_map_sheet",)),
+    ):
+        screen = LegendScreen(view_key=view_key)
+        for helper in helpers:
+            produced = getattr(screen, helper)()
+            assert produced, f"{helper}() produced nothing for view_key={view_key!r}"
+            non_widgets = sorted(
+                {type(item).__name__ for item in produced if not isinstance(item, Widget)}
+            )
+            assert not non_widgets, (
+                f"{helper}() must return WIDGETS for compose to re-parent, not text "
+                f"for it to rebuild (LLR-072-7.1); got {non_widgets}"
+            )
 
 
 # --------------------------------------------------------------------------- #

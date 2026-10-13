@@ -71,7 +71,10 @@ from tools.id_registry import (
 # ``tests/test_docs_canon.py`` (160); batch-92 adds ``tests/test_render_hexview.py``,
 # ``tests/test_render_format.py``, ``tests/test_import_census.py`` (163, re-count
 # verified by this guard). MEASURED, not incremented.
-EXPECTED_SCANNED_TEST_FILES = 163
+# batch-93 inc-003 (2026-10-13): 164 -> 166, measured — the bound had drifted to
+# 164 before this increment (one module added without a bump); this increment
+# adds ``tests/test_legend_map_sheet.py`` + ``tests/test_command_bar_interlock.py``.
+EXPECTED_SCANNED_TEST_FILES = 166
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

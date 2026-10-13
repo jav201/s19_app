@@ -260,19 +260,17 @@ class BandKeyRow(NamedTuple):
     css_class: str
 
 
-#: Closing note stating bands are an ENTROPY domain, distinct from severities
-#: (rendered by ``compose`` after the band key — LLR-N8-3.2).
-BAND_DOMAIN_NOTE = (
-    "bands = bits/byte entropy over a 256 B window; boundary values go to the "
-    "HIGHER band. Bands ≠ severities: an ENTROPY domain, separate from the "
-    "sev-* severity domain."
-)
-
-#: The gap-hatch pseudo-row shown under the band key: an unmapped gap between
-#: runs is not a band and carries no colour class (LLR-N8-3.2).
-BAND_GAP_HATCH_NOTE = (
-    "╱ gap hatch — unmapped gap between runs (NOT a band, no colour "
-    "class)"
+#: The gap pseudo-row's fields for the spec sheet's Entropy-bands box
+#: (batch-93 HLR-132 / LLR-132.1): an unmapped gap between runs is NOT a band —
+#: it has no entropy range and no colour class, so its range column reads
+#: ``(fold)`` (the band bar folds gaps into the strip). Rendered by
+#: ``LegendScreen._render_map_sheet`` through the SAME live-derived column
+#: alignment as the band rows above it.
+BAND_GAP_FIELDS: Tuple[str, str, str, str] = (
+    "╱",
+    "unmapped gap",
+    "(fold)",
+    "address hole between runs — not a band",
 )
 
 
@@ -377,26 +375,127 @@ def build_band_key_rows() -> List[BandKeyRow]:
     return rows
 
 
+# ---------------------------------------------------------------------------
+# HLR-132 (batch 2026-10-11-batch-93 inc-003) — the map view's SPEC SHEET.
+#
+# The operator ruling of 2026-08-06 (legend A, captured in
+# ``prototypes/memmap2_legend_A.120w.svg``) replaced the map's annotated
+# example card with a grouped spec sheet: four bordered boxes — Entropy bands ·
+# Map anatomy · Region row · Keys — zero prose paragraphs, no wrapping line.
+# The box RENDER lives in ``LegendScreen._render_map_sheet`` (screens.py); this
+# block owns only the AUTHORED data, mirroring the LEGEND_EXAMPLES → compose
+# split (design decision D-2). The band rows are deliberately NOT authored
+# here: ``_render_map_sheet`` derives them at RENDER time from
+# ``build_band_key_rows()`` (LLR-132.4's live-source law), so the sheet cannot
+# drift from the band domain. Every sheet line renders ``markup=False`` (the
+# ``[lo,hi)`` ranges carry literal brackets — TC-N8-11's precedent), so these
+# constants need no bracket escaping.
+# ---------------------------------------------------------------------------
+
+#: The Map-anatomy box's meaning lines, one per map surface, in render order:
+#: band bar, ruler, glance chips, stats line (LLR-132.1). The matching SAMPLE
+#: lines are built by :func:`build_map_anatomy_samples`, whose band glyphs are
+#: derived live — the samples may not drift from the band domain either.
+MAP_ANATOMY_MEANINGS: Tuple[str, ...] = (
+    "band bar — width ∝ mapped bytes; ╱ = folded gap",
+    "ruler — a tick per run start + last mapped byte",
+    "glance — regions and share of mapped, per band",
+    "stats — mapped vs span · ranges · gaps · issues",
+)
+
+
+def build_map_anatomy_samples() -> List[Tuple[str, str]]:
+    """
+    Summary:
+        Build the Map-anatomy box's ``(sample, meaning)`` pairs (LLR-132.1) —
+        one rendered sample line per map surface followed by its one-line
+        meaning. The band glyphs INSIDE the samples are DERIVED from
+        ``band_style`` at call time (design decision D-3's anti-drift law),
+        so an upstream band GLYPH change flows through to the sheet with zero
+        legend-code change. The samples use the CANONICAL band vocabulary —
+        ``band_style`` resolves it against the style tables, falling back to
+        the highest band for a label they no longer carry — so a domain
+        RE-CUT upstream can never crash the anatomy box; only the live band
+        key tracks renames (LLR-132.4).
+
+    Args:
+        None.
+
+    Returns:
+        List[Tuple[str, str]]: exactly ``len(MAP_ANATOMY_MEANINGS)``
+        ``(sample, meaning)`` pairs, in box order — band bar, ruler, glance
+        chips, stats line.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Calls ``band_style`` for the sample glyphs (never indexes
+          :data:`ENTROPY_BANDS` — the anatomy box is illustration; the live
+          derivation is the band key's job).
+        - Consumed by ``LegendScreen._render_map_sheet`` (screens.py).
+
+    Dependencies:
+        Uses:
+            - band_style
+            - MAP_ANATOMY_MEANINGS
+        Used by:
+            - s19_app.tui.screens.LegendScreen._render_map_sheet
+            - tests/test_legend_map_sheet.py
+
+    Example:
+        >>> samples = build_map_anatomy_samples()
+        >>> len(samples) == len(MAP_ANATOMY_MEANINGS)
+        True
+        >>> samples[0][1]
+        'band bar — width ∝ mapped bytes; ╱ = folded gap'
+    """
+    samples = (
+        # Band bar: one proportional segment per merged run (all four bands
+        # shown), gaps folded in.
+        band_style("constant/padding")[1] * 3
+        + "╱"
+        + band_style("low")[1] * 3
+        + "╱"
+        + band_style("medium")[1] * 6
+        + "╱"
+        + band_style("high/random")[1] * 4,
+        # Ruler: one 8-hex tick per run start + the last mapped byte.
+        "00000000   08001000   1FFF01FF",
+        # Glance chips: per OCCUPIED band — count + mapped-byte share (sums 100).
+        f"{band_style('low')[1]} 1 19%  "
+        f"{band_style('medium')[1]} 4 57%  "
+        f"{band_style('high/random')[1]} 3 24%",
+        # Stats strip: the compact one-line form (LLR-129.2, 66-cell shape).
+        "Mapped 5.2 KiB / 512 MiB 0.0010% · 9 rng (9 ok) · 4 gaps · 0 iss",
+    )
+    return list(zip(samples, MAP_ANATOMY_MEANINGS))
+
+
+#: The Region-row box's rendered sample — ONE shipped-fixed-width region row
+#: (``screens_directionb._build_region_row``, LLR-127.1's format
+#: ``{glyph} 0x{addr} {size:>7} {microbar} {sym:>2} {band:<9}↵``), so the
+#: sheet documents the exact surface the operator sees (sample → meaning).
+MAP_REGION_ROW_SAMPLE = " ▒ 0x08000000 2.0 KiB ████  3 medium   ↵"
+
+#: The Region-row box's field key: one line decoding every sample field
+#: (LLR-132.1). Authored to fit the 80x24 floor box interior — the width
+#: budget is recorded with the ``.legend-sheet-*`` rules in ``styles.tcss``.
+MAP_REGION_ROW_FIELD_KEY = (
+    "glyph · start · size · size vs largest · A2L sym · band · ↵ opens hex"
+)
+
+#: The Keys box's one line (LLR-132.1, verbatim from the contract).
+MAP_KEYS_LINE = (
+    "↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close"
+)
+
+
 def _band_glyphs_spaced() -> str:
     """Ordered band glyphs (``· ░ ▒ ▓``) DERIVED from
     ``band_style`` (AMD-10b) — the workspace memory strip and the map band bar
     both draw their glyphs from this one source, never a hand-list."""
     return "  ".join(band_style(label)[1] for label, _lo, _hi in ENTROPY_BANDS)
-
-
-def _map_band_bar_sample() -> str:
-    """A representative band-bar strip built from the DERIVED band glyphs plus
-    the gap hatch (LLR-N8-3.1: the sample uses ``·░▒▓`` and
-    the gap glyph ``╱``)."""
-    glyph = {label: band_style(label)[1] for label, _lo, _hi in ENTROPY_BANDS}
-    return (
-        glyph["medium"] * 6
-        + glyph["high/random"] * 4
-        + "╱" * 3
-        + glyph["low"] * 6
-        + glyph["constant/padding"] * 4
-        + glyph["high/random"] * 4
-    )
 
 
 def _workspace_lines() -> List[LegendLine]:
@@ -583,88 +682,6 @@ def _a2l_lines() -> List[LegendLine]:
     ]
 
 
-def _map_lines() -> List[LegendLine]:
-    return [
-        LegendLine(
-            ROLE_SUB,
-            "Header + band bar (one proportional segment per merged run)",
-        ),
-        LegendLine(
-            ROLE_LINE,
-            "Entropy bands - 7 region(s), 262144 B mapped",
-        ),
-        LegendLine(
-            ROLE_CAPTION,
-            "= merged runs + mapped bytes · empty: No file loaded … / "
-            "No entropy detail for this image.",
-        ),
-        LegendLine(ROLE_LINE, _map_band_bar_sample()),
-        LegendLine(
-            ROLE_CAPTION,
-            "glyph repeated per segment · ╱╱╱ gap hatch = "
-            "unmapped gap between runs (NOT a band)",
-        ),
-        LegendLine(
-            ROLE_LINE,
-            "80000000 80004000 80008000 8000A000 8000C000 8000FFFF",
-        ),
-        LegendLine(
-            ROLE_CAPTION,
-            "address ruler — one tick per merged run start, plus the last "
-            "mapped byte (8-hex, no 0x prefix, ≥1 blank column between "
-            "labels); interior ticks drop when they will not fit, the first "
-            "and last always stay",
-        ),
-        LegendLine(ROLE_SUB, "Region row (click to inspect + jump to hex)"),
-        LegendLine(
-            ROLE_LINE,
-            "[b]░ 0x80000000  256 B  ██░░  3 sym  low "
-            "↵[/]",
-        ),
-        LegendLine(
-            ROLE_CAPTION,
-            "= band glyph · start · size · 4-cell size bar(vs "
-            "largest) · symbols · band label · ↵ open hex",
-        ),
-        LegendLine(ROLE_SUB, "At a glance"),
-        LegendLine(
-            ROLE_LINE,
-            "░ low 4 ████ 66%   = per-band histogram: "
-            "glyph · band · count · 6-cell bar · % of regions",
-        ),
-        LegendLine(ROLE_LINE, " ▁▂▅█▇▄▂▁ …"),
-        LegendLine(
-            ROLE_CAPTION,
-            "sparkline — 24-col entropy profile, 9-level ramp "
-            "\" ▁▂▃▄▅▆▇█\" "
-            "(0 none → 8 max), band-coloured",
-        ),
-        LegendLine(ROLE_SUB, "Coverage stats + region inspector"),
-        LegendLine(
-            ROLE_CAPTION,
-            "Coverage: 98.4375% · Bytes covered 1.0 KiB of 128.0 MiB "
-            "· Valid/Invalid ranges · Gaps · Largest gap 64.0 MiB "
-            "· Total issues",
-        ),
-        LegendLine(
-            ROLE_CAPTION,
-            "inspector: Status VALID/INVALID/GAP · Cell · Region(+A2L "
-            "sym) · issues · Size · band · Peek",
-        ),
-        LegendLine(ROLE_SUB, "Hex overlays (painted in the map hex-peek)"),
-        LegendLine(
-            ROLE_CAPTION,
-            "search / goto-focus highlight = byte span matched by the last "
-            "in-memory search / goto jump",
-        ),
-        LegendLine(
-            ROLE_CAPTION,
-            "MAC address overlay = a hex byte at an address referenced by a "
-            "loaded MAC record",
-        ),
-    ]
-
-
 def _mac_lines() -> List[LegendLine]:
     return [
         LegendLine(ROLE_SUB, "Coverage strip"),
@@ -805,14 +822,17 @@ def _issues_lines() -> List[LegendLine]:
 
 
 #: Per-view annotated example-card content, keyed by ``_active_screen_key``
-#: (``workspace`` / ``a2l`` / ``map`` / ``mac`` / ``issues``). Each value is an
+#: (``workspace`` / ``a2l`` / ``mac`` / ``issues``). Each value is an
 #: ordered list of :class:`LegendLine` transcribed at FULL density from
 #: ``prototypes/legend_n8.kimi.NOTES.md`` / ``legend_n8.INVENTORY.md``. Rendered
 #: by ``LegendScreen.compose`` (Inc-2/Inc-3) above the view's colour/band key.
+#: The MAP key is deliberately ABSENT (batch-93 HLR-132, inc-003): the map
+#: view's annotated card retired with the N8 example card in favour of the
+#: spec sheet — see the HLR-132 block above and
+#: ``LegendScreen._render_map_sheet``.
 LEGEND_EXAMPLES: Dict[str, List[LegendLine]] = {
     "workspace": _workspace_lines(),
     "a2l": _a2l_lines(),
-    "map": _map_lines(),
     "mac": _mac_lines(),
     "issues": _issues_lines(),
 }

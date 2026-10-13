@@ -64,6 +64,24 @@ def _modal_meanings(screen: LegendScreen) -> list[str]:
     return out
 
 
+async def _settle_legend(pilot, app: S19TuiApp, max_pauses: int = 10) -> bool:
+    """Bounded settle for a freshly pushed LegendScreen (the modal mount race
+    this module's button/key tests could hit under load — fixed at batch-93
+    inc-003 along the inc-001 bounded-poll precedent): ``push_screen`` mounts
+    the modal on a later tick than a single ``pilot.pause()`` guarantees under
+    process load, so the body query can race ahead of the mount and read
+    EMPTY. Poll — never an unbounded wait — until the LegendScreen is on top
+    with its body rows composed, and report failure honestly when the bound
+    is hit."""
+    for _ in range(max_pauses):
+        await pilot.pause()
+        if isinstance(app.screen, LegendScreen) and app.screen.query(
+            "#legend_body Static"
+        ):
+            return True
+    return False
+
+
 def test_legend_table_covers_all_severities() -> None:  # TC-S1
     """Every policy severity is reachable via a legend colour, and no legend
     colour is an orphan (must map to a severity, or be the default White)."""
@@ -164,8 +182,7 @@ def test_at023a_a2l_legend_opens_via_key(tmp_path: Path) -> None:
             await pilot.pause()
             app.set_focus(None)  # user not typing in a filter field
             await pilot.press("k")
-            await pilot.pause()
-            on_legend = isinstance(app.screen, LegendScreen)
+            on_legend = await _settle_legend(pilot, app)
             return on_legend, _modal_meanings(app.screen) if on_legend else []
 
     on_legend, meanings = asyncio.run(_drive())
@@ -185,8 +202,7 @@ def test_at023b_mac_legend_button_opens(tmp_path: Path) -> None:
             app.action_show_screen("mac")
             await pilot.pause()
             app.query_one("#mac_legend_button", Button).press()
-            await pilot.pause()
-            on_legend = isinstance(app.screen, LegendScreen)
+            on_legend = await _settle_legend(pilot, app)
             return on_legend, _modal_meanings(app.screen) if on_legend else []
 
     on_legend, meanings = asyncio.run(_drive())
@@ -206,8 +222,7 @@ def test_at023c_issues_legend_button_opens(tmp_path: Path) -> None:
             app.action_show_screen("issues")
             await pilot.pause()
             app.query_one("#issues_legend_button", Button).press()
-            await pilot.pause()
-            on_legend = isinstance(app.screen, LegendScreen)
+            on_legend = await _settle_legend(pilot, app)
             return on_legend, _modal_meanings(app.screen) if on_legend else []
 
     on_legend, meanings = asyncio.run(_drive())
@@ -227,8 +242,7 @@ def test_at023d_close_dismisses_modal(tmp_path: Path) -> None:
             app.action_show_screen("issues")
             await pilot.pause()
             app.query_one("#issues_legend_button", Button).press()
-            await pilot.pause()
-            opened = isinstance(app.screen, LegendScreen)
+            opened = await _settle_legend(pilot, app)
             app.screen.query_one("#legend_close", Button).press()
             await pilot.pause()
             closed = not isinstance(app.screen, LegendScreen)
@@ -284,7 +298,8 @@ def test_at023e_c13_geometry_at_80_cols(tmp_path: Path) -> None:
             app.action_show_screen("mac")
             await pilot.pause()
             app.query_one("#mac_legend_button", Button).press()
-            await pilot.pause()
+            settled = await _settle_legend(pilot, app)
+            assert settled, "the legend modal did not mount within the poll bound"
             dlg = app.screen.query_one("#legend_dialog")
             return dlg.region.right, dlg.region.bottom, app.size.width, app.size.height
 
@@ -309,8 +324,7 @@ def test_at023f_legend_shows_without_file_loaded(tmp_path: Path) -> None:
             await pilot.pause()
             app.set_focus(None)
             await pilot.press("k")
-            await pilot.pause()
-            on_legend = isinstance(app.screen, LegendScreen)
+            on_legend = await _settle_legend(pilot, app)
             return on_legend, len(_modal_meanings(app.screen)) if on_legend else 0
 
     on_legend, n_rows = asyncio.run(_drive())
@@ -332,7 +346,9 @@ def test_tc023_1_modal_renders_all_table_rows(tmp_path: Path) -> None:
             await pilot.pause()
             app.set_focus(None)
             await pilot.press("k")
-            await pilot.pause()
+            assert await _settle_legend(pilot, app), (
+                "pressing 'k' did not open LegendScreen within the poll bound"
+            )
             headers = [
                 str(label.render())
                 for label in app.screen.query("#legend_body Label")
@@ -399,8 +415,7 @@ def test_at059a_hex_legend_present_in_modal(tmp_path: Path) -> None:
             await pilot.pause()
             app.set_focus(None)  # user not typing in a filter field
             await pilot.press("k")
-            await pilot.pause()
-            on_legend = isinstance(app.screen, LegendScreen)
+            on_legend = await _settle_legend(pilot, app)
             headers = (
                 [
                     str(label.render())

@@ -13,6 +13,17 @@ Batch 2026-07-23-batch-n8. Two layers:
 
 Batch-91 contract adoption (HLR-122):
 # TC-643 — this module pins the N8 legend and logwidth scope (LLR-122.5).
+
+Batch-93 inc-003 (HLR-132): the MAP example card retired — the map view's
+``k``-legend is the spec sheet now (``tests/test_legend_map_sheet.py``), so
+``LEGEND_EXAMPLES`` carries the four card views. The registry-bound node
+NAMES stay (TC-643's row binds them; the batch-77 precedent: a rename is a
+registry change) — ``test_at_n8_03_map_band_key_and_overlays``,
+``test_tc_n8_05_map_example_data``,
+``test_map_card_band_bar_sample_uses_band_and_gap_glyphs`` and
+``test_map_card_contains_both_hex_overlay_meanings`` keep their names with
+bodies re-aimed at the sheet (the overlay arm now pins legend A's NO-overlay
+block, the meanings staying sourced in the Hex table data).
 """
 
 from __future__ import annotations
@@ -32,7 +43,9 @@ from s19_app.tui.services.entropy_service import ENTROPY_BANDS
 from textual.content import Content
 from textual.widgets import DataTable, Static
 
-VIEW_KEYS = ("workspace", "a2l", "map", "mac", "issues")
+#: The card-carrying views (batch-93 HLR-132: the map card retired to the spec
+#: sheet — ``tests/test_legend_map_sheet.py`` owns the map path).
+VIEW_KEYS = ("workspace", "a2l", "mac", "issues")
 
 
 def _text(view_key: str) -> str:
@@ -44,7 +57,12 @@ def _text(view_key: str) -> str:
 # LEGEND_EXAMPLES shape (LLR-N8-1.1 .. 5.1)
 # --------------------------------------------------------------------------- #
 def test_legend_examples_has_all_five_view_keys():
+    """NAME retained per TC-643's registry binding (batch-77 precedent: the
+    binding wins over accuracy) — the body pins the POST-HLR-132 reality:
+    the four card-carrying views, with the map card retired to the spec
+    sheet (``tests/test_legend_map_sheet.py`` owns the map path)."""
     assert set(L.LEGEND_EXAMPLES) == set(VIEW_KEYS)
+    assert "map" not in L.LEGEND_EXAMPLES
 
 
 @pytest.mark.parametrize("view_key", VIEW_KEYS)
@@ -115,26 +133,77 @@ def test_tc_n8_04_a2l_example_data():
 
 
 # --------------------------------------------------------------------------- #
-# TC-N8-05 — map example data (LLR-N8-3.1) incl. the 2 Hex overlays (AMD-6)
+# TC-N8-05's map limb — the map view's legend is the spec sheet (HLR-132,
+# inc-003). NAMES retained per TC-643's registry binding (batch-77 precedent);
+# the bodies pin the sheet's DATA (the retired card arms went away with the
+# card — legend A carries no overlay block — while the overlay meanings stay
+# sourced in the Hex table's _HEX_STYLE_MEANINGS).
 # --------------------------------------------------------------------------- #
 def test_tc_n8_05_map_example_data():
-    text = _text("map")
-    for needle in ("band bar", "region", "At a glance", "inspector"):
-        assert needle in text, f"map card missing {needle!r}"
+    """The map sheet's DATA (the retired map-card pin's successor): the live
+    band meanings, the anatomy sample/meaning pairs, the region sample + field
+    key and the Keys line are all present and non-blank."""
+    text = " ".join(
+        [
+            *[row.meaning for row in L.build_band_key_rows()],
+            *[sample for sample, meaning in L.build_map_anatomy_samples()],
+            *[meaning for sample, meaning in L.build_map_anatomy_samples()],
+            L.MAP_REGION_ROW_SAMPLE,
+            L.MAP_REGION_ROW_FIELD_KEY,
+            L.MAP_KEYS_LINE,
+            *L.BAND_GAP_FIELDS,
+        ]
+    )
+    for needle in ("band bar", "ruler", "glance", "stats", "unmapped gap"):
+        assert needle in text, f"map sheet data missing {needle!r}"
+    assert all(text.strip() for text in L.MAP_ANATOMY_MEANINGS)
 
 
 def test_map_card_contains_both_hex_overlay_meanings():
-    """AMD-6 / AMD-3: the map view keeps the band key (map -> ()), so its two
-    Hex byte-cell overlays must be explained inside the card instead."""
-    text = _text("map")
-    assert "search / goto-focus highlight" in text
-    assert "MAC address overlay" in text
+    """NAME retained per TC-643's binding; body pins the RETIREMENT (legend A):
+    the map sheet carries NO hex-overlay prose (zero prose paragraphs, no
+    overlay block — AT-N8-03's overlay arm superseded), while both overlay
+    meanings stay sourced in the Hex table data so the knowledge is not lost
+    with the card."""
+    sheet_text = " ".join(
+        [
+            *[row.meaning for row in L.build_band_key_rows()],
+            *[sample for sample, meaning in L.build_map_anatomy_samples()],
+            *[meaning for sample, meaning in L.build_map_anatomy_samples()],
+            L.MAP_REGION_ROW_SAMPLE,
+            L.MAP_REGION_ROW_FIELD_KEY,
+            L.MAP_KEYS_LINE,
+            *L.BAND_GAP_FIELDS,
+        ]
+    )
+    assert "search / goto-focus highlight" not in sheet_text, (
+        "the retired overlay explanation leaked back into the map sheet"
+    )
+    assert "MAC address overlay" not in sheet_text, (
+        "the retired overlay explanation leaked back into the map sheet"
+    )
+    hex_meanings = " ".join(meaning for _colour, meaning in L.LEGEND_TABLE["Hex"].values())
+    assert "search / goto-focus highlight" in hex_meanings
+    assert "MAC address overlay" in hex_meanings
 
 
 def test_map_card_band_bar_sample_uses_band_and_gap_glyphs():
-    text = _text("map")
-    for glyph in ("·", "░", "▒", "▓", "╱"):
-        assert glyph in text, f"map card missing glyph {glyph!r}"
+    """NAME retained per TC-643's binding; body pins the sheet's anatomy
+    samples (the retired map-card band-bar sample's successor): the samples
+    use the DERIVED band glyphs + the gap hatch — never a hand-listed glyph."""
+    from s19_app.tui.entropy_style import band_style
+
+    samples = L.build_map_anatomy_samples()
+    text = " ".join(sample for sample, _meaning in samples[:3])
+    for glyph in (
+        band_style("constant/padding")[1],
+        band_style("low")[1],
+        band_style("medium")[1],
+        band_style("high/random")[1],
+        "╱",
+    ):
+        assert glyph in text, f"derived band glyph {glyph!r} absent from samples"
+    assert len(samples) == len(L.MAP_ANATOMY_MEANINGS) == 4
 
 
 # --------------------------------------------------------------------------- #
@@ -330,11 +399,18 @@ def test_at_n8_02_a2l_card_above_key(tmp_path: Path) -> None:
 
 
 def test_at_n8_03_map_band_key_and_overlays(tmp_path: Path) -> None:
-    """AT-N8-03 — Map legend shows the band-bar/region card, all four band
-    meanings, the domain-separation note and BOTH Hex overlay meanings (AMD-6),
-    and NO A2L severity row (LLR-N8-3.1/3.2)."""
+    """AT-N8-03 (body re-aimed at batch-93 HLR-132; NAME retained — TC-643's
+    registry row binds this exact node path, and per the batch-77 TC-519
+    precedent a rename is a registry change, not a test change) — through the
+    real ``action_show_legend`` path the map view renders the SPEC SHEET: the
+    four grouped boxes (band key + gap row, anatomy samples, region sample +
+    field key, Keys line) and NO A2L severity row. The full
+    structure/liveness arms live in ``tests/test_legend_map_sheet.py``
+    (TC-676/677); the retired card arms (band-bar card, domain note, Hex
+    overlay explanations) went away with the card — legend A carries no
+    overlay block (see this module's docstring)."""
     text = _legend_text_on("map", tmp_path)
-    assert "band bar" in text and "region" in text, "map card missing"
+    assert "band bar" in text and "ruler" in text, "sheet anatomy box missing"
     for meaning in (
         "padding / fill",
         "structured / tables",
@@ -342,11 +418,10 @@ def test_at_n8_03_map_band_key_and_overlays(tmp_path: Path) -> None:
         "code / compressed / random",
     ):
         assert meaning in text, f"map band meaning missing: {meaning!r}"
-    assert "Bands ≠ severities" in text, "entropy-domain note missing"
-    # AMD-6: both Hex byte-cell overlays explained inside the card.
-    assert "search / goto-focus highlight" in text
-    assert "MAC address overlay" in text
-    # negative: the map renders the band key, not the A2L/Hex severity key.
+    assert "unmapped gap" in text, "sheet gap row missing"
+    assert L.MAP_REGION_ROW_SAMPLE in text, "sheet region sample missing"
+    assert L.MAP_KEYS_LINE in text, "sheet Keys line missing"
+    # negative: the sheet renders no A2L/Hex severity key rows.
     assert L.LEGEND_TABLE["A2L"]["Red"][1] not in text
 
 
@@ -463,12 +538,36 @@ def test_tc_n8_04_a2l_card_covers_every_live_column(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# TC-N8-11b (AMD-9 defense-in-depth) — the band-key notes render on the map view
-# (BAND_DOMAIN_NOTE with markup enabled) but live OUTSIDE LEGEND_EXAMPLES, so the
-# _all_lines() tripwire above does not reach them. Guard them here so a future
-# literal '[' added to either note can't open a tag and crash the modal.
+# TC-N8-11b (AMD-9 defense-in-depth, re-aimed at batch-93 HLR-132) — the map
+# spec-sheet lines live OUTSIDE LEGEND_EXAMPLES (the retired band notes went
+# away with the map card), so the _all_lines() tripwire does not reach them.
+# Guard them here so a future markup-sensitive character added to any sheet
+# line can't open a tag and crash the modal if a line ever flips markup=True.
 # --------------------------------------------------------------------------- #
 def test_tc_n8_11b_band_notes_are_markup_safe():
-    for note in (L.BAND_DOMAIN_NOTE, L.BAND_GAP_HATCH_NOTE):
-        content = Content.from_markup(note)  # no MarkupError
+    """TC-N8-11b (body re-aimed at batch-93 HLR-132; NAME retained — TC-643's
+    registry row binds it): the retired band notes went away with the map
+    card, so the tripwire guards the spec-sheet lines instead — they live
+    OUTSIDE LEGEND_EXAMPLES, so the _all_lines() tripwire does not reach
+    them. A future markup-sensitive character added to any sheet line can't
+    open a tag and crash the modal if a line ever flips markup=True."""
+    sheet_lines = [
+        *[row.range_text for row in L.build_band_key_rows()],
+        *[sample for sample, _meaning in L.build_map_anatomy_samples()],
+        *[meaning for _sample, meaning in L.build_map_anatomy_samples()],
+        L.MAP_REGION_ROW_SAMPLE,
+        L.MAP_REGION_ROW_FIELD_KEY,
+        L.MAP_KEYS_LINE,
+        *L.BAND_GAP_FIELDS,
+    ]
+    for line in sheet_lines:
+        content = Content.from_markup(line)  # no MarkupError
         assert content.plain  # renders to visible text
+    # The sheet renders markup=False — a literal '[' must round-trip untouched
+    # (the [lo,hi) range texts are the carriers).
+    bracketed = [line for line in sheet_lines if "[" in line]
+    assert bracketed, "the tripwire expects the [lo,hi) range texts to carry '['"
+    for line in bracketed:
+        assert "[" in Content.from_markup(line).plain, (
+            f"literal bracket lost in {line!r}"
+        )

@@ -1849,6 +1849,45 @@ ModalScreen {
     margin-left: 1;
 }
 
+/* --- batch-93 inc-003 (HLR-132): the map spec-sheet dialog ----------------
+ * The map view's `k`-legend is the spec sheet: four grouped bordered boxes
+ * in ONE full-width scrolling column (LegendScreen.compose's map branch) —
+ * not the two-pane card/key body. The chrome is deliberately full-bleed:
+ * WIDTH BUDGET, measured at the 80x24 floor on textual 8.2.8 — screen 78 ->
+ * dialog 78 (100%) -> content 76 after the dialog border (2) -> sheet pane 74
+ * after the vertical-scrollbar gutter (2; the sheet always scrolls at the
+ * floor) -> box interior 72 after the box border (2). The contract's pinned
+ * Keys line measures 71 cells (LLR-132.1), so it fits the floor interior
+ * with ONE column of slack — under the stock 96% dialog + 2-col side padding
+ * (interior ~64) it cannot, so `.legend-sheet` carries its own chrome and
+ * the boxes take ZERO padding: every interior column is spoken for. */
+#legend_dialog.legend-sheet {
+    width: 100%;
+    padding: 1 0;
+}
+
+#legend_dialog.legend-sheet #legend_body {
+    height: 1fr;
+}
+
+/* The grouped boxes echo the map's own `.db-pane` chrome tokens (LLR-125.1's
+ * idiom) so the sheet reads as the map's reference card. */
+#legend_dialog.legend-sheet .legend-sheet-box {
+    border: tall $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+    background: $bg-panel;
+    height: auto;
+    margin-top: 1;
+}
+
+/* Meaning lines (the annotation under each rendered sample) sit dim — the
+ * LLR-N8-6.2 weight/dim-only law for card lines, kept for the sheet: a
+ * meaning line must never read as a colour-key row. */
+#legend_dialog.legend-sheet .legend-sheet-meaning {
+    text-style: dim;
+}
+
 /* The entropy-viewer modal (batch-26 `#entropy_*` / `.entropy-*` rules) was
  * removed in batch-45 Inc-5 — its function moved into the always-visible
  * Memory-Map band view (R-TUI-060/061/062). */
