@@ -1287,6 +1287,7 @@ def write_change_document(
     base_dir: Path,
     file_name: str = DEFAULT_CHANGE_FILE_NAME,
     copy_fn: Optional[CopyIntoWorkarea] = None,
+    dest_dir: Optional[Path] = None,
 ) -> tuple[Optional[Path], list[ValidationIssue]]:
     """
     Summary:
@@ -1295,6 +1296,12 @@ def write_change_document(
         ``.s19tool/workarea/temp/`` and let ``workspace.copy_into_workarea``
         perform the containment-checked final placement (the
         ``write_unified_to_workarea`` pattern, reused not re-invented).
+
+        Change 1 (HLR-138) adds the scoped home: ``dest_dir`` overrides the
+        COMMON ``workarea/patches/`` library — with a project, the caller
+        passes ``<project>/patches/`` (or ``<project>/checks/`` for a check
+        document) so a NEW artifact defaults into the project; without one
+        the COMMON home is kept.
 
     Args:
         document (ChangeDocument): The document to serialize — passed to
@@ -1311,6 +1318,12 @@ def write_change_document(
             copy_into_workarea`` at call time, so monkeypatching that symbol
             also redirects the write path; injectable so a test can stub the
             containment-checked placement without OS symlink privilege.
+        dest_dir (Optional[Path]): The change-1 scoped home — the directory
+            the staged file is placed into. ``None`` (the default) keeps the
+            shipped COMMON ``workarea/patches/``; a caller-supplied project
+            home (``<project>/patches/`` / ``<project>/checks/``) rides the
+            SAME containment-checked placement, so the containment law holds
+            for the scoped homes exactly as for the COMMON one.
 
     Returns:
         tuple[Optional[Path], list[ValidationIssue]]: The absolute path of
@@ -1328,10 +1341,11 @@ def write_change_document(
         - Serialize ``document``; ensure the work-area structure; stage the
           bytes in ``.s19tool/workarea/temp/`` — itself inside the work area,
           so no bytes ever land outside it.
-        - Place the staged file into the dedicated patches folder
-          ``.s19tool/workarea/patches/`` via the copy helper (containment +
-          reparse point + dedup checks reused; the helper creates the patches
-          subdir on demand); remove the staged temp file either way.
+        - Place the staged file into the destination folder (the COMMON
+          patches folder by default, the change-1 scoped home when given)
+          via the copy helper (containment + reparse point + dedup checks
+          reused; the helper creates the destination subdir on demand);
+          remove the staged temp file either way.
 
     Dependencies:
         Uses:
@@ -1356,10 +1370,11 @@ def write_change_document(
 
     workarea = ensure_workarea(base_dir)
     staged = workarea / WORKAREA_TEMP / _safe_name(file_name)
+    target_dir = dest_dir if dest_dir is not None else workarea / WORKAREA_PATCHES
     try:
         staged.parent.mkdir(parents=True, exist_ok=True)
         staged.write_bytes(data)
-        target = placement(staged, workarea / WORKAREA_PATCHES)
+        target = placement(staged, target_dir)
         return target, issues
     except (WorkareaContainmentError, OSError) as exc:
         issues.append(

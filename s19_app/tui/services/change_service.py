@@ -1203,19 +1203,30 @@ class ChangeService:
         )
 
     def save(
-        self, base_dir: Path, file_name: str = DEFAULT_CHANGE_FILE_NAME
+        self,
+        base_dir: Path,
+        file_name: str = DEFAULT_CHANGE_FILE_NAME,
+        dest_dir: Optional[Path] = None,
     ) -> ChangeActionResult:
         """
         Summary:
             Write the owned document to a v2 JSON file inside the work area
             via ``write_change_document`` (LLR-003.4 save; canonical wire
-            grammar, staged containment).
+            grammar, staged containment). Change 1 (HLR-138) threads the
+            scoped home through: with a project the caller passes
+            ``<project>/patches/`` (or ``<project>/checks/`` for a check
+            document) so the NEW artifact defaults into the project; without
+            one the COMMON ``workarea/patches/`` home is kept.
 
         Args:
             base_dir (Path): The app base directory whose
                 ``.s19tool/workarea/`` is the containment root.
             file_name (str): The desired file name; a collision is
                 dedup-suffixed by the writer — never a silent clobber.
+            dest_dir (Optional[Path]): The change-1 scoped home — ``None``
+                keeps the COMMON patches library; a project home redirects
+                the write INTO the project (same containment-checked
+                placement).
 
         Returns:
             ChangeActionResult: ``ok`` is ``True`` with the written path in
@@ -1229,7 +1240,7 @@ class ChangeService:
                 - app.py ``save_doc`` action routing
         """
         path, issues = write_change_document(
-            self.document, base_dir, file_name=file_name
+            self.document, base_dir, file_name=file_name, dest_dir=dest_dir
         )
         if path is None:
             return ChangeActionResult(

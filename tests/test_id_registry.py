@@ -74,7 +74,13 @@ from tools.id_registry import (
 # batch-93 inc-003 (2026-10-13): 164 -> 166, measured — the bound had drifted to
 # 164 before this increment (one module added without a bump); this increment
 # adds ``tests/test_legend_map_sheet.py`` + ``tests/test_command_bar_interlock.py``.
-EXPECTED_SCANNED_TEST_FILES = 166
+# batch-95 inc-001 (2026-10-13): 166 -> 167, measured — the engine increment adds
+# ``tests/test_segment_ops.py`` (the HLR-137 slice/join engine TCs); the A2L
+# extractor TCs (TC-682) extend the existing ``tests/test_a2l_enriched.py``.
+# batch-95 inc-002 (2026-10-13): 167 -> 168, measured — the change-1 increment
+# adds ``tests/test_project_gather.py`` (the HLR-138 save-gather + scoped-homes
+# TCs, TC-699..702).
+EXPECTED_SCANNED_TEST_FILES = 168
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

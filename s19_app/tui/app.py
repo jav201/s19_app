@@ -137,6 +137,12 @@ from .services.manifest_writer import (
     verify_written_manifest,
     write_project_manifest,
 )
+from .services.project_gather_service import (
+    PROJECT_CHECKS_DIR,
+    PROJECT_PATCHES_DIR,
+    gather_project_artifacts,
+    scoped_home,
+)
 from .services.validation_service import (
     build_mac_coverage_strip,
     build_validation_report,
@@ -156,8 +162,10 @@ from .workspace import (
     PROJECT_PRIMARY_DATA_EXTENSIONS,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
+    WORKAREA_DIRNAME,
     WORKAREA_PATCHES,
     WORKAREA_TEMP,
+    WORKAREA_TEMPLATES,
     WorkareaContainmentError,
     build_variant_set,
     copy_into_workarea,
@@ -1488,6 +1496,14 @@ class S19TuiApp(App):
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
         self._change_service = ChangeService()
+        #: Change 1 (HLR-138) — the CRC template LAST loaded through the
+        #: CRC Designer's load path, recorded so the save-gather can copy the
+        #: template the project USES into ``<project>/templates/`` (the
+        #: active-template limb of the recorded predicate in
+        #: ``project_gather_service``). ``None`` until a template load
+        #: succeeds; a since-deleted path is tolerated by the gather (one
+        #: skip finding, never a crash).
+        self._last_template_path: Optional[Path] = None
         #: Monotonic image-load generation (batch-48 LLR-077.2). Bumped once
         #: per image install in ``_apply_prepared_load`` and pushed into
         #: ``_change_service``, which stamps it onto each check run so the
@@ -1797,6 +1813,58 @@ class S19TuiApp(App):
         if self.current_project:
             return (self.workarea / self.current_project).resolve()
         return None
+
+    def active_project_dir(self) -> Optional[Path]:
+        """
+        Summary:
+            Public alias of :meth:`_active_project_dir` for non-app surfaces
+            (change 1, HLR-138): the CRC Designer's save resolves its scoped
+            template home through this seam — panels read public app
+            accessors only, never the ``_``-prefixed internals.
+
+        Args:
+            None
+
+        Returns:
+            Optional[Path]: The active project's directory, or ``None``
+            without a project — same value as :meth:`_active_project_dir`.
+
+        Data Flow:
+            - Pure delegation — one seam, two spellings, no second
+              resolution logic to drift (C-14).
+
+        Dependencies:
+            Used by:
+                - s19_app.tui.crc_designer_view.CrcDesignerPanel (Save)
+        """
+        return self._active_project_dir()
+
+    def record_template_load(self, path: Path) -> None:
+        """
+        Summary:
+            Record the CRC template path last successfully loaded through
+            the CRC Designer (change 1, HLR-138): the save-gather's
+            active-template limb copies the template the project USES into
+            ``<project>/templates/`` at the next project save. The recorded
+            path is the RESOLVED on-disk path (the same resolution the
+            reader used), so the gather never re-resolves raw operator text.
+
+        Args:
+            path (Path): The resolved template file just loaded.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Writes ``self._last_template_path`` — read by
+              ``_handle_save_dialog`` at save time; a since-deleted path is
+              tolerated there (one skip finding, never a crash).
+
+        Dependencies:
+            Used by:
+                - s19_app.tui.crc_designer_view.CrcDesignerPanel (_load_template)
+        """
+        self._last_template_path = path
 
     def _shift_window_for_index(self, total: int, index: int, start: int, window_size: int) -> int:
         """
@@ -2666,7 +2734,13 @@ class S19TuiApp(App):
                             f"{loaded.file_type} save-back not supported"
                         )
             elif event.action == "save_doc":
-                self._report_change_result(service.save(self.base_dir))
+                self._report_change_result(
+                    # Change 1 (HLR-138): a NEW change-set defaults INTO the
+                    # project (``patches/``, or ``checks/`` for a check
+                    # document) when a project is active; without one the
+                    # COMMON patches library keeps the write.
+                    service.save(self.base_dir, dest_dir=self._change_doc_save_home())
+                )
                 # R2 / LLR-030.3: a save while the patch screen is open must
                 # appear in the dropdown without re-activation.
                 self._prefill_patch_change_files()
@@ -4409,6 +4483,48 @@ class S19TuiApp(App):
                 - ``on_patch_editor_panel_change_file_selected``
         """
         return self.workarea / WORKAREA_PATCHES
+
+    def _change_doc_save_home(self) -> Optional[Path]:
+        """
+        Summary:
+            Resolve the change-1 (HLR-138) scoped home for a NEW change/check
+            document save: with an active project, the per-artifact project
+            folder — ``<project>/patches/`` for a change-set,
+            ``<project>/checks/`` for a check document (the wire ``kind``
+            discriminator) — so project artifacts live in organized project
+            folders; with NO project, ``None``, and the writer keeps the
+            COMMON ``workarea/patches/`` home. Both limbs ride
+            ``project_gather_service.scoped_home``'s containment check, so
+            the scoped homes obey the same ``.s19tool/workarea/`` law as the
+            gather.
+
+        Args:
+            None
+
+        Returns:
+            Optional[Path]: The scoped save destination, or ``None`` without
+            a project (the writer's COMMON-home default). A containment
+            refusal propagates as ``WorkareaContainmentError`` — the save
+            action surfaces it through the service result, never a crash.
+
+        Data Flow:
+            - ``_active_project_dir()`` → ``None`` ⇒ ``None``.
+            - Else ``scoped_home(project_dir, <kind home>,
+              common=workarea/patches)``.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``scoped_home``
+                - ``_change_service.document.kind`` (the discriminator)
+            Used by:
+                - ``on_patch_editor_panel_action_requested`` (save_doc)
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            return None
+        kind = self._change_service.document.kind
+        subdir = PROJECT_CHECKS_DIR if kind == "check" else PROJECT_PATCHES_DIR
+        return scoped_home(project_dir, subdir, self.workarea / WORKAREA_PATCHES)
 
     def _scan_patch_change_files(self) -> List[str]:
         """Discover the change files under the patches folder (LLR-030.3).
@@ -6836,11 +6952,33 @@ class S19TuiApp(App):
             )
         else:
             self.set_status(f"Saved project to {project_dir}")
+        # Change 1 (HLR-138 / LLR-138.1..138.3): the save-gather — COPY the
+        # JSON artifacts the project USES (the recorded predicate lives in
+        # ``project_gather_service``) into their per-artifact project homes,
+        # leaving the COMMON originals untouched. The gather is best-effort:
+        # its per-artifact findings are logged, never save-blocking.
+        composition_names = list(payload.batch) + [
+            name
+            for entries in payload.assignments.values()
+            for name in entries
+        ]
+        gather_outcome = gather_project_artifacts(
+            project_dir,
+            composition_names=composition_names,
+            active_document=self._change_service.document.source_path,
+            active_document_kind=self._change_service.document.kind,
+            active_template=self._last_template_path,
+            common_patches_dir=self.workarea / WORKAREA_PATCHES,
+            common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
+        )
+        for issue in gather_outcome.issues:
+            self.logger.warning("Project gather: %s", issue.message)
         self._write_and_verify_manifest(
             project_dir,
             batch=payload.batch,
             assignments=payload.assignments,
             declared_regions=self._declared_regions,
+            gathered=gather_outcome.gathered,
         )
         self.update_project_labels()
         self.refresh_files()
@@ -6852,6 +6990,7 @@ class S19TuiApp(App):
         batch: Sequence[str] = (),
         assignments: Optional[Mapping[str, Sequence[str]]] = None,
         declared_regions: Sequence[DeclaredRegion] = (),
+        gathered: Optional[Mapping[str, Sequence[str]]] = None,
     ) -> None:
         """
         Summary:
@@ -6883,6 +7022,12 @@ class S19TuiApp(App):
                 ``verify_written_manifest``, which re-reads the written file as
                 the oracle (CARRY C-P3c). Empty ⇒ the serializer omits the key
                 (back-compat).
+            gathered (Optional[Mapping[str, Sequence[str]]]): The change-1
+                gather rows (HLR-138) — project home → project-relative
+                paths, from ``gather_project_artifacts``. Forwarded into
+                ``write_project_manifest`` ONLY (the reader ignores the
+                additive key, so the verify oracle is unchanged); ``None`` /
+                empty ⇒ the serializer omits the key (back-compat).
 
         Returns:
             None
@@ -6917,6 +7062,7 @@ class S19TuiApp(App):
             batch=batch,
             assignments=assignments,
             declared_regions=declared_regions,
+            gathered=gathered,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"

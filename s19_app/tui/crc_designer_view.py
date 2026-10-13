@@ -69,6 +69,7 @@ a markup sink.
 from __future__ import annotations
 
 from dataclasses import replace
+from pathlib import Path
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -100,7 +101,13 @@ from .operations.crc_designer_model import (
 )
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
 from .operations.crc_template import CrcTemplate, emit_template, read_template
-from .workspace import ensure_template_lib, sanitize_project_name
+from .services.project_gather_service import PROJECT_TEMPLATES_DIR, scoped_home
+from .workspace import (
+    WorkareaContainmentError,
+    ensure_template_lib,
+    resolve_input_path,
+    sanitize_project_name,
+)
 
 #: The graceful empty-state note shown when no image is loaded — shared by the
 #: coverage preview and the coverage-window hero so the two surfaces never
@@ -1182,14 +1189,19 @@ class CrcDesignerPanel(ScrollableContainer):
             self._load_template()
 
     def _save_template(self) -> None:
-        """Save the current template to the library (LLR-V5.2 / V5.4c, F2/F3).
+        """Save the current template to its artifact home (LLR-V5.2 / V5.4c, F2/F3; change 1 HLR-138).
 
         Summary:
             Build the current template, normalize its ``name`` through
-            :func:`sanitize_project_name`, and write ``emit_template`` to the
-            fixed ``<template-lib>/<sanitized-basename>.crc.json`` — a bounded
+            :func:`sanitize_project_name`, and write ``emit_template`` to
+            ``<home>/<sanitized-basename>.crc.json`` — a bounded
             write (F3: only the basename is name-derived, the directory is fixed).
-            An all-symbol / empty name (``sanitize`` → ``None``) writes NOTHING
+            Change 1 (HLR-138) scopes the home: with an active project the
+            write lands in the project's ``templates/`` folder; without one
+            it keeps the COMMON cross-project library
+            (``ensure_template_lib``). Both limbs ride
+            ``project_gather_service.scoped_home``'s work-area containment
+            check. An all-symbol / empty name (``sanitize`` → ``None``) writes NOTHING
             and warns (F2). On Save the known-answer is validated
             (``check == compute("123456789")``, obs #3) and a mismatch WARNS but
             still writes (LLR-V5.4c). Every status/warning renders ``markup=False``
@@ -1201,8 +1213,8 @@ class CrcDesignerPanel(ScrollableContainer):
         Dependencies:
             Uses:
                 - :meth:`_current_template`, ``sanitize_project_name``,
-                  ``ensure_template_lib``, :func:`emit_template`,
-                  :meth:`CrcAlgorithm.kat_ok`
+                  ``scoped_home`` / ``ensure_template_lib``,
+                  :func:`emit_template`, :meth:`CrcAlgorithm.kat_ok`
             Used by:
                 - :meth:`on_button_pressed`
         """
@@ -1229,7 +1241,19 @@ class CrcDesignerPanel(ScrollableContainer):
                 )
         except ValueError as exc:
             kat_warning = f"could not validate the known-answer: {exc} (saved anyway)"
-        lib_dir = ensure_template_lib(self.app.base_dir)
+        # Change 1 (HLR-138): the scoped template home — INTO the project's
+        # ``templates/`` folder when a project is active, else the COMMON
+        # cross-project library (``scoped_home`` runs the same work-area
+        # containment check for both limbs).
+        try:
+            lib_dir = scoped_home(
+                self.app.active_project_dir(),
+                PROJECT_TEMPLATES_DIR,
+                ensure_template_lib(self.app.base_dir),
+            )
+        except WorkareaContainmentError as exc:
+            status.update(f"Cannot save: {exc}")
+            return
         target = lib_dir / f"{safe_name}.crc.json"
         try:
             target.write_text(emit_template(template), encoding="utf-8")
@@ -1252,13 +1276,17 @@ class CrcDesignerPanel(ScrollableContainer):
             :meth:`_apply_template`, after which the live surfaces recompute so
             the (possibly hostile) ``name`` / ``aliases`` render literally at
             every ``markup=False`` sink incl. the JSON preview (C-17, F1).
+            Change 1 (HLR-138): the RESOLVED path is recorded on the app
+            (``record_template_load``) so the save-gather can copy the
+            template the project USES into ``<project>/templates/``.
 
         Returns:
             None
 
         Dependencies:
             Uses:
-                - :func:`read_template`, :meth:`_apply_template`
+                - :func:`read_template`, :meth:`_apply_template`,
+                  ``resolve_input_path``, ``S19TuiApp.record_template_load``
             Used by:
                 - :meth:`on_button_pressed`
         """
@@ -1273,6 +1301,12 @@ class CrcDesignerPanel(ScrollableContainer):
             status.update(f"Load failed: {first}")
             return
         self._apply_template(template)
+        # Change 1 (HLR-138): record the RESOLVED path so the save-gather
+        # can copy this template into <project>/templates/ — the
+        # active-template limb of the recorded predicate.
+        resolved = resolve_input_path(Path(raw), self.app.base_dir)
+        if resolved is not None:
+            self.app.record_template_load(resolved)
         status.update("Loaded template from file.")
 
     def _apply_template(self, template: CrcTemplate) -> None:

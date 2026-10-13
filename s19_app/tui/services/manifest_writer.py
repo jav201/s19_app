@@ -229,6 +229,7 @@ def serialize_manifest(
     batch: Sequence[str] = (),
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
     declared_regions: Sequence[DeclaredRegion] = (),
+    gathered: Optional[Mapping[str, Sequence[str]]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[str], list[ValidationIssue]]:
     """
@@ -262,6 +263,15 @@ def serialize_manifest(
         declared_regions (Sequence[DeclaredRegion]): Operator-declared memory
             regions (LLR-026.1). Each is serialized as ``{name, start, end}``;
             the key is omitted entirely when empty (back-compat).
+        gathered (Optional[Mapping[str, Sequence[str]]]): The change-1 gather
+            rows (HLR-138) — project home name (``patches`` / ``checks`` /
+            ``templates``) → project-relative POSIX paths, exactly as
+            produced by ``project_gather_service.gather_project_artifacts``.
+            Each entry is run through the same refusal predicate as
+            ``batch`` / ``assignments`` (context ``gathered[<home>]``); the
+            key is omitted entirely when ``None`` / empty (back-compat —
+            the reader ignores unknown keys, so a pre-change-1 reader
+            round-trips a gathered manifest without findings).
         schema_version (int): The literal written for ``schema_version``;
             defaults to :data:`DEFAULT_SCHEMA_VERSION` (``1``).
 
@@ -276,7 +286,9 @@ def serialize_manifest(
 
     Data Flow:
         - Check every ``batch`` then every ``assignments`` entry through
-          :func:`_reject_unsafe_entry`; collect all refusals.
+          :func:`_reject_unsafe_entry`; collect all refusals. The change-1
+          ``gathered`` rows (HLR-138) go through the same predicate
+          (context ``gathered[<home>]``).
         - On any refusal → return ``(None, findings)`` (write nothing).
         - Otherwise normalize entries to POSIX, build the 4-key dict, and
           ``json.dumps`` it with stable key order (``sort_keys=False``,
@@ -310,6 +322,13 @@ def serialize_manifest(
             issue = _reject_unsafe_entry(project_root, entry, context)
             if issue is not None:
                 findings.append(issue)
+    gathered = gathered or {}
+    for home, entries in gathered.items():
+        context = f"gathered[{home!r}]"
+        for entry in entries:
+            issue = _reject_unsafe_entry(project_root, entry, context)
+            if issue is not None:
+                findings.append(issue)
 
     if findings:
         return None, findings
@@ -332,6 +351,15 @@ def serialize_manifest(
             {"name": region.name, "start": region.start, "end": region.end}
             for region in declared_regions
         ]
+    # Optional, additive key (HLR-138): the change-1 gather rows, written
+    # ONLY when the save gathered at least one artifact — a zero-used save
+    # serializes byte-identically to before (back-compat, same idiom as
+    # ``declared_regions`` above).
+    if gathered:
+        envelope["gathered"] = {
+            home: _posix_entries(list(entries))
+            for home, entries in gathered.items()
+        }
     return json.dumps(envelope, indent=2), []
 
 
@@ -391,6 +419,7 @@ def write_project_manifest(
     batch: Sequence[str] = (),
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
     declared_regions: Sequence[DeclaredRegion] = (),
+    gathered: Optional[Mapping[str, Sequence[str]]] = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[Path], list[ValidationIssue]]:
     """
@@ -422,6 +451,10 @@ def write_project_manifest(
             :func:`serialize_manifest`.
         assignments (Optional[Mapping[str, Sequence[str]]]): Per-variant file
             entries — see :func:`serialize_manifest`.
+        declared_regions (Sequence[DeclaredRegion]): Operator-declared
+            regions (LLR-026.1) — see :func:`serialize_manifest`.
+        gathered (Optional[Mapping[str, Sequence[str]]]): The change-1
+            gather rows (HLR-138) — see :func:`serialize_manifest`.
         schema_version (int): The literal written for ``schema_version``.
 
     Returns:
@@ -465,6 +498,7 @@ def write_project_manifest(
         batch=batch,
         assignments=assignments,
         declared_regions=declared_regions,
+        gathered=gathered,
         schema_version=schema_version,
     )
     if text is None:

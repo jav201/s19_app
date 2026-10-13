@@ -125,7 +125,12 @@ _ENGINE_PATHS: list[str] = [
     # ``s19_app/tui/a2l.py`` was UNFROZEN for batch-56 (operator-approved
     # alignment-aware summer, PR #114) and is now RE-FROZEN (PR-B): it is a
     # read-only oracle again. Any further edit needs an explicit unfreeze.
-    "s19_app/tui/a2l.py",
+    # UNFROZEN for batch-95 (2026-10-13, the batch's Phase-1 contract
+    # 2026-10-13-batch-95 HLR-137 / LLR-137.4): the extract_memory_segments
+    # hardening (quoted MEMORY_SEGMENT names + the offset field) is an
+    # explicit, contract-pinned edit to this module. Re-freeze after the
+    # batch lands; the parsing layer beyond that function stays read-only.
+    # "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
 ]
 
@@ -139,11 +144,13 @@ def test_tc027_engine_modules_unchanged_vs_main() -> None:
     """TC-027 — the parsing / range / validation engine is unchanged vs ``main``.
 
     The read-only-engine constraint forbids TUI-side batches from editing the
-    parsing layer (``core.py`` / ``hexfile.py`` / ``tui/a2l.py`` /
-    ``tui/mac.py``), the range primitive (``range_index.py``) or the validation
-    engine (``validation/``): they are *consumed* read-only. This runs
-    ``git diff --name-only main`` over exactly those paths and asserts the
-    result is empty — so a single accidental edit to any engine module is
+    parsing layer (``core.py`` / ``hexfile.py`` / ``tui/mac.py``), the range
+    primitive (``range_index.py``) or the validation engine (``validation/``):
+    they are *consumed* read-only. ``tui/a2l.py`` left the frozen set for
+    batch-95 (contract-pinned ``extract_memory_segments`` hardening, HLR-137 /
+    LLR-137.4 — see the ``_ENGINE_PATHS`` note) and is expected to diff. This
+    runs ``git diff --name-only main`` over exactly those paths and asserts
+    the result is empty — so a single accidental edit to any engine module is
     caught at the increment boundary, not discovered later. ``git diff`` is
     line-ending / ``__pycache__`` aware, so the verdict is robust to checkout
     noise.
