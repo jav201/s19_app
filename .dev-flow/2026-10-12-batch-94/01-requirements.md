@@ -59,9 +59,9 @@ Standing constraints carried into the derivation (from the ARQ map,
 (R9); `.chk.json` is a suffix distinction on the existing v2 grammar with
 `kind="check"` (R10); the rail grows 10→12 with the key binding **open to
 PDR** (R11 — this contract states the constraint and records the question, it
-does not decide it); US-004's seam is decided here at P1 (§6.2, HLR-013). The
-change-set schema is unchanged — no `from`/`to` fields (operator ruling, spike
-decision D-set).
+does not decide it); US-004's seam is decided here at P1 (§6.2, HLR-012). The
+change-set schema is unchanged — no `from`/`to` fields (operator ruling from the
+spike: schema unchanged).
 
 ### 1.3 Definitions, acronyms, abbreviations
 
@@ -89,7 +89,7 @@ decision D-set).
 - Field guides: `templates/guides/req-template.md`, `req-template.part2.md`, `templates/ifc-template.md` (same bundle).
 - Batch plan: `.dev-flow/2026-10-12-batch-94/PLAN.md` (R8–R12, roadmap Inc-001…004, operator grant).
 - Architecture map: `docs/architecture.md` §10 (batch-94 declarations, R8–R12) and §11 (interface rows; frozen Part B contracts; batch-94 pending rows).
-- Operator rulings from the spike: `G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/flow_bench.NOTES.md` and `editor_bench.NOTES.md` (D1–D5; fb_a/fx_a/pe_b/ce_b graduation calls).
+- Operator rulings from the spike: `G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/flow_bench.NOTES.md` and `editor_bench.NOTES.md` (A2B per-block configurability with report provenance + ≥1 input from the current flow, sequential-default/parallel-per-chain control, `.chk.json` by suffix, schema unchanged, refined cable routing — quoted by substance where cited, the NOTES carry no D-labels; fb_a/fx_a/pe_b/ce_b graduation calls).
 - Operator spec images (copies, `-text`-marked): `evidence/PatchEditor1.png` (six annotations), `evidence/Ventanas_1.png`, `evidence/Issues_Report1.png`, `evidence/Archivos_1.png`.
 - Pilot measurements: `evidence/p1-pilot-measurements.txt` (boxed budgets; rail 5/23, top 2, footer 1).
 - Phase-1 executed probes (scripts + transcripts, same directory): `p1_probe_rail_census.py/.txt`, `p1_probe_chk_roundtrip.py/.txt`, `p1_probe_a2l_unrecognized.py/.txt`, `p1_probe_a2l_negative.py/.txt`, `p1_probe_diff_report_emitted.py/.txt`.
@@ -183,14 +183,14 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 - **Functionality (V, N):** user = calibration engineer · outcome = a Check Editor builds a check-spec JSON listing A2L parameters / memory locations to report; A2B Diff's file dropdown lists `.chk.json` specs distinguished from patch files; loading one adds those items to the diff report · why = repeatable, reviewable check sets without editing patches · out of scope = applying a check file (explicitly forbidden by the operator); check EXECUTION (that's Flow Execution, later batch or later increment as declared).
 - **Feasibility:** path = approved decisions: `.chk.json` distinguished by suffix; ce_b panel is report-oriented with a `.chk.json` content panel; provenance of inputs recorded in the report · dependencies = US-001 split · fits = yes.
 - **Evaluability (T):** When the user saves a check spec and loads it in A2B Diff, the diff report contains the declared parameters/locations; when they attempt apply, no apply path exists. AT through the shipped surface (A2B Diff dropdown → report contents).
-- **RC-1(b) probe:** `grep -ri "chk.json"` → no hits. Not shipped.
+- **RC-1(b) probe:** `grep -ri 'chk\.json' s19_app/` → 0 hits (9 hits in tests/ + 2 goldens are test-side vocabulary, product-clean). Not shipped.
 - **Open questions:** none.
 - **Classification:** `READY`
 
 **US-004 — Issues Report warnings triage (`A2L_UNRECOGNIZED_BLOCK`)**
 - **INVEST:** I ✓ · N ✓ (resolution shape is open: recognize, reclassify, or suppress — operator leans "not really a problem") · V ✓ · E ✓ (bounded: the exhibited class + the parser's block table) · S ✓ · T ✓
 - **Functionality:** user = calibration engineer · outcome = the Issues Report stops flooding warnings that represent no real problem (4 489 `A2L_UNRECOGNIZED_BLOCK` rows on a standard A2L), either by recognizing the standard blocks or by reclassifying them with a stated justification the report shows · why = warning fatigue hides real issues · out of scope = A2L parsing correctness for blocks that DO affect addresses/data.
-- **Feasibility:** path = audit `A2L_UNRECOGNIZED_BLOCK` emitters against the A2L keyword table; each hit gets recognize-or-reclassify with justification · dependencies = a real operator A2L fixture (the 13 990-tag `software_a_2.a2l`) · fits = yes.
+- **Feasibility:** path = audit `A2L_UNRECOGNIZED_BLOCK` emitters against the A2L keyword table; each hit gets recognize-or-reclassify with justification · dependencies = the in-repo stand-in `examples/case_00_public/software_a.a2l` (13 990 tags, premise 9) is the executable fixture; the operator's `software_a_2.a2l` is the field-verification target, not a suite dependency · fits = yes.
 - **Evaluability (T):** When the user loads the operator's A2L and opens Issues, they observe the unrecognized-block warnings resolved (recognized or reclassified with visible justification) and any genuinely unrecognized block still warned. AT: fixture load → Issues surface.
 - **RC-1(b) probe:** the warnings exist (subject of the story, image evidence); no resolution on origin/main. Not shipped.
 - **Open questions:** resolution direction per block family (recognize vs reclassify) — decided at P1/P2 with the audit evidence.
@@ -202,7 +202,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 - **Feasibility:** path = fb_a (PLC-style builder: palette, canvas, cable routing refined per approved decision); block semantics reuse existing services (patch apply, CRC apply, A2B diff) · dependencies = US-001/US-002 land first (patch JSON shape stable) · fits = yes as increment 002.
 - **Evaluability (T):** When the user places a patch block, wires a file + a patch JSON, and runs the flow (in Flow Execution), the output S19 carries the patch; the A2B block's report states each input's provenance. ATs drive block placement + run through the shipped surface.
 - **RC-1(b) probe:** `FlowBuilderPanel` exists (rail-8, R-TUI-059 tracer, partial CRC block: `tests/test_flow_crc_block.py`); the redesign outcome not shipped.
-- **Open questions:** none (spike discharged the prototyping question; operator decisions D1–D5 recorded in `prototypes/flow_bench.NOTES.md`).
+- **Open questions:** none (spike discharged the prototyping question; operator rulings from the spike intake recorded in `prototypes/flow_bench.NOTES.md` — quoted by substance where cited, the NOTES carry no D-labels).
 - **Classification:** `READY`
 
 **US-006 — CRC Designer test-vector (Run + explanation + algorithm JSON)**
@@ -219,7 +219,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 - **Functionality:** user = calibration engineer · outcome = Flow Execution imports builder templates; several chains run with per-run input files (the variant workflow that replaces in-editor variant handling); a set of chains + inputs + outputs saves and reloads · why = repeatable multi-variant operations · out of scope = variant references inside patch/check/CRC builders (explicit operator ruling); block tags (Cambio8, OUT).
 - **Feasibility:** path = fx_a (carriles + run-log); control sequential by default, parallel per chain per approved decision; input provenance recorded in reports · dependencies = US-005 · fits = yes as increment 003.
 - **Evaluability (T):** When the user imports a template, binds two different input files to two chains, runs, and saves the set; then reloads the set and re-runs — they observe both chains' outputs regenerate. ATs through the shipped surface.
-- **RC-1(b) probe:** `grep -ri "flowexecution\|flow_execution"` → no hits. Not shipped.
+- **RC-1(b) probe:** `grep -ri 'flowexecution' s19_app/` → 0 hits (the loose pattern hits 7 `flow_execution_service` doc references — the service exists, the surface does not); `FlowExecutionPanel`/`CheckEditorPanel` → 0 hits as the panel-absence probes. Not shipped.
 - **Open questions:** none.
 - **Classification:** `READY`
 
@@ -260,12 +260,12 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-001 — Check Editor as a distinct build surface
 - **Traceability:** US-001
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.9
 - **Statement:** When the user selects the Check Editor rail entry, the system shall mount the Check Editor panel in the workspace as a build surface separate from the Patch Editor panel.
 - **Rationale (informative):** Cambio1 separates build windows from view and execute windows. The check twin of the editor (ce_b per the approved spike set, folded into the ce_a collector with the live addendum preview per the `editor_bench.NOTES.md` graduation call) becomes the build side of check specs; the existing Checks and Issues surfaces remain view-only. Base probe: `grep -ri "checkeditor\|check_editor" s19_app/` → 0 hits 2026-10-13 (P0 RC-1(b), §2.6) — the panel is new work.
 - **Validation:** `test`
 - **Executed verification:** AT-B94-01 through the shipped rail+panel at 120×30 (`pytest tests/test_tui_directionb.py -k check_editor`, node minted at Phase 3 — provisional per V-5); full guard host per C-34 (`engineering-rules.md:190`) at the render increment's gate.
-- **Numeric pass threshold:** exactly 1 panel mounted per rail selection, identified as the Check Editor, exposing write/validate actions and 0 apply actions; base-state probe reads 0 `checkeditor` hits.
+- **Numeric pass threshold:** exactly 1 panel mounted per rail selection, identified as the Check Editor, exposing write/validate actions and 0 apply actions; base-state probe reads 0 `checkeditor` hits; 0 build/apply controls mounted on `#screen_checks` and `#screen_issues` (query census, guard-host covered).
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
   - **Observable outcome:** The rail lists "Check Editor" as its own entry; selecting it mounts a panel identified as the Check Editor whose actions offer writing and validating a check spec (no Apply affordance); selecting "Patch Editor" mounts the Patch Editor instead.
@@ -276,16 +276,16 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-002 — The rail presents twelve ordered surfaces (key binding OPEN)
 - **Traceability:** US-001, US-007
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.11
 - **Statement:** The system shall present the activity rail with twelve ordered surfaces, including Check Editor and Flow Execution.
-- **Rationale (informative):** R11 (`docs/architecture.md:413`): the rail grows 10→12; the digit key space `1`–`0` is exhausted at 10 entries (`app.py:1362-1371` binds `1`…`0`), so the key binding of the two new surfaces is an OPEN question decided at PDR with measured Textual `Binding` mechanics — recorded in §6.3, not decided here. Ordering: existing entries keep their order; Check Editor follows Patch Editor; Flow Execution follows Flow Builder.
+- **Rationale (informative):** R11 (`docs/architecture.md:413`): the rail grows 10→12; the digit key space `1`–`0` is exhausted at 10 entries (`app.py:1361-1370` binds `1`…`0`), so the key binding of the two new surfaces is an OPEN question decided at PDR with measured Textual `Binding` mechanics — recorded in §6.3, not decided here. Ordering: existing entries keep their order; Check Editor follows Patch Editor; Flow Execution follows Flow Builder.
 - **Validation:** `test`
 - **Executed verification:** full guard host `pytest tests/test_tui_directionb.py` at each landing increment (census constants `SCREEN_IDS`/`SCREEN_KEYS`/`EXPECTED_RAIL`, `test_tui_directionb.py:137-169`, `:468-479`, move with the increment per `docs/architecture.md:392` — never before); executed base probe `evidence/p1_probe_rail_census.txt` (10 entries, keys `workspace`…`crc_designer`).
 - **Numeric pass threshold:** `len(RAIL_ENTRIES) == 12` with `len(SCREEN_IDS) == len(SCREEN_KEYS) == 12` at the landing increment's gate; at 80×24 all 12 entries render inside the rail's 21-row chrome budget (24 − top 2 − footer 1, pilot-measured).
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
   - **Observable outcome:** The rail shows twelve entries in a stable order; Patch Editor and Check Editor are two distinct build entries; Flow Execution appears as an execute entry; every entry mounts its panel.
-  - **Shipped surface:** `RAIL_ENTRIES` (`rail.py:80-91`) + `S19TuiApp` rail bindings and routing (`app.py:1362-1371`, `action_show_screen` `:5881`).
+  - **Shipped surface:** `RAIL_ENTRIES` (`rail.py:80-91`) + `S19TuiApp` rail bindings and routing (`app.py:1361-1370`, `action_show_screen` `:5881`).
   - **Acceptance test(s):** AT-B94-02
   - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☒ error — boundary arm: smallest regime 80×24 (12 entries ≤ 21 rows); invalid arm: a rail entry whose screen id is absent fails the census loudly; error arm: binding collision on the new surfaces is impossible by construction until PDR decides the keys (census asserts one binding per entry).
   - **Negative control:** `evidence/p1_probe_rail_census.txt` (10 entries at base) — the AT goes RED if the batch lands 11 entries or the order drifts from the declared sequence.
@@ -308,7 +308,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-004 — Edit-JSON + validate flow merges into the entries table
 - **Traceability:** US-002
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.1
 - **Statement:** When the user confirms JSON edits, the system shall validate the edited text; when the text is valid, the system shall merge the declared changes into the entries table, and when the text is invalid, the system shall display the validation errors and leave the entries table unchanged.
 - **Rationale (informative):** Annotation 2: the left side must show the changes added; edits happen through an explicit "Edit JSON" action; on save the validator adds new changes to the top-left table or shows the JSON errors. The mechanism exists today (`EditJsonRequested` `:5366` → `ChangeSetJsonScreen` `screens.py:223`); this HLR pins the validate-merge/error-display outcome. Validator: `parse_change_document` (`io.py:440`) collects issues on the document (`ChangeDocument.issues`, `model.py:249`) instead of aborting.
 - **Validation:** `test`
@@ -319,7 +319,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
   - **Observable outcome:** Confirming valid JSON adds the declared changes to the top-left entries table; confirming invalid JSON shows the validation errors and the table keeps its prior rows.
   - **Shipped surface:** `PatchEditorPanel` Edit-JSON action (`patch_edit_json_button`, `:6094-6098`) + `ChangeSetJsonScreen` (`screens.py:223`) + `refresh_entries` (`:6639`).
   - **Acceptance test(s):** AT-B94-04, AT-B94-05
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☒ error — invalid arms: malformed JSON text; unknown `kind`; address outside the `^0x[0-9A-Fa-f]+$` wire grammar (`io.py:198-199`); empty arm: valid JSON with zero entries merges as a no-op, not an error.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — invalid arms: malformed JSON text; unknown `kind`; address outside the `^0x[0-9A-Fa-f]+$` wire grammar (`io.py:198-199`); empty arm: valid JSON with zero entries merges as a no-op, not an error.
   - **Negative control:** invalid-text arm (AT-B94-05) — RED the moment an invalid text lands rows in the table or fails silently.
 
 ### HLR-005 — Dirty guard on Load offers accept-loss and cancel
@@ -340,7 +340,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-006 — Variant selector removed; single-document editing
 - **Traceability:** US-002
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.8
 - **Statement:** The Patch Editor shall not present variant selection, and shall bind editing to a single change-set document.
 - **Rationale (informative):** Annotation 4: the variant selector is eliminated; only single-file hex/S19 content editing stays; variant application moves to Flow Execution inputs (US-007) — the operator ruling behind "ya no queremos referencia a variantes en los builders". Retires `patch_variant_select` (`:5910-5916`), `VariantSelected` (`:5417`), `VariantHelpRequested` (`:5442`), and the app routing `_variant_selected` (`app.py:4659`); the A3 message contract is amended accordingly (`docs/architecture.md:463`, freezes at Inc-001's PDR).
 - **Validation:** `test` + `inspection`
@@ -404,7 +404,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-010 — A2B Diff consumes `.chk.json` by suffix (output-then-consume)
 - **Traceability:** US-003
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.7
 - **Statement:** When the user opens the A2B Diff file dropdown, the system shall list `.chk.json` check specs distinguished from patch files by suffix, and when the user loads one, the system shall add the declared parameters and memory locations to the diff report.
 - **Rationale (informative):** Cambio3: the spec "cargarse para los reportes A2L Diff en dropdown … sólo se leen los de check". C-12 output-then-consume: the acceptance observes a `.chk.json` through the shipped producer chain — Check Editor writes it, A2B Diff loads THAT file, the report carries the declared items — never a hand-written artifact fed to the consumer. The dropdown idiom exists for patch files (`patch_doc_file_select` at `:5794-5799`, scan at `app.py:4413`); the A2B Diff report dropdown + check addendum are NEW — created in Phase 3, following the existing report addendum security precedent (`services/report_addendum.py` scrub + `markdown_safety.md_safe`, batch-19/62).
 - **Validation:** `test`
@@ -436,7 +436,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-012 — `A2L_UNRECOGNIZED_BLOCK` warnings triage (seam: view-level reclassification)
 - **Traceability:** US-004
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.12
 - **Statement:** When the Issues surface presents `A2L_UNRECOGNIZED_BLOCK` findings whose block name belongs to the curated ASAP2 standard-keyword set, the system shall present them as informational findings with a stated justification and shall not present them as warnings, and findings whose block name is not in the set shall remain warnings.
 - **Rationale (informative):** Cambio4: contemplate whether what is reported as warnings really is a warning — the exhibited class (4 489 rows on the operator's file) is standard ASAP2 vocabulary the parser's section tree surfaces as unrecognized. The seam decision owed at P1 (R12) is made here: **view-level reclassification in the Issues surface** — `s19_app/validation/rules.py` and `s19_app/tui/a2l.py` stay frozen (the §7 engine stability list is untouched; the parser-level alternative — extending `RECOGNIZED_A2L_BLOCKS`, `rules.py:9-25` — is recorded as the rejected candidate in §6.2 with its freeze consequence and re-open condition). The curated set constant is NEW — created in Phase 3 in `issues_view.py`, seeded from the executed 2026-10-13 tally (21 families pasted in `evidence/p1_probe_a2l_unrecognized.txt`); per-family recognize-vs-reclassify mechanics inside the set are a Phase-2/3 detail — this HLR pins the observable outcome, not the mechanism.
 - **Validation:** `test`
@@ -452,7 +452,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-013 — fb_a block-diagram Flow Builder with patch, CRC, and A2B-diff blocks
 - **Traceability:** US-005
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.6
 - **Statement:** The Flow Builder shall present a block-diagram editor — a block palette, a canvas with refined cable routing, and typed blocks for patch, CRC, and A2B diff — in place of the current list-based builder.
 - **Rationale (informative):** Cambio5 + the fb_a graduation call (`flow_bench.NOTES.md`: connectivity is the builder's job — explicit `in`/`out` stubs and `─│└┐` cable runs; the fb_c audit precision folds in as an inspector pane). Block semantics reuse the existing services (patch apply, CRC apply, A2B diff). The fb_a palette/canvas/cable widgets, the A2B diff block, and its block-type constant are NEW — created in Phase 3 in `s19_app/tui/flow_screens.py` (R8); reused constants: `BLOCK_PATCH="patch"`, `BLOCK_CRC="crc"` (`flow_model.py:25-33`). `FlowBuilderPanel`'s address moves `screens_directionb.py` → `flow_screens.py` (B2 reader census owed at Inc-002, `docs/architecture.md:402`; known consumers enumerated there).
 - **Validation:** `test`
@@ -468,9 +468,9 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-014 — A2B block inputs: flow-output-or-file, at least one from the current flow, provenance in the report
 - **Traceability:** US-005
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.4, LED-2026-10-12-batch-94.7
 - **Statement:** Where an A2B diff block is included in a flow, the system shall let each of its two image inputs be bound either to a flow output or to an external file, shall require at least one input to come from the current flow, and shall state each input's provenance in the A2B diff report.
-- **Rationale (informative):** Operator decision D1 (A2B configurable per block with input provenance in the report) + the intake rule "para no falsear reportes" — never a cross-flow smuggle. The report producer exists (`generate_diff_report`, `diff_report_service.py:1216`); the per-block input binding model and the flow-provenance emission are NEW — created in Phase 3.
+- **Rationale (informative):** Operator ruling from the spike intake (`flow_bench.NOTES.md`): the A2B block is configurable per block and the report states each input's provenance; ≥1 input must come from the current flow ("para no falsear reportes") — never a cross-flow smuggle. The report producer exists (`generate_diff_report`, `diff_report_service.py:1216`); the per-block input binding model and the flow-provenance emission are NEW — created in Phase 3.
 - **Validation:** `test`
 - **Executed verification:** AT-B94-16 through the shipped builder+report; C-35/C-42 emitted-form evidence: the external-file arm's actual emitted line is pasted from `evidence/p1_probe_diff_report_emitted.txt` — `- Image A: prg [external] path=\`C:\…\prg.s19\` parse-errors=0`; the flow-output arm's emitted form is NEW — pasted at the Phase-3 increment and the predicate written against that paste (provisional per V-5).
 - **Numeric pass threshold:** the produced report contains one provenance line per A2B input; the external arm matches the executed emitted form verbatim in shape; a binding with both inputs external, or any cross-flow input, is refused at wiring time (0 reports produced).
@@ -548,9 +548,9 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-019 — Sequential default with a parallel-per-chain run control
 - **Traceability:** US-007
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.4
 - **Statement:** When the user runs a chain set, the system shall run the chains sequentially by default, and the run controls shall offer a per-run mode that runs the chains in parallel.
-- **Rationale (informative):** Operator ruling D4: sequential by default, parallel per chain. C-10: the control is operator-selectable, so the AT drives the NON-DEFAULT value (parallel) and asserts the captured mode changed; a second AT pins the untouched-default (sequential). Base state: `run_flow` is strictly sequential (`flow_execution_service.py:133`); no parallel machinery exists — the parallel mode is NEW, created in Phase 3, with per-chain failure isolation.
+- **Rationale (informative):** Operator ruling from the spike intake (`flow_bench.NOTES.md`): chains run sequential by default with parallel control per chain. C-10: the control is operator-selectable, so the AT drives the NON-DEFAULT value (parallel) and asserts the captured mode changed; a second AT pins the untouched-default (sequential). Base state: `run_flow` is strictly sequential (`flow_execution_service.py:133`); no parallel machinery exists — the parallel mode is NEW, created in Phase 3, with per-chain failure isolation.
 - **Validation:** `test`
 - **Executed verification:** AT-B94-21 (parallel arm, non-default per C-10) and AT-B94-22 (default arm); unit arm TC-B94-05 on the mode capture in the run record.
 - **Numeric pass threshold:** default arm — chain B starts only after chain A finishes (run-log order); parallel arm — both chains execute concurrently (overlapping elapsed windows in the run-log) and the persisted run record states the selected mode; the mode field's captured value differs between the two arms.
@@ -564,9 +564,9 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-020 — Run log with per-chain status; input provenance recorded per run
 - **Traceability:** US-007
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.4
 - **Statement:** While a chain set runs, the system shall show a run log with per-chain status and mid-chain failures visible inline, and the run's report shall record each chain's input provenance.
-- **Rationale (informative):** Operator suggestion #1 (mid-chain failure visible inline) is the fx_a graduation reason; D1 requires per-run input provenance. The flow report's existing headings (`# Flow report — <name>`, `## Pipeline ledger`, `flow_report_service.py:320/:331`) are the emitted-form baseline; the chain-set report's provenance lines are NEW — pasted at the Phase-3 increment (provisional per V-5).
+- **Rationale (informative):** Operator suggestion #1 (mid-chain failure visible inline) is the fx_a graduation reason; the spike-intake ruling requires per-run input provenance in the report. The flow report's existing headings (`# Flow report — <name>`, `## Pipeline ledger`, `flow_report_service.py:320/:331`) are the emitted-form baseline; the chain-set report's provenance lines are NEW — pasted at the Phase-3 increment (provisional per V-5).
 - **Validation:** `test`
 - **Executed verification:** AT-B94-23 runs the bench scenario (chain with a missing CRC config fails mid-run) and reads the log + report.
 - **Numeric pass threshold:** the run log shows one start and one terminal status line per chain plus the failing block's inline `✗` line naming the block and the missing config; the report carries one provenance line per chain input.
@@ -613,7 +613,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### LLR-001.2 — Check Editor rail mounting and message routing
 - **Traceability:** HLR-001
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.10
 - **Statement:** When the Check Editor rail entry is selected, `S19TuiApp` shall mount `CheckEditorPanel` in the workspace and route its write/validate messages to the change service.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B94-07 driving rail selection under a Textual pilot (provisional per V-5); routing idiom verified at `app.py:2529` (`on_patch_editor_panel_action_requested`) and mounting idiom at `app.py:2245` (`_compose_screen_flow`).
@@ -843,10 +843,10 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### LLR-013.1 — fb_a palette, canvas, and cable widgets
 - **Traceability:** HLR-013
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.4
 - **Statement:** The reworked Flow Builder shall compose a block palette rail, a framed canvas with grid dots, and box-drawn blocks carrying `in`/`out` IO rows with cable runs routed between stubs.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B94-20 widget census over the reworked panel (widgets NEW — created in Phase 3 in `flow_screens.py`; fb_a layout doctrine: `flow_bench.NOTES.md` fb_a — header bar, IO rows, `┤├` stubs, `─│└┐` runs, refined cable routing per operator decision D5).
+- **Executed verification:** TC-B94-20 widget census over the reworked panel (widgets NEW — created in Phase 3 in `flow_screens.py`; fb_a layout doctrine: `flow_bench.NOTES.md` fb_a — header bar, IO rows, `┤├` stubs, `─│└┐` runs, refined cable routing per the operator ruling from the spike intake).
 - **Numeric pass threshold:** composition: 1 palette, 1 canvas, 3 placeable block types (patch/CRC/A2B-diff); a two-block flow renders ≥1 cable run connecting an out-stub to an in-row at 120×30 inside the boxed 96×18 workspace.
 - **Negative control:** base panel (`FlowBuilderPanel` list tracer, `screens_directionb.py:4257-4404`) — RED if the list-based UI survives the rework.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary arm: empty canvas renders the fb_a empty state without exception.
@@ -923,7 +923,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### LLR-017.1 — Template import mounts one lane per chain
 - **Traceability:** HLR-017
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.10
 - **Statement:** When the user imports a template, `FlowExecutionPanel` shall append one lane rendering the template's chain with its pinned inputs.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B94-26 through the shipped panel (provisional per V-5) over `list_saved_flows`/`load_flow_json` (`flow_persistence_service.py:570/:463`).
@@ -973,10 +973,10 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### LLR-019.2 — Parallel-per-chain mode with per-lane failure isolation
 - **Traceability:** HLR-019
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.5
 - **Statement:** When the user selects the parallel mode, the system shall execute the chains concurrently, isolate a chain's failure to its own lane, and record the selected mode in the run record.
 - **Validation:** `test (integration)`
-- **Executed verification:** AT-B94-21 (C-10: drives the non-default value and asserts the captured mode changed); parallel machinery NEW — created in Phase 3.
+- **Executed verification:** AT-B94-21 (C-10: drives the non-default value and asserts the captured mode changed) + TC-B94-05 on the mode capture in the run record; parallel machinery NEW — created in Phase 3.
 - **Numeric pass threshold:** parallel arm — 2 chains' elapsed windows overlap (while the default arm shows 0 overlap); the persisted run record's mode field reads `parallel` in 1 of 1 driven runs and differs from the default arm's record; when 1 chain fails, ≥1 sibling lane still completes (0 siblings halted).
 - **Negative control:** the C-10 captured-value assertion — RED if the run record ever reads sequential after the parallel control was driven.
 - **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☒ error — error arm: mid-run chain failure isolated to its lane (fx_a `✗` inline idiom).
@@ -1114,10 +1114,14 @@ FLOW: rail_selection_to_panel_mount
       owner : LLR-002.1
       in    : rail entry identity
       out   : screen id to mount
-    - fn    : panel mounting for the two new surfaces
+    - fn    : check-editor panel mounting
       owner : LLR-001.2
-      in    : screen id (check_editor / flow_execution)
-      out   : mounted CheckEditorPanel / FlowExecutionPanel
+      in    : screen id (check_editor)
+      out   : mounted CheckEditorPanel
+    - fn    : flow-execution panel mounting
+      owner : LLR-017.1
+      in    : screen id (flow_execution)
+      out   : mounted FlowExecutionPanel
   SINK   : the workspace region rendering the mounted panel
 ```
 
@@ -1263,7 +1267,7 @@ See §1.3. Batch-specific terms (boxed budget, chain set, template) are defined 
 |---|---|---|
 | D-1 | US-004's seam is **view-level reclassification** in the Issues surface: the curated standard-keyword set is a view-owned constant (LLR-012.1); `s19_app/validation/rules.py` and `s19_app/tui/a2l.py` stay frozen — the §7 engine stability list is untouched. | HLR-012 rationale; LLR-012.1/.2 |
 | D-2 | Rejected candidate for D-1: parser-level recognition by extending `RECOGNIZED_A2L_BLOCKS` (`rules.py:9-25`). It crosses the §7 freeze and changes the engine's stability story, so it is not picked. Re-open condition (per R12): if the view-level seam is found to falsify a real warning class — a genuinely malformed block read as benign — the seam moves parser-ward, the freeze crossing is stated in the increment packet, and the curated set lands in the engine with a ledger entry. | §6.3 open risk R-2 |
-| D-3 | The rail key binding for the two new surfaces is **OPEN to PDR** (R11): this contract obliges the surfaces, their order, and the census; the digit key space `1`–`0` is exhausted at 10 (`app.py:1362-1371`), and Textual `Binding` mechanics are measured at PDR, not invented here. | HLR-002 rationale; §6.3 open risk R-1 |
+| D-3 | The rail key binding for the two new surfaces is **OPEN to PDR** (R11): this contract obliges the surfaces, their order, and the census; the digit key space `1`–`0` is exhausted at 10 (`app.py:1361-1370`), and Textual `Binding` mechanics are measured at PDR, not invented here. | HLR-002 rationale; §6.3 open risk R-1 |
 | D-4 | C-12 output-then-consume for US-003: the acceptance chains Check Editor write → A2B Diff load of THAT file → report contents; a hand-written artifact fed to the consumer is not the acceptance surface. | HLR-010 |
 | D-5 | C-17 sinks: TUI surfaces render via `safe_text` (`utils.py:44`); markdown reports via `markdown_safety.md_safe` / `md_code` per its mode truth table (paths in cells are FORBIDDEN raw — Mode B inside a code span only). | LLR-011.1, LLR-016.1 |
 | D-6 | Reclassification, never suppression: triaged rows stay visible as INFO with justification (1 023 rows on the stand-in, none dropped); the executed `FROBNICATE` negative control pins the unknown-block WARNING. | HLR-012; `p1_probe_a2l_negative.txt` |
@@ -1273,8 +1277,10 @@ See §1.3. Batch-specific terms (boxed budget, chain set, template) are defined 
 - **R-1 — Rail key binding (OPEN, decision owner: PDR).** Two new surfaces, no free digit keys. Question recorded for PDR: which Textual `Binding` keys (or alternate chrome) carry Check Editor and Flow Execution, measured against Textual 8.x mechanics and the operator's muscle memory. Until decided, no acceptance in this contract depends on the specific keys — ATs drive rail entries by identity/position, and HLR-002's census asserts one binding per entry once PDR lands it.
 - **R-2 — US-004 view-level seam.** Risk: a future standard block outside the curated set floods INFO rows instead of WARNING rows (operator blindness by classification). Mitigation: the curated set is a named, reviewable constant; additions are ledger entries; the D-2 re-open condition stands. Residual: accepted for this batch.
 - **R-3 — Boxed-geometry transfer (C-29).** The spike measured full-screen prototypes (94×26 body @120×30); production boxes are 96×18 @120×30 (`p1-pilot-measurements.txt`). All layout acceptances key on the pilot ceilings; inner pane splits are flagged `assumed — verify in Phase 3` where the pilot did not measure them (LLR-003.1).
-- **R-4 — B2 move census (Inc-002).** `FlowBuilderPanel`'s address change triggers the reader census (`docs/architecture.md:402`); known consumers today: `tests/test_flow_builder_render.py`, `tests/test_flow_crc_block.py`, `tests/test_flow_crc_ribbon.py`, the guard host, `app.py` routing. The census re-runs at the increment cut and lands in the packet.
+- **R-4 — B2 move census (Inc-002).** `FlowBuilderPanel`'s address change triggers the reader census (`docs/architecture.md:402`); executed census 2026-10-13 — `grep -rl "FlowBuilderPanel\|screen_flow" tests/ s19_app/` → 11 files: `tests/test_flow_builder_render.py`, `tests/test_flow_crc_ui.py`, `tests/test_flow_crc_block.py`, `tests/test_flow_crc_ribbon.py`, `tests/test_flow_multi_image_ui.py` (:25 import), `tests/test_flow_report_ui.py` (:22 import), `tests/test_tui_flow_persistence_ui.py`, the guard host `tests/test_tui_directionb.py` (screen_flow census), plus s19_app-side `app.py`, `services/flow_execution_service.py`, `services/flow_model.py` (doc refs). Note: `test_flow_crc_block.py` references block machinery, NOT the panel (0 panel hits). The census re-runs at the increment cut and lands in the packet.
 - **R-5 — Parallel execution (LLR-019.2).** New concurrency in the execution service; failure isolation is pinned by AT-B94-21's error arm; the sequential default is the untouched-path regression pin.
+- **R-6 — Variant-retirement observers (Inc-001).** Executed census 2026-10-13 — `grep -rln "patch_variant\|VariantSelected\|VariantHelpRequested" tests/` → 9 files, in two groups. REWRITE group (the panel-scoped observers Inc-001 must rewrite): `tests/test_tui_patch_variant.py` (11 tests), `tests/test_tui_patch_big.py:647-666` (C-17 hostile test over the removed widget), `tests/test_tui_patch_layout.py`, `tests/test_tui_patch_chips.py`, `tests/test_tui_patch_card.py` (4 snapshot tests), `tests/test_tui_commandbar.py:2151` docstring. DO-NOT-TOUCH group (the app-level project-variant machinery this contract does NOT retire): `tests/test_tui_variants.py` (11 tests, `action_select_variant`/`SelectVariantScreen`), `tests/test_variant_execution.py`. Load-bearing: Inc-001 rewrites the first group and must not delete the second.
+- **R-7 — Flow-report golden observers (Inc-002/003).** The trigger-table probe `grep -l "flow_" tests/goldens/**/*.md` is INOPERATIVE (matches nothing, exit 1). Executed sweep 2026-10-13 replaces it: the byte-identity observers of the two report producers this batch changes are `tests/goldens/batch35/at054b-before-after-report.{md,html}` (asserted by `tests/test_before_after_report.py`; captures the `- Image A: … [external] path=… parse-errors=0` provenance lines HLR-010/HLR-014 pin), `tests/goldens/batch71/ac6-unscoped-flow-report.md` (asserted by `tests/test_flow_report_ac6_golden.py` — named drift candidate for Inc-003's chain-set/provenance lines), and `tests/test_report_addendum_bound.py` (guards the addendum territory HLR-010 extends). Inc-002/003 packets must name these and rebaseline surgically if they drift (double-proven per the golden control).
 - **Security scan (family C — trigger C6/C8, `security_required: true`):** run at this gate 2026-10-13 — `python -B devflow-scan-spec.py 01-requirements.md` → **exit 1, all 5 self-controls ok**; 123 921 bytes of sections 1–4 read. Fired flags: `hash`, `schema change`, `form`, `escape`, `expose`. Each flag's security question is answered here:
   - **`hash`** (LLR-008.2, "hash equality before/after"): no hashing of sensitive data is introduced — the phrase is an identity check of the loaded document across a Refresh. No crypto, no PII surface (tool processes local ECU firmware artifacts; triggers C1–C5/C7 not fired, PLAN trigger table).
   - **`schema change`** (HLR-009 rationale, "no schema change is needed"): the sentence states the negative — `.chk.json` reuses the existing v2 grammar (`kind="check"` already in `DOCUMENT_KINDS`, `io.py:120-123`; operator ruling, schema unchanged). No migration, no destructive data operation.
