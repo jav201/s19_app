@@ -33,6 +33,7 @@ from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
 from .open_folder_chip import OpenFolderChip, titled_header
+from .window_help import WindowHelpChip, open_window_help
 from .os_clipboard_input import OsClipboardInput
 from .workspace import sanitize_project_name
 from .legend import (
@@ -1542,6 +1543,18 @@ class ReportViewerScreen(ModalScreen[None]):
     )
     UNREADABLE_TEXT = "This report file could not be read."
 
+    #: batch-95 change 3 (HLR-140) — while the Reports window (this modal)
+    #: is focused, `?` opens ITS usage-help section instead of the app-wide
+    #: stock HelpPanel; the binding is `show=False` and lives on the modal,
+    #: so the global `question_mark` binding is untouched and still opens
+    #: the panel everywhere else.
+    BINDINGS = [
+        Binding("question_mark", "show_window_usage_help", "Window help", show=False),
+    ]
+
+    def action_show_window_usage_help(self) -> None:
+        open_window_help(self.app, "reports")
+
     class GenerateRequested(Message):
         """Operator asked for a new report with the given context size.
 
@@ -1654,6 +1667,7 @@ class ReportViewerScreen(ModalScreen[None]):
                 f"Reports (project '{self.project_name}'):",
                 OpenFolderChip("reports"),
                 title_classes="modal-title",
+                help_button=WindowHelpChip("reports"),
             ),
             listing,
             ScrollableContainer(

@@ -172,6 +172,20 @@ Screen {
     text-opacity: 0.6;
 }
 
+/* batch-95 change 3 (HLR-140): the per-window `?` usage-help ghost chip.
+ * The same compact 1-tall borderless chip shape as `.open-folder-chip`,
+ * narrowed to its single glyph; it rides the `.db-screen-header` row
+ * between the title label and the open-folder chip (never displacing it). */
+.window-help-chip {
+    height: 1;
+    min-width: 3;
+    border: none;
+    text-style: bold;
+    background: transparent;
+    color: $accent-calm;
+    margin-bottom: 1;
+}
+
 /* LLR-002.3 empty-state panel — neutral no-file-loaded prompt. */
 #empty_state_panel {
     width: 100%;
@@ -416,10 +430,14 @@ DataTable > .datatable--odd-row {
  * MAC View (`#mac_*`, LLR-010.1) keeps the increment-6 two-regime layout.
  * Every widget subtree is reused verbatim; no renderer/paging/jump/filter
  * logic is touched (LLR-009.2).
- */
+ * batch-95 change 3 (HLR-140): the height is `1fr` instead of `100%` —
+ * the change-3 header row (title + `?` chip) now leads `#screen_a2l`, so
+ * the panes take the remainder; with `100%` the header would clip the
+ * panes' bottom row. As the only remaining child this renders identically
+ * to the former `100%`. */
 #a2l_panes {
     layout: horizontal;
-    height: 100%;
+    height: 1fr;
 }
 
 /* Flat 3:4 proportional ratio at every terminal width (LLR-009.1,

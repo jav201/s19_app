@@ -86,7 +86,10 @@ from tools.id_registry import (
 # batch-95 inc-003b (2026-10-13): 169 -> 170, measured — the change-2
 # increment adds ``tests/test_open_folder_chips.py`` (the HLR-139 open-folder
 # chip + cross-platform seam TCs, TC-703..705).
-EXPECTED_SCANNED_TEST_FILES = 170
+# batch-95 inc-003c (2026-10-13): 170 -> 171, measured — the change-3
+# increment adds ``tests/test_window_usage_help.py`` (the HLR-140 per-window
+# usage-help modal + section-census TCs, TC-706..707).
+EXPECTED_SCANNED_TEST_FILES = 171
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

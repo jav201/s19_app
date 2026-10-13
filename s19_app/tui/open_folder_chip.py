@@ -26,7 +26,10 @@ limb's create-offer IS a press.
 """
 from __future__ import annotations
 
+from typing import List, Optional
+
 from textual.containers import Horizontal
+from textual.widget import Widget
 from textual.widgets import Button, Label
 
 from .services import folder_open_service
@@ -181,25 +184,37 @@ class OpenFolderChip(Button):
 
 def titled_header(
     title: str,
-    chip: OpenFolderChip,
+    chip: Optional[OpenFolderChip] = None,
     *,
     title_classes: str = "db-screen-title",
+    help_button: Optional[Button] = None,
 ) -> Horizontal:
     """Build the window header row: the title left, the chip header-right.
 
     Args:
         title (str): The window title (author-constant chrome, never
             file-derived — C-17).
-        chip (OpenFolderChip): The window's open-folder chip.
+        chip (OpenFolderChip): The window's open-folder chip. ``None``
+            for the windows without one (Memory Map / Flow Builder /
+            A2L Explorer / Workspace) — the title row ships without it
+            (batch-95 change 3).
         title_classes (str): The title label's classes — ``modal-title``
             for the Reports modal, ``db-screen-title`` (the default)
             everywhere else.
+        help_button (Optional[Button]): The per-window ``?`` usage-help
+            chip (batch-95 change 3, HLR-140) — seated BETWEEN the title
+            label and the chip, so the chip stays the rightmost child
+            (TC-703's placement assertion is unchanged).
 
     Returns:
-        Horizontal: The ``.db-screen-header`` row seating both.
+        Horizontal: The ``.db-screen-header`` row seating all parts.
     """
+    children: List[Widget] = [Label(title, classes=title_classes)]
+    if help_button is not None:
+        children.append(help_button)
+    if chip is not None:
+        children.append(chip)
     return Horizontal(
-        Label(title, classes=title_classes),
-        chip,
+        *children,
         classes=HEADER_ROW_CLASS,
     )

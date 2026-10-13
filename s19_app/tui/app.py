@@ -145,6 +145,7 @@ from .services.project_gather_service import (
 )
 from .services import folder_open_service
 from .open_folder_chip import OpenFolderChip, titled_header
+from .window_help import WindowHelpChip, WindowSection
 from .services.validation_service import (
     build_mac_coverage_strip,
     build_validation_report,
@@ -2126,7 +2127,12 @@ class S19TuiApp(App):
         # The persistent "Loaded" panel (unload feature Inc-2) sits OUTSIDE
         # `#workspace_panes` so `_apply_empty_state` (which hides the panes with
         # no file) never hides it — it is the always-visible load-state readout.
-        return Container(
+        # The change-3 header row (title + the `?` usage-help chip, HLR-140)
+        # leads the screen like every other window; the panes hold the 1fr
+        # remainder.
+        return WindowSection(
+            "workspace",
+            titled_header("Workspace", help_button=WindowHelpChip("workspace")),
             _memstrip,
             LoadedArtifactsPanel(),
             _panes,
@@ -2258,8 +2264,13 @@ class S19TuiApp(App):
             ),
             id="checks_content",
         )
-        return Container(
-            titled_header("Checks", OpenFolderChip("checks")),
+        return WindowSection(
+            "checks",
+            titled_header(
+                "Checks",
+                OpenFolderChip("checks"),
+                help_button=WindowHelpChip("checks"),
+            ),
             _checks_content,
             EmptyStatePanel(),
             id="screen_checks",
@@ -2302,8 +2313,9 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
-        return Container(
-            Label("Memory Map", classes="db-screen-title"),
+        return WindowSection(
+            "map",
+            titled_header("Memory Map", help_button=WindowHelpChip("map")),
             Container(
                 MemoryMapPanel(),
                 id="map_content",
@@ -2337,8 +2349,9 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
-        return Container(
-            Label("Flow Builder", classes="db-screen-title"),
+        return WindowSection(
+            "flow",
+            titled_header("Flow Builder", help_button=WindowHelpChip("flow")),
             FlowBuilderPanel(),
             id="screen_flow",
             classes="db-screen hidden",
@@ -2372,8 +2385,13 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
-        return Container(
-            titled_header("CRC Designer", OpenFolderChip("templates")),
+        return WindowSection(
+            "crc_designer",
+            titled_header(
+                "CRC Designer",
+                OpenFolderChip("templates"),
+                help_button=WindowHelpChip("crc_designer"),
+            ),
             CrcDesignerPanel(),
             id="screen_crc_designer",
             classes="db-screen hidden",
@@ -2592,8 +2610,13 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
-        return Container(
-            titled_header("Patch Editor", OpenFolderChip("patch")),
+        return WindowSection(
+            "patch",
+            titled_header(
+                "Patch Editor",
+                OpenFolderChip("patch"),
+                help_button=WindowHelpChip("patch"),
+            ),
             PatchEditorPanel(),
             id="screen_patch",
             classes="db-screen hidden",
@@ -5344,8 +5367,15 @@ class S19TuiApp(App):
             _hex_pane,
             id="a2l_panes",
         )
-        return Container(
-            _panes, id="screen_a2l", classes="db-screen hidden"
+        # The change-3 header row (title + the `?` usage-help chip, HLR-140)
+        # leads the screen like every other window; `#a2l_panes` holds the
+        # `1fr` remainder (its height rule in styles.tcss).
+        return WindowSection(
+            "a2l",
+            titled_header("A2L Explorer", help_button=WindowHelpChip("a2l")),
+            _panes,
+            id="screen_a2l",
+            classes="db-screen hidden",
         )
 
     def _compose_screen_mac(self) -> Container:
