@@ -1,0 +1,24 @@
+== C-15 identity probes ==
+FORMAT_ID        : 's19app-changeset'
+FORMAT_VERSION   : '2.0'
+_safe_name('baseline.chk.json') -> 'baseline.chk.json'
+_safe_name('hotfix.pch.json')   -> 'hotfix.pch.json'
+DUMMY_CHANGESET_TEXT kind line  : ['  "kind": "change",']
+
+== producer chain over kind=check ==
+parsed kind      : 'check'  entries: 2  blocking errors: False
+emitted 315 bytes; first lines:
+  | {
+  |   "format": "s19app-changeset",
+  |   "version": "2.0",
+  |   "kind": "check",
+  |   "encoding": "utf-8",
+  |   "value_mode": "text",
+  |   "entries": [
+  |     {
+re-read kind     : 'check'  entries: 2
+run_check_document: blocked reason code = None  entry verdicts = [CheckRunEntry(entry_type='bytes', address_start=256, address_end=260, expected_bytes=(222, 173, 190, 239), actual_bytes=(222, 173, 190, 239), result='pass', linkage='standalone', linkage_symbol=None, reason_code=None, reason=None), CheckRunEntry(entry_type='string', address_start=512, address_end=515, expected_bytes=(65, 66, 67), actual_bytes=None, result='uncheckable', linkage='standalone', linkage_symbol=None, reason_code='outside', reason='range outside the loaded image [outside]')]
+apply_change_document over kind=check: counts = {'applied': 0, 'skipped-partial': 0, 'skipped-outside': 0, 'skipped-no-image': 0, 'blocked': 2}
+mem_map untouched after apply gate  : True
+
+PROBE OK
