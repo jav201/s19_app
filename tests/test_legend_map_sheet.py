@@ -1,4 +1,6 @@
-"""batch-93 increment 003 — the map legend's spec sheet (HLR-132 / LLR-132.1-.4).
+"""AT-293 -- the legend A acceptance (batch-93 inc-003).
+
+batch-93 increment 003 — the map legend's spec sheet (HLR-132 / LLR-132.1-.4).
 
 The operator ruling of 2026-08-06 (legend A): the map view's ``k``-legend is a
 GROUPED SPEC SHEET — four bordered boxes (Entropy bands · Map anatomy ·

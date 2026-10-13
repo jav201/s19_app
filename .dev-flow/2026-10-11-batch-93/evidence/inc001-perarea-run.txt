@@ -1,0 +1,208 @@
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+.........FFFFFFFFFFFFFFFFFFFFFFFF..FFF...                                [100%]
+================================== FAILURES ===================================
+________ test_tc016s_density_layout_snapshot[workspace-compact-80x24] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AACCCD580>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAB3AB100>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAB3AB100> = _snapshot_run_before('workspace', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[workspace-compact-120x30] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAB1E8680>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC67DDA0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC67DDA0> = _snapshot_run_before('workspace', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[workspace-compact-160x40] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AACFA11C0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AABB823E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AABB823E0> = _snapshot_run_before('workspace', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+______ test_tc016s_density_layout_snapshot[workspace-comfortable-80x24] _______
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAAB1DF80>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AB10C68E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AB10C68E0> = _snapshot_run_before('workspace', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+______ test_tc016s_density_layout_snapshot[workspace-comfortable-120x30] ______
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AABB83380>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAEF8ACA0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAEF8ACA0> = _snapshot_run_before('workspace', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+______ test_tc016s_density_layout_snapshot[workspace-comfortable-160x40] ______
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AB04F2F20>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAB81C720>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAB81C720> = _snapshot_run_before('workspace', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[a2l-compact-80x24] ____________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAB0D3100>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAB902DE0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAB902DE0> = _snapshot_run_before('a2l', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[a2l-compact-120x30] ___________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AB0EAE700>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AB0A14D60>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AB0A14D60> = _snapshot_run_before('a2l', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[a2l-compact-160x40] ___________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAE668EA0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC933A60>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC933A60> = _snapshot_run_before('a2l', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[a2l-comfortable-80x24] __________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAAD7CE00>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAFF2FC40>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAFF2FC40> = _snapshot_run_before('a2l', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[a2l-comfortable-120x30] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAB20AD40>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AACADD4E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AACADD4E0> = _snapshot_run_before('a2l', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[a2l-comfortable-160x40] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC5513A0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AACB9B7E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AACB9B7E0> = _snapshot_run_before('a2l', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[mac-compact-80x24] ____________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC1B94E0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A2FC0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A2FC0> = _snapshot_run_before('mac', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[mac-compact-120x30] ___________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAD36BF60>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AACE2DDA0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AACE2DDA0> = _snapshot_run_before('mac', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+___________ test_tc016s_density_layout_snapshot[mac-compact-160x40] ___________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AACADD760>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A39C0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A39C0> = _snapshot_run_before('mac', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[mac-comfortable-80x24] __________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC679C60>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A0B80>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC5A0B80> = _snapshot_run_before('mac', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[mac-comfortable-120x30] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AB01D2200>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC486700>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC486700> = _snapshot_run_before('mac', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[mac-comfortable-160x40] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAAEC1DA0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC02C180>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC02C180> = _snapshot_run_before('mac', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+__________ test_tc016s_density_layout_snapshot[issues-compact-80x24] __________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAB5BBBA0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAAF6F100>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAAF6F100> = _snapshot_run_before('issues', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[issues-compact-120x30] __________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAF417B00>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAED259E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAED259E0> = _snapshot_run_before('issues', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_________ test_tc016s_density_layout_snapshot[issues-compact-160x40] __________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAB0D0400>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AA8FBDF80>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AA8FBDF80> = _snapshot_run_before('issues', 'compact', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[issues-comfortable-80x24] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC5537E0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC51A840>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC51A840> = _snapshot_run_before('issues', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_______ test_tc016s_density_layout_snapshot[issues-comfortable-120x30] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC3D0E00>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AABD63EC0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AABD63EC0> = _snapshot_run_before('issues', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+_______ test_tc016s_density_layout_snapshot[issues-comfortable-160x40] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC8C05E0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAE78B9C0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAE78B9C0> = _snapshot_run_before('issues', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AAC5A1EE0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAB976D40>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAB976D40> = _snapshot_run_before('patch', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] ________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AABB07B00>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAC931E40>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAC931E40> = _snapshot_run_before('patch', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+________ test_tc016s_density_layout_snapshot[diff-comfortable-120x30] _________
+tests\test_tui_snapshot.py:1126: in test_tc016s_density_layout_snapshot
+    assert snap_compare(
+E   AssertionError: assert False
+E    +  where False = <function snap_compare.<locals>.compare at 0x0000020AB10E23E0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus', 'nocolor'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000020AAD3685E0>)
+E    +    where <function _snapshot_run_before.<locals>.run_before at 0x0000020AAD3685E0> = _snapshot_run_before('diff', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18568/snapshot_public0/snap.s19')})
+--------------------------- snapshot report summary ---------------------------
+27 snapshots failed. 2 snapshots passed.
+Textual Snapshot Report
+
+27 mismatched snapshots
+
+View the failure report.
+
+C:\Users\jjgh8\Github\s19_app\snapshot_report.html
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+27 failed, 302 passed in 595.08s (0:09:55)
+inc001 exit=1

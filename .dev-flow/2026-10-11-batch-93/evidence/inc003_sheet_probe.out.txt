@@ -1,0 +1,44 @@
+== (120, 36): dialog 118x30, body 116x20
+  box 'Entropy bands — 256 B windows, bits/byte': box_w=116 title_cells=40
+    [1] ( 44 vs 114) '·  constant/padding  [0,1)    padding / fill'
+    [1] ( 49 vs 114) '░  low               [1,5)    structured / tables'
+    [1] ( 48 vs 114) '▒  medium            [5,7.2)  calibration / data'
+    [1] ( 56 vs 114) '▓  high/random       [7.2,8]  code / compressed / random'
+    [1] ( 68 vs 114) '╱  unmapped gap      (fold)   address hole between runs — not a band'
+  box 'Map anatomy': box_w=116 title_cells=11
+    [1] ( 15 vs 114) '░░░╱▒▒▒▒▒▒╱▓▓▓▓'
+    [1] ( 47 vs 114) 'band bar — width ∝ mapped bytes; ╱ = folded gap'
+    [1] ( 30 vs 114) '00000000   08001000   1FFF01FF'
+    [1] ( 47 vs 114) 'ruler — a tick per run start + last mapped byte'
+    [1] ( 25 vs 114) '░ 1 19%  ▒ 4 57%  ▓ 3 24%'
+    [1] ( 46 vs 114) 'glance — regions and share of mapped, per band'
+    [1] ( 64 vs 114) 'Mapped 5.2 KiB / 512 MiB 0.0010% · 9 rng (9 ok) · 4 gaps · 0 iss'
+    [1] ( 47 vs 114) 'stats — mapped vs span · ranges · gaps · issues'
+  box 'Region row': box_w=116 title_cells=10
+    [1] ( 40 vs 114) ' ▒ 0x08000000 2.0 KiB ████  3 medium   ↵'
+    [1] ( 69 vs 114) 'glyph · start · size · size vs largest · A2L sym · band · ↵ opens hex'
+  box 'Keys': box_w=116 title_cells=4
+    [1] ( 71 vs 114) '↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close'
+  after Esc: Screen
+== (80, 24): dialog 78x19, body 76x9
+  box 'Entropy bands — 256 B windows, bits/byte': box_w=76 title_cells=40
+    [1] ( 44 vs  74) '·  constant/padding  [0,1)    padding / fill'
+    [1] ( 49 vs  74) '░  low               [1,5)    structured / tables'
+    [1] ( 48 vs  74) '▒  medium            [5,7.2)  calibration / data'
+    [1] ( 56 vs  74) '▓  high/random       [7.2,8]  code / compressed / random'
+    [1] ( 68 vs  74) '╱  unmapped gap      (fold)   address hole between runs — not a band'
+  box 'Map anatomy': box_w=76 title_cells=11
+    [1] ( 15 vs  74) '░░░╱▒▒▒▒▒▒╱▓▓▓▓'
+    [1] ( 47 vs  74) 'band bar — width ∝ mapped bytes; ╱ = folded gap'
+    [1] ( 30 vs  74) '00000000   08001000   1FFF01FF'
+    [1] ( 47 vs  74) 'ruler — a tick per run start + last mapped byte'
+    [1] ( 25 vs  74) '░ 1 19%  ▒ 4 57%  ▓ 3 24%'
+    [1] ( 46 vs  74) 'glance — regions and share of mapped, per band'
+    [1] ( 64 vs  74) 'Mapped 5.2 KiB / 512 MiB 0.0010% · 9 rng (9 ok) · 4 gaps · 0 iss'
+    [1] ( 47 vs  74) 'stats — mapped vs span · ranges · gaps · issues'
+  box 'Region row': box_w=76 title_cells=10
+    [1] ( 40 vs  74) ' ▒ 0x08000000 2.0 KiB ████  3 medium   ↵'
+    [1] ( 69 vs  74) 'glyph · start · size · size vs largest · A2L sym · band · ↵ opens hex'
+  box 'Keys': box_w=76 title_cells=4
+    [1] ( 71 vs  74) '↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close'
+  after Esc: Screen
