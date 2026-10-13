@@ -1,0 +1,21 @@
+=== 80x24
+  screen 80x24: workspace region=Region(x=5, y=2, width=74, height=12)
+  chrome    : rail_width=5  top=2  footer_h=1
+  #screen_patch : region=Region(x=5, y=2, width=74, height=12)  content=74x12
+  #screen_flow  : region=Region(x=5, y=2, width=74, height=12)  content=74x12
+  #screen_checks: region=Region(x=5, y=2, width=74, height=12)  content=74x12
+  regime    : icon (breakpoint 120)
+=== 120x30
+  screen 120x30: workspace region=Region(x=23, y=2, width=96, height=18)
+  chrome    : rail_width=23  top=2  footer_h=1
+  #screen_patch : region=Region(x=23, y=2, width=96, height=18)  content=96x18
+  #screen_flow  : region=Region(x=23, y=2, width=96, height=18)  content=96x18
+  #screen_checks: region=Region(x=23, y=2, width=96, height=18)  content=96x18
+  regime    : fixed (breakpoint 120)
+=== 160x40
+  screen 160x40: workspace region=Region(x=23, y=2, width=136, height=28)
+  chrome    : rail_width=23  top=2  footer_h=1
+  #screen_patch : region=Region(x=23, y=2, width=136, height=28)  content=136x28
+  #screen_flow  : region=Region(x=23, y=2, width=136, height=28)  content=136x28
+  #screen_checks: region=Region(x=23, y=2, width=136, height=28)  content=136x28
+  regime    : fixed (breakpoint 120)
