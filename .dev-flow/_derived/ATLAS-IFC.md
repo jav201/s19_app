@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 72 requirement files | corpus digest: b922b9e262c326c7 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 71 requirement files | corpus digest: 568c1faef02690cc -->
 
 # ATLAS-IFC — how is the application addressed?
 
-18 FLOW declaration(s) · 8 COMPONENT declaration(s) · 677 declared requirement heading ids — one row per declaration.
+13 FLOW declaration(s) · 6 COMPONENT declaration(s) · 636 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -94,35 +94,6 @@
 
 ### FLOW `the amendment, from the operator's eye to one word of chrome` — .dev-flow/2026-10-13-batch-94/01-requirements.md:126
 - node `the legend spec sheet's fourth box title (screens.py _box)` — owner HLR-134
-
-### FLOW `split_join_screen` — .dev-flow/2026-10-13-batch-95/01-requirements.md:719
-- node `the three segment-source tabs + the ranges-first default + the manual parser` — owner LLR-135.7
-- node `the graft chassis composition` — owner LLR-135.1
-- node `the output plan (per-file blocks, coverage sweep, conflict marks, guard flag)` — owner LLR-136.1
-- node `the visor band + legend + ruler` — owner LLR-135.2
-- node `the two-regime reflow + the split gantt show/hide` — owner LLR-135.3
-- node `the span guard arm/disarm` — owner LLR-135.5
-- node `split/join emission (slicer + pad-fill emitter + S19/HEX/BIN emitters + naming)` — owner LLR-136.5
-
-### FLOW `save_gather` — .dev-flow/2026-10-13-batch-95/01-requirements.md:757
-- node `the used-set computation (the P3-recorded predicate)` — owner LLR-138.1
-- node `the COPY gather into the project homes` — owner LLR-138.2
-- node `the no-project guard + the snapshot refresh on re-save` — owner LLR-138.4
-
-### FLOW `open_folder_buttons` — .dev-flow/2026-10-13-batch-95/01-requirements.md:777
-- node `the per-window target resolution (project vs COMMON, missing-folder limbs)` — owner LLR-139.1
-- node `the cross-platform seam` — owner LLR-139.3
-
-### FLOW `usage_help` — .dev-flow/2026-10-13-batch-95/01-requirements.md:792
-- node `the per-window modal on the VariantHelpScreen pattern` — owner LLR-140.1
-- node `the section census (9/9, step counts, markup-free)` — owner LLR-140.2
-
-### FLOW `a2l_referenced_patch` — .dev-flow/2026-10-13-batch-95/01-requirements.md:807
-- node `symbol resolution (name -> address+length+datatype via the tag map)` — owner LLR-141.1
-- node `physical->raw encode (the COMPU_METHOD composition) + the canonical wire form` — owner LLR-141.1
-- node `the Patch Editor symbol picker + the refusal limb` — owner LLR-141.2
-- node `the flow blocks' A2L reference resolution (project / workspace homes)` — owner LLR-142.1 / LLR-142.2
-- node `report attribution + the A2B diff reference block` — owner LLR-143.1 / LLR-143.2
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -261,38 +232,15 @@
 |---|---|---|---|---|
 | `markup-safe Text` | `s19_app.utils.safe_text` | None | 14 declared | LLR-003.2 |
 
-### COMPONENT `split_join_engine` — .dev-flow/2026-10-13-batch-95/01-requirements.md:840
-- gap : str ; pad_byte: int ; fmt: str ; stem: str ; pattern: str ; destination: Path
-- inputs : image: S19File|IntelHexFile ; segments: SegRow[] ; selection: set[int] ; mode: str ;
-- outputs : 
-- parent : SYSTEM
-- surface : the Split / Join / Export screen
-
-| output | address | cardinality | consumers | owner |
-|---|---|---|---|---|
-| `output_files` | `s19_app/tui/changes/io.py (the split/join emit entry minted by LLR-137.1-137.3)` | 1..N | 3 declared | LLR-136.5 |
-| `memory_segment_rows` | `s19_app/tui/a2l.py::extract_memory_segments` | 0..N | 2 declared | LLR-137.4 |
-
-### COMPONENT `change_set_wire` — .dev-flow/2026-10-13-batch-95/01-requirements.md:864
-- inputs : document: ChangeDocument (address-form and symbol-form entries) ; a2l: the referenced [+ABSORBED]
-- outputs : 
-- parent : SYSTEM
-- surface : the change-set JSON (the s19app-changeset v2 wire) + the flow blocks' a2l_ref
-
-| output | address | cardinality | consumers | owner |
-|---|---|---|---|---|
-| `resolved_entries` | `s19_app/tui/changes/io.py (read_change_document — the v2 reader seam)` | 1..N | 3 declared | LLR-141.1 |
-
 ## STATUS — the real rules, run at derivation
 
-- [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:824: FLOW a2l_referenced_patch: node `the flow blocks' A2L reference resolution (project / workspace homes)` names 2 owners (LLR-142.1, LLR-142.2) — a node has exactly one owner; split it into one node per owning requirement
-- [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:828: FLOW a2l_referenced_patch: node `report attribution + the A2B diff reference block` names 2 owners (LLR-143.1, LLR-143.2) — a node has exactly one owner; split it into one node per owning requirement
-- [-] V11  01-requirements.md: 86 OUTPUT(s), each with an address and a declared consumer list
+- [-] V10  01-requirements.md: 64 FLOW node(s), every one owned
+- [-] V11  01-requirements.md: 83 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:540: COMPONENT loaded_panel/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:391: COMPONENT screen_workspace/screen_root: reached by 5 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, tests/test_segment_split_window.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:391: COMPONENT screen_workspace/screen_root: reached by 4 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:401: COMPONENT screen_workspace/memstrip_band: reached by 4 undeclared file(s) — REQUIREMENTS.md, prototypes/legend_n8.INVENTORY.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:418: COMPONENT screen_workspace/left_pane: reached by 3 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:426: COMPONENT screen_workspace/center_pane: reached by 2 undeclared file(s) — REQUIREMENTS.md, prototypes/screen_upgrades.HANDOFF-PLAN.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -312,17 +260,16 @@
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:602: COMPONENT screen_workspace/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:623: COMPONENT screen_workspace/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:850: COMPONENT workspace_body/body_root: reached by 5 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, tests/test_tui_map_big.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:865: COMPONENT workspace_body/screen_slot_set: reached by 3 undeclared file(s) — s19_app/tui/open_folder_chip.py, tests/test_open_folder_chips.py, tests/test_window_usage_help.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:871: COMPONENT workspace_body/a2l_screen: reached by 3 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:871: COMPONENT workspace_body/a2l_screen: reached by 2 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:880: COMPONENT workspace_body/mac_screen: reached by 2 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:889: COMPONENT workspace_body/map_screen: reached by 5 undeclared file(s) — REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, tests/test_command_bar_interlock.py, tests/test_segment_split_window.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:889: COMPONENT workspace_body/map_screen: reached by 4 undeclared file(s) — REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, tests/test_command_bar_interlock.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:898: COMPONENT workspace_body/issues_screen: reached by 5 undeclared file(s) — REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss, tests/test_tui_issues_view.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:909: COMPONENT workspace_body/patch_screen: reached by 1 undeclared file(s) — docs/architecture.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:917: COMPONENT workspace_body/diff_screen: reached by 1 undeclared file(s) — docs/architecture.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:926: COMPONENT workspace_body/flow_screen: reached by 5 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, .fast-dev-flow/archive/2026-07-14-batch44-flow-builder-spec.md, REQUIREMENTS.md, docs/architecture.md, tests/test_flow_builder_render.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:933: COMPONENT workspace_body/checks_screen: reached by 3 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:942: COMPONENT workspace_body/crc_designer_screen: reached by 3 undeclared file(s) — docs/architecture.md, docs/crc-algorithm-designer/01-requirements.md, s19_app/tui/crc_designer_view.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:950: COMPONENT workspace_body/screen_root: reached by 5 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, tests/test_segment_split_window.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:950: COMPONENT workspace_body/screen_root: reached by 4 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:960: COMPONENT workspace_body/memstrip_band: reached by 4 undeclared file(s) — REQUIREMENTS.md, prototypes/legend_n8.INVENTORY.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:977: COMPONENT workspace_body/left_pane: reached by 3 undeclared file(s) — .fast-dev-flow/archive/2026-07-07-sections-label-spec.md, prototypes/screen_upgrades.HANDOFF-PLAN.md, s19_app/tui/app.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:985: COMPONENT workspace_body/center_pane: reached by 2 undeclared file(s) — REQUIREMENTS.md, prototypes/screen_upgrades.HANDOFF-PLAN.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -341,8 +288,6 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1151: COMPONENT workspace_body/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1161: COMPONENT workspace_body/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  01-requirements.md: 9 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text, split_join_engine/output_files, split_join_engine/memory_segment_rows, change_set_wire/resolved_entries. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `none — the first consumer is the screen's export action and the batch's own` names a file that is not there — the contract points at nothing
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `TCs` names a file that is not there — the contract points at nothing
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `no shipped consumer indexes it` names a file that is not there — the contract points at nothing
-- [-] V19  01-requirements.md: 8 COMPONENT id(s), each declared exactly once
+- [!] V13  01-requirements.md: 6 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
+- [-] V14  01-requirements.md: 295 declared consumer(s), every one resolved
+- [-] V19  01-requirements.md: 6 COMPONENT id(s), each declared exactly once
