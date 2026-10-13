@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 71 requirement files | corpus digest: 3d949fc69e3ecc03 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 71 requirement files | corpus digest: 0d8e4bb7a39f8421 -->
 
 # ATLAS-IFC — how is the application addressed?
 
@@ -92,7 +92,7 @@
 - node `live-sourced band key` — owner LLR-132.4
 - node `command-bar interlock` — owner LLR-133.1
 
-### FLOW `the amendment, from the operator's eye to one word of chrome` — .dev-flow/2026-10-13-batch-94/01-requirements.md:136
+### FLOW `the amendment, from the operator's eye to one word of chrome` — .dev-flow/2026-10-13-batch-94/01-requirements.md:126
 - node `the legend spec sheet's fourth box title (screens.py _box)` — owner HLR-134
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
