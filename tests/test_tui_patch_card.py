@@ -30,7 +30,6 @@ from pathlib import Path
 import pytest
 from textual.widgets import Button, DataTable
 from textual.widget import Widget
-from textual.containers import VerticalScroll
 
 from s19_app.tui.app import A2LDetailCard, S19TuiApp
 from s19_app.tui.screens_directionb import (
@@ -64,6 +63,27 @@ class _Row:
         self.check_glyph = "·"
         self.address = address
         self.encoded_bytes = encoded_bytes
+
+
+def _fully_visible(app: S19TuiApp, w: object) -> bool:
+    """AT-080d helper (registry name retained) — is the widget fully painted?
+
+    Batch-94: the panel is one vertical scroll (FOLD-8 at every regime), so
+    "fully visible" for a widget taller than the viewport is realised as the
+    FOLD-8 contract: the widget's region intersects the screen with nonzero
+    height after `scroll_visible()` — the same oracle as `_on_screen` below,
+    kept under the registered name.
+    """
+    region = w.region
+    screen = app.screen.region
+    return (
+        region.height > 0
+        and region.width > 0
+        and region.y < screen.height
+        and region.bottom > 0
+        and region.right > 0
+        and region.x < screen.width
+    )
 
 
 def _card_plain(app: S19TuiApp) -> str:
@@ -353,38 +373,45 @@ def test_tc080_3b_stub_row_shape_matches_the_real_dataclass() -> None:
 # AT-080d ★ — C-29 / field-audit B2 reachability (GATE-BLOCKING)
 # ---------------------------------------------------------------------------
 
-_NAMED_BUTTONS = (
-    "patch_entry_add_button",
-    "patch_entry_edit_button",
-    "patch_entry_remove_button",
-    "patch_entry_edit_json_button",
-    "patch_undo_button",
-    "patch_redo_button",
-    "patch_doc_load_button",
-    "patch_doc_refresh_button",
-    "patch_doc_validate_button",
-    "patch_doc_apply_button",
-    "patch_doc_save_button",
-    "patch_variant_info_button",
-    "patch_execute_scope_button",
-    "patch_execute_run_button",
-    "patch_checks_run_button",
-    "patch_paste_parse_button",
-    "patch_edit_json_button",
+# The card's batch-94 neighbors whose reachability-with-card this file guards
+# (the card moved INTO the JSON window body, under the entry-input band):
+# the band above it, the card itself, and the JSON window's docked rows below.
+# (The full named-BUTTON reachability census lives in
+# ``tests/test_tui_patch_layout.py::AT-064a/b`` — not duplicated here.)
+# Reachability oracle: ``_on_screen`` (intersection) — the body-resident
+# neighbors are ~4-16 rows tall against the JSON body's 1-5-row viewport
+# (MEASURED batch-94, textual==8.2.8: the content-height window starves the
+# body's tcss `height: 1fr` to a 1-row slit @80x24, 5 rows @120x30), so full
+# containment is unachievable; the FOLD-8 contract is that the operator's
+# scroll brings the widget INTO view. The docked-row neighbors are 1 row and
+# fully visible under the same oracle.
+_CARD_NEIGHBORS = (
+    "patch_doc_entry_inputs",
+    "patch_before_after_card",
+    "patch_paste_controls",
+    "patch_history_controls",
+    "patch_execute_row",
 )
 
 
-def _fully_visible(app: S19TuiApp, w: object) -> bool:
-    """Batch-46's FOLD-8 primitive, reused verbatim."""
+def _on_screen(app: S19TuiApp, w: object) -> bool:
+    """The FOLD-8 reachable oracle for widgets that may be TALLER than a
+    scrollable ancestor's viewport (the JSON body at batch-94: the
+    entry-input band is ~16 rows against a 1-5-row body viewport — full
+    containment is unachievable, but the operator's scroll must still bring
+    the widget INTO view). Intersection, not containment: the region must
+    overlap the screen and every scrollable ancestor's content region (a
+    ``Region`` is falsy when its area is 0 — a mere edge touch does not
+    count)."""
     r = w.region
     if r.area == 0:
         return False
-    if not app.screen.region.contains_region(r):
+    if not app.screen.region.intersection(r):
         return False
     node = w.parent
     while node is not None and node is not app.screen:
         if getattr(node, "is_scrollable", False):
-            if not node.content_region.contains_region(r):
+            if not node.content_region.intersection(r):
                 return False
         node = node.parent
     return True
@@ -423,23 +450,41 @@ def _drive_reachability_with_card(tmp_path: Path, size) -> dict:
             await _select_row(app, pilot, 1)
             card = app.query("#patch_before_after_card")
             card_region = card.first().region if card else None
-            trapped, unreachable = [], []
-            for bid in _NAMED_BUTTONS:
-                btn = app.query_one(f"#{bid}", Button)
-                node = btn.parent
+            # Structural B2 census over every panel button (the card's move
+            # into the JSON body is exactly what could re-trap a docked row):
+            # each button rides a #patch_win_* dock, never a
+            # .patch-window-body.
+            trapped = []
+            for button in panel.walk_children(Button):
+                node = button.parent
+                in_window = False
+                in_body = False
                 while node is not None and node is not app.screen:
-                    if isinstance(node, VerticalScroll):
-                        trapped.append(bid)
-                        break
+                    if getattr(node, "id", None) in (
+                        "patch_win_script",
+                        "patch_win_json",
+                        "patch_win_checks",
+                    ):
+                        in_window = True
+                    if "patch-window-body" in (
+                        set(getattr(node, "classes", ()) or ())
+                    ):
+                        in_body = True
                     node = node.parent
-                await _reach(app, pilot, btn)
-                if not _fully_visible(app, btn):
-                    unreachable.append(bid)
+                if in_body or not in_window:
+                    trapped.append(button.id or type(button).__name__)
+            unreachable = []
+            for nid in _CARD_NEIGHBORS:
+                target = app.query_one(f"#{nid}")
+                await _reach(app, pilot, target)
+                if not _on_screen(app, target):
+                    unreachable.append(nid)
             return {
                 "trapped": trapped,
                 "unreachable": unreachable,
                 "card_mounted": len(card) == 1,
                 "card_area": card_region.area if card_region else 0,
+                "card_parent": card.first().parent.id if card else None,
             }
 
     return asyncio.run(_run())
@@ -447,22 +492,37 @@ def _drive_reachability_with_card(tmp_path: Path, size) -> dict:
 
 @pytest.mark.parametrize("size", _SIZES)
 def test_at080d_reachable_with_card(tmp_path: Path, size) -> None:
-    """AT-080d ★ — GATE-BLOCKING. Docked buttons stay reachable WITH the card.
+    """AT-080d ★ — GATE-BLOCKING. The card's neighbors stay reachable WITH it.
 
-    Intent: HLR-080 / LLR-080.6 — field-audit **B2** (docked buttons unreachable)
-    is the defect batch-46 fixed; the card is this batch's only structural
-    addition to that same container, so it is the thing that could re-litigate
-    it. Measured AFTER Inc-6's extra docked row.
+    Intent: HLR-080 / LLR-080.6 — field-audit **B2** (docked buttons
+    unreachable) is the defect batch-46 fixed; the card is the batch's only
+    structural addition to the same container, so it is the thing that could
+    re-litigate it. Measured AFTER Inc-6's extra docked row; batch-94 (the
+    pe_b rework) moved the card INTO the JSON window body, beneath the
+    entry-input band — so this gate now drives the card's neighbors: the band
+    above it, the card itself, and the JSON window's docked rows below
+    (paste controls, history/Undo-Redo, the execute row), plus the structural
+    B2 census over every panel button. The full named-BUTTON census lives in
+    ``test_tui_patch_layout.py::AT-064a/b`` — not duplicated here.
 
     **Form 1** (LLR-080.6 / MJ-2): the Phase-3 measurement showed no deficit —
-    at both regimes the card mounts AND every named button is reachable — so no
-    relaxation fired and no §6.5 amendment is owed. The card is asserted MOUNTED
-    and NON-ZERO-AREA here, so this cannot pass by the card quietly vanishing
-    (which is precisely the vacuity MJ-2 pre-empted).
+    at both regimes the card mounts AND every neighbor is reachable — so no
+    relaxation fired and no §6.5 amendment is owed. The card is asserted
+    MOUNTED, NON-ZERO-AREA and at its batch-94 home (``#patch_win_json_body``)
+    here, so this cannot pass by the card quietly vanishing (which is
+    precisely the vacuity MJ-2 pre-empted).
+
+    MEASURED (batch-94, textual==8.2.8) and reported upstream: the JSON
+    window body's viewport is ONE row tall @80x24 (five @120x30) — the
+    content-height window starves the body's tcss ``height: 1fr`` — so the
+    body-resident neighbors can never paint in full; the gate therefore uses
+    the ``_on_screen`` (intersection) oracle: the operator's scroll must bring
+    every neighbor INTO view at both regimes. The docked-row neighbors are
+    one row and fully visible under the same oracle.
 
     Contract (batch-46 FOLD-8, verbatim): ``off == []`` at scroll 0 is NOT
-    asserted — the measured viewport cannot show 17 buttons at once. The
-    contract is sibling-not-descendant + ``_fully_visible`` AFTER ``_reach``.
+    asserted — the measured viewport cannot show everything at once. The
+    contract is sibling-not-descendant + ``_on_screen`` AFTER ``_reach``.
     """
     dims = _drive_reachability_with_card(tmp_path, size)
     assert dims["card_mounted"], (
@@ -472,20 +532,26 @@ def test_at080d_reachable_with_card(tmp_path: Path, size) -> None:
     assert dims["card_area"] > 0, (
         f"@{size}: the card occupies no rows — it cannot be said to be present"
     )
+    assert dims["card_parent"] == "patch_win_json_body", (
+        f"@{size}: batch-94 moved the card under the JSON window body (beneath "
+        f"the entry inputs); got parent {dims['card_parent']!r}"
+    )
     assert dims["trapped"] == [], (
         f"@{size}: B2 REGRESSION — buttons trapped inside a scrollable body: "
         f"{dims['trapped']}"
     )
     assert dims["unreachable"] == [], (
-        f"@{size}: B2 REGRESSION — buttons not reachable-under-scroll with the "
-        f"card mounted: {dims['unreachable']}"
+        f"@{size}: B2 REGRESSION — the card's neighbors not reachable by "
+        f"scrolling with the card mounted: {dims['unreachable']}"
     )
 
 
-#: The MEASURED card content width per regime (batch-48 Inc-7, C-29 both axes,
-#: card mounted + row selected). NOT the body's 38, NOT the docked strip's 38 —
-#: the card's own `padding: 0 1` costs 2 cells.
-_MEASURED_CARD_BUDGET = {(80, 24): 62, (120, 30): 36}
+#: The MEASURED card content width per regime (batch-48 Inc-7 budget,
+#: RE-MEASURED at batch-94 after the card moved into the wide JSON body —
+#: C-29 both axes, card mounted + row selected). NOT the old script-window
+#: 36 @120x30 (the three-column regime is gone); the card's own
+#: `padding: 0 1` costs 2 cells off the JSON body's content width.
+_MEASURED_CARD_BUDGET = {(80, 24): 60, (120, 30): 81}
 
 
 @pytest.mark.parametrize("size", _SIZES)
@@ -496,7 +562,8 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
     PAINTED geometry, so a card that renders nothing, overflows, or is hidden
     fails — where a pre-layout content accessor would pass on all three.
 
-    The budget is the MEASURED card content width (62 @80×24 / **36** @120×30),
+    The budget is the MEASURED card content width (60 @80×24 / **81** @120×30
+    — re-measured at batch-94 against the card's new home, ``#patch_win_json_body``),
     asserted as a FLOOR on the container and a CEILING on the content: the floor
     fails loud with the real width if the layout ever narrows, and the ceiling
     fails if the card outgrows it. The worst-case line is exercised (a 32-bit
@@ -518,6 +585,7 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
             card = app.query_one("#patch_before_after_card", BeforeAfterCard)
             plain = _card_plain(app)
             return {
+                "card_parent": card.parent.id,
                 "content_w": card.content_region.width,
                 "region_h": card.region.height,
                 "widest": max((len(x) for x in plain.splitlines()), default=0),
@@ -526,6 +594,10 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
 
     out = asyncio.run(_run())
     budget = _MEASURED_CARD_BUDGET[size]
+    assert out["card_parent"] == "patch_win_json_body", (
+        f"@{size}: the card's measured container is the JSON window body at "
+        f"batch-94; got {out['card_parent']!r}"
+    )
     assert out["content_w"] >= budget, (
         f"@{size}: the card's container narrowed to {out['content_w']}, below "
         f"the measured budget {budget} — the C-29 measurement is stale"

@@ -795,6 +795,11 @@ def _batch47_theme_drift_marks(screen: str, density: str, size_key: str) -> tupl
 # (LLR-075.3). All three repaint the Patch Editor's window chrome, so both
 # `patch` scaffold cells (comfortable x {80x24, 120x30}) drift.
 #
+# batch-94 (HLR-006): the line renamed `#patch_scope_line` and now reads
+# `Scope active variant` (the variant segment retired) — the prose below
+# keeps the batch-48 name as the drift mark's own history; the CURRENT id is
+# `#patch_scope_line`.
+#
 # ⚠ Unlike every mark above, these two cells are STRICT GREEN oracles at HEAD —
 # `_batch46_patch_drift_marks` was RETIRED by batch-47's regen PR (#87), so a
 # repaint fails CI **RED, not xfail**. Hence this mark (C-22 upper bound).
@@ -1005,6 +1010,56 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-94 Inc-001 (the editors split + Patch Editor rework + the Check Editor
+# rail entry): TWO drift sources, reasoned per cell (C-22) and swept across the
+# shared chrome (C-28):
+#   (1) THE RAIL CENSUS 10→11 — the ``✔ Check Editor`` entry lands after Patch
+#       Editor on the activity rail, and the rail renders in EVERY snapshot
+#       cell's chrome. At all three sizes the 11th row fits the rail's chrome
+#       budget (11 <= 21 rows at 80x24, HLR-002's own threshold), so every
+#       cell's rail gains one row. The footer does NOT drift: the ``=`` binding
+#       is ``show=False`` (the R-1 closure, probe-verified) and no
+#       ``show=True`` binding was added or removed.
+#   (2) SCREEN-OWNED CONTENT: the two ``patch`` cells additionally carry the
+#       pe_b rework (vertical stack — table band + expanded JSON editor +
+#       change-file row with Load/Refresh beside the path input); the ``diff``
+#       cell additionally carries the new check-spec dropdown row. Both were
+#       RED at base already (the batch-93 census); the mark's reason names the
+#       batch-94 drift specifically.
+# The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml,
+# pinned textual==8.2.8) — NEVER locally. RETIRE this mark when that regen
+# lands; under strict=False a stale mark XPASSes silently and masks
+# regressions (the batch-77 retirement note above is the precedent).
+def _batch94_inc001_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-94 Inc-001 rail-census + rework drift marks (per-cell).
+
+    Every cell drifts by the rail census (source 1). The ``patch`` cells drift
+    additionally by the pe_b rework; the ``diff`` cell by the check-spec
+    dropdown. Measured against the actual run before this mark was written
+    (C-22: predict THEN verify, per cell).
+    """
+    reasons = [
+        "batch-94 Inc-001: rail census 10->11 — the Check Editor entry "
+        "(after Patch Editor) renders in every cell's rail chrome"
+    ]
+    if screen == "patch":
+        reasons.append(
+            "batch-94 Inc-001: the Patch Editor pe_b rework (vertical stack — "
+            "entries-table band + expanded JSON editor + Load/Refresh beside "
+            "the path input)"
+        )
+    if screen == "diff":
+        reasons.append(
+            "batch-94 Inc-001: the A2B Diff check-spec dropdown row (LLR-010.1)"
+        )
+    return (
+        pytest.mark.xfail(
+            reason="; ".join(reasons),
+            strict=False,
+        ),
+    )
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -1020,7 +1075,8 @@ _RESTYLED_CELLS = [
         + _batch47_a2l_drift_marks(screen, density, size_key)
         + _batch47_mac_drift_marks(screen, density, size_key)
         + _batch47_theme_drift_marks(screen, density, size_key)
-        + _discoverability_drift_marks(screen, density, size_key),
+        + _discoverability_drift_marks(screen, density, size_key)
+        + _batch94_inc001_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -1074,7 +1130,8 @@ _SCAFFOLD_CELLS = [
         + _discoverability_drift_marks(screen, "comfortable", size_key)
         + _batch48_patch_drift_marks(screen, "comfortable", size_key)
         + _fdf_json_height_drift_marks(screen, "comfortable", size_key)
-        + _batch77_map_drift_marks(screen, "comfortable", size_key),
+        + _batch77_map_drift_marks(screen, "comfortable", size_key)
+        + _batch94_inc001_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

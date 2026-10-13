@@ -71,6 +71,7 @@ from textual.containers import (
     Vertical,
     VerticalScroll,
 )
+from textual.coordinate import Coordinate
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import (
@@ -85,7 +86,7 @@ from textual.widgets import (
     TextArea,
 )
 
-from .changes.io import DUMMY_CHANGESET_TEXT
+from .changes.io import DUMMY_CHANGESET_TEXT, is_check_spec_name
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
 from .insight_style import (
@@ -106,6 +107,7 @@ from .json_highlight import JsonHighlightTextArea
 from .os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS
 from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
+from textual.screen import ModalScreen
 from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
     BLOCK_CHECK,
@@ -5051,6 +5053,86 @@ class BeforeAfterCard(Static):
         self.update(before_after_card_text(address, before, after))
 
 
+class LoadGuardScreen(ModalScreen[bool]):
+    """The dirty-load warning popup (batch-94, HLR-005 / LLR-005.2).
+
+    Summary:
+        Modal raised by ``app.py`` when the Patch Editor's Load control is
+        activated while unsaved edits exist in either editor region. It
+        states the loss and offers the two policy branches: **Accept loss
+        and load** continues the load of the path the operator typed (the
+        document is replaced; the unsaved edits are lost), **Cancel** aborts
+        the load and retains both the document and the dirty flag. Escape
+        dismisses with Cancel, mirroring the sibling modals' Escape bond
+        (batch-41 fold). Composed in this module (the ``screens.py`` modal
+        idiom) because the popup is private to the panel that posts
+        :class:`PatchEditorPanel.DirtyLoadRequested` — no fifth SOURCE file.
+
+    Args:
+        None
+
+    Returns:
+        bool: ``True`` when the operator accepted the loss, ``False`` on
+            Cancel / Escape (``ModalScreen[bool]``).
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with the warning text and
+          the Accept / Cancel buttons.
+        - ``on_button_pressed`` dismisses with the branch's value.
+
+    Dependencies:
+        Used by:
+            - ``S19TuiApp.on_patch_editor_panel_dirty_load_requested``
+    """
+
+    #: Route initial focus to Cancel — the SAFE branch. Accept sits one Tab
+    #: away; a popup whose default action destroys work would be a trap.
+    AUTO_FOCUS = "#load_guard_cancel"
+
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
+    def compose(self) -> ComposeResult:
+        with Vertical(classes="modal-dialog"):
+            yield Label(
+                "Unsaved changes will be lost",
+                id="load_guard_title",
+                classes="modal-title",
+            )
+            yield Static(
+                "The change editor and the text editor carry unsaved "
+                "changes. Loading a new document replaces them.",
+                id="load_guard_body",
+                markup=False,
+            )
+            yield Horizontal(
+                Button(
+                    "Accept loss and load",
+                    id="load_guard_accept",
+                    classes="patch-chip",
+                ),
+                Button(
+                    "Cancel",
+                    id="load_guard_cancel",
+                    classes="patch-chip",
+                ),
+                id="load_guard_buttons",
+            )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Dismiss with the branch the operator chose (LLR-005.2)."""
+        button_id = event.button.id or ""
+        if button_id == "load_guard_accept":
+            event.stop()
+            self.dismiss(True)
+        elif button_id == "load_guard_cancel":
+            event.stop()
+            self.dismiss(False)
+
+    def action_cancel(self) -> None:
+        """Escape bond — dismiss with the Cancel branch (batch-41 fold)."""
+        self.dismiss(False)
+
+
 class PatchEditorPanel(ScrollableContainer):
     """Consolidated Patch Editor rail screen — the single v2 change flow.
 
@@ -5250,10 +5332,6 @@ class PatchEditorPanel(ScrollableContainer):
     #: The CHECKS window's border subtitle before any check run (LLR-075.1).
     _NO_RUN_SUBTITLE = "no run yet"
 
-    #: The variant/scope line's placeholder when no variant is active
-    #: (LLR-075.3 invalid boundary — a neutral placeholder, never a crash).
-    _NO_VARIANT_PLACEHOLDER = "-"
-
     #: The save-back S19 record widths in selector cycle order (US-015 /
     #: LLR-015.3). 32 is the default (the populated-S0 / 32-byte mode); 16 is
     #: the legacy empty-S0 / 16-byte mode. Spelled locally so this view widget
@@ -5414,48 +5492,6 @@ class PatchEditorPanel(ScrollableContainer):
             super().__init__()
             self.filename = filename
 
-    class VariantSelected(Message):
-        """The operator picked a variant from the Variant-pane dropdown (US-028).
-
-        Summary:
-            Posted when ``#patch_variant_select`` fires ``Select.Changed``
-            with a concrete variant id (not the blank sentinel). Carries the
-            bare id only — the panel owns no variant-set access and no
-            activation logic; ``app.py`` routes the id wholesale through the
-            existing ``_handle_select_variant`` pipeline (LLR-035.4). Blank /
-            cleared selections post nothing (a blank is not a switch
-            request), mirroring :class:`ChangeFileSelected`.
-
-        Args:
-            variant_id (str): The chosen variant's id, e.g. ``"b"`` (the
-                FULL FILENAME when stems collide — the E6 duplicate-id rule).
-
-        Dependencies:
-            Used by:
-                - ``S19TuiApp.on_patch_editor_panel_variant_selected``
-        """
-
-        def __init__(self, variant_id: str) -> None:
-            super().__init__()
-            self.variant_id = variant_id
-
-    class VariantHelpRequested(Message):
-        """The operator activated the variant-selector info button (US-067).
-
-        Summary:
-            Posted by ``#patch_variant_info_button`` — the always-rendered
-            info affordance beside ``#patch_variant_select`` (LLR-067.1) — to
-            open the ``VariantHelpScreen`` discovery-help modal (LLR-067.3).
-            Carries no payload: it is a pure trigger, so ``app.py`` routes it
-            straight to ``push_screen(VariantHelpScreen())`` (LLR-067.2). The
-            button is unconditionally enabled (help is always available), so
-            this message may be posted in any project state.
-
-        Dependencies:
-            Used by:
-                - ``S19TuiApp.on_patch_editor_panel_variant_help_requested``
-        """
-
     class UndoRequested(Message):
         """The operator activated the change-set Undo control (US-068a).
 
@@ -5518,6 +5554,19 @@ class PatchEditorPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
+        #: batch-94 (LLR-003.1, the pe_b row-focus doctrine): the panel lays
+        #: its three windows out VERTICALLY at every regime — the entries
+        #: table top-anchored (the source of truth), the expanded JSON editor
+        #: beneath it (the primary edit surface), the CHECKS window at the
+        #: foot — replacing the old three-column regime where the JSON editor
+        #: was a capped side pane. Inline styles (not styles.tcss) carry the
+        #: rework so the increment stays inside its SOURCE-file budget; the
+        #: panel scrolls as a whole at the narrow regime (reachable-under-
+        #: scroll, the batch-46 FOLD-8 contract), so the overflow is `auto`
+        #: at BOTH regimes.
+        self.styles.layout = "vertical"
+        self.styles.overflow_y = "auto"
+        self.styles.overflow_x = "hidden"
         #: The execution scope the selector currently shows (LLR-006.6) —
         #: cycled by ``#patch_execute_scope_button``; carried on the
         #: ``execute_scope`` ``ActionRequested``.
@@ -5526,11 +5575,15 @@ class PatchEditorPanel(ScrollableContainer):
         #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
         #: carried on the ``SaveBackDecision``. Defaults to 32.
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
-        #: The active variant id the variant/scope line shows (LLR-075.3),
-        #: mirrored from ``set_variants`` — ``app.py`` remains the ONLY
-        #: populator (the US-026 ownership split). File-derived, so it reaches
-        #: the line only through a literal ``Text`` append (LLR-075.4 / C-17).
-        self._active_variant: Optional[str] = None
+        #: The dirty flag (batch-94, LLR-005.1 — NEW with the rework). Set
+        #: while unsaved edits exist in EITHER editor region (the entries
+        #: table or the JSON text editor); cleared by a successful save or
+        #: load. Readers: the Load guard and the SCRIPT window's border
+        #: subtitle indicator. Writer census (C-15.1, exactly four sites):
+        #: w1 ``request_action`` (entries-table edit) · w2
+        #: ``on_text_area_changed`` (JSON-text edit) · w3 ``mark_saved`` ·
+        #: w4 ``mark_loaded``.
+        self._dirty: bool = False
         #: The loaded image's sparse memory map, RETAINED from
         #: ``refresh_entries``' parameter for the before/after card's
         #: row-selection render (batch-48 LLR-080.2). ``None`` is MEANINGFUL —
@@ -5598,141 +5651,52 @@ class PatchEditorPanel(ScrollableContainer):
         options = [(safe_text(str(name)), name) for name in names]
         self.query_one("#patch_doc_file_select", Select).set_options(options)
 
-    def set_variants(
-        self,
-        options: Sequence[tuple[str, str]],
-        active_id: Optional[str] = None,
-    ) -> None:
-        """Populate the variant dropdown and mirror the active variant.
-
-        Summary:
-            Replace the ``#patch_variant_select`` options with the project's
-            variant ids and pre-select the active one (LLR-035.3), mirroring
-            :meth:`set_change_files`: the panel owns no ``_variant_set``
-            access — ``app.py`` is the ONLY populator (the US-026 ownership
-            split). ``set_options`` runs strictly BEFORE the value assignment
-            (F-4: assigning a value not in the options raises
-            ``InvalidSelectValueError``); the reset-to-blank-sentinel
-            (``Select.NULL``) ``Changed`` echo pair a repopulate emits is
-            absorbed by the ``Select.NULL`` / same-as-active
-            short-circuits in the handler chain (LLR-035.4). An empty
-            ``options`` clears the dropdown back to its blank placeholder
-            with NO preselection (F-2), and the control is disabled whenever
-            fewer than 2 options exist (LLR-035.5 — no false affordance for
-            the no-project / single-variant states, DoR Q1).
-
-        Args:
-            options (Sequence[tuple[str, str]]): ``(label, variant_id)``
-                pairs in model order (``ProjectVariantSet.variants``); empty
-                for the no-project / N<2 states.
-            active_id (Optional[str]): The ``variant_set.active_id`` to
-                display, or ``None`` to leave the blank prompt.
-
-        Returns:
-            None
-
-        Data Flow:
-            - ``Select.set_options`` (resets the selection to the blank
-              sentinel ``Select.NULL``), then
-              the value assignment when ``active_id`` is provided with N >= 2,
-              then the ``disabled`` invariant (``len(options) < 2``).
-
-        Dependencies:
-            Uses:
-                - ``textual.widgets.Select.set_options``
-            Used by:
-                - ``S19TuiApp._refresh_patch_variant_select``
-
-        Example:
-            >>> panel.set_variants([("a", "a"), ("b", "b")], "b")
-        """
-        select = self.query_one("#patch_variant_select", Select)
-        # C-17 (LLR-075.4, WIDENED — a SECOND live sink found in Phase 3):
-        # the option LABEL is project-file-derived (`S19TuiApp._refresh_patch_variant_select` maps
-        # each `variant.variant_id` to BOTH label and value), and Textual's
-        # `SelectCurrent.update(prompt)` (`_select.py:615`) hands a bare `str`
-        # label to a markup-enabled `Static` -> `Content.from_markup`
-        # (`visual.py:103`). Measured at `textual==8.2.8`: a variant id of
-        # `[/nope]` raised `MarkupError` out of `set_variants`; `[link=…]`
-        # injected a link from project data. `update` takes a `RenderableType`,
-        # so a literal `Text` label is passed through unparsed — the same fix
-        # shape as LLR-075.6, applied at the panel's render boundary so
-        # `app.py` stays unchanged.
-        select.set_options(
-            [(safe_text(str(label)), value) for label, value in options]
-        )
-        if active_id is not None and len(options) >= 2:
-            select.value = active_id
-        select.disabled = len(options) < 2
-        # LLR-075.3: mirror the active variant onto the variant/scope line.
-        # Driving it from HERE (the single populator) is what keeps the line
-        # from going stale: a dropdown pick routes through
-        # ``_handle_select_variant`` -> load -> ``_apply_prepared_load`` ->
-        # ``_refresh_patch_variant_select`` -> back into this method.
-        self._active_variant = active_id
-        self._refresh_variant_scope_line()
-
     def compose(self) -> ComposeResult:
-        """Lay out the Patch Editor as three responsive bordered windows.
+        """Lay out the Patch Editor as three vertically-stacked bordered windows.
 
         Summary:
             Render the change-flow editor as three bordered windows
             (HLR-063) — ``#patch_win_script`` (PATCH SCRIPT),
             ``#patch_win_checks`` (CHECKS) and ``#patch_win_json``
-            (JSON EDIT). Each window is a constant **border title** + a
-            scrollable ``VerticalScroll`` body + one or more **docked
-            button-row siblings of the body** (not descendants of it), so an
-            action button is never trapped below the body's inner scroll fold
-            (HLR-064 / the field-audit B2 fix).
+            (JSON EDIT) — stacked VERTICALLY at every regime (batch-94,
+            LLR-003.1, the pe_b row-focus doctrine): the entries table is
+            top-anchored as the source of truth, the expanded
+            ``JsonHighlightTextArea`` editor sits beneath it as the panel's
+            PRIMARY edit surface (replacing the old capped side pane), and
+            the CHECKS window rides at the foot. Each window keeps the
+            batch-46 contract: a constant **border title** + a scrollable
+            ``VerticalScroll`` body + **docked button-row siblings of the
+            body** (not descendants of it), so an action button is never
+            trapped below the body's inner scroll fold (HLR-064 / the B2
+            fix). Where a window's docked rows exceed its slot the WINDOW
+            scrolls (``.patch-window``'s own ``overflow-y: auto``) — the
+            batch-46 FOLD-8 reachable-under-scroll contract, now at every
+            regime, since the vertical stack shares one panel height.
 
-            **batch-48 (§6.5 Amendment D): the in-body title ``Label`` is
-            GONE.** R-TUI-063 originally specified a constant-title ``Label``
-            as each window's first child; Inc-1 added the dolphie-idiom
-            ``border_title`` (LLR-075.1), which rendered the SAME constant a
-            second time — so each window read its own name twice. The border
-            title supersedes the Label: it is strictly stronger (it self-
-            describes on the window's own chrome, it cannot be scrolled away
-            from its window, and it spends 0 content rows against the measured
-            ~5-row @80x24 budget). The protected property — *each window
-            self-describes* — is preserved and re-pinned in that stronger form
-            by ``test_tui_patch_layout.py::test_tc46_1_*``, which now asserts
-            ``border_title`` instead of the Label's class.
-
-            **batch-48 (HLR-076): the docked buttons are CHIPS.** Each
-            button-bearing container carries a ``patch-chip-{entry,apply,
-            checks}`` group class and each ``Button`` a ``patch-chip``; the
-            colour rules live in ``styles.tcss`` scoped under
-            ``#patch_editor_panel`` (LLR-076.1 — the C-30 containment). This
-            is a CLASSES-ONLY restyle: no id is added-in-place-of, renamed,
-            moved, or re-parented (LLR-076.3).
-
-            The pre-existing grouping
-            sub-containers ``#patch_pane_entries``, ``#patch_pane_changefile``,
-            ``#patch_pane_variant`` and ``#patch_doc_file_row`` are preserved
-            intact as **non-scrolling** groups (FOLD-1) so every leaf id and
-            the two variant-order tests stay green unchanged; only their
-            button rows move out to the docked region. The wide↔narrow switch
-            is pure CSS reusing the existing ``width-narrow`` regime
-            (styles.tcss): three columns when ≥120 cols, stacked with a
-            panel-level scroll below it (FOLD-8 reachable-under-scroll, since
-            the measured 5-row @80×24 viewport cannot show all buttons at
-            once). Window titles are CONSTANT strings — never file-derived
-            (C-17 / F3). No leaf id is renamed; the variant group stays ABOVE
-            the execute group (R-PATCH-VARIANT-SELECT-001).
+            **batch-94 (the six operator annotations, HLR-003…008):** the
+            variant group is GONE (HLR-006 — selector, info button, messages
+            and app routing retire; the execution-scope row survives). The
+            Load and Refresh controls move INTO ``#patch_doc_file_row``,
+            beside the change-file dropdown and path input (annotation 6:
+            Load loads the path typed beside it); the document controls row
+            keeps Validate / **Apply loaded changes** (annotation 5) / Save.
+            Window geometry is set INLINE here (``styles``), not in
+            ``styles.tcss``, so the rework stays inside the increment's
+            SOURCE-file budget.
 
         Args:
             None
 
         Returns:
             ComposeResult: The Patch Editor widget tree — three
-            ``#patch_win_*`` window containers, each a border-titled window
-            holding a scrollable body and its docked button-row sibling(s).
+            ``#patch_win_*`` window containers stacked vertically, each a
+            border-titled window holding a scrollable body and its docked
+            button-row sibling(s).
 
         Data Flow:
-            - Each window ``Container`` lays its children out vertically
-              (body / docked rows); ``#patch_editor_panel`` lays the
-              three windows out horizontally when wide and vertically (with a
-              panel scroll) when ``width-narrow`` is set (styles.tcss).
+            - The panel lays the three windows out vertically (inline
+              ``layout: vertical`` set in ``__init__``); each window lays its
+              children out vertically (body / docked rows).
 
         Dependencies:
             Used by:
@@ -5742,10 +5706,6 @@ class PatchEditorPanel(ScrollableContainer):
         script_window = Container(
             VerticalScroll(
                 Container(
-                    Label(
-                        "Change document (JSON)",
-                        classes="patch-section-title",
-                    ),
                     DataTable(
                         id="patch_doc_entries_table",
                         zebra_stripes=True,
@@ -5756,69 +5716,62 @@ class PatchEditorPanel(ScrollableContainer):
                         id="patch_doc_empty_state",
                         markup=False,
                     ),
-                    # batch-48 (LLR-080.1) — the live before/after card, the
-                    # HEADLINE. Mounted INSIDE the scrollable body, directly
-                    # under the table whose selection drives it: content here
-                    # costs SCROLL, while the docked button rows are siblings
-                    # of the body (batch-46's B2 fix), so the card cannot push
-                    # a button below the fold. Measured, not assumed —
-                    # AT-080d drives every named button at both regimes with
-                    # the card mounted.
-                    BeforeAfterCard(id="patch_before_after_card"),
-                    Container(
-                        Label("Address", classes="patch-field-label"),
-                        # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in
-                        # Input subclass) so Ctrl+V pastes from the OS
-                        # clipboard through the single bounded batch-29 funnel.
-                        OsClipboardInput(
-                            placeholder="0x100",
-                            id="patch_entry_address_input",
-                        ),
-                        Label("String value", classes="patch-field-label"),
-                        OsClipboardInput(
-                            placeholder="text (document encoding)",
-                            id="patch_entry_value_input",
-                        ),
-                        Label("Bytes", classes="patch-field-label"),
-                        OsClipboardInput(
-                            placeholder="DE AD BE EF",
-                            id="patch_entry_bytes_input",
-                        ),
-                        id="patch_doc_entry_inputs",
-                    ),
                     id="patch_pane_entries",
-                ),
-                Container(
-                    Container(
-                        Label("Change file", classes="patch-field-label"),
-                        Select(
-                            [],
-                            id="patch_doc_file_select",
-                            prompt="Change files in patches/",
-                            allow_blank=True,
-                        ),
-                        OsClipboardInput(
-                            placeholder=(
-                                "or type a path to the same change-set JSON "
-                                "(alternative to the patches/ dropdown)"
-                            ),
-                            id="patch_doc_path_input",
-                        ),
-                        # batch-35 (US-057 / LLR-057.1): the patch-script
-                        # section label. Its button row (#patch_doc_controls)
-                        # is docked below (batch-46 HLR-064), out of this
-                        # scrollable body.
-                        Label(
-                            "Patch script",
-                            id="patch_script_section_label",
-                            classes="patch-section-title",
-                        ),
-                        id="patch_doc_file_row",
-                    ),
-                    id="patch_pane_changefile",
                 ),
                 id="patch_win_script_body",
                 classes="patch-window-body",
+            ),
+            # batch-94 (annotation 6 / HLR-008): the change-file row is DOCKED
+            # (a sibling of the body, not inside it) and carries the Load and
+            # Refresh controls. Annotation 6 pins Load BESIDE the path input
+            # ("ese botón debe ir al lado de ese texto") — so the row splits in
+            # two at the measured 80x24 budget (finding B of the independent
+            # review): line 1 = the dropdown + path input + Load (68 of the
+            # ~70 available cells), line 2 = Refresh + the section label.
+            # Refresh repopulates the dropdown from the patches-folder scan
+            # ("Refresh Files in Folder"). The change-file Select lists both
+            # patch ``*.json`` and check-spec ``*.chk.json`` files (the scan's
+            # glob already matches both); the option labels distinguish check
+            # specs by suffix.
+            Vertical(
+                Horizontal(
+                    Select(
+                        [],
+                        id="patch_doc_file_select",
+                        prompt="Change files in patches/",
+                        allow_blank=True,
+                    ),
+                    OsClipboardInput(
+                        placeholder=(
+                            "or type a path to the same change-set JSON "
+                            "(alternative to the patches/ dropdown)"
+                        ),
+                        id="patch_doc_path_input",
+                    ),
+                    Button(
+                        "Load",
+                        id="patch_doc_load_button",
+                        classes="patch-chip",
+                    ),
+                    id="patch_doc_file_line1",
+                ),
+                Horizontal(
+                    Button(
+                        "Refresh",
+                        id="patch_doc_refresh_button",
+                        classes="patch-chip",
+                    ),
+                    # batch-35 (US-057 / LLR-057.1): the patch-script section
+                    # label rides the file row it labels.
+                    Label(
+                        "Patch script",
+                        id="patch_script_section_label",
+                        classes="patch-section-title",
+                    ),
+                    id="patch_doc_file_line2",
+                ),
+                id="patch_doc_file_row",
+                classes="patch-docked-row",
             ),
             # Docked button rows — siblings of the body (the B2 fix): never
             # trapped below the body's inner scroll fold.
@@ -5842,134 +5795,25 @@ class PatchEditorPanel(ScrollableContainer):
                 id="patch_doc_entry_buttons",
                 classes="patch-docked-row patch-chip-entry",
             ),
-            # batch-48 (LLR-081.2): the history strip, directly ABOVE the
-            # Undo/Redo row it describes. DOCKED as a sibling of the body (not
-            # inside it) for the same reason the buttons are: it must stay
-            # beside the controls it labels rather than scrolling away from
-            # them. It renders derived integers + author-fixed key hints and
-            # NOTHING file-derived (C-17 / LLR-081 boundary catalog "error").
-            # It carries no `patch-chip-*` group class — it holds no Button,
-            # and the group classes cue BUTTON function (HLR-076). And no
-            # `.patch-field-label`: that class's `color: $fg-base` would be
-            # INERT here (every fragment of the strip's `Text` sets its own
-            # style), so it would claim a styling role it does not play — the
-            # F4 finding that produced `.patch-stat-line`. `.patch-docked-row`
-            # alone supplies all this needs: width 100%, height auto, and the
-            # padding that aligns it with the buttons below.
-            Static(
-                "",
-                id="patch_history_strip",
-                markup=False,
-                classes="patch-docked-row",
-            ),
-            # US-068a: change-set Undo / Redo in their own dedicated row —
-            # disabled for a file-backed document (A-01 data-loss guard).
-            # LLR-076.2 `assumed` arm resolved: undo/redo MOVE the entry
-            # document, so they are entry-actions (blue), not apply-path.
+            # batch-94 (annotation 5 / HLR-007, LLR-007.2): the document
+            # controls row — Validate / **Apply loaded changes** / Save. Load
+            # and Refresh moved up into #patch_doc_file_row beside the path
+            # input (annotation 6). The APPLY-PATH chip group (green) is
+            # unchanged.
             Horizontal(
-                Button("Undo", id="patch_undo_button", classes="patch-chip"),
-                Button("Redo", id="patch_redo_button", classes="patch-chip"),
-                id="patch_history_controls",
-                classes="patch-docked-row patch-chip-entry",
-            ),
-            # batch-37 (US-064a): Refresh re-reads the loaded change file from
-            # its own source_path. The 5-button census is pinned by
-            # test_tui_patch_editor_v2 / the layout TC.
-            # HLR-076: `patch-chip-apply` (green) = the APPLY-PATH group.
-            Horizontal(
-                Button("Load", id="patch_doc_load_button", classes="patch-chip"),
-                Button(
-                    "Refresh",
-                    id="patch_doc_refresh_button",
-                    classes="patch-chip",
-                ),
                 Button(
                     "Validate",
                     id="patch_doc_validate_button",
                     classes="patch-chip",
                 ),
-                Button("Apply", id="patch_doc_apply_button", classes="patch-chip"),
+                Button(
+                    "Apply loaded changes",
+                    id="patch_doc_apply_button",
+                    classes="patch-chip",
+                ),
                 Button("Save", id="patch_doc_save_button", classes="patch-chip"),
                 id="patch_doc_controls",
                 classes="patch-docked-row patch-chip-apply",
-            ),
-            # US-028 (LLR-035.2): the variant group composes ABOVE the execute
-            # group (R-PATCH-VARIANT-SELECT-001 / TC-035.2). Kept intact as a
-            # docked, non-scrolling group so the Select + "?" + execute buttons
-            # are reachable by scrolling the window into view (FOLD-8), never
-            # trapped below the body fold.
-            Container(
-                Container(
-                    Label("Active variant", classes="patch-field-label"),
-                    # US-067: the "?" info button is ALWAYS rendered beside the
-                    # selector so its click target always exists.
-                    # LLR-076.2 `assumed` arm resolved: the variant group
-                    # scopes WHAT A RUN TARGETS, so both of its button-bearing
-                    # rows join the apply-path group (green).
-                    Horizontal(
-                        Select(
-                            [],
-                            id="patch_variant_select",
-                            prompt="Variants in project",
-                            allow_blank=True,
-                            disabled=True,
-                        ),
-                        Button(
-                            "?",
-                            id="patch_variant_info_button",
-                            classes="patch-chip",
-                        ),
-                        id="patch_variant_select_row",
-                        classes="patch-chip-apply",
-                    ),
-                    id="patch_variant_row",
-                ),
-                Container(
-                    Label(
-                        "Execute over variants", classes="patch-field-label"
-                    ),
-                    Horizontal(
-                        Button(
-                            f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
-                            id="patch_execute_scope_button",
-                            classes="patch-chip",
-                        ),
-                        Button(
-                            "Execute scope",
-                            id="patch_execute_run_button",
-                            classes="patch-chip",
-                        ),
-                        id="patch_execute_buttons",
-                        classes="patch-chip-apply",
-                    ),
-                    # LLR-075.3: the variant + execution scope as a readable
-                    # LINE. Before this, the scope was legible only from
-                    # #patch_execute_scope_button's own label. An ADDED id —
-                    # no existing id moves, is renamed, or is re-parented
-                    # (§2.4-6). Nested INSIDE #patch_execute_row (still a
-                    # descendant of #patch_pane_variant per LLR-075.3, and
-                    # adjacent to the button that cycles it) so
-                    # #patch_pane_variant's pinned direct-child list stays
-                    # exactly [patch_variant_row, patch_execute_row] —
-                    # TC-035.2 / R-PATCH-VARIANT-SELECT-001 stay green
-                    # unedited. markup=False is defence-in-depth: every
-                    # update() passes a literal Text, so the file-derived
-                    # variant id is never markup-parsed (LLR-075.4 / C-17).
-                    # batch-48 (code-review F4): `.patch-stat-line`, not the
-                    # borrowed `.patch-field-label` — this renders a
-                    # label+VALUE pair (label_value sets both colours on the
-                    # Text itself), so the field label's `color: $fg-base` was
-                    # inert here and only its padding was ever wanted.
-                    Static(
-                        "",
-                        id="patch_variant_scope_line",
-                        markup=False,
-                        classes="patch-stat-line",
-                    ),
-                    id="patch_execute_row",
-                ),
-                id="patch_pane_variant",
-                classes="patch-docked-group",
             ),
             id="patch_win_script",
             classes="patch-window",
@@ -6045,6 +5889,10 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_win_checks",
             classes="patch-window",
         )
+        checks_window.styles.width = "100%"
+        checks_window.styles.height = "auto"
+        checks_window.styles.margin_right = 0
+        checks_window.styles.margin_bottom = 1
         # ================= JSON EDIT window =================
         json_window = Container(
             VerticalScroll(
@@ -6053,9 +5901,21 @@ class PatchEditorPanel(ScrollableContainer):
                 # content-region at scroll 0 (FOLD-4). #patch_paste_row is kept
                 # for the AT-057a id census; its button row is docked below.
                 Container(
-                    Label(
-                        "Paste change-set (v2 JSON)",
-                        classes="patch-field-label",
+                    # batch-94: the "Paste change-set (v2 JSON)" in-body label
+                    # is gone — the JSON window's border title/subtitle name
+                    # the surface (batch-48 Amendment D precedent), and the
+                    # boxed budget pays the expanded editor, not a duplicated
+                    # label row. The editor rides FIRST in the paste row (the
+                    # primary edit surface, LLR-003.1) with the batch-48
+                    # paste-cap gauge beneath it. #patch_paste_row is kept for
+                    # the AT-057a id census; its button row is docked below.
+                    # batch-48 (LLR-079.1): a `CappedTextArea` subclass — BOTH
+                    # paste ingresses stay capped + in-place JSON colouring via
+                    # the widget's own `_highlights` map. NO markup path — see
+                    # `json_highlight.py`'s module docstring for the pinned
+                    # `_render_line` verification (C-17 / LLR-079.3).
+                    JsonHighlightTextArea(
+                        DUMMY_CHANGESET_TEXT, id="patch_paste_text"
                     ),
                     # batch-48 (LLR-079.4): the paste-cap gauge. The 64 KiB cap
                     # already truncates SILENTLY (`capped_text_area.py:120`/
@@ -6069,17 +5929,40 @@ class PatchEditorPanel(ScrollableContainer):
                         markup=False,
                         classes="patch-field-label",
                     ),
-                    # batch-48 (LLR-079.1): was a plain `CappedTextArea`. The
-                    # subclass keeps BOTH paste ingresses capped and adds
-                    # in-place JSON colouring via the widget's own
-                    # `_highlights` map. NO markup path is introduced — see
-                    # `json_highlight.py`'s module docstring for the pinned
-                    # `_render_line` verification (C-17 / LLR-079.3).
-                    JsonHighlightTextArea(
-                        DUMMY_CHANGESET_TEXT, id="patch_paste_text"
-                    ),
                     id="patch_paste_row",
                 ),
+                # batch-94 (the pe_b inline edit band): the per-entry input
+                # fields ride the JSON window's body BELOW the expanded
+                # editor — the table and the primary edit surface stay in
+                # the first screenful, and the band scrolls with the body.
+                Container(
+                    Label("Address", classes="patch-field-label"),
+                    # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in
+                    # Input subclass) so Ctrl+V pastes from the OS
+                    # clipboard through the single bounded batch-29 funnel.
+                    OsClipboardInput(
+                        placeholder="0x100",
+                        id="patch_entry_address_input",
+                    ),
+                    Label("String value", classes="patch-field-label"),
+                    OsClipboardInput(
+                        placeholder="text (document encoding)",
+                        id="patch_entry_value_input",
+                    ),
+                    Label("Bytes", classes="patch-field-label"),
+                    OsClipboardInput(
+                        placeholder="DE AD BE EF",
+                        id="patch_entry_bytes_input",
+                    ),
+                    id="patch_doc_entry_inputs",
+                ),
+                # batch-48 (LLR-080.1) — the live before/after card, relocated
+                # by the batch-94 rework: an ON-DEMAND inspector (the pe_a
+                # doctrine — "not permanent chrome") that rides the JSON
+                # window's body beneath the edit band, rendered from the
+                # entries table's selection regardless of which window holds
+                # it.
+                BeforeAfterCard(id="patch_before_after_card"),
                 id="patch_win_json_body",
                 classes="patch-window-body",
             ),
@@ -6098,6 +5981,64 @@ class PatchEditorPanel(ScrollableContainer):
                 ),
                 id="patch_paste_controls",
                 classes="patch-docked-row patch-chip-apply",
+            ),
+            # batch-48 (LLR-081.2): the history strip, directly ABOVE the
+            # Undo/Redo row it describes. DOCKED as a sibling of the body for
+            # the same reason the buttons are: it must stay beside the
+            # controls it labels rather than scrolling away from them. It
+            # renders derived integers + author-fixed key hints and NOTHING
+            # file-derived (C-17 / LLR-081 boundary catalog "error").
+            Static(
+                "",
+                id="patch_history_strip",
+                markup=False,
+                classes="patch-docked-row",
+            ),
+            # US-068a: change-set Undo / Redo in their own dedicated row —
+            # disabled for a file-backed document (A-01 data-loss guard).
+            # LLR-076.2 `assumed` arm resolved: undo/redo MOVE the entry
+            # document, so they are entry-actions (blue), not apply-path.
+            Horizontal(
+                Button("Undo", id="patch_undo_button", classes="patch-chip"),
+                Button("Redo", id="patch_redo_button", classes="patch-chip"),
+                id="patch_history_controls",
+                classes="patch-docked-row patch-chip-entry",
+            ),
+            # batch-94 (HLR-006): the variant group RETIRES with the rework —
+            # no selector, no help button, no VariantSelected routing. What
+            # survives is the execution-scope row alone (the operator's "LA
+            # aplicación a otras variantes se delegará a la parte de flow
+            # builder" ruling removes variant SELECTION from the editor; the
+            # scoped-execution control over the project's variants stays, and
+            # its scope line now names the scope only — no variant id).
+            Container(
+                Label("Execute over variants", classes="patch-field-label"),
+                Horizontal(
+                    Button(
+                        f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
+                        id="patch_execute_scope_button",
+                        classes="patch-chip",
+                    ),
+                    Button(
+                        "Execute scope",
+                        id="patch_execute_run_button",
+                        classes="patch-chip",
+                    ),
+                    id="patch_execute_buttons",
+                    classes="patch-chip-apply",
+                ),
+                # LLR-075.3 (batch-94 form): the execution scope as a readable
+                # line — "Scope <label>" only; the variant half of the line
+                # retired with the selector. markup=False is defence-in-depth:
+                # every update() passes a literal Text (C-17).
+                Static(
+                    "",
+                    id="patch_scope_line",
+                    markup=False,
+                    classes="patch-stat-line",
+                ),
+                id="patch_execute_row",
+                classes="patch-docked-group",
             ),
             # The hidden save-back prompt is a docked group revealed by the
             # app's save-back handler on a successful save; docked so its
@@ -6150,21 +6091,45 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_win_json",
             classes="patch-window",
         )
+        # batch-94 (LLR-003.1 geometry, set INLINE so the rework stays inside
+        # the increment's SOURCE-file budget — styles.tcss is untouched):
+        # every window is content-height (``auto``) and the PANEL scrolls as
+        # one (the batch-46 FOLD-8 reachable-under-scroll contract, now the
+        # single regime) — the entries table (SCRIPT, top) and the expanded
+        # editor (JSON, directly beneath it) both land in the first screenful
+        # at 120x30, and every docked row stays a body sibling (the B2 fix
+        # holds: no button is a descendant of a scrollable body). The CHECKS
+        # window rides at the foot.
+        script_window.styles.width = "100%"
+        script_window.styles.height = "auto"
+        script_window.styles.margin_right = 0
+        # The script window's bottom margin goes to 0 — one more content row
+        # for the JSON window beneath it (the checks window keeps its own).
+        script_window.styles.margin_bottom = 0
+        json_window.styles.width = "100%"
+        json_window.styles.height = "auto"
+        json_window.styles.margin_right = 0
+        json_window.styles.margin_bottom = 1
+        checks_window.styles.width = "100%"
+        checks_window.styles.height = "auto"
+        checks_window.styles.margin_right = 0
+        checks_window.styles.margin_bottom = 1
         # LLR-075.1: the dolphie-idiom border title + subtitle on each window
         # (the batch-47 `app.py:1651-1656` Workspace-pane precedent). The
         # titles are CONSTANT author strings; the subtitles carry LIVE state
-        # and are re-set by refresh_entries (SCRIPT: entry count) and
-        # refresh_check_results (CHECKS: run state). The JSON subtitle is the
-        # static schema token. `.patch-window` already draws `border: round
-        # $rule` (styles.tcss:864), so the border chrome exists to host them.
+        # and are re-set by refresh_entries (SCRIPT: entry count + dirty
+        # marker) and refresh_check_results (CHECKS: run state). The JSON
+        # subtitle is the static schema token. `.patch-window` already draws
+        # `border: round $rule` (styles.tcss:864), so the border chrome
+        # exists to host them.
         script_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_script"]
         checks_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_checks"]
         json_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_json"]
         checks_window.border_subtitle = self._NO_RUN_SUBTITLE
         json_window.border_subtitle = self._JSON_SCHEMA_SUBTITLE
         yield script_window
-        yield checks_window
         yield json_window
+        yield checks_window
 
     def _set_window_subtitle(self, window_id: str, subtitle: str) -> None:
         """Set one patch window's live border subtitle (LLR-075.1).
@@ -6200,57 +6165,51 @@ class PatchEditorPanel(ScrollableContainer):
         if windows:
             windows.first(Container).border_subtitle = subtitle
 
-    def _refresh_variant_scope_line(self) -> None:
-        """Render the variant + execution-scope line (LLR-075.3 / LLR-075.4).
+    def _refresh_scope_line(self) -> None:
+        """Render the execution-scope line (LLR-075.3, batch-94 form).
 
         Summary:
-            Compose ``Variant <id> · Scope <label>`` as a Rich ``Text`` and
-            write it to ``#patch_variant_scope_line``. The scope label comes
-            from the panel's OWN local vocabulary (``_SCOPE_LABELS``), so this
-            view widget still imports nothing from the service layer (C-7).
-            The variant id is project-file-derived and is therefore appended
-            LITERALLY — never f-strung into a markup string and never passed
-            to ``Text.from_markup`` (LLR-075.4 / C-17).
+            Compose ``Scope <label>`` as a Rich ``Text`` and write it to
+            ``#patch_scope_line``. The scope label comes from the panel's
+            OWN local vocabulary (``_SCOPE_LABELS``), so this view widget
+            still imports nothing from the service layer (C-7). Batch-94
+            (HLR-006): the ``Variant <id> ·`` half of the former
+            variant/scope line retired with the variant selector — the line
+            names the scope only, and carries NO file-derived text.
 
         Returns:
             None
 
         Data Flow:
-            - ``self._active_variant`` (mirrored from ``set_variants``) +
-              ``self._execute_scope`` (cycled by the scope button) →
-              ``label_value`` pairs → ``Static.update``.
+            - ``self._execute_scope`` (cycled by the scope button) →
+              ``label_value`` pair → ``Static.update``.
 
         Dependencies:
             Uses:
                 - ``insight_style.label_value``
             Used by:
-                - ``PatchEditorPanel.set_variants``
                 - ``PatchEditorPanel.on_button_pressed`` (the scope cycle)
                 - ``PatchEditorPanel.on_mount``
 
         Example:
-            >>> panel._refresh_variant_scope_line()
+            >>> panel._refresh_scope_line()
         """
-        lines = self.query("#patch_variant_scope_line")
+        lines = self.query("#patch_scope_line")
         if not lines:
             return
-        variant = self._active_variant or self._NO_VARIANT_PLACEHOLDER
-        # `label_value` appends both segments literally — the C-17-safe
-        # constructor. A hostile variant id renders as its own characters.
-        line = label_value("Variant", variant, CYAN)
-        line.append(" · ")
-        line.append_text(
+        lines.first(Static).update(
             label_value("Scope", self._SCOPE_LABELS[self._execute_scope])
         )
-        lines.first(Static).update(line)
 
     def on_mount(self) -> None:
-        """Initialise the entries table columns and the empty state.
+        """Initialise the entries table columns, heights and the empty state.
 
         Summary:
             Add the entries ``DataTable`` columns once the widget is
-            mounted and show the empty-state line for the initially-empty
-            document.
+            mounted, cap the table's height (batch-94: the source of truth
+            shows a fixed band at the top of the stacked layout), relax the
+            editor's tcss ``min-height`` to the reworked window's real slot,
+            and show the empty-state line for the initially-empty document.
 
         Dependencies:
             Used by:
@@ -6258,10 +6217,63 @@ class PatchEditorPanel(ScrollableContainer):
         """
         table = self.query_one("#patch_doc_entries_table", DataTable)
         table.add_columns(*self._ENTRIES_COLUMNS)
+        # batch-94 (LLR-003.1): the table is a bounded band (three rows) at
+        # the top of the stacked layout — the window body scrolls beneath it.
+        table.styles.height = 3
+        # The paste row and editor sit inside the now-content-sized windows:
+        # the editor is a FIXED eight-row band (the tcss `1fr` fill predates
+        # the vertical stack and resolves against the unbounded scroll
+        # viewport once the windows go content-height — the C-23 re-measure).
+        paste_row = self.query_one("#patch_paste_row")
+        paste_row.styles.height = "auto"
+        paste_text = self.query_one("#patch_paste_text", TextArea)
+        paste_text.styles.height = 8
+        paste_text.styles.min_height = 8
+        # The docked rows are height-FORCED so the change-file controls keep
+        # Load beside the path input (annotation 6) inside the first
+        # screenful: the Select compacts to its one-line value row and the
+        # path input to its single row. (The boxed 96x18 workspace cannot pay
+        # the stock 3-row Select / 2-row chip rows against the stacked layout
+        # — measured, the C-13 budget arithmetic applied inline because
+        # styles.tcss is outside this increment's SOURCE-file budget.)
+        # Finding A of the independent review (fixed): the BUTTON grids stay
+        # height-AUTO — a forced height collapses the grid's row distribution
+        # and the first-row chips (Add/Edit) paint at zero height.
+        file_row = self.query_one("#patch_doc_file_row")
+        file_row.styles.height = 3
+        file_row.styles.padding_top = 0
+        # The two file-row lines are Horizontal containers (Textual default
+        # height 1fr) — inside the content-height row the fr default
+        # balloons; pin both to their content height (the path input's
+        # min-height makes line 1 two rows).
+        self.query_one("#patch_doc_file_line1").styles.height = 2
+        self.query_one("#patch_doc_file_line2").styles.height = 1
+        select = self.query_one("#patch_doc_file_select", Select)
+        select.styles.height = 1
+        select.styles.width = 30
+        path_input = self.query_one("#patch_doc_path_input", Input)
+        path_input.styles.height = 1
+        path_input.styles.width = 28
+        entry_buttons = self.query_one("#patch_doc_entry_buttons")
+        entry_buttons.styles.height = "auto"
+        # The entry chips keep the batch-46 WRAPPING grid (grid-size: 2 —
+        # two per row, the anti-clip fix); inside the content-height window
+        # that is two rows, measured into the stacked budget.
+        self.query_one("#patch_doc_controls").styles.height = "auto"
+        # Finding C of the independent review (fixed): the batch-48 JSON-fill
+        # tcss (`#patch_win_json_body { height: 1fr }`, styles.tcss:1590)
+        # starves the body to a one-row viewport inside the rework's
+        # content-height window at 80x24 — the auto override restores the
+        # editor band inside the panel scroll.
+        self.query_one("#patch_win_json_body").styles.height = "auto"
+        # The panel's vertical padding goes to 0 (the horizontal padding
+        # stays) — two more content rows for the stacked windows.
+        self.styles.padding_top = 0
+        self.styles.padding_bottom = 0
         self.refresh_entries([])
-        # LLR-075.3: render the line's no-variant/default-scope initial state
-        # so it never mounts blank.
-        self._refresh_variant_scope_line()
+        # LLR-075.3: render the line's default-scope initial state so it never
+        # mounts blank.
+        self._refresh_scope_line()
         # LLR-079.4: the buffer mounts NON-empty (`DUMMY_CHANGESET_TEXT`), so a
         # gauge that only rode `TextArea.Changed` would read a stale `0 / 64K`
         # until the analyst's first keystroke.
@@ -6300,6 +6312,11 @@ class PatchEditorPanel(ScrollableContainer):
                 - Textual message dispatch (the ``#patch_paste_text`` buffer)
         """
         if event.text_area.id == "patch_paste_text":
+            # w2 (LLR-005.1 writer census): an edit in the JSON text region
+            # sets the dirty flag — the Load guard treats the buffer as
+            # unsaved work even when the entries table is clean.
+            self._dirty = True
+            self._refresh_dirty_indicator()
             self._refresh_paste_gauge()
 
     def _refresh_paste_gauge(self) -> None:
@@ -6343,6 +6360,9 @@ class PatchEditorPanel(ScrollableContainer):
             ``ActionRequested`` message so ``app.py`` can call
             ``ChangeService``. The widget itself performs no
             ``changes``-package work — it only forwards the request.
+            Batch-94 (LLR-005.1): the entries-table edit actions also SET
+            the dirty flag (writer w1) — an Add / Edit / Remove is unsaved
+            work until the next successful save or load.
 
         Args:
             action (str): One of the eight LLR-003.2 v2 actions —
@@ -6357,6 +6377,10 @@ class PatchEditorPanel(ScrollableContainer):
             Used by:
                 - the panel's entry and document controls
         """
+        if action in ("add_entry", "edit_entry", "remove_entry"):
+            # w1 (LLR-005.1 writer census): entries-table edit → dirty.
+            self._dirty = True
+            self._refresh_dirty_indicator()
         self.post_message(
             self.ActionRequested(
                 action=action,
@@ -6461,13 +6485,6 @@ class PatchEditorPanel(ScrollableContainer):
                 )
             )
             return
-        if button_id == "patch_variant_info_button":
-            # US-067 / LLR-067.1/.2: open the variant-selector help modal. A
-            # pure trigger — post a payload-free request; the app pushes
-            # ``VariantHelpScreen`` (no variant-set access, no routed action).
-            event.stop()
-            self.post_message(self.VariantHelpRequested())
-            return
         if button_id == "patch_undo_button":
             # US-068a / LLR-068a.3: pure trigger — the app calls
             # ``ChangeService.undo()`` and re-renders. Disabled for a
@@ -6505,13 +6522,26 @@ class PatchEditorPanel(ScrollableContainer):
             )
             # LLR-075.3: the line and the button label are two views of the
             # SAME `_execute_scope` — cycle them together or the line lies.
-            self._refresh_variant_scope_line()
+            self._refresh_scope_line()
+            return
+        if button_id == "patch_doc_load_button":
+            # batch-94 (HLR-005 / LLR-005.2): the dirty guard. With unsaved
+            # edits in either editor region, Load does NOT load — it asks.
+            # Post :class:`DirtyLoadRequested`; ``app.py`` pushes the
+            # :class:`LoadGuardScreen` modal and only proceeds with THIS path
+            # when the operator accepts the loss. A clean document loads
+            # directly (the popup-always shape is the negative control).
+            event.stop()
+            path_text = self.query_one("#patch_doc_path_input", Input).value
+            if self._dirty:
+                self.post_message(self.DirtyLoadRequested(path_text=path_text))
+            else:
+                self.request_action("load_doc")
             return
         actions = {
             "patch_entry_add_button": "add_entry",
             "patch_entry_edit_button": "edit_entry",
             "patch_entry_remove_button": "remove_entry",
-            "patch_doc_load_button": "load_doc",
             "patch_doc_refresh_button": "refresh_doc",
             "patch_doc_validate_button": "validate_doc",
             "patch_doc_apply_button": "apply_doc",
@@ -6524,23 +6554,80 @@ class PatchEditorPanel(ScrollableContainer):
             event.stop()
             self.request_action(action)
 
+    def mark_saved(self) -> None:
+        """Clear the dirty flag after a successful save (LLR-005.1, writer w3).
+
+        Called by ``app.py`` when the change service reports a clean
+        ``save_doc`` — the flag must not survive its own save (the
+        save-then-check arm of TC-B94-10 is the negative control).
+        """
+        self._dirty = False
+        self._refresh_dirty_indicator()
+
+    def mark_loaded(self) -> None:
+        """Clear the dirty flag after a successful load (LLR-005.1, writer w4).
+
+        Called by ``app.py`` when a document load / paste parse succeeds —
+        the freshly-loaded document has no unsaved edits, in BOTH editor
+        regions (the entries table re-renders from the loaded document and
+        the buffer is reseeded, so one clear covers the two regions).
+        """
+        self._dirty = False
+        self._refresh_dirty_indicator()
+
+    def _refresh_dirty_indicator(self) -> None:
+        """Repaint the SCRIPT window's dirty marker (LLR-005.1 reader).
+
+        The marker rides the SCRIPT window's border subtitle after the entry
+        count: ``N entries ●`` when unsaved edits exist, ``N entries`` when
+        clean. The count half is rewritten by :meth:`refresh_entries`; this
+        method repaints only the marker half so the two readers (the Load
+        guard and this chrome) can never disagree.
+        """
+        subtitle = self.query_one("#patch_win_script", Container).border_subtitle
+        if subtitle is None:
+            subtitle = ""
+        base = subtitle.split(" ●", 1)[0]
+        self.query_one("#patch_win_script", Container).border_subtitle = (
+            f"{base} ●" if self._dirty else base
+        )
+
+    class DirtyLoadRequested(Message):
+        """Load was activated while unsaved edits exist (HLR-005).
+
+        Summary:
+            Posted by ``#patch_doc_load_button`` in place of the plain
+            ``load_doc`` action when the dirty flag is set. Carries the path
+            input's current text so ``app.py`` can present the guard popup
+            and, on accept, run EXACTLY the load the operator asked for —
+            the path beside the Load control (annotation 6).
+
+        Args:
+            path_text (str): The change-file path input's current text.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_dirty_load_requested``
+        """
+
+        def __init__(self, path_text: str) -> None:
+            super().__init__()
+            self.path_text = path_text
+
     def on_select_changed(self, event: Select.Changed) -> None:
-        """Forward a dropdown pick to ``app.py`` (US-026 / US-028).
+        """Forward a change-file dropdown pick to ``app.py`` (US-026).
 
         Summary:
             When ``#patch_doc_file_select`` changes to a concrete filename,
             post a :class:`ChangeFileSelected` carrying the bare name so the app
             re-resolves it under the patches folder (with the LLR-030.3
             containment guard) and loads it via the existing
-            ``ChangeService.load`` path. When ``#patch_variant_select``
-            changes to a concrete variant id, post a :class:`VariantSelected`
-            so the app routes it through the existing activation pipeline
-            (LLR-035.4). A blank selection (``Select.NULL`` — the
-            ``NoSelection`` placeholder emitted when ``set_change_files`` /
-            ``set_variants`` repopulates or clears the option set) is NOT a
-            request, so nothing is posted. Only this panel's own two selects
-            are handled; other ``Select`` widgets are left for their own
-            handlers.
+            ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
+            the ``NoSelection`` placeholder emitted when ``set_change_files``
+            repopulates or clears the option set) is NOT a request, so
+            nothing is posted. Batch-94 (HLR-006): the variant dropdown
+            retired with the variant group — this handler owns the one
+            remaining select.
 
         Args:
             event (Select.Changed): The Textual select-change event; its
@@ -6551,25 +6638,14 @@ class PatchEditorPanel(ScrollableContainer):
 
         Data Flow:
             - Ignore events from other selects and the blank sentinel, else
-              post ``VariantSelected(str(value))`` for the variant dropdown
-              or ``ChangeFileSelected(str(value))`` for the change-file one.
+              post ``ChangeFileSelected(str(value))``.
 
         Dependencies:
             Uses:
-                - ``ChangeFileSelected`` / ``VariantSelected``
+                - ``ChangeFileSelected``
             Used by:
                 - Textual select-change dispatch
         """
-        if event.select.id == "patch_variant_select":
-            # ``Select.NULL`` is the installed textual 8.2.5 blank sentinel
-            # (a ``NoSelection`` instance) — ``Select.BLANK`` resolves to an
-            # unrelated inherited ``Widget.BLANK`` bool in this version and
-            # never matches a blank value.
-            if event.value is Select.NULL:
-                return
-            event.stop()
-            self.post_message(self.VariantSelected(str(event.value)))
-            return
         if event.select.id != "patch_doc_file_select":
             return
         if event.value is Select.NULL:
@@ -6746,9 +6822,14 @@ class PatchEditorPanel(ScrollableContainer):
                 safe_text(str(row.linkage_text)),
             )
         count = len(rows)
+        # LLR-005.1 (batch-94): the entry-count subtitle doubles as the dirty
+        # indicator — the marker is part of the SAME string so the two chrome
+        # reads can never disagree. `_refresh_dirty_indicator` repaints the
+        # marker half without touching the count.
         self._set_window_subtitle(
             "patch_win_script",
-            f"{count} {'entry' if count == 1 else 'entries'}",
+            f"{count} {'entry' if count == 1 else 'entries'}"
+            + (" ●" if self._dirty else ""),
         )
         if rows:
             table.remove_class("hidden")
@@ -7391,6 +7472,696 @@ class PatchEditorPanel(ScrollableContainer):
         )
 
 
+class CheckEditorPanel(ScrollableContainer):
+    """The Check Editor rail screen — the ce_a collector (batch-94, US-003).
+
+    Summary:
+        The check twin of the Patch Editor: a collector for A2L parameters
+        and memory locations the operator wants in the A2B diff report.
+        Per the ratified graduation call (``editor_bench.NOTES.md``), the
+        panel is the ce_a two-column form — left: the A2L parameter picker
+        (filter + measurement list with address and fmt/unit, ☑ marks the
+        selected); right: the memory-address table (addr / label / fmt) over
+        the spec-file row, the JSON-to-be preview strip, and the footer
+        actions — with ce_b's live addendum folded in as a read-only
+        preview toggle. The product is ONE artifact: a ``.chk.json`` check
+        spec (v2 grammar, ``kind="check"``) that the A2B Diff dropdown lists
+        suffix-distinguished and whose declared fields ride the emitted
+        report.
+
+        The NO-APPLY doctrine is the design statement and is carried three
+        ways, per the bench notes: the footer shows a struck APPLY ghost
+        (a STATIC — never an actionable control), the preview strip's
+        JSON-to-be carries ``"apply": false``, and the hint row reads
+        ``apply: n/a — check spec``. The panel exposes write and validate
+        actions only.
+
+        The panel stays **presentational** (C-7): controls post
+        :class:`ActionRequested` messages (sibling family to
+        ``PatchEditorPanel.ActionRequested``) that ``app.py`` routes — the
+        write assembles the ``kind="check"`` document through the change
+        service seam, the validate rides ``run_check_document``, and the
+        shaped verdict rows come back via :meth:`refresh_check_results`.
+
+    Example:
+        >>> panel = CheckEditorPanel()
+        >>> panel.id
+        'check_editor_panel'
+    """
+
+    #: The no-apply doctrine's three carriers (see the class docstring). The
+    #: struck-APPLY ghost text and the hint row are author constants — never
+    #: file-derived (C-17).
+    _APPLY_GHOST_TEXT = "APPLY — not available"
+    _APPLY_HINT = "apply: n/a — check spec"
+    _PREVIEW_CAP = 6
+
+    #: The memory-size -> fmt label vocabulary (closed author set).
+    _FMT_LABELS = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}
+
+    class ActionRequested(Message):
+        """A Check Editor write/validate control was triggered (LLR-009).
+
+        Summary:
+            Posted by the Write ``.chk.json`` and Validate controls. Carries
+            the spec file name input's text and the COLLECTED items tuple —
+            one ``{"source", "name", "address", "size"}`` dict per declared
+            field — so ``app.py`` can assemble the ``kind="check"`` document
+            (resolving expected bytes from the loaded image) and either write
+            it (``write_doc``) or run it through ``run_check_document``
+            (``validate_doc``). The panel performs no ``changes``-package
+            work itself.
+
+        Args:
+            action (str): ``"write_doc"`` or ``"validate_doc"``.
+            file_name_text (str): The ``.chk.json`` name input's text.
+            items (tuple): The collected field dicts, in collector order.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_check_editor_panel_action_requested``
+        """
+
+        def __init__(
+            self,
+            action: str,
+            file_name_text: str = "",
+            items: tuple = (),
+        ) -> None:
+            super().__init__()
+            self.action = action
+            self.file_name_text = file_name_text
+            self.items = items
+
+    class SpecFileSelected(Message):
+        """The operator picked a spec/patch file from the dropdown (LLR-010.1).
+
+        Summary:
+            Posted when ``#check_spec_file_select`` fires ``Select.Changed``
+            with a concrete filename. Carries the bare name only — ``app.py``
+            re-resolves it under the patches folder, reads it through the
+            shipped reader and, for a valid ``kind="check"`` document, feeds
+            the declared fields back via :meth:`load_spec`. A blank selection
+            (``Select.NULL``) posts nothing.
+
+        Args:
+            filename (str): The chosen file's bare component.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_check_editor_panel_spec_file_selected``
+        """
+
+        def __init__(self, filename: str) -> None:
+            super().__init__()
+            self.filename = filename
+
+    def __init__(self) -> None:
+        super().__init__(id="check_editor_panel")
+        self.styles.layout = "vertical"
+        #: The picked A2L parameter rows: {name: (address, size, fmt_unit)}.
+        self._param_rows: dict = {}
+        #: The picker rows currently mounted (filter-aware), in table order.
+        self._visible_params: list = []
+        #: The picked parameter names in picker order (the ☑ set).
+        self._picked_params: list = []
+        #: The declared memory rows: list of (address, label, size).
+        self._memory_rows: list = []
+        #: Whether the ce_b addendum preview toggle is open.
+        self._preview_open: bool = False
+
+    # ------------------------------------------------------------------
+    # Population seams (app.py is the only caller — the US-026 split)
+    # ------------------------------------------------------------------
+
+    def set_spec_files(self, names: Sequence[str]) -> None:
+        """Populate the spec dropdown, suffix-distinguished (LLR-010.1).
+
+        Summary:
+            Replace ``#check_spec_file_select``'s options with one entry per
+            file from the patches-folder scan — check specs (``.chk.json``)
+            AND patch files listed together, every check spec's label
+            carrying the green ``CHECK`` distinction and every patch file
+            the ``PATCH`` one (the ce_a idiom: the suffix picks the surface).
+            The option label is a FILENAME read off disk, so it reaches the
+            Select as a literal ``Text`` (C-17 — the same live sink the
+            batch-37 ``set_change_files`` fold documented); the VALUE stays
+            the bare ``str``.
+
+        Args:
+            names (Sequence[str]): Sorted bare names from the folder scan
+                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+        """
+        options = []
+        for name in names:
+            label = Text(safe_text(str(name)).plain)
+            if is_check_spec_name(name):
+                label.append(" CHECK", style=GREEN)
+            else:
+                label.append(" PATCH", style=CYAN)
+            options.append((label, name))
+        self.query_one("#check_spec_file_select", Select).set_options(options)
+
+    def set_a2l_parameters(self, rows: Sequence[dict]) -> None:
+        """Populate the A2L parameter picker (LLR-001.1).
+
+        Summary:
+            Replace the picker's rows with the loaded A2L's measurable
+            parameters — name, address, fmt/unit — clearing any ☑ picks that
+            no longer exist. Called by ``app.py`` when the Check Editor
+            screen activates (and when the A2L reloads). Every cell is a
+            literal ``Text`` (C-17): A2L symbol names are file-derived.
+
+        Args:
+            rows (Sequence[dict]): The enriched A2L tags carrying ``name``,
+                ``address`` (int or None), ``byte_size`` and a unit token.
+        """
+        self._param_rows = {}
+        self._picked_params = []
+        self._visible_params = []
+        table = self.query_one("#check_param_table", DataTable)
+        table.clear()
+        for row in rows:
+            name = str(row.get("name") or "?")
+            address = row.get("address")
+            address = int(address) if isinstance(address, int) else None
+            size = int(row.get("byte_size") or 1)
+            unit = str(row.get("compu_method_unit") or "")
+            fmt_unit = f"u{size * 8}" + (f" {unit}" if unit else "")
+            self._param_rows[name] = (address, size, fmt_unit)
+            self._visible_params.append(name)
+            table.add_row(
+                Text("·", style=DGRAY),
+                safe_text(name, VALUE),
+                safe_text(
+                    f"0x{address:08X}" if address is not None else "-", CYAN
+                ),
+                safe_text(fmt_unit),
+            )
+        self._refresh_preview()
+
+    def load_spec(self, items: Sequence[dict], source_name: str) -> None:
+        """Populate the collector from a loaded check spec (LLR-009.1 read arm).
+
+        Summary:
+            Replace the collector state with the declared fields of the spec
+            the operator picked from the dropdown: every declared address
+            becomes a memory row (the v2 wire grammar carries no names —
+            fields are named by address). ``app.py`` read the document
+            through the shipped reader; this method only mirrors it into the
+            collector tables.
+
+        Args:
+            items (Sequence[dict]): ``{"address", "size"}`` per declared
+                field (address may be None for an unresolvable field).
+            source_name (str): The spec file name for the name input
+                (already containment-checked by the caller).
+        """
+        self._picked_params = []
+        self._memory_rows = []
+        table = self.query_one("#check_mem_table", DataTable)
+        table.clear()
+        for item in items:
+            address = item.get("address")
+            size = int(item.get("size") or 1)
+            if address is None:
+                continue
+            label = f"field @ 0x{address:08X}"
+            self._memory_rows.append((int(address), label, size))
+            table.add_row(
+                safe_text(f"0x{int(address):08X}", CYAN),
+                safe_text(label, VALUE),
+                safe_text(self._fmt_label(size)),
+            )
+        base = str(source_name)
+        if is_check_spec_name(base):
+            base = base[: -len(".chk.json")]
+        elif base.lower().endswith(".json"):
+            base = base[:-5]
+        self.query_one("#check_file_name_input", Input).value = (
+            f"{base}.chk.json"
+        )
+        self._refresh_preview()
+
+    # ------------------------------------------------------------------
+    # Collector internals
+    # ------------------------------------------------------------------
+
+    def _fmt_label(self, size: int) -> str:
+        """Map a declared byte size to the closed fmt vocabulary."""
+        return self._FMT_LABELS.get(size, f"{size}B")
+
+    def _collected_items(self) -> tuple:
+        """Gather the collector state into the message items tuple.
+
+        One ``{"source", "name", "address", "size"}`` dict per declared
+        field, in collector order: the ☑-picked parameters first (model
+        order), then the memory rows (table order).
+        """
+        items = []
+        for name in self._picked_params:
+            address, size, _fmt = self._param_rows.get(name, (None, 1, ""))
+            items.append(
+                {
+                    "source": "param",
+                    "name": name,
+                    "address": address,
+                    "size": size,
+                }
+            )
+        for address, label, size in self._memory_rows:
+            items.append(
+                {
+                    "source": "memory",
+                    "name": label,
+                    "address": address,
+                    "size": size,
+                }
+            )
+        return tuple(items)
+
+    def _preview_text(self) -> Text:
+        """Build the JSON-to-be preview strip (ce_a doctrine, C-17-safe).
+
+        A compact rendering of the document the Write control would produce:
+        the v2 envelope with ``"kind": "check"`` and the explicit
+        ``"apply": false`` marker, then up to :attr:`_PREVIEW_CAP` declared
+        fields and the ``← never applied`` tail. Every file-derived string
+        (parameter names, memory labels) is appended LITERALLY — built with
+        ``Text.append``, never f-strung into a markup string.
+        """
+        text = Text()
+        text.append("{", style=LABEL)
+        for line in (
+            '  "format": "s19app-changeset",',
+            '  "version": "2.0",',
+            '  "kind": "check",',
+            '  "apply": false,',
+            '  "entries": [',
+        ):
+            text.append("\n")
+            text.append(line, style=LABEL)
+        items = self._collected_items()
+        for index, item in enumerate(items[: self._PREVIEW_CAP]):
+            address = item["address"]
+            addr = f"0x{address:08X}" if address is not None else "unresolved"
+            text.append("\n")
+            text.append(
+                f'    [{index}] {addr} · {item["size"]}B · ', style=LABEL
+            )
+            text.append(safe_text(str(item["name"]), VALUE))
+        if len(items) > self._PREVIEW_CAP:
+            text.append("\n")
+            text.append(f"    … {len(items) - self._PREVIEW_CAP} more", style=DGRAY)
+        text.append("\n")
+        text.append("  ]", style=LABEL)
+        text.append("\n")
+        text.append("}", style=LABEL)
+        text.append("   ← never applied", style=DGRAY)
+        return text
+
+    def _addendum_preview_text(self) -> Text:
+        """Build the ce_b addendum preview (read-only report-gain frame).
+
+        Renders what the A2B diff report gains from this spec: the ``## Checks``
+        heading, the declared-field count, and the no-apply statement. Field
+        names are appended literally (C-17).
+        """
+        items = self._collected_items()
+        text = Text("## Checks", style=GREEN)
+        text.append("\n", style=LABEL)
+        text.append(
+            f"· {len(items)} fields → A2B diff report · ", style=LABEL
+        )
+        text.append(self._APPLY_HINT, style=DGRAY)
+        for item in items[: self._PREVIEW_CAP]:
+            address = item["address"]
+            addr = f"0x{address:08X}" if address is not None else "unresolved"
+            text.append("\n")
+            text.append(f"· {addr} ", style=CYAN)
+            text.append(safe_text(str(item["name"]), VALUE))
+        if len(items) > self._PREVIEW_CAP:
+            text.append(f"  … {len(items) - self._PREVIEW_CAP} more", style=DGRAY)
+        return text
+
+    def _refresh_preview(self) -> None:
+        """Repaint the preview strip, the addendum preview and the counts."""
+        previews = self.query("#check_preview")
+        if previews:
+            previews.first(Static).update(self._preview_text())
+        addenda = self.query("#check_addendum_preview")
+        if addenda and self._preview_open:
+            addenda.first(Static).update(self._addendum_preview_text())
+        fields = self.query("#check_fields_count")
+        if fields:
+            fields.first(Static).update(
+                Text(
+                    f"{len(self._collected_items())} fields → report",
+                    style=GREEN,
+                )
+            )
+
+    # ------------------------------------------------------------------
+    # Composition
+    # ------------------------------------------------------------------
+
+    def compose(self) -> ComposeResult:
+        """Lay out the ce_a two-column collector (LLR-001.1).
+
+        Summary:
+            Left column: the A2L parameter picker — filter input, the
+            measurement table (☑ / Parameter / Address / Fmt · Unit) and its
+            include control. Right column: the spec-file row (the
+            suffix-distinguished dropdown tops it, per ce_a), the memory
+            table with its add/remove inputs, the JSON-to-be preview strip,
+            the ce_b addendum preview (revealed by its toggle), the footer
+            actions (Validate · Write ``.chk.json`` · the struck APPLY ghost ·
+            the field count) and the no-apply hint row. The window geometry
+            is inline (the panel's SOURCE-file budget excludes styles.tcss).
+
+        Returns:
+            ComposeResult: The Check Editor widget tree.
+        """
+        left = Vertical(
+            Label("A2L parameters", classes="patch-field-label"),
+            OsClipboardInput(
+                placeholder="filter parameters",
+                id="check_param_filter",
+            ),
+            DataTable(
+                id="check_param_table",
+                zebra_stripes=True,
+                cursor_type="row",
+            ),
+            Horizontal(
+                Button(
+                    "Include parameter",
+                    id="check_param_include_button",
+                    classes="patch-chip",
+                ),
+                id="check_param_controls",
+                classes="patch-docked-row patch-chip-entry",
+            ),
+            id="check_left_column",
+        )
+        right = Vertical(
+            Horizontal(
+                Select(
+                    [],
+                    id="check_spec_file_select",
+                    prompt="Check specs in patches/",
+                    allow_blank=True,
+                ),
+                OsClipboardInput(
+                    placeholder="spec file name",
+                    id="check_file_name_input",
+                ),
+                id="check_spec_file_row",
+                classes="patch-docked-row",
+            ),
+            Label("Memory locations", classes="patch-field-label"),
+            DataTable(
+                id="check_mem_table",
+                zebra_stripes=True,
+                cursor_type="row",
+            ),
+            Horizontal(
+                OsClipboardInput(
+                    placeholder="0x100",
+                    id="check_mem_address_input",
+                ),
+                OsClipboardInput(
+                    placeholder="label",
+                    id="check_mem_label_input",
+                ),
+                OsClipboardInput(
+                    placeholder="size",
+                    id="check_mem_size_input",
+                ),
+                id="check_mem_inputs",
+                classes="patch-docked-row",
+            ),
+            Horizontal(
+                Button(
+                    "Add memory row",
+                    id="check_mem_add_button",
+                    classes="patch-chip",
+                ),
+                Button(
+                    "Remove memory row",
+                    id="check_mem_remove_button",
+                    classes="patch-chip",
+                ),
+                id="check_mem_controls",
+                classes="patch-docked-row patch-chip-entry",
+            ),
+            Static("", id="check_preview", markup=False),
+            Static(
+                "",
+                id="check_addendum_preview",
+                markup=False,
+                classes="hidden",
+            ),
+            Horizontal(
+                Button(
+                    "Validate",
+                    id="check_validate_button",
+                    classes="patch-chip",
+                ),
+                Button(
+                    "Write .chk.json",
+                    id="check_write_button",
+                    classes="patch-chip",
+                ),
+                # The struck-APPLY ghost — a STATIC, not a Button. The
+                # no-apply doctrine made visible (C-ux-2: the apply-action
+                # census counts ACTIONABLE controls only; this ghost posts
+                # nothing and can be pressed nowhere).
+                Static(
+                    Text(self._APPLY_GHOST_TEXT, style="strike dim"),
+                    id="check_apply_ghost",
+                ),
+                id="check_actions_row",
+                classes="patch-docked-row patch-chip-apply",
+            ),
+            Horizontal(
+                Static("", id="check_fields_count", markup=False),
+                Button(
+                    "Addendum preview",
+                    id="check_preview_toggle_button",
+                    classes="patch-chip",
+                ),
+                id="check_actions_row2",
+                classes="patch-docked-row",
+            ),
+            Static(
+                Text(self._APPLY_HINT, style=DGRAY),
+                id="check_apply_hint",
+                markup=False,
+            ),
+            Container(id="check_results"),
+            Label(
+                "",
+                id="check_status",
+                classes="patch-field-label",
+                markup=False,
+            ),
+            id="check_right_column",
+        )
+        row = Horizontal(left, right, id="check_columns")
+        yield row
+
+    def on_mount(self) -> None:
+        """Initialise the collector tables' columns and column widths."""
+        self.query_one("#check_param_table", DataTable).add_columns(
+            "✓", "Parameter", "Address", "Fmt · Unit"
+        )
+        self.query_one("#check_mem_table", DataTable).add_columns(
+            "Address", "Label", "Fmt"
+        )
+        self.query_one("#check_file_name_input", Input).value = "spec.chk.json"
+        # The ce_a two-column split: each column takes half the boxed
+        # workspace, and the compact input widths keep every docked row inside
+        # its column at the 120x30 primary regime (measured — the C-13
+        # budget arithmetic, applied inline because styles.tcss is outside
+        # this increment's SOURCE-file budget).
+        self.query_one("#check_left_column").styles.width = "1fr"
+        self.query_one("#check_right_column").styles.width = "1fr"
+        # Static defaults to 1fr — the count read-out must size to its text or
+        # it pushes the addendum toggle off the row at 120 cols.
+        self.query_one("#check_fields_count").styles.width = "auto"
+        for input_id, width in (
+            ("#check_mem_address_input", 12),
+            ("#check_mem_label_input", 14),
+            ("#check_mem_size_input", 8),
+            ("#check_file_name_input", 16),
+        ):
+            self.query_one(input_id, Input).styles.width = width
+        self._refresh_preview()
+
+    # ------------------------------------------------------------------
+    # Events
+    # ------------------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Translate the collector controls into messages (LLR-001.1/.2)."""
+        button_id = event.button.id or ""
+        if button_id == "check_param_include_button":
+            event.stop()
+            if not self._visible_params:
+                return
+            table = self.query_one("#check_param_table", DataTable)
+            cursor = table.cursor_row
+            if not 0 <= cursor < len(self._visible_params):
+                return
+            name = self._visible_params[cursor]
+            if name in self._picked_params:
+                self._picked_params.remove(name)
+            else:
+                self._picked_params.append(name)
+            new_marker = (
+                Text("✓", style=GREEN)
+                if name in self._picked_params
+                else Text("·", style=DGRAY)
+            )
+            table.update_cell_at(Coordinate(cursor, 0), new_marker)
+            self._refresh_preview()
+            return
+        if button_id == "check_mem_add_button":
+            event.stop()
+            self._add_memory_row()
+            return
+        if button_id == "check_mem_remove_button":
+            event.stop()
+            table = self.query_one("#check_mem_table", DataTable)
+            if table.row_count == 0:
+                return
+            cursor = table.cursor_row
+            if not 0 <= cursor < len(self._memory_rows):
+                return
+            self._memory_rows.pop(cursor)
+            table.remove_row(cursor)
+            self._refresh_preview()
+            return
+        if button_id == "check_preview_toggle_button":
+            event.stop()
+            self._preview_open = not self._preview_open
+            preview = self.query_one("#check_addendum_preview", Static)
+            if self._preview_open:
+                preview.update(self._addendum_preview_text())
+                preview.remove_class("hidden")
+            else:
+                preview.add_class("hidden")
+            return
+        actions = {
+            "check_write_button": "write_doc",
+            "check_validate_button": "validate_doc",
+        }
+        action = actions.get(button_id)
+        if action is not None:
+            event.stop()
+            self.post_message(
+                self.ActionRequested(
+                    action=action,
+                    file_name_text=self.query_one(
+                        "#check_file_name_input", Input
+                    ).value,
+                    items=self._collected_items(),
+                )
+            )
+
+    def _add_memory_row(self) -> None:
+        """Validate the memory inputs and append one declared memory row."""
+        address_text = self.query_one(
+            "#check_mem_address_input", Input
+        ).value.strip()
+        label = self.query_one("#check_mem_label_input", Input).value.strip()
+        size_text = self.query_one("#check_mem_size_input", Input).value.strip()
+        try:
+            address = int(address_text, 16) if address_text.lower().startswith(
+                "0x"
+            ) else int(address_text, 10)
+        except ValueError:
+            self.query_one("#check_status", Label).update(
+                f"Check Editor: bad memory address {address_text!r}."
+            )
+            return
+        if address < 0:
+            self.query_one("#check_status", Label).update(
+                "Check Editor: memory address must be non-negative."
+            )
+            return
+        try:
+            size = int(size_text, 10)
+        except ValueError:
+            size = 1
+        if size <= 0 or size > 8:
+            self.query_one("#check_status", Label).update(
+                f"Check Editor: size must be 1..8 bytes, got {size}."
+            )
+            return
+        if not label:
+            label = f"field @ 0x{address:08X}"
+        self._memory_rows.append((address, label, size))
+        self.query_one("#check_mem_table", DataTable).add_row(
+            safe_text(f"0x{address:08X}", CYAN),
+            safe_text(label, VALUE),
+            safe_text(self._fmt_label(size)),
+        )
+        self._refresh_preview()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Filter the parameter picker as the operator types (ce_a picker)."""
+        if event.input.id != "check_param_filter":
+            return
+        needle = event.value.strip().lower()
+        table = self.query_one("#check_param_table", DataTable)
+        names = list(self._param_rows)
+        self._visible_params = [
+            name
+            for name in names
+            if not needle or needle in name.lower()
+        ]
+        table.clear()
+        for name in self._visible_params:
+            address, size, fmt_unit = self._param_rows[name]
+            picked = name in self._picked_params
+            table.add_row(
+                Text("✓", style=GREEN) if picked else Text("·", style=DGRAY),
+                safe_text(name, VALUE),
+                safe_text(
+                    f"0x{address:08X}" if address is not None else "-", CYAN
+                ),
+                safe_text(fmt_unit),
+            )
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Forward a spec-file dropdown pick to ``app.py`` (LLR-010.1)."""
+        if event.select.id != "check_spec_file_select":
+            return
+        if event.value is Select.NULL:
+            return
+        event.stop()
+        self.post_message(self.SpecFileSelected(str(event.value)))
+
+    def refresh_check_results(
+        self,
+        rows: Sequence[tuple],
+        status_line: str,
+    ) -> None:
+        """Render the validate verdicts (LLR-009.2) — one row per entry.
+
+        Args:
+            rows (Sequence[tuple]): ``(text, css_class)`` per entry verdict.
+            status_line (str): The aggregate status sentence.
+        """
+        self.query_one("#check_status", Label).update(status_line)
+        container = self.query_one("#check_results", Container)
+        container.remove_children()
+        for text, css_class in rows:
+            container.mount(Static(text, classes=css_class, markup=False))
+
+
 #: HLR-124 / LLR-124.1 — the three width/height regime constants. All three are
 #: TERMINAL dimensions, compared against `events.Resize.size`, exactly as the
 #: `S19TuiApp._apply_width_regime` precedent does (`app.py:6281`). Only the run
@@ -7633,6 +8404,33 @@ class AbDiffPanel(Container):
             super().__init__()
             self.dest_input = dest_input
 
+    class CheckFileSelected(Message):
+        """The operator picked a check-spec/patch file for the report (LLR-010.1).
+
+        Summary:
+            Posted when ``#diff_check_select`` fires ``Select.Changed`` with a
+            concrete filename (not the blank sentinel). Carries the bare name
+            only — ``app.py`` re-resolves it under the patches folder, reads it
+            through the shipped ``read_change_document`` seam and, when it is a
+            valid ``kind="check"`` document, stashes it as the check spec the
+            next Report generation appends (LLR-010.2). A blank selection
+            (``Select.NULL``) posts nothing. A patch file (``.json`` without
+            the check suffix) is listed — suffix-distinguished — but loads as
+            an ordinary change document, so the app refuses it for the check
+            addendum with a status line naming the kind gate.
+
+        Args:
+            filename (str): The chosen file's bare component.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_check_file_selected``
+        """
+
+        def __init__(self, filename: str) -> None:
+            super().__init__()
+            self.filename = filename
+
     def __init__(self) -> None:
         super().__init__(id="ab_diff_panel")
         #: The most recent comparison runs (display-capped) the operator can
@@ -7699,6 +8497,20 @@ class AbDiffPanel(Container):
             Select(empty, id="diff_select_b", allow_blank=False),
             OsClipboardInput(placeholder="external path B", id="diff_path_b"),
             id="diff_select_row_b",
+        )
+        # batch-94 (HLR-010 / LLR-010.1): the check-spec file dropdown — lists
+        # the patches folder's check specs (`.chk.json`) AND patch files from
+        # the same directory, every check spec's label carrying the green
+        # CHECK distinction. Loading a check spec adds its declared fields to
+        # the emitted diff report (the C-12 writer→reader→report chain).
+        yield Horizontal(
+            Label("Check spec:", classes="diff-field-label"),
+            Select(
+                [(safe_text("(no check spec)"), "")],
+                id="diff_check_select",
+                allow_blank=False,
+            ),
+            id="diff_check_row",
         )
         yield Horizontal(
             Button("Compare", id="diff_compare_button"),
@@ -7958,6 +8770,49 @@ class AbDiffPanel(Container):
             select = self.query_one(select_id, Select)
             select.set_options(options)
             select.value = options[0][1]
+
+    def set_check_files(self, names: Sequence[str]) -> None:
+        """Populate the check-spec dropdown, suffix-distinguished (LLR-010.1).
+
+        Summary:
+            Replace ``#diff_check_select``'s options with one entry per file
+            from the patches-folder scan — check specs and patch files listed
+            TOGETHER, check specs labeled with the green ``CHECK`` suffix
+            distinction (patch files get the plain ``PATCH`` label). The
+            leading ``(no check spec)`` blank-value option is always present:
+            it is the dropdown's "no addendum" state. The option labels are
+            FILENAMES read off disk, so they reach the Select as literal
+            ``Text`` objects (C-17 — the batch-37 ``set_change_files`` fold).
+
+        Args:
+            names (Sequence[str]): Sorted bare names from the folder scan
+                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+        """
+        options: List[Tuple[Any, str]] = [
+            (safe_text("(no check spec)"), "")
+        ]
+        for name in names:
+            label = Text(safe_text(str(name)).plain)
+            if is_check_spec_name(name):
+                label.append(" CHECK", style=GREEN)
+            else:
+                label.append(" PATCH", style=CYAN)
+            options.append((label, name))
+        select = self.query_one("#diff_check_select", Select)
+        select.set_options(options)
+        select.value = ""
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Forward a check-spec dropdown pick to ``app.py`` (LLR-010.1)."""
+        if event.select.id != "diff_check_select":
+            return
+        value = event.value
+        if value in ("", Select.NULL):
+            event.stop()
+            self.post_message(self.CheckFileSelected(""))
+            return
+        event.stop()
+        self.post_message(self.CheckFileSelected(str(value)))
 
     def set_status(self, message: str, css_class: str = "sev-info") -> None:
         """Render a full (untruncated) status line in the panel (LLR-005.3/4).

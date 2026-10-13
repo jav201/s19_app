@@ -99,8 +99,10 @@ from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
 from ..changes.display import format_memory_value
 from ..changes.model import DISPOSITION_APPLIED
+from ..changes.model import ChangeDocument
 from .flow_model import FlowChangeRecord, FlowRefusal, FlowRunResult
 from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+from .markdown_safety import md_safe
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_TIMESTAMP_FORMAT,
@@ -1461,6 +1463,85 @@ def _hex_windows_lines(
     return out
 
 
+def _check_addendum_lines(
+    check_spec: ChangeDocument,
+    check_spec_name: str,
+    symbol_addresses: Sequence[Tuple[int, str]],
+) -> List[str]:
+    """Build the check-spec addendum of the A2B diff report (LLR-010.2).
+
+    Summary:
+        Append the declared check fields to the emitted report — the batch-94
+        (US-003) "what does the report gain?" addendum. Every FILE-DERIVED
+        value (the spec file name, the artifact-resolved field names) escapes
+        through ``markdown_safety.md_safe`` (Mode A, the batch-19/62
+        ``report_addendum`` precedent); addresses and expected bytes are
+        derived integers, not file text. The no-apply doctrine is carried in
+        the section itself: ``0 byte changes — image never modified``.
+
+        The field NAME is resolved from the loaded artifact context by
+        address (the same ``_artifact_addresses_with_names`` membership the
+        run annotation uses): the v2 wire grammar pins the entry shape to
+        ``type``/``address``/``value``/``bytes`` (a name key would not
+        survive the shipped reader), so a declared field is named by the
+        A2L/MAC symbol at its address, falling back to a positional label
+        when no artifact names it.
+
+    Args:
+        check_spec (ChangeDocument): The loaded check spec (``kind ==
+            "check"``) — its entries are the declared fields.
+        check_spec_name (str): The bare spec file name (file-derived —
+            md_safe-scrubbed here).
+        symbol_addresses (Sequence[Tuple[int, str]]): The shared artifact
+            ``(address, name)`` pairs of :func:`generate_diff_report`.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included. An EMPTY spec
+            renders the header, the ``0 byte changes`` line and a
+            ``No declared fields.`` row — an empty addendum, never an error
+            (LLR-010.2's empty arm).
+
+    Dependencies:
+        Uses:
+            - md_safe (markdown_safety)
+        Used by:
+            - generate_diff_report
+    """
+    out = ["## Checks", ""]
+    name = (
+        md_safe(check_spec_name, limit=120)
+        if check_spec_name
+        else "(unnamed check spec)"
+    )
+    entries = check_spec.entries
+    out.append(f"- Check spec: `{name}`")
+    out.append(
+        f"- Declared fields: {len(entries)} "
+        f"(0 byte changes — image never modified)"
+    )
+    out.append("")
+    if not entries:
+        out.append("No declared fields.")
+        out.append("")
+        return out
+    names_by_address = {addr: nm for addr, nm in symbol_addresses}
+    out.append("| # | Field | Address | Expected |")
+    out.append("|---|---|---|---|")
+    for index, entry in enumerate(entries, start=1):
+        field_name = names_by_address.get(entry.address)
+        if field_name is None:
+            field_name = f"entry {index}"
+        expected = " ".join(f"{byte:02X}" for byte in entry.encoded_bytes)
+        out.append(
+            f"| {index} "
+            f"| {md_safe(field_name, limit=120)} "
+            f"| 0x{entry.address:08X} "
+            f"| {expected} |"
+        )
+    out.append("")
+    return out
+
+
 def generate_diff_report(
     comparison: ComparisonResult,
     *,
@@ -1477,6 +1558,8 @@ def generate_diff_report(
     filename_stem: Optional[str] = None,
     report_filter: Optional["ReportFilterMatcher"] = None,
     flow_changes: Optional["FlowChangeAttribution"] = None,
+    check_spec: Optional[ChangeDocument] = None,
+    check_spec_name: str = "",
 ) -> DiffReportResult:
     """
     Summary:
@@ -1544,6 +1627,13 @@ def generate_diff_report(
             FILTER-MATCHED runs so it can never contradict the run table.
             ``None`` (the shipped default) leaves the output BYTE-IDENTICAL
             to the pre-change-5c behavior — a B that is NOT a flow product.
+        check_spec (Optional[ChangeDocument]): The check spec loaded into
+            the A2B Diff (batch-94, LLR-010.2) — when given, a ``## Checks``
+            addendum appends the declared fields to the report (file-derived
+            values md_safe-scrubbed). ``None`` (the default) leaves the
+            output BYTE-IDENTICAL to the pre-batch-94 behavior.
+        check_spec_name (str): The bare spec file name for the addendum
+            header (file-derived — scrubbed by the addendum builder).
 
     Returns:
         DiffReportResult: ``written=True`` with the path on success, or
@@ -1659,6 +1749,13 @@ def generate_diff_report(
             filtered_runs if filtered_runs is not None else comparison.runs
         )
         lines.extend(_flow_change_attribution_lines(flow_changes, census_runs))
+    if check_spec is not None:
+        # batch-94 (LLR-010.2): the check-spec addendum rides the report end,
+        # after the run table / hex windows and the flow-change attribution,
+        # independent of the run scope.
+        lines.extend(
+            _check_addendum_lines(check_spec, check_spec_name, symbol_addresses)
+        )
 
     target = dest_dir / filename
     target.write_text("\n".join(lines), encoding="utf-8")
