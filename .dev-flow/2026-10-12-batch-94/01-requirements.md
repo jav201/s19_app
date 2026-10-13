@@ -388,7 +388,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-009 — Check Editor assembles a `kind="check"` spec (write/validate only)
 - **Traceability:** US-003
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.2
 - **Statement:** The Check Editor shall assemble a check-spec document with `kind="check"` that lists A2L parameters or memory locations, and shall offer write and validate actions and no apply action.
 - **Rationale (informative):** Cambio3: changes are not edited; only A2L parameters or memory locations to include in the report are collected; the file can only be written and validated — "la ausencia de Apply es la declaración de diseño" (`editor_bench.NOTES.md`). Same entry shape as changes — no `from`/`to` fields (operator ruling; `ChangeEntry` at `model.py:79-140`). The v2 grammar already discriminates `"change"`/`"check"` (`DOCUMENT_KINDS`, `io.py:120-123`), so no schema change is needed (R10).
 - **Validation:** `test`
@@ -436,7 +436,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-012 — `A2L_UNRECOGNIZED_BLOCK` warnings triage (seam: view-level reclassification)
 - **Traceability:** US-004
-- **Ledger:** LED-2026-10-12-batch-94.12
+- **Ledger:** LED-2026-10-12-batch-94.12, LED-2026-10-12-batch-94.13
 - **Statement:** When the Issues surface presents `A2L_UNRECOGNIZED_BLOCK` findings whose block name belongs to the curated ASAP2 standard-keyword set, the system shall present them as informational findings with a stated justification and shall not present them as warnings, and findings whose block name is not in the set shall remain warnings.
 - **Rationale (informative):** Cambio4: contemplate whether what is reported as warnings really is a warning — the exhibited class (4 489 rows on the operator's file) is standard ASAP2 vocabulary the parser's section tree surfaces as unrecognized. The seam decision owed at P1 (R12) is made here: **view-level reclassification in the Issues surface** — `s19_app/validation/rules.py` and `s19_app/tui/a2l.py` stay frozen (the §7 engine stability list is untouched; the parser-level alternative — extending `RECOGNIZED_A2L_BLOCKS`, `rules.py:9-25` — is recorded as the rejected candidate in §6.2 with its freeze consequence and re-open condition). The curated set constant is NEW — created in Phase 3 in `issues_view.py`, seeded from the executed 2026-10-13 tally (21 families pasted in `evidence/p1_probe_a2l_unrecognized.txt`); per-family recognize-vs-reclassify mechanics inside the set are a Phase-2/3 detail — this HLR pins the observable outcome, not the mechanism.
 - **Validation:** `test`
@@ -516,7 +516,7 @@ Cambio1–7 (US-001..US-007). Cambio8/9 are recorded as OUT — outside the comm
 
 ### HLR-017 — Flow Execution imports templates and presents chains side by side
 - **Traceability:** US-007
-- **Ledger:** none
+- **Ledger:** LED-2026-10-12-batch-94.3
 - **Statement:** When the user imports a builder template into Flow Execution, the system shall present the template's chain in its own lane, and shall present multiple imported chains side by side.
 - **Rationale (informative):** Cambio7 + the fx_a graduation call (carriles + run-log; "especial para cuando se trabaja en proyectos con variantes"). Base probe: `grep -ri "flowexecution\|flow_execution"` → 0 hits at base (P0, §2.6) — `FlowExecutionPanel` is NEW, created in Phase 3 in `flow_screens.py` (R8).
 - **Validation:** `test`

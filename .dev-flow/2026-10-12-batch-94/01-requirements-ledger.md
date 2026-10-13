@@ -18,7 +18,7 @@ above this line is ever edited._
 - **Evidence:** `02-review.md` findings table, qa#1; contract §3 HLR-004.
 
 ### LED-2026-10-12-batch-94.2 — US-003 RC-1(b) probe: scoped, reproduced form
-- **Requirement:** US-003
+- **Requirement:** HLR-009
 - **Date:** 2026-10-13
 - **What changed:** §2.6 US-003 refinement-log probe line now reads `grep -ri 'chk\.json' s19_app/` → 0 hits (9 hits in tests/ + 2 goldens are test-side vocabulary, product-clean); "Not shipped" kept.
 - **Why:** Phase-2 findings qa#3 / security#3 / architect#4: the unscoped `grep -ri "chk.json"` claim ("no hits") was false — the loose pattern matches test-side fixtures; a probe that cannot demonstrate its pre-state is unproven.
@@ -26,7 +26,7 @@ above this line is ever edited._
 - **Evidence:** executed grep 2026-10-13; `02-review.md` findings table, qa#3.
 
 ### LED-2026-10-12-batch-94.3 — US-007 RC-1(b) probe: scoped form + panel-absence probes
-- **Requirement:** US-007
+- **Requirement:** HLR-017
 - **Date:** 2026-10-13
 - **What changed:** §2.6 US-007 refinement-log probe line now reads `grep -ri 'flowexecution' s19_app/` → 0 hits (the loose pattern hits 7 `flow_execution_service` doc references — the service exists, the surface does not), plus `FlowExecutionPanel`/`CheckEditorPanel` → 0 hits as the panel-absence probes; "Not shipped" kept.
 - **Why:** same findings as LED-2026-10-12-batch-94.2 (qa#3 / security#3 / architect#4): the loose pattern conflated the existing service module with the absent surface.
@@ -106,7 +106,7 @@ above this line is ever edited._
 - **Evidence:** contract §3 HLR-012; `02-review.md` findings table, arch#1.
 
 ### LED-2026-10-12-batch-94.13 — US-004 fixture dependency: stand-in executable, operator file field-only
-- **Requirement:** US-004
+- **Requirement:** HLR-012
 - **Date:** 2026-10-13
 - **What changed:** §2.6 US-004 refinement-log Feasibility line now reads: the in-repo stand-in `examples/case_00_public/software_a.a2l` (13 990 tags, premise 9) is the executable fixture; the operator's `software_a_2.a2l` is the field-verification target, not a suite dependency.
 - **Why:** Phase-2 qa-reviewer finding qa#4 (minor): the dependency named a file that is not in the repo as if the suite depended on it.
