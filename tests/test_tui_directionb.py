@@ -6362,7 +6362,9 @@ def test_tc028_patch_editor_renderer_invokes_no_patch_logic() -> None:
     # this test guards. The allowlist extends the same way inc-003d extended
     # the tc028 root-module census for segment_ops.py: the newer requirement
     # supersedes the invariant for these NAMED view-shell widgets, and the
-    # guard still flags any OTHER unexpected call.
+    # guard still flags any OTHER unexpected call. (Both lanes carried this
+    # extension — the RC-1 rebase resolution and C-25's official census —
+    # deduped to one.)
     assert calls <= {
         "Container",
         "Label",
