@@ -120,7 +120,7 @@ async def _map_ready(app: "S19TuiApp", loaded: "object", pilot: "object"):
 
 
 def _drive_clicks(
-    tmp_path: Path, gesture: Callable, match_text: str = "high/random"
+    tmp_path: Path, gesture: Callable, match_text: str = "high/rand"
 ) -> tuple[List[int], str, int]:
     """Run one gesture against a matching region row.
 
@@ -128,7 +128,10 @@ def _drive_clicks(
         tmp_path (Path): pytest temp dir for the app base.
         gesture (Callable): ``async (pilot, widget) -> None`` — the pointer
             gesture under test.
-        match_text (str): Substring identifying the target region row.
+        match_text (str): Substring identifying the target region row. The
+            batch-93 row uses the DISPLAY-ONLY short label ``high/rand`` for
+            the ``high/random`` band (LLR-127.2) — the full domain string no
+            longer appears on the row.
 
     Returns:
         tuple[List[int], str, int]: ``(navigation addresses posted, detail-pane
@@ -147,19 +150,34 @@ def _drive_clicks(
             row = next(
                 r for r in app.query(RegionRow) if match_text in _widget_plain(r)
             )
-            # Scroll the OWNING viewport, not the row's own ``scroll_visible``.
-            # batch-77's LLR-111.9 stacks the band row, growing it 4 -> 6 rows at
-            # 120x30 (the accepted C-77-k cost), which pushes the region list to
-            # the bottom edge of #map_content's 13-row viewport. Measured, the
-            # target row then sits on the boundary: ``scroll_visible`` treats it
-            # as already visible and does not scroll, but it is not hit-testable
-            # — ``get_widget_at`` at its own reported centre returns the
-            # container. ``scroll_to_widget(..., top=True)`` brings it genuinely
-            # into view, which is also what the operator does.
-            app.query_one("#map_content").scroll_to_widget(
+            # Scroll the OWNING viewport — the cockpit's internal region-list
+            # scroll container (batch-93, HLR-126) — not the row's own
+            # ``scroll_visible``. batch-77's stacked band row grew the old
+            # #map_content scroll, which is gone: #map_content is a plain host
+            # now and the list scrolls inside ``.map-region-scroll``.
+            # ``scroll_to_widget(..., top=True)`` brings the row genuinely into
+            # view — then POLL the pointer hit-test before the gesture: the
+            # nested container takes one extra compositor pass to apply the
+            # scroll to its hit map, and a single pause races the click onto
+            # whatever row the hit map still shows (measured ~1 run in 2). The
+            # same bounded poll ``tests/test_tui_directionb`` uses.
+            app.query_one(".map-region-scroll").scroll_to_widget(
                 row, animate=False, top=True
             )
-            await pilot.pause()
+            for _ in range(8):
+                await pilot.pause()
+                cx, cy = row.region.center
+                widget, _ = app.get_widget_at(int(cx), int(cy))
+                if (
+                    isinstance(widget, RegionRow)
+                    and widget.region_start == row.region_start
+                ):
+                    break
+            else:
+                raise AssertionError(
+                    f"region row 0x{row.region_start:08X} never became "
+                    f"hit-testable after scrolling its viewport"
+                )
             await gesture(pilot, row)
             await pilot.pause()
             await pilot.pause()

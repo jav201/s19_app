@@ -250,18 +250,80 @@ _RULER_TICK_PITCH = _RULER_LABEL_WIDTH + 1
 #: index 8 = a full block (maximal entropy). Mirrors the prototype ``BARS``.
 _ENTROPY_BAR_RAMP = " ▁▂▃▄▅▆▇█"
 
-#: Fixed histogram bar width for the At-a-glance per-band rows (LLR-045B.1) —
-#: geometry-pure: a per-band ratio, not a share of the pane.
-_GLANCE_BAR_WIDTH = 6
-
 #: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
+#: Retired from the always-on surface at batch-93 (the docked glance block
+#: folded to one chips line) but kept — ``sparkline_glyphs`` remains a tested
+#: unit of the entropy-profile sampling. (The glance histogram's
+#: ``_GLANCE_BAR_WIDTH`` constant retired with the docked block it sized.)
 _SPARKLINE_WIDTH = 24
 
 #: Cell width of the per-region size micro-bar on each ``RegionRow`` (batch-47,
-#: R-TUI-073 / LLR-073.1). Kept short so the enriched row (glyph · addr · size ·
-#: bar · N sym · band · ↵) fits the tightest measured region-row width — 52 cols
-#: at 120x30 (C-29 pilot measurement, Inc-6).
+#: R-TUI-073 / LLR-073.1; batch-93 HLR-127 keeps it inside the fixed-width row).
 _REGION_MICROBAR_WIDTH = 4
+
+#: Display-only short forms of the band domain labels that are wider than the
+#: region row's 9-cell band column (batch-93, HLR-127 / LLR-127.2). The domain
+#: strings in ``ENTROPY_BAND_LABELS`` are NEVER touched — only the row's band
+#: column DISPLAY maps them. ``constant/padding`` (16) -> ``const`` (5);
+#: ``high/random`` (11) -> ``high/rand`` (exactly 9 — the column edge).
+_BAND_SHORT_LABELS: Dict[str, str] = {
+    "constant/padding": "const",
+    "high/random": "high/rand",
+}
+
+#: Width-adaptive stats threshold, in PANEL columns (batch-93, HLR-129 /
+#: LLR-129.2). PILOT-MEASURED at P3 (C-29), not copied: the full one-line form
+#: `` Mapped 5.2 KiB / 511.9 MiB span (0.0010%) · 5 ranges (5 valid) · 4 gaps ·
+#: 0 issues `` measures 84 cells on the charter demo fixture (executed
+#: formatter measurement); the compact form (same seven statistics, shortened
+#: labels/separators only — no flanking padding, no ``span`` word, no pct
+#: parens) measures 66 cells on the same fixture, clearing the 68-column stats
+#: strip the 80x24 floor geometry admits. A strip whose measured width is below
+#: the full form's own 84-cell width renders compact.
+_STATS_FULL_MIN_WIDTH = 84
+
+#: Width-aware microbar threshold, in the region row's AVAILABLE columns
+#: (batch-93, HLR-127 / LLR-127.3). PILOT-MEASURED at P3 (C-29): the microbar
+#: row measures 40 cells and the compact row 35 cells (executed formatter);
+#: the charter captures bound the threshold from both limbs — at 120x36 the
+#: left pane's content width measures 41 columns and the microbar is ABSENT,
+#: at 160x48 it measures 81 columns and the microbar is PRESENT (grid
+#: reconstructions of ``memmap2_map_C.120w.svg`` / ``memmap2_map_C_160x48.120w.
+#: svg``). 43 is the smallest threshold consistent with both limbs
+#: (41 < 43 <= 81) while keeping the 40-cell row ~3 columns inside the
+#: available width.
+_REGION_ROW_MICROBAR_MIN_WIDTH = 43
+
+#: The panel-width inset from the region row's available width, measured in
+#: the SIDE-BY-SIDE regime: at 120x36 the panel's content is 92 columns wide
+#: while the left pane's content (the row's available width) measures 41
+#: (92 - 41 = 51 — panel padding, the fixed 44-col inspector + 1-col gutter,
+#: and the pane's border + padding). The contract's two capture limbs are both
+#: side-by-side; the STACKED narrow regime (80x24, LLR-041.10) hands the left
+#: pane the full width, so this inset over-subtracts there and the floor rows
+#: render without the microbar — the regime-aware re-derivation is HLR-131's.
+#: A panel that has not been laid out yet reports width 0 (a conforming
+#: first-frame input, P-4); the fallback then renders the narrow form,
+#: matching the 120x36 capture's microbar-free rows.
+_MAP_PANEL_TO_ROWS_INSET = 51
+_MAP_PANEL_WIDE_FALLBACK = 92
+
+#: The inspector peek renders 8-byte rows of ``ADDR  hh×8`` (batch-93, HLR-128 /
+#: LLR-128.1): an 8-hex address, two spaces, eight 2-hex bytes — 33 cells, no
+#: ASCII gutter, no ``0x`` prefix. The shipped 16-byte row measured 79 cells
+#: and the 8-byte row 33 cells by executing the formatters (P-1 method) — 33
+#: is the widest row that cannot wrap in the ~40-col inspector pane.
+_PEEK_BYTES_PER_ROW = 8
+#: Cell an UNMAPPED byte renders as inside a peek row (2 cells — the row keeps
+#: its 33-cell width with holes).
+_PEEK_UNMAPPED_CELL = "··"
+#: Rows the aligned inspector field block occupies above the peek: the five
+#: fields (Status/Region/Size/Band/Symbols) + the ``Peek`` header.
+_INSPECTOR_FIELD_ROWS = 6
+#: Width of the inspector's aligned field labels: the longest label
+#: (``Symbols``, 7 cells) plus the capture's two-space field gutter
+#: (batch-93, HLR-126 / LLR-126.2).
+_INSPECTOR_LABEL_WIDTH = 9
 
 #: App-supplied hatch glyph marking an unmapped address gap in the band strip
 #: (batch-47, R-TUI-072 / LLR-072.1). NOT an entropy band and NOT sourced from
@@ -272,12 +334,13 @@ _MAP_GAP_HATCH = "╱"
 #: hint that a single click drives the reused ``RegionRow.Activated`` nav.
 _OPEN_IN_HEX_GLYPH = "↵"  # ↵
 
-#: Target row count for the Memory-Map region inspector hex peek (batch-47,
-#: R-TUI-074 / LLR-074.2). The ``#map_detail`` pane is ``height: auto`` and
-#: reachable under scroll (C-29 pilot: 2 visible rows @120x30 / 1 @80x24; the
-#: detail Static already overflows-under-scroll by the batch-45 design), so a
-#: 3-row peek is content that is reachable under scroll, never clipped.
-_MAP_PEEK_ROWS = 3
+#: Default peek row count when the inspector pane cannot drive the cut:
+#: ``0`` before first layout (a conforming width-0 first frame, P-4) and in
+#: the NARROW stacked regime, where ``#map_detail`` is height-auto and grows
+#: with its content. The 100x30 capture frame shows 2 peek rows there; the
+#: height-derived cut takes over wherever the pane is height-constrained
+#: (the wide regime — LLR-126.3's monotone limb).
+_PEEK_ROWS_FALLBACK = 2
 
 
 def entropy_ramp_glyph(entropy: float) -> str:
@@ -2103,13 +2166,19 @@ class MemoryMapPanel(Container):
         ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
         replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
         arrow-nav machinery was removed in batch-45 Inc-5; a single click on a
-        region row drives detail + hex nav via ``on_region_row_activated``). It
-        is a pure presentational widget — it performs NO entropy, coverage,
+        region row drives detail + hex nav via ``on_region_row_activated``).
+        batch-93 (HLR-125..129, the memmap2 charter's variant C) re-composes the
+        same facts as the inspector cockpit: chromed ``.db-pane`` panes, the
+        left pane stacking band bar → ruler → one-line glance chips → scrollable
+        region list beside a full-height inspector (aligned fields + multi-row
+        8-byte peek), fixed-width region rows, and a one-line width-adaptive
+        stats strip that always paints without scrolling. It is a pure
+        presentational widget — it performs NO entropy, coverage,
         parsing or validation of its own (LLR-045A.2 / LLR-041.7).
         Band colours route through the ``band-*`` CSS classes owned by
         ``entropy_style`` + ``styles.tcss`` (LLR-045A.3); no colour hex is
-        hard-coded. The coverage stats strip is retained unchanged. With no
-        image / no entropy it preserves the neutral no-data note (LLR-045A.5).
+        hard-coded. With no image / no entropy it preserves the neutral no-data
+        note (LLR-045A.5).
 
     Args:
         None
@@ -2121,15 +2190,16 @@ class MemoryMapPanel(Container):
         - ``render_ranges`` receives the pre-computed ``ranges`` +
           ``range_validity`` + ``entropy_windows`` from
           ``S19TuiApp.update_memory_map``, merges contiguous same-band windows
-          via ``_merge_band_runs``, and mounts ``.map-band-seg`` segments (the
-          band bar) plus the ``.map-region-row`` region list
-          and the docked ``.at-a-glance`` histogram/sparkline into
-          ``#map_grid`` — no per-cell ``.map-cell`` widgets are mounted.
-        - Clicking a region row drives ``on_region_row_activated`` → populates
-          ``#map_detail`` (via ``build_detail_text``: status chip, covering
-          region, A2L symbols, issues) and posts ``OpenInHexRequested`` for
-          single-click hex nav; the ``#map_stats`` strip shows the seven
-          coverage statistics derived by ``coverage_stats`` (US-037 / LLR-041.8).
+          via ``_merge_band_runs``, and mounts the ``.map-band-seg`` band bar,
+          the ruler, the one-line ``.map-glance-chips`` and the scrollable
+          ``.map-region-list`` into the ``#map_grid`` pane — no per-cell
+          ``.map-cell`` widgets are mounted.
+        - Clicking a region row drives ``on_region_row_activated`` →
+          ``_select_region`` populates ``#map_detail`` (the aligned field block
+          + 8-byte peek) and posts ``OpenInHexRequested`` on a double click
+          (batch-67 N4a); the ``#map_stats`` strip shows the seven coverage
+          statistics as ONE width-adaptive line derived by ``coverage_stats``
+          (batch-93, HLR-129).
         - With no ranges / no entropy the header shows the neutral empty note,
           no segments/rows are mounted, and the stats strip is blanked (LLR-041.9).
         - ``#map_grid`` and ``#map_detail`` sit in a ``#map_body`` sub-container
@@ -2215,20 +2285,42 @@ class MemoryMapPanel(Container):
         #: (batch-47, R-TUI-074) — the read-only source for the inspector hex
         #: peek (LLR-074.2). Empty on the no-file path; never re-parsed.
         self._mem_map: Mapping[int, int] = {}
+        #: The last non-empty stats inputs (``ranges``, ``range_validity``,
+        #: ``issues``) — carried so a live panel resize can re-render the
+        #: width-adaptive one-line strip when the width crosses the
+        #: ``_STATS_FULL_MIN_WIDTH`` threshold (batch-93, LLR-129.2). ``None``
+        #: on the empty paths (the strip stays blank until the next render).
+        self._stats_state: Optional[
+            Tuple[List[Tuple[int, int]], List[bool], List[ValidationIssue]]
+        ] = None
+        #: Render generation counter — incremented on EVERY ``render_ranges``
+        #: call so a deferred selection hook from a SUPERSEDED render can tell
+        #: it is stale and stand down (batch-93: the bounded auto-selection
+        #: retry extends the hook's window by one frame; without the guard a
+        #: late retry could re-apply the previous render's resolution).
+        self._render_generation = 0
 
     def compose(self) -> ComposeResult:
-        """Compose the header, the band-view body and the (empty) placeholders.
+        """Compose the header, the inspector-cockpit body and the stats strip.
 
         Summary:
-            Yield the full-width header, then a ``#map_body`` horizontal
-            sub-container holding the ``#map_grid`` band-view container and the
-            ``#map_detail`` pane side by side (the wide-regime layout;
-            ``#map_body`` stacks them vertically under ``width-narrow`` — the
-            reflow lives in ``styles.tcss``), and finally the full-width
-            ``#map_stats`` coverage strip (US-037 / LLR-041.8).
+            Yield the full-width header (the band summary, or the neutral
+            no-file note), then a ``#map_body`` sub-container holding the two
+            chromed cockpit panes side by side (batch-93, HLR-125/126 —
+            variant C): the ``#map_grid`` ``.db-pane`` (lit title
+            ``Memory Map``, subtitle ``{N} regions · ░▒▓ k``) carries the 1-row
+            band bar, the run-start ruler, the one-line glance chips and the
+            scrollable region list; the ``#map_detail`` ``.db-pane`` (lit title
+            ``Inspector — 0x{selected:08X}``, subtitle ``↑↓ · ↵ hex``) carries
+            the full-height aligned field block + 8-byte hex peek. The panes
+            render side by side wide and stacked under ``width-narrow`` (the
+            reflow lives in ``styles.tcss``, LLR-041.10). Finally the
+            full-width ``#map_stats`` coverage strip renders OUTSIDE any scroll
+            region so the one-line stats always paint in the visible viewport
+            (batch-93, HLR-129 — defect ④ of premise P-1).
 
         Returns:
-            ComposeResult: the header, the band-view + detail body, and the
+            ComposeResult: the header, the two-pane cockpit body, and the
             stats strip.
 
         Dependencies:
@@ -2237,10 +2329,11 @@ class MemoryMapPanel(Container):
         """
         yield Label(self._EMPTY_TEXT, id="map_header", markup=False)
         yield Horizontal(
-            Container(id="map_grid"),
+            Container(id="map_grid", classes="db-pane"),
             Container(
                 Static(safe_text(self._DETAIL_HINT), id="map_detail_body"),
                 id="map_detail",
+                classes="db-pane",
             ),
             id="map_body",
         )
@@ -2331,6 +2424,11 @@ class MemoryMapPanel(Container):
             # to draw into; the compose default already shows the empty note.
             return
 
+        # A new render supersedes any deferred hook still in flight from the
+        # previous one (the auto-selection retry carries its generation).
+        self._render_generation += 1
+        generation = self._render_generation
+
         grid.remove_children()
         self._issues = list(issues)
         self._a2l_tags = list(a2l_tags)
@@ -2347,6 +2445,13 @@ class MemoryMapPanel(Container):
         span = span_end - span_start
         if not ranges or span <= 0 or not entropy_windows:
             self._ordered_ranges = []
+            # The cockpit panes mount no content on the empty paths — clear any
+            # chrome a previous render left on them (batch-93, HLR-125; the
+            # no-file screen state itself is the EmptyStatePanel, LLR-002.3).
+            grid.border_title = ""
+            grid.border_subtitle = ""
+            self.query_one("#map_detail").border_title = ""
+            self.query_one("#map_detail").border_subtitle = ""
             if not ranges:
                 # Genuinely no image loaded.
                 empty_msg = self._EMPTY_TEXT
@@ -2372,16 +2477,25 @@ class MemoryMapPanel(Container):
 
         runs = _merge_band_runs(entropy_windows)
         self._run_bands = {start: band for band, _run_bytes, start in runs}
-        # The bar does not exist yet, so its width is measured from ``#map_grid``,
-        # which is mounted and whose width the bar takes in full (LLR-111.9). The
-        # post-refresh hook then re-apportions against the bar itself — required
-        # because ``grid.mount()`` is deferred and because the first frame can
-        # report width 0 before layout.
+        # The bar does not exist yet, so its width is measured from ``#map_grid``
+        # (LLR-111.9): the CONTENT box (border + padding excluded — the batch-93
+        # pane chrome), which is the width the bar takes in full. ``0`` before
+        # first layout is a conforming out-of-domain input (the allocator
+        # floor); the post-refresh hook then re-apportions against the bar
+        # itself, required because ``grid.mount()`` is deferred.
         grid.mount(
             *self._build_band_widgets(
-                runs, entropy_windows, span_start, span_end, grid.region.width
+                runs, span_start, span_end, max(0, grid.content_region.width)
             )
         )
+        # batch-93 (HLR-125): the cockpit chrome — every map surface sits in a
+        # lit, titled ``.db-pane``; the affordance hints live in the border
+        # subtitles, never in body rows. The inspector title is (re)set by
+        # ``_select_region`` — the single owner of the selection — because it
+        # carries the SELECTED region's start address.
+        grid.border_title = "Memory Map"
+        grid.border_subtitle = f"{len(runs)} regions · ░▒▓ k"
+        self.query_one("#map_detail").border_subtitle = "↑↓ · ↵ hex"
         self.call_after_refresh(self._resize_band_segments)
         # ``grid.mount()`` is DEFERRED, so the rows are not queryable here and
         # "after the rows are mounted" is not a synchronous point inside this
@@ -2389,7 +2503,9 @@ class MemoryMapPanel(Container):
         # the resolution ran against the OLD row set, which
         # ``grid.remove_children()`` had already scheduled for removal
         # (LLR-116.2).
-        self.call_after_refresh(self._apply_auto_selection, previous_start)
+        self.call_after_refresh(
+            self._apply_auto_selection, previous_start, False, generation
+        )
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -2449,8 +2565,17 @@ class MemoryMapPanel(Container):
         return counts
 
     def on_resize(self, event: events.Resize) -> None:
-        """Re-apportion the band bar when the panel's geometry changes."""
+        """Re-apportion the band bar — and the width-adaptive stats — on resize.
+
+        The stats strip re-renders from the stored inputs so a live resize
+        across ``_STATS_FULL_MIN_WIDTH`` swaps the full/compact form
+        (batch-93, LLR-129.2); a same-width resize re-renders the identical
+        line, which ``Static.update`` repaints without a layout change.
+        """
         self._resize_band_segments()
+        if self._stats_state is not None:
+            ranges, range_validity, issues = self._stats_state
+            self._render_stats(ranges, range_validity, issues, empty=False)
 
     def on_band_bar_measured(self, event: BandBar.Measured) -> None:
         """Re-apportion when the BAR itself learns its width (LLR-111.1).
@@ -2551,30 +2676,36 @@ class MemoryMapPanel(Container):
     def _build_band_widgets(
         self,
         runs: Sequence[Tuple[str, int, int]],
-        windows: Sequence[EntropyWindow],
         span_start: int,
         span_end: int,
         bar_width: int,
     ) -> List[Container]:
-        """Build the band row (bar + glance), the address ruler, the region list.
+        """Build the band bar, the ruler, the glance chips, the scrollable list.
 
         Summary:
-            Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
-            R-TUI-061; extended batch-47, R-TUI-072/073): a ``.map-band-row``
-            stacking the ``.map-band-bar`` over the ``.at-a-glance`` panel, a
-            :class:`MapRuler` address ruler beneath the band row (one tick per
+            Assemble the left-pane stack of the inspector cockpit (batch-93,
+            HLR-126 / LLR-126.1, amending the batch-45/47 layout): the 1-row
+            ``.map-band-bar`` (the batch-77 allocator, untouched), the
+            :class:`MapRuler` run-start ruler beneath it (one tick per
             run start plus the last mapped byte, batch-77 LLR-112.1 — this
             supersedes batch-47's five span percentiles, of which four named
-            unmapped addresses), then the ``.map-region-list``. Unmapped address
-            gaps between runs render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
-            is enriched to ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym
-            {band} ↵`` — a humanized size (LLR-072.2), a size micro-bar vs the
-            largest region (LLR-073.1), the ``range_index`` symbol count
-            (LLR-073.1) and the ``↵`` open-in-hex affordance (LLR-073.2). Region
-            rows still carry NO file-derived text (band labels + counts only —
-            security B3). Each sub-widget is addressed by CLASS (re-mounted every
-            render; an id would trip ``DuplicateIds``) with markup-safe
-            ``safe_text`` content.
+            unmapped addresses), the one-line ``.map-glance-chips`` glance
+            (batch-93, HLR-129 — the retired 6-row ``.at-a-glance`` dock
+            folds to chips), and finally the SCROLLABLE region list — a
+            ``ScrollableContainer`` around the ``.map-region-list`` of
+            :class:`RegionRow`s, so every region is reachable however many
+            runs overflow the viewport (defect #3 of premise P-1). Unmapped
+            address gaps between runs render as ``╱`` hatch segments
+            (``.map-band-gap``, LLR-072.1). Each region row is composed from
+            FIXED-WIDTH fields (batch-93, HLR-127 / LLR-127.1): glyph ·
+            ``0x{addr}`` (10) · right-aligned size (>7) · size microbar (4,
+            dropped below ``_REGION_ROW_MICROBAR_MIN_WIDTH`` available
+            columns, LLR-127.3) · symbol count (>2) · band short label (<=9,
+            display-only, LLR-127.2) · ``↵`` — so every field of every row
+            starts at the same column. Rows still carry NO file-derived text
+            (band labels + counts only — security B3). Each sub-widget is
+            addressed by CLASS (re-mounted every render; an id would trip
+            ``DuplicateIds``) with markup-safe ``safe_text`` content.
 
             batch-77 (R-TUI-103 / LLR-111.1, .2, .7) changes what the bar is
             drawn against, on both axes. The BASIS is the measured container
@@ -2586,22 +2717,25 @@ class MemoryMapPanel(Container):
             run widths are bounded in ``_allocate_band_widths`` so the strip
             cannot emit more columns than its container has.
 
-            batch-77 (HLR-114 / LLR-114.1) REMOVES the ``.map-band-legend``
+            batch-77 (HLR-114 / LLR-114.1) REMOVED the ``.map-band-legend``
             block this method used to append. The four band rows were a static
             key — identical on every image — occupying four of the map body's
             scarce rows, and the same key is already rendered by the ``k``
             legend screen from the same ``ENTROPY_BANDS`` source
             (``screens.py::LegendScreen`` via ``build_band_key_rows``). The
             legend is therefore not deleted, only moved off the always-on
-            surface; ``ENTROPY_BAND_LABELS`` stays imported because
-            ``_band_histogram_counts`` still orders the glance by it.
+            surface; ``ENTROPY_BAND_LABELS`` stays imported because the glance
+            chips order themselves by it. batch-93 (HLR-129) likewise folds
+            the ``.at-a-glance`` histogram + sparkline dock into the one-line
+            chips — the per-band detail the block carried is entropy-window
+            trivia the operator never reads on the always-on surface. The
+            sampling helpers (``band_histogram`` / ``sparkline_glyphs`` /
+            ``_sparkline_segments``) stay as tested units.
 
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
                 ``(band_label, summed_bytes, start_addr)`` runs from
                 ``_merge_band_runs`` (non-empty), ascending by start.
-            windows (Sequence[EntropyWindow]): The loader-computed entropy
-                windows the sparkline profile is sampled from.
             span_start (int): Inclusive image span start (``derive_image_span``).
             span_end (int): Exclusive image span end (``derive_image_span``).
             bar_width (int): The container width to apportion, measured at render
@@ -2610,18 +2744,18 @@ class MemoryMapPanel(Container):
                 re-apportions once the bar itself is measurable.
 
         Returns:
-            List[Container]: ``[band_row, ruler, region_list]`` ready to mount
-            into ``#map_grid``.
+            List[Container]: ``[band_bar, ruler, glance_chips, region_scroll]``
+            ready to mount into ``#map_grid``.
 
         Data Flow:
-            - Reads ``runs`` + ``windows`` + the span + ``self._a2l_tags``;
-              produces the widgets ``render_ranges`` mounts.
+            - Reads ``runs`` + the span + ``self._a2l_tags``; produces the
+              widgets ``render_ranges`` mounts.
 
         Dependencies:
             Uses:
                 - ``band_style`` / ``safe_text`` /
                   ``human_bytes`` / ``microbar`` / ``MapRuler`` /
-                  ``_region_symbol_counts`` / ``_build_glance_widgets`` /
+                  ``_region_symbol_counts`` / ``_build_glance_chips`` /
                   ``_allocate_band_widths``
             Used by:
                 - ``render_ranges``
@@ -2676,7 +2810,14 @@ class MemoryMapPanel(Container):
             )
             region_rows.append(
                 self._build_region_row(
-                    band, glyph, token, run_bytes, start, largest_region, sym_counts
+                    band,
+                    glyph,
+                    token,
+                    run_bytes,
+                    start,
+                    largest_region,
+                    sym_counts,
+                    self._rows_show_microbar(),
                 )
             )
 
@@ -2689,17 +2830,48 @@ class MemoryMapPanel(Container):
         # out yet), so the bar MUST report its own resize or the out-of-domain
         # floor is what ships. See :class:`BandBar`.
         band_bar = BandBar(*segments, classes="map-band-bar")
-        glance = self._build_glance_widgets(runs, windows)
         return [
-            Horizontal(band_bar, glance, classes="map-band-row"),
+            band_bar,
             # The ruler labels what the BAR DRAWS — run starts, not percentiles
             # of the span, and the last MAPPED byte, not the exclusive
             # ``span_end`` (LLR-112.1). ``runs`` is the same list the bar was
             # apportioned from three statements above, so the two surfaces
             # cannot disagree about which regions exist.
             MapRuler([start for _band, _run_bytes, start in runs], span_end - 1),
-            Vertical(*region_rows, classes="map-region-list"),
+            # The glance block's successor: ONE line of per-band chips between
+            # the ruler and the list (batch-93, HLR-129 / LLR-129.3).
+            self._build_glance_chips(runs),
+            # The region list scrolls inside its own container (HLR-126) — the
+            # outer #map_content no longer scrolls, so the stats strip below
+            # the cockpit always paints without scrolling (HLR-129).
+            ScrollableContainer(
+                Vertical(*region_rows, classes="map-region-list"),
+                classes="map-region-scroll",
+            ),
         ]
+
+    def _rows_show_microbar(self) -> bool:
+        """True when the rows' available width admits the 4-cell size microbar.
+
+        Summary:
+            Width-aware microbar gate (batch-93, HLR-127 / LLR-127.3): the
+            full row measures 40 cells against the compact row's 35 (executed
+            formatter, P3 pilot), and the microbar renders only when the row's
+            available width — the left pane's content width, derived from the
+            panel's own measured width via ``_MAP_PANEL_TO_ROWS_INSET`` — is at
+            least ``_REGION_ROW_MICROBAR_MIN_WIDTH`` (43, pilot-measured
+            against the charter captures: microbar ABSENT at 41 available
+            columns, PRESENT at 81). A panel that has not been laid out yet
+            reports width 0 (a conforming first-frame input, P-4); the wide
+            fallback then renders the full row.
+
+        Returns:
+            bool: ``True`` to compose the 4-cell size microbar into each row.
+        """
+        width = self.size.width
+        if width <= 0:
+            width = _MAP_PANEL_WIDE_FALLBACK
+        return (width - _MAP_PANEL_TO_ROWS_INSET) >= _REGION_ROW_MICROBAR_MIN_WIDTH
 
     def _build_region_row(
         self,
@@ -2710,18 +2882,29 @@ class MemoryMapPanel(Container):
         start: int,
         largest_region: int,
         sym_counts: Mapping[int, int],
+        show_microbar: bool,
     ) -> RegionRow:
-        """Compose one enriched region-list row (batch-47, R-TUI-073).
+        """Compose one FIXED-WIDTH enriched region-list row (batch-93, HLR-127).
 
         Summary:
-            Build the ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym {band}
-            ↵`` row as a Rich ``Text`` (single-space separators so the row fits
-            the tightest measured region-row width — 52 cols @120x30, C-29): a
-            humanized size (LLR-072.2), a ``_REGION_MICROBAR_WIDTH``-cell size
-            micro-bar of ``run_bytes / largest_region`` (LLR-073.1), the region's
-            ``range_index`` symbol count (LLR-073.1) and the ``↵`` open-in-hex
-            affordance (LLR-073.2). Every field is developer-formatted or a
-            constant band label — NO file-derived text reaches the row (B3).
+            Build the column-aligned ``{glyph} 0x{addr} {size:>7} {microbar}
+            {sym:>2} {band-short:<9} ↵`` row as a Rich ``Text`` of fixed-width
+            fields with single-space separators only INSIDE a field, never
+            across fields (LLR-127.1): the humanized size is right-aligned in
+            its >7-cell field, the ``_REGION_MICROBAR_WIDTH``-cell size
+            micro-bar of ``run_bytes / largest_region`` (LLR-073.1) renders
+            only when ``show_microbar`` admits it (LLR-127.3 — below the
+            threshold it drops WITHOUT disturbing the surviving fields'
+            offsets), the region's ``range_index`` symbol count sits in a
+            >2-cell field, the band renders through the DISPLAY-ONLY
+            ``_BAND_SHORT_LABELS`` mapping (LLR-127.2 — ``constant/padding``
+            and ``high/random`` cannot fit the <=9-cell column raw), and the
+            ``↵`` open-in-hex affordance closes the row (LLR-073.2). Because
+            every field is fixed-width, every field of every row starts at the
+            same column — the variable-width ``256 B`` vs ``2.0 KiB`` shifts
+            the shipped single-space row suffered (P-1) cannot occur. Every
+            field is developer-formatted or a constant band label — NO
+            file-derived text reaches the row (B3).
 
         Args:
             band (str): The run's band label.
@@ -2733,6 +2916,8 @@ class MemoryMapPanel(Container):
                 denominator; ``>= 1``).
             sym_counts (Mapping[int, int]): ``{region_start: N sym}`` from
                 ``_region_symbol_counts``.
+            show_microbar (bool): ``_rows_show_microbar()`` — whether the
+                available row width admits the 4-cell microbar.
 
         Returns:
             RegionRow: The composed clickable region row.
@@ -2743,16 +2928,22 @@ class MemoryMapPanel(Container):
         Dependencies:
             Uses:
                 - ``human_bytes`` / ``microbar`` / ``safe_text`` / ``RegionRow``
+                  / ``_BAND_SHORT_LABELS``
             Used by:
                 - ``_build_band_widgets``
         """
         n_sym = sym_counts.get(start, 0)
         frac = run_bytes / largest_region if largest_region else 0.0
         content = Text()
-        content.append_text(safe_text(f"{glyph} 0x{start:08X} "))
-        content.append_text(safe_text(f"{human_bytes(run_bytes)} "))
-        content.append_text(microbar(frac, _REGION_MICROBAR_WIDTH))
-        content.append_text(safe_text(f" {n_sym} sym {band} {_OPEN_IN_HEX_GLYPH}"))
+        content.append_text(safe_text(f" {glyph} "))
+        content.append_text(safe_text(f"0x{start:08X} "))
+        content.append_text(safe_text(f"{human_bytes(run_bytes):>7} "))
+        if show_microbar:
+            content.append_text(microbar(frac, _REGION_MICROBAR_WIDTH))
+            content.append_text(safe_text(" "))
+        content.append_text(safe_text(f"{n_sym:>2} "))
+        content.append_text(safe_text(f"{_BAND_SHORT_LABELS.get(band, band):<9}"))
+        content.append_text(safe_text(_OPEN_IN_HEX_GLYPH))
         return RegionRow(
             content,
             region_start=start,
@@ -2760,67 +2951,63 @@ class MemoryMapPanel(Container):
             classes=f"map-region-row {token}",
         )
 
-    def _build_glance_widgets(
+    def _build_glance_chips(
         self,
         runs: Sequence[Tuple[str, int, int]],
-        windows: Sequence[EntropyWindow],
-    ) -> Container:
-        """Build the docked "At a glance" panel (histogram + sparkline).
+    ) -> Horizontal:
+        """Build the one-line glance chips (the folded "At a glance" block).
 
         Summary:
-            Assemble the ``.at-a-glance`` panel (batch-45, R-TUI-061): a title,
-            one band-styled histogram row per OCCUPIED band (``{glyph} {label}
-            {count} {bar} {pct}%`` — region counts via :func:`band_histogram`,
-            LLR-045B.1), and a band-coloured profile ``.map-sparkline`` of the
-            entropy windows (one band-styled segment per contiguous same-band
-            run of sampled ramp glyphs, :func:`_sparkline_segments`,
-            LLR-045B.2). Colour flows solely through the ``band-*`` CSS classes;
-            every text sink is a markup-safe ``safe_text`` over CONSTANT band
-            labels — no file-derived text (security B3).
+            The at-a-glance block's successor (batch-93, HLR-129 / LLR-129.3,
+            amending R-TUI-061): ONE line of per-band chips in canonical
+            ``ENTROPY_BAND_LABELS`` order — ``{glyph} {count} {share}%`` per
+            OCCUPIED band, where ``count`` is the band's merged-run tally
+            (consistent with the region list, not a raw window count) and
+            ``share%`` is the band's MAPPED-BYTE share of the total mapped
+            bytes — the only reading under which the capture's chips sum to
+            100 (``· 1 19% ░ 1 5% ▒ 4 57% ▓ 3 19%``: counts 1+1+4+3 = 9 runs,
+            shares 19+5+57+19 = 100). Zero-count bands render NO chip. Colour
+            flows solely through the ``band-*`` CSS classes — one chip widget
+            per band, never an inline hex — and every text sink is a
+            markup-safe ``safe_text`` over CONSTANT band labels + developer
+            counts (security B3). The entropy-window sampling helpers
+            (``band_histogram`` / ``sparkline_glyphs``) retire from this
+            surface with the docked block; the chips need only the runs.
 
         Args:
-            runs (Sequence[Tuple[str, int, int]]): The merged region runs (the
-                histogram's region tally).
-            windows (Sequence[EntropyWindow]): The entropy windows the
-                sparkline profile is sampled from.
+            runs (Sequence[Tuple[str, int, int]]): The merged region runs —
+            the tally + mapped-byte population.
 
         Returns:
-            Container: The ``.at-a-glance`` panel to dock beside the band bar.
+            Horizontal: The ``.map-glance-chips`` one-line chip row.
 
         Data Flow:
-            - Reads ``runs`` (histogram) + ``windows`` (sparkline); produces the
-              docked panel.
+            - Reads ``runs``; produces the chip widgets.
 
         Dependencies:
             Uses:
-                - ``band_histogram`` / ``_sparkline_segments`` / ``band_style``
-                  / ``safe_text``
+                - ``band_style`` / ``safe_text`` / ``ENTROPY_BAND_LABELS``
             Used by:
                 - ``_build_band_widgets``
         """
-        children: List[Static] = [
-            Static(safe_text("At a glance"), classes="glance-title")
-        ]
-        for band, count, pct in band_histogram(runs):
+        totals: Dict[str, int] = {}
+        counts: Dict[str, int] = {}
+        for band, run_bytes, _start in runs:
+            totals[band] = totals.get(band, 0) + run_bytes
+            counts[band] = counts.get(band, 0) + 1
+        mapped = sum(totals.values()) or 1
+        chips: List[Static] = []
+        for band in ENTROPY_BAND_LABELS:
+            if band not in totals:
+                continue
             token, glyph, _meaning = band_style(band)
-            bar = "█" * max(1, round(_GLANCE_BAR_WIDTH * pct / 100.0))
-            children.append(
+            chips.append(
                 Static(
-                    safe_text(f"{glyph} {band} {count} {bar} {pct:.0f}%"),
-                    classes=f"map-glance-row {token}",
+                    safe_text(f"{glyph} {counts[band]} {100 * totals[band] / mapped:.0f}%"),
+                    classes=f"map-glance-chip {token}",
                 )
             )
-
-        spark_segments: List[Static] = [
-            Static(safe_text(glyphs), classes=f"map-sparkline-seg {band_style(band)[0]}")
-            for band, glyphs in _sparkline_segments(windows, _SPARKLINE_WIDTH)
-        ]
-        children.append(
-            Horizontal(*spark_segments, classes="map-sparkline")
-            if spark_segments
-            else Static(safe_text(""), classes="map-sparkline")
-        )
-        return Vertical(*children, classes="at-a-glance")
+        return Horizontal(*chips, classes="map-glance-chips")
 
     def _render_stats(
         self,
@@ -2829,16 +3016,25 @@ class MemoryMapPanel(Container):
         issues: Sequence[ValidationIssue],
         empty: bool,
     ) -> None:
-        """Populate (or clear) the ``#map_stats`` coverage strip (US-037).
+        """Populate (or clear) the ONE-LINE ``#map_stats`` coverage strip.
 
         Summary:
             Compute the seven coverage statistics from the already-parsed
             ``ranges``/``range_validity`` and the pre-computed ``issues`` list
             via ``coverage_stats`` and render them markup-safe into
-            ``#map_stats_body`` (LLR-041.8). When ``empty`` (no ranges), the
-            strip is blanked so the no-file state shows nothing / neutral, with
-            no divide-by-zero (LLR-041.9). Pure arithmetic on already-parsed
-            values — no new coverage/parse/analysis (LLR-041.7).
+            ``#map_stats_body`` as ONE always-visible line (batch-93, HLR-129 /
+            LLR-129.1, amending HLR-113 — defect ④ of premise P-1 was the
+            multi-line strip rendering below the fold of the old scrolling
+            ``#map_content``). The strip lives outside any scroll region now,
+            so it paints without scrolling at 120x36; the form is width-adaptive
+            (LLR-129.2): the full form renders when the strip's measured width
+            admits its 84 cells, the compact form (same seven statistics,
+            shortened labels only) below ``_STATS_FULL_MIN_WIDTH``. The last
+            non-empty inputs are stored so a live resize re-renders the strip
+            when the width crosses the threshold. When ``empty`` (no ranges),
+            the strip is blanked so the no-file state shows nothing / neutral,
+            with no divide-by-zero (LLR-041.9). Pure arithmetic on
+            already-parsed values — no new coverage/parse/analysis (LLR-041.7).
 
         Args:
             ranges (Sequence[Tuple[int, int]]): The image ranges (empty in the
@@ -2857,50 +3053,75 @@ class MemoryMapPanel(Container):
             Uses:
                 - ``coverage_stats`` / ``build_stats_text`` / ``safe_text``
             Used by:
-                - ``render_ranges``
+                - ``render_ranges`` / ``on_resize`` (width re-adaptation)
         """
         try:
             body = self.query_one("#map_stats_body", Static)
         except Exception:
             return
         if empty:
+            self._stats_state = None
             body.update(safe_text(""))
             return
+        self._stats_state = (list(ranges), list(range_validity), list(issues))
         stats = coverage_stats(ranges, range_validity, issues)
-        body.update(self.build_stats_text(stats))
+        body.update(self.build_stats_text(stats, self._stats_available_width()))
 
-    def build_stats_text(self, stats: CoverageStats) -> Text:
-        """Assemble the markup-safe coverage-strip text (US-037 / LLR-041.8).
+    def _stats_available_width(self) -> int:
+        """The strip's measured width for the width-adaptive form (LLR-129.2).
 
         Summary:
-            Compose the seven-statistic strip — coverage %, bytes covered,
-            valid/invalid range counts, gap count, largest gap and total
-            issues — as labelled ``Text`` segments so the strip is readable and
-            markup-safe (LLR-041.11 uniformity; the numbers are developer
-            formatting, not file-derived, but the panel stays uniformly
-            ``Text``-composed). Pure formatting of a :class:`CoverageStats` —
-            no analysis (LLR-041.7).
+            The honest width is ``#map_stats_body``'s own region once laid out;
+            before first layout (a conforming width-0 first frame, P-4) the
+            panel's own measured width stands in, and before THAT the full-form
+            threshold itself (the wide default — an unlaid panel renders the
+            full form, matching the wide-regime capture).
+        """
+        try:
+            width = self.query_one("#map_stats_body", Static).region.width
+        except Exception:
+            width = 0
+        if width <= 0:
+            width = self.size.width
+        if width <= 0:
+            width = _STATS_FULL_MIN_WIDTH
+        return width
 
-            batch-77 (R-TUI-041 as amended / HLR-113, LLR-113.1-.2) changes
-            three renderings and no arithmetic. Coverage takes **exactly four**
-            fractional digits: at ``.2f`` a sparsely-mapped image reads a flat
-            ``0.00%`` for every coverage below half a percent, which is the
-            common case here — ``case_02`` maps 93 bytes of a 2 GiB span. Four
-            digits discriminate ``0.0008%`` from ``0.0000%``; more digits buy
-            nothing an operator reads. The covered total becomes a DUAL
-            readout — mapped bytes against the image span, both through
-            ``human_bytes`` — because a bare ``1024`` answers "how much" without
-            "out of what", and the span is the number that makes it a coverage
-            figure at all. The largest gap is humanized for the same reason
-            ``67108408`` is not a size a reader can weigh, and its literal
-            ``bytes`` suffix is dropped because ``human_bytes`` already carries
-            the unit.
+    def build_stats_text(
+        self, stats: CoverageStats, available_width: int = 0
+    ) -> Text:
+        """Assemble the ONE-LINE coverage-strip text (batch-93, HLR-129).
+
+        Summary:
+            Compose the seven coverage statistics as ONE line in the contract's
+            fixed field order — ``Mapped {covered} / {span} span ({pct}) ·
+            {ranges} ranges ({valid} valid) · {gaps} gaps · {issues} issues``
+            (LLR-129.1) — width-adaptive (LLR-129.2): below
+            ``_STATS_FULL_MIN_WIDTH`` available columns the compact form
+            renders the SAME seven statistics with shortened labels
+            (``rng``/``ok``/``iss``, the ``span`` word, the pct parens and the
+            flanking padding dropped) — 66 cells against the full form's 84 on
+            the demo fixture (executed formatter, P3 pilot), clearing the
+            68-column strip the 80x24 floor geometry admits. NO statistic's
+            arithmetic changes —
+            the numbers all come from the passed :class:`CoverageStats` and the
+            coverage keeps **exactly four** fractional digits (batch-77,
+            LLR-113.1: four digits discriminate ``0.0008%`` from ``0.0000%``
+            where ``.2f`` reads flat). Coverage is a dual readout — mapped
+            bytes against the image span, both through ``human_bytes`` —
+            because a bare ``1024`` answers "how much" without "out of what".
+            Pure formatting — no analysis (LLR-041.7); the content is
+            developer-formatted, never file-derived, and stays uniformly
+            ``Text``-composed (LLR-041.11).
 
         Args:
             stats (CoverageStats): The metrics from ``coverage_stats``.
+            available_width (int): The strip's available width in columns;
+                ``0`` (the default) means "unmeasured" and renders the full
+                form — the wide default.
 
         Returns:
-            Text: The composed, markup-safe coverage strip.
+            Text: The composed, markup-safe one-line coverage strip.
 
         Data Flow:
             - Reads ``stats``; produces the ``Text`` rendered into
@@ -2908,21 +3129,43 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``safe_text`` / ``human_bytes``
+                - ``safe_text`` / ``human_bytes`` / ``_STATS_FULL_MIN_WIDTH``
             Used by:
                 - ``_render_stats`` / (test) TC-041.8
         """
+        n_ranges = stats.valid_count + stats.invalid_count
+        compact = 0 < available_width < _STATS_FULL_MIN_WIDTH
         text = Text()
-        text.append(f"Coverage: {stats.coverage_pct:.4f}%  ")
-        text.append(
-            f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
-            f"{human_bytes(stats.image_span)}\n"
-        )
-        text.append(f"Valid ranges: {stats.valid_count}  ")
-        text.append(f"Invalid ranges: {stats.invalid_count}\n")
-        text.append(f"Gaps: {stats.gap_count}  ")
-        text.append(f"Largest gap: {human_bytes(stats.largest_gap)}\n")
-        text.append(f"Total issues: {stats.total_issues}")
+        if compact:
+            # Shortened labels/separators ONLY — the same seven statistics in
+            # the same field order. No flanking padding, no ``span`` word, no
+            # pct parens: the compact form must clear the 68-column strip the
+            # 80x24 floor admits (66 cells measured on the demo fixture).
+            text.append("Mapped ")
+            text.append(human_bytes(stats.covered_bytes))
+            text.append(
+                f" / {human_bytes(stats.image_span)} "
+                f"{stats.coverage_pct:.4f}%"
+            )
+            text.append(" · ")
+            text.append(f"{n_ranges} rng ({stats.valid_count} ok)")
+            text.append(" · ")
+            text.append(f"{stats.gap_count} gaps")
+            text.append(" · ")
+            text.append(f"{stats.total_issues} iss")
+        else:
+            text.append(" Mapped ")
+            text.append(human_bytes(stats.covered_bytes))
+            text.append(
+                f" / {human_bytes(stats.image_span)} span "
+                f"({stats.coverage_pct:.4f}%)"
+            )
+            text.append(" · ")
+            text.append(f"{n_ranges} ranges ({stats.valid_count} valid)")
+            text.append(" · ")
+            text.append(f"{stats.gap_count} gaps")
+            text.append(" · ")
+            text.append(f"{stats.total_issues} issues")
         return text
 
     def _reset_detail(self) -> None:
@@ -3050,17 +3293,17 @@ class MemoryMapPanel(Container):
 
             On a :class:`RegionRow.Activated`, populate the
             retained ``#map_detail`` inspector for the clicked run's
-            ``[region_start, region_end)`` window (batch-45 LLR-045C + batch-47
-            R-TUI-074): the ``build_detail_text`` body (status chip, span/size,
-            R-TUI-041 R-3 A2L-symbol region naming with its C-17 markup-safety
-            guard), then a humanized size + the region's dominant band + a ≤3-row
-            hex peek at the region start (LLR-074.1/074.2). It then posts
+            ``[region_start, region_end)`` window (batch-93, HLR-126/128): the
+            aligned Status/Region/Size/Band/Symbols field block + the
+            multi-row 8-byte hex peek, composed by ``_build_inspector_text``
+            (the retired ``build_detail_text``/16-byte-peek soup no longer
+            renders on this screen). It then posts
             :class:`OpenInHexRequested` so the reused app handler switches to the
             Workspace/hex screen (LLR-045C.1). Detail is populated BEFORE the nav
             message so the pane reflects the selection when the operator returns.
-            Every file-derived string in the inspector (A2L symbol names via
-            ``build_detail_text``) renders through ``safe_text`` — the peek adds
-            only developer-formatted hex, no untrusted text (C-17 / MN-4).
+            Every file-derived string in the inspector (A2L symbol names) renders
+            through ``safe_text`` — the peek adds only developer-formatted hex,
+            no untrusted text (C-17 / MN-4).
 
         Args:
             event (RegionRow.Activated): The clicked run's window plus the
@@ -3068,8 +3311,7 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``cell_status`` / ``build_detail_text`` / ``band_style`` /
-                  ``human_bytes`` / ``_region_hex_peek`` / ``OpenInHexRequested``
+                - ``_select_region`` / ``OpenInHexRequested``
             Used by:
                 - Textual message dispatch (from ``RegionRow``)
         """
@@ -3121,11 +3363,20 @@ class MemoryMapPanel(Container):
 
         Summary:
             The single owner of "a region is selected": it stores the selection
-            address, writes ``#map_detail_body`` (the retained
-            ``build_detail_text`` body plus size, dominant band and hex peek —
-            batch-45 LLR-045C, batch-47 R-TUI-074), and moves the
-            ``_SELECTED_ROW_CLASS`` marker to the row whose ``region_start``
-            equals ``start`` (LLR-117.1, matched by ADDRESS, never by index).
+            address, writes ``#map_detail_body`` with the cockpit inspector
+            (batch-93, HLR-126 / LLR-126.2 + HLR-128): the aligned field block
+            ``Status`` / ``Region`` / ``Size`` / ``Band`` / ``Symbols`` at fixed
+            columns (labels padded to ``_INSPECTOR_LABEL_WIDTH`` — the longest
+            label plus the capture's two-space gutter), the region's overlapping
+            A2L symbol NAMES one per line (markup-safe, so a hostile name like
+            ``sensor[red]`` renders literally — C-17/MN-4), the ``Peek`` header
+            and the multi-row 8-byte hex peek cut against the pane height
+            (LLR-126.3). The pane's lit border title is set to
+            ``Inspector — 0x{start:08X}`` here — the title carries the SELECTED
+            address, so it belongs to the selection owner. The values come from
+            the already-selected region only — the panel re-derives nothing
+            (P-3): status via ``cell_status``, size via ``human_bytes``, band
+            via the run's own merged band, symbols via ``symbols_in_window``.
 
             It deliberately posts NOTHING. ``OpenInHexRequested`` is the click
             handler's decision alone, which is what keeps auto-selection from
@@ -3145,28 +3396,174 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``cell_status`` / ``build_detail_text`` / ``band_style`` /
-                  ``human_bytes`` / ``_region_hex_peek`` / ``_live_region_rows``
+                - ``cell_status`` / ``band_style`` / ``human_bytes`` /
+                  ``symbols_in_window`` / ``_build_inspector_text`` /
+                  ``_live_region_rows``
             Used by:
                 - ``on_region_row_activated`` (click) / ``_apply_auto_selection``
         """
         self._selected_cell_start = start
         status = cell_status(start, end, self._ordered_ranges)
-        detail = self.build_detail_text(start, end, status)
-        detail.append("\n")
-        detail.append(f"Size: {human_bytes(end - start)}\n")
-        band = self._run_bands.get(start)
-        if band is not None:
-            _token, glyph, _meaning = band_style(band)
-            detail.append(f"Dominant band: {glyph} {band}\n")
-        detail.append(f"Peek @ 0x{start:08X}:\n")
-        detail.append(self._region_hex_peek(start, end))
         body = self.query_one("#map_detail_body", Static)
-        body.update(detail)
+        body.update(self._build_inspector_text(start, end, status))
+        self.query_one("#map_detail").border_title = f"Inspector — 0x{start:08X}"
         for row in self._live_region_rows():
             row.set_class(row.region_start == start, self._SELECTED_ROW_CLASS)
 
-    def _apply_auto_selection(self, previous_start: Optional[int]) -> None:
+    def _build_inspector_text(self, start: int, end: int, status: str) -> Text:
+        """Compose the aligned inspector field block + the multi-row peek.
+
+        Summary:
+            The full-height inspector's body (batch-93, HLR-126 / LLR-126.2,
+            HLR-128): five fixed-column fields — ``Status`` (the ``cell_status``
+            chip: ``VALID`` / ``INVALID`` / ``GAP (uncovered)``), ``Region``
+            (``0x{start:08X}-0x{end-1:08X}``), ``Size`` (``human_bytes``),
+            ``Band`` (the run's own dominant band: glyph + FULL domain label —
+            the short labels are display-only on the region rows, never here),
+            ``Symbols`` (the count) — then one line per overlapping A2L symbol
+            NAME (``safe_text``, so hostile file-derived names render literally,
+            C-17), the ``Peek`` header, and the 8-byte hex peek rows. Every
+            value is developer-formatted or carried through the shipped
+            markup-safe seams; no statistic or entropy fact is re-derived here
+            (P-3 / LLR-041.7).
+
+        Args:
+            start (int): The selected run's inclusive start address.
+            end (int): The selected run's exclusive end address.
+            status (str): The region status (``"valid"`` / ``"invalid"`` /
+                ``"gap"``) from ``cell_status``.
+
+        Returns:
+            Text: The composed, markup-safe inspector body.
+
+        Dependencies:
+            Uses:
+                - ``band_style`` / ``human_bytes`` / ``symbols_in_window`` /
+                  ``safe_text`` / ``_region_peek_text``
+            Used by:
+                - ``_select_region``
+        """
+        text = Text()
+
+        def field(label: str, value: str) -> None:
+            text.append(f"{label:<{_INSPECTOR_LABEL_WIDTH}}")
+            text.append(f"{value}\n")
+
+        chip = {
+            "valid": "VALID",
+            "invalid": "INVALID",
+            "gap": "GAP (uncovered)",
+        }.get(status, "GAP (uncovered)")
+        field("Status", chip)
+        field("Region", f"0x{start:08X}-0x{end - 1:08X}")
+        field("Size", human_bytes(end - start))
+        band = self._run_bands.get(start)
+        if band is not None:
+            _token, glyph, _meaning = band_style(band)
+            field("Band", f"{glyph} {band}")
+        else:
+            field("Band", "-")
+        region_names = symbols_in_window(self._a2l_tags, start, end)
+        field("Symbols", str(len(region_names)))
+        for name in region_names:
+            # File-derived names go through ``safe_text`` — a hostile
+            # ``sensor[red]`` renders literally, never as markup (C-17).
+            text.append("  ")
+            text.append(safe_text(name))
+            text.append("\n")
+        text.append("Peek\n")
+        text.append_text(self._region_peek_text(start, len(region_names)))
+        return text
+
+    def _inspector_peek_rows(self, reserved: int) -> int:
+        """The 8-byte peek row count the inspector pane height admits.
+
+        Summary:
+            The peek fills the inspector below the field block (batch-93,
+            LLR-126.3): as many 8-byte rows as the pane's measured content
+            height admits after the ``_INSPECTOR_FIELD_ROWS`` field rows and
+            ``reserved`` extra body rows (the selected region's symbol-name
+            lines), floored at one row so a region is never left without a
+            peek. A pane that has not been laid out yet reports height 0 (a
+            conforming first-frame input, P-4); the fallback then renders
+            ``_PEEK_ROWS_FALLBACK`` rows — the count the 120x36 capture frame
+            shows. The cut re-derives on every selection, so it tracks the
+            pane the selection lands in.
+
+        Args:
+            reserved (int): Body rows above the peek but below the field block
+                (the symbol-name lines of the selected region).
+
+        Returns:
+            int: ``>= 1`` peek rows.
+        """
+        try:
+            height = self.query_one("#map_detail").region.height
+        except Exception:
+            height = 0
+        if height <= 0:
+            return _PEEK_ROWS_FALLBACK
+        content_height = height - 4  # border (2) + ``.db-pane`` padding (2)
+        return max(1, content_height - _INSPECTOR_FIELD_ROWS - reserved)
+
+    def _region_peek_text(self, start: int, reserved: int = 0) -> Text:
+        """Render the non-wrapping 8-byte hex peek at a region (batch-93, HLR-128).
+
+        Summary:
+            Return a markup-safe ``Text`` of ``_inspector_peek_rows()`` rows of
+            ``f"{addr:08X}  " + " ".join(f"{byte:02X}")`` over 8 bytes (LLR-128.1
+            — exactly 33 cells per mapped row): an 8-hex address with NO ``0x``
+            prefix and NO ASCII gutter, assembled with ``markup=False`` content.
+            Unmapped bytes render ``_PEEK_UNMAPPED_CELL`` (``··``, 2 cells — the
+            row keeps its 33-cell width with holes). The first row starts at the
+            8-aligned base CONTAINING ``start`` (the shipped alignment
+            convention preserved); rows below a short region render ``··`` for
+            the addresses past its end. An empty ``_mem_map`` (no file /
+            headless) yields an empty ``Text`` rather than raising. The shipped
+            16-byte ``hexview.render_hex_view`` peek surface is RETIRED on this
+            screen by this replacement — 79-cell rows wrapped in the ~40-col
+            inspector pane (defect ② of premise P-1).
+
+        Args:
+            start (int): The region's inclusive start address.
+            reserved (int): Body rows above the peek (the symbol-name lines) —
+                forwarded to ``_inspector_peek_rows``.
+
+        Returns:
+            Text: The composed, markup-safe 8-byte peek (possibly empty).
+
+        Dependencies:
+            Uses:
+                - ``safe_text`` / ``_PEEK_BYTES_PER_ROW`` /
+                  ``_PEEK_UNMAPPED_CELL`` / ``_inspector_peek_rows``
+            Used by:
+                - ``_build_inspector_text``
+        """
+        if not self._mem_map:
+            return safe_text("")
+        rows = self._inspector_peek_rows(reserved)
+        base = start - (start % _PEEK_BYTES_PER_ROW)
+        out = Text()
+        for row in range(rows):
+            addr = base + row * _PEEK_BYTES_PER_ROW
+            if row:
+                out.append("\n")
+            out.append(f"{addr:08X}  ")
+            cells = [
+                f"{self._mem_map[addr + i]:02X}"
+                if (addr + i) in self._mem_map
+                else _PEEK_UNMAPPED_CELL
+                for i in range(_PEEK_BYTES_PER_ROW)
+            ]
+            out.append(" ".join(cells))
+        return out
+
+    def _apply_auto_selection(
+        self,
+        previous_start: Optional[int],
+        retry: bool = False,
+        generation: Optional[int] = None,
+    ) -> None:
         """Resolve, apply and focus the selection after a render (HLR-116).
 
         Summary:
@@ -3178,6 +3575,23 @@ class MemoryMapPanel(Container):
             many runs precede the selection, so an index would silently follow
             a different region.
 
+            The hook can observe the DEFERRED-mount prune window: the rows are
+            mounted by message, and the ``InvokeLater`` this hook runs on may
+            fire before the mount messages are processed — measured
+            intermittent (the batch-93 cockpit's nested ``ScrollableContainer``
+            changed the frame timing, ~1 in 4 renders at any geometry). When
+            no live rows resolve, ONE bounded retry is scheduled for the next
+            frame — the ``_resize_band_segments`` width-0 discipline — then
+            the hook gives up; it never spins and fabricates no selection.
+
+            Two guards keep the deferred window safe (batch-93):
+            ``generation`` ties the hook to the render that scheduled it — a
+            newer ``render_ranges`` supersedes the hook, which stands down
+            instead of re-applying a stale resolution. And the retry applies
+            only while the selection is still unowned: an intervening click or
+            key that selected a region between the attempt and the retry owns
+            the inspector, and the retry must not stomp it.
+
             Focus then follows the resolved selection (``LLR-116.5``) so the
             operator's arrow keys act on the map instead of resuming wherever
             they were.
@@ -3186,6 +3600,12 @@ class MemoryMapPanel(Container):
             previous_start (Optional[int]): The selection address captured
                 before ``_reset_detail()`` cleared it, or ``None`` on a first
                 render.
+            retry (bool): ``True`` only on the single self-scheduled re-attempt
+                made when the rows were not yet mounted. Bounds the reschedule
+                to ONE extra frame.
+            generation (Optional[int]): The ``self._render_generation`` value
+                at render time; a mismatch means a newer render superseded
+                this hook. ``None`` (a direct call) means "current".
 
         Returns:
             None
@@ -3198,11 +3618,28 @@ class MemoryMapPanel(Container):
             Uses:
                 - ``_live_region_rows`` / ``_select_region``
             Used by:
-                - ``render_ranges`` (via ``call_after_refresh``)
+                - ``render_ranges`` (via ``call_after_refresh``) and itself
+                  (one bounded retry)
         """
+        if generation is not None and generation != self._render_generation:
+            # A newer render superseded this hook — the new render's own hook
+            # owns the resolution now.
+            return
         rows = self._live_region_rows()
         if not rows:
-            # No image, or the render was superseded — fabricate no selection.
+            # No image, the render was superseded, or the deferred mount has
+            # not landed yet — fabricate no selection. When this is the first
+            # attempt, hand the resolution ONE more frame; afterwards give up
+            # and wait for the next real render.
+            if not retry:
+                self.call_after_refresh(
+                    self._apply_auto_selection, previous_start, True, generation
+                )
+            return
+        if retry and self._selected_cell_start is not None:
+            # An intervening selection (a click, a key) owns the inspector
+            # between the attempt and this retry — re-applying the render's
+            # auto-resolution would stomp it.
             return
         starts = [row.region_start for row in rows]
         index = starts.index(previous_start) if previous_start in starts else 0
@@ -3226,61 +3663,6 @@ class MemoryMapPanel(Container):
             for node in self.ancestors_with_self
             if isinstance(node, Widget)
         )
-
-    def _region_hex_peek(self, start: int, end: int) -> Text:
-        """Render a ≤3-row hex peek at a region's start (batch-47, R-TUI-074).
-
-        Summary:
-            Return a markup-safe ``Text`` hex+ASCII peek of up to
-            ``_MAP_PEEK_ROWS`` 16-byte rows beginning at ``start``, using the
-            plain ``hexview.render_hex_view`` renderer over the stored
-            ``self._mem_map`` (LLR-074.2). Row bases start at the
-            ``HEX_WIDTH``-aligned base of ``start`` and stop at the region end,
-            so the first rendered row is the ``HEX_WIDTH``-aligned row that
-            CONTAINS ``start`` (standard hex-grid convention); when the region
-            start is 16-aligned (the common case) that row address equals the
-            region start, otherwise it is the aligned row containing it. A
-            region shorter than three rows
-            shows only the available rows. The peek carries only developer hex
-            formatting — no file-derived text — but is still wrapped in
-            ``safe_text`` for uniform markup-safety. An empty ``_mem_map`` (no
-            file / headless) yields an empty ``Text`` rather than raising.
-
-        Args:
-            start (int): The region's inclusive start address.
-            end (int): The region's exclusive end address.
-
-        Returns:
-            Text: The composed, markup-safe hex peek (possibly empty).
-
-        Data Flow:
-            - Reads ``self._mem_map`` (read-only) + the region bounds; produces
-              the ``Text`` appended to ``#map_detail_body``.
-
-        Dependencies:
-            Uses:
-                - ``hexview.render_hex_view`` / ``hexview.HEX_WIDTH`` /
-                  ``safe_text``
-            Used by:
-                - ``on_region_row_activated``
-        """
-        if not self._mem_map:
-            return safe_text("")
-        from ..render.hexview import HEX_WIDTH, render_hex_view
-
-        base = start - (start % HEX_WIDTH)
-        row_bases: List[int] = []
-        addr = base
-        while addr < end and len(row_bases) < _MAP_PEEK_ROWS:
-            row_bases.append(addr)
-            addr += HEX_WIDTH
-        # Pass the stored map directly (no O(N) copy — large images are 40M+);
-        # supplying ``row_bases`` skips ``build_row_bases`` so only the ≤3 peek
-        # rows are materialised.
-        rendered = render_hex_view(
-            self._mem_map, row_bases=row_bases, max_rows=_MAP_PEEK_ROWS
-        )
-        return safe_text(rendered)
 
 
 def _make_flow_block(

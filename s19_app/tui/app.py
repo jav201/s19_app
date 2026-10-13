@@ -2206,7 +2206,7 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_map`` holding a title label, a scrollable
+            Container: ``#screen_map`` holding a title label, a
             ``MemoryMapPanel`` (the ``#map_content`` coverage view) and an
             ``EmptyStatePanel``. Hidden at startup.
 
@@ -2215,6 +2215,11 @@ class S19TuiApp(App):
               which reads the already-computed ``LoadedFile.ranges`` and
               ``LoadedFile.range_validity`` — no coverage is computed here
               (LLR-012.1 / LLR-012.4).
+            - ``#map_content`` is a plain (non-scrolling) host: batch-93's
+              inspector cockpit scrolls the region list inside its own pane
+              (HLR-126) so the one-line stats strip always paints without
+              scrolling (HLR-129) — the outer host must not swallow it below
+              the fold (defect ④ of premise P-1).
             - An ``EmptyStatePanel`` is composed alongside; while no
               ``LoadedFile`` is present ``_apply_empty_state`` shows it and
               hides ``#map_content`` (LLR-002.3).
@@ -2228,7 +2233,7 @@ class S19TuiApp(App):
         """
         return Container(
             Label("Memory Map", classes="db-screen-title"),
-            ScrollableContainer(
+            Container(
                 MemoryMapPanel(),
                 id="map_content",
             ),

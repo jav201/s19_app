@@ -3509,7 +3509,7 @@ def test_tc041_6_region_activation_focus_equals_region_start(
             await pilot.pause()
             panel = app.query_one("#memory_map_panel", MemoryMapPanel)
             row = next(
-                r for r in app.query(RegionRow) if "high/random" in _widget_plain(r)
+                r for r in app.query(RegionRow) if "high/rand" in _widget_plain(r)
             )
             orig_post = panel.post_message
 
@@ -3582,7 +3582,7 @@ def test_at036b_region_click_reveals_hex_at_region_start(tmp_path: Path) -> None
             app.update_memory_map()
             await pilot.pause()
             row = await _double_click_region_row(
-                pilot, app, lambda r: "constant/padding" in _widget_plain(r)
+                pilot, app, lambda r: "const" in _widget_plain(r)
             )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
             hex_str = str(app.query_one("#hex_view").render())
@@ -3846,11 +3846,19 @@ def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
 
 
 def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
-    """Black-box: the `#map_stats` strip shows the seven case_02 metrics
-    (AT-037 / US-037).
+    """Black-box: the `#map_stats` strip shows the seven case_02 metrics as
+    ONE line (AT-037 / US-037).
 
-    Intent: load case_02, show the map, read `#map_stats`, and assert each of
-    the seven metric labels is present with its value — the coverage %% equals
+    **AMENDED batch-93 (HLR-129 / LLR-129.1, amending HLR-113):** the retired
+    multi-line label form (``Coverage:`` / ``Bytes covered:`` / …) is gone —
+    the strip is now the single line `` Mapped {covered} / {span} span
+    ({pct:.4f}%) · {N} ranges ({V} valid) · {G} gaps · {I} issues `` (compact
+    form below 84 columns; 120x30 renders the full form). The seven statistics
+    and their order are UNCHANGED; only the wording moved. ``Largest gap:``
+    retired entirely — it is no longer one of the seven.
+
+    Intent: load case_02, show the map, read `#map_stats`, and assert the
+    seven statistics appear IN ORDER on one line — the coverage %% equals
     TC-041.8's hand-computed number, and the total-issue count equals
     ``len(app._validation_issues)`` (the single canonical source).
     """
@@ -3868,45 +3876,42 @@ def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
 
     strip, issue_count = asyncio.run(_drive())
 
-    # All seven labels present.
-    for label in (
-        "Coverage:",
-        "Bytes covered:",
-        "Valid ranges:",
-        "Invalid ranges:",
-        "Gaps:",
-        "Largest gap:",
-        "Total issues:",
-    ):
-        assert label in strip, f"stats label {label!r} missing; got {strip!r}"
+    # The strip is ONE line (batch-93 HLR-129 — the multi-line form retired).
+    assert "\n" not in strip, (
+        f"the stats strip must render as one line; got {strip!r}"
+    )
+    # All seven statistics, in the contract's field order, on the one line.
+    expected = (
+        f"Mapped {human_bytes(_CASE_02_COVERED_BYTES)} / "
+        f"{human_bytes(_CASE_02_IMAGE_SPAN)} span "
+        f"({_CASE_02_COVERAGE_PCT:.4f}%) · "
+        f"{_CASE_02_VALID_COUNT + _CASE_02_INVALID_COUNT} ranges "
+        f"({_CASE_02_VALID_COUNT} valid) · "
+        f"{_CASE_02_GAP_COUNT} gaps · {issue_count} issues"
+    )
+    assert expected in strip, (
+        f"the seven statistics must render in order; got {strip!r}"
+    )
+    # Retirement pin: the old multi-line labels are ABSENT (each would let the
+    # retired wording pass).
+    for label in ("Coverage:", "Bytes covered:", "Largest gap:", "Total issues:"):
+        assert label not in strip, (
+            f"retired label {label!r} must not render; got {strip!r}"
+        )
 
     # Values match the hand-computed case_02 literals. batch-40 S3 rendered
     # coverage at .2f; batch-77 (HLR-113 / LLR-113.1) widens that to EXACTLY
     # four fractional digits and humanizes the two byte read-outs. The .2f and
     # .6f forms are BOTH asserted absent so the digit count is pinned from both
     # sides — "at least four" would let a .6f implementation pass.
-    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.4f}%" in strip, (
-        f"coverage %% must render at .4f (TC-041.8's number); got {strip!r}"
-    )
-    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.2f}%" not in strip, (
+    assert f"{_CASE_02_COVERAGE_PCT:.2f}%" not in strip, (
         f"coverage %% must NOT render the 2-decimal form; got {strip!r}"
     )
     assert f"{_CASE_02_COVERAGE_PCT:.6f}%" not in strip, (
         f"coverage %% must NOT render the 6-decimal form; got {strip!r}"
     )
-    assert (
-        f"Bytes covered: {human_bytes(_CASE_02_COVERED_BYTES)} of "
-        f"{human_bytes(_CASE_02_IMAGE_SPAN)}" in strip
-    ), f"the covered total must be a humanized dual read-out; got {strip!r}"
-    assert f"Valid ranges: {_CASE_02_VALID_COUNT}" in strip
-    assert f"Invalid ranges: {_CASE_02_INVALID_COUNT}" in strip
-    assert f"Gaps: {_CASE_02_GAP_COUNT}" in strip
-    assert f"Largest gap: {human_bytes(_CASE_02_LARGEST_GAP)}" in strip
-    assert f"Largest gap: {_CASE_02_LARGEST_GAP} bytes" not in strip, (
-        f"the largest gap must be humanized, not a raw byte count; got {strip!r}"
-    )
     # Total issues == the single canonical source len(_validation_issues).
-    assert f"Total issues: {issue_count}" in strip, (
+    assert f"{issue_count} issues" in strip, (
         f"total issues must equal len(_validation_issues)={issue_count}; "
         f"got {strip!r}"
     )
@@ -3970,9 +3975,27 @@ async def _map_stats_strip(app: "S19TuiApp", pilot: "object") -> str:
     ``#map_stats_body``, NOT ``#map_stats``: the latter is the CONTAINER, whose
     own render is a ``Blank`` — reading it returns no strip text at all and
     every absence assertion below would pass vacuously against it.
+
+    The batch-93 width-adaptive re-render (LLR-129.2: the first
+    ``update_memory_map`` renders before the panel's first Resize, so the 80x24
+    compact form only lands after ``on_resize`` re-renders from the stored
+    inputs) settles at the panel's SETTLED width — a fixed point across pause
+    boundaries (the ``_settled_bar_width`` discipline; two fixed pauses are not
+    enough under load, measured). Read only after the fixed point, plus one
+    pause for that final re-render to land.
     """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
     app.action_show_screen("map")
     app.update_memory_map()
+    panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+    previous = None
+    for _ in range(20):
+        await pilot.pause()
+        width = panel.size.width
+        if previous is not None and width == previous and width > 0:
+            break
+        previous = width
     await pilot.pause()
     return str(app.query_one("#map_stats_body").render())
 
@@ -3983,6 +4006,17 @@ def test_b77_stats_strip_dual_readout_and_four_digit_coverage(
     """Black-box: the stats strip humanizes both byte read-outs and renders
     coverage to EXACTLY four fractional digits (AT-B77-05 / HLR-113).
 
+    **AMENDED batch-93 (HLR-129 / LLR-129.2, amending HLR-113):** the strip is
+    now ONE width-adaptive line rendering the same seven statistics. The full
+    form (`` Mapped {covered} / {span} span ({pct:.4f}%) · {N} ranges ({V}
+    valid) · {G} gaps · {I} issues ``) renders when the measured strip width
+    admits its 84 cells (120x30); below that (80x24, ~68 columns) the COMPACT
+    form renders the same seven statistics with shortened labels (``rng`` /
+    ``ok`` / ``iss``, no flanking padding, no ``span`` word, no pct parens).
+    The ``Largest gap:`` limb retired — it is no longer one of the seven — and
+    its absence is pinned here (the retirement pin replaces the old presence
+    limb).
+
     Intent: the strip must let an operator tell a sparsely-mapped image from an
     empty one and weigh the numbers it prints. Three limbs, each with its
     presence clause and its absence clause IN THIS NODE (C-40) — an absence
@@ -3992,12 +4026,14 @@ def test_b77_stats_strip_dual_readout_and_four_digit_coverage(
     1. **coverage** — ``0.0008%`` present, ``0.00%`` and the ``.6f`` form
        absent. EXACTLY four, not "at least four": a ``.6f`` implementation
        satisfies "at least" while reddening ``test_at037``.
-    2. **dual read-out** — ``1.0 KiB of 128.0 MiB`` present (mapped total AND
-       image span, both humanized), the bare integer ``1024`` absent.
-    3. **largest gap** — ``64.0 MiB`` present, ``67108408 bytes`` absent.
+    2. **dual read-out** — ``Mapped 1.0 KiB / 128.0 MiB`` present (mapped total
+       AND image span, both humanized), the bare integer ``1024`` absent.
+    3. **largest gap** — RETIRED: ``Largest gap`` must NOT render at all, and
+       the raw ``67108408`` count stays absent too.
 
-    Both pilot sizes: the strip spans the full panel width (66 @80x24,
-    88 @120x30) and must not depend on the regime.
+    Both pilot sizes: the strip spans the full panel width (~90 @120x30 → full
+    form, ~68 @80x24 → compact form) and must carry the same seven statistics
+    whatever the regime.
 
     RED pre-change, executed at both sizes:
     ``'Coverage: 0.00%  Bytes covered: 1024\\nValid ranges: 3  Invalid ranges: 0
@@ -4016,40 +4052,68 @@ def test_b77_stats_strip_dual_readout_and_four_digit_coverage(
             app._apply_empty_state()
             return await _map_stats_strip(app, pilot)
 
+    n_ranges = stats.valid_count + stats.invalid_count
+    # The width-adaptive one-line contract (batch-93 HLR-129 / LLR-129.2):
+    # the SAME seven statistics, full form at >=84 strip columns, compact
+    # form below. EVERY expected string is COMPUTED through `human_bytes(...)`
+    # (C-42) — never hand-typed.
+    expected_full = (
+        f" Mapped {human_bytes(stats.covered_bytes)} / "
+        f"{human_bytes(stats.image_span)} span "
+        f"({stats.coverage_pct:.4f}%) · "
+        f"{n_ranges} ranges ({stats.valid_count} valid) · "
+        f"{stats.gap_count} gaps · {stats.total_issues} issues "
+    )
+    expected_compact = (
+        f"Mapped {human_bytes(stats.covered_bytes)} / "
+        f"{human_bytes(stats.image_span)} "
+        f"{stats.coverage_pct:.4f}% · "
+        f"{n_ranges} rng ({stats.valid_count} ok) · "
+        f"{stats.gap_count} gaps · {stats.total_issues} iss"
+    )
+
     for size in ((120, 30), (80, 24)):
         strip = asyncio.run(_drive(size))
         tag = f"{size[0]}x{size[1]}"
+        expected = expected_compact if size == (80, 24) else expected_full
+
+        # One line, carrying the same seven statistics in the contract's field
+        # order — the full form at 120x30, the compact form at 80x24. The
+        # composed Text carries the full form's flanking padding; the rendered
+        # surface trims trailing whitespace, so the assertion reads the
+        # trimmed line.
+        assert "\n" not in strip, f"{tag}: the strip must be one line; {strip!r}"
+        assert expected.strip() in strip, (
+            f"{tag}: the seven statistics must render in the "
+            f"{'compact' if size == (80, 24) else 'full'} form; got {strip!r}"
+        )
 
         # Limb 1 — coverage, exactly four fractional digits.
-        assert f"Coverage: {stats.coverage_pct:.4f}%" in strip, (
-            f"{tag}: coverage must render at exactly .4f "
-            f"({stats.coverage_pct:.4f}%); got {strip!r}"
-        )
-        assert f"Coverage: {stats.coverage_pct:.2f}%" not in strip, (
+        assert f"{stats.coverage_pct:.2f}%" not in strip, (
             f"{tag}: the 2-digit form collapses this image to a flat 0.00%; "
             f"got {strip!r}"
         )
-        assert f"Coverage: {stats.coverage_pct:.6f}%" not in strip, (
+        assert f"{stats.coverage_pct:.6f}%" not in strip, (
             f"{tag}: EXACTLY four digits — .6f is over-precise; got {strip!r}"
         )
 
-        # Limb 2 — the dual read-out: mapped total AND image span, humanized.
-        assert (
-            f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
-            f"{human_bytes(stats.image_span)}" in strip
-        ), (
-            f"{tag}: the covered total must be humanized and stated against the "
-            f"image span; got {strip!r}"
+        # Limb 2 — the dual read-out: mapped total AND image span, humanized;
+        # the raw covered byte count must not survive.
+        assert f"Mapped {human_bytes(stats.covered_bytes)} / " in strip, (
+            f"{tag}: the covered total must be humanized and stated against "
+            f"the image span; got {strip!r}"
         )
-        assert f"Bytes covered: {stats.covered_bytes}\n" not in strip, (
+        assert str(stats.covered_bytes) not in strip, (
             f"{tag}: the raw covered byte count must not survive; got {strip!r}"
         )
 
-        # Limb 3 — the largest gap, humanized.
-        assert f"Largest gap: {human_bytes(stats.largest_gap)}" in strip, (
-            f"{tag}: the largest gap must be humanized; got {strip!r}"
+        # Limb 3 — the largest gap retired: it is NOT one of the seven
+        # statistics any more, neither its label nor its raw byte count.
+        assert "Largest gap" not in strip, (
+            f"{tag}: 'Largest gap' retired with the multi-line strip "
+            f"(batch-93 HLR-129) and must not render at all; got {strip!r}"
         )
-        assert f"{stats.largest_gap} bytes" not in strip, (
+        assert str(stats.largest_gap) not in strip, (
             f"{tag}: the raw largest-gap byte count must not survive; "
             f"got {strip!r}"
         )
@@ -4058,7 +4122,7 @@ def test_b77_stats_strip_dual_readout_and_four_digit_coverage(
         # `ranges` (LLR-041.7 keeps it presentational). The strip's numbers are
         # `coverage_stats`' fields verbatim, so an INDEPENDENTLY computed
         # `CoverageStats` must reproduce the painted text exactly.
-        assert f"Gaps: {stats.gap_count}  " in strip, (
+        assert f"{stats.gap_count} gaps" in strip, (
             f"{tag}: gap count must be coverage_stats' own; got {strip!r}"
         )
 
@@ -4096,12 +4160,17 @@ def test_tc_b77_10_no_file_stats_strip_is_positively_empty(tmp_path: Path) -> No
 
 
 def test_tc_b77_11_full_coverage_strip_reads_100_and_a_zero_gap() -> None:
-    """Boundary: a fully covered image reads 100.0000%% and a ``human_bytes(0)``
-    largest gap (TC-B77-11 / HLR-113).
+    """Boundary: a fully covered image reads 100.0000%% and ``0 gaps``
+    (TC-B77-11 / HLR-113).
+
+    **AMENDED batch-93 (HLR-129):** the strip is the one-line
+    `` Mapped {covered} / {span} span ({pct:.4f}%) · {N} ranges ({V} valid) ·
+    {G} gaps · {I} issues `` — the ``Largest gap:`` limb retired with the
+    multi-line form (its absence is pinned: ``Largest gap`` must NOT render).
 
     Intent: the upper boundary of the coverage percentage and the ZERO boundary
-    of the humanizer. ``human_bytes(0)`` is asserted through the function, not
-    as the literal ``"0 B"`` — a test that hard-codes the humanizer's zero form
+    of the gap count. ``human_bytes`` is asserted through the function, not as
+    the literal ``"1.0 MiB"`` — a test that hard-codes the humanizer's output
     re-implements the code under test and stops tracking it.
 
     The dual read-out degenerates here: covered == span, so both halves print
@@ -4115,22 +4184,28 @@ def test_tc_b77_11_full_coverage_strip_reads_100_and_a_zero_gap() -> None:
     strip = MemoryMapPanel().build_stats_text(stats).plain
 
     assert stats.coverage_pct == 100.0, "one contiguous range is fully covered"
-    assert "Coverage: 100.0000%" in strip, (
-        f"full coverage must render at four digits; got {strip!r}"
-    )
-    assert f"Largest gap: {human_bytes(0)}" in strip, (
-        f"no gaps → the largest gap is the humanizer's zero form "
-        f"({human_bytes(0)!r}); got {strip!r}"
-    )
+    assert "\n" not in strip, f"the strip must be one line; got {strip!r}"
     assert (
-        f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
-        f"{human_bytes(stats.image_span)}" in strip
-    ), f"both halves print even when they are equal; got {strip!r}"
+        f"Mapped {human_bytes(stats.covered_bytes)} / "
+        f"{human_bytes(stats.image_span)} span (100.0000%)" in strip
+    ), (
+        f"full coverage must render at four digits with BOTH halves printing "
+        f"even when they are equal; got {strip!r}"
+    )
+    assert "0 gaps" in strip, f"no gaps → the gap count reads 0; got {strip!r}"
+    assert "Largest gap" not in strip, (
+        f"'Largest gap' retired with the multi-line strip (batch-93 HLR-129) "
+        f"and must not render at all; got {strip!r}"
+    )
 
 
 def test_tc_b77_12_one_byte_image_strip() -> None:
     """Boundary: a one-byte image humanizes to the sub-KiB integer form
     (TC-B77-12 / HLR-113).
+
+    **AMENDED batch-93 (HLR-129):** the strip is the one-line
+    `` Mapped {covered} / {span} span ({pct:.4f}) · … `` form; this node pins
+    the 1-byte boundary on that line.
 
     Intent: the smallest non-empty image. ``human_bytes`` switches formats
     below 1024 (integer + ``B``, no false precision), so this is the boundary
@@ -4143,10 +4218,10 @@ def test_tc_b77_12_one_byte_image_strip() -> None:
     strip = MemoryMapPanel().build_stats_text(stats).plain
 
     assert stats.image_span == 1 and stats.covered_bytes == 1
+    assert "\n" not in strip, f"the strip must be one line; got {strip!r}"
     assert (
-        f"Bytes covered: {human_bytes(1)} of {human_bytes(1)}" in strip
+        f"Mapped {human_bytes(1)} / {human_bytes(1)} span (100.0000%)" in strip
     ), f"a 1-byte image takes the sub-KiB integer form; got {strip!r}"
-    assert "Coverage: 100.0000%" in strip, f"got {strip!r}"
 
 
 def test_tc_b77_13_zero_span_strip_divides_by_nothing(tmp_path: Path) -> None:
@@ -4161,7 +4236,10 @@ def test_tc_b77_13_zero_span_strip_divides_by_nothing(tmp_path: Path) -> None:
     only in a unit call.
 
     Both byte read-outs degenerate to the humanizer's zero form and coverage to
-    ``0.0000%`` — the guarded value, not a computed one.
+    ``0.0000%`` — the guarded value, not a computed one. **AMENDED batch-93
+    (HLR-129):** the strip is the one-line `` Mapped {covered} / {span} span
+    ({pct:.4f}%) · {N} ranges ({V} valid) · {G} gaps · {I} issues `` form; the
+    guarded read-outs must render on that one line without raising.
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel
 
@@ -4179,14 +4257,15 @@ def test_tc_b77_13_zero_span_strip_divides_by_nothing(tmp_path: Path) -> None:
 
     strip = asyncio.run(_drive())
 
-    assert "Coverage: 0.0000%" in strip, (
+    assert "\n" not in strip, (
+        f"a zero span must still render the strip as one line; got {strip!r}"
+    )
+    assert (
+        f"Mapped {human_bytes(0)} / {human_bytes(0)} span (0.0000%)" in strip
+    ), (
         f"a zero span takes the guarded 0.0 coverage, at four digits; "
         f"got {strip!r}"
     )
-    assert (
-        f"Bytes covered: {human_bytes(0)} of {human_bytes(0)}" in strip
-    ), f"both halves degenerate to the humanizer's zero form; got {strip!r}"
-    assert f"Largest gap: {human_bytes(0)}" in strip, f"got {strip!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -4257,16 +4336,55 @@ async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object
 
     **batch-67 N4a:** a single click now INSPECTS ONLY. Callers that assert hex
     navigation must use :func:`_double_click_region_row`.
+
+    **batch-93 HLR-126:** the region list scrolls inside the cockpit's own
+    ``.map-region-scroll`` container — ``#map_content`` is a plain host now and
+    the row's own ``scroll_visible`` no longer brings it under the pointer.
+    Scroll the OWNING viewport (``scroll_to_widget(..., top=True)``), the same
+    disambiguation ``tests/test_map_click_chain.py`` applies.
     """
     from s19_app.tui.screens_directionb import RegionRow
 
     target = next(r for r in app.query(RegionRow) if match(r))
-    target.scroll_visible(animate=False)
-    await pilot.pause()
+    await _scroll_row_hit_testable(pilot, app, target)
     await pilot.click(target)
     await pilot.pause()
     await pilot.pause()
     return target
+
+
+async def _scroll_row_hit_testable(pilot: "object", app: "S19TuiApp", target) -> None:
+    """Scroll the owning viewport until the pointer hit-test AGREES the row is
+    where its reported region says — then stop.
+
+    Why a poll instead of the batch-77 single pause: the batch-93 cockpit's
+    scroll container is NESTED (``ScrollableContainer`` inside the pane inside
+    ``#map_body``), and applying a scroll to the compositor's hit map takes one
+    compositor pass more than the reported ``region`` — measured, one pause
+    after ``scroll_to_widget`` races the click and the pointer lands on
+    whatever row the hit map still shows (~1 run in 2, at any session order).
+    Asserting the hit-test right before the gesture is the batch-77 lesson
+    (``scroll_visible`` misjudges) made deterministic: poll up to 8 pause
+    boundaries, then give up loudly — a click at a stale coordinate would test
+    the wrong row while reporting the right one.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+
+    scroll = app.query_one(".map-region-scroll")
+    scroll.scroll_to_widget(target, animate=False, top=True)
+    for _ in range(8):
+        await pilot.pause()
+        cx, cy = target.region.center
+        widget, _ = app.get_widget_at(int(cx), int(cy))
+        if (
+            isinstance(widget, RegionRow)
+            and widget.region_start == target.region_start
+        ):
+            return
+    raise AssertionError(
+        f"region row 0x{target.region_start:08X} never became hit-testable "
+        f"after scrolling its viewport"
+    )
 
 
 async def _double_click_region_row(
@@ -4279,19 +4397,17 @@ async def _double_click_region_row(
     genuine chain-2 pointer event produced by Textual, not a hand-built
     ``Activated`` message). Returns the clicked row.
 
-    batch-77 LLR-111.9 grows the band row from 4 to 6 rows at 120x30 (the cost
-    R-8 accepted), which pushes the region list onto the bottom boundary of
-    ``#map_content``'s 13-row viewport. ``widget.scroll_visible()`` then judges
-    the row already visible and does not scroll — yet ``get_widget_at`` at the
-    row's own reported centre resolves to the container, so the click misses
-    the row entirely. Scrolling the OWNING viewport to the widget (``top=True``)
-    puts the row where the pointer hit-test agrees it is.
+    batch-93 HLR-126: the region list scrolls inside the cockpit's own
+    ``.map-region-scroll`` container — batch-77's ``#map_content`` 13-row
+    viewport is gone (``#map_content`` is a plain host now). Scrolling the
+    OWNING viewport to the widget (``top=True``) puts the row where the pointer
+    hit-test agrees it is — asserted by :func:`_scroll_row_hit_testable`, which
+    also absorbs the nested container's extra compositor pass.
     """
     from s19_app.tui.screens_directionb import RegionRow
 
     target = next(r for r in app.query(RegionRow) if match(r))
-    app.query_one("#map_content").scroll_to_widget(target, animate=False, top=True)
-    await pilot.pause()
+    await _scroll_row_hit_testable(pilot, app, target)
     await pilot.double_click(target)
     await pilot.pause()
     await pilot.pause()
@@ -4344,14 +4460,17 @@ def test_at069_high_region_renders_high_band(tmp_path: Path) -> None:
             await pilot.pause()
             for row in _region_rows(app):
                 text = _widget_plain(row)
-                if "high/random" in text:
+                if "high/rand" in text:
                     return "band-high" in row.classes, text
             return False, ""
 
     has_class, text = asyncio.run(_drive())
     assert has_class, "the high region row must carry the band-high class"
     assert "▓" in text, f"the high region row must carry the ▓ glyph; got {text!r}"
-    assert "high/random" in text, f"high band label missing; got {text!r}"
+    # batch-93 LLR-127.2: the row's band column is DISPLAY-ONLY short label
+    # ``high/rand`` — the full ``high/random`` domain string no longer appears
+    # on rows (its census lives in entropy_service, untouched).
+    assert "high/rand" in text, f"high band short label missing; got {text!r}"
 
 
 def test_at070_constant_vs_high_bands_differ(tmp_path: Path) -> None:
@@ -4374,9 +4493,9 @@ def test_at070_constant_vs_high_bands_differ(tmp_path: Path) -> None:
             const_text = const_classes = high_text = high_classes = None
             for row in _region_rows(app):
                 text = _widget_plain(row)
-                if "constant/padding" in text:
+                if "const" in text:
                     const_text, const_classes = text, tuple(row.classes)
-                elif "high/random" in text:
+                elif "high/rand" in text:
                     high_text, high_classes = text, tuple(row.classes)
             return const_text, const_classes, high_text, high_classes
 
@@ -4420,11 +4539,17 @@ def test_at071_region_list_rows_addr_size_band(tmp_path: Path) -> None:
         f"one region row per merged run expected {len(runs)}; got {len(texts)}"
     )
     # A specific run's row must carry its address, size (bytes) and band.
+    from s19_app.tui.screens_directionb import _BAND_SHORT_LABELS
+
     band, run_bytes, start = next(r for r in runs if r[0] == "high/random")
-    row_text = next(t for t in texts if "high/random" in t)
+    row_text = next(t for t in texts if "high/rand" in t)
     assert f"0x{start:08X}" in row_text, f"row start address missing; got {row_text!r}"
     assert f"{run_bytes} B" in row_text, f"row size missing; got {row_text!r}"
-    assert band in row_text, f"row band label missing; got {row_text!r}"
+    # batch-93 LLR-127.2: the row's band column carries the DISPLAY-ONLY short
+    # label; the full domain string's census lives in entropy_service.
+    assert _BAND_SHORT_LABELS.get(band, band) in row_text, (
+        f"row band short label missing; got {row_text!r}"
+    )
 
 
 def test_at071b_disjoint_same_band_regions_stay_separate(tmp_path: Path) -> None:
@@ -4555,7 +4680,7 @@ def test_at074_single_click_repositions_hex(tmp_path: Path) -> None:
             app.update_memory_map()
             await pilot.pause()
             row = await _double_click_region_row(
-                pilot, app, lambda r: "high/random" in _widget_plain(r)
+                pilot, app, lambda r: "high/rand" in _widget_plain(r)
             )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
             hex_str = str(app.query_one("#hex_view").render())
@@ -4737,14 +4862,14 @@ def _constant_only_loaded(tmp_path: Path) -> "LoadedFile":
     return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
 
 
-def _glance_rows(app: "S19TuiApp") -> "list":
-    """Return the At-a-glance histogram rows on the map screen."""
-    return list(app.query(".map-glance-row"))
+def _glance_chips(app: "S19TuiApp") -> "list":
+    """Return the one-line glance chips on the map screen (batch-93 HLR-129).
 
-
-def _sparkline_text(app: "S19TuiApp") -> str:
-    """Concatenated plain text of the At-a-glance sparkline segments."""
-    return "".join(_widget_plain(s) for s in app.query(".map-sparkline-seg"))
+    The retired ``.at-a-glance`` / ``.map-glance-row`` histogram surface is
+    gone; its successor is the ``.map-glance-chips`` line of
+    ``.map-glance-chip`` widgets, one per occupied band.
+    """
+    return list(app.query(".map-glance-chip"))
 
 
 def test_tc061_1_band_histogram_counts() -> None:
@@ -4798,11 +4923,24 @@ def test_tc061_2_sparkline_ramp_mapping() -> None:
 
 
 def test_at072_histogram_per_band_counts(tmp_path: Path) -> None:
-    """Black-box: the At-a-glance histogram lists each occupied band with a
-    count equal to its region tally, %s ~summing to 100 (AT-072 / LLR-045B.1).
+    """Black-box: the one-line glance chips list each occupied band with a
+    count equal to its region tally, shares ~summing to 100 (AT-072 /
+    LLR-045B.1).
 
-    RED pre-impl: no ``.at-a-glance`` / ``.map-glance-row`` surface exists.
+    **AMENDED batch-93 (HLR-129, amending R-TUI-061):** the At-a-glance
+    histogram rows folded into the ONE line of ``.map-glance-chip`` widgets.
+    The COUNT ORACLE IS UNCHANGED — a chip per occupied band whose count
+    equals ``band_histogram``'s merged-run tally. What moved is the surface
+    (rows → chips) and the share's READING: the chip share is the band's
+    MAPPED-BYTE share of the total mapped bytes — it replaced the old
+    count-share when the histogram rows retired. Read the chips' shares as
+    the mapped-byte share.
+
+    RED pre-impl: no ``.map-glance-chips`` / ``.map-glance-chip`` surface
+    exists.
     """
+    import re
+
     from s19_app.tui.screens_directionb import band_histogram
 
     loaded = _two_band_loaded(tmp_path)
@@ -4817,45 +4955,63 @@ def test_at072_histogram_per_band_counts(tmp_path: Path) -> None:
             app.update_memory_map()
             await pilot.pause()
             out: dict = {}
-            for row in _glance_rows(app):
-                text = _widget_plain(row)
-                classes = tuple(row.classes)
+            for chip in _glance_chips(app):
+                text = _widget_plain(chip)
+                classes = tuple(chip.classes)
                 out[classes] = text
             return out
 
-    rows = asyncio.run(_drive())
-    # Both bands present as histogram rows (by band class), non-vacuous counts.
-    const_row = next(t for c, t in rows.items() if "band-constant" in c)
-    high_row = next(t for c, t in rows.items() if "band-high" in c)
+    chips = asyncio.run(_drive())
+    # Both bands present as chips (by band class), non-vacuous counts.
+    const_chip = next(t for c, t in chips.items() if "band-constant" in c)
+    high_chip = next(t for c, t in chips.items() if "band-high" in c)
     const_count = expected["constant/padding"]
     high_count = expected["high/random"]
     assert const_count >= 1 and high_count >= 1, expected
-    assert f"constant/padding {const_count} " in const_row, (
-        f"constant row must show its region count {const_count}; got {const_row!r}"
-    )
-    assert f"high/random {high_count} " in high_row, (
-        f"high row must show its region count {high_count}; got {high_row!r}"
-    )
-    # Percentages present and ~sum to 100 across the two rows.
-    import re
 
-    pcts = [
-        int(re.search(r"(\d+)%", t).group(1))
-        for t in (const_row, high_row)
-    ]
-    assert abs(sum(pcts) - 100) <= 1, f"histogram %s must ~sum to 100; got {pcts}"
+    shares: "list[int]" = []
+    for chip_text, tally in ((const_chip, const_count), (high_chip, high_count)):
+        # Each chip's text is ``{glyph} {count} {share}%``.
+        m = re.fullmatch(r"(.+) (\d+) (\d+)%", chip_text)
+        assert m is not None, (
+            f"a chip must read '{{glyph}} {{count}} {{share}}%'; got {chip_text!r}"
+        )
+        count = int(m.group(2))
+        assert count == tally, (
+            f"chip count must equal the band_histogram tally {tally}; "
+            f"got {chip_text!r}"
+        )
+        shares.append(int(m.group(3)))
+    # The shares are the mapped-byte share, ~summing to 100 across the chips.
+    assert abs(sum(shares) - 100) <= 1, (
+        f"chip shares must ~sum to 100; got {shares}"
+    )
 
 
 def test_at073_sparkline_tracks_profile(tmp_path: Path) -> None:
-    """Black-box: a mixed image's sparkline has >=2 distinct ramp glyphs, and a
-    constant-only image's sparkline is uniform (AT-073 / LLR-045B.2, two-branch).
+    """Black-box retirement PIN + pure unit: the profile sparkline no longer
+    renders on the map screen, and the ``sparkline_glyphs`` helper keeps the
+    entropy-profile sampling under test (AT-073 / LLR-045B.2).
 
-    RED pre-impl: no ``.map-sparkline`` surface exists.
+    **AMENDED batch-93 (HLR-129):** the sparkline surface retired WITH the
+    At-a-glance dock — operator ruling, charter S-5 (LLR-045B.2's surface is
+    gone). The HELPER STAYS a tested unit: ``sparkline_glyphs`` remains
+    DEFINED, so this node pins the retirement on the DOM side (no
+    ``.map-sparkline`` / ``.map-sparkline-seg`` renders on either the mixed
+    or the constant-only fixture) and re-asserts the profile oracle against
+    the helper directly — a mixed image profiles to >=2 distinct ramp glyphs,
+    a constant-only image to exactly 1. Presence co-assertion: the
+    replacement ``.map-glance-chip`` line DOES render on both fixtures, so
+    the absence pin is not green on an app that rendered nothing at all.
+
+    RED pre-impl: no ``.map-glance-chip`` surface exists.
     """
+    from s19_app.tui.screens_directionb import _SPARKLINE_WIDTH, sparkline_glyphs
+
     mixed = _two_band_loaded(tmp_path)
     flat = _constant_only_loaded(tmp_path)
 
-    async def _spark(loaded) -> str:
+    async def _surfaces(loaded) -> "tuple[int, int]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
@@ -4863,35 +5019,63 @@ def test_at073_sparkline_tracks_profile(tmp_path: Path) -> None:
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            return _sparkline_text(app)
+            return (
+                len(_glance_chips(app)),
+                len(app.query(".map-sparkline"))
+                + len(app.query(".map-sparkline-seg")),
+            )
 
-    async def _both() -> "tuple[str, str]":
-        return await _spark(mixed), await _spark(flat)
+    async def _both() -> "tuple[tuple[int, int], tuple[int, int]]":
+        return await _surfaces(mixed), await _surfaces(flat)
 
-    mixed_spark, flat_spark = asyncio.run(_both())
-    assert len(set(mixed_spark)) >= 2, (
-        f"a mixed-entropy image's sparkline must vary (>=2 distinct glyphs); "
-        f"got {mixed_spark!r}"
+    (mixed_chips, mixed_sparks), (flat_chips, flat_sparks) = asyncio.run(_both())
+    # The retired surface renders NOTHING on either fixture...
+    assert mixed_sparks == 0, (
+        "no .map-sparkline/.map-sparkline-seg may render on the map screen "
+        "(surface retired by batch-93 HLR-129)"
     )
-    assert flat_spark and len(set(flat_spark)) == 1, (
-        f"a constant-only image's sparkline must be uniform (1 glyph); "
-        f"got {flat_spark!r}"
+    assert flat_sparks == 0, (
+        "no .map-sparkline/.map-sparkline-seg may render on the map screen "
+        "(surface retired by batch-93 HLR-129)"
+    )
+    # ...and the replacement chips DO render — the absence pin is not vacuous.
+    assert mixed_chips >= 1, "the glance chips must render on the mixed image"
+    assert flat_chips >= 1, "the glance chips must render on the constant image"
+
+    # The helper stays a tested unit: its entropy-profile sampling is
+    # unchanged — a mixed image profiles to >=2 distinct ramp glyphs, a
+    # constant-only image to exactly 1.
+    mixed_glyphs = sparkline_glyphs(mixed.entropy_windows, _SPARKLINE_WIDTH)
+    flat_glyphs = sparkline_glyphs(flat.entropy_windows, _SPARKLINE_WIDTH)
+    assert len(set(mixed_glyphs)) >= 2, (
+        f"a mixed-entropy image's profile must vary (>=2 distinct glyphs); "
+        f"got {mixed_glyphs!r}"
+    )
+    assert flat_glyphs and len(set(flat_glyphs)) == 1, (
+        f"a constant-only image's profile must be uniform (1 glyph); "
+        f"got {flat_glyphs!r}"
     )
 
 
 def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
-    """Pilot-geometry: the band bar + At-a-glance fit the viewport at 120x30 AND
-    80x24, STACKED (bar over glance) at both sizes (LLR-045B.3, C-23 — measured
-    regions, not fr-math).
+    """Pilot-geometry: the band bar + glance chips fit the viewport at 120x30
+    AND 80x24, STACKED (bar over chips) at both sizes (LLR-045B.3 → batch-93
+    HLR-129; C-23 — measured regions, not fr-math).
 
-    **batch-77 LLR-111.9:** stacking is now UNIVERSAL. The horizontal dock that
-    placed the glance to the RIGHT of the bar at >=120 was retired — docking
-    spent the bar's width on the glance panel (the bar measured 21 columns at
-    120x30 against 66 at 80x24), and every column the glance took lowered the
-    ceiling on runs the operator can see. Both arms therefore assert the same
-    relationship now: the glance sits below the bar, on the same left edge. The
-    ``width-narrow`` regime flag is still asserted per size — it still toggles,
-    it just no longer changes this row's layout axis.
+    **batch-93 amendments (HLR-129 / HLR-125).** The At-a-glance dock retired;
+    the glance surface is now the ONE line of ``.map-glance-chips``. And the
+    LLR-111.9 threshold reads on the grid's CONTENT box: ``#map_grid`` carries
+    the ``.db-pane`` chrome now (border tall + padding 1), so the bar's
+    initial allocation apportions against ``grid.content_region.width`` —
+    equivalently ``bar.region.width == grid.region.width - 4``. The bound
+    stays the bar's own width; the two agree because the bar is
+    ``width: 100%`` of the content box with no border/padding of its own.
+
+    Stacking is UNIVERSAL (batch-77 LLR-111.9 retired the horizontal dock that
+    placed the glance to the RIGHT of the bar at >=120): both arms assert the
+    same relationship now — the chips sit below the bar, on the same left
+    edge. The ``width-narrow`` regime flag is still asserted per size — it
+    still toggles, it just no longer changes this row's layout axis.
 
     # AT-073b
     """
@@ -4907,12 +5091,12 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
             await pilot.pause()
             body = app.query_one("#workspace_body")
             bar = app.query_one(".map-band-bar")
-            glance = app.query_one(".at-a-glance")
+            glance = app.query_one(".map-glance-chips")
             grid = app.query_one("#map_grid")
             return {
                 "narrow": body.has_class("width-narrow"),
                 "body_right": body.region.right,
-                "grid_width": grid.region.width,
+                "grid_content_width": grid.content_region.width,
                 "bar": (bar.region.x, bar.region.y, bar.region.width, bar.region.right),
                 "glance": (
                     glance.region.x,
@@ -4931,41 +5115,45 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
         assert bw > 0 and gw > 0, f"{tag}: both widgets must have width; {m}"
         # No horizontal overflow past the body's right edge (no clip off-screen).
         assert bright <= m["body_right"], f"{tag}: band bar overflows body; {m}"
-        assert gright <= m["body_right"], f"{tag}: glance overflows body; {m}"
+        assert gright <= m["body_right"], f"{tag}: glance chips overflow body; {m}"
 
-        # LLR-111.9's OWN THRESHOLD, asserted at both regimes (batch-77 Inc-1).
-        # The initial allocation in ``render_ranges`` apportions against
-        # ``#map_grid.region.width`` because ``.map-band-bar`` does not exist
-        # yet at that point, while ``LLR-111.7``'s bound is stated over
-        # ``bar.region.width``. Those two are equal ONLY because the bar is
-        # ``width: 100%`` of ``#map_grid`` and ``#map_grid`` carries no padding
-        # and no border. Nothing else in the batch tests that equality, so a CSS
-        # edit adding either would go unnoticed here and every band segment
-        # would then overflow its container by exactly the difference —
-        # silently, because the post-refresh hook re-apportions against the bar
-        # and the two allocations would simply disagree.
-        assert bw == m["grid_width"], (
+        # LLR-111.9's OWN THRESHOLD, in its batch-93 form, asserted at both
+        # regimes. The initial allocation in ``render_ranges`` apportions
+        # against ``#map_grid``'s CONTENT width because ``.map-band-bar`` does
+        # not exist yet at that point, while ``LLR-111.7``'s bound is stated
+        # over ``bar.region.width``. Those two are equal ONLY because the bar
+        # is ``width: 100%`` of the content box and carries no border/padding
+        # of its own — and the content box is the basis because ``#map_grid``
+        # carries the ``.db-pane`` chrome (border tall + padding 1). Nothing
+        # else in the batch tests that equality, so a CSS edit adding either
+        # would go unnoticed here and every band segment would then overflow
+        # its container by exactly the difference — silently, because the
+        # post-refresh hook re-apportions against the bar and the two
+        # allocations would simply disagree.
+        assert bw == m["grid_content_width"], (
             f"{tag}: LLR-111.9 threshold violated — .map-band-bar is "
-            f"{bw} columns but #map_grid is {m['grid_width']}. The initial "
-            f"allocation is computed against #map_grid and the bound is stated "
-            f"over the bar; a divergence of {m['grid_width'] - bw} column(s) "
-            f"overflows the container by that difference. Check for padding, "
-            f"border or a width other than 100% on .map-band-bar / #map_grid."
+            f"{bw} columns but #map_grid's content box is "
+            f"{m['grid_content_width']}. The initial allocation is computed "
+            f"against the grid's content width and the bound is stated over "
+            f"the bar; a divergence of {m['grid_content_width'] - bw} "
+            f"column(s) overflows the container by that difference. Check for "
+            f"padding, border or a width other than 100% on .map-band-bar / "
+            f"#map_grid."
         )
 
-    # Wide (>=120): NOT narrow, and the glance STACKS below the bar anyway —
+    # Wide (>=120): NOT narrow, and the chips STACK below the bar anyway —
     # LLR-111.9 retired the horizontal dock, so the wide regime now lays out
     # like the narrow one (same x, greater y). Re-introducing the dock, or
     # collapsing the two onto one row, fails here.
     assert not wide["narrow"], f"120x30 must be the wide regime; {wide}"
     assert wide["glance"][0] == wide["bar"][0] and wide["glance"][1] > wide["bar"][1], (
-        f"at 120x30 the glance must stack below the band bar — same x, greater "
-        f"y; the horizontal dock was retired by LLR-111.9; {wide}"
+        f"at 120x30 the glance chips must stack below the band bar — same x, "
+        f"greater y; the horizontal dock was retired by LLR-111.9; {wide}"
     )
-    # Narrow (<120): width-narrow → glance STACKS below the band bar.
+    # Narrow (<120): width-narrow → chips STACK below the band bar.
     assert narrow["narrow"], f"80x24 must be the narrow regime; {narrow}"
     assert narrow["glance"][1] > narrow["bar"][1], (
-        f"at 80x24 the glance must stack below the band bar; {narrow}"
+        f"at 80x24 the glance chips must stack below the band bar; {narrow}"
     )
 
 

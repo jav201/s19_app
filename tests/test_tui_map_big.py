@@ -83,12 +83,21 @@ def _two_region_loaded(tmp_path: Path):
 
 
 async def _prime_map(app: S19TuiApp, pilot, loaded, a2l_tags=None) -> None:
-    """Install ``loaded`` (+ optional A2L tags) and render the map screen."""
+    """Install ``loaded`` (+ optional A2L tags) and render the map screen.
+
+    The map screen is shown and given ONE pause to lay the panel out BEFORE
+    ``update_memory_map`` renders into it: the batch-93 cockpit reads the
+    panel's MEASURED width for the width-aware microbar (LLR-127.3), the
+    width-adaptive stats form (LLR-129.2) and the height-cut peek (LLR-126.3),
+    and an unlaid render would decide all three against width-0 fallbacks.
+    This mirrors the operator flow (the screen is painted before any render).
+    """
     await pilot.pause()
     app.current_file = loaded
     if a2l_tags is not None:
         app._a2l_enriched_tags = a2l_tags
     app.action_show_screen("map")
+    await pilot.pause()
     app.update_memory_map()
     await pilot.pause()
 
@@ -289,13 +298,19 @@ def test_at072a_bands(tmp_path: Path, size) -> None:
 # ---------------------------------------------------------------------------
 # AT-072b — every ruler label names a mapped address, legibly (HLR-112)
 #
-# FIXTURE PIN — NORMATIVE. This node MUST use ``case_02`` (4 runs -> 5 ticks)
-# and MUST NOT use ``prg.s19``. The "no elided tick" clause below is IN-DOMAIN
-# ONLY, and HLR-112's domain is ``n_ticks <= (ruler_width + 1) // 9`` = 7 ticks
-# @80x24 and 5 @120x30 (executed: ruler width 66 / 50). ``prg.s19`` needs 15
-# ticks and is out of domain at BOTH regimes, so pinning it here would redden
-# this node ON CORRECT CODE. It is the obvious fixture to reach for — it is the
-# batch's showcase everywhere else — and it is exactly wrong here.
+# FIXTURE PIN — NORMATIVE. This node MUST use a THREE-tick fixture (the
+# ``two_region`` builder: 2 runs + the last mapped byte) and MUST NOT use
+# ``case_02`` or ``prg.s19``. The "no elided tick" clause below is IN-DOMAIN
+# ONLY, and HLR-112's domain is ``n_ticks <= (ruler_width + 1) // 9``.
+# batch-93's cockpit narrowed the ruler's container by design (the 44-col
+# Inspector pane beside the band surfaces): the ruler now measures ~64 columns
+# at 80x24 and 41 at 120x30 (executed: settled bar 64 / 41), so the ceiling is
+# 7 ticks @80x24 and 4 @120x30. ``case_02`` (4 runs -> 5 ticks) was in domain
+# at BOTH regimes pre-batch-93 but ELIDES at 120x30 now — still correct
+# out-of-domain behaviour, covered for the side-by-side regime by TC-B77-08 —
+# so it can no longer pin the no-elision limb. ``prg.s19`` needs 15 ticks and
+# is out of domain at BOTH regimes. The obvious fixtures are exactly wrong
+# here; the three-tick ``two_region`` image stays in domain at both regimes.
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("size", _SIZES)
 def test_at072b_ruler(tmp_path: Path, size) -> None:
@@ -312,7 +327,7 @@ def test_at072b_ruler(tmp_path: Path, size) -> None:
     (executed: ``20004050``/``400080A0``/``6000C0F0``/``80010140``), the last of
     them being the EXCLUSIVE ``span_end``.
     """
-    loaded = _load_case_02()
+    loaded = _two_region_loaded(tmp_path)
     admissible = _admissible_tick_labels(loaded)
     index = build_sorted_range_index(loaded.ranges)
 
@@ -337,7 +352,9 @@ def test_at072b_ruler(tmp_path: Path, size) -> None:
     assert addrs == sorted(set(addrs)), (
         f"{size}: labels must strictly ascend with no duplicate; got {ticks}"
     )
-    # In domain (5 ticks vs a ceiling of 7 @80x24 and 5 @120x30): nothing elided.
+    # In domain (3 ticks vs a ceiling of 7 @80x24 and 4 @120x30): nothing
+    # elided. The pin above states the measured ceilings — re-measure them if
+    # the cockpit chrome changes again.
     assert len(ticks) == len(admissible), (
         f"{size}: in-domain ruler elided a tick — expected {len(admissible)}, "
         f"got {len(ticks)}: {ticks}"
@@ -358,13 +375,17 @@ def test_at072b_ruler(tmp_path: Path, size) -> None:
 # NOT OPTIONAL: executed, ``set() <= admissible`` is True, so AT-072b's
 # subset-only predicate is GREEN on a ruler that rendered ZERO ticks. This node
 # is the only thing standing between that and a green suite.
+#
+# Same fixture pin as AT-072b (batch-93 narrowed the ruler's container to
+# ~64 cols @80x24 / 41 @120x30; the three-tick ``two_region`` image stays in
+# domain at both regimes, ``case_02``'s five ticks elide at 120x30).
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("size", _SIZES)
 def test_b77_ruler_labels_every_run_start_and_the_last_byte(
     tmp_path: Path, size
 ) -> None:
     """In domain the ruler emits a label for EVERY run start and the last byte."""
-    loaded = _load_case_02()
+    loaded = _two_region_loaded(tmp_path)
     admissible = _admissible_tick_labels(loaded)
 
     async def _drive() -> list:
@@ -490,14 +511,20 @@ def test_tc_b77_09_b77_ruler_floor_of_two_retains_both_bounds(width) -> None:
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("size", _SIZES)
 def test_at073_sym_count(tmp_path: Path, size) -> None:
-    """Each region row's ``N sym`` equals an independent ``range_index`` count,
-    and every row carries the ``↵`` open-in-hex affordance.
+    """Each region row's symbol count equals an independent ``range_index``
+    count, and every row carries the ``↵`` open-in-hex affordance.
 
     Black-box over the shipped ``.map-region-row`` widgets for an S19 + A2L
     pair: two symbols placed in region B (high) and one in region A (constant).
-    For each rendered row, the parsed ``N sym`` count must equal the INDEPENDENT
+    For each rendered row, the parsed symbol count must equal the INDEPENDENT
     membership count computed from ``build_sorted_range_index`` /
     ``address_in_sorted_ranges`` over that row's span.
+
+    batch-93: the row is FIXED-WIDTH (HLR-127.1) — the count sits in a >2-cell
+    field immediately before the band short-label column (the display-only
+    ``const`` / ``low`` / ``medium`` / ``high/rand`` labels of LLR-127.2), so
+    the count is parsed from that field rather than from the retired
+    ``"N sym"`` wording.
     """
     loaded = _two_region_loaded(tmp_path)
     tags = [
@@ -519,16 +546,19 @@ def test_at073_sym_count(tmp_path: Path, size) -> None:
     rows = asyncio.run(_drive())
     assert rows, f"{size}: region rows must render"
     for start, end, text in rows:
-        match = re.search(r"(\d+) sym", text)
-        assert match, f"{size}: row missing 'N sym'; got {text!r}"
+        match = re.search(r"(\d+) (?:const|low|medium|high/rand)", text)
+        assert match, (
+            f"{size}: row missing the fixed-width symbol-count field; "
+            f"got {text!r}"
+        )
         shown = int(match.group(1))
         index = build_sorted_range_index([(start, end)])
         expected = sum(
             1 for t in tags if address_in_sorted_ranges(t["address"], index)
         )
         assert shown == expected, (
-            f"{size}: region 0x{start:08X} N sym {shown} != range_index count "
-            f"{expected}; row {text!r}"
+            f"{size}: region 0x{start:08X} symbol count {shown} != "
+            f"range_index count {expected}; row {text!r}"
         )
         assert "↵" in text, f"{size}: row missing ↵ affordance; got {text!r}"
 
@@ -546,6 +576,11 @@ def test_at074_inspector(tmp_path: Path, size) -> None:
     MN-4 (gate-blocking C-17): a ``sensor[red]`` symbol overlapping the region
     surfaces in ``#map_detail_body`` LITERALLY — no markup parse, no
     ``MarkupError``, no crash.
+
+    batch-93: the peek is the 8-byte cockpit form (HLR-128) — ``ADDR  hh×8``
+    rows with an 8-hex address and NO ``0x`` prefix — so the peek-row address
+    asserts the bare hex form; the ``Region`` field still carries the
+    ``0x…-0x…`` window (its ``0x{start}`` prefix limb is unchanged).
     """
     loaded = _two_region_loaded(tmp_path)
     hostile = "sensor[red]"
@@ -578,20 +613,35 @@ def test_at074_inspector(tmp_path: Path, size) -> None:
             return str(app.query_one("#map_detail_body").render())
 
     detail = asyncio.run(_drive())
-    # Hex peek first row address == the activated region's start.
+    # The Region field names the activated window with its 0x prefix.
     assert f"0x{non_first_start:08X}" in detail, (
-        f"{size}: inspector peek must start at region 0x{non_first_start:08X}; "
+        f"{size}: the inspector must name region 0x{non_first_start:08X}; "
         f"got {detail!r}"
     )
+    # batch-93: the 8-byte peek rows carry a bare 8-hex address (no 0x prefix,
+    # no ASCII gutter — LLR-128.1). The first peek row must open with the
+    # region's own start address at its containing 8-aligned base (the region
+    # start here is 8-aligned, so the row address == the region start).
     first_hex_row = next(
-        (ln for ln in detail.splitlines() if ln.strip().startswith("0x8001")),
+        (ln for ln in detail.splitlines() if ln.startswith(f"{non_first_start:08X}")),
         None,
     )
     assert first_hex_row is not None, (
         f"{size}: a hex peek row for the region must render; got {detail!r}"
     )
-    assert first_hex_row.strip().startswith(f"0x{non_first_start:08X}"), (
-        f"{size}: first peek row addr must == region start; got {first_hex_row!r}"
+    assert first_hex_row.startswith(f"{non_first_start:08X}  "), (
+        f"{size}: first peek row addr must == region start in the bare 8-hex "
+        f"form; got {first_hex_row!r}"
+    )
+    # The 8-byte row is exactly 33 cells: 8-hex address, two spaces, eight
+    # 2-hex bytes — and no ASCII gutter (the shipped 16-byte row's ``|…|``
+    # tail is retired on this screen by LLR-128.1).
+    assert len(first_hex_row) == 33, (
+        f"{size}: the 8-byte peek row must measure 33 cells; "
+        f"got {len(first_hex_row)} in {first_hex_row!r}"
+    )
+    assert "|" not in first_hex_row, (
+        f"{size}: the peek row must carry no ASCII gutter; got {first_hex_row!r}"
     )
     # MN-4 C-17: the bracketed symbol name renders literally (no markup parse).
     assert hostile in detail, (
@@ -1150,13 +1200,15 @@ def test_b77_gapless_golden(tmp_path: Path, size) -> None:
 
     ⚠️ **THIS NODE IS COUPLED TO THE CONTAINER CSS BY DESIGN — read a failure
     accordingly.** Each golden record is keyed by the SETTLED bar width
-    (``80x24|66|…``, ``120x30|50|…``), because a byte-golden over a
-    container-relative allocation is meaningless without the container it was
-    allocated against. The consequence is direct: **any CSS change that moves
-    ``.map-band-bar``'s width reddens this node**, and that is the contract
-    working, not drift. ``LLR-111.1`` makes the measured container the basis, so
-    a silent width change IS a silent change to every emitted segment width —
-    the coupling is the only thing that surfaces it.
+    (``80x24|62|…``, ``120x30|41|…`` since batch-93's cockpit chrome — the
+    chromed panes' borders/padding and the 44-col inspector narrowed the bar's
+    container; pre-batch-93 the keys were ``66`` / ``50``), because a
+    byte-golden over a container-relative allocation is meaningless without
+    the container it was allocated against. The consequence is direct: **any
+    CSS change that moves ``.map-band-bar``'s width reddens this node**, and
+    that is the contract working, not drift. ``LLR-111.1`` makes the measured
+    container the basis, so a silent width change IS a silent change to every
+    emitted segment width — the coupling is the only thing that surfaces it.
 
     So a future editor who widens or narrows the bar should expect this node RED
     and must **re-capture the golden deliberately**, recording the new settled
@@ -2810,3 +2862,630 @@ def test_b77_bar_reapportions_without_panel_resize_or_retry(
     assert gaps and all(g == _BAND_GAP_FOLD for g in gaps), (
         f"gap markers must stay at {_BAND_GAP_FOLD} column(s); {context}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-93 — the Memory Map cohesion pass (variant C, the inspector cockpit).
+# Contract: .dev-flow/2026-10-11-batch-93/01-requirements.md, HLR-125..129.
+# New arms minted from the batch's TC-649.. reservation (TC-656..663) + the
+# Layer-B acceptance AT-292, each driving the SHIPPED surface at 120x36 with
+# the charter demo fixture (9 merged runs over 5 ranges, 5376 B mapped).
+# ---------------------------------------------------------------------------
+from s19_app.tui.entropy_style import ENTROPY_BAND_LABELS
+from s19_app.tui.models import LoadedFile
+from s19_app.tui.screens_directionb import (
+    _BAND_SHORT_LABELS,
+    _INSPECTOR_LABEL_WIDTH,
+    _REGION_ROW_MICROBAR_MIN_WIDTH,
+    _STATS_FULL_MIN_WIDTH,
+)
+
+
+def _lcg_bytes(seed: int, n: int):
+    out, state = [], seed
+    for _ in range(n):
+        state = (state * 1103515245 + 12345) & 0x7FFFFFFF
+        out.append((state >> 16) & 0xFF)
+    return out
+
+
+def _demo_loaded() -> LoadedFile:
+    """The charter demo fixture (memmap2): 9 merged runs over 5 ranges.
+
+    Mirrors ``prototypes/memmap2.tui_prototype.py::_fixture`` — the capture
+    population P-6 re-derived: 5376 B mapped, span 0x00000000..0x1FFF0200,
+    4 gaps, chips ``· 1 19% ░ 1 5% ▒ 4 57% ▓ 3 19%``. Built in-memory through
+    the real ``compute_entropy`` + ``LoadedFile`` (no disk write).
+    """
+    mem = {}
+
+    def put(addr, data):
+        for i, v in enumerate(data):
+            mem[addr + i] = v
+
+    put(0x00000000, [(0x08, 0x00, 0x10 + (i % 8), 0x00)[i % 4] for i in range(0x100)])
+    put(0x08000000, [(i // 4) & 0xFF for i in range(0x800)])
+    put(0x08001000, _lcg_bytes(0xC0FFEE, 0x600))
+    put(0x08002000, [0xFF] * 0x400)
+    put(0x1FFF0000, [(0x30 + (i * 7) % 60) for i in range(0x200)])
+    ranges = [
+        (0x00000000, 0x00000100),
+        (0x08000000, 0x08000800),
+        (0x08001000, 0x08001600),
+        (0x08002000, 0x08002400),
+        (0x1FFF0000, 0x1FFF0200),
+    ]
+    return LoadedFile(
+        path=Path("ecu_fw_v3.s19"),
+        file_type="s19",
+        mem_map=mem,
+        row_bases=sorted({a - a % 16 for a in mem}),
+        ranges=ranges,
+        range_validity=[True] * len(ranges),
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        entropy_windows=compute_entropy(mem),
+    )
+
+
+_DEMO_RUNS = _merge_band_runs(compute_entropy(_demo_loaded().mem_map))
+assert len(_DEMO_RUNS) == 9, f"the demo fixture must merge to 9 runs: {_DEMO_RUNS}"
+assert {band for band, _b, _s in _DEMO_RUNS} == set(ENTROPY_BAND_LABELS)
+
+
+def _row_fields(text: str):
+    """Parse a FIXED-WIDTH region row into its field offsets (LLR-127.1).
+
+    Grammar: `` {glyph} 0x{addr} {size:>7}[ {microbar} ]{sym:>2} {band:<9}↵``
+    — single-space separators only INSIDE a field, so a field's start column
+    is constant for every row and value. Returns the parsed offsets; the
+    caller asserts they are identical across rows.
+    """
+    glyph = text[1]
+    addr = text[3:13]
+    i = 14
+    size = text[i : i + 7]
+    i += 8
+    microbar = ""
+    if text[i : i + 4] and text[i] in "█░▒▓":
+        microbar = text[i : i + 4]
+        i += 5
+    sym = text[i : i + 2]
+    i += 3
+    end = text.index("↵", i)
+    band = text[i:end].strip()
+    return {
+        "glyph": glyph,
+        "addr": addr,
+        "size": size,
+        "microbar": microbar,
+        "sym": sym.strip(),
+        "band": band,
+        "glyph_off": 1,
+        "addr_off": 3,
+        "size_off": 14,
+        "sym_off": 22 if not microbar else 27,
+        "band_off": 25 if not microbar else 30,
+        "band_field_len": end - i,
+        "row_len": len(text),
+    }
+
+
+def _inspector_fields(text: str):
+    """Parse the aligned inspector field block (LLR-126.2).
+
+    Each field line is ``{label:<9}{value}`` — the value column starts at
+    offset 9 (the longest label, ``Symbols``, plus the capture's two-space
+    gutter). Returns ``{label: (value, value_column)}`` for the five fields.
+    """
+    fields = {}
+    for line in text.splitlines():
+        for label in ("Status", "Region", "Size", "Band", "Symbols"):
+            if line.startswith(label + " " * (_INSPECTOR_LABEL_WIDTH - len(label))):
+                fields[label] = (line[_INSPECTOR_LABEL_WIDTH:], _INSPECTOR_LABEL_WIDTH)
+    return fields
+
+
+# TC-656 — the chrome kit: every map surface in a lit, titled pane (HLR-125)
+# ---------------------------------------------------------------------------
+def test_tc656_chrome_pane_titles_and_subtitles(tmp_path: Path) -> None:
+    """LLR-125.1/125.2 — the cockpit panes render the exact lit titles and the
+    affordance-hint subtitles; the hints live in chrome, not body rows."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            panel = _panel(app)
+            # the inspector title is set by the DEFERRED auto-selection
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            grid = app.query_one("#map_grid")
+            detail = app.query_one("#map_detail")
+            return {
+                "grid_title": grid.border_title,
+                "grid_sub": grid.border_subtitle,
+                "detail_title": detail.border_title,
+                "detail_sub": detail.border_subtitle,
+                "grid_chrome": "db-pane" in grid.classes,
+                "detail_chrome": "db-pane" in detail.classes,
+            }
+
+    got = asyncio.run(_drive())
+    assert got["grid_chrome"] and got["detail_chrome"], (
+        f"both cockpit panes must carry the shared .db-pane chrome: {got}"
+    )
+    assert got["grid_title"] == "Memory Map", got
+    assert got["grid_sub"] == "9 regions · ░▒▓ k", got
+    assert got["detail_title"] == "Inspector — 0x00000000", got
+    assert got["detail_sub"] == "↑↓ · ↵ hex", got
+
+
+# TC-657 — the cockpit stack order + the scrollbar's BEHAVIOR (HLR-126)
+# ---------------------------------------------------------------------------
+def test_tc657_left_pane_stack_order_and_scroll_behavior(tmp_path: Path) -> None:
+    """LLR-126.1 — the left pane stacks band bar → ruler → chips → scrollable
+    list (bar exactly 1 row); the list scrolls: with 9 runs in a ~6-row
+    viewport the last row is reachable by scrolling (the scrollbar's behavior
+    is asserted — scroll reachability — not its glyph, which the 120x36
+    capture does not render; contract §6.3)."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _prime_map(app, pilot, _demo_loaded())
+            grid = app.query_one("#map_grid")
+            order = [type(c).__name__ for c in grid.children]
+            bar = app.query_one(".map-band-bar")
+            scroll = app.query_one(".map-region-scroll")
+            rows = _live_rows(app)
+            max_scroll = scroll.max_scroll_y
+            # Behavioral scroll assertion (the capture does not glyph-render
+            # the scrollbar — contract §6.3): scrolling the owning viewport
+            # brings the LAST row to a hit-testable position.
+            scroll.scroll_to_widget(rows[-1], animate=False, top=False)
+            hit = None
+            for _ in range(6):
+                await pilot.pause()
+                cx, cy = rows[-1].region.center
+                widget, _ = app.get_widget_at(int(cx), int(cy))
+                hit = widget
+                if isinstance(widget, RegionRow) and widget.region_start == rows[-1].region_start:
+                    break
+            return {
+                "order": order,
+                "bar_h": bar.region.height,
+                "n_rows": len(rows),
+                "max_scroll": max_scroll,
+                "last_hit": (
+                    isinstance(hit, RegionRow)
+                    and hit.region_start == rows[-1].region_start
+                ),
+            }
+
+    got = asyncio.run(_drive())
+    assert got["order"] == ["BandBar", "MapRuler", "Horizontal", "ScrollableContainer"], (
+        f"the left pane must stack bar → ruler → chips → scrollable list: {got}"
+    )
+    assert got["bar_h"] == 1, f"the band bar must be exactly 1 row: {got}"
+    assert got["n_rows"] == 9, got
+    # The behavioral half: 9 rows overflow the viewport (max_scroll_y > 0 IS
+    # the overflow fact), and scrolling reaches the last row hit-testably.
+    assert got["max_scroll"] >= 1, (
+        f"9 rows must overflow the region list's viewport (scrollable): {got}"
+    )
+    assert got["last_hit"], (
+        f"scrolling must bring the LAST region to a hit-testable position: {got}"
+    )
+
+
+# TC-658 — the aligned inspector fields + zero-click population (HLR-126)
+# ---------------------------------------------------------------------------
+def test_tc658_inspector_aligned_fields_populated_before_input(
+    tmp_path: Path,
+) -> None:
+    """LLR-126.2/126.4 — before any input, the inspector shows the five fields
+    at identical value columns (offset 9), its pane titled with the selected
+    address, and ≥1 clean peek row."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            panel = _panel(app)
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            detail = app.query_one("#map_detail")
+            body = app.query_one("#map_detail_body").render().plain
+            fields = _inspector_fields(body)
+            peek_rows = [
+                ln
+                for ln in body.splitlines()
+                if ln[:8].isalnum() and "  " in ln[:10]
+            ]
+            return {
+                "selected": panel._selected_cell_start,
+                "title": detail.border_title,
+                "fields": fields,
+                "peek_rows": peek_rows,
+                "body": body,
+            }
+
+    got = asyncio.run(_drive())
+    assert got["selected"] == 0x00000000, (
+        f"the first region must be auto-selected with zero clicks: {got}"
+    )
+    assert got["title"] == "Inspector — 0x00000000", got
+    assert set(got["fields"]) == {"Status", "Region", "Size", "Band", "Symbols"}, (
+        f"the aligned field block must carry the five fields: {got['body']!r}"
+    )
+    for label, (value, col) in got["fields"].items():
+        assert col == 9 and value, (
+            f"{label} value must start at column 9 and be non-empty: {got}"
+        )
+    assert got["fields"]["Region"][0] == "0x00000000-0x000000FF", got
+    assert got["fields"]["Size"][0] == "256 B", got
+    assert got["fields"]["Status"][0] == "VALID", got
+    assert got["peek_rows"], f"at least one peek row must render: {got['body']!r}"
+    assert all(len(ln) == 33 for ln in got["peek_rows"]), got["peek_rows"]
+
+
+# TC-659 — fixed-width region rows + display-only short labels (HLR-127)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", [(80, 24), (120, 36), (160, 48)])
+def test_tc659_region_row_fixed_offsets_and_short_labels(tmp_path: Path, size) -> None:
+    """LLR-127.1/127.2 — every field of every rendered row starts at the same
+    column (parsed offsets identical across rows), sizes right-align, and the
+    band column shows a <=9-cell DISPLAY form of the domain label — the domain
+    strings themselves are untouched."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            return [str(r.render()) for r in _live_rows(app)]
+
+    texts = asyncio.run(_drive())
+    assert len(texts) == 9, f"the demo fixture renders 9 rows: {len(texts)}"
+    parsed = [_row_fields(t) for t in texts]
+    offsets = {
+        (p["glyph_off"], p["addr_off"], p["size_off"], p["sym_off"], p["band_off"])
+        for p in parsed
+    }
+    assert len(offsets) == 1, (
+        f"{size}: every field of every row must start at the same column; "
+        f"got {offsets}"
+    )
+    glyph_off, addr_off, size_off, sym_off, band_off = next(iter(offsets))
+    assert glyph_off == 1 and addr_off == 3 and size_off == 14, next(iter(offsets))
+    for p in parsed:
+        # sizes right-aligned in the >7-cell field (LLR-127.1)
+        assert p["size"] == p["size"].strip().rjust(7) and len(p["size"]) == 7, p
+        # band display label <= 9 cells (LLR-127.2)
+        assert 0 < len(p["band"]) <= 9, p
+    # the demo fixture forces the widest domain labels through the mapping:
+    # constant/padding -> const, high/random -> high/rand (exactly 9).
+    bands = {p["band"] for p in parsed}
+    assert {"const", "high/rand"} <= bands, bands
+
+
+def test_tc659_short_label_mapping_is_display_only() -> None:
+    """LLR-127.2 — the display mapping covers every band-domain label at <=9
+    cells and the domain census is byte-identical (the strings never change)."""
+    from s19_app.tui.services.entropy_service import ENTROPY_BANDS
+
+    labels = [label for label, _lo, _hi in ENTROPY_BANDS]
+    assert labels == list(ENTROPY_BAND_LABELS)
+    for label in labels:
+        display = _BAND_SHORT_LABELS.get(label, label)
+        assert len(display) <= 9, f"{label!r} -> {display!r} exceeds 9 cells"
+    # exactly the two over-wide labels are mapped (16 and 11 cells)
+    assert set(_BAND_SHORT_LABELS) == {"constant/padding", "high/random"}
+    assert _BAND_SHORT_LABELS["constant/padding"] == "const"
+    assert _BAND_SHORT_LABELS["high/random"] == "high/rand"
+
+
+# TC-660 — the width-aware microbar drop (HLR-127.3)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "size,expected",
+    [((120, 36), False), ((160, 48), True)],
+    ids=["narrow-drops", "wide-keeps"],
+)
+def test_tc660_microbar_drops_below_the_threshold(tmp_path: Path, size, expected) -> None:
+    """LLR-127.3 — the 4-cell microbar renders only when the row's available
+    width is >= the pilot-measured 43-column threshold (capture limbs: ABSENT
+    at the 41-col 120x36 pane, PRESENT at the 81-col 160x48 pane); when it
+    drops, the surviving fields keep identical parsed offsets."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            return [str(r.render()) for r in _live_rows(app)]
+
+    texts = asyncio.run(_drive())
+    parsed = [_row_fields(t) for t in texts]
+    has_bar = [bool(p["microbar"]) for p in parsed]
+    assert has_bar == [expected] * len(parsed), (
+        f"{size}: microbar presence {has_bar} != {expected} (threshold "
+        f"{_REGION_ROW_MICROBAR_MIN_WIDTH}): {texts}"
+    )
+    # the surviving fields' offsets are identical in BOTH limbs
+    offsets = {(p["glyph_off"], p["addr_off"], p["size_off"], p["sym_off"], p["band_off"]) for p in parsed}
+    assert len(offsets) == 1, offsets
+    assert next(iter(offsets)) == (1, 3, 14, 27 if expected else 22, 30 if expected else 25)
+
+
+def test_tc660_row_widths_pin_the_threshold(tmp_path: Path) -> None:
+    """LLR-127.3 boundary — the recorded 43-column threshold sits strictly
+    between the two measured capture limbs (the 41-col 120x36 pane drops the
+    microbar, the 81-col 160x48 pane keeps it) and keeps the 40-cell full row
+    ~3 columns inside the available width; the compact row it admits at
+    narrower widths measures 35 cells. Runs inside the app because constructing
+    a ``RegionRow`` needs the active-app context."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            panel = _panel(app)
+            sym = {0x80000000: 3}
+            full = panel._build_region_row(
+                "low", "░", "band-low", 256, 0x80000000, 256, sym, True
+            )
+            compact = panel._build_region_row(
+                "low", "░", "band-low", 256, 0x80000000, 256, sym, False
+            )
+            return str(full.render()), str(compact.render())
+
+    full_text, compact_text = asyncio.run(_drive())
+    assert len(full_text) == 40, full_text
+    assert len(compact_text) == 35, compact_text
+    assert full_text[21] == " " and full_text[22] in "█░", (
+        f"the microbar must sit right after the size field: {full_text!r}"
+    )
+    # the pilot-measured constant: 41 < 43 <= 81 (capture limbs), and the
+    # full row (40) fits with ~3 columns of inset inside the threshold.
+    assert 41 < _REGION_ROW_MICROBAR_MIN_WIDTH <= 81
+    assert _REGION_ROW_MICROBAR_MIN_WIDTH - 3 >= 40
+
+
+# TC-661 — the 8-byte peek: 33 cells, holes, height-cut (HLR-128)
+# ---------------------------------------------------------------------------
+def test_tc661_peek_rows_are_33_cells_with_gap_holes(tmp_path: Path) -> None:
+    """LLR-128.1 — every peek row is exactly ``ADDR  hh×8`` (33 cells, no
+    ``0x`` prefix, no ASCII gutter); unmapped bytes inside the span render
+    ``··`` keeping the 33-cell width."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            panel = _panel(app)
+            # the inspector body is written by the DEFERRED auto-selection
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            body = app.query_one("#map_detail_body").render().plain
+            return body.splitlines()[body.splitlines().index("Peek") + 1 :]
+
+    rows = asyncio.run(_drive())
+    assert rows, "peek rows must render"
+    for ln in rows:
+        addr, _, cells = ln.partition("  ")
+        assert len(addr) == 8 and all(c in "0123456789ABCDEF" for c in addr), ln
+        assert len(ln) == 33, f"{ln!r} is not 33 cells"
+        assert "|" not in ln, ln
+        parts = cells.split(" ")
+        assert len(parts) == 8, ln
+        assert all(len(p) == 2 for p in parts), ln
+
+    # Gap hole: poke a hole directly in a contiguous span — the deleted bytes
+    # render ``··`` and the row keeps its 33-cell width.
+    panel = MemoryMapPanel()
+    mem = {0x1000 + i: (i * 7) & 0xFF for i in range(600)}
+    for missing in (0x1003, 0x1004):  # holes inside the first row
+        del mem[missing]
+    panel._mem_map = mem
+    text = panel._region_peek_text(0x1000, 0).plain
+    lines = text.splitlines()
+    assert lines[0].startswith("00001000  ")
+    assert "··" in lines[0], lines[0]
+    assert len(lines[0]) == 33, lines[0]
+    # the holes are exactly the deleted addresses (bytes are (i*7)&0xFF)
+    assert lines[0].split("  ")[1].split() == [
+        "00", "07", "0E", "··", "··", "23", "2A", "31",
+    ], lines[0]
+
+
+def test_tc661_peek_row_count_is_monotone_in_pane_height(tmp_path: Path) -> None:
+    """LLR-126.3 — the peek renders as many rows as the pane height admits:
+    strictly more at 160x48 than 120x36 than 100x30."""
+    loaded = _demo_loaded()
+
+    async def _count(size):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            body = app.query_one("#map_detail_body").render().plain
+            lines = body.splitlines()
+            return len(lines) - lines.index("Peek") - 1
+
+    small = asyncio.run(_count((100, 30)))
+    medium = asyncio.run(_count((120, 36)))
+    large = asyncio.run(_count((160, 48)))
+    assert 1 <= small < medium < large, (small, medium, large)
+
+
+# TC-662 — ONE always-visible width-adaptive stats line (HLR-129)
+# ---------------------------------------------------------------------------
+def test_tc662_stats_one_line_adaptive_visible(tmp_path: Path) -> None:
+    """LLR-129.1/129.2 — the strip is exactly one line carrying the seven
+    statistics in the contract's field order; the FULL form renders at 120x36
+    (strip width >= the 84-cell threshold) INSIDE the non-scrolling host —
+    visible with zero scrolling — and the COMPACT form (same seven statistics)
+    renders below it at the 80x24 floor."""
+    loaded = _demo_loaded()
+
+    async def _drive(size):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            body = app.query_one("#map_stats_body")
+            content = app.query_one("#map_content")
+            return {
+                "text": body.render().plain,
+                "width": body.region.width,
+                "line_count": len(body.render().plain.splitlines()),
+                # the stats widget must be fully inside the non-scrolling host
+                # and the host must have nothing to scroll (zero scrolling
+                # paints the strip — defect ④ of premise P-1)
+                "inside_host": content.region.contains_region(body.region),
+                "host_max_scroll": content.max_scroll_y,
+            }
+
+    wide = asyncio.run(_drive((120, 36)))
+    assert wide["line_count"] == 1, f"exactly one line: {wide}"
+    assert wide["host_max_scroll"] == 0, (
+        f"the #map_content host must not scroll (the strip always paints): {wide}"
+    )
+    assert wide["inside_host"], f"the strip must paint inside the host: {wide}"
+    assert wide["width"] >= _STATS_FULL_MIN_WIDTH, wide
+    assert wide["text"] == (
+        " Mapped 5.2 KiB / 511.9 MiB span (0.0010%) · 5 ranges (5 valid) · "
+        "4 gaps · 0 issues"
+    ), wide["text"]
+
+    narrow = asyncio.run(_drive((80, 24)))
+    assert narrow["line_count"] == 1, narrow
+    assert narrow["width"] < _STATS_FULL_MIN_WIDTH, narrow
+    assert "Mapped 5.2 KiB / 511.9 MiB 0.0010%" in narrow["text"], narrow["text"]
+    assert "5 rng (5 ok)" in narrow["text"], narrow["text"]
+    assert "4 gaps" in narrow["text"] and "0 iss" in narrow["text"], narrow["text"]
+    # both forms render unwrapped in their strip
+    assert len(narrow["text"]) <= narrow["width"], narrow
+
+
+def test_tc662_stats_threshold_boundary_limb() -> None:
+    """LLR-129.2 boundary — the 84-cell threshold itself: at exactly the
+    threshold the FULL form renders, one column below the COMPACT form. Both
+    forms assert the same seven statistics (mapped, span, pct, ranges, valid,
+    gaps, issues) — only the labels/separators shorten."""
+    from s19_app.tui.screens_directionb import coverage_stats
+
+    stats = coverage_stats(
+        [(0x0, 0x100), (0x08000000, 0x08000800), (0x08001000, 0x08001600),
+         (0x08002000, 0x08002400), (0x1FFF0000, 0x1FFF0200)],
+        [True] * 5,
+        [],
+    )
+    full = MemoryMapPanel().build_stats_text(stats, _STATS_FULL_MIN_WIDTH).plain
+    compact = MemoryMapPanel().build_stats_text(
+        stats, _STATS_FULL_MIN_WIDTH - 1
+    ).plain
+    assert "span (" in full and "ranges (" in full and "issues" in full, full
+    assert "rng (" in compact and "iss" in compact and "span (" not in compact, compact
+    # the seven numbers are identical in both forms
+    import re as _re
+
+    nums = lambda s: _re.findall(r"\d+\.?\d*", s)
+    assert nums(full)[:2] == nums(compact)[:2] == ["5.2", "511.9"], (full, compact)
+    assert "0.0010" in full and "0.0010" in compact
+    assert "\n" not in full and "\n" not in compact
+
+
+# TC-663 — the glance chips carry the mapped-byte share (HLR-129.3)
+# ---------------------------------------------------------------------------
+def test_tc663_glance_chips_sum_to_one_line(tmp_path: Path) -> None:
+    """LLR-129.3 — ONE line of per-band chips in canonical band order; the
+    counts are merged-run tallies (summing to the run count) and the shares
+    are the mapped-byte share, summing to 100 ± 0.5 (the capture's chips:
+    counts 1+1+4+3 = 9, shares 19+5+57+19 = 100)."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _prime_map(app, pilot, loaded)
+            chips = app.query_one(".map-glance-chips")
+            return (
+                chips.region.height,
+                [str(c.render()) for c in chips.children],
+                [c for c in chips.children],
+            )
+
+    height, texts, _ = asyncio.run(_drive())
+    assert height == 1, f"the chips are ONE line: {texts}"
+    glyphs = [t.split()[0] for t in texts]
+    counts = [int(t.split()[1]) for t in texts]
+    shares = [int(t.split()[2].rstrip("%")) for t in texts]
+    # canonical band order (the four demo bands are all occupied)
+    order = [b for b in ENTROPY_BAND_LABELS]
+    demo_bands = [b for b in order if b in {r[0] for r in _DEMO_RUNS}]
+    assert [band_style(b)[1] for b in demo_bands] == glyphs, texts
+    assert sum(counts) == 9, counts
+    assert abs(sum(shares) - 100) <= 0.5, shares
+    assert shares == [19, 5, 57, 19], shares
+
+
+# AT-292 — the cockpit black-box acceptance (US-125/126 through the shipped
+# surface at 120x36, Layer B)
+# ---------------------------------------------------------------------------
+def test_at292_cockpit_acceptance_at_120x36(tmp_path: Path) -> None:
+    """The operator-visible outcome: every map surface chromed and populated
+    with zero clicks, the stats line and chips visible without scrolling, and
+    the region rows column-straight — the integrated Layer-B acceptance."""
+    loaded = _demo_loaded()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            panel = _panel(app)
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            stats = app.query_one("#map_stats_body")
+            chips = app.query_one(".map-glance-chips")
+            grid = app.query_one("#map_grid")
+            return {
+                "grid_title": grid.border_title,
+                "grid_sub": grid.border_subtitle,
+                "stats_text": stats.render().plain,
+                "stats_visible": app.query_one("#map_content").region.contains_region(
+                    stats.region
+                ),
+                "chips": [str(c.render()) for c in chips.children],
+                "rows": [str(r.render()) for r in _live_rows(app)],
+            }
+
+    got = asyncio.run(_drive())
+    assert got["grid_title"] == "Memory Map" and "9 regions" in got["grid_sub"], got
+    assert got["stats_visible"], f"the stats line paints without scrolling: {got}"
+    assert got["stats_text"].startswith(" Mapped 5.2 KiB"), got["stats_text"]
+    assert [t.split()[2] for t in got["chips"]] == ["19%", "5%", "57%", "19%"], got["chips"]
+    offsets = {
+        (p["glyph_off"], p["addr_off"], p["size_off"], p["sym_off"], p["band_off"])
+        for p in (_row_fields(t) for t in got["rows"])
+    }
+    assert len(got["rows"]) == 9 and len(offsets) == 1, got["rows"]

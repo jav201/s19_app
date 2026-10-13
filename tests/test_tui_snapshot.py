@@ -356,6 +356,23 @@ def _snapshot_run_before(
             app.action_cycle_density()
         app.action_show_screen(screen)
         await pilot.pause()
+        if screen == "map":
+            # batch-93: the cockpit's deferred auto-selection (LLR-116.5)
+            # focuses the first region row, and at the 80x24 floor that focus
+            # scrolls the narrow #map_body overflow to reveal the row — racing
+            # the capture into two different scroll positions. Settle the
+            # selection, then pin the body scroll to the top so every capture
+            # shows the same canonical cockpit top (the docstring's
+            # "deterministic state" for this cell).
+            from s19_app.tui.screens_directionb import MemoryMapPanel
+
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            for _ in range(10):
+                await pilot.pause()
+                if panel._selected_cell_start is not None:
+                    break
+            app.query_one("#map_body").scroll_to(y=0, animate=False)
+            await pilot.pause()
 
     return run_before
 

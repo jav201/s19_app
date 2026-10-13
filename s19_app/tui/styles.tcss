@@ -763,10 +763,12 @@ DataTable > .datatable--odd-row {
 
 /* --- Memory Map + Bookmarks scaffolds (batch-02 increment 9) -------------
  * LLR-012.1: the Memory Map is a read-only coverage visualization rendered
- * from the existing `LoadedFile.ranges` / `range_validity` — `#map_content`
- * scrolls the coverage map; an `EmptyStatePanel` shows when no file is
- * loaded (LLR-002.3). LLR-002.2: the Bookmarks screen is a neutral "coming
- * soon" placeholder with no persistence logic.
+ * from the existing `LoadedFile.ranges` / `range_validity` — batch-93 makes
+ * `#map_content` a NON-scrolling host (the cockpit's region list scrolls
+ * inside its own pane, HLR-126, so the one-line stats strip always paints);
+ * an `EmptyStatePanel` shows when no file is loaded (LLR-002.3). LLR-002.2:
+ * the Bookmarks screen is a neutral "coming soon" placeholder with no
+ * persistence logic.
  */
 #map_content {
     width: 100%;
@@ -779,20 +781,26 @@ DataTable > .datatable--odd-row {
     display: none;
 }
 
+/* batch-93 (HLR-126): the panel fills the (non-scrolling) content host so the
+ * cockpit's two panes are height-constrained — the region list and the peek
+ * re-apportion against the measured panes instead of growing the host. */
 #memory_map_panel {
     width: 100%;
-    height: auto;
+    height: 100%;
     padding: 1 2;
     color: $fg-base;
 }
 
 /*
- * R-TUI-041 (batch-27): the Memory Map is a colour-coded 2-D minimap. The
- * `#map_grid` lays its `.map-cell` widgets in a wrapping grid; each cell
- * carries its `sev-*` status class (single source of truth = color_policy).
- * The header and the `#map_stats` coverage strip span the full panel width;
- * `#map_grid` + `#map_detail` share a `#map_body` sub-container laid out
- * per the two-regime reflow below (LLR-041.10).
+ * batch-93 (HLR-125/126, variant C — the inspector cockpit): `#map_grid` is
+ * the left "Memory Map" pane (`.db-pane` chrome: lit title, navy surface,
+ * subtitle `{N} regions · ░▒▓ k`) stacking the 1-row band bar, the run-start
+ * ruler, the one-line glance chips and the scrollable region list; `#map_detail`
+ * is the full-height right "Inspector — 0xADDR" pane (subtitle `↑↓ · ↵ hex`).
+ * The header and the `#map_stats` one-line coverage strip span the full panel
+ * width, OUTSIDE any scroll region (HLR-129 — the strip always paints without
+ * scrolling); `#map_grid` + `#map_detail` share a `#map_body` sub-container
+ * laid out per the two-regime reflow below (LLR-041.10).
  */
 #map_header {
     width: 100%;
@@ -803,15 +811,15 @@ DataTable > .datatable--odd-row {
 /*
  * Two-regime reflow (LLR-041.10) — reuses the existing `width-narrow` class
  * toggled by `_apply_width_regime`/`on_resize`; NOT a new breakpoint.
- *   Wide (>= 120): `#map_body` is horizontal — the grid takes the `1fr`
- *   remainder beside a fixed 36-col `#map_detail` right column (C-13 budget
- *   §6.2: 98-col body − 36 = 62-col elastic grid, positive).
- *   Narrow (< 120): `#map_body` stacks vertically — grid full width, detail
- *   below it; no horizontal fixed-sibling contention.
+ *   Wide (>= 120): `#map_body` is horizontal — the grid pane takes the `1fr`
+ *   remainder beside a fixed 44-col `#map_detail` inspector (its ~40-col
+ *   interior admits the 33-cell 8-byte peek row, HLR-128).
+ *   Narrow (< 120): `#map_body` stacks vertically — grid pane 55% over the
+ *   inspector 45%, both full width; no horizontal fixed-sibling contention.
  */
 #map_body {
     width: 100%;
-    height: auto;
+    height: 1fr;
     layout: horizontal;
 }
 
@@ -819,36 +827,22 @@ DataTable > .datatable--odd-row {
     layout: vertical;
 }
 
-/* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
- * region list stacked vertically); the batch-27 validity cell grid (and its
- * `.map-cell` rules + MapCell class) was removed in Inc-5.
- *
- * batch-77 HLR-114: the band LEGEND is no longer one of these children. It was
- * MOVED, not deleted — it lives in the `k` LegendScreen — so this comment said
- * "band bar + region list + legend" after the legend had left. */
+/* batch-93 (HLR-125/126): `#map_grid` is the chromed left cockpit pane (the
+ * `.db-pane` class carries border/title colours/surface/padding); its id rule
+ * keeps the elastic width + the vertical interior stack. The chrome is the
+ * shared kit — never a hand-typed style list (LLR-125.1). */
 #map_grid {
     width: 1fr;
-    height: auto;
+    height: 100%;
     layout: vertical;
 }
 
-/* batch-77 LLR-111.9: the band row ALWAYS stacks — bar over glance — at every
- * supported terminal size. This is a REMOVAL of a special case, not a new one:
- * 80x24 already stacked via width-narrow (batch-45 LLR-045B.3), so >=120 now
- * behaves like the regime that already worked. Docking the two side by side
- * spent the bar's width on the glance panel: measured, the bar rendered 21
- * columns at 120x30 against 66 at 80x24, and every column the glance takes
- * lowers the ceiling on runs the operator can see. Every glance-shrinking
- * alternative measured worse — the glance's widest content row is 29 columns,
- * so 20 / 16 / 1fr all clip it. Re-mounted per render → addressed by CLASS
- * (not id) to avoid DuplicateIds. */
-.map-band-row {
+#workspace_body.width-narrow #map_grid {
     width: 100%;
-    height: auto;
-    layout: vertical;
+    height: 55%;
 }
 
-/* Entropy band bar: the full width of #map_grid, which is the basis
+/* Entropy band bar: the full width of the left pane, which is the basis
  * ``_allocate_band_widths`` apportions (LLR-111.1); one segment per merged run
  * plus a one-column marker per unmapped gap (LLR-111.2). */
 .map-band-bar {
@@ -862,47 +856,44 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
-/* "At a glance": full width beneath the band bar at every size (LLR-111.9).
- * Title + per-band histogram rows + a band-coloured profile sparkline. */
-.at-a-glance {
-    width: 100%;
-    height: auto;
-    margin-left: 0;
-    margin-top: 1;
-}
-
-.glance-title {
-    width: 100%;
-    height: 1;
-    text-style: bold;
-}
-
-.map-glance-row {
-    width: 100%;
-    height: 1;
-}
-
-.map-sparkline {
+/* batch-93 (HLR-129): the glance chips — the retired 6-row `.at-a-glance`
+ * histogram/sparkline dock folded to ONE line of per-band chips between the
+ * ruler and the region list. Colour flows through the `band-*` classes on the
+ * per-chip widgets; the chips' own rules only lay the line out. The stack
+ * carries NO inter-section margins: the map viewport's row budget is the
+ * operator's standing complaint (charter S-5), and every margin row is one
+ * region row the list cannot show. */
+.map-glance-chips {
     width: 100%;
     height: 1;
     layout: horizontal;
 }
 
-.map-sparkline-seg {
+.map-glance-chip {
     width: auto;
     height: 1;
+    margin-right: 2;
 }
 
-/* Per-region list: one full-width row each. The `.map-band-legend` container
-   and its `.map-legend-row` children were REMOVED at batch-77 (HLR-114): the
-   band key is a static four-row block, identical on every image, and it is
-   already rendered by the `k` legend screen (whose rows carry `.legend-row`
-   and are styled separately). Nothing selects those two classes any more, so
-   the rules are deleted rather than left as dead CSS. */
+/* Per-region list: the rows live inside this scroll container (batch-93,
+ * HLR-126 — the outer #map_content no longer scrolls, so the one-line stats
+ * strip below the cockpit always paints). The container takes the pane's
+ * remaining height; the scrollbar renders whenever the rows overflow. The
+ * 2-row floor guarantees at least two rows paint wherever the pane is
+ * height-constrained (the 80x24 stacked regime hands the pane its natural
+ * height and lets #map_body scroll — see the narrow rules below). */
+.map-region-scroll {
+    width: 100%;
+    height: 1fr;
+    min-height: 2;
+}
+
+/* The `.map-band-legend` container and its `.map-legend-row` children were
+   REMOVED at batch-77 (HLR-114); the `.at-a-glance` dock at batch-93 (HLR-129)
+   — the rules are deleted rather than left as dead CSS. */
 .map-region-list {
     width: 100%;
     height: auto;
-    margin-top: 1;
 }
 
 .map-region-row {
@@ -922,18 +913,47 @@ DataTable > .datatable--odd-row {
     text-style: bold;
 }
 
+/* batch-93 (HLR-125/126): `#map_detail` is the chromed right cockpit pane —
+ * the full-height Inspector. Fixed 44 columns wide (a ~40-col interior admits
+ * the 33-cell 8-byte peek row, HLR-128); `.db-pane` carries the chrome.
+ * `overflow-y: auto` keeps the field block + peek reachable when a short
+ * side-by-side pane cannot show the whole body. */
 #map_detail {
-    width: 36;
+    width: 44;
+    height: 100%;
+    margin-left: 1;
+    overflow-y: auto;
+}
+
+/* batch-93 narrow regime (the 80x24 floor, LLR-041.10's stacking): the
+ * cockpit cannot fit both panes above the always-visible stats strip, so
+ * #map_body scrolls as ONE unit — the panes take their natural heights
+ * (overview stack + inspector body) and the operator scrolls the body,
+ * exactly the shipped pre-batch-93 floor's reachability, while the one-line
+ * stats strip still paints without scrolling (HLR-129). A `1fr` child of a
+ * height-auto pane collapses to 0 (the shipped Textual trap), so the region
+ * list carries a 2-row min-height floor of its own. */
+#workspace_body.width-narrow #map_body {
+    layout: vertical;
+    overflow-y: auto;
+}
+
+#workspace_body.width-narrow #map_grid {
+    width: 100%;
     height: auto;
-    margin-left: 2;
+    min-height: 7;
 }
 
 #workspace_body.width-narrow #map_detail {
     width: 100%;
+    height: auto;
     margin-left: 0;
     margin-top: 1;
 }
 
+/* Height AUTO (not 100%): the body grows with its content so the pane's
+ * overflow-y can scroll it; at full-height panes the content fits and no
+ * scrollbar appears. */
 #map_detail_body {
     width: 100%;
     height: auto;
@@ -948,15 +968,19 @@ DataTable > .datatable--odd-row {
     display: none;
 }
 
+/* batch-93 (HLR-129): the coverage stats strip is ONE always-visible line
+ * (LLR-129.1) — height-locked so it can never push content below the fold,
+ * placed outside any scroll region so it paints at 120x36 with zero
+ * scrolling (defect ④ of premise P-1). */
 #map_stats {
     width: 100%;
-    height: auto;
+    height: 1;
     margin-top: 1;
 }
 
 #map_stats_body {
     width: 100%;
-    height: auto;
+    height: 1;
     color: $fg-base;
 }
 
