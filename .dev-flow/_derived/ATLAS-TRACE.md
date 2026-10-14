@@ -1507,7 +1507,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1587 unique id(s)
+## family US/HLR/LLR — 1588 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2591,6 +2591,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `LLR-139.1..139.3` | tests |
 | `LLR-139.2` | tests |
 | `LLR-139.3` | tests |
+| `LLR-139.x` | tests |
 | `LLR-141.1` | tests |
 | `LLR-141.2` | tests |
 | `LLR-142.1` | tests |
@@ -3274,7 +3275,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1649 unique id(s)
+## family AT/TC — 1650 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4903,6 +4904,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `TC-B94-05` | batches |
 | `TC-B94-06` | batches, tests |
 | `TC-B94-07` | batches, tests |
+| `TC-B94-07b` | tests |
 | `TC-B94-08` | batches |
 | `TC-B94-09` | batches, tests |
 | `TC-B94-10` | batches, tests |
