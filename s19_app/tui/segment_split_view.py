@@ -60,7 +60,7 @@ from textual.widgets import TextArea
 from .a2l import extract_memory_segments
 from .capped_text_area import CappedTextArea
 from .open_folder_chip import titled_header
-from .services.project_gather_service import scoped_home
+from .services.project_gather_service import scoped_home, scoped_home_target
 from .window_help import WindowHelpChip, WindowSection
 
 # NOTE (cyclic import): the engine (``s19_app.segment_ops``) imports
@@ -1197,6 +1197,26 @@ class SplitJoinWindow(WindowSection):
             )
         return common
 
+    def _dest_dir_display(self) -> Path:
+        """The destination LABEL only — resolved, never created.
+
+        The paint path (``_summary_text``) must not mkdir: this window is
+        mounted hidden from app startup and re-synced on every project
+        load, so a creating resolution here would make ``splits/`` appear
+        in the project dir with NO export ever run (the LLR-035.6 law: a
+        switch/load alone touches no project file). The HLR-139 chip idiom
+        applies verbatim — display rides ``scoped_home_target``, creation
+        stays at the byte-writing seam (``_dest_dir`` in the export flow,
+        LLR-136.5).
+        """
+        app = self._app()
+        common = Path(app.workarea) / SPLITS_DIR
+        if self._dest == "project":
+            return scoped_home_target(
+                app.active_project_dir(), SPLITS_DIR, common
+            )
+        return common
+
     def _valid_picked(self, rows: List[SegRow]) -> List[int]:
         """Selection indices that still exist (a stale seat never indexes)."""
         return [i for i in sorted(self._sel[self._tab]) if 0 <= i < len(rows)]
@@ -1354,7 +1374,7 @@ class SplitJoinWindow(WindowSection):
         noun = {"a2l": "segments", "ranges": "ranges", "manual": "localities"}[
             self._tab
         ]
-        dst = str(self._dest_dir())
+        dst = str(self._dest_dir_display())
         t = Text()
         if self._mode == "split":
             data = sum(f.packed for f in plan.files)

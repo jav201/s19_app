@@ -6280,8 +6280,26 @@ def test_tc028_patch_editor_renderer_invokes_no_patch_logic() -> None:
         for node in ast.walk(tree)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
-    # The builder constructs only Container / Label / PatchEditorPanel.
-    assert calls <= {"Container", "Label", "PatchEditorPanel"}, (
+    # The builder constructs only the view shell. batch-95 inc-003b/003c
+    # (HLR-139/140) seated the 📂 Open-folder chip and the ? usage-help chip
+    # in the header row through the shared shell helpers — all presentational
+    # chrome: a chip press routes to the folder-open / window-help services,
+    # never to the patch engine (engine routing lives in
+    # on_patch_editor_panel_action_requested), so none of these calls invokes
+    # patch apply / undo / redo / engine logic — the LLR-012.2/012.4 criterion
+    # this test guards. The allowlist extends the same way inc-003d extended
+    # the tc028 root-module census for segment_ops.py: the newer requirement
+    # supersedes the invariant for these NAMED view-shell widgets, and the
+    # guard still flags any OTHER unexpected call.
+    assert calls <= {
+        "Container",
+        "Label",
+        "PatchEditorPanel",
+        "WindowSection",
+        "titled_header",
+        "OpenFolderChip",
+        "WindowHelpChip",
+    }, (
         f"_compose_screen_patch must build only the view shell, "
         f"found calls {sorted(calls)}"
     )

@@ -793,6 +793,13 @@ _CLAIMED_HUES = {
     "band-high + AbDiffPanel only_a (tcss:579, screens_directionb.py:4269)": "#e06c75",
     "AbDiffPanel only_b (screens_directionb.py:4270)": "#4ec9d4",
     "band-low (styles.tcss:571)": "#5fb98a",
+    # batch-95 inc-004a (the SJE Split/Join/Export window): the visor band's
+    # "ctx" class tint — a FOREGROUND glyph cue (the · context marks painted
+    # by S_CTX at segment_split_view.py:91, HSL sat ~27%). That is above the
+    # ~20% achromatic floor the exclusions below rely on, and it rides the
+    # band's hue+glyph encoding, so an analyst CAN read it as a chromatic cue
+    # — it claims, like every other live foreground hue.
+    "SJE band ctx tint (segment_split_view.py:91 foreground '·' cue)": "#46557a",
     # Rich NAMED styles: not hex, so the source sweep cannot see them. RESOLVED
     # through rich rather than transcribed — transcribing is how Inc-5 recorded
     # orange3 as #d75f00 (darkorange3) and measured a hue the app never paints.
@@ -824,6 +831,10 @@ _EXCLUDED_LITERALS = {
     "#0f1525": "DEPTH_PANEL — background fill (val 14.5%), not a foreground cue",
     "#131a2c": "DEPTH_ODD_ROW — background fill (val 17.3%), not a foreground cue",
     "#1b233a": "DEPTH_BORDER — border fill (val 22.7%), not a foreground cue",
+    # --- SJE export-button background: same law as the DEPTH stack — a hue
+    # is only confusable when it paints a FOREGROUND cue; this is a button
+    # chrome fill (#sje_export) behind a label, never a cue itself.
+    "#1a2340": "#sje_export button background (styles.tcss:2568) — background fill, not a foreground cue",
     # --- Achromatic / near-achromatic: hue is not a meaningful coordinate below
     # ~20% saturation — these read as grey, so no hue distance protects anything.
     # (LBLUE is 19.4% and is nonetheless CLAIMED above: claimed beats excluded.)
