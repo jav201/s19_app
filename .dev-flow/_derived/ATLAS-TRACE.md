@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 72 requirement files | corpus digest: f7ca0d85cb67d5ca -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1507,7 +1507,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1611 unique id(s)
+## family US/HLR/LLR — 1632 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1538,6 +1538,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `HLR-011` | batches, tests |
 | `HLR-012` | batches |
 | `HLR-013` | batches, canon, tests |
+| `HLR-013..016` | batches |
 | `HLR-014` | batches, canon, tests |
 | `HLR-015` | batches, canon, tests |
 | `HLR-016` | batches, canon, tests |
@@ -1702,14 +1703,22 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `HLR-132` | batches, canon, tests |
 | `HLR-133` | batches, canon, tests |
 | `HLR-134` | batches, canon, tests |
-| `HLR-135` | tests |
-| `HLR-136` | tests |
-| `HLR-137` | tests |
-| `HLR-138` | tests |
-| `HLR-139` | tests |
-| `HLR-140` | tests |
-| `HLR-141` | tests |
-| `HLR-143` | tests |
+| `HLR-135` | batches, canon, tests |
+| `HLR-135..140` | batches |
+| `HLR-135..143` | batches |
+| `HLR-136` | batches, canon, tests |
+| `HLR-137` | batches, canon, tests |
+| `HLR-137.1` | batches |
+| `HLR-138` | batches, canon, tests |
+| `HLR-139` | batches, canon, tests |
+| `HLR-140` | batches, canon, tests |
+| `HLR-141` | batches, canon, tests |
+| `HLR-141..143` | batches |
+| `HLR-141.2` | batches |
+| `HLR-142` | batches, canon |
+| `HLR-143` | batches, canon, tests |
+| `HLR-143.1` | batches |
+| `HLR-143.2` | batches |
 | `HLR-6` | batches |
 | `HLR-64` | batches |
 | `HLR-85.1` | batches, canon |
@@ -2579,45 +2588,50 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-132.3` | batches, canon, tests |
 | `LLR-132.4` | batches, canon, tests |
 | `LLR-133.1` | batches, canon, tests |
-| `LLR-135.1` | tests |
+| `LLR-135.1` | batches, canon, tests |
 | `LLR-135.1..135.7` | tests |
-| `LLR-135.2` | tests |
-| `LLR-135.3` | tests |
-| `LLR-135.4` | tests |
-| `LLR-135.5` | tests |
-| `LLR-135.6` | tests |
-| `LLR-135.7` | tests |
+| `LLR-135.1..140.2` | batches |
+| `LLR-135.2` | batches, canon, tests |
+| `LLR-135.3` | batches, canon, tests |
+| `LLR-135.4` | batches, canon, tests |
+| `LLR-135.5` | batches, canon, tests |
+| `LLR-135.6` | batches, canon, tests |
+| `LLR-135.7` | batches, canon, tests |
 | `LLR-136` | tests |
-| `LLR-136.1` | tests |
+| `LLR-136.1` | batches, canon, tests |
 | `LLR-136.1..136.6` | tests |
-| `LLR-136.2` | tests |
-| `LLR-136.3` | tests |
-| `LLR-136.4` | tests |
-| `LLR-136.5` | tests |
-| `LLR-136.6` | tests |
-| `LLR-137.1` | tests |
+| `LLR-136.2` | batches, canon, tests |
+| `LLR-136.3` | batches, canon, tests |
+| `LLR-136.4` | batches, canon, tests |
+| `LLR-136.5` | batches, canon, tests |
+| `LLR-136.6` | batches, canon, tests |
+| `LLR-137` | batches |
+| `LLR-137.1` | batches, canon, tests |
+| `LLR-137.1-137.3` | batches |
 | `LLR-137.1..137.4` | tests |
-| `LLR-137.2` | tests |
-| `LLR-137.3` | tests |
-| `LLR-137.4` | tests |
-| `LLR-138.1` | tests |
+| `LLR-137.2` | batches, canon, tests |
+| `LLR-137.3` | batches, canon, tests |
+| `LLR-137.4` | batches, canon, tests |
+| `LLR-138.1` | batches, canon, tests |
+| `LLR-138.1-138.3` | batches |
 | `LLR-138.1..138.4` | tests |
-| `LLR-138.2` | tests |
-| `LLR-138.3` | tests |
-| `LLR-138.4` | tests |
-| `LLR-139.1` | tests |
+| `LLR-138.2` | batches, canon, tests |
+| `LLR-138.3` | batches, canon, tests |
+| `LLR-138.4` | batches, canon, tests |
+| `LLR-139.1` | batches, canon, tests |
 | `LLR-139.1..139.3` | tests |
-| `LLR-139.2` | tests |
-| `LLR-139.3` | tests |
-| `LLR-140.1` | tests |
+| `LLR-139.2` | batches, canon, tests |
+| `LLR-139.3` | batches, canon, tests |
+| `LLR-140.1` | batches, canon, tests |
 | `LLR-140.1..140.2` | tests |
-| `LLR-140.2` | tests |
-| `LLR-141.1` | tests |
-| `LLR-141.2` | tests |
-| `LLR-142.1` | tests |
-| `LLR-142.2` | tests |
-| `LLR-143.1` | tests |
-| `LLR-143.2` | tests |
+| `LLR-140.2` | batches, canon, tests |
+| `LLR-141.1` | batches, canon, tests |
+| `LLR-141.1..143.2` | batches |
+| `LLR-141.2` | batches, canon, tests |
+| `LLR-142.1` | batches, canon, tests |
+| `LLR-142.2` | batches, canon, tests |
+| `LLR-143.1` | batches, canon, tests |
+| `LLR-143.2` | batches, canon, tests |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -2988,7 +3002,14 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `US-126` | batches |
 | `US-127` | batches |
 | `US-128` | batches |
-| `US-129` | tests |
+| `US-129` | batches, tests |
+| `US-129..132` | batches |
+| `US-129..133` | batches |
+| `US-129..US-132` | batches |
+| `US-130` | batches |
+| `US-131` | batches |
+| `US-132` | batches |
+| `US-133` | batches |
 | `US-77` | canon |
 | `US-77-1` | batches |
 | `US-77-2` | batches, canon |
@@ -3298,7 +3319,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1657 unique id(s)
+## family AT/TC — 1667 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3804,8 +3825,17 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `AT-293` | batches, tests |
 | `AT-294` | batches |
 | `AT-295` | batches, tests |
+| `AT-296` | batches |
+| `AT-297` | batches |
+| `AT-298` | batches |
+| `AT-299` | batches |
 | `AT-2xx` | batches |
 | `AT-3` | batches |
+| `AT-300` | batches |
+| `AT-301` | batches |
+| `AT-302` | batches |
+| `AT-303` | batches |
+| `AT-304` | batches |
 | `AT-40` | batches, tests |
 | `AT-43` | batches, canon |
 | `AT-65` | batches |
@@ -4769,31 +4799,32 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-679` | batches, tests |
 | `TC-680` | batches, tests |
 | `TC-681` | batches, tests |
-| `TC-682` | tests |
-| `TC-683` | tests |
+| `TC-682` | batches, tests |
+| `TC-683` | batches, tests |
 | `TC-684` | tests |
-| `TC-685` | tests |
-| `TC-694` | tests |
-| `TC-699` | tests |
+| `TC-685` | batches, tests |
+| `TC-694` | batches, tests |
+| `TC-699` | batches, tests |
 | `TC-6xx` | batches, tests |
-| `TC-700` | tests |
+| `TC-700` | batches, tests |
 | `TC-701` | tests |
-| `TC-702` | tests |
-| `TC-703` | tests |
+| `TC-702` | batches, tests |
+| `TC-703` | batches, tests |
 | `TC-704` | tests |
-| `TC-705` | tests |
-| `TC-706` | tests |
-| `TC-707` | tests |
-| `TC-708` | tests |
-| `TC-709` | tests |
-| `TC-710` | tests |
-| `TC-712` | tests |
-| `TC-713` | tests |
-| `TC-714` | tests |
-| `TC-715` | tests |
-| `TC-716` | tests |
-| `TC-717` | tests |
-| `TC-718` | tests |
+| `TC-705` | batches, tests |
+| `TC-706` | batches, tests |
+| `TC-707` | batches, tests |
+| `TC-708` | batches, tests |
+| `TC-709` | batches, tests |
+| `TC-710` | batches, tests |
+| `TC-711` | batches |
+| `TC-712` | batches, tests |
+| `TC-713` | batches, tests |
+| `TC-714` | batches, tests |
+| `TC-715` | batches, tests |
+| `TC-716` | batches, tests |
+| `TC-717` | batches, tests |
+| `TC-718` | batches, tests |
 | `TC-79b` | batches, tests |
 | `TC-79c` | batches, tests |
 | `TC-79d` | batches, tests |
