@@ -1,0 +1,1159 @@
+==============================================================================
+inc003 mutation battery — batch-94 increment 003 (fx_a Flow Execution)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+
+[phase 0] resolving node ids via pytest --collect-only
+  resolved OK: 19 collectable nodes across 2 files
+
+[phase 1] arms: 10; node-runs: 15
+  planned: 10 arms / 15 node-runs
+
+[phase 2] clean-tree baseline (all nodes, ONE pytest run)
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..............                                                           [100%]
+14 passed in 56.48s
+  [baseline] exit 0
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 01: s19_app/tui/app.py
+    note: land 11 rail entries: the 12th row (and its container/binding census) is dropped from the shipped rail
+    edit: '    + (RailEntry("flow_execution", "▶", ">", "Flow Execution"),)\r\n    + RAIL_ENTRIES[8:]'
+          -> '    + RAIL_ENTRIES[8:]'
+    before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_02_rail_twelve_entries_mount_panels _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19312/test_at_b94_02_rail_twelve_ent0')
+
+    def test_at_b94_02_rail_twelve_entries_mount_panels(tmp_path: Path) -> None:
+        """AT-B94-02 (HLR-002, LLR-002.1; black-box): the rail shows TWELVE
+        entries in the stable declared order at every pinned pilot size
+        (C-3: sizes declared here, incl. the 80x24 rail-chrome arm — 12 entries
+        inside the 21-row chrome budget); every entry mounts its panel through
+        the rail-click path (no key is exercised — the R-1 closure).
+        """
+        expected_order = list(_DECLARED_RAIL_ORDER)
+    
+        async def _drive(size: tuple[int, int]) -> tuple[list[str], int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                rail = app.query_one(Rail)
+                keys = [item.entry.key for item in app.query(RailItem)]
+                return keys, rail.region.height
+    
+        for size in _PILOT_SIZES:
+            keys, rail_height = asyncio.run(_drive(size))
+>           assert keys == expected_order, (
+                f"@{size}: the rail order drifted from the declared sequence: {keys}"
+            )
+E           AssertionError: @(120, 30): the rail order drifted from the declared sequence: ['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'checks', 'crc_designer']
+E           assert ['workspace',... 'patch', ...] == ['workspace',... 'patch', ...]
+E             
+E             At index 9 diff: 'checks' != 'flow_execution'
+E             Right contains one more item: 'crc_designer'
+E             Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:215: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels
+1 failed in 1.43s
+  [arm 01 [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels]] exit 1
+    after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
+    arm 01 [tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels]: RED (KILLED)
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b94_08_rail_entries_census_and_duplicate_rejection __________
+
+    def test_tc_b94_08_rail_entries_census_and_duplicate_rejection() -> None:
+        """TC-B94-08 (LLR-002.1, white-box): RAIL_ENTRIES_B94 declares 12 in the
+        preserved order (Check Editor after Patch Editor, Flow Execution after
+        Flow Builder); SCREEN_IDS/SCREEN_KEYS move to 12; duplicate screen keys
+        are rejected by construction (the key set has the census length).
+        """
+        keys = [entry.key for entry in RAIL_ENTRIES_B94]
+>       assert len(RAIL_ENTRIES_B94) == 12, f"rail declares {len(RAIL_ENTRIES_B94)}"
+E       AssertionError: rail declares 11
+E       assert 11 == 12
+E        +  where 11 = len((RailEntry(key='workspace', glyph='◫', ascii_glyph='#', label='Workspace'), RailEntry(key='a2l', glyph='≡', ascii_glyp...ascii_glyph='!', label='Issues Report'), RailEntry(key='patch', glyph='✎', ascii_glyph='P', label='Patch Editor'), ...))
+
+tests\test_tui_flow_execution_b94.py:256: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection
+1 failed in 0.49s
+  [arm 01 [tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection]] exit 1
+    after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
+    arm 01 [tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection]: RED (KILLED)
+
+--- arm 02: s19_app/tui/app.py
+    note: a cancelled import mounts a lane (the cancel arm adds a lane)
+    edit: '            if stem is None:\r\n                return  # cancelled — 0 lanes mounted (LLR-017.1 cancel arm)'
+          -> '            if stem is None:\r\n                from .services.flow_model import Flow as _CancelledFlow\r\n                panel.add_lane("cancelled", _CancelledFlow(name="cancelled", blocks=[]))\r\n                return  # cancelled — 0 lanes mounted (LLR-017.1 cancel arm)'
+    before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_19_import_mounts_lanes_side_by_side _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19313/test_at_b94_19_import_mounts_l0')
+
+    def test_at_b94_19_import_mounts_lanes_side_by_side(tmp_path: Path) -> None:
+        """AT-B94-19 (HLR-017, black-box): importing a template adds one lane;
+        a second import shows both chains SIDE BY SIDE at 120x30 and 160x40
+        inside the boxed workspaces; each lane's blocks == its template's;
+        a corrupt import is refused with a notice (0 lanes); a cancelled import
+        adds 0 lanes.
+        """
+        project = _project(tmp_path)
+        fps.save_flow_json(Flow(name="nightly", blocks=_base_blocks()), "nightly", project)
+        (project / fps.FLOWS_SUBDIR / "corrupt.json").write_text("{ nope", encoding="utf-8")
+    
+        async def _drive(size: tuple[int, int]) -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            state: dict = {}
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+    
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                state["one_lane"] = panel.lane_count()
+    
+                await _import_stem(app, pilot, "nightly")
+                await pilot.pause()
+                state["two_lanes"] = panel.lane_count()
+                state["names"] = panel.lane_names()
+                screen = app.query_one("#screen_flow_execution")
+                lanes = app.query("#fx_lanes .fx-lane")
+                state["screen_box"] = (screen.region.width, screen.region.height)
+                state["lanes_visible"] = all(
+                    lane.region.right <= screen.region.right
+                    and lane.region.bottom <= screen.region.bottom
+                    for lane in lanes
+                )
+                state["paint0"] = panel.lane_paint_plain(0)
+                state["paint1"] = panel.lane_paint_plain(1)
+    
+                # Corrupt arm: refused with a notice, 0 lanes added.
+                await _import_stem(app, pilot, "corrupt")
+                await pilot.pause()
+                notice = app.query_one("#fx_notice", Static)
+                state["corrupt_notice"] = (
+                    notice.display,
+                    notice.render().plain,
+                    panel.lane_count(),
+                )
+    
+                # Cancel arm: open the picker and Cancel — 0 lanes added.
+                app.query_one("#fx_import", Button).press()
+                await _wait_for(app, pilot, "#flow_load_cancel")
+                app.screen.query_one("#flow_load_cancel", Button).press()
+                await pilot.pause()
+                state["after_cancel"] = panel.lane_count()
+            return state
+    
+        for size in ((120, 30), (160, 40)):
+            state = asyncio.run(_drive(size))
+            assert state["one_lane"] == 1, "one import must add exactly one lane"
+            assert state["two_lanes"] == 2, "two imports must show two lanes"
+            assert state["names"] == ["base", "nightly"], state["names"]
+            # The boxed budget: the screen is the measured 96x18 / 136x28 and
+            # both lanes render fully inside it (side by side, no overlap).
+            assert state["screen_box"] == (
+                (96, 18) if size == (120, 30) else (136, 28)
+            ), state["screen_box"]
+            assert state["lanes_visible"], "both lanes must be fully visible"
+            # Each lane's block list == its template's blocks (kind chain).
+            assert "source → patch → write_out" in state["paint0"]
+            assert "source → patch → write_out" in state["paint1"]
+            assert "tpl base" in state["paint0"] and "tpl nightly" in state["paint1"]
+            assert "in1 base.s19" in state["paint0"], (
+                f"the pinned input line must show the template's own ref"
+            )
+            # Corrupt arm.
+            shown, text, count = state["corrupt_notice"]
+            assert shown and "refused" in text and count == 2, state["corrupt_notice"]
+            # Cancel arm.
+>           assert state["after_cancel"] == 2, "a cancelled import adds 0 lanes"
+E           AssertionError: a cancelled import adds 0 lanes
+E           assert 3 == 2
+
+tests\test_tui_flow_execution_b94.py:355: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side
+1 failed in 3.08s
+  [arm 02 [tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side]] exit 1
+    after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
+    arm 02 [tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side]: RED (KILLED)
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b94_26_lane_mounting_and_render_census ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19314/test_tc_b94_26_lane_mounting_a0')
+
+    def test_tc_b94_26_lane_mounting_and_render_census(tmp_path: Path) -> None:
+        """TC-B94-26 (LLR-017.1/.2, white-box over the shipped panel): lane
+        count == imported count, 0 missing/duplicates, 0 lanes on a cancelled
+        import; lanes render at 120x30 (96x18) and 160x40 (136x28) with the
+        chain name, pinned inputs and status region; at 80x24 the overflow is
+        reachable by scroll rather than an error (74x12 cannot host two lanes).
+        """
+        project = _project(tmp_path)
+        fps.save_flow_json(Flow(name="nightly", blocks=_base_blocks()), "nightly", project)
+    
+        async def _drive(size: tuple[int, int]) -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            state: dict = {}
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "nightly")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")  # duplicate import
+                await pilot.pause()
+                state["names"] = panel.lane_names()
+                # The cancel arm (LLR-017.1): a cancelled import adds 0 lanes.
+                app.query_one("#fx_import", Button).press()
+                await _wait_for(app, pilot, "#flow_load_cancel")
+                app.screen.query_one("#flow_load_cancel", Button).press()
+                await pilot.pause()
+                state["after_cancel"] = panel.lane_count()
+                state["screen_box"] = (
+                    app.query_one("#screen_flow_execution").region.width,
+                    app.query_one("#screen_flow_execution").region.height,
+                )
+                lanes = list(app.query("#fx_lanes .fx-lane"))
+                state["lane_count"] = len(lanes)
+                screen = app.query_one("#screen_flow_execution")
+                state["fit"] = all(
+                    lane.region.right <= screen.region.right
+                    for lane in lanes
+                )
+                scroll = app.query_one("#fx_lanes_scroll")
+                state["max_scroll_x"] = scroll.max_scroll_x
+                state["paints"] = [
+                    panel.lane_paint_plain(i) for i in range(panel.lane_count())
+                ]
+            return state
+    
+        wide = asyncio.run(_drive((120, 30)))
+        assert wide["names"] == ["base", "nightly", "base_2"], (
+            f"0 duplicate lanes: duplicate imports uniquify with the _<N> idiom; "
+            f"got {wide['names']}"
+        )
+>       assert wide["lane_count"] == 3
+E       assert 4 == 3
+
+tests\test_tui_flow_execution_b94.py:416: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census
+1 failed in 2.99s
+  [arm 02 [tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census]] exit 1
+    after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
+    arm 02 [tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census]: RED (KILLED)
+
+--- arm 03: s19_app/tui/flow_screens.py
+    note: one shared bindings dict across lanes: editing A writes every lane
+    edit: '        lane.bindings[src_index] = value\r\n'
+          -> '        for _lane in self._lanes:\r\n            _lane.bindings[src_index] = value\r\n'
+    before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19315/test_at_b94_20_rebind_run_read0')
+
+    def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
+        """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
+        chain B->release.s19; the run reads X for A and Y for B (the report's
+        provenance lines); rebinding A leaves B's binding byte-identical.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                b_before = panel.lane_bindings("base_2")
+    
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                b_after_a = panel.lane_bindings("base_2")
+                _bind(app, 1, 0, "release.s19")
+                await pilot.pause()
+    
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                log = panel.run_log_plain()
+                record = panel.last_run_record
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "b_after_a": b_after_a,
+                    "b_before": b_before,
+                    "log": log,
+                    "report": report,
+                    "statuses": [o.status for o in record.outcomes],
+                }
+    
+        state = asyncio.run(_drive())
+        # Rebinding A left B's binding byte-identical (0 fields changed).
+>       assert state["b_after_a"] == state["b_before"] == {}
+E       AssertionError: assert {0: 'variant_b.hex'} == {}
+E         
+E         Left contains 1 more item:
+E         {0: 'variant_b.hex'}
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:581: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+1 failed in 3.48s
+  [arm 03 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]] exit 1
+    after:  65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6 restore-ok=True
+    arm 03 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]: RED (KILLED)
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b94_27_lane_binding_isolation_and_noop ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19316/test_tc_b94_27_lane_binding_is0')
+
+    def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
+        """TC-B94-27 (LLR-018.1, white-box over the shipped panel): editing lane
+        A changes exactly A's record; B's bound path is byte-identical
+        before/after (0 fields changed); a rebind to the same path is a no-op.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                before_b = panel.lane_bindings("base_2")
+                field_b = app.query_one("#fx_in_1_0", Input).value
+                dirty_before_noop = panel.is_dirty
+    
+                # Rebind A (the no-op arm first: same ref as now).
+                _bind(app, 0, 0, "base.s19")
+                await pilot.pause()
+                noop_bindings = panel.lane_bindings("base")
+    
+                # Rebind A to a different file — exactly A's record changes.
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                after_a = panel.lane_bindings("base")
+                after_b = panel.lane_bindings("base_2")
+                field_b_after = app.query_one("#fx_in_1_0", Input).value
+                paint_b = panel.lane_paint_plain(1)
+                return {
+                    "before_b": before_b,
+                    "field_b": field_b,
+                    "dirty_before_noop": dirty_before_noop,
+                    "noop_bindings": noop_bindings,
+                    "after_a": after_a,
+                    "after_b": after_b,
+                    "field_b_after": field_b_after,
+                    "paint_b": paint_b,
+                }
+    
+        state = asyncio.run(_drive())
+        # The rebind-to-same arm: a no-op (0 records written, no dirty flag set —
+        # the import itself set it; the no-op must not change the bindings).
+        assert state["noop_bindings"] == {}, (
+            f"rebinding to the same ref wrote a record: {state['noop_bindings']}"
+        )
+        # Editing A changed exactly A's record.
+        assert state["after_a"] == {0: "variant_b.hex"}, state["after_a"]
+        # B's binding record + UI field + painted lane are byte-identical.
+>       assert state["after_b"] == state["before_b"] == {}
+E       AssertionError: assert {0: 'variant_b.hex'} == {}
+E         
+E         Left contains 1 more item:
+E         {0: 'variant_b.hex'}
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:523: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+1 failed in 2.57s
+  [arm 03 [tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop]] exit 1
+    after:  65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6 restore-ok=True
+    arm 03 [tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop]: RED (KILLED)
+
+--- arm 04: s19_app/tui/services/flow_execution_service.py
+    note: the mode field hard-coded: the record never changes from the default
+    edit: '    record = ChainSetRunRecord(mode=mode)'
+          -> '    record = ChainSetRunRecord(mode="sequential")'
+    before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_at_b94_21_parallel_mode_overlaps_isolates_and_captures _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19317/test_at_b94_21_parallel_mode_o0')
+
+    def test_at_b94_21_parallel_mode_overlaps_isolates_and_captures(tmp_path: Path) -> None:
+        """AT-B94-21 (HLR-019, LLR-019.2; C-10 non-default arm, black-box): the
+        parallel mode runs both chains CONCURRENTLY (overlapping elapsed windows
+        in the record), the persisted run record reads ``parallel``, and a
+        failing chain is isolated to its lane — the sibling completes (A5).
+        """
+        project = _big_project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "big")
+                await pilot.pause()
+                await _import_stem(app, pilot, "big_crc")
+                await pilot.pause()
+    
+                # Drive the NON-DEFAULT mode control (C-10).
+                app.query_one("#fx_mode", Select).value = "parallel"
+                await pilot.pause()
+                app.query_one("#fx_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                record = panel.last_run_record
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "mode": record.mode,
+                    "windows": [
+                        (o.chain, o.started_at, o.finished_at, o.status)
+                        for o in record.outcomes
+                    ],
+                    "report": report,
+                    "written": [len(o.written_paths) for o in record.outcomes],
+                }
+    
+        state = asyncio.run(_drive())
+        (a_name, a_start, a_end, a_status), (b_name, b_start, b_end, b_status) = (
+            state["windows"]
+        )
+        # The captured mode: the record reads ``parallel`` (never the default).
+>       assert state["mode"] == "parallel", state["mode"]
+E       AssertionError: sequential
+E       assert 'sequential' == 'parallel'
+E         
+E         - parallel
+E         + sequential
+
+tests\test_tui_flow_execution_b94.py:652: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures
+1 failed in 4.64s
+  [arm 04 [tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures]] exit 1
+    after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
+    arm 04 [tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures]: RED (KILLED)
+  $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b94_05_mode_capture_in_run_record_and_report _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19318/test_tc_b94_05_mode_capture_in0')
+
+    def test_tc_b94_05_mode_capture_in_run_record_and_report(tmp_path: Path) -> None:
+        """TC-B94-05 (LLR-019.2, white-box): the record's mode field reads
+        ``parallel`` in 1/1 driven parallel runs and ``sequential`` on the
+        untouched default arm — and the EMITTED report persists the same mode
+        line (the C-42 predicate pins the producer's own form).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+    
+        driven = run_chain_set(
+            [_clean_chain("a"), _clean_chain("b")],
+            ctx,
+            mode=CHAIN_RUN_PARALLEL,
+            set_name="variants_a_b",
+        )
+        untouched = run_chain_set(
+            [_clean_chain("a"), _clean_chain("b")],
+            ctx,
+            set_name="variants_a_b",
+        )
+    
+        # The C-10 captured-value assertion: the driven record differs from the
+        # default arm's record; 1/1 driven parallel runs read ``parallel``.
+>       assert driven.mode == CHAIN_RUN_PARALLEL
+E       AssertionError: assert 'sequential' == 'parallel'
+E         
+E         - parallel
+E         + sequential
+
+tests\test_flow_chainset_b94.py:120: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report
+1 failed in 0.52s
+  [arm 04 [tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report]] exit 1
+    after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
+    arm 04 [tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report]: RED (KILLED)
+
+--- arm 05: s19_app/tui/services/flow_execution_service.py
+    note: parallel-always dispatch: an untouched default run overlaps chains
+    edit: '    if mode == CHAIN_RUN_PARALLEL:'
+          -> '    if True or mode == CHAIN_RUN_PARALLEL:'
+    before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_at_b94_22_default_run_is_strictly_sequential ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19319/test_at_b94_22_default_run_is_0')
+
+    def test_at_b94_22_default_run_is_strictly_sequential(tmp_path: Path) -> None:
+        """AT-B94-22 (HLR-019 default arm, black-box): an untouched run executes
+        chains one at a time in lane order — chain N+1 starts only after chain
+        N's terminal status, 0 elapsed overlap, and the run record reads
+        ``sequential``.
+        """
+        project = _big_project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "big")
+                await pilot.pause()
+                await _import_stem(app, pilot, "big_crc")
+                await pilot.pause()
+                # The mode control is UNTOUCHED — the default arm.
+                assert str(app.query_one("#fx_mode", Select).value) == "sequential"
+                app.query_one("#fx_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                record = panel.last_run_record
+                return {
+                    "mode": record.mode,
+                    "windows": [
+                        (o.chain, o.started_at, o.finished_at) for o in record.outcomes
+                    ],
+                    "log": panel.run_log_plain(),
+                }
+    
+        state = asyncio.run(_drive())
+        assert state["mode"] == "sequential", state["mode"]
+        (a_name, a_start, a_end), (b_name, b_start, b_end) = state["windows"]
+        # 0 elapsed overlap: B starts only after A's terminal status.
+>       assert b_start >= a_end, (
+            f"the default arm must not overlap chains: {state['windows']}"
+        )
+E       AssertionError: the default arm must not overlap chains: [('big', 1218032.3583005, 1218032.5552801), ('big_crc', 1218032.3585635, 1218032.5509981)]
+E       assert 1218032.3585635 >= 1218032.5552801
+
+tests\test_tui_flow_execution_b94.py:710: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential
+1 failed in 4.40s
+  [arm 05 [tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential]] exit 1
+    after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
+    arm 05 [tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential]: RED (KILLED)
+
+--- arm 06: s19_app/tui/flow_screens.py
+    note: the inline X line suppressed: the failure is visible only elsewhere
+    edit: '            log.append("✗ ", style=_S_ERR)'
+          -> '            log.append("· ", style=_S_ERR)'
+    before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_at_b94_23_run_log_inline_failure_and_report_provenance _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19320/test_at_b94_23_run_log_inline_0')
+
+    def test_at_b94_23_run_log_inline_failure_and_report_provenance(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B94-23 (HLR-020, black-box): the run log shows per-chain start +
+        terminal status and the inline ``✗`` line naming the block and the
+        missing ``crc_regions.json``; the failing chain halts and its later
+        blocks read ``skipped``; the report carries one provenance line per
+        chain input.
+        """
+        project = _project(tmp_path)
+        fps.save_flow_json(Flow(name="base_crc", blocks=_crc_blocks()), "base_crc", project)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base_crc")
+                await pilot.pause()
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                record = panel.last_run_record
+                failed = record.outcomes[1]
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "log": panel.run_log_plain(),
+                    "failed_statuses": [
+                        (br.kind, br.status) for br in failed.block_results
+                    ],
+                    "report": report,
+                }
+    
+        state = asyncio.run(_drive())
+        log = state["log"]
+        # Per chain: one start line + one terminal status line (>= 2 lines each).
+        for chain in ("base", "base_crc"):
+            assert f"▶ {chain}" in log, f"{chain} must have a start line: {log!r}"
+            terminal = f"✓ {chain}" if chain == "base" else f"✗ {chain}"
+>           assert terminal in log, f"{chain} must have a terminal line: {log!r}"
+E           AssertionError: base_crc must have a terminal line: "00:00.000 ▶ base · started\n00:00.007 ✓ base · done · wrote base_out.s19\n00:00.007 ▶ base_crc · started\n00:00.008 · base_crc · block 3/4 CRC — config 'crc_regions.json' missing · chain halted\n"
+E           assert '✗ base_crc' in "00:00.000 ▶ base · started\n00:00.007 ✓ base · done · wrote base_out.s19\n00:00.007 ▶ base_crc · started\n00:00.008 · base_crc · block 3/4 CRC — config 'crc_regions.json' missing · chain halted\n"
+
+tests\test_tui_flow_execution_b94.py:774: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance
+1 failed in 3.37s
+  [arm 06 [tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance]] exit 1
+    after:  65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6 restore-ok=True
+    arm 06 [tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance]: RED (KILLED)
+
+--- arm 07: s19_app/tui/flow_screens.py
+    note: the all-clean arm emits an X: the log invents a failure
+    edit: '                log.append(f"{glyph} ", style=_S_LABEL)'
+          -> '                log.append("✗ ", style=_S_LABEL)'
+    before: 65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_tc_b94_29_run_log_emission_and_all_clean_arm ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19321/test_tc_b94_29_run_log_emissio0')
+
+    def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
+        """TC-B94-29 (LLR-020.1, white-box over the shipped strip): per chain
+        >=2 status lines (start, terminal); the all-clean arm shows 0 ``✗``
+        lines; the painted strip is markup-safe (the C-32 painted oracle).
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                from textual.widgets import Static as _Static
+    
+                rendered = app.query_one("#fx_log", _Static).render()
+                return {"plain": rendered.plain, "spans": rendered.spans}
+    
+        state = asyncio.run(_drive())
+        plain = state["plain"]
+        # Per chain >=2 status lines (start + terminal), 2 chains.
+        for chain in ("base", "base_2"):
+            assert f"▶ {chain}" in plain, plain
+>           assert f"✓ {chain}" in plain, plain
+E           AssertionError: 00:00.000 ▶ base · started
+E             00:00.006 ✗ base · done · wrote base_out.s19
+E             00:00.006 ▶ base_2 · started
+E             00:00.009 ✗ base_2 · done · wrote base_out_1.s19
+E             
+E           assert '✓ base' in '00:00.000 ▶ base · started\n00:00.006 ✗ base · done · wrote base_out.s19\n00:00.006 ▶ base_2 · started\n00:00.009 ✗ base_2 · done · wrote base_out_1.s19\n'
+
+tests\test_tui_flow_execution_b94.py:833: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm
+1 failed in 3.22s
+  [arm 07 [tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm]] exit 1
+    after:  65385e925653b25c89290f6cfeb058e47a64252a60d4edeb4c8d8dd1e3b6adf6 restore-ok=True
+    arm 07 [tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm]: RED (KILLED)
+
+--- arm 08: s19_app/tui/app.py
+    note: the reload silently drops input bindings (a stale run by construction)
+    edit: '            bindings = {index: ref for index, ref in entry.inputs}'
+          -> '            bindings = {}'
+    before: 47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_at_b94_24_save_reload_rerun_regenerates_and_notices ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19322/test_at_b94_24_save_reload_rer0')
+
+    def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> None:
+        """AT-B94-24 (HLR-021, black-box; C-10 non-default battery + C-12):
+        bind TWO different inputs to two chains, run, save the set, reload it,
+        re-run — both outputs regenerate (driven by the RELOADED bindings, not
+        the panel's current state); a moved input yields a per-chain
+        provenance-mismatch notice, not a silent stale run.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                _bind(app, 1, 0, "release.s19")
+                await pilot.pause()
+    
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+    
+                # Save the set under its own name.
+                app.query_one("#fx_set_name", Input).value = "variants_a_b"
+                app.query_one("#fx_save", Button).press()
+                await pilot.pause()
+                await pilot.pause()
+                saved_path = project / fps.FLOWSETS_SUBDIR / "variants_a_b.json"
+                saved_exists = saved_path.exists()
+    
+                # C-12: dirty the panel state AFTER the save — the reload, not
+                # the current panel, is what re-runs.
+                _bind(app, 0, 0, "base.s19")
+                await pilot.pause()
+    
+                # Reload through the shipped Load Set control.
+                select = app.query_one("#fx_set_select", Select)
+                assert str(select.value) == "variants_a_b", str(select.value)
+                app.query_one("#fx_load", Button).press()
+                for _ in range(10):
+                    await pilot.pause()
+                restored = {
+                    name: panel.lane_bindings(name) for name in panel.lane_names()
+                }
+    
+                # Re-run: both outputs regenerate. ``save_patched_image`` never
+                # overwrites — a re-run lands FRESH artifacts (the ``_<N>``
+                # dedup idiom), so regeneration is asserted on the artifact set.
+                import time as _time
+    
+                _time.sleep(0.01)
+                before_files = sorted(project.glob("base_out*.s19"))
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                record = panel.last_run_record
+                after_files = sorted(project.glob("base_out*.s19"))
+                fresh = [p for p in after_files if p not in before_files]
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+    
+                # The moved-input arm: rename an input away, reload — the lane
+                # mounts with the per-chain mismatch notice.
+                (project / "variant_b.hex").rename(project / "moved_away.hex")
+                app.query_one("#fx_load", Button).press()
+                for _ in range(10):
+                    await pilot.pause()
+                notice = app.query_one("#fx_notice", Static).render().plain
+                paint_after_move = panel.lane_paint_plain(0)
+                return {
+                    "saved_exists": saved_exists,
+                    "restored": restored,
+                    "statuses": [o.status for o in record.outcomes],
+                    "written": [len(o.written_paths) for o in record.outcomes],
+                    "fresh_outputs": [p.name for p in fresh],
+                    "report": report,
+                    "notice": notice,
+                    "paint_after_move": paint_after_move,
+                }
+    
+        state = asyncio.run(_drive())
+        # Save persisted the whole set.
+        assert state["saved_exists"], "save set must write flowsets/variants_a_b.json"
+        # Reload restored the SAVED bindings (not the panel's post-save dirt):
+        # C-12 — the reloaded set is what re-runs.
+>       assert state["restored"] == {"base": {0: "variant_b.hex"}, "base_2": {0: "release.s19"}}, (
+            state["restored"]
+        )
+E       AssertionError: {'base': {}, 'base_2': {}}
+E       assert {'base': {}, 'base_2': {}} == {'base': {0: ...release.s19'}}
+E         
+E         Differing items:
+E         {'base': {}} != {'base': {0: 'variant_b.hex'}}
+E         {'base_2': {}} != {'base_2': {0: 'release.s19'}}
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:940: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices
+1 failed in 5.72s
+  [arm 08 [tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices]] exit 1
+    after:  47db4dc99f4913e2dedacfdd9a4df4d4ea1c313434896eaba41ebe410a981975 restore-ok=True
+    arm 08 [tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices]: RED (KILLED)
+
+--- arm 09: s19_app/tui/services/flow_execution_service.py
+    note: the runner ignores the bindings: a stale input is named after a rebind
+    edit: '    for index, ref in bindings.items():'
+          -> '    for index, ref in {}.items():'
+    before: c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771
+  $ pytest [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19323/test_at_b94_20_rebind_run_read0')
+
+    def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
+        """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
+        chain B->release.s19; the run reads X for A and Y for B (the report's
+        provenance lines); rebinding A leaves B's binding byte-identical.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                b_before = panel.lane_bindings("base_2")
+    
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                b_after_a = panel.lane_bindings("base_2")
+                _bind(app, 1, 0, "release.s19")
+                await pilot.pause()
+    
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                log = panel.run_log_plain()
+                record = panel.last_run_record
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "b_after_a": b_after_a,
+                    "b_before": b_before,
+                    "log": log,
+                    "report": report,
+                    "statuses": [o.status for o in record.outcomes],
+                }
+    
+        state = asyncio.run(_drive())
+        # Rebinding A left B's binding byte-identical (0 fields changed).
+        assert state["b_after_a"] == state["b_before"] == {}
+        # The run consumed each chain's own bindings: both chains ran clean.
+        assert state["statuses"] == ["ok", "ok"], state["statuses"]
+        prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
+        assert len(prov) == 2, f"one provenance line per chain input: {prov}"
+        # The chain half is md_safe-escaped in the report (``base_2`` -> ``base\_2``)
+        # — match the escaped prefix and disambiguate by the bound file.
+        a_line = next(
+            ln for ln in prov if ln.startswith("- Chain base input 1")
+        )
+>       b_line = next(ln for ln in prov if "release.s19" in ln)
+E       StopIteration
+
+tests\test_tui_flow_execution_b94.py:591: StopIteration
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+1 failed in 3.52s
+  [arm 09 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]] exit 1
+    after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
+    arm 09 [tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs]: RED (KILLED)
+  $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_tc_b94_30_chain_set_report_provenance_lines _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19324/test_tc_b94_30_chain_set_repor0')
+
+    def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
+        """TC-B94-30 (LLR-020.2, C-42): the report carries one provenance line
+        per chain input — 1 per input, 0 missing, 0 duplicates; every line
+        resolves to the bound path (name equality with the binding record).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+        record = run_chain_set(
+            [
+                _clean_chain("a"),
+                ChainSpec(
+                    name="b",
+                    template="base",
+                    flow=_clean_chain("b").flow,
+                    bindings={0: "variant_b.hex"},
+                ),
+            ],
+            ctx,
+            set_name="variants_a_b",
+        )
+        report = record.report_path.read_text(encoding="utf-8")
+        prov_lines = [ln for ln in report.splitlines() if ln.startswith("- Chain ")]
+        # line count == chain-input count (1 per input, 0 missing/duplicates).
+        assert len(prov_lines) == 2
+        assert len(set(prov_lines)) == 2, f"duplicate provenance lines: {prov_lines}"
+        # The C-42 fixed form + name equality with the binding record. The
+        # emitted form is ``- Chain <name> input <j>: <ref> [bound] path=`...```
+        # (the label half md_safe-escaped, the path half a byte-faithful code
+        # span); the predicate pins the fixed scaffolding and the resolved name.
+        for outcome in record.outcomes:
+            for index, (ref, resolved) in enumerate(outcome.inputs, start=1):
+                line = next(
+                    (
+                        ln
+                        for ln in prov_lines
+                        if ln.startswith(f"- Chain {outcome.chain} input {index}:")
+                    ),
+                    None,
+                )
+                assert line is not None, (
+                    f"missing provenance line for {outcome.chain} input {index}"
+                )
+                assert " [bound] path=`" in line
+                assert line.endswith("`"), f"the code span must close: {line}"
+                assert Path(resolved).name == Path(ref).name
+                assert line.rstrip("`").endswith(Path(ref).name), (
+                    f"the line must resolve to the bound path's name: {line}"
+                )
+    
+        # Rebind-then-rerun arm: the report names the NEW binding, never a stale one.
+        rebound = run_chain_set(
+            [
+                ChainSpec(
+                    name="a",
+                    template="base",
+                    flow=_clean_chain("a").flow,
+                    bindings={0: "variant_b.hex"},
+                )
+            ],
+            ctx,
+            set_name="variants_a_b",
+        )
+        rerun_report = rebound.report_path.read_text(encoding="utf-8")
+        rerun_lines = [ln for ln in rerun_report.splitlines() if ln.startswith("- Chain ")]
+        assert len(rerun_lines) == 1
+>       assert "variant_b.hex" in rerun_lines[0]
+E       AssertionError: assert 'variant_b.hex' in '- Chain a input 1: base\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-19324\\test_tc_b94_30_chain_set_repor0\\.s19tool\\workarea\\proj\\base.s19`'
+
+tests\test_flow_chainset_b94.py:324: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines
+1 failed in 0.53s
+  [arm 09 [tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines]] exit 1
+    after:  c27e7428e0f058b8fb7ce440b56b3de766c2ea4e27a6b220709d8f3ac3e72771 restore-ok=True
+    arm 09 [tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines]: RED (KILLED)
+
+--- arm 10: s19_app/tui/services/flow_persistence_service.py
+    note: the outputs field omitted from the envelope: the round-trip loses it
+    edit: '                "outputs": list(entry.outputs),'
+          -> ''
+    before: 828ae15a07255aecc0aa6b605c6085429b2338a2d849e0fb3b3ad11116104a4e
+  $ pytest [tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b94_31_chain_set_serializer_round_trip ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19325/test_tc_b94_31_chain_set_seria0')
+
+    def test_tc_b94_31_chain_set_serializer_round_trip(tmp_path: Path) -> None:
+        """TC-B94-31 (LLR-021.1, unit): ONE document; chain count == lane count;
+        every chain carries 1 template ref, >=1 input, >=1 output; reload
+        restores 100% with 0 field diffs (the 0-diff contract rides the same
+        assertion family as AT-B94-24's e2e).
+        """
+        project = _project(tmp_path)
+        saved = fps.save_chain_set(_saved_set(project), "variants_a_b", project)
+        assert saved is not None and saved.parent == project / fps.FLOWSETS_SUBDIR, (
+            f"the set must land inside the work area: {saved}"
+        )
+        # 1 saved document; the on-disk envelope shape.
+        envelope = json.loads(saved.read_text(encoding="utf-8"))
+        assert envelope["schema_version"] == fps.CHAIN_SET_SCHEMA_VERSION
+        assert envelope["kind"] == "chain-set"
+        assert len(envelope["chains"]) == 2
+        for entry in envelope["chains"]:
+            assert isinstance(entry["template"], str) and entry["template"]
+            assert len(entry["inputs"]) >= 1
+>           assert len(entry["outputs"]) >= 1
+E           KeyError: 'outputs'
+
+tests\test_flow_chainset_b94.py:410: KeyError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip
+1 failed in 0.51s
+  [arm 10 [tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]] exit 1
+    after:  828ae15a07255aecc0aa6b605c6085429b2338a2d849e0fb3b3ad11116104a4e restore-ok=True
+    arm 10 [tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip]: RED (KILLED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 01 | tests/test_tui_flow_execution_b94.py::test_at_b94_02_rail_twelve_entries_mount_panels
+    edit:     + (RailEntry("flow_execution", "▶", ">", "Flow Execution"),)... | RED (KILLED) | restore-hash OK
+    note: land 11 rail entries: the 12th row (and its container/binding census) is dropped from the shipped rail
+arm 01 | tests/test_tui_flow_execution_b94.py::test_tc_b94_08_rail_entries_census_and_duplicate_rejection
+    edit:     + (RailEntry("flow_execution", "▶", ">", "Flow Execution"),)... | RED (KILLED) | restore-hash OK
+    note: land 11 rail entries: the 12th row (and its container/binding census) is dropped from the shipped rail
+arm 02 | tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side
+    edit:             if stem is None:... | RED (KILLED) | restore-hash OK
+    note: a cancelled import mounts a lane (the cancel arm adds a lane)
+arm 02 | tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census
+    edit:             if stem is None:... | RED (KILLED) | restore-hash OK
+    note: a cancelled import mounts a lane (the cancel arm adds a lane)
+arm 03 | tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+    edit:         lane.bindings[src_index] = value... | RED (KILLED) | restore-hash OK
+    note: one shared bindings dict across lanes: editing A writes every lane
+arm 03 | tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+    edit:         lane.bindings[src_index] = value... | RED (KILLED) | restore-hash OK
+    note: one shared bindings dict across lanes: editing A writes every lane
+arm 04 | tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures
+    edit:     record = ChainSetRunRecord(mode=mode)... | RED (KILLED) | restore-hash OK
+    note: the mode field hard-coded: the record never changes from the default
+arm 04 | tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report
+    edit:     record = ChainSetRunRecord(mode=mode)... | RED (KILLED) | restore-hash OK
+    note: the mode field hard-coded: the record never changes from the default
+arm 05 | tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential
+    edit:     if mode == CHAIN_RUN_PARALLEL:... | RED (KILLED) | restore-hash OK
+    note: parallel-always dispatch: an untouched default run overlaps chains
+arm 06 | tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance
+    edit:             log.append("✗ ", style=_S_ERR)... | RED (KILLED) | restore-hash OK
+    note: the inline X line suppressed: the failure is visible only elsewhere
+arm 07 | tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm
+    edit:                 log.append(f"{glyph} ", style=_S_LABEL)... | RED (KILLED) | restore-hash OK
+    note: the all-clean arm emits an X: the log invents a failure
+arm 08 | tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices
+    edit:             bindings = {index: ref for index, ref in entry.inputs}... | RED (KILLED) | restore-hash OK
+    note: the reload silently drops input bindings (a stale run by construction)
+arm 09 | tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+    edit:     for index, ref in bindings.items():... | RED (KILLED) | restore-hash OK
+    note: the runner ignores the bindings: a stale input is named after a rebind
+arm 09 | tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines
+    edit:     for index, ref in bindings.items():... | RED (KILLED) | restore-hash OK
+    note: the runner ignores the bindings: a stale input is named after a rebind
+arm 10 | tests/test_flow_chainset_b94.py::test_tc_b94_31_chain_set_serializer_round_trip
+    edit:                 "outputs": list(entry.outputs),... | RED (KILLED) | restore-hash OK
+    note: the outputs field omitted from the envelope: the round-trip loses it
+------------------------------------------------------------------------------
+TOTALS: 15 node-runs | RED 15 | SURVIVED 0 | CRASH/BAD 0
+runner exit: 0 (all arms killed)

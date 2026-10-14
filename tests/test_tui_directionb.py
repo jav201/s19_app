@@ -134,9 +134,10 @@ from s19_app.tui.screens_directionb import EmptyStatePanel
 from s19_app.tui.screens_directionb import MemoryMapPanel
 
 
-# The 11 Direction B rail screen container ids, in rail order (keys 1-9 then
+# The 12 Direction B rail screen container ids, in rail order (keys 1-9 then
 # 0 for the 10th digit-bound screen; batch-94 LLR-002.1 inserts the Check
-# Editor after Patch Editor on the `=` binding — the digits still bind the
+# Editor after Patch Editor on the `=` binding and US-007 inserts Flow
+# Execution after Flow Builder on the `]` binding — the digits still bind the
 # ten pre-batch-94 screens).
 SCREEN_IDS = [
     "screen_workspace",
@@ -148,6 +149,7 @@ SCREEN_IDS = [
     "screen_check_editor",
     "screen_diff",
     "screen_flow",
+    "screen_flow_execution",
     "screen_checks",
     "screen_crc_designer",
 ]
@@ -163,18 +165,22 @@ SCREEN_KEYS = [
     "check_editor",
     "diff",
     "flow",
+    "flow_execution",
     "checks",
     "crc_designer",
 ]
 
 # The digit-bound screens: keys 1-9 and 0 bind the ten pre-batch-94 screens
 # (the digit row was exhausted at 10 surfaces — batch-94 R-1); the Check
-# Editor routes through the `equals_sign` binding instead, so the digit
-# census derives by excluding it, in rail order.
+# Editor routes through the `equals_sign` binding and Flow Execution through
+# the `right_square_bracket` binding instead, so the digit census derives by
+# excluding both, in rail order.
+_NON_DIGIT_SCREEN_KEYS = ("check_editor", "flow_execution")
 DIGIT_SCREEN_IDS = [
-    sid for key, sid in zip(SCREEN_KEYS, SCREEN_IDS) if key != "check_editor"
+    sid for key, sid in zip(SCREEN_KEYS, SCREEN_IDS)
+    if key not in _NON_DIGIT_SCREEN_KEYS
 ]
-DIGIT_SCREEN_KEYS = [key for key in SCREEN_KEYS if key != "check_editor"]
+DIGIT_SCREEN_KEYS = [key for key in SCREEN_KEYS if key not in _NON_DIGIT_SCREEN_KEYS]
 
 # Rail keys in rail order: digits 1-9 then 0 for the 10th digit-bound screen.
 RAIL_KEYS_IN_ORDER = "1234567890"
@@ -479,13 +485,15 @@ def test_tc037_scaffold_screens_carry_empty_state(tmp_path: Path) -> None:
 # Increment 3 — activity rail widget + rail navigation wiring
 # ===========================================================================
 
-# The 11 rail items, in rail order, paired with their screen key and the
+# The 12 rail items, in rail order, paired with their screen key and the
 # normative LLR-001.3 glyph -> screen mapping table (Unicode + ASCII).
 # batch-49 (LLR-083.1): Checks appended as the 9th entry on key 9.
 # batch-58 (LLR-V1.1): CRC Designer appended as the 10th entry on key 0.
 # batch-94 (LLR-002.1): Check Editor inserted after Patch Editor on the
-# `=` binding (the digit row was exhausted at 10 surfaces — R-1 closure);
-# its glyph/ascii pair is the Phase-3 chrome census (✔ / K — C is Checks).
+# `=` binding; Flow Execution inserted after Flow Builder on the `]` binding
+# (the digit row was exhausted at 10 surfaces — R-1 closure). The glyph/ascii
+# pairs are the Phase-3 chrome census (✔ / K — C is Checks; ▶ / > — the fx_a
+# run glyph).
 EXPECTED_RAIL = [
     ("workspace", "◫", "#"),
     ("a2l", "≡", "="),
@@ -496,14 +504,16 @@ EXPECTED_RAIL = [
     ("check_editor", "✔", "K"),
     ("diff", "⏚", "D"),
     ("flow", "✦", "F"),
+    ("flow_execution", "▶", ">"),
     ("checks", "☑", "C"),
     ("crc_designer", "⊕", "R"),
 ]
 
-# The digit-bound EXPECTED_RAIL rows (the Check Editor routes via `=`, not a
-# digit) — the digit-routing tests zip these with "123456789"/"0".
+# The digit-bound EXPECTED_RAIL rows (the Check Editor routes via `=` and
+# Flow Execution via `]`, not a digit) — the digit-routing tests zip these
+# with "123456789"/"0".
 DIGIT_EXPECTED_RAIL = [
-    entry for entry in EXPECTED_RAIL if entry[0] != "check_editor"
+    entry for entry in EXPECTED_RAIL if entry[0] not in _NON_DIGIT_SCREEN_KEYS
 ]
 
 
@@ -513,14 +523,15 @@ DIGIT_EXPECTED_RAIL = [
 
 
 def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
-    """The activity rail composes exactly 11 items in the keymap rail order.
+    """The activity rail composes exactly 12 items in the keymap rail order.
 
     Intent: LLR-001.1 / batch-49 LLR-083.1 / batch-94 LLR-002.1 — the rail
-    is fixed at eleven items, ordered Workspace, A2L, MAC, Map, Issues,
-    Patch, Check Editor, Diff, Flow, Checks, CRC Designer. Each digit-bound
-    item's 1-based position is its keymap key; the Check Editor (position 7)
-    routes through the ``=`` binding (batch-94 R-1 — the digit row was
-    exhausted at 10 surfaces).
+    is fixed at twelve items, ordered Workspace, A2L, MAC, Map, Issues,
+    Patch, Check Editor, Diff, Flow, Flow Execution, Checks, CRC Designer.
+    Each digit-bound item's 1-based position is its keymap key; the Check
+    Editor (position 7) routes through the ``=`` binding and Flow Execution
+    (position 10) through the ``]`` binding (batch-94 R-1 — the digit row
+    was exhausted at 10 surfaces).
     """
 
     async def _drive() -> tuple[list[str], list[int]]:
@@ -536,8 +547,8 @@ def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
     assert keys == [key for key, _, _ in EXPECTED_RAIL], (
         f"Rail item order should match the keymap rail order, got {keys}"
     )
-    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], (
-        f"Rail items must be positioned 1-11 in order, got {positions}"
+    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], (
+        f"Rail items must be positioned 1-12 in order, got {positions}"
     )
 
 
@@ -739,7 +750,7 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             # Force the fallback mode by re-mounting the rail in ASCII mode.
             slot = app.query_one("#rail_slot")
             await app.query_one(Rail).remove()
-            # batch-94: the shipped rail is the 11-entry B94 order (rail.py's
+            # batch-94: the shipped rail is the 12-entry B94 order (rail.py's
             # RAIL_ENTRIES stays the batch-93 record) — the fallback census
             # exercises the same entries the app composes.
             await slot.mount(
@@ -752,7 +763,7 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             ]
 
     rendered = asyncio.run(_drive())
-    assert len(rendered) == 11, f"expected 11 rail items, got {len(rendered)}"
+    assert len(rendered) == 12, f"expected 12 rail items, got {len(rendered)}"
     for (screen_key, glyph), (exp_key, _, exp_ascii) in zip(rendered, EXPECTED_RAIL):
         assert screen_key == exp_key, f"order: {screen_key} != {exp_key}"
         assert glyph == exp_ascii, (

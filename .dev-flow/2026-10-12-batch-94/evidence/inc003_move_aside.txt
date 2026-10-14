@@ -1,0 +1,27 @@
+==============================================================================
+inc003 C-20 move-aside — the trigger-absent RED for the 2 net-new files
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+before-hash tests/test_tui_flow_execution_b94.py: db680d482b1d150ffdff12a7201bc42c14230c229821cc3937f0fd52c090f412
+before-hash tests/test_flow_chainset_b94.py: d4db68d3e1e4c7b0b8ef0e4146f9f3f3e2b2fe09459065b84590a035d9c3869f
+moved aside: tests/test_tui_flow_execution_b94.py -> .dev-flow\2026-10-12-batch-94\evidence\_aside_inc003\test_tui_flow_execution_b94.py
+moved aside: tests/test_flow_chainset_b94.py -> .dev-flow\2026-10-12-batch-94\evidence\_aside_inc003\test_flow_chainset_b94.py
+$ pytest [tests/test_tui_flow_execution_b94.py tests/test_flow_chainset_b94.py]  (the moved-aside run)
+---- run output (tail) ----
+
+no tests ran in 0.00s
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+ERROR: file or directory not found: tests/test_tui_flow_execution_b94.py
+
+
+---- exit 4 ----
+verdict: RED (KILLED) — collection of the minted nodes fails with the files absent
+restored: tests/test_tui_flow_execution_b94.py — hash identical (db680d482b1d150ffdff12a7201bc42c14230c229821cc3937f0fd52c090f412)
+restored: tests/test_flow_chainset_b94.py — hash identical (d4db68d3e1e4c7b0b8ef0e4146f9f3f3e2b2fe09459065b84590a035d9c3869f)
+after-hash  tests/test_tui_flow_execution_b94.py: db680d482b1d150ffdff12a7201bc42c14230c229821cc3937f0fd52c090f412
+after-hash  tests/test_flow_chainset_b94.py: d4db68d3e1e4c7b0b8ef0e4146f9f3f3e2b2fe09459065b84590a035d9c3869f
+
+RESTORE PROVEN (hash identical) for every moved-aside file

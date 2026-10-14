@@ -66,7 +66,7 @@ from .screens import (
     SaveProjectScreen,
     SelectVariantScreen,
 )
-from .flow_screens import FlowBuilderPanel
+from .flow_screens import FlowBuilderPanel, FlowExecutionPanel
 from .screens_directionb import (
     AbDiffPanel,
     CheckEditorPanel,
@@ -213,17 +213,22 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
 
 #: The batch-94 (LLR-002.1/.2, LLR-001.2) rail order — the ten shipped entries
 #: plus the Check Editor inserted after Patch Editor (the R-1 closure: ``=``
-#: binding, ``show=False``; the Flow Execution entry is Inc-003's). Built HERE
-#: (the sole rail/routing/scan site) rather than in ``rail.py`` so the rework
-#: stays inside the increment's four-file SOURCE budget; ``rail.py``'s
-#: ``RAIL_ENTRIES`` stays the batch-93 record. The glyph/ascii pair is the
-#: Phase-3 chrome census: ``✔``/``K`` — CHECK-family glyph, ``K`` free in the
-#: ASCII table (``C`` belongs to Checks). The guard-host census constants move
-#: with this increment (test-side, LLR-002.2 — never before).
+#: binding, ``show=False``) and the Flow Execution entry inserted after Flow
+#: Builder (Inc-003, the ``]`` binding — the 12-entry census completes the D5
+#: freeze). Built HERE (the sole rail/routing/scan site) rather than in
+#: ``rail.py`` so the rework stays inside the increment's four-file SOURCE
+#: budget; ``rail.py``'s ``RAIL_ENTRIES`` stays the batch-93 record. The
+#: glyph/ascii pairs are the Phase-3 chrome census: ``✔``/``K`` — CHECK-family
+#: glyph, ``K`` free in the ASCII table (``C`` belongs to Checks); ``▶``/``>``
+#: — the fx_a run glyph (▶ is the spike's running-status glyph), ``>`` free.
+#: The guard-host census constants move with this increment (test-side,
+#: LLR-002.2 — never before).
 RAIL_ENTRIES_B94: tuple[RailEntry, ...] = (
     RAIL_ENTRIES[:6]
     + (RailEntry("check_editor", "✔", "K", "Check Editor"),)
-    + RAIL_ENTRIES[6:]
+    + RAIL_ENTRIES[6:8]
+    + (RailEntry("flow_execution", "▶", ">", "Flow Execution"),)
+    + RAIL_ENTRIES[8:]
 )
 
 #: The Check Editor's routable action set (LLR-001.2) — write and validate
@@ -1411,10 +1416,11 @@ class S19TuiApp(App):
         # the digit row is exhausted at 10 surfaces, so the Check Editor binds
         # `=` — the number row's right-hand neighbour, `show=False` so the
         # footer stays uncrowded (C-13) and discoverable through the `?` help
-        # panel. Flow Execution is Inc-003's (`]`, not bound here).
+        # panel. Flow Execution rides `]` (batch-94 Inc-003, the R-1 closure).
         Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),
         Binding("7", "show_screen('diff')", "A2B Diff", show=False),
         Binding("8", "show_screen('flow')", "Flow Builder", show=False),
+        Binding("right_square_bracket", "show_screen('flow_execution')", "Flow Execution", show=False),
         Binding("9", "show_screen('checks')", "Checks", show=False),
         Binding("0", "show_screen('crc_designer')", "CRC Designer", show=False),
         ("plus", "page_next_context", "Page+"),
@@ -1998,8 +2004,9 @@ class S19TuiApp(App):
         )
         # Activity rail (left) + the 8-screen workspace body (right).
         # The rail emits `Rail.Selected`; `on_rail_selected` routes it.
-        # batch-94: the rail carries the 11-entry B94 order (Check Editor
-        # after Patch Editor) — see `RAIL_ENTRIES_B94`.
+        # batch-94: the rail carries the 12-entry B94 order (Check Editor
+        # after Patch Editor, Flow Execution after Flow Builder) — see
+        # `RAIL_ENTRIES_B94`.
         yield Horizontal(
             Container(Rail(entries=RAIL_ENTRIES_B94, active="workspace"), id="rail_slot"),
             Container(
@@ -2012,6 +2019,7 @@ class S19TuiApp(App):
                 self._compose_screen_check_editor(),
                 self._compose_screen_diff(),
                 self._compose_screen_flow(),
+                self._compose_screen_flow_execution(),
                 self._compose_screen_checks(),
                 self._compose_screen_crc_designer(),
                 self._compose_screen_split_join(),
@@ -2392,6 +2400,40 @@ class S19TuiApp(App):
             classes="db-screen hidden",
         )
 
+    def _compose_screen_flow_execution(self) -> Container:
+        """Build the Flow Execution rail screen (``#screen_flow_execution``).
+
+        Summary:
+            The batch-94 Inc-003 fx_a surface (US-007, HLR-017…021) — one
+            :class:`FlowExecutionPanel` mounted between Flow Builder and
+            Checks (the R-1 order). The panel is presentational: Import… /
+            Run / Save Set / Load Set post ``FlowExecutionPanel.*`` messages
+            that the ``on_flow_execution_panel_*`` handlers route — template
+            import through the hardened ``load_flow_json``, the run through
+            the service's ``run_chain_set``, the set through
+            ``save_chain_set`` / ``load_chain_set``. A plain Container (not a
+            ``WindowSection``): ``window_help.py``'s section table is
+            batch-95's frozen surface and names no ``flow_execution`` section,
+            so this window ships no focused-``?`` chip rather than forking
+            the frozen table.
+
+        Returns:
+            Container: ``#screen_flow_execution`` holding the title row and
+            the ``FlowExecutionPanel``. Hidden at startup.
+
+        Dependencies:
+            Uses:
+                - ``FlowExecutionPanel`` / ``titled_header``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            titled_header("Flow Execution"),
+            FlowExecutionPanel(),
+            id="screen_flow_execution",
+            classes="db-screen hidden",
+        )
+
     def _compose_screen_crc_designer(self) -> Container:
         """
         Summary:
@@ -2654,6 +2696,243 @@ class S19TuiApp(App):
                 panel.set_blocks(loaded, name=stem)
 
         self.push_screen(LoadFlowScreen(flows, project_dir), _do_load)
+
+    # -- Flow Execution (fx_a, batch-94 Inc-003; US-007, HLR-017…021) ---------
+
+    def _prefill_flow_execution_sets(self) -> None:
+        """Repopulate the set picker on entry (LLR-021.2's restore seam)."""
+        from .services.flow_persistence_service import list_chain_sets
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        panel.set_available_sets(
+            list_chain_sets(project_dir) if project_dir is not None else []
+        )
+
+    def on_flow_execution_panel_import_requested(
+        self, event: "FlowExecutionPanel.ImportRequested"
+    ) -> None:
+        """Import a builder template as a new lane (HLR-017, LLR-017.1).
+
+        Summary:
+            Resolve the active project, list ``flows/*.json``, and open the
+            existing :class:`LoadFlowScreen` picker (its Import… arm copies
+            an external template into ``flows/`` containment-guarded, so the
+            operator can import from anywhere). On a chosen stem, load through
+            the fail-closed ``load_flow_json``: a valid template mounts one
+            lane via :meth:`FlowExecutionPanel.add_lane`; a rejection paints
+            the import notice (0 lanes mounted — LLR-017.1's invalid arm). A
+            cancelled picker changes nothing (the cancel arm).
+
+        Args:
+            event (FlowExecutionPanel.ImportRequested): The import request
+                (no payload).
+        """
+        from .services.flow_persistence_service import (
+            FLOWS_SUBDIR,
+            list_saved_flows,
+            load_flow_json,
+        )
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_import_refusal(
+                "?", [self._flow_issue("no project loaded - load or save a project first")]
+            )
+            return
+        flows = list_saved_flows(project_dir)
+
+        def _do_import(stem: Optional[str]) -> None:
+            if stem is None:
+                return  # cancelled — 0 lanes mounted (LLR-017.1 cancel arm)
+            flow_path = project_dir / FLOWS_SUBDIR / f"{stem}.json"
+            loaded, findings = load_flow_json(flow_path, project_dir)
+            if loaded is None:
+                panel.render_import_refusal(stem, findings)
+                return
+            panel.add_lane(stem, loaded)
+
+        self.push_screen(LoadFlowScreen(flows, project_dir), _do_import)
+
+    @staticmethod
+    def _flow_issue(message: str):
+        from ..validation.model import ValidationIssue, ValidationSeverity
+
+        return ValidationIssue(
+            code="FX-NO-PROJECT",
+            severity=ValidationSeverity.ERROR,
+            message=message,
+            artifact="flow",
+        )
+
+    def on_flow_execution_panel_run_requested(
+        self, event: "FlowExecutionPanel.RunRequested"
+    ) -> None:
+        """Run the lane set and paint the fx_a lanes + run log (HLR-019/020).
+
+        Summary:
+            Translate the panel's lane payloads into the service's
+            ``ChainSpec`` plan (per-chain independent bindings, LLR-018) and
+            dispatch ``run_chain_set`` — sequential default, parallel per
+            chain when the operator drove the mode control (LLR-019.2's C-10
+            non-default arm). The service wraps the union ``run_flow`` per
+            chain; this handler re-implements no block semantics. The record
+            comes back to :meth:`FlowExecutionPanel.render_run` for the lanes
+            + the run-log strip; a no-project state paints the log error
+            instead of running.
+
+        Args:
+            event (FlowExecutionPanel.RunRequested): Carries the lanes, the
+                mode token, and the set name.
+        """
+        from .services.flow_execution_service import ChainSpec, run_chain_set
+        from .services.flow_model import FlowContext
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_run_error(
+                "no project loaded - load or save a project first"
+            )
+            return
+        chains = [
+            ChainSpec(
+                name=lane.name,
+                template=lane.template,
+                flow=lane.flow,
+                bindings=dict(lane.bindings),
+            )
+            for lane in event.lanes
+        ]
+        record = run_chain_set(
+            chains,
+            FlowContext(project_dir=project_dir),
+            mode=event.mode,
+            set_name=event.set_name,
+        )
+        panel.render_run(record)
+
+    def on_flow_execution_panel_save_requested(
+        self, event: "FlowExecutionPanel.SaveRequested"
+    ) -> None:
+        """Persist the chain set to ``flowsets/<name>.json`` (HLR-021).
+
+        Summary:
+            Translate the lane payloads into the ``ChainSetEntry`` envelope
+            (chains + bound inputs + recorded outputs, LLR-021.1) and write
+            through ``save_chain_set`` — the sanitiser is the write-side
+            containment authority; an empty set (0 lanes) or an un-sanitisable
+            name writes NOTHING and surfaces one status line. A successful
+            save marks the panel saved (identity = the stem).
+
+        Args:
+            event (FlowExecutionPanel.SaveRequested): Carries the lanes and
+                the raw operator-typed name.
+        """
+        from .services.flow_persistence_service import ChainSet, ChainSetEntry, save_chain_set
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("No project loaded - load or save a project first.")
+            return
+        chain_set = ChainSet(
+            name=event.raw_name.strip() or "chain-set",
+            chains=tuple(
+                ChainSetEntry(
+                    chain=lane.name,
+                    template=lane.template,
+                    # lane.bindings rides as (index, ref) pairs — the panel's
+                    # effective-input contract (>=1 input per chain).
+                    inputs=tuple(sorted(lane.bindings)),
+                    outputs=tuple(lane.outputs),
+                )
+                for lane in event.lanes
+            ),
+        )
+        saved = save_chain_set(chain_set, event.raw_name, project_dir)
+        if saved is None:
+            self.set_status(
+                "Chain set not saved - the set is empty or the name sanitised away."
+            )
+            return
+        panel.mark_saved(saved.stem)
+        self._prefill_flow_execution_sets()
+
+    async def on_flow_execution_panel_load_set_requested(
+        self, event: "FlowExecutionPanel.LoadSetRequested"
+    ) -> None:
+        """Reload a saved set and restore its lanes for a re-run (LLR-021.2).
+
+        Summary:
+            Load the set fail-closed through ``load_chain_set`` (a corrupt set
+            is refused with the notice, 0 lanes change). For every chain,
+            re-load its template through the hardened ``load_flow_json`` and
+            restore the lane with its bound inputs + recorded outputs; a
+            chain whose template is gone is skipped and NAMED in the notice.
+            A bound input whose file moved is NOT a refusal — the lane mounts
+            with the per-lane provenance-mismatch notice (LLR-021.2's error
+            arm: never a silent stale run).
+
+        Args:
+            event (FlowExecutionPanel.LoadSetRequested): Carries the chosen
+                ``flowsets/<stem>.json`` identity.
+        """
+        from .services.flow_persistence_service import (
+            FLOWS_SUBDIR,
+            load_chain_set,
+            load_flow_json,
+        )
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("No project loaded - load or save a project first.")
+            return
+        set_path = project_dir / "flowsets" / f"{event.stem}.json"
+        loaded, findings = load_chain_set(set_path, project_dir)
+        if loaded is None:
+            first = findings[0].message if findings else "unreadable set"
+            panel.render_set_refusal(event.stem, findings)
+            self.set_status(f"Chain set load refused: {first}")
+            return
+        # A successful reload REPLACES the lanes with the restored set (the
+        # C-12 chain: the reloaded set is what re-runs, never a merge). The
+        # lane clearing is awaited — the restored lanes mount onto the emptied
+        # container, never a half-removed tree.
+        await panel.begin_set_restore(event.stem)
+        skipped: List[str] = []
+        restored = 0
+        for entry in loaded.chains:
+            template_path = project_dir / FLOWS_SUBDIR / f"{entry.template}.json"
+            flow, template_findings = load_flow_json(template_path, project_dir)
+            if flow is None:
+                skipped.append(entry.chain)
+                continue
+            bindings = {index: ref for index, ref in entry.inputs}
+            missing = [
+                ref
+                for ref in bindings.values()
+                if not (project_dir / ref).exists()
+            ]
+            panel.restore_lane(
+                entry.chain,
+                entry.template,
+                flow,
+                bindings,
+                entry.outputs,
+                missing,
+            )
+            restored += 1
+        notices: List[str] = []
+        if skipped:
+            notices.append(
+                "chain(s) skipped, template missing: " + ", ".join(skipped)
+            )
+        if restored:
+            notices.append(f"{restored} chain(s) restored")
+        panel.restore_set(event.stem, restored, notices)
 
     def _compose_screen_patch(self) -> Container:
         """
@@ -6260,8 +6539,9 @@ class S19TuiApp(App):
 
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
     #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Check Editor, Diff,
-    #: Flow, Checks, CRC Designer — the batch-94 rail order (RAIL_ENTRIES_B94;
-    #: the Check Editor inserted after Patch Editor, LLR-002.1).
+    #: Flow, Flow Execution, Checks, CRC Designer — the batch-94 rail order
+    #: (RAIL_ENTRIES_B94; Check Editor after Patch Editor LLR-002.1, Flow
+    #: Execution after Flow Builder US-007).
     SCREEN_CONTAINER_IDS = {
         "workspace": "screen_workspace",
         "a2l": "screen_a2l",
@@ -6272,6 +6552,7 @@ class S19TuiApp(App):
         "check_editor": "screen_check_editor",
         "diff": "screen_diff",
         "flow": "screen_flow",
+        "flow_execution": "screen_flow_execution",
         "checks": "screen_checks",
         "crc_designer": "screen_crc_designer",
     }
@@ -6313,6 +6594,7 @@ class S19TuiApp(App):
         "check_editor": None,
         "diff": None,
         "flow": None,
+        "flow_execution": None,
         "checks": None,
         "crc_designer": None,
     }
@@ -6476,6 +6758,10 @@ class S19TuiApp(App):
             # Lazy read-only mirror rebuilt on entry (batch-49, LLR-083.6);
             # checks state changes only on run/undo/redo, so no load hook.
             self.update_checks_view()
+        elif screen_key == "flow_execution":
+            # batch-94 Inc-003 (LLR-021.2): the set picker repopulates on
+            # entry, the ``_prefill_check_editor`` idiom.
+            self._prefill_flow_execution_sets()
 
     def action_open_split_join_export(self) -> None:
         """

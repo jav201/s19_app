@@ -1,12 +1,13 @@
-"""Flow Builder + Flow Execution surfaces (batch-94, ARQ R8; Inc-002 fb_a).
+"""Flow Builder + Flow Execution surfaces (batch-94, ARQ R8; Inc-002 fb_a,
+Inc-003 fx_a).
 
 This module is the R8 home of the flow family: the reworked fb_a
-:class:`FlowBuilderPanel` (Inc-002) and, at Inc-003, the fx_a
-``FlowExecutionPanel``. Pure view layer — the panels and their
-``ActionRequested``-kin message types; flow execution SEMANTICS stays in
-``services/flow_*`` (messages out, services never called directly; the one
-declared data edge ``flow_screens → services/flow_model`` is read-only
-constants/dataclasses per ``docs/architecture.md`` §10).
+:class:`FlowBuilderPanel` (Inc-002) and the fx_a
+:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Pure view layer —
+the panels and their ``ActionRequested``-kin message types; flow execution
+SEMANTICS stays in ``services/flow_*`` (messages out, services never called
+directly; the one declared data edge ``flow_screens → services/flow_model``
+is read-only constants/dataclasses per ``docs/architecture.md`` §10).
 
 fb_a doctrine (the ratified spike graduation call, ``flow_bench.NOTES.md`` —
 "connectivity is the builder's job"): a block palette rail, a framed canvas
@@ -18,13 +19,25 @@ upstream block of the CURRENT flow) or a project-relative file, with ≥1 input
 from this flow enforced at wiring time (HLR-014); SOURCE blocks render as file
 chips dropping onto the next block's image row.
 
+fx_a doctrine (``flow_bench.NOTES.md``: per-chain carriles + the RUN LOG
+strip — the operator's suggestion #1, mid-chain failure visible inline):
+imported templates mount one lane per chain, side by side; each lane paints
+its pinned inputs, a shaded ``▓/░`` progress bar and a status glyph
+(``▶✗✓``); the run-log strip below names a failed chain's block and its
+missing config on one inline ``✗`` line. The panel is presentational — Run
+posts the lane payloads to the app, the app runs the service's chain-set
+runner and hands the record back for painting; Save Set / Load Set post the
+same way. Every file-derived string renders through ``safe_text`` (C-17).
+
 No engine code is imported beyond the read-only flow-model data types; every
 file-derived string renders through ``safe_text`` (C-17).
 """
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Tuple
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -1259,6 +1272,719 @@ class FlowBuilderPanel(ScrollableContainer):
             )
 
         container.mount(*widgets)
+
+
+# ---------------------------------------------------------------------------
+# fx_a — Flow Execution (batch-94 Inc-003, US-007; HLR-017…021): per-chain
+# lanes + shaded progress + status glyph + the RUN LOG strip with the inline
+# ✗ naming the block and the missing config (the operator's suggestion #1).
+# ---------------------------------------------------------------------------
+
+#: The painted lane width. Two lanes at 46 cells (44 + frame) sit inside the
+#: measured 96×18 workspace at 120×30 (A3's boxed budget); the 74-cell floor
+#: at 80×24 scrolls horizontally inside ``#fx_lanes_scroll`` (LLR-017.2's
+#: reachable-under-scroll fallback — 74×12 cannot host two full lanes).
+_FX_LANE_W = 44
+
+#: The shaded progress bar's cell budget (fx_a doctrine: ▓ done / □ queued —
+#: the state carrier, never decoration).
+_FX_BAR_CELLS = 14
+_FX_BAR_DONE = "▓"
+_FX_BAR_GAP = "░"
+
+#: Terminal status → (glyph, shade style). Enum-derived, never file-derived
+#: (correctly outside the C-17 sweep, like ``_FLOW_STATUS_BANNER``).
+_FX_STATUS_STYLE = {
+    "": ("·", _S_DIM),
+    FLOW_STATUS_OK: ("✓", _S_OUT),
+    FLOW_STATUS_ISSUES: ("◈", _S_LABEL),
+    FLOW_STATUS_ERROR: ("✗", _S_ERR),
+}
+
+
+@dataclass(frozen=True)
+class FxLaneSpec:
+    """The panel-side lane payload posted to the app (Run / Save Set).
+
+    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``
+    — the panel never imports the execution/persistence modules (the declared
+    ``flow_screens → services/flow_model`` edge stays read-only dataclasses).
+
+    Args:
+        name (str): The lane name (unique inside the set).
+        template (str): The ``flows/<stem>.json`` template reference.
+        flow (Flow): The loaded template (the app hands it back at import).
+        bindings (Tuple[Tuple[int, str], ...]): Bound input records —
+            ``(SOURCE block index, project-relative ref)`` — LLR-018.1's
+            per-chain independent state.
+        outputs (Tuple[str, ...]): The chain's recorded last outputs.
+    """
+
+    name: str
+    template: str
+    flow: Flow
+    bindings: Tuple[Tuple[int, str], ...] = ()
+    outputs: Tuple[str, ...] = ()
+
+
+@dataclass
+class _FxLane:
+    """One live lane's view state (the mounted widgets mirror this list)."""
+
+    name: str
+    template: str
+    flow: Flow
+    bindings: Dict[int, str] = field(default_factory=dict)
+    last_outputs: List[Path] = field(default_factory=list)
+    last_status: str = ""
+    last_elapsed: float = 0.0
+    fail_block: Optional[int] = None
+    missing: List[str] = field(default_factory=list)
+
+
+def _fx_stamp(seconds: float) -> str:
+    """``mm:ss.mmm`` — the fx_a run-log timestamp shape (the spike's form)."""
+    seconds = max(0.0, seconds)
+    minutes = int(seconds // 60)
+    return f"{minutes:02d}:{seconds % 60:06.3f}"
+
+
+def _fx_progress_bar(frac: float) -> Text:
+    """The shaded ▓/░ bar — ``frac`` of :data:`_FX_BAR_CELLS` cells filled."""
+    filled = max(0, min(_FX_BAR_CELLS, round(_FX_BAR_CELLS * max(0.0, min(1.0, frac)))))
+    return Text(_FX_BAR_DONE * filled + _FX_BAR_GAP * (_FX_BAR_CELLS - filled))
+
+
+class FlowExecutionPanel(ScrollableContainer):
+    """Rail-9 Flow Execution — the fx_a chain-set supervisor (batch-94 Inc-003).
+
+    Summary:
+        The HLR-017…021 surface: Import… mounts one lane per builder template
+        (side by side, LLR-017); each lane paints its pinned inputs and offers
+        per-input rebinding that touches exactly that lane's record
+        (LLR-018.1); Run dispatches the set through the app's chain-set
+        runner — sequential by default, parallel per chain on demand
+        (LLR-019) — and paints each lane's shaded progress + status glyph +
+        elapsed, plus the RUN LOG strip: one start and one terminal status
+        line per chain, and a failed chain's inline ``✗`` line naming the
+        block and its missing config (LLR-020.1). Save Set persists the whole
+        set (chains + bound inputs + recorded outputs) and Load Set restores
+        it for a re-run without re-binding (LLR-021). Presentational — every
+        control posts a message the app routes; every file-derived string
+        renders markup-safe via ``safe_text`` (C-17).
+
+    Data Flow:
+        - Import… → ``ImportRequested`` → app (template picker) →
+          :meth:`add_lane` / :meth:`render_import_refusal`.
+        - Run → ``RunRequested(lane_specs, mode, set_name)`` → app →
+          ``run_chain_set`` → :meth:`render_run` (lanes + run log).
+        - Save Set → ``SaveRequested`` → app persists → :meth:`mark_saved`.
+        - Load Set → ``LoadSetRequested`` → app restores →
+          :meth:`restore_set`.
+
+    Dependencies:
+        Uses:
+            - ``flow_model`` (read-only dataclasses, the declared R8 edge)
+            - ``safe_text`` / the ``_Grid`` painter (markup-safe paint)
+        Used by:
+            - ``S19TuiApp._compose_screen_flow_execution`` + the
+              ``on_flow_execution_panel_*`` handlers
+    """
+
+    #: The run-mode control options (label, mode token). ``sequential`` is
+    #: the untouched default (LLR-019.1); the operator drives ``parallel``
+    #: per run (the C-10 non-default arm).
+    _MODE_OPTIONS = [
+        ("Sequential (default)", "sequential"),
+        ("Parallel per chain", "parallel"),
+    ]
+
+    class ImportRequested(Message):
+        """The operator pressed Import… — the app opens the template picker."""
+
+    class RunRequested(Message):
+        """The operator pressed Run — carries the lane set to the app.
+
+        Args:
+            lanes (List[FxLaneSpec]): The current lanes, in lane order.
+            mode (str): ``sequential`` (default) or ``parallel``.
+            set_name (str): The set's display name (the report header).
+        """
+
+        def __init__(
+            self, lanes: List[FxLaneSpec], mode: str, set_name: str
+        ) -> None:
+            super().__init__()
+            self.lanes = lanes
+            self.mode = mode
+            self.set_name = set_name
+
+    class SaveRequested(Message):
+        """The operator pressed Save Set — carries the lanes + the raw name.
+
+        Args:
+            lanes (List[FxLaneSpec]): The current lanes, in lane order.
+            raw_name (str): The operator-typed set name (untrusted text).
+        """
+
+        def __init__(self, lanes: List[FxLaneSpec], raw_name: str) -> None:
+            super().__init__()
+            self.lanes = lanes
+            self.raw_name = raw_name
+
+    class LoadSetRequested(Message):
+        """The operator pressed Load Set — carries the chosen set stem.
+
+        Args:
+            stem (str): The ``flowsets/<stem>.json`` identity to restore.
+        """
+
+        def __init__(self, stem: str) -> None:
+            super().__init__()
+            self.stem = stem
+
+    def __init__(self) -> None:
+        super().__init__(id="fx_panel")
+        self._lanes: List[_FxLane] = []
+        #: The set's display name; identity is the FILENAME on save.
+        self._set_name = "chain-set"
+        #: Unsaved-edits flag — glyph ● (dirty) / ✓ (saved), the C-10 idiom.
+        self._dirty = False
+        self._last_record = None
+
+    # -- composition ---------------------------------------------------------
+
+    def compose(self) -> ComposeResult:
+        yield Static(
+            self._name_strip_text(),
+            id="fx_name_strip",
+            markup=False,
+            classes=self._name_strip_class(),
+        )
+        yield Label(
+            "Flow Execution (fx_a): Import… adds a chain lane from a builder "
+            "template; bind each lane's inputs; Run (sequential default, "
+            "parallel per chain); Save Set persists chains + inputs + outputs.",
+            id="fx_help",
+            markup=False,
+        )
+        yield Horizontal(
+            Button("Import…", id="fx_import"),
+            Select(
+                self._MODE_OPTIONS,
+                value="sequential",
+                allow_blank=False,
+                id="fx_mode",
+            ),
+            Button("Run", id="fx_run", variant="primary"),
+            id="fx_run_row",
+        )
+        yield Horizontal(
+            OsClipboardInput(placeholder="set name", id="fx_set_name"),
+            Button("Save Set", id="fx_save"),
+            Select(
+                [("(no saved sets)", "")],
+                value="",
+                allow_blank=False,
+                id="fx_set_select",
+            ),
+            Button("Load Set", id="fx_load"),
+            id="fx_set_row",
+        )
+        yield Static("", id="fx_notice", markup=False)
+        yield ScrollableContainer(
+            Horizontal(
+                Static(
+                    "(no chains — Import… adds a lane)",
+                    id="fx_empty",
+                    markup=False,
+                ),
+                id="fx_lanes",
+            ),
+            id="fx_lanes_scroll",
+        )
+        yield Static("", id="fx_log", markup=False)
+
+    def on_mount(self) -> None:
+        self.query_one("#fx_set_name", Input).value = self._set_name
+
+    # -- name strip (the C-10 dirty-guard idiom) -----------------------------
+
+    def _name_strip_text(self) -> Text:
+        glyph = "●" if self._dirty else "✓"
+        text = Text()
+        text.append("Set: ")
+        text.append(safe_text(self._set_name))
+        text.append(f"  {glyph}")
+        return text
+
+    def _name_strip_class(self) -> str:
+        return "flow-name-strip " + ("sev-warning" if self._dirty else "sev-neutral")
+
+    def _refresh_name_strip(self) -> None:
+        strip = self.query_one("#fx_name_strip", Static)
+        strip.update(self._name_strip_text())
+        strip.set_classes(self._name_strip_class())
+
+    def _mark_dirty(self) -> None:
+        self._dirty = True
+        self._refresh_name_strip()
+
+    def mark_saved(self, stem: str) -> None:
+        """Record a successful save: identity = ``stem``, clear the flag."""
+        self._set_name = stem
+        self._dirty = False
+        self.query_one("#fx_set_name", Input).value = stem
+        self._refresh_name_strip()
+        self._show_notice(f"✓ saved flowsets/{stem}.json")
+
+    @property
+    def is_dirty(self) -> bool:
+        return self._dirty
+
+    # -- lanes ---------------------------------------------------------------
+
+    def _source_indices(self, flow: Flow) -> List[int]:
+        return [
+            index
+            for index, block in enumerate(flow.blocks)
+            if isinstance(block, SourceBlock)
+        ]
+
+    def _unique_lane_name(self, stem: str) -> str:
+        names = {lane.name for lane in self._lanes}
+        if stem not in names:
+            return stem
+        counter = 2
+        while f"{stem}_{counter}" in names:
+            counter += 1
+        return f"{stem}_{counter}"
+
+    def add_lane(self, template: str, flow: Flow) -> str:
+        """Mount one lane for an imported template (LLR-017.1).
+
+        The lane binds the template's own SOURCE refs by default; the
+        operator rebinds per lane afterwards (LLR-018). Duplicate template
+        imports uniquify with the ``_<N>`` idiom (0 duplicate lanes).
+
+        Returns:
+            str: The mounted lane's unique name.
+        """
+        lane = _FxLane(
+            name=self._unique_lane_name(template),
+            template=template,
+            flow=flow,
+        )
+        self._lanes.append(lane)
+        empty = self.query_one("#fx_empty", Static)
+        empty.display = False
+        self.query_one("#fx_lanes", Horizontal).mount(self._lane_widgets(lane))
+        self._mark_dirty()
+        return lane.name
+
+    def restore_lane(
+        self,
+        name: str,
+        template: str,
+        flow: Flow,
+        bindings: Dict[int, str],
+        outputs: Sequence[str],
+        missing: Sequence[str],
+    ) -> None:
+        """Mount one lane from a reloaded set (LLR-021.2), notices included.
+
+        ``missing`` carries the bound refs whose files are absent at reload
+        time — the LLR-021.2 moved-input arm paints a per-lane
+        provenance-mismatch notice instead of running silently stale.
+        """
+        lane = _FxLane(
+            name=name,
+            template=template,
+            flow=flow,
+            bindings=dict(bindings),
+            last_outputs=[Path(out) for out in outputs],
+            last_status=FLOW_STATUS_OK if outputs else "",
+            missing=list(missing),
+        )
+        self._lanes.append(lane)
+        self.query_one("#fx_empty", Static).display = False
+        self.query_one("#fx_lanes", Horizontal).mount(self._lane_widgets(lane))
+
+    def _lane_widgets(self, lane: _FxLane) -> Vertical:
+        index = len(self._lanes) - 1
+        children: List[Widget] = [
+            Static(
+                self._lane_paint(lane),
+                id=f"fx_lane_{index}_paint",
+                markup=False,
+            )
+        ]
+        for src_index in self._source_indices(lane.flow):
+            children.append(
+                Horizontal(
+                    OsClipboardInput(
+                        placeholder=f"input {src_index + 1} ref",
+                        id=f"fx_in_{index}_{src_index}",
+                        value=self._effective_ref(lane, src_index),
+                    ),
+                    Button("Bind", id=f"fx_bind_{index}_{src_index}"),
+                    id=f"fx_lane_{index}_edit_{src_index}",
+                )
+            )
+        lane_widget = Vertical(*children, id=f"fx_lane_{index}", classes="fx-lane")
+        lane_widget.styles.width = _FX_LANE_W + 2
+        return lane_widget
+
+    def _effective_ref(self, lane: _FxLane, src_index: int) -> str:
+        if src_index in lane.bindings:
+            return lane.bindings[src_index]
+        block = lane.flow.blocks[src_index]
+        return block.image_ref if isinstance(block, SourceBlock) else ""
+
+    def _lane_paint(self, lane: _FxLane) -> Text:
+        """Paint one lane box: name, template, block list, pinned inputs,
+        missing-input notices, and the shaded status bar (the fx_a density)."""
+        src_indices = self._source_indices(lane.flow)
+        kinds = " → ".join(block.kind for block in lane.flow.blocks)
+        rows = (
+            2  # title + template/blocks lines
+            + max(1, len(src_indices))  # pinned inputs
+            + len(lane.missing)  # reload mismatch notices
+            + 1  # status bar
+        )
+        g = _Grid(_FX_LANE_W, rows + 2)
+        g.box(0, 0, _FX_LANE_W, rows + 2)
+        title = f"[ {safe_text(lane.name).plain} ]"
+        g.put(2, 0, title[: _FX_LANE_W - 4], _S_HEAD)
+        g.put(2, 1, f"tpl {safe_text(lane.template).plain}", _S_DIM)
+        g.put(
+            2 + len(lane.template) + 4,
+            1,
+            f"· {len(lane.flow.blocks)} blocks",
+            _S_DIM,
+        )
+        g.put(2, 2, safe_text(kinds).plain[: _FX_LANE_W - 4], _S_LABEL)
+        row = 3
+        for src_index in src_indices:
+            ref = self._effective_ref(lane, src_index)
+            g.put(2, row, f"in{src_index + 1}", _S_LABEL)
+            g.put(6, row, safe_text(ref).plain[: _FX_LANE_W - 8], _S_VALUE)
+            row += 1
+        for missing in lane.missing:
+            g.put(
+                2,
+                row,
+                ("⚠ '" + safe_text(missing).plain + "' missing — re-bind").replace(
+                    "—", "-"
+                )[: _FX_LANE_W - 4],
+                _S_ERR,
+            )
+            row += 1
+        glyph, style = _FX_STATUS_STYLE.get(lane.last_status, ("·", _S_DIM))
+        blocks = max(1, len(lane.flow.blocks))
+        if lane.last_status == FLOW_STATUS_OK:
+            frac = 1.0
+        elif lane.last_status and lane.fail_block is not None:
+            frac = lane.fail_block / blocks
+        elif lane.last_status:
+            frac = 1.0
+        else:
+            frac = 0.0
+        bar = _fx_progress_bar(frac)
+        g.put(2, row, bar.plain, style)
+        pct = round(100 * frac)
+        g.put(2 + _FX_BAR_CELLS + 1, row, f"{pct:>3d}%", _S_VALUE)
+        g.put(2 + _FX_BAR_CELLS + 6, row, glyph, style)
+        if lane.last_status:
+            g.put(
+                2 + _FX_BAR_CELLS + 9,
+                row,
+                f"{lane.last_elapsed:.3f}s",
+                _S_LABEL,
+            )
+        return _join_lines(g.lines())
+
+    def _repaint_lane(self, lane_index: int) -> None:
+        self.query_one(f"#fx_lane_{lane_index}_paint", Static).update(
+            self._lane_paint(self._lanes[lane_index])
+        )
+
+    def lane_names(self) -> List[str]:
+        return [lane.name for lane in self._lanes]
+
+    def lane_count(self) -> int:
+        return len(self._lanes)
+
+    def lane_bindings(self, lane_name: str) -> Dict[int, str]:
+        for lane in self._lanes:
+            if lane.name == lane_name:
+                return dict(lane.bindings)
+        raise KeyError(lane_name)
+
+    def lane_specs(self) -> List[FxLaneSpec]:
+        """The current lanes as payloads for Run / Save Set.
+
+        The bindings are the EFFECTIVE inputs — every SOURCE block's ref with
+        the operator overrides merged over it (LLR-021.1's ``>=1 input per
+        chain`` contract records what the chain consumes, not only what the
+        operator re-typed; a reloaded set restores 100% without consulting
+        the template's defaults).
+        """
+        return [
+            FxLaneSpec(
+                name=lane.name,
+                template=lane.template,
+                flow=lane.flow,
+                bindings=tuple(
+                    (index, lane.bindings.get(index, block.image_ref))
+                    for index, block in enumerate(lane.flow.blocks)
+                    if isinstance(block, SourceBlock)
+                ),
+                outputs=tuple(str(path) for path in lane.last_outputs),
+            )
+            for lane in self._lanes
+        ]
+
+    # -- notices -------------------------------------------------------------
+
+    def _show_notice(self, message: str) -> None:
+        notice = self.query_one("#fx_notice", Static)
+        if message:
+            notice.update(safe_text(message))  # SINK: file-derived notice text
+            notice.display = True
+            notice.set_classes("sev-warning")
+        else:
+            notice.update("")
+            notice.display = False
+
+    def render_import_refusal(self, stem: str, findings: List[ValidationIssue]) -> None:
+        """Paint a rejected template import — the current lanes are untouched."""
+        first = findings[0].message if findings else "unreadable template"
+        self._show_notice(
+            f"import refused: flows/{stem}.json — {first}"
+        )
+
+    # -- run -----------------------------------------------------------------
+
+    def _failure_detail(
+        self, lane: _FxLane, outcome
+    ) -> Tuple[int, str, str, str]:
+        """The inline-✗ detail: (block index, kind, noun, ref).
+
+        The ``'<ref>' missing`` wording is used for the unresolved-ref arms
+        (the block result says so); every other failure carries its own
+        recorded diagnostic, never invented text.
+        """
+        for block_result in outcome.block_results:
+            if block_result.status != BLOCK_STATUS_ERROR:
+                continue
+            index = block_result.index
+            block = lane.flow.blocks[index]
+            noun, ref = _block_ref_noun(block)
+            if block_result.summary.endswith("unresolved"):
+                return index, block.kind, noun, ref
+            diagnostic = (
+                block_result.diagnostics[-1]
+                if block_result.diagnostics
+                else block_result.summary
+            )
+            return index, block.kind, "", safe_text(diagnostic).plain
+        return 0, "?", "", "unknown failure"
+
+    def render_run(self, record) -> None:
+        """Paint the lanes + the RUN LOG strip from the set run record.
+
+        Args:
+            record (ChainSetRunRecord): The completed run — one outcome per
+                lane in lane order, the captured mode, and the report path.
+        """
+        self._last_record = record
+        run_start = min(
+            (outcome.started_at for outcome in record.outcomes), default=0.0
+        )
+        log = Text()
+        for lane_index, lane in enumerate(self._lanes):
+            outcome = record.outcomes[lane_index]
+            lane.last_status = outcome.status
+            lane.last_elapsed = outcome.finished_at - outcome.started_at
+            lane.last_outputs = list(outcome.written_paths)
+            lane.fail_block = next(
+                (
+                    block_result.index
+                    for block_result in outcome.block_results
+                    if block_result.status == BLOCK_STATUS_ERROR
+                ),
+                None,
+            )
+            self._repaint_lane(lane_index)
+
+            log.append(f"{_fx_stamp(outcome.started_at - run_start)} ")
+            log.append("▶ ", style=_S_LABEL)
+            log.append(safe_text(outcome.chain))
+            log.append(" · started\n", style=_S_DIM)
+            if outcome.status == FLOW_STATUS_ERROR:
+                index, kind, noun, ref = self._failure_detail(lane, outcome)
+                total = max(1, len(outcome.block_results))
+                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
+                log.append("✗ ", style=_S_ERR)
+                log.append(safe_text(outcome.chain))
+                if noun:
+                    log.append(
+                        f" · block {index + 1}/{total} {kind.upper()} — "
+                        f"{noun} '{safe_text(ref).plain}' missing",
+                        style=_S_DIM,
+                    )
+                else:
+                    log.append(
+                        f" · block {index + 1}/{total} {kind.upper()} — {ref}",
+                        style=_S_DIM,
+                    )
+                log.append(" · chain halted\n", style=_S_DIM)
+            else:
+                glyph, _ = _FX_STATUS_STYLE.get(outcome.status, ("·", _S_DIM))
+                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
+                log.append(f"{glyph} ", style=_S_LABEL)
+                log.append(safe_text(outcome.chain))
+                log.append(" · done", style=_S_DIM)
+                if outcome.written_paths:
+                    names = ", ".join(path.name for path in outcome.written_paths)
+                    log.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
+                log.append("\n")
+        for diagnostic in record.diagnostics:
+            log.append(safe_text(diagnostic))
+            log.append("\n")
+        self.query_one("#fx_log", Static).update(log)
+        if record.outcomes:
+            self._mark_dirty()
+
+    def render_run_error(self, message: str) -> None:
+        """Paint a no-project run refusal into the log strip (the Run idiom)."""
+        log = Text()
+        log.append("✗ ", style=_S_ERR)
+        log.append(safe_text(message))
+        self.query_one("#fx_log", Static).update(log)
+
+    @property
+    def last_run_record(self):
+        """The retained run record (the AT reads the captured mode from it)."""
+        return self._last_record
+
+    def run_log_plain(self) -> str:
+        """The painted run-log text (the C-32 painted oracle seam)."""
+        return self.query_one("#fx_log", Static).render().plain
+
+    def lane_paint_plain(self, lane_index: int) -> str:
+        """One lane's painted text (the C-32 painted oracle seam)."""
+        return self.query_one(f"#fx_lane_{lane_index}_paint", Static).render().plain
+
+    # -- save / load set -----------------------------------------------------
+
+    def set_available_sets(self, stems: Sequence[str]) -> None:
+        """Repopulate the set picker (the app's on-entry prefill)."""
+        options = [(f"flowsets/{stem}.json", stem) for stem in stems]
+        if not options:
+            options = [("(no saved sets)", "")]
+        select = self.query_one("#fx_set_select", Select)
+        select.set_options(options)
+        select.value = stems[0] if stems else ""
+
+    async def begin_set_restore(self, stem: str) -> None:
+        """Clear the lanes ahead of a set reload — the restored set REPLACES
+        the current one (LLR-021.2; the reload is a restore, not a merge).
+
+        Async: the removal of the old lane widgets is AWAITED before the
+        caller mounts the restored lanes — mounting into a half-removed tree
+        would collide on the lane ids.
+        """
+        await self.query_one("#fx_lanes", Horizontal).remove_children(".fx-lane")
+        self._lanes.clear()
+        empty = self.query_one("#fx_empty", Static)
+        empty.display = True
+        self._set_name = stem
+        self._dirty = False
+        self.query_one("#fx_set_name", Input).value = stem
+        self._refresh_name_strip()
+
+    def restore_set(self, stem: str, lanes: int, notices: Sequence[str]) -> None:
+        """Finish a successful set reload: identity + notices for what moved."""
+        self._set_name = stem
+        self._dirty = False
+        self.query_one("#fx_set_name", Input).value = stem
+        self._refresh_name_strip()
+        self._show_notice(" · ".join(notices))
+
+    def render_set_refusal(self, stem: str, findings: List[ValidationIssue]) -> None:
+        """Paint a rejected set load — the current lanes are untouched."""
+        first = findings[0].message if findings else "unreadable set"
+        self._show_notice(f"load refused: flowsets/{stem}.json — {first}")
+
+    # -- events --------------------------------------------------------------
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id or ""
+        if button_id == "fx_import":
+            self.post_message(self.ImportRequested())
+        elif button_id == "fx_run":
+            self.post_message(
+                self.RunRequested(
+                    self.lane_specs(),
+                    str(self.query_one("#fx_mode", Select).value),
+                    self._set_name,
+                )
+            )
+        elif button_id == "fx_save":
+            self.post_message(
+                self.SaveRequested(
+                    self.lane_specs(),
+                    self.query_one("#fx_set_name", Input).value,
+                )
+            )
+        elif button_id == "fx_load":
+            stem = str(self.query_one("#fx_set_select", Select).value)
+            if stem:
+                self.post_message(self.LoadSetRequested(stem))
+        elif button_id.startswith("fx_bind_"):
+            parts = button_id.removeprefix("fx_bind_").split("_")
+            self._rebind(int(parts[0]), int(parts[1]))
+
+    def _rebind(self, lane_index: int, src_index: int) -> None:
+        """Bind one lane's input — exactly that lane's record is written.
+
+        LLR-018.1: an edit touches exactly one binding record; rebinding to
+        the same ref is a no-op (the writer does not even mark dirty).
+        """
+        lane = self._lanes[lane_index]
+        value = self.query_one(f"#fx_in_{lane_index}_{src_index}", Input).value.strip()
+        if not value:
+            self._show_notice(
+                f"binding refused: lane '{lane.name}' input {src_index + 1} "
+                "needs a non-empty ref"
+            )
+            return
+        # Rebind-to-same is a no-op (LLR-018.1's boundary arm) — the EFFECTIVE
+        # ref is the comparison base, so typing the path the lane already
+        # consumes (its override or the template's own ref) writes nothing.
+        if value == self._effective_ref(lane, src_index):
+            return
+        lane.bindings[src_index] = value
+        self._repaint_lane(lane_index)
+        self._show_notice("")
+        self._mark_dirty()
+
+
+def _block_ref_noun(block: FlowBlock) -> Tuple[str, str]:
+    """The (noun, ref) pair naming a block's own file ref (the ✗ line seam)."""
+    if isinstance(block, SourceBlock):
+        return "source", block.image_ref
+    if isinstance(block, PatchBlock):
+        return "change doc", block.change_doc_ref
+    if isinstance(block, CheckBlock):
+        return "check doc", block.check_doc_ref
+    if isinstance(block, CrcBlock):
+        return "config", block.config_ref
+    if isinstance(block, WriteOutBlock):
+        return "output", block.output_name
+    return "ref", getattr(block, "kind", "?")
 
 
 def _join_lines(lines: List[Text]) -> Text:

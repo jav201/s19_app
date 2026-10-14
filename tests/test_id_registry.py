@@ -100,7 +100,11 @@ from tools.id_registry import (
 # batch-94 Inc-002 (2026-10-14): 175 -> 177, measured — the flow-builder
 # increment adds ``tests/test_tui_flow_builder_b94.py`` (AT-B94-15..18,
 # TC-B94-20) and ``tests/test_flow_a2b_b94.py`` (TC-B94-04, 21..25).
-EXPECTED_SCANNED_TEST_FILES = 177
+# batch-94 Inc-003 (2026-10-14): 177 -> 179, measured — the flow-execution
+# increment adds ``tests/test_tui_flow_execution_b94.py`` (AT-B94-02, 19..24,
+# TC-B94-08, 26, 27, 29) and ``tests/test_flow_chainset_b94.py`` (TC-B94-05,
+# 28, 30, 31).
+EXPECTED_SCANNED_TEST_FILES = 179
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

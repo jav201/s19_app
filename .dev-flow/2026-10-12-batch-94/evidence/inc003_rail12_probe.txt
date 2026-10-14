@@ -1,0 +1,32 @@
+textual 8.2.8
+=== static census — the shipped 12-entry rail
+  [ok] RAIL_ENTRIES_B94 declares 12 — keys=['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+  [ok] duplicate screen keys rejected
+  [ok] SCREEN_CONTAINER_IDS carries flow_execution
+  [ok] _FIND_GOTO_INPUTS owns an explicit decision for flow_execution
+  terminal-side canonicalization (textual.keys):
+    KEY_TO_UNICODE_NAME[']'] = 'RIGHT SQUARE BRACKET'
+=== run_test 120x30 — shipped-tree reachability
+  [ok] the app composes the 12 shipped rail entries — order=['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+  [ok] order: flow_execution after flow (the R-1 landing)
+  [ok] right_square_bracket resolves to show_screen('flow_execution')
+  [ok] the `]` binding is show=False (footer chrome unchanged, C-13)
+  [ok] ten digit bindings intact
+  [ok] '8' still mounts the Flow Builder (regression)
+  [ok] ']' mounts #screen_flow_execution
+  [ok] the Flow Builder is hidden after ']'
+  [ok] the rail marker follows ']'
+=== run_test 80x24 — shipped-tree reachability
+  [ok] the app composes the 12 shipped rail entries — order=['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+  [ok] order: flow_execution after flow (the R-1 landing)
+  [ok] C-3 rail-chrome arm: 12 entries inside the 21-row budget at 80x24 — rail renders 12 rows for 12 entries
+  [ok] right_square_bracket resolves to show_screen('flow_execution')
+  [ok] the `]` binding is show=False (footer chrome unchanged, C-13)
+  [ok] ten digit bindings intact
+  [ok] '8' still mounts the Flow Builder (regression)
+  [ok] ']' mounts #screen_flow_execution
+  [ok] the Flow Builder is hidden after ']'
+  [ok] the rail marker follows ']'
+  [ok] no Textual binding collision/conflict/duplicate warning — captured=[]
+
+PROBE: PASS — the shipped rail lands 12 entries; `]` routes; 80x24 chrome holds; zero collisions

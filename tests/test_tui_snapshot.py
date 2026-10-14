@@ -1026,21 +1026,37 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 #       cell additionally carries the new check-spec dropdown row. Both were
 #       RED at base already (the batch-93 census); the mark's reason names the
 #       batch-94 drift specifically.
+# batch-94 Inc-003 (the fx_a Flow Execution surface + the Flow Execution rail
+# entry) repaints the SAME 29 cells and no others, for ONE source swept across
+# the shared chrome (C-28): THE RAIL CENSUS 11→12 — the ``▶ Flow Execution``
+# entry lands after Flow Builder on the ``]`` binding (show=False, the R-1
+# closure's probe-verified landing), and the rail renders in EVERY cell's
+# chrome. The 12th row fits the 21-row budget at 80x24 (probe-measured: the
+# rail renders 12 rows for 12 entries), so every cell's rail gains one row.
+# The footer does NOT drift (``]`` is show=False); no screen OWNED by a matrix
+# cell changed (the fx_a panel lives on #screen_flow_execution, which is not
+# in the matrix — the execution cell enters at the P4 regen). Containment
+# measured at this increment's gate run: exactly the 29 cells mismatched,
+# zero XPASS (inc003_suite_snapshot.txt).
 # The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml,
 # pinned textual==8.2.8) — NEVER locally. RETIRE this mark when that regen
-# lands; under strict=False a stale mark XPASSes silently and masks
+# lands (refreshing the rail chrome to 12 entries retires BOTH generations);
+# under strict=False a stale mark XPASSes silently and masks
 # regressions (the batch-77 retirement note above is the precedent).
 def _batch94_inc001_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-94 Inc-001 rail-census + rework drift marks (per-cell).
+    """Return the batch-94 rail-census + rework drift marks (per-cell).
 
-    Every cell drifts by the rail census (source 1). The ``patch`` cells drift
-    additionally by the pe_b rework; the ``diff`` cell by the check-spec
-    dropdown. Measured against the actual run before this mark was written
-    (C-22: predict THEN verify, per cell).
+    Every cell drifts by the rail census (10->11 at Inc-001, 11->12 at
+    Inc-003 — the same cells, the same canonical-CI regen retires both).
+    The ``patch`` cells drift additionally by the pe_b rework; the ``diff``
+    cell by the check-spec dropdown. Measured against the actual run before
+    this mark was written (C-22: predict THEN verify, per cell).
     """
     reasons = [
         "batch-94 Inc-001: rail census 10->11 — the Check Editor entry "
-        "(after Patch Editor) renders in every cell's rail chrome"
+        "(after Patch Editor) renders in every cell's rail chrome; "
+        "batch-94 Inc-003: rail census 11->12 — the Flow Execution entry "
+        "(after Flow Builder, `]`) renders in every cell's rail chrome"
     ]
     if screen == "patch":
         reasons.append(

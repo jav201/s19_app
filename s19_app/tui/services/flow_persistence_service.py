@@ -6,6 +6,13 @@ validator. Every embedded READ ref is re-validated through the SAME
 ``_resolve_manifest_entry`` containment guard the runtime already uses
 (reuse-not-fork); any finding rejects the whole flow (never a partial pipeline).
 
+batch-94 Inc-003 (US-007, HLR-021) adds the chain-set envelope at the bottom
+of this module: ``save_chain_set`` / ``load_chain_set`` persist the US-007
+save-set artifact — every chain's template reference, its bound inputs, and
+its recorded outputs in ONE document inside the work area (``flowsets/``) —
+with the flow loader's fail-closed vocabulary namespaced (CHAIN-SET-*) and
+the same reused containment guard for every bound input ref.
+
 Textual-free (service-layer contract C-7): imports stdlib + the flow model + the
 manifest guard + the validation model only. UI wiring (modals, panel, handlers)
 lands in a later increment; this module owns serialize/deserialize/load.
@@ -26,6 +33,7 @@ Finding taxonomy (OQ-1, §6.2 — mixed and honest):
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from pathlib import Path, PureWindowsPath
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -838,3 +846,444 @@ def import_flow_file(picked: Path, project_dir: Path) -> Path:
     return copy_into_workarea(
         picked, project_dir / FLOWS_SUBDIR, max_size_bytes=FLOW_SIZE_CAP_BYTES
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-94 Inc-003 — the chain-set envelope (US-007 save/load, HLR-021;
+# LLR-021.1/.2). The US-007 artifact: every chain's template reference, its
+# bound inputs, and its recorded outputs in ONE document inside the work
+# area. The fail-closed read path reuses the flow loader's vocabulary
+# (size cap → parse guard → validated envelope), the SAME containment guard
+# for every bound input ref, and the SAME write-side sanitiser authority.
+# ---------------------------------------------------------------------------
+
+#: Chain-set storage subdirectory under the active project work area
+#: (``.s19tool/workarea/<project>/flowsets/`` — the FLOWS_SUBDIR idiom: a
+#: subdirectory, so ``validate_project_files`` is unaffected).
+FLOWSETS_SUBDIR = "flowsets"
+
+#: The one supported chain-set envelope version.
+CHAIN_SET_SCHEMA_VERSION = 1
+
+#: The envelope discriminator (the flow envelope has no ``kind`` — a set file
+#: is never read as a flow template and vice versa).
+CHAIN_SET_KIND = "chain-set"
+
+#: Structural sanity caps (fail closed outside them).
+CHAIN_SET_MIN_CHAINS = 1
+CHAIN_SET_MAX_CHAINS = 32
+CHAIN_SET_MAX_NAME_LEN = 64
+CHAIN_SET_MAX_INPUTS = 64
+CHAIN_SET_MAX_OUTPUTS = 64
+
+#: Loader-OWN finding codes (the flow loader's taxonomy, namespaced).
+CHAIN_SET_SIZE_CAP = "CHAIN-SET-SIZE-CAP"
+CHAIN_SET_JSON_PARSE = "CHAIN-SET-JSON-PARSE"
+CHAIN_SET_BAD_STRUCTURE = "CHAIN-SET-BAD-STRUCTURE"
+CHAIN_SET_SCHEMA_UNSUPPORTED = "CHAIN-SET-SCHEMA-UNSUPPORTED"
+CHAIN_SET_BAD_FIELD = "CHAIN-SET-BAD-FIELD"
+#: Loader-side path-shape reject for a Windows drive-relative ref / a template
+#: stem that is not a plain file name (the V6/V7 read arms, namespaced).
+CHAIN_SET_UNSAFE_REF = "CHAIN-SET-UNSAFE-REF"
+
+
+@dataclass(frozen=True)
+class ChainSetEntry:
+    """One saved chain: template ref + bound inputs + recorded outputs.
+
+    Args:
+        chain (str): The lane name (unique inside the set).
+        template (str): The ``flows/<stem>.json`` template reference
+            (LLR-021.1's one-template-ref-per-chain).
+        inputs (Tuple[Tuple[int, str], ...]): The bound input records —
+            ``(SOURCE block index, project-relative ref)``, one per bound
+            input (LLR-021.1's ≥1-input-per-chain). Unbound SOURCE blocks are
+            not recorded: a reload restores them from the template itself.
+        outputs (Tuple[str, ...]): The chain's recorded last outputs (file
+            names written by the last run — regenerated on the re-run).
+    """
+
+    chain: str
+    template: str
+    inputs: Tuple[Tuple[int, str], ...] = ()
+    outputs: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ChainSet:
+    """The whole saved set — chains + inputs + outputs under one name.
+
+    Args:
+        name (str): The set's display name (identity is the FILENAME on save,
+            the ``save_flow_json`` write-side idiom).
+        chains (Tuple[ChainSetEntry, ...]): One per lane, in lane order.
+    """
+
+    name: str
+    chains: Tuple[ChainSetEntry, ...] = ()
+
+
+def _chain_set_finding(code: str, message: str) -> ValidationIssue:
+    """Build one chain-set-load finding — artifact ``chain-set``, always ERROR."""
+    return ValidationIssue(
+        code=code,
+        severity=ValidationSeverity.ERROR,
+        message=message,
+        artifact="chain-set",
+    )
+
+
+def _is_plain_template_stem(ref: str) -> bool:
+    """Report whether ``ref`` is a plain file stem (a ``flows/`` identity).
+
+    A template ref names a file inside ``flows/`` — the same WRITE-target
+    shape pre-check as the flow loader's V7 (no separators, no traversal, not
+    absolute, not drive-relative, not hidden) so a set can never point its
+    chains at a template outside the work area.
+    """
+    return not (
+        "/" in ref
+        or "\\" in ref
+        or ".." in ref
+        or Path(ref).is_absolute()
+        or _is_drive_relative(ref)
+        or ref.strip().startswith(".")
+    )
+
+
+def chain_set_to_dict(chain_set: ChainSet) -> dict:
+    """Serialize a :class:`ChainSet` to the envelope dict (trusted side).
+
+    The inputs ride as ``[[index, ref], …]`` pairs (JSON object keys would
+    coerce the int index to a string — the pair form round-trips honestly).
+    """
+    return {
+        "schema_version": CHAIN_SET_SCHEMA_VERSION,
+        "kind": CHAIN_SET_KIND,
+        "name": chain_set.name,
+        "chains": [
+            {
+                "chain": entry.chain,
+                "template": entry.template,
+                "inputs": [[index, ref] for index, ref in entry.inputs],
+                "outputs": list(entry.outputs),
+            }
+            for entry in chain_set.chains
+        ],
+    }
+
+
+def dict_to_chain_set(
+    payload: Any,
+    project_dir: Path,
+) -> Tuple[Optional[ChainSet], List[ValidationIssue]]:
+    """Validate an UNTRUSTED chain-set envelope — fail-closed, never partial.
+
+    Summary:
+        The flow loader's fixed-order vocabulary, namespaced:
+          V1  top level is a JSON object                  → CHAIN-SET-BAD-STRUCTURE
+          V2  schema_version is EXACTLY int 1 and
+              kind is EXACTLY ``chain-set``                 → CHAIN-SET-SCHEMA-UNSUPPORTED
+          V3  name is a non-empty str ≤ cap                 → CHAIN-SET-BAD-FIELD
+          V4  chains is a list of CHAIN_SET_MIN..MAX        → CHAIN-SET-BAD-STRUCTURE
+          V5  per chain: chain/template names, inputs
+              (index/ref pairs), outputs (names)            → CHAIN-SET-BAD-FIELD
+          V6  template stem shape + every bound input ref:
+              drive-relative pre-reject, then the REUSED
+              containment guard (no fs open; existence is
+              NOT required — a moved input is the LLR-021.2
+              notice arm, not a load refusal)               → CHAIN-SET-UNSAFE-REF /
+                                                              MANIFEST-PATH-ESCAPE
+        ANY finding rejects the WHOLE set (never a partial restore).
+
+    Args:
+        payload (Any): The parsed, UNTRUSTED envelope (any JSON value).
+        project_dir (Path): The containment base for the bound input refs.
+
+    Returns:
+        Tuple[Optional[ChainSet], List[ValidationIssue]]: ``(ChainSet, [])``
+        only when finding-free; otherwise ``(None, findings)``. Never raises;
+        never opens an embedded path.
+    """
+    findings: List[ValidationIssue] = []
+
+    if not isinstance(payload, dict):
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_BAD_STRUCTURE,
+                "chain-set top level is not a JSON object",
+            )
+        )
+        return None, findings
+
+    version = payload.get("schema_version")
+    if (
+        not isinstance(version, int)
+        or isinstance(version, bool)
+        or version != CHAIN_SET_SCHEMA_VERSION
+        or payload.get("kind") != CHAIN_SET_KIND
+    ):
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_SCHEMA_UNSUPPORTED,
+                f"chain-set schema_version {version!r}/kind "
+                f"{payload.get('kind')!r} is not supported (this build reads "
+                f"version {CHAIN_SET_SCHEMA_VERSION} '{CHAIN_SET_KIND}' only)",
+            )
+        )
+        return None, findings
+
+    name = payload.get("name")
+    if not isinstance(name, str) or not name.strip():
+        findings.append(
+            _chain_set_finding(CHAIN_SET_BAD_FIELD, "chain-set name is not a non-empty string")
+        )
+    elif len(name) > CHAIN_SET_MAX_NAME_LEN:
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_BAD_FIELD,
+                f"chain-set name exceeds {CHAIN_SET_MAX_NAME_LEN} characters",
+            )
+        )
+
+    chains_raw = payload.get("chains")
+    if not isinstance(chains_raw, list):
+        findings.append(
+            _chain_set_finding(CHAIN_SET_BAD_STRUCTURE, "chain-set chains is not an array")
+        )
+        return None, findings
+    if len(chains_raw) < CHAIN_SET_MIN_CHAINS:
+        findings.append(
+            _chain_set_finding(CHAIN_SET_BAD_STRUCTURE, "chain-set has no chains")
+        )
+    if len(chains_raw) > CHAIN_SET_MAX_CHAINS:
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_BAD_STRUCTURE,
+                f"chain-set has {len(chains_raw)} chains, over the "
+                f"{CHAIN_SET_MAX_CHAINS}-chain cap",
+            )
+        )
+        return None, findings
+
+    project_root = project_dir.resolve()
+    chains: List[ChainSetEntry] = []
+    for index, entry in enumerate(chains_raw):
+        label = f"chains[{index}]"
+        if not isinstance(entry, dict):
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_STRUCTURE, f"{label} is not a JSON object"
+                )
+            )
+            continue
+        if set(entry) != {"chain", "template", "inputs", "outputs"}:
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_FIELD,
+                    f"{label} carries unknown or missing field(s) "
+                    f"{sorted(set(entry) ^ {'chain', 'template', 'inputs', 'outputs'})} "
+                    f"- the {CHAIN_SET_KIND} schema is strict",
+                )
+            )
+            continue
+        chain_name = entry["chain"]
+        if not isinstance(chain_name, str) or not chain_name.strip():
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_FIELD, f"{label}.chain is not a non-empty string"
+                )
+            )
+            continue
+        template = entry["template"]
+        if not isinstance(template, str) or not template.strip():
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_FIELD, f"{label}.template is not a non-empty string"
+                )
+            )
+            continue
+        template = template.strip()
+        if not _is_plain_template_stem(template):
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_UNSAFE_REF,
+                    f"{label}.template {template!r} must be a plain flows/ file name "
+                    "(no separators, no traversal, not absolute)",
+                )
+            )
+            continue
+        inputs_raw = entry["inputs"]
+        if (
+            not isinstance(inputs_raw, list)
+            or not inputs_raw
+            or len(inputs_raw) > CHAIN_SET_MAX_INPUTS
+        ):
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_FIELD,
+                    f"{label}.inputs is not a non-empty list of at most "
+                    f"{CHAIN_SET_MAX_INPUTS} [index, ref] pairs",
+                )
+            )
+            continue
+        inputs: List[Tuple[int, str]] = []
+        input_ok = True
+        for pair in inputs_raw:
+            if (
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not isinstance(pair[0], int)
+                or isinstance(pair[0], bool)
+                or pair[0] < 0
+                or not isinstance(pair[1], str)
+                or not pair[1].strip()
+            ):
+                findings.append(
+                    _chain_set_finding(
+                        CHAIN_SET_BAD_FIELD,
+                        f"{label}.inputs carries a malformed [index, ref] pair "
+                        f"{pair!r}",
+                    )
+                )
+                input_ok = False
+                break
+            ref = pair[1].strip()
+            if _is_drive_relative(ref):
+                findings.append(
+                    _chain_set_finding(
+                        CHAIN_SET_UNSAFE_REF,
+                        f"{label}.inputs ref {ref!r} is a Windows drive-relative "
+                        "path - refs resolve against the project directory only",
+                    )
+                )
+                input_ok = False
+                break
+            resolved = _resolve_manifest_entry(
+                project_root, ref, f"{label}.inputs.ref", findings
+            )
+            if resolved is None:
+                input_ok = False
+                break  # the guard appended its finding — chain rejected
+            inputs.append((pair[0], ref))
+        if not input_ok:
+            continue
+        outputs_raw = entry["outputs"]
+        if (
+            not isinstance(outputs_raw, list)
+            or len(outputs_raw) > CHAIN_SET_MAX_OUTPUTS
+            or any(not isinstance(out, str) or not out.strip() for out in outputs_raw)
+        ):
+            findings.append(
+                _chain_set_finding(
+                    CHAIN_SET_BAD_FIELD,
+                    f"{label}.outputs is not a list of at most "
+                    f"{CHAIN_SET_MAX_OUTPUTS} non-empty file names",
+                )
+            )
+            continue
+        chains.append(
+            ChainSetEntry(
+                chain=chain_name.strip(),
+                template=template,
+                inputs=tuple(inputs),
+                outputs=tuple(out.strip() for out in outputs_raw),
+            )
+        )
+
+    if findings:
+        return None, findings
+    return ChainSet(name=name.strip(), chains=tuple(chains)), findings
+
+
+def save_chain_set(
+    chain_set: ChainSet,
+    raw_name: str,
+    project_dir: Path,
+) -> Optional[Path]:
+    """Serialize the set and write it to ``flowsets/<sanitized>.json`` (LLR-021.1).
+
+    Summary:
+        The ``save_flow_json`` write-side idiom verbatim: ``sanitize_project_name``
+        is the containment authority; an empty set (or a name that sanitises
+        to ``None``) writes NOTHING and returns ``None`` — LLR-021.1's empty
+        arm, ``0 empty sets written as non-empty``; a name collision
+        dedup-suffixes (``_<N>``) instead of clobbering.
+
+    Args:
+        chain_set (ChainSet): The in-memory set to persist (trusted-side).
+        raw_name (str): The operator-typed set name (untrusted text).
+        project_dir (Path): The active ``.s19tool/workarea/<project>/`` dir.
+
+    Returns:
+        Optional[Path]: The absolute path written (``flowsets/<clean>.json``),
+        or ``None`` when nothing was written (empty set / un-sanitisable name).
+    """
+    if not chain_set.chains:
+        return None
+    clean = sanitize_project_name(raw_name)
+    if clean is None:
+        return None
+    flowsets_dir = project_dir / FLOWSETS_SUBDIR
+    flowsets_dir.mkdir(parents=True, exist_ok=True)
+    target = flowsets_dir / f"{clean}.json"
+    if target.exists():
+        counter = 2
+        while (flowsets_dir / f"{clean}_{counter}.json").exists():
+            counter += 1
+        target = flowsets_dir / f"{clean}_{counter}.json"
+    target.write_text(
+        json.dumps(chain_set_to_dict(chain_set), indent=2), encoding="utf-8"
+    )
+    return target
+
+
+def load_chain_set(
+    set_path: Path,
+    project_dir: Path,
+) -> Tuple[Optional[ChainSet], List[ValidationIssue]]:
+    """File-level hardened load: size cap → parse guard → :func:`dict_to_chain_set`.
+
+    The ``load_flow_json`` idiom verbatim (the size cap is bound to the same
+    ``FLOW_SIZE_CAP_BYTES`` — a set is a small binding document, not a
+    payload). Never raises.
+    """
+    findings: List[ValidationIssue] = []
+    try:
+        size = set_path.stat().st_size
+    except OSError as exc:
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_JSON_PARSE, f"chain-set file unreadable: {type(exc).__name__}"
+            )
+        )
+        return None, findings
+    if size > FLOW_SIZE_CAP_BYTES:
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_SIZE_CAP,
+                f"chain-set file is {size} bytes, over the "
+                f"{FLOW_SIZE_CAP_BYTES}-byte cap - not loaded",
+            )
+        )
+        return None, findings
+    try:
+        with set_path.open("rb") as handle:
+            payload = json.load(handle)
+    except (json.JSONDecodeError, RecursionError, UnicodeDecodeError, OSError) as exc:
+        findings.append(
+            _chain_set_finding(
+                CHAIN_SET_JSON_PARSE,
+                f"chain-set file is not well-formed JSON - {type(exc).__name__}",
+            )
+        )
+        return None, findings
+    return dict_to_chain_set(payload, project_dir)
+
+
+def list_chain_sets(project_dir: Path) -> List[str]:
+    """List the saved chain-set stems under ``flowsets/`` (the listing seam)."""
+    flowsets_dir = project_dir / FLOWSETS_SUBDIR
+    if not flowsets_dir.is_dir():
+        return []
+    return sorted(entry.stem for entry in flowsets_dir.glob("*.json") if entry.is_file())
