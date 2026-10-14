@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens_directionb import (
+from s19_app.tui.flow_screens import (
     FlowBuilderPanel,
     _flow_block_label,
     _make_flow_block,

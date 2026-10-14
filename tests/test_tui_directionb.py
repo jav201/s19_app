@@ -8321,6 +8321,43 @@ def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) ->
         f"{sorted(interpolations)}"
     )
 
+    # batch-94 Inc-002 (architect finding 3, second extension): the census
+    # FOLLOWS the moved panel — flow_screens.py (the fb_a Flow Builder, R8/B2)
+    # must carry zero from_markup and zero markup=True sites: every
+    # file-derived string rides ``safe_text`` into ``markup=False`` Statics or
+    # literal ``Text`` appends (the canvas grid is append-built).
+    import s19_app.tui.flow_screens as _fsc
+
+    fsc_source = _P(_fsc.__file__).read_text(encoding="utf-8")
+    fsc_tree = _ast.parse(fsc_source)
+    fsc_from_markup = [
+        node.lineno
+        for node in _ast.walk(fsc_tree)
+        if isinstance(node, _ast.Call)
+        and isinstance(node.func, _ast.Attribute)
+        and node.func.attr == "from_markup"
+    ]
+    assert fsc_from_markup == [], (
+        "flow_screens.py must not call from_markup — file-derived text "
+        f"renders through literal Text (C-17); found at {fsc_from_markup}"
+    )
+    fsc_markup_true_sites = [
+        node.lineno
+        for node in _ast.walk(fsc_tree)
+        if isinstance(node, _ast.Call)
+        and any(
+            kw.arg == "markup"
+            and isinstance(kw.value, _ast.Constant)
+            and kw.value.value is True
+            for kw in node.keywords
+        )
+    ]
+    assert fsc_markup_true_sites == [], (
+        "flow_screens.py must carry zero markup=True sites (canvas, ledger, "
+        f"notices and result panes are all markup=False); found "
+        f"{fsc_markup_true_sites}"
+    )
+
 
 # ===========================================================================
 # batch-28 (R-TUI-042) — Increment 3: US-040 Workspace dense-cockpit signal

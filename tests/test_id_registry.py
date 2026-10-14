@@ -96,9 +96,11 @@ from tools.id_registry import (
 # batch-94 Inc-001 (2026-10-13): 172 -> 175, measured — the editors increment
 # adds ``tests/test_tui_check_editor.py``, ``tests/test_tui_patch_editor_b94.py``
 # and ``tests/test_tui_check_chain_b94.py``; the RC-1 mid-batch rebase unions
-# both lanes' additions (172 + 3 batch-94 = 175 at Inc-001; Inc-002 adds two
-# more flow modules below).
-EXPECTED_SCANNED_TEST_FILES = 175
+# both lanes' additions (172 + 3 batch-94 = 175 at Inc-001).
+# batch-94 Inc-002 (2026-10-14): 175 -> 177, measured — the flow-builder
+# increment adds ``tests/test_tui_flow_builder_b94.py`` (AT-B94-15..18,
+# TC-B94-20) and ``tests/test_flow_a2b_b94.py`` (TC-B94-04, 21..25).
+EXPECTED_SCANNED_TEST_FILES = 177
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

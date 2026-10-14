@@ -19,7 +19,7 @@ from textual.widgets import Button, Markdown
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ReportViewerScreen, _hardened_markdown_parser
-from s19_app.tui.screens_directionb import FlowBuilderPanel
+from s19_app.tui.flow_screens import FlowBuilderPanel
 from s19_app.tui.services.flow_model import ReportBlock, SourceBlock
 from tests.test_flow_execution_service import _S19_CLEAN, _make_project
 

@@ -31,6 +31,11 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ...validation.model import ValidationIssue, ValidationSeverity
 from .flow_model import (
+    A2BBlock,
+    A2BInputBinding,
+    A2B_INPUT_FILE,
+    A2B_INPUT_FLOW,
+    BLOCK_A2B,
     BLOCK_CHECK,
     BLOCK_CRC,
     BLOCK_PATCH,
@@ -49,6 +54,8 @@ from .flow_model import (
     ReportBlock,
     SourceBlock,
     WriteOutBlock,
+    parse_a2b_binding,
+    validate_a2b_bindings,
 )
 from .variant_execution_service import (
     MANIFEST_PATH_ESCAPE,
@@ -100,6 +107,10 @@ _KIND_SPEC: Dict[str, Tuple[Optional[str], Dict[str, Set[str]]]] = {
     ),
     BLOCK_CRC: ("config_ref", {}),
     BLOCK_REPORT: (None, {}),
+    # batch-94 Inc-002 (LLR-013.2): A2B carries NO single ref — its two input
+    # bindings get the dedicated V5 arm below (strict keys {kind, image_a,
+    # image_b}, per-binding grammar + containment).
+    BLOCK_A2B: (None, {}),
 }
 
 #: READ-ref fields → containment-checked at load through the reused guard.
@@ -249,6 +260,20 @@ def flow_to_dict(flow: Flow) -> dict:
             blocks.append({"kind": block.kind, "config_ref": block.config_ref})
         elif isinstance(block, ReportBlock):
             blocks.append({"kind": block.kind})
+        elif isinstance(block, A2BBlock):
+            blocks.append(
+                {
+                    "kind": block.kind,
+                    "image_a": {
+                        "source": block.image_a.source,
+                        "ref": block.image_a.ref,
+                    },
+                    "image_b": {
+                        "source": block.image_b.source,
+                        "ref": block.image_b.ref,
+                    },
+                }
+            )
         else:  # trusted-side serializer — an unknown model object is a bug
             raise TypeError(f"unserializable block type: {type(block)!r}")
     return {
@@ -371,6 +396,17 @@ def dict_to_flow(
                     f"{label} has unknown kind {kind!r} - known kinds: {sorted(_KIND_SPEC)}",
                 )
             )
+            continue
+        # V5 (A2B arm, batch-94 Inc-002 / LLR-013.2) — the A2B kind carries no
+        # single ref: its two input bindings get the dedicated parser below
+        # (strict keys, per-binding grammar, file-ref containment through the
+        # SAME reused guard, and the wiring matrix via the model helper).
+        if kind == BLOCK_A2B:
+            block_a2b = _parse_a2b_entry(
+                entry, label, project_root, blocks, findings
+            )
+            if block_a2b is not None:
+                blocks.append(block_a2b)
             continue
         ref_field, enum_fields = _KIND_SPEC[kind]
         allowed_keys = {"kind", *enum_fields}
@@ -505,6 +541,111 @@ def dict_to_flow(
     return Flow(name=name, blocks=blocks, schema_version=FLOW_SCHEMA_VERSION), findings
 
 
+def _parse_a2b_entry(
+    entry: Dict[str, Any],
+    label: str,
+    project_root: Path,
+    upstream_blocks: List[FlowBlock],
+    findings: List[ValidationIssue],
+) -> Optional[A2BBlock]:
+    """V5 arm for the A2B kind — validate the two input bindings, fail closed.
+
+    Summary:
+        Strict keys ``{kind, image_a, image_b}`` (schema v1 is strict); each
+        binding is an object of exactly ``{source, ref}`` with a known source
+        discriminator; a ``file`` binding rides the SAME drive-relative
+        pre-reject + reused containment guard as every other READ ref; a
+        ``flow`` binding keeps its decimal index grammar (range/kind checks
+        ride the model's wiring matrix). ANY problem appends one finding and
+        returns ``None`` — the whole-flow fail-closed aggregate still applies.
+        The wiring matrix (:func:`flow_model.validate_a2b_bindings`) re-runs
+        over the parsed block here, so a template smuggling a both-external
+        pair or a downstream/self reference is refused AT LOAD, never mounted
+        (LLR-013.2 invalid arm / LLR-014.1).
+
+    Args:
+        entry (Dict[str, Any]): The untrusted ``blocks[i]`` object.
+        label (str): The ``blocks[i]`` finding prefix.
+        project_root (Path): The containment base (resolved project dir).
+        upstream_blocks (List[FlowBlock]): The blocks already parsed BEFORE
+            this one — the only legal flow-binding targets.
+        findings (List[ValidationIssue]): Finding collector, appended in place.
+
+    Returns:
+        Optional[A2BBlock]: The validated block, or ``None`` on any finding.
+    """
+    unknown = set(entry) - {"kind", "image_a", "image_b"}
+    if unknown:
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (a2b) carries unknown field(s) {sorted(unknown)} - "
+                f"schema v{FLOW_SCHEMA_VERSION} is strict",
+            )
+        )
+        return None
+    bindings: Dict[str, A2BInputBinding] = {}
+    for field in ("image_a", "image_b"):
+        raw = entry.get(field)
+        if not isinstance(raw, dict) or set(raw) != {"source", "ref"}:
+            findings.append(
+                _finding(
+                    FLOW_BAD_FIELD,
+                    f"{label} (a2b) {field} must be an object of exactly "
+                    "{'source', 'ref'}",
+                )
+            )
+            return None
+        source = raw.get("source")
+        ref = raw.get("ref")
+        if source not in (A2B_INPUT_FLOW, A2B_INPUT_FILE):
+            findings.append(
+                _finding(
+                    FLOW_BAD_FIELD,
+                    f"{label} (a2b) {field} source {source!r} is not one of "
+                    f"{sorted((A2B_INPUT_FLOW, A2B_INPUT_FILE))}",
+                )
+            )
+            return None
+        if not isinstance(ref, str) or not ref.strip():
+            findings.append(
+                _finding(
+                    FLOW_BAD_FIELD,
+                    f"{label} (a2b) {field} ref is not a non-empty string",
+                )
+            )
+            return None
+        ref = ref.strip()
+        if source == A2B_INPUT_FILE:
+            if _is_drive_relative(ref):
+                findings.append(
+                    _finding(
+                        FLOW_UNSAFE_REF,
+                        f"{label} (a2b) {field}.ref {ref!r} is a Windows "
+                        "drive-relative path - refs resolve against the "
+                        "project directory only",
+                    )
+                )
+                return None
+            resolved = _resolve_manifest_entry(
+                project_root, ref, f"{label}.{field}.ref", findings
+            )
+            if resolved is None:
+                return None  # the guard appended its finding — binding rejected
+        bindings[field] = A2BInputBinding(source=source, ref=ref)
+    block = A2BBlock(image_a=bindings["image_a"], image_b=bindings["image_b"])
+    reasons = validate_a2b_bindings(block, upstream_blocks)
+    if reasons:
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (a2b) refused: " + "; ".join(reasons),
+            )
+        )
+        return None
+    return block
+
+
 def load_flow_json(
     flow_path: Path,
     project_dir: Path,
@@ -590,6 +731,11 @@ def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Pat
         - ``flow`` → :func:`flow_to_dict` → ``json.dumps(..., indent=2)`` → file.
         - The write-side inverse of :func:`load_flow_json`; a saved file round-trips.
 
+        batch-94 Inc-002 (LLR-015.1): a name collision dedup-suffixes
+        (``<clean>_2.json``, ``_3``, … — the house ``_<N>`` idiom) instead of
+        clobbering the existing template; the returned path names the file
+        actually written.
+
     Dependencies:
         Uses:
             - sanitize_project_name (write-side containment, workspace.py)
@@ -608,6 +754,13 @@ def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Pat
     flows_dir = project_dir / FLOWS_SUBDIR
     flows_dir.mkdir(parents=True, exist_ok=True)
     target = flows_dir / f"{clean}.json"
+    if target.exists():
+        # Collision dedup-suffix (LLR-015.1) — a second same-name save must
+        # never overwrite the first template.
+        counter = 2
+        while (flows_dir / f"{clean}_{counter}.json").exists():
+            counter += 1
+        target = flows_dir / f"{clean}_{counter}.json"
     target.write_text(json.dumps(flow_to_dict(flow), indent=2), encoding="utf-8")
     return target
 

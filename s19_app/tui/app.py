@@ -66,10 +66,10 @@ from .screens import (
     SaveProjectScreen,
     SelectVariantScreen,
 )
+from .flow_screens import FlowBuilderPanel
 from .screens_directionb import (
     AbDiffPanel,
     CheckEditorPanel,
-    FlowBuilderPanel,
     CoverageStats,
     EmptyStatePanel,
     LoadedArtifactsPanel,

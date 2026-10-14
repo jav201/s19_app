@@ -49,6 +49,52 @@ def _painted(widget: Static) -> str:
     return widget.render().plain
 
 
+async def _wait_for(app: S19TuiApp, pilot, selector: str, attempts: int = 25) -> None:
+    """Bounded settle poll for a widget on the CURRENT (modal) screen.
+
+    Batch-94 Inc-002: the reworked builder screen carries more chrome (the
+    fb_a palette + canvas), so a single ``pilot.pause()`` no longer
+    guarantees a pushed modal's compose under load — poll for the widget
+    instead of racing it (the load-flaky settle family, hardened test-side;
+    the product surface is unchanged).
+    """
+    from textual.css.query import NoMatches
+
+    for _ in range(attempts):
+        await pilot.pause()
+        try:
+            app.screen.query_one(selector)
+            return
+        except NoMatches:
+            continue
+    raise AssertionError(f"modal widget {selector!r} did not compose in time")
+
+
+async def _wait_prefill(app: S19TuiApp, pilot, expected: str) -> None:
+    """Wait for SaveFlowScreen's on_mount prefill to land BEFORE typing.
+
+    The modal prefills ``#flow_save_name`` with the current flow name in
+    on_mount (``screens.py``) — a typed value that lands before the prefill
+    is overwritten (the load-flaky family, deterministic once polled).
+    """
+    for _ in range(25):
+        await pilot.pause()
+        if app.screen.query_one("#flow_save_name", Input).value == expected:
+            return
+    raise AssertionError(f"save-name prefill {expected!r} did not land")
+
+
+async def _wait_list_items(app: S19TuiApp, pilot, minimum: int = 1) -> None:
+    """Wait until the LoadFlowScreen's ``#flow_list`` has its items mounted
+    (the ListView populates a beat after the modal's other widgets — poll
+    for the items instead of racing them)."""
+    for _ in range(25):
+        await pilot.pause()
+        if len(app.screen.query("#flow_list ListItem")) >= minimum:
+            return
+    raise AssertionError(f"#flow_list items did not mount (>= {minimum})")
+
+
 # --------------------------------------------------------------------------- #
 # AT-002 / TC-011 — name strip glyph dirty ● → saved ✓ (painted, C-32/C-10)
 # --------------------------------------------------------------------------- #
@@ -76,11 +122,16 @@ def test_at002_name_strip_glyph_dirty_then_saved(tmp_path: Path) -> None:
             states.append((_painted(strip), strip.region.area, set(strip.classes)))
             # (iii) Save through the REAL button + modal -> saved ✓ + file on disk.
             app.query_one("#flow_save", Button).press()
-            await pilot.pause()
+            await _wait_for(app, pilot, "#flow_save_name")
+            await _wait_prefill(app, pilot, "flow")
             app.screen.query_one("#flow_save_name", Input).value = "nightly"
             app.screen.query_one("#flow_save_ok", Button).press()
-            await pilot.pause()
-            await pilot.pause()
+            for _ in range(25):
+                await pilot.pause()
+                if "nightly" in _painted(
+                    app.query_one("#flow_name_strip", Static)
+                ):
+                    break
             states.append((_painted(strip), strip.region.area, set(strip.classes)))
             saved_exists = (project / "flows" / "nightly.json").exists()
             return states, saved_exists
@@ -110,7 +161,8 @@ def test_at003_save_overwrite_notice_fires_on_existing_name(tmp_path: Path) -> N
         async with app.run_test(size=(80, 24)) as pilot:
             await pilot.pause()
             app.push_screen(SaveFlowScreen("nightly", existing=["nightly", "release"]))
-            await pilot.pause()
+            await _wait_for(app, pilot, "#flow_save_name")
+            await _wait_prefill(app, pilot, "nightly")
             notice = app.screen.query_one("#flow_overwrite_notice", Static)
             on_existing = _painted(notice)
             app.screen.query_one("#flow_save_name", Input).value = "brand_new"
@@ -140,7 +192,8 @@ def test_at003_load_screen_lists_saved_flow_stems(tmp_path: Path) -> None:
             await pilot.press("8")
             await pilot.pause()
             app.query_one("#flow_load", Button).press()
-            await pilot.pause()
+            await _wait_for(app, pilot, "#flow_load_ok")
+            await _wait_list_items(app, pilot, 2)
             rows = [
                 item.query_one(Static).render().plain
                 for item in app.screen.query("#flow_list ListItem")
@@ -171,7 +224,8 @@ def test_at006_report_bearing_flow_shows_report_row(tmp_path: Path) -> None:
             await pilot.press("8")
             await pilot.pause()
             app.query_one("#flow_load", Button).press()
-            await pilot.pause()
+            await _wait_for(app, pilot, "#flow_load_ok")
+            await _wait_list_items(app, pilot, 1)
             # highlight the "withrep" row and Load it.
             app.screen.query_one("#flow_list", ListView).index = 0
             app.screen.query_one("#flow_load_ok", Button).press()
@@ -214,7 +268,8 @@ def test_at006_quarantine_card_painted_and_flow_unchanged(tmp_path: Path) -> Non
             blocks_before = app.query_one("#flow_blocks", Static).render().plain
             # Open Load, pick the hostile file, Load it.
             app.query_one("#flow_load", Button).press()
-            await pilot.pause()
+            await _wait_for(app, pilot, "#flow_load_ok")
+            await _wait_list_items(app, pilot, 1)
             app.screen.query_one("#flow_list", ListView).index = 0
             app.screen.query_one("#flow_load_ok", Button).press()
             await pilot.pause()
@@ -300,12 +355,17 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
     project = _make_project(tmp_path)
     save_flow_json(Flow(name="o", blocks=[SourceBlock("other.s19")]), "other", project)
 
-    async def _load_other(app, pilot):
+    async def _load_other(app, pilot, expect_confirm: bool):
         app.query_one("#flow_load", Button).press()
-        await pilot.pause()
+        await _wait_for(app, pilot, "#flow_load_ok")
+        await _wait_list_items(app, pilot, 1)
         app.screen.query_one("#flow_list", ListView).index = 0
         app.screen.query_one("#flow_load_ok", Button).press()
-        await pilot.pause()
+        if expect_confirm:
+            await _wait_for(app, pilot, "#flow_discard_cancel")
+        else:
+            await pilot.pause()
+            await pilot.pause()
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
@@ -320,7 +380,7 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
             await pilot.pause()
 
             # (a) dirty + Load -> confirm modal shown; Cancel -> blocks kept.
-            await _load_other(app, pilot)
+            await _load_other(app, pilot, expect_confirm=True)
             modal_on_cancel = any(
                 isinstance(s, ConfirmDiscardScreen) for s in app.screen_stack
             )
@@ -329,7 +389,7 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
             blocks_after_cancel = app.query_one("#flow_blocks", Static).render().plain
 
             # (b) dirty + Load -> Discard -> blocks replaced with the loaded flow.
-            await _load_other(app, pilot)
+            await _load_other(app, pilot, expect_confirm=True)
             app.screen.query_one("#flow_discard_ok", Button).press()
             await pilot.pause()
             await pilot.pause()
@@ -337,7 +397,7 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
             strip_after_discard = _painted(app.query_one("#flow_name_strip", Static))
 
             # (c) clean + Load -> NO modal (loads directly).
-            await _load_other(app, pilot)
+            await _load_other(app, pilot, expect_confirm=False)
             modal_on_clean = any(
                 isinstance(s, ConfirmDiscardScreen) for s in app.screen_stack
             )

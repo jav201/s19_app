@@ -1,0 +1,15 @@
+=== C-20 move-aside RED counterfactual for net-new s19_app/tui/flow_screens.py ===
+UTC 2026-10-14T02:44:16Z
+before-hash: a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942
+-- move-aside (rename out of the tree; never stash)
+moved aside: present=no
+-- trigger-absent run: the minted builder nodes + an import probe
+    from .flow_screens import FlowBuilderPanel
+ModuleNotFoundError: No module named 's19_app.tui.flow_screens'
+=========================== short test summary info ===========================
+ERROR tests/test_tui_flow_builder_b94.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.48s
+-- restore
+after-hash: a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942
+RESTORE PROVEN (hash identical)

@@ -27,8 +27,9 @@ from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
+from ...compare import ComparisonResult, ImageRef, diff_mem_maps
 from ...core import S19File
 from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
@@ -40,7 +41,13 @@ from ..changes import (
 from ..changes.check import run_check_document
 from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
+from .compare_service import SOURCE_EXTERNAL
+from .diff_report_service import generate_diff_report
+from .markdown_safety import md_code, md_safe
 from .flow_model import (
+    A2BBlock,
+    A2B_INPUT_FILE,
+    A2B_INPUT_FLOW,
     BLOCK_STATUS_ERROR,
     BLOCK_STATUS_NOTICES,
     BLOCK_STATUS_OK,
@@ -128,14 +135,21 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
         - REPORT → ``write_flow_report`` composes from ``FlowReportState``
           (batch-95 inc-004b carries the retained change records — the
           change-attribution section, LLR-143.1).
+        - A2B (batch-94 Inc-002, LLR-013.3/014.2) → each input resolved
+          independently (file binding: F1 guard + headless loaders; flow
+          binding: per-block image snapshots) → ``diff_mem_maps`` →
+          ``generate_diff_report`` under ``reports/``. A sink: the threaded
+          image passes through unchanged; a failed report records an error
+          without aborting (the REPORT-block idiom).
 
     Dependencies:
         Uses:
             - _resolve_manifest_entry (F1 containment)
             - build_loaded_s19 / build_loaded_hex / enrich_tags_and_render
             - read_change_document / apply_change_document / save_patched_image
+            - diff_mem_maps / generate_diff_report (A2B arm, reuse-not-fork)
         Used by:
-            - s19_app.tui.screens_directionb.FlowBuilderPanel (rail-8 Run)
+            - s19_app.tui.flow_screens.FlowBuilderPanel (rail-8 Run)
     """
     result = FlowRunResult(status=FLOW_STATUS_OK)
     mem_map: Optional[dict] = None
@@ -155,6 +169,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # "resolved against" attribution. Never the implicit ctx.a2l_data.
     source_a2l_ref: Optional[str] = None
     aborted = False
+    # batch-94 Inc-002 (LLR-014): per-block image snapshots, consumed by
+    # downstream A2B flow bindings (`#k` references an upstream block's
+    # output). Captured only when the flow actually carries an A2B block, so
+    # the tracer chains pay nothing. A shallow dict copy per boundary is
+    # enough: PATCH mutates in place (the copy freezes the boundary), CRC
+    # reassigns to a fresh map (inject_crcs builds a working copy).
+    snapshots: Optional[Dict[int, Tuple[dict, List[Tuple[int, int]]]]] = (
+        {} if any(isinstance(b, A2BBlock) for b in flow.blocks) else None
+    )
 
     for index, block in enumerate(flow.blocks):
         kind = getattr(block, "kind", "?")
@@ -543,6 +566,146 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         BlockResult(index, kind, BLOCK_STATUS_OK, summary)
                     )
 
+            elif isinstance(block, A2BBlock):
+                # batch-94 Inc-002 (LLR-013.3/014.2): run the A2B diff through
+                # the EXISTING diff-report service — the app computes no report
+                # content. Each input resolves independently: a file binding
+                # through the F1 containment guard + the headless loaders; a
+                # flow binding through the per-block snapshots. Wiring
+                # validation (≥1 from this flow, no both-external pair) ran at
+                # build/load time, so a refused binding never reaches this arm;
+                # an upstream block that failed still leaves NO snapshot and
+                # fails this block closed with a named diagnostic (error arm,
+                # LLR-014.2 — and the generic upstream skip keeps the rest
+                # `skipped`). The block is a SINK: the threaded image passes
+                # through unchanged, so a failed report records an error but
+                # does NOT abort the chain (the REPORT-block idiom).
+                sides: List[Tuple[dict, str, str, str, int]] = []
+                side_failed = False
+                for side, binding in (
+                    ("A", block.image_a),
+                    ("B", block.image_b),
+                ):
+                    if binding.source == A2B_INPUT_FILE:
+                        issues = []
+                        path = _resolve_manifest_entry(
+                            ctx.project_dir, binding.ref,
+                            f"A2BBlock.image_{side.lower()}", issues,
+                        )
+                        if path is None or not path.exists():
+                            aborted = _record_error(
+                                result, index, kind, "input unresolved",
+                                issues,
+                                f"A2B image {side} file not found or not "
+                                "inside the project",
+                            )
+                            side_failed = True
+                            break
+                        try:
+                            if path.suffix.lower() in (".hex", ".ihex"):
+                                loaded_side = build_loaded_hex(
+                                    path, IntelHexFile(str(path)), None,
+                                    ctx.a2l_data,
+                                )
+                            else:
+                                loaded_side = build_loaded_s19(
+                                    path, S19File(str(path)), None,
+                                    ctx.a2l_data,
+                                )
+                        except Exception as exc:  # noqa: BLE001 - per-input arm
+                            aborted = _record_error(
+                                result, index, kind, "input unreadable", [],
+                                f"A2B image {side}: "
+                                f"{type(exc).__name__}: {exc}",
+                            )
+                            side_failed = True
+                            break
+                        # HLR-016: the report identity is file-derived — the
+                        # bare label rides the escaper (Mode A) and the path
+                        # rides the code-span form (Mode B, the truth table).
+                        # Both are IDENTITY on clean values, so the external
+                        # arm keeps the producer's established emitted form
+                        # (C-42 paste, TC-B94-24); flow-arm values are
+                        # model-derived vocabulary and need no scrub.
+                        sides.append(
+                            (
+                                loaded_side.mem_map or {},
+                                md_safe(path.stem, limit=120),
+                                SOURCE_EXTERNAL,
+                                md_code(str(path)),
+                                len(getattr(loaded_side, "errors", None) or []),
+                            )
+                        )
+                    else:
+                        ref = binding.ref.strip()
+                        snap = snapshots.get(int(ref)) if ref.isdigit() else None
+                        if snap is None:
+                            aborted = _record_error(
+                                result, index, kind,
+                                "flow output unavailable", [],
+                                f"A2B image {side}: flow block "
+                                f"{int(ref) + 1 if ref.isdigit() else ref} "
+                                "produced no image (failed or skipped upstream)",
+                            )
+                            side_failed = True
+                            break
+                        producer = flow.blocks[int(ref)]
+                        name = f"block {int(ref) + 1} ({producer.kind}).out"
+                        sides.append(
+                            (
+                                snap[0],
+                                f"{producer.kind}.out",
+                                A2B_INPUT_FLOW,
+                                name,
+                                0,
+                            )
+                        )
+                if side_failed:
+                    continue
+                mem_map_a, label_a, src_a, path_a, err_a = sides[0]
+                mem_map_b, label_b, src_b, path_b, err_b = sides[1]
+                runs, stats = diff_mem_maps(mem_map_a, mem_map_b)
+                comparison = ComparisonResult(
+                    image_a=ImageRef(
+                        label=label_a, path=path_a, source_kind=src_a,
+                        variant_id=None, parse_error_count=err_a,
+                    ),
+                    image_b=ImageRef(
+                        label=label_b, path=path_b, source_kind=src_b,
+                        variant_id=None, parse_error_count=err_b,
+                    ),
+                    runs=runs,
+                    stats=stats,
+                )
+                try:
+                    # Fixed stem (never flow.name — operator text): the report
+                    # filename stays inside the producer's M-5 scheme.
+                    report = generate_diff_report(
+                        comparison,
+                        mem_map_a=mem_map_a,
+                        mem_map_b=mem_map_b,
+                        project_dir=ctx.project_dir,
+                        filename_stem="flow-a2b",
+                    )
+                except Exception as exc:  # noqa: BLE001 - degrade, never abort
+                    result.block_results.append(
+                        BlockResult(index, kind, BLOCK_STATUS_ERROR,
+                                    "report write failed",
+                                    [f"{type(exc).__name__}: {exc}"])
+                    )
+                else:
+                    if not report.written:
+                        result.block_results.append(
+                            BlockResult(index, kind, BLOCK_STATUS_ERROR,
+                                        "report write failed",
+                                        list(report.diagnostics))
+                        )
+                    else:
+                        result.block_results.append(
+                            BlockResult(index, kind, BLOCK_STATUS_OK,
+                                        f"wrote reports/{report.path.name}")
+                        )
+
             elif isinstance(block, ReportBlock) and ctx.defer_report:
                 # batch-70 FB-P2 (D-4): under a fused run the report is written
                 # ONCE, by run_flow_over_variants, with a section per variant.
@@ -605,6 +768,16 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 aborted = _record_error(
                     result, index, kind, "unknown block", [],
                     f"unknown block kind {kind!r}",
+                )
+            # batch-94 Inc-002: freeze the threaded image at this boundary for
+            # downstream A2B flow bindings (only when the flow carries an A2B
+            # block, so tracer chains pay nothing). Only a branch that ran
+            # clean reaches here — every abort path above `continue`d — so the
+            # snapshot always names a successfully produced image.
+            if snapshots is not None and mem_map is not None:
+                snapshots[index] = (
+                    dict(mem_map),
+                    [(int(s), int(e)) for s, e in ranges] if ranges else [],
                 )
         except Exception as exc:  # noqa: BLE001 - per-block isolation (F5)
             result.block_results.append(

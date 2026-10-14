@@ -1,0 +1,996 @@
+==============================================================================
+inc002 mutation battery — batch-94 increment 002 (fb_a builder + A2B)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+
+[phase 0] resolving node ids via pytest --collect-only
+  resolved OK: 18 collectable nodes across 2 files
+
+[phase 1] arms: 8; node-runs: 11
+  planned: 8 arms / 11 node-runs
+
+[phase 2] clean-tree baseline (all 11 nodes, ONE pytest run)
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...........                                                              [100%]
+11 passed in 17.42s
+  [baseline] exit 0
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 01: s19_app/tui/flow_screens.py
+    note: the fb_a canvas compose replaced by a placeholder (list-only UI)
+    edit: '        yield Static(self._canvas_text(), id="flow_canvas", markup=False)'
+          -> '        yield Static("(no canvas)", id="flow_canvas", markup=False)'
+    before: a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_at_b94_15_fb_a_surface_and_wired_patch_run _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19191/test_at_b94_15_fb_a_surface_an0')
+
+    def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
+        """AT-B94-15 (HLR-013, black-box): the palette exposes patch/CRC/A2B-diff;
+        placed blocks carry typed in/out stubs; >=1 cable run renders at 120x30
+        inside the boxed 96x18 workspace; a patch block wired to an S19 image and
+        a patch JSON, run through the shipped surface, writes the patched image.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> "tuple[list[str], str, tuple[int, int], int]":
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                palette_kinds = [
+                    button.id.removeprefix("flow_palette_")
+                    for button in app.query("#flow_palette Button")
+                ]
+                empty_canvas, _ = _painted_static(app, "#flow_canvas")
+                assert "(empty canvas" in empty_canvas
+    
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                _add_ref_block(app, "patch", "hotfix.json")
+                await pilot.pause()
+                _add_ref_block(app, "write_out", "out.s19")
+                await pilot.pause()
+    
+                canvas, _ = _painted_static(app, "#flow_canvas")
+                screen = app.query_one("#screen_flow")
+                canvas_region = app.query_one("#flow_canvas").region
+                app.query_one("#flow_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                return (
+                    palette_kinds,
+                    canvas,
+                    (screen.region.width, screen.region.height),
+                    canvas_region.width,
+                )
+    
+>       palette_kinds, canvas, screen_box, canvas_width = asyncio.run(_drive())
+
+tests\test_tui_flow_builder_b94.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> "tuple[list[str], str, tuple[int, int], int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await _show_flow(app, pilot, project)
+            palette_kinds = [
+                button.id.removeprefix("flow_palette_")
+                for button in app.query("#flow_palette Button")
+            ]
+            empty_canvas, _ = _painted_static(app, "#flow_canvas")
+>           assert "(empty canvas" in empty_canvas
+E           AssertionError: assert '(empty canvas' in '(no canvas)'
+
+tests\test_tui_flow_builder_b94.py:147: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+1 failed in 1.77s
+  [arm 01 [tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run]] exit 1
+    after:  a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942 restore-ok=True
+    arm 01 [tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run]: RED (KILLED)
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________________ test_tc_b94_20_fb_a_composition_census ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19192/test_tc_b94_20_fb_a_compositio0')
+
+    def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
+        """TC-B94-20 (LLR-013.1, white-box census): the reworked panel composes
+        exactly ONE palette rail (carrying the three placeable types), ONE framed
+        canvas; a source + two box blocks render >=1 cable run with typed stubs
+        inside the boxed 96x18 at 120x30; the empty canvas renders the fb_a empty
+        state; the panel also composes at the 80x24 floor (C-29 overflow scrolls,
+        no exception)."""
+        project = _project(tmp_path)
+    
+        async def _drive(size: "tuple[int, int]") -> "tuple[int, int, int, str, int]":
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                palette_count = len(app.query("#flow_palette"))  # one rail…
+                palette_buttons = len(app.query("#flow_palette Button"))
+                canvas_count = len(app.query("#flow_canvas"))
+                if size == (120, 30):
+                    empty_canvas, _ = _painted_static(app, "#flow_canvas")
+                    assert "(empty canvas" in empty_canvas
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                _add_ref_block(app, "patch", "hotfix.json")
+                await pilot.pause()
+                _add_ref_block(app, "write_out", "out.s19")
+                await pilot.pause()
+                canvas, _ = _painted_static(app, "#flow_canvas")
+                return (
+                    palette_count,
+                    palette_buttons,
+                    canvas_count,
+                    canvas,
+                    app.query_one("#flow_canvas").region.width,
+                )
+    
+>       palette_count, palette_buttons, canvas_count, canvas, canvas_width = asyncio.run(
+            _drive((120, 30))
+        )
+
+tests\test_tui_flow_builder_b94.py:453: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+size = (120, 30)
+
+    async def _drive(size: "tuple[int, int]") -> "tuple[int, int, int, str, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await _show_flow(app, pilot, project)
+            palette_count = len(app.query("#flow_palette"))  # one rail…
+            palette_buttons = len(app.query("#flow_palette Button"))
+            canvas_count = len(app.query("#flow_canvas"))
+            if size == (120, 30):
+                empty_canvas, _ = _painted_static(app, "#flow_canvas")
+>               assert "(empty canvas" in empty_canvas
+E               AssertionError: assert '(empty canvas' in '(no canvas)'
+
+tests\test_tui_flow_builder_b94.py:437: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+1 failed in 1.76s
+  [arm 01 [tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census]] exit 1
+    after:  a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942 restore-ok=True
+    arm 01 [tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census]: RED (KILLED)
+
+--- arm 02: s19_app/tui/services/flow_model.py
+    note: both-external refusal suppressed: the (file,file) pair is accepted
+    edit: '    if flow_count == 0:\r\n        reasons.append('
+          -> '    if False and flow_count == 0:\r\n        reasons.append('
+    before: 40c75471a53fab94775102e745ea48efaf7d9d4de6d75da93479577ab4b083fd
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_at_b94_16_a2b_wiring_rule_and_report_provenance _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19193/test_at_b94_16_a2b_wiring_rule0')
+
+    def test_at_b94_16_a2b_wiring_rule_and_report_provenance(tmp_path: Path) -> None:
+        """AT-B94-16 (HLR-014, black-box): each A2B input binds to a flow output
+        or a file; a both-external pair is refused AT WIRING time (the refusal is
+        visible, the block is never added, and a run produces 0 reports); the
+        accepted flow+file binding's report states each input's provenance."""
+        project = _project(tmp_path)
+    
+        async def _drive() -> "tuple[str, int, str, list[str]]":
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                panel = app.query_one("#flow_panel", FlowBuilderPanel)
+    
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                _add_ref_block(app, "patch", "hotfix.json")
+                await pilot.pause()
+    
+                # Refused wiring: both inputs external.
+                app.query_one("#flow_palette_a2b", Button).press()
+                await pilot.pause()
+                assert app.query_one("#flow_ref_a").display is True
+                assert app.query_one("#flow_ref", Input).display is False
+                app.query_one("#flow_ref_a", Input).value = "base.s19"
+                app.query_one("#flow_ref_b", Input).value = "prg.s19"
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                refused_notice = app.query_one("#flow_wiring_notice", Static)
+                refused_blocks = len(panel._blocks)
+                refused_visible = refused_notice.display
+                refused_text = refused_notice.render().plain
+    
+                # Accepted wiring: one flow output (#2 = the patch) + one file.
+                app.query_one("#flow_ref_a", Input).value = "#2"
+                app.query_one("#flow_ref_b", Input).value = "base.s19"
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                accepted_blocks = len(panel._blocks)
+                notice_hidden = not app.query_one("#flow_wiring_notice", Static).display
+                canvas, _ = _painted_static(app, "#flow_canvas")
+    
+                app.query_one("#flow_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                reports = sorted((project / "reports").glob("*flow-a2b*.md"))
+                provenance = []
+                if reports:
+                    provenance = [
+                        ln
+                        for ln in reports[-1].read_text(encoding="utf-8").splitlines()
+                        if ln.startswith("- Image A:") or ln.startswith("- Image B:")
+                    ]
+                return (
+                    refused_text,
+                    refused_blocks + (1000 if refused_visible else 0),
+                    canvas,
+                    provenance if notice_hidden and accepted_blocks == 3 else [],
+                )
+    
+        refused_text, refused_state, canvas, provenance = asyncio.run(_drive())
+    
+>       assert "refused" in refused_text
+E       AssertionError: assert 'refused' in ''
+
+tests\test_tui_flow_builder_b94.py:259: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+1 failed in 3.66s
+  [arm 02 [tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance]] exit 1
+    after:  40c75471a53fab94775102e745ea48efaf7d9d4de6d75da93479577ab4b083fd restore-ok=True
+    arm 02 [tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance]: RED (KILLED)
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_tc_b94_23_binding_validation_matrix ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19194/test_tc_b94_23_binding_validat0')
+
+    def test_tc_b94_23_binding_validation_matrix(tmp_path: Path) -> None:
+        """TC-B94-23 (LLR-014.1): accepted (flow,flow) / (flow,file) / (file,flow);
+        refused (file,file), out-of-range/downstream flow refs, and flow bindings
+        to blocks that produce no image — a refused binding yields its reasons and
+        never reaches the runner (0 reports)."""
+        project = _make_project(tmp_path, {"prg.s19": _S19_A, "base.s19": _S19_A})
+        upstream = [
+            SourceBlock("prg.s19"),
+            PatchBlock("hotfix.json"),
+            _flow_a2b_block("#1", "base.s19"),  # produces a REPORT, not an image
+        ]
+    
+        def _reasons(ref_a: str, ref_b: str, blocks=upstream) -> list[str]:
+            return validate_a2b_bindings(_flow_a2b_block(ref_a, ref_b), blocks)
+    
+        # Accepted combos (the boundary arm is exactly one flow + one file).
+        # 1-based canvas numbering: #1 = SOURCE, #2 = PATCH, #3 = the A2B itself.
+        assert _reasons("#1", "#2") == []
+        assert _reasons("#2", "base.s19") == []
+        assert _reasons("base.s19", "#2") == []
+        # Refused: both external.
+>       assert any("at least one" in r for r in _reasons("prg.s19", "base.s19"))
+E       assert False
+E        +  where False = any(<generator object test_tc_b94_23_binding_validation_matrix.<locals>.<genexpr> at 0x0000022AA6AA8E10>)
+
+tests\test_flow_a2b_b94.py:290: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix
+1 failed in 0.59s
+  [arm 02 [tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix]] exit 1
+    after:  40c75471a53fab94775102e745ea48efaf7d9d4de6d75da93479577ab4b083fd restore-ok=True
+    arm 02 [tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix]: RED (KILLED)
+
+--- arm 03: s19_app/tui/services/flow_persistence_service.py
+    note: collision dedup-suffix suppressed: a second same-name save clobbers
+    edit: '    target = flows_dir / f"{clean}.json"\r\n    if target.exists():'
+          -> '    target = flows_dir / f"{clean}.json"\r\n    if False and target.exists():'
+    before: ba635bea98602a5ddc490db498eac0bebcaf6fee1a791ba7290bbaafb4df755a
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_at_b94_17_template_save_listing_import_and_dedup ____________
+
+    async def _drive() -> "tuple[list[str], list[str], str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await _show_flow(app, pilot, project)
+            panel = app.query_one("#flow_panel", FlowBuilderPanel)
+            _add_ref_block(app, "source", "prg.s19")
+            await pilot.pause()
+            _add_ref_block(app, "patch", "hotfix.json")
+            await pilot.pause()
+    
+            # Save "chain1" through the real button + modal.
+            app.query_one("#flow_save", Button).press()
+>           await _wait_prefill(app, pilot, "flow")
+
+tests\test_tui_flow_builder_b94.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_tui_flow_builder_b94.py:107: in _wait_prefill
+    if app.screen.query_one("#flow_save_name", Input).value == expected:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SaveFlowScreen(), selector = '#flow_save_name'
+expect_type = <class 'textual.widgets._input.Input'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#flow_save_name' on SaveFlowScreen()
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19195/test_at_b94_17_template_save_l0')
+
+    def test_at_b94_17_template_save_listing_import_and_dedup(tmp_path: Path) -> None:
+        """AT-B94-17 (HLR-015, black-box): saving a built flow names it; the name
+        appears in the Flow Execution import listing (``list_saved_flows`` — the
+        surface Inc-003's import consumes); importing reconstructs the flow
+        (block count + kinds); a second same-name save dedup-suffixes instead of
+        clobbering."""
+        project = _project(tmp_path)
+    
+        async def _drive() -> "tuple[list[str], list[str], str]":
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                panel = app.query_one("#flow_panel", FlowBuilderPanel)
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                _add_ref_block(app, "patch", "hotfix.json")
+                await pilot.pause()
+    
+                # Save "chain1" through the real button + modal.
+                app.query_one("#flow_save", Button).press()
+                await _wait_prefill(app, pilot, "flow")
+                app.screen.query_one("#flow_save_name", Input).value = "chain1"
+                app.screen.query_one("#flow_save_ok", Button).press()
+                for _ in range(5):
+                    await pilot.pause()
+                saved_kinds = [b.kind for b in panel._blocks]
+                strip, _ = _painted_static(app, "#flow_name_strip")
+    
+                # Second save under the SAME name (a write-out variant flow).
+                _add_ref_block(app, "write_out", "out.s19")
+                await pilot.pause()
+                app.query_one("#flow_save", Button).press()
+                await _wait_prefill(app, pilot, "chain1")
+                app.screen.query_one("#flow_save_name", Input).value = "chain1"
+                app.screen.query_one("#flow_save_ok", Button).press()
+                for _ in range(5):
+                    await pilot.pause()
+                return saved_kinds, [b.kind for b in panel._blocks], strip
+    
+>       saved_kinds, dedup_kinds, strip = asyncio.run(_drive())
+
+tests\test_tui_flow_builder_b94.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_flow_builder_b94.py:282: in _drive
+    async with app.run_test(size=(120, 30)) as pilot:
+..\..\anaconda3\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(value)
+..\..\anaconda3\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:604: in _pre_process
+    await self._dispatch_message(events.Mount())
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:808: in on_event
+    await self._on_message(event)
+..\..\anaconda3\Lib\site-packages\textual\message_pump.py:829: in _on_message
+    await invoke(method, message)
+..\..\anaconda3\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+..\..\anaconda3\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+s19_app\tui\screens.py:778: in on_mount
+    self.query_one("#flow_save_name", Input).value = self.default_name
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SaveFlowScreen(), selector = '#flow_save_name'
+expect_type = <class 'textual.widgets._input.Input'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#flow_save_name' on SaveFlowScreen()
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b94\s19_app\tui\screens.py:778 in on_mount     
+│                                                                              
+│    775 │   │   )                                                             
+│    776 │                                                                     
+│    777 │   def on_mount(self) -> None:                                       
+│ ❱  778 │   │   self.query_one("#flow_save_name", Input).value = self.default 
+│    779 │   │   self._refresh_overwrite_notice(self.default_name)             
+│    780 │                                                                     
+│    781 │   def on_input_changed(self, event: Input.Changed) -> None:         
+│                                                                              
+│ ╭──────── locals ─────────╮                                                  
+│ │ self = SaveFlowScreen() │                                                  
+│ ╰─────────────────────────╯                                                  
+╰──────────────────────────────────────────────────────────────────────────────
+NoMatches: No nodes match '#flow_save_name' on SaveFlowScreen()
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+1 failed in 2.08s
+  [arm 03 [tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup]] exit 1
+    after:  ba635bea98602a5ddc490db498eac0bebcaf6fee1a791ba7290bbaafb4df755a restore-ok=True
+    arm 03 [tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup]: RED (KILLED)
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_tc_b94_04_template_save_reload_and_dedup ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19196/test_tc_b94_04_template_save_r0')
+
+    def test_tc_b94_04_template_save_reload_and_dedup(tmp_path: Path) -> None:
+        """TC-B94-04 (LLR-015.1/015.2): a saved template parses as the schema-v1
+        envelope and reloads with equal block count + kinds; a name collision
+        dedup-suffixes (``hotfix_2.json``) instead of clobbering — the first
+        template's bytes are untouched; corrupt and oversized payloads are refused
+        fail-closed (0 blocks mounted + findings)."""
+        project = _make_project(tmp_path, {"prg.s19": _S19_A, "base.s19": _S19_A})
+        flow_one = Flow(
+            name="hotfix",
+            blocks=[SourceBlock("prg.s19"), _flow_a2b_block("#1", "base.s19")],
+        )
+        flow_two = Flow(
+            name="hotfix",
+            blocks=[SourceBlock("base.s19"), WriteOutBlock("out.s19")],
+        )
+    
+        first = fps.save_flow_json(flow_one, "hotfix", project)
+        assert first is not None and first.name == "hotfix.json"
+        envelope = json.loads(first.read_text(encoding="utf-8"))
+        assert envelope["schema_version"] == 1
+        assert envelope["name"] == "hotfix"
+        assert [b["kind"] for b in envelope["blocks"]] == ["source", "a2b"]
+    
+        second = fps.save_flow_json(flow_two, "hotfix", project)
+>       assert second is not None and second.name == "hotfix_2.json"
+E       AssertionError: assert (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19196/test_tc_b94_04_template_save_r0/.s19tool/workarea/proj/flows/hotfix.json') is not None and 'hotfix.json' == 'hotfix_2.json'
+E         
+E         - hotfix_2.json
+E         ?       --
+E         + hotfix.json)
+
+tests\test_flow_a2b_b94.py:527: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup
+1 failed in 0.59s
+  [arm 03 [tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup]] exit 1
+    after:  ba635bea98602a5ddc490db498eac0bebcaf6fee1a791ba7290bbaafb4df755a restore-ok=True
+    arm 03 [tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup]: RED (KILLED)
+
+--- arm 04: s19_app/tui/flow_screens.py
+    note: canvas label scrub dropped: control bytes survive into the paint
+    edit: '        scrub = lambda s: safe_text(s).plain  # noqa: E731 - one-line sink guard'
+          -> '        scrub = lambda s: s  # noqa: E731 - one-line sink guard'
+    before: a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942
+  $ pytest [tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_at_b94_18_hostile_names_render_literally ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19197/test_at_b94_18_hostile_names_r0')
+
+    def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
+        """AT-B94-18 (HLR-016, black-box, C-17): the batch-77 hostile payload in a
+        bound file name renders literally on the canvas (sentinel visible, markup
+        literal, 0 control bytes) and a Windows-legal hostile name reaches the
+        emitted report with the sentinel visible, the Mode-A label escaped and 0
+        control bytes. Two app sessions: the full payload never runs (its file
+        does not exist), the report arm uses the legal on-disk name."""
+        project = _make_project(
+            tmp_path,
+            {"prg.s19": _S19, _HOSTILE_FILE_NAME: _S19, "hotfix.json": _patch_json()},
+        )
+    
+        async def _drive_canvas() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                # The full hostile payload (control bytes + markup) as the file
+                # input — refused bindings never paint, so pair it with a legal
+                # flow output to make the wiring stick. Never run.
+                app.query_one("#flow_palette_a2b", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_ref_a", Input).value = "#1"
+                app.query_one("#flow_ref_b", Input).value = _HOSTILE_SYMBOL
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                canvas, _spans = _painted_static(app, "#flow_canvas")
+                return canvas
+    
+        async def _drive_report() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_flow(app, pilot, project)
+                _add_ref_block(app, "source", "prg.s19")
+                await pilot.pause()
+                app.query_one("#flow_palette_a2b", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_ref_a", Input).value = "#1"
+                app.query_one("#flow_ref_b", Input).value = _HOSTILE_FILE_NAME
+                app.query_one("#flow_add", Button).press()
+                await pilot.pause()
+                app.query_one("#flow_run", Button).press()
+                for _ in range(30):
+                    await pilot.pause()
+                reports = sorted((project / "reports").glob("*flow-a2b*.md"))
+                assert reports, "the runnable hostile-name arm must emit a report"
+                return reports[-1].read_bytes().decode("utf-8")
+    
+        canvas = asyncio.run(_drive_canvas())
+        report_text = asyncio.run(_drive_report())
+    
+        # Canvas: sentinel visible, brackets literal, 0 control bytes. (The canvas
+        # legitimately carries STYLE spans — box-art colours — so the markup
+        # census is the AST scan in test_tc_042_10, not a span emptiness check.)
+        assert _SENTINEL in canvas
+        assert "_evil[red]" in canvas  # literal brackets, never parsed
+>       assert _control_bytes(canvas) == []
+E       assert [27, 155, 157, 0, 127] == []
+E         
+E         Left contains 5 more items, first extra item: 27
+E         Use -v to get more diff
+
+tests\test_tui_flow_builder_b94.py:398: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+1 failed in 4.77s
+  [arm 04 [tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally]] exit 1
+    after:  a480fd6145f952945999804217ffd995b6b1adde4ed0be371b666a63776d4942 restore-ok=True
+    arm 04 [tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally]: RED (KILLED)
+
+--- arm 05: s19_app/tui/services/flow_execution_service.py
+    note: the Mode-A label escaper bypassed: raw markup reaches the report
+    edit: '                                md_safe(path.stem, limit=120),'
+          -> '                                path.stem,'
+    before: a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b94_25_hostile_file_name_in_emitted_report ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19198/test_tc_b94_25_hostile_file_na0')
+
+    def test_tc_b94_25_hostile_file_name_in_emitted_report(tmp_path: Path) -> None:
+        """TC-B94-25 hostile arm (LLR-016.1): a hostile (Windows-legal) file name
+        bound to an A2B input renders in the EMITTED report with the sentinel
+        visible, zero control bytes, and no unescaped markup in the Mode-A label
+        cell; the producer raises nothing."""
+        project = _make_project(
+            tmp_path,
+            {
+                "prg.s19": _S19_A,
+                _HOSTILE_FILE_NAME: _S19_A,
+            },
+        )
+        flow = Flow(
+            name="hostile",
+            blocks=[
+                SourceBlock("prg.s19"),
+                _flow_a2b_block("#1", _HOSTILE_FILE_NAME),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        assert result.block_results[1].status == BLOCK_STATUS_OK
+        reports = sorted((project / "reports").glob("*flow-a2b*.md"))
+        assert len(reports) == 1
+        raw = reports[0].read_bytes()
+        text = raw.decode("utf-8")
+        assert _SENTINEL in text
+        # The Mode-A label (everything before the " [external]" kind tag) carries
+        # the ESCAPED spelling — no raw markup; the code-span path (Mode B) keeps
+        # the literal name inert inside the backticks.
+        image_lines = [
+            ln for ln in text.splitlines() if ln.startswith("- Image B:")
+        ]
+        assert len(image_lines) == 1, image_lines
+        label_part = image_lines[0].split(" [external]")[0]
+>       assert "[red]" not in label_part
+E       AssertionError: assert '[red]' not in '- Image B: ...rk_evil[red]'
+E         
+E         '[red]' is contained here:
+E           - Image B: b77hostilemark_evil[red]
+E         ?                               +++++
+
+tests\test_flow_a2b_b94.py:487: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report
+1 failed in 0.62s
+  [arm 05 [tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report]] exit 1
+    after:  a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e restore-ok=True
+    arm 05 [tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report]: RED (KILLED)
+
+--- arm 06: s19_app/tui/services/flow_persistence_service.py
+    note: A2B bindings dropped at serialize: the round-trip loses them
+    edit: '                    "image_a": {\r\n                        "source": block.image_a.source,\r\n                        "ref": block.image_a.ref,\r\n                    },\r\n                    "image_b": {\r\n                        "source": block.image_b.source,\r\n                        "ref": block.image_b.ref,\r\n                    },'
+          -> '                    "image_a": {},\r\n                    "image_b": {},'
+    before: ba635bea98602a5ddc490db498eac0bebcaf6fee1a791ba7290bbaafb4df755a
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19199/test_tc_b94_21_roundtrip_one_o0')
+
+    def test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b(tmp_path: Path) -> None:
+        """TC-B94-21 (LLR-013.2): a serialized flow with one of each block kind —
+        SOURCE / PATCH / CHECK / CRC / WRITE-OUT / REPORT + the NEW A2B — round-
+        trips through flow_to_dict/dict_to_flow with kind equality and per-kind
+        fields intact (the two A2B bindings survive verbatim); schema_version
+        stays 1; a foreign kind is refused fail-closed."""
+        project = _make_project(tmp_path, {"prg.s19": _S19_A, "base.s19": _S19_A})
+        flow = Flow(
+            name="all-kinds",
+            blocks=[
+                SourceBlock("prg.s19"),
+                PatchBlock("hotfix.json"),
+                CheckBlock("audit.chk.json"),
+                CrcBlock("crc.json"),
+                WriteOutBlock("out.s19"),
+                ReportBlock(),
+                _flow_a2b_block("#2", "base.s19"),
+            ],
+        )
+    
+        envelope = fps.flow_to_dict(flow)
+        assert envelope["schema_version"] == 1
+        kinds = [b["kind"] for b in envelope["blocks"]]
+        assert kinds == [
+            "source", "patch", "check", "crc", "write_out", "report", "a2b",
+        ]
+        a2b_env = envelope["blocks"][6]
+>       assert a2b_env["image_a"] == {"source": "flow", "ref": "1"}
+E       AssertionError: assert {} == {'ref': '1', 'source': 'flow'}
+E         
+E         Right contains 2 more items:
+E         {'ref': '1', 'source': 'flow'}
+E         Use -v to get more diff
+
+tests\test_flow_a2b_b94.py:117: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b
+1 failed in 0.59s
+  [arm 06 [tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b]] exit 1
+    after:  ba635bea98602a5ddc490db498eac0bebcaf6fee1a791ba7290bbaafb4df755a restore-ok=True
+    arm 06 [tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b]: RED (KILLED)
+
+--- arm 07: s19_app/tui/services/flow_execution_service.py
+    note: C-1 re-arm: a missing CRC config applies anyway (chain proceeds)
+    edit: '                if path is None or not path.exists():\r\n                    # LLR-092.1: containment reject (absolute/escape/reparse) or\r\n                    # a missing target — fail closed BEFORE opening any file.\r\n                    aborted = _record_error(\r\n                        result, index, kind, "config unresolved", issues,\r\n                        "crc config not found or not inside the project",\r\n                    )\r\n                    continue'
+          -> '                if path is None or not path.exists():\r\n                    result.block_results.append(\r\n                        BlockResult(index, kind, BLOCK_STATUS_OK, "crc skipped")\r\n                    )\r\n                    continue'
+    before: a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b94_22_upstream_crc_failure_skips_write_out _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19200/test_tc_b94_22_upstream_crc_fa0')
+
+    def test_tc_b94_22_upstream_crc_failure_skips_write_out(tmp_path: Path) -> None:
+        """TC-B94-22 error arm + the C-1 re-arm (PDR-2026-10-12-batch-94#C-1):
+        over the patch → CRC → write-out chain, a MISSING CRC config fails the
+        CRC block closed; the write-out downstream reads ``skipped``; ZERO image
+        files are written. Precedent: tests/test_flow_crc_block.py AT-126 — the
+        authoring-time mutation 'a missing CRC config applies anyway' turns this
+        node RED."""
+        project = _make_project(
+            tmp_path,
+            {
+                "prg.s19": _S19_A,
+                "hotfix.json": _patch_doc(
+                    [{"type": "bytes", "address": "0x1001", "bytes": "AA"}]
+                ),
+                # NOTE: no crc.json — the CRC block's config is missing.
+            },
+        )
+        flow = Flow(
+            name="c1-arm",
+            blocks=[
+                SourceBlock("prg.s19"),
+                PatchBlock("hotfix.json"),
+                CrcBlock("crc.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        assert len(result.block_results) == len(flow.blocks)  # never raised
+>       assert result.block_results[2].status == BLOCK_STATUS_ERROR
+E       AssertionError: assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_flow_a2b_b94.py:257: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out
+1 failed in 0.58s
+  [arm 07 [tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out]] exit 1
+    after:  a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e restore-ok=True
+    arm 07 [tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out]: RED (KILLED)
+
+--- arm 08: s19_app/tui/services/flow_execution_service.py
+    note: external arm source-kind drifted off the C-42 pasted form
+    edit: '                                SOURCE_EXTERNAL,'
+          -> '                                A2B_INPUT_FILE,'
+    before: a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e
+  $ pytest [tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance]
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b94_24_a2b_report_states_each_inputs_provenance ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19201/test_tc_b94_24_a2b_report_stat0')
+
+    def test_tc_b94_24_a2b_report_states_each_inputs_provenance(tmp_path: Path) -> None:
+        """TC-B94-24 (LLR-014.2, C-42): the flow-run A2B report emits exactly two
+        provenance lines; the flow arm matches the increment's own Phase-3 paste
+        character-for-character; the external arm matches the executed base form's
+        fixed parts; the flow arm NAMES THE PRODUCING BLOCK."""
+        project = _make_project(
+            tmp_path,
+            {
+                "prg.s19": _S19_A,
+                "base.s19": _S19_A,
+                "hotfix.json": _patch_doc(
+                    [{"type": "bytes", "address": "0x1001", "bytes": "AA"}]
+                ),
+            },
+        )
+        flow = Flow(
+            name="provenance",
+            blocks=[
+                SourceBlock("prg.s19"),
+                PatchBlock("hotfix.json"),
+                _flow_a2b_block("#2", "base.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        assert result.block_results[2].status == BLOCK_STATUS_OK
+        reports = sorted((project / "reports").glob("*flow-a2b*.md"))
+        assert len(reports) == 1
+        text = reports[0].read_text(encoding="utf-8")
+        provenance = [
+            ln
+            for ln in text.splitlines()
+            if ln.startswith("- Image A:") or ln.startswith("- Image B:")
+        ]
+        assert len(provenance) == 2, provenance
+        line_a, line_b = provenance
+        # The flow arm: the increment's own paste, asserted character-for-character.
+        assert line_a == _TC_B94_24_FLOW_ARM_PASTE, line_a
+        assert "block 2 (patch).out" in line_a  # names the producing block
+        # The external arm: the executed base form's fixed parts (C-42 lineage).
+>       assert _TC_B94_24_EXTERNAL_ARM_RE.match(line_b), line_b
+E       AssertionError: - Image B: base [file] path=`C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-19201\test_tc_b94_24_a2b_report_stat0\.s19tool\workarea\proj\base.s19` parse-errors=0
+E       assert None
+E        +  where None = <built-in method match of re.Pattern object at 0x000002534190F870>('- Image B: base [file] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-19201\\test_tc_b94_24_a2b_report_stat0\\.s19tool\\workarea\\proj\\base.s19` parse-errors=0')
+E        +    where <built-in method match of re.Pattern object at 0x000002534190F870> = re.compile('^- Image B: base \\[external\\] path=`.*[\\\\/]base\\.s19` parse-errors=0$').match
+
+tests\test_flow_a2b_b94.py:385: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+1 failed in 0.65s
+  [arm 08 [tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance]] exit 1
+    after:  a40bd1ee8fb029b08b67bada23405227fdd9f76f41c69bea28f475a4b23b061e restore-ok=True
+    arm 08 [tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance]: RED (KILLED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 01 | tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+    edit:         yield Static(self._canvas_text(), id="flow_canvas", markup=False)... | RED (KILLED) | restore-hash OK
+    note: the fb_a canvas compose replaced by a placeholder (list-only UI)
+arm 01 | tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+    edit:         yield Static(self._canvas_text(), id="flow_canvas", markup=False)... | RED (KILLED) | restore-hash OK
+    note: the fb_a canvas compose replaced by a placeholder (list-only UI)
+arm 02 | tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+    edit:     if flow_count == 0:... | RED (KILLED) | restore-hash OK
+    note: both-external refusal suppressed: the (file,file) pair is accepted
+arm 02 | tests/test_flow_a2b_b94.py::test_tc_b94_23_binding_validation_matrix
+    edit:     if flow_count == 0:... | RED (KILLED) | restore-hash OK
+    note: both-external refusal suppressed: the (file,file) pair is accepted
+arm 03 | tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+    edit:     target = flows_dir / f"{clean}.json"... | RED (KILLED) | restore-hash OK
+    note: collision dedup-suffix suppressed: a second same-name save clobbers
+arm 03 | tests/test_flow_a2b_b94.py::test_tc_b94_04_template_save_reload_and_dedup
+    edit:     target = flows_dir / f"{clean}.json"... | RED (KILLED) | restore-hash OK
+    note: collision dedup-suffix suppressed: a second same-name save clobbers
+arm 04 | tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+    edit:         scrub = lambda s: safe_text(s).plain  # noqa: E731 - one-line sink guard... | RED (KILLED) | restore-hash OK
+    note: canvas label scrub dropped: control bytes survive into the paint
+arm 05 | tests/test_flow_a2b_b94.py::test_tc_b94_25_hostile_file_name_in_emitted_report
+    edit:                                 md_safe(path.stem, limit=120),... | RED (KILLED) | restore-hash OK
+    note: the Mode-A label escaper bypassed: raw markup reaches the report
+arm 06 | tests/test_flow_a2b_b94.py::test_tc_b94_21_roundtrip_one_of_each_kind_incl_a2b
+    edit:                     "image_a": {... | RED (KILLED) | restore-hash OK
+    note: A2B bindings dropped at serialize: the round-trip loses them
+arm 07 | tests/test_flow_a2b_b94.py::test_tc_b94_22_upstream_crc_failure_skips_write_out
+    edit:                 if path is None or not path.exists():... | RED (KILLED) | restore-hash OK
+    note: C-1 re-arm: a missing CRC config applies anyway (chain proceeds)
+arm 08 | tests/test_flow_a2b_b94.py::test_tc_b94_24_a2b_report_states_each_inputs_provenance
+    edit:                                 SOURCE_EXTERNAL,... | RED (KILLED) | restore-hash OK
+    note: external arm source-kind drifted off the C-42 pasted form
+------------------------------------------------------------------------------
+TOTALS: 11 node-runs | RED 11 | SURVIVED 0 | CRASH/BAD 0
+runner exit: 0 (all arms killed)
