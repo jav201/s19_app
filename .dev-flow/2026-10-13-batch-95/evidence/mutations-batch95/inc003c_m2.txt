@@ -1,0 +1,387 @@
+# Mutation INC003C-M2 — inc-003c (e460ffb)
+# Finding: LLR-140.1 markup=False verbatim render
+# File: s19_app/tui/window_help.py
+# Anchor (must match exactly once):
+                markup=False,
+# Replacement:
+                markup=True,
+# Claim: turning Rich markup parsing ON lets **/backtick metacharacters in the operator copy be interpreted — TC-706's markup_off assertion (8/8 windows) must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal -q -p no:cacheprovider
+# sha256 before mutation: 0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
+# sha256 after restore:   0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_ test_tc706_affordance_opens_window_section_modal[patch-#window_help_patch-patch] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi0')
+window_key = 'patch', chip_id = '#window_help_patch', screen_key = 'patch'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[checks-#window_help_checks-checks] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi1')
+window_key = 'checks', chip_id = '#window_help_checks', screen_key = 'checks'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[crc_designer-#window_help_crc_designer-crc_designer] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi2')
+window_key = 'crc_designer', chip_id = '#window_help_crc_designer'
+screen_key = 'crc_designer'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[map-#window_help_map-map] __
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi3')
+window_key = 'map', chip_id = '#window_help_map', screen_key = 'map'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[flow-#window_help_flow-flow] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi4')
+window_key = 'flow', chip_id = '#window_help_flow', screen_key = 'flow'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[a2l-#window_help_a2l-a2l] __
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi5')
+window_key = 'a2l', chip_id = '#window_help_a2l', screen_key = 'a2l'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[workspace-#window_help_workspace-workspace] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi6')
+window_key = 'workspace', chip_id = '#window_help_workspace'
+screen_key = 'workspace'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+_ test_tc706_affordance_opens_window_section_modal[reports-#window_help_reports-reports] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19102/test_tc706_affordance_opens_wi7')
+window_key = 'reports', chip_id = '#window_help_reports', screen_key = 'reports'
+
+    @pytest.mark.parametrize("window_key,chip_id,screen_key", _SEATS)
+    def test_tc706_affordance_opens_window_section_modal(
+        tmp_path: Path,
+        window_key: str,
+        chip_id: str,
+        screen_key: str,
+    ) -> None:
+        """TC-706 (LLR-140.1): the ``?`` affordance on each of the 8 shipped
+        windows opens the modal with THAT window's section — title + steps —
+        and the body renders the copy verbatim with markup parsing off."""
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                screen = await _open_via_chip(app, pilot, screen_key, chip_id)
+                assert isinstance(screen, WindowHelpScreen)
+                title = screen.query_one(".modal-title", Label)
+                body = screen.query_one("#window_help_body", Static)
+                return {
+                    "section_key": screen.section_key,
+                    "title": str(title.render()),
+                    "markup_off": body._render_markup is False,
+                    "verbatim": body.content == section_body_text(window_key),
+                    "non_empty": len(str(body.content)) > 0,
+                }
+    
+        observed = asyncio.run(_drive())
+        section = WINDOW_HELP_SECTIONS[window_key]
+        assert observed["section_key"] == window_key
+        assert observed["title"] == str(section["title"]), (
+            "the modal title is the authored section title"
+        )
+>       assert observed["markup_off"], "the copy must render with markup=False"
+E       AssertionError: the copy must render with markup=False
+E       assert False
+
+tests\test_window_usage_help.py:284: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[patch-#window_help_patch-patch]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[checks-#window_help_checks-checks]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[crc_designer-#window_help_crc_designer-crc_designer]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[map-#window_help_map-map]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[flow-#window_help_flow-flow]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[a2l-#window_help_a2l-a2l]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[workspace-#window_help_workspace-workspace]
+FAILED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[reports-#window_help_reports-reports]
+8 failed in 15.64s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+........                                                                 [100%]
+8 passed in 14.79s

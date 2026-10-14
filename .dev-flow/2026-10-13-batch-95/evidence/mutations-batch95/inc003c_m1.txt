@@ -1,0 +1,92 @@
+# Mutation INC003C-M1 — inc-003c (e460ffb)
+# Finding: LLR-140.2 generated N. numbering
+# File: s19_app/tui/window_help.py
+# Anchor (must match exactly once):
+        f"{number}. {step}" for number, step in enumerate(steps, start=1)
+# Replacement:
+        f"{number}) {step}" for number, step in enumerate(steps, start=1)
+# Claim: rendering the generated numbering with ')' instead of '. ' breaks the numbered-steps voice — TC-707's sequential-numbering assertion (and the '1. ' boundary) must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal -q -p no:cacheprovider
+# sha256 before mutation: 0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
+# sha256 after restore:   0b4dbc172285a65338fa5731d2a9d8103d3f36882334f459d64c2f74d526067b
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__________________ test_tc707_numbering_generated_sequential __________________
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+        md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+        # Split the md into per-section bodies at the "## " headings.
+        chunks = re.split(r"(?m)^## ", md_text)[1:]
+        md_numbered_counts = {}
+        for chunk in chunks:
+            heading = chunk.splitlines()[0]
+            count = len(re.findall(r"(?m)^\d+\.", chunk))
+            for key, section in WINDOW_HELP_SECTIONS.items():
+                if heading.startswith(str(section["title"])):
+                    md_numbered_counts[key] = count
+        assert frozenset(md_numbered_counts) == _EXPECTED_KEYS, (
+            f"every authored section must be found in the md by its title; "
+            f"matched: {sorted(md_numbered_counts)}"
+        )
+        for key in WINDOW_HELP_SECTIONS:
+            body = section_body_text(key)
+            paragraphs = body.split("\n\n")
+            for number, paragraph in enumerate(paragraphs, start=1):
+>               assert paragraph.startswith(f"{number}. "), (
+                    f"{key}: paragraph {number} must render with its generated "
+                    f"number prefix; got {paragraph[:20]!r}"
+                )
+E               AssertionError: patch: paragraph 1 must render with its generated number prefix; got '1) Load an S19/HEX i'
+E               assert False
+E                +  where False = <built-in method startswith of str object at 0x000002968E9048F0>('1. ')
+E                +    where <built-in method startswith of str object at 0x000002968E9048F0> = '1) Load an S19/HEX image first (`^L`) — patching needs bytes in memory.'.startswith
+
+tests\test_window_usage_help.py:211: AssertionError
+_____________ test_tc707_boundary_no_orphan_seats_no_blank_modal ______________
+
+    def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
+        """TC-707/TC-706 (the boundary catalog): a window with no authored
+        section keeps the stock help only — the seat constructors refuse an
+        unknown key, the opener pushes nothing for one (never a blank modal),
+        and the shipped seats are exactly the nine keys minus the inc-004
+        ``split_join_export``."""
+        assert frozenset(SHIPPED_WINDOW_KEYS) == _EXPECTED_KEYS - {
+            "split_join_export"
+        }, "the eighth shipped seats are the nine sections minus split_join_export"
+        for key in WINDOW_HELP_SECTIONS:
+            body = section_body_text(key)
+>           assert body.startswith("1. ") and len(body) > 0, (
+                f"{key}: no section may render a blank modal"
+            )
+E           AssertionError: patch: no section may render a blank modal
+E           assert (False)
+E            +  where False = <built-in method startswith of str object at 0x000002968C648370>('1. ')
+E            +    where <built-in method startswith of str object at 0x000002968C648370> = '1) Load an S19/HEX image first (`^L`) — patching needs bytes in memory.\n\n2) Type an address (`0x…`) plus either a s...re your change-set files live: the project folder when a project is saved, the common `workarea\\patches\\` otherwise.'.startswith
+
+tests\test_window_usage_help.py:232: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+FAILED tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal
+2 failed in 0.31s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+..                                                                       [100%]
+2 passed in 0.21s

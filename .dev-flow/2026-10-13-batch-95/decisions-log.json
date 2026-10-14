@@ -1,0 +1,32 @@
+[
+  {
+    "station": "P2",
+    "date": "2026-10-13",
+    "decision": "P2 approve (0/0/3, the amendment 0/0/2) — the contract is the round's record re-derived (premises P-1..P-23 executed, all TRUE); the change-5 amendment contracted mid-P3 (LED-2026-10-13-batch-95.2); P3 runs in the single lane on the MAIN checkout",
+    "guided": false
+  },
+  {
+    "station": "P3",
+    "date": "2026-10-13",
+    "decision": "increment 001 -- the Split/Join/Export engine (HLR-137, LLR-137.*): the range slicer, the BIN emitter + .addr sidecar, the pad-byte fill emitter (gap-conflict abort, the CRC editor's law), the join from the lowest base, the hardened MEMORY_SEGMENT extractor (quoted names + the offset field); the registry meta repaired",
+    "guided": false
+  },
+  {
+    "station": "P3",
+    "date": "2026-10-13",
+    "decision": "increment 002 + 003 -- the change-1 project gather with the scoped homes (HLR-138, COPY idempotent) and the changes 2/3/5 backend (HLR-139/140/141): the open-folder chips on one cross-platform seam, the per-window usage help (nine authored sections verbatim), the A2L symbol wire + the physical-to-raw encode + the picker + the flow a2l_ref (TC-712..715 + TC-718); the C-25 collateral sweep closed the two pre-existing reds and bound-polled the at064b/tc329 race",
+    "guided": false
+  },
+  {
+    "station": "P3",
+    "date": "2026-10-13",
+    "decision": "increment 004 -- the SJE window (HLR-135/136, the graft + visor + guard two-step + the two-regime reflow + palette-first; TC-708..710) + the change-attribution backend (HLR-143: ChangeSummaryEntry.symbol, the report's change-attribution section, the A2B diff reference-all law; TC-716/717); the gantt pre-layout fallback paint; the registry bound 171->172 measured",
+    "guided": false
+  },
+  {
+    "station": "P5",
+    "date": "2026-10-13",
+    "decision": "batch closed -- the C-25 definitive run read 35 failed + 2988 passed + 3 skipped + 3 xfailed, the census all declared pre-existing Windows-env families (29 snapshot cells, the rotating flakes; none attributable to the batch's diff); the gate commit 6c18d95 fixed a real inc-004 defect (the SJE summary's eager mkdir) + two census-hygiene guards; 6 named mutants ALL RED (sha256-verified restores); the fold-canon discharged IN the close (41 ids: HLR-135..143 + 32 LLRs); verdict PASS-WITH-NOTES (the AT-296..304 reservation stays unminted -- bookkeeping carry); validator 0 block is the coordinator's commit-time check; the operator's visual verdict on veredicto-batch95.html folds on arrival",
+    "guided": false
+  }
+]

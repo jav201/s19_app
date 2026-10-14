@@ -1,0 +1,42 @@
+                # passed only because the fake generators are instant — a race this
+27 snapshots failed. 2 snapshots passed.
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_legend_scope_and_logwidth.py::test_n1_legend_scoped_per_screen
+FAILED tests/test_report_field_census.py::test_a16_canonicaliser_residue_guard_can_actually_fire
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_directionb.py::test_tc028_no_new_processing_module_added_outside_view_layer
+FAILED tests/test_tui_directionb.py::test_tc028_no_new_processing_module_added_outside_view_layer_inc10
+FAILED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert Fals...
+FAILED tests/test_tui_patch_editor_v2.py::test_at064b_json_popup_edit_confirm_cancel_and_geometry
+FAILED tests/test_tui_patch_editor_v2.py::test_tc329_popup_seed_and_load_text_apply_seam
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+FAILED tests/test_tui_variants.py::test_variant_help_modal_fits_at_both_sizes
+38 failed, 2837 passed, 3 skipped, 3 xfailed in 2873.29s (0:47:53)
+--- exit: 0 ---

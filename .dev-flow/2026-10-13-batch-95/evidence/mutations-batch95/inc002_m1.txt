@@ -1,0 +1,77 @@
+# Mutation INC002-M1 — inc-002 (4d6db31)
+# Finding: LLR-138.4 snapshot refresh
+# File: s19_app/tui/services/project_gather_service.py
+# Anchor (must match exactly once):
+            if destination.read_bytes() == source.read_bytes():
+# Replacement:
+            if destination.read_bytes() != source.read_bytes():
+# Claim: inverting the drift compare makes a drifted destination SKIP the refresh (the stale bytes are kept and copy2 never runs) — TC-702's refreshed-bytes assertion must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_project_gather.py::test_tc702_resave_refreshes_stale_copies -q -p no:cacheprovider
+# sha256 before mutation: 07582684816913926ee0e41eb88ef8742302c862913e855c06b3ba67ce5fcfae
+# sha256 after restore:   07582684816913926ee0e41eb88ef8742302c862913e855c06b3ba67ce5fcfae
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________ test_tc702_resave_refreshes_stale_copies ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19093/test_tc702_resave_refreshes_st0')
+
+    def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
+        """TC-702 (LLR-138.4, snapshot refresh): divergence from a later COMMON
+        edit is repaired by a re-save — the project copy is refreshed in place
+        (same name, new bytes), never duplicated."""
+        external = tmp_path / "a.s19"
+        external.write_text(S19_A, encoding="utf-8")
+    
+        async def _drive() -> tuple[bytes, int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            common_doc = _write_common_doc(app, "boost.json", kind="change")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(external)
+                await _flush(pilot)
+                _save_project(app, _payload(app, batch=("boost.json",)))
+                await _flush(pilot)
+                # Later COMMON edit after the first snapshot — the save's re-gather
+                # must refresh the project copy in place.
+                common_doc.write_text(
+                    _change_doc_text("change") + " ", encoding="utf-8"
+                )
+                _save_project(app, _payload(app, batch=("boost.json",)))
+                await _flush(pilot)
+                home = app.workarea / "proj" / PROJECT_PATCHES_DIR
+                copies = list(home.glob("boost*.json"))
+                return common_doc.read_bytes(), len(copies)
+    
+        common_now, copy_count = asyncio.run(_drive())
+        assert copy_count == 1, f"a refresh must keep exactly one copy; found {copy_count}"
+        refreshed = (tmp_path / ".s19tool" / "workarea" / "proj" / "patches" / "boost.json")
+>       assert refreshed.read_bytes() == common_now, (
+            "a re-save must refresh the stale copy to the COMMON original's bytes"
+        )
+E       AssertionError: a re-save must refresh the stale copy to the COMMON original's bytes
+E       assert b'{"format": ...entries": []}' == b'{"format": ...ntries": []} '
+E         
+E         Use -v to get more diff
+
+tests\test_project_gather.py:463: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_project_gather.py::test_tc702_resave_refreshes_stale_copies
+1 failed in 3.65s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+.                                                                        [100%]
+1 passed in 3.65s

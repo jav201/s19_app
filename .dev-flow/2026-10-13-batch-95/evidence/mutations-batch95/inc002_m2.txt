@@ -1,0 +1,67 @@
+# Mutation INC002-M2 — inc-002 (4d6db31)
+# Finding: LLR-138.2 kind→home classification
+# File: s19_app/tui/services/project_gather_service.py
+# Anchor (must match exactly once):
+    return PROJECT_CHECKS_DIR if kind == "check" else PROJECT_PATCHES_DIR
+# Replacement:
+    return PROJECT_CHECKS_DIR if kind != "check" else PROJECT_PATCHES_DIR
+# Claim: inverting the kind discriminator gathers a check document into patches/ — TC-700's checks-home census must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_project_gather.py::test_tc700_check_document_gathers_into_project_checks -q -p no:cacheprovider
+# sha256 before mutation: 07582684816913926ee0e41eb88ef8742302c862913e855c06b3ba67ce5fcfae
+# sha256 after restore:   07582684816913926ee0e41eb88ef8742302c862913e855c06b3ba67ce5fcfae
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc700_check_document_gathers_into_project_checks ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19096/test_tc700_check_document_gath0')
+
+    def test_tc700_check_document_gathers_into_project_checks(tmp_path: Path) -> None:
+        """TC-700 (LLR-138.2): a referenced document whose wire ``kind`` is
+        ``"check"`` gathers into ``<project>/checks/`` — the new home — and
+        NOTHING check-ish is dumped into the project ``patches/`` folder."""
+        external = tmp_path / "a.s19"
+        external.write_text(S19_A, encoding="utf-8")
+    
+        async def _drive() -> tuple[bool, bool, dict]:
+            app = S19TuiApp(base_dir=tmp_path)
+            _write_common_doc(app, "smoke.json", kind="check")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(external)
+                await _flush(pilot)
+                _save_project(app, _payload(app, batch=("smoke.json",)))
+                await _flush(pilot)
+                project_dir = app.workarea / "proj"
+                return (
+                    (project_dir / PROJECT_CHECKS_DIR / "smoke.json").exists(),
+                    (project_dir / PROJECT_PATCHES_DIR / "smoke.json").exists(),
+                    _manifest_text(project_dir).get("gathered", {}),
+                )
+    
+        in_checks, in_patches, gathered = asyncio.run(_drive())
+>       assert in_checks, "a check document must gather into <project>/checks/"
+E       AssertionError: a check document must gather into <project>/checks/
+E       assert False
+
+tests\test_project_gather.py:327: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_project_gather.py::test_tc700_check_document_gathers_into_project_checks
+1 failed in 3.00s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+.                                                                        [100%]
+1 passed in 2.71s

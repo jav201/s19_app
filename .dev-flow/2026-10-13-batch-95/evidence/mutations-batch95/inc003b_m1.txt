@@ -1,0 +1,69 @@
+# Mutation INC003B-M1 — inc-003b (59ee033)
+# Finding: LLR-139.3 per-platform opener
+# File: s19_app/tui/services/folder_open_service.py
+# Anchor (must match exactly once):
+    if platform == "darwin":
+        return "open"
+# Replacement:
+    if platform == "darwin":
+        return "explorer"
+# Claim: pointing the darwin arm at the Windows opener breaks the platform→opener table — TC-705's darwin arm must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm -q -p no:cacheprovider
+# sha256 before mutation: 73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
+# sha256 after restore:   73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_tc705_seam_popen_argv_list_per_platform_arm _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020FFFE9D910>
+
+    def test_tc705_seam_popen_argv_list_per_platform_arm(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """TC-705 (LLR-139.3): each platform arm issues exactly one Popen in
+        argv-LIST form — [opener, dir] — never a bare string on POSIX."""
+        popens: List[list] = []
+        monkeypatch.setattr(fos.subprocess, "Popen", lambda argv: popens.append(argv))
+        target = Path("/tmp/some dir")
+    
+        for platform, opener in (
+            ("win32", "explorer"),
+            ("darwin", "open"),
+            ("linux", "xdg-open"),
+        ):
+            popens.clear()
+            monkeypatch.setattr("sys.platform", platform)
+            ok = fos.open_folder_in_file_manager(target, set_status=None)
+            assert ok, f"{platform}: the seam reports success when Popen is issued"
+>           assert popens == [[opener, str(target)]], (
+                f"{platform}: exactly one argv-list Popen with the platform opener "
+                f"and the resolved dir; got {popens}"
+            )
+E           AssertionError: darwin: exactly one argv-list Popen with the platform opener and the resolved dir; got [['explorer', '\\tmp\\some dir']]
+E           assert [['explorer',...p\\some dir']] == [['open', '\\tmp\\some dir']]
+E             
+E             At index 0 diff: ['explorer', '\\tmp\\some dir'] != ['open', '\\tmp\\some dir']
+E             Use -v to get more diff
+
+tests\test_open_folder_chips.py:506: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm
+1 failed in 0.28s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+.                                                                        [100%]
+1 passed in 0.20s

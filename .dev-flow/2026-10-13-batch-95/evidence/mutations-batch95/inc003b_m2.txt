@@ -1,0 +1,75 @@
+# Mutation INC003B-M2 — inc-003b (59ee033)
+# Finding: LLR-139.1 checks-family COMMON home
+# File: s19_app/tui/services/folder_open_service.py
+# Anchor (must match exactly once):
+        return _FAMILY_SUBDIR[family], workarea / WORKAREA_PATCHES
+# Replacement:
+        return _FAMILY_SUBDIR[family], workarea / "checks"
+# Claim: a no-project Checks chip pointed at a (nonexistent) COMMON checks/ home instead of the contracted workarea/patches — TC-703's no-project arm must redden
+# Command: PYTHONUTF8=1 C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes -q -p no:cacheprovider
+# sha256 before mutation: 73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
+# sha256 after restore:   73aa4cd1a459957feaba64b8d30a9ef80eaffdb103476b4c862fe7944f41d90c
+# restore verified: True
+# VERDICT: RED (counterfactual confirmed)
+
+==============================================================================
+BASELINE (fixed tree) transcript:
+==============================================================================
+(green — see summary)
+
+==============================================================================
+MUTATED (RED expected) transcript:
+==============================================================================
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_tc703_checks_chip_resolves_check_artifact_home_both_modes ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000265D1E3E850>
+
+    def test_tc703_checks_chip_resolves_check_artifact_home_both_modes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """TC-703 (LLR-139.1): the Checks chip resolves to the check-artifact
+        home — project ``<proj>/checks/`` / no-project COMMON ``workarea/patches/``
+        (the contract's literal ruling: the no-project COMMON home holds
+        change-sets AND check artifacts, folders.html §1)."""
+        spy = SeamSpy(monkeypatch)
+    
+        async def _drive() -> Tuple[List[Tuple[Path, str]], List[Tuple[Path, str]], Path]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pilot_pause(pilot)
+                app.action_show_screen("checks")
+                await _pilot_pause(pilot)
+                chip = app.query_one("#open_folder_checks", OpenFolderChip)
+                _press_chip(chip)
+                await _pilot_pause(pilot)
+                no_project_calls = list(spy.calls)
+                spy.calls.clear()
+                project_dir = _set_project(app)
+                _press_chip(chip)
+                await _pilot_pause(pilot)
+                return no_project_calls, list(spy.calls), project_dir
+    
+        no_project_calls, project_calls, project_dir = asyncio.run(_drive())
+    
+        assert len(no_project_calls) == 1
+>       assert no_project_calls[0][0] == tmp_path / WORKAREA_DIRNAME / "workarea" / WORKAREA_PATCHES, (
+            "no-project Checks chip must open the COMMON workarea/patches home "
+            "(the contract's literal ruling — not a checks/ COMMON home)"
+        )
+E       AssertionError: no-project Checks chip must open the COMMON workarea/patches home (the contract's literal ruling — not a checks/ COMMON home)
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0/.s19tool/workarea/checks') == (((WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-19099/test_tc703_checks_chip_resolve0') / '.s19tool') / 'workarea') / 'patches')
+
+tests\test_open_folder_chips.py:213: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes
+1 failed in 2.07s
+
+
+==============================================================================
+RESTORED (green expected) transcript:
+==============================================================================
+.                                                                        [100%]
+1 passed in 2.08s
