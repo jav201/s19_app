@@ -89,7 +89,11 @@ from tools.id_registry import (
 # batch-95 inc-003c (2026-10-13): 170 -> 171, measured — the change-3
 # increment adds ``tests/test_window_usage_help.py`` (the HLR-140 per-window
 # usage-help modal + section-census TCs, TC-706..707).
-EXPECTED_SCANNED_TEST_FILES = 171
+# batch-95 inc-004b (2026-10-13): 171 -> 172, measured — the change-4
+# increment adds ``tests/test_segment_split_window.py`` (the HLR-135
+# Split/Join/Export window TCs); inc-004b itself extends the existing
+# ``tests/test_changes_symbol_entries.py`` (no new module).
+EXPECTED_SCANNED_TEST_FILES = 172
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

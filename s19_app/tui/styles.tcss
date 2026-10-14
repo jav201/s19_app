@@ -2456,3 +2456,157 @@ ModalScreen {
 #workspace_body.width-narrow #crc_designer_help {
     display: none;
 }
+
+
+/* --- Split / Join / Export (batch-95 change 4, HLR-135) -------------------
+ * The graft chassis: V1's cockpit (the range table left, the .db-pane
+ * PREVIEW right) + V2's deltas — the pane widens to 58 at the MEASURED
+ * >=118-column regime (the band gets 54 cells) and split mode gains the
+ * per-file gantt under the union map (hidden at the floor and outside
+ * 1..6 files by the window's own show/hide). The two-regime thresholds
+ * read the measured screen exactly like the batch-93 frame discipline;
+ * every new id's styles live HERE (LLR-135.1's 0-hand-typed-styles law —
+ * the visor's per-class hues are band DATA, code-side Rich styles like the
+ * shipped Memory Map band idiom, not widget CSS). */
+#sje_body {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#sje_left {
+    width: 1fr;
+    height: 100%;
+    layout: vertical;
+    padding-right: 1;
+}
+
+#sje_right {
+    width: 40;
+    height: 100%;
+    border: tall $rule;
+    background: $bg-panel;
+    /* The .db-pane idiom ships padding: 1; here it is zeroed so the wide
+     * regime's band measures the contracted 54 cells (58 - 2 border - 2
+     * child padding). The spacing rows ride margin/padding-top instead. */
+    padding: 0;
+}
+
+#sje_right:focus-within {
+    border: tall $accent-calm;
+}
+
+#sje_right > * {
+    padding: 0 1;
+}
+
+#sje_table {
+    height: 1fr;
+    min-height: 4;
+    overflow-y: auto;
+    border-top: solid $rule;
+    border-bottom: solid $rule;
+}
+
+#sje_table:focus {
+    border-top: solid $accent-calm;
+    border-bottom: solid $accent-calm;
+}
+
+#sje_manual {
+    height: 3;
+    border: solid $rule;
+}
+
+#sje_band {
+    margin-top: 1;
+}
+
+#sje_files_wrap {
+    height: auto;
+    margin-top: 1;
+}
+
+#sje_files {
+    height: auto;
+}
+
+#sje_stats {
+    padding-top: 1;
+    height: auto;
+    min-height: 2;
+}
+
+#sje_summary {
+    margin-top: 1;
+    max-height: 3;
+}
+
+.sje-chips {
+    height: 1;
+}
+
+.sje-legend {
+    height: 1;
+}
+
+.sje-outlabel {
+    height: 1;
+}
+
+.sje-band {
+    height: 1;
+}
+
+.sje-ruler {
+    height: 1;
+}
+
+#sje_export {
+    height: 1;
+    min-width: 14;
+    border: none;
+    background: #1a2340;
+    color: $accent-calm;
+    margin: 0 1;
+}
+
+#sje_export:hover,
+#sje_export:focus {
+    background: $accent-calm;
+    color: $bg-base;
+    text-style: bold;
+}
+
+/* The two-regime reflow (LLR-135.3): the floor narrows the pane to 30 and
+ * hides the gantt wrap + the naming row (the sample lives in the outlabel);
+ * the wide regime (MEASURED >= 118 cols) widens the pane to 58 so the band
+ * gets 54 cells. Rules are scoped to #screen_split_join so the class names
+ * can never leak onto another surface. */
+#screen_split_join.narrow #sje_right {
+    width: 30;
+}
+
+#screen_split_join.narrow #sje_files_wrap {
+    display: none;
+}
+
+#screen_split_join.narrow #sje_naming {
+    display: none;
+}
+
+/* The floor hides the summary too (the outlabel + stats already name the
+ * selection and the numbers) so the EXPORT button keeps its row — the
+ * oracle floor frame shows ^E, and LLR-135.3 wants every control reachable.
+ * The stats' separator row is dropped with it (the single state line abuts
+ * the ruler). */
+#screen_split_join.narrow #sje_summary {
+    display: none;
+}
+
+#screen_split_join.narrow #sje_stats {
+    padding-top: 0;
+}
+
+#screen_split_join.wide #sje_right {
+    width: 58;
+}

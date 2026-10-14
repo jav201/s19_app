@@ -64,7 +64,9 @@ from .flow_model import (
     BLOCK_STATUS_OK,
     BLOCK_STATUS_SKIPPED,
     BlockResult,
+    FlowChangeRecord,
 )
+from ..changes.model import DISPOSITION_APPLIED
 from .markdown_safety import MD_ESCAPE, TRUNCATION_MARKER, md_safe
 from .report_service import (
     REPORT_MAX_TOTAL_BYTES,
@@ -111,8 +113,13 @@ _STATUS_GLYPH = {
 }
 
 #: The section headings, in order — the structural threshold (AMD-14/m-2).
+#: batch-95 inc-004b (LLR-143.1) adds "## Change attribution" directly after
+#: the Pipeline ledger: the ledger says WHAT ran ("patch: applied 2 entries"),
+#: the attribution section names every change the flow's patch arms applied —
+#: the operator's "Todo esto debe terminar en el reporte".
 SECTION_HEADINGS = (
     "## Pipeline ledger",
+    "## Change attribution",
     "## Findings",
     "## Image footprint",
     "## Written files",
@@ -190,6 +197,11 @@ class FlowReportState:
             own path is NOT added (AMD-11 — that is the image-output contract).
         project_dir (Optional[Path]): Base used to render written paths RELATIVE,
             so absolute host paths never leak into a shareable record (AMD-8).
+        change_records (Sequence[FlowChangeRecord]): The per-entry change
+            identities the run's PATCH arms retained SO FAR (batch-95 inc-004b,
+            LLR-143.1) — positional, exactly like ``block_results`` (D-2): a
+            REPORT-last flow attributes every patch, a mid-flow report only
+            the patches before it.
     """
 
     flow_name: str
@@ -199,6 +211,7 @@ class FlowReportState:
     pre_crc_ranges: Sequence[Tuple[int, int]] = field(default_factory=tuple)
     written_paths: Sequence[Path] = field(default_factory=tuple)
     project_dir: Optional[Path] = None
+    change_records: Sequence[FlowChangeRecord] = field(default_factory=tuple)
 
 
 def _fmt_ranges(ranges: Optional[Sequence[Tuple[int, int]]]) -> str:
@@ -271,17 +284,89 @@ def _provisional_status(state: FlowReportState) -> str:
     return STATUS_CLEAN
 
 
+def _change_attribution_lines(state: FlowReportState) -> List[str]:
+    """Build the change-attribution section (batch-95 inc-004b, LLR-143.1).
+
+    Summary:
+        One row per change the flow's patch arms APPLIED — the retained
+        :class:`FlowChangeRecord`\\ s whose disposition is ``applied`` — in
+        arm then document order. Every row names the change by its OWN A2L
+        symbol when symbol-referenced AND always by its resolved address,
+        with the length, the exact before/after byte runs, the change
+        document and the A2L reference the entry resolved against. The
+        section renders even when nothing was applied — empty, never absent
+        (the LLR-143.1 boundary catalog): a flow that patched nothing still
+        says so.
+
+    Args:
+        state (FlowReportState): The run state up to the report block.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included. The empty case
+        emits a single ``- (no changes applied)`` bullet — deliberately NOT a
+        table, so a no-patch report grows no table rows.
+
+    Dependencies:
+        Uses:
+            - _md_safe (the change_doc_ref / symbol / a2l_ref cells are
+              file-derived; addresses, lengths and bytes are int-derived)
+        Used by:
+            - compose_flow_report
+    """
+    lines = ["## Change attribution", ""]
+    applied = [
+        record
+        for record in state.change_records
+        if record.disposition == DISPOSITION_APPLIED
+    ]
+    if not applied:
+        lines.extend(["- (no changes applied)", ""])
+        return lines
+    lines.extend(
+        [
+            "| Patch | Change document | Address | Length | Before | After "
+            "| Symbol | A2L reference |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+    )
+    for record in applied:
+        # The shared limbs keep the shipped P-21 column order (Address |
+        # Length | Before | After | Symbol); Patch / Change document / A2L
+        # reference identify WHICH arm and reference produced the row.
+        symbol_cell = _md_safe(record.symbol) if record.symbol else "-"
+        a2l_cell = _md_safe(record.a2l_ref) if record.a2l_ref else "-"
+        before = (
+            " ".join(f"{byte:02X}" for byte in record.before_bytes)
+            if record.before_bytes is not None
+            else "-"
+        )
+        after = " ".join(f"{byte:02X}" for byte in record.after_bytes)
+        lines.append(
+            f"| #{record.block_index + 1} "
+            f"| {_md_safe(record.change_doc_ref)} "
+            f"| 0x{record.address_start:08X} "
+            f"| {record.address_end - record.address_start} "
+            f"| {before} | {after} "
+            f"| {symbol_cell} | {a2l_cell} |"
+        )
+    lines.append("")
+    return lines
+
+
 def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
     """Compose the markdown flow-run report — pure and deterministic (LLR-001.1).
 
     Summary:
         Emit, in order: a header block (flow name, generated timestamp,
         provisional status, block count), the **Pipeline ledger** table (one row
-        per reported block), a **Findings** section, the **Image footprint**
-        (``Before CRC`` only when a CRC has already run), and **Written files**.
-        Every file-derived field passes :func:`_md_safe`; every glyph, label and
-        address is enum/int-derived. A whole-document byte budget bounds the
-        output so it can never exceed the viewer's size cap (AMD-7).
+        per reported block), the **Change attribution** section (one row per
+        change the flow's patch arms applied — symbol when present, always the
+        resolved address; batch-95 inc-004b, LLR-143.1), a **Findings**
+        section, the **Image footprint** (``Before CRC`` only when a CRC has
+        already run), and **Written files**. Every file-derived field passes
+        :func:`_md_safe`; every glyph, label and address is enum/int-derived.
+        A whole-document byte budget bounds the output so it can never exceed
+        the viewer's size cap (AMD-7).
 
     Args:
         state (FlowReportState): The run state up to the report block.
@@ -338,6 +423,8 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
         )
     ledger.append("")
     put(ledger, "Pipeline ledger")
+
+    put(_change_attribution_lines(state), "Change attribution")
 
     findings_lines = ["## Findings", ""]
     any_finding = False

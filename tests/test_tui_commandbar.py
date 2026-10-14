@@ -83,9 +83,10 @@ def test_tc007_palette_lists_every_bindings_action(tmp_path: Path) -> None:
     Intent: LLR-003.2 — the palette must not drift from ``BINDINGS``. This
     iterates the *full* pre-batch + Direction B binding set and asserts a
     palette entry exists for every distinct action id, and that no palette
-    entry carries an action id outside ``BINDINGS`` (apart from the one
-    explicitly resurfaced ``open_settings_menu`` command). Built
-    programmatically so a palette missing an action fails loudly.
+    entry carries an action id outside ``BINDINGS`` (apart from the two
+    explicit extras: the resurfaced ``open_settings_menu`` command and
+    batch-95 change 4's palette-first ``open_split_join_export`` screen
+    entry). Built programmatically so a palette missing an action fails loudly.
     """
 
     async def _drive() -> tuple[set[str], set[str]]:
@@ -107,10 +108,12 @@ def test_tc007_palette_lists_every_bindings_action(tmp_path: Path) -> None:
     assert not missing, (
         f"these BINDINGS actions have no palette entry: {sorted(missing)}"
     )
-    # The only palette action allowed beyond BINDINGS is the resurfaced
-    # viewer settings command (owner decision C-9).
+    # The only palette actions allowed beyond BINDINGS are the resurfaced
+    # viewer settings command (owner decision C-9) and batch-95 change 4's
+    # palette-first Split / Join / Export screen entry (LLR-135.6, ruling
+    # Q6/7a — the screen binds NO rail key, so the palette is its door).
     extra = palette_actions - binding_actions
-    assert extra == {"open_settings_menu"}, (
+    assert extra == {"open_settings_menu", "open_split_join_export"}, (
         f"palette carries unexpected non-BINDINGS actions: {sorted(extra)}"
     )
 
@@ -667,9 +670,13 @@ _B78_PALETTE_ARTIFACT = "at-b78-03-palette-actions.json"
 _B78_DIFF_HEIGHT_ARTIFACT = "at-b78-33-diff-hex-a-height.json"
 
 #: ``blake2b(digest_size=8)`` over each artifact file's bytes AS STORED.
+#: The palette artifact's digest was re-recorded by hand for batch-95 change 4
+#: (LLR-135.6): ONE action ("open_split_join_export") was hand-appended to the
+#: frozen 37-row artifact — a reviewed contract amendment, not a regeneration
+#: (see test_at_b78_03's batch-95 note and the artifact's tail).
 _B78_ARTIFACT_DIGESTS = {
     _B78_PAYLOAD_ARTIFACT: "713be432b69cb2e0",
-    _B78_PALETTE_ARTIFACT: "65bfd6bf668a0249",
+    _B78_PALETTE_ARTIFACT: "a567d55d7ea155f3",
     _B78_DIFF_HEIGHT_ARTIFACT: "167c7a4dd5ac5821",
 }
 
@@ -1060,8 +1067,12 @@ def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
         )
 
     actions = _b78_artifact(_B78_PALETTE_ARTIFACT)
-    assert isinstance(actions, list) and len(actions) == 37, (
-        f"the palette artifact must hold the 37 pre-change actions (D-3), got "
+    # batch-95 change 4 (LLR-135.6) hand-appended "open_split_join_export" to
+    # the frozen artifact: the 37 pre-change rows stay, plus the one reviewed
+    # amendment (same contract change the re-recorded digest above names).
+    assert isinstance(actions, list) and len(actions) == 38, (
+        f"the palette artifact must hold the 37 pre-change actions (D-3) plus "
+        f"batch-95's one hand-appended action, got "
         f"{len(actions) if isinstance(actions, list) else type(actions)}"
     )
     assert len(set(actions)) == len(actions), (
@@ -2652,10 +2663,16 @@ def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
 
     observed = asyncio.run(_drive())
 
-    assert len(expected) == 37, (
-        f"the frozen artifact must still carry 37 actions; it has "
-        f"{len(expected)} -- if this fails the artifact was REGENERATED, which "
-        f"restores the tautology this node exists to break"
+    # batch-95 change 4 (LLR-135.6, ruling Q6/7a) amended the freeze by ONE
+    # hand-appended action — "open_split_join_export", the palette-first
+    # Split / Join / Export screen entry. The original 37 rows stay frozen
+    # (nothing was regenerated — regenerating would restore the tautology
+    # this node exists to break); the amendment is an explicit, reviewed
+    # contract change, recorded here and in the artifact's tail.
+    assert len(expected) == 38, (
+        f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+        f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+        f"the artifact was REGENERATED, which restores the tautology"
     )
     assert observed == list(expected), (
         f"the palette action set must equal the Inc-0 freeze.\n"

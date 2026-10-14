@@ -424,7 +424,19 @@ _ESCAPED_EXPRESSIONS = {
     ("md_safe", "descriptor.path.name"): "planted (path_name)",
     ("md_safe", "descriptor.variant_id"): "planted (variant_id)",
     ("md_safe", "entry.linkage"): "planted (linkage)",
-    ("md_safe", "entry.linkage_symbol"): "planted (linkage_symbol)",
+    # batch-95 inc-004b (LLR-143.1): the Modifications Symbol cell now prefers
+    # the entry's OWN change-5 symbol — the former ``md_safe(entry.linkage_symbol,
+    # ...)`` site became ``md_safe(symbol_source, ...)`` over
+    # ``symbol_source = entry.symbol or entry.linkage_symbol``, so BOTH fields
+    # escape through the one site below (the disappeared entry is the subsumed
+    # site, not an unescaped field).
+    ("md_safe", "symbol_source"): (
+        "NOT planted — needs a symbol-referenced ChangeSummaryEntry (the change-5 "
+        "forward reference), which this fixture does not build; driven hostile "
+        "by tests/test_changes_symbol_entries.py::test_tc716_project_report_modifications_attribute_symbol_and_address "
+        "(own-symbol preference) with the shipped fallback pinned by "
+        "tests/test_changes_symbol_entries.py::test_tc716_diff_linkage_table_prefers_entry_symbol"
+    ),
     ("md_safe", "entry.result"): "planted (check_result)",
     ("md_safe", "issue.code"): "planted (issue_code)",
     ("md_safe", "issue.symbol"): "planted (issue_symbol)",

@@ -1910,9 +1910,15 @@ def _modifications_lines(
             # The empty guard stays: ``md_safe("")`` would render "(empty)", but
             # a linkage with no symbol is not an empty symbol — it is a
             # standalone entry, and the golden's "-" says so.
+            # batch-95 inc-004b (LLR-143.1): the cell names the change by its
+            # OWN A2L symbol when the entry is symbol-referenced (the change-5
+            # forward reference), falling back to the shipped best-effort
+            # reverse linkage — and the Address column is always present, so
+            # every row attributes by symbol (when present) AND address.
+            symbol_source = entry.symbol or entry.linkage_symbol
             symbol_cell = (
-                md_safe(entry.linkage_symbol, limit=REPORT_CELL_CHARS)
-                if entry.linkage_symbol
+                md_safe(symbol_source, limit=REPORT_CELL_CHARS)
+                if symbol_source
                 else "-"
             )
             rows.append(

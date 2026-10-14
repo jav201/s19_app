@@ -17,7 +17,12 @@ identities and source kinds, the artifact-usage notes, the generation UTC
 instant, the tool version), a statistics table (per-classification run/byte
 counts), a run table (start, end, length, classification, best-effort symbol
 annotation — LLR-004.4), and per-run bounded hex windows of image A and image B
-rendered through the plain-string ``hexview.render_hex_view``. In the Markdown
+rendered through the plain-string ``hexview.render_hex_view``. batch-95 inc-004b
+(LLR-143.2) adds an OPTIONAL trailing flow-change attribution section — when the
+caller passes the record of the flow run that produced image B, every flow
+change is referenced (runs attributed to their producing entries by
+address-range intersection; no-diff entries and named refusals listed as such).
+In the Markdown
 report each ``changed`` run additionally renders as a fenced ```diff block with
 image A's bytes as ``-`` lines and image B's bytes as ``+`` lines; the HTML
 report colours the three run kinds with inline CSS.
@@ -93,6 +98,8 @@ if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
 from ..changes.display import format_memory_value
+from ..changes.model import DISPOSITION_APPLIED
+from .flow_model import FlowChangeRecord, FlowRefusal, FlowRunResult
 from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -588,11 +595,12 @@ def _linkage_table_lines(
         ]
     )
     for index, entry in enumerate(entries, start=1):
-        symbol = (
-            _md_cell(entry.linkage_symbol)
-            if entry.linkage_symbol is not None
-            else "-"
-        )
+        # batch-95 inc-004b (LLR-143.1): the change's OWN A2L symbol (the
+        # change-5 forward reference) wins over the best-effort reverse
+        # linkage — attribution names the symbol when present, the address
+        # always (the Start/End columns).
+        entry_symbol = entry.symbol or entry.linkage_symbol
+        symbol = _md_cell(entry_symbol) if entry_symbol is not None else "-"
         lines.append(
             f"| {index} | {_md_cell(entry.entry_type)} "
             f"| 0x{entry.address_start:08X} | 0x{entry.address_end:08X} "
@@ -1005,6 +1013,246 @@ def _run_table_lines(
     return lines
 
 
+# ---------------------------------------------------------------------------
+# batch-95 inc-004b — the flow-change attribution (LLR-143.2): an A2B diff
+# whose input B an s19 tool flow produced references ALL the flow's changes.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class FlowChangeAttribution:
+    """What a flow run did — its OWN record, projected for the A2B diff census.
+
+    Summary:
+        The plain-data input of the flow-change attribution section: every
+        per-entry change record the run retained (``FlowRunResult.
+        change_records``) plus every named refusal (``FlowRunResult.
+        refusals``). A diff caller passes this — built by
+        :func:`flow_change_attribution` from the run that produced image B —
+        and the diff block then references 100% of the flow's changes: each
+        differing run is attributed to the change entry/entries that produced
+        it (by half-open address-range intersection, the shipped linkage idiom
+        extended forward), an entry whose bytes produced no differing run
+        appears as an explicit ``(no diff)`` reference, and a named refusal is
+        still an attribution line — never silently dropped. ``None`` (the
+        shipped default) renders the report byte-identical to the pre-change
+        output — a B that is NOT a flow product (the LLR-143.2 boundary).
+
+    Args:
+        records (Tuple[FlowChangeRecord, ...]): The flow's per-entry change
+            identities, in arm then document order.
+        refusals (Tuple[FlowRefusal, ...]): The flow's named refusals.
+
+    Returns:
+        None: Frozen dataclass container.
+
+    Data Flow:
+        - Built by :func:`flow_change_attribution` from a
+          :class:`FlowRunResult`; consumed by :func:`generate_diff_report` /
+          :func:`generate_diff_report_html` and by
+          :func:`flow_change_census_complete` (the census predicate).
+
+    Dependencies:
+        Used by:
+            - generate_diff_report / generate_diff_report_html
+            - flow_change_census_complete
+    """
+
+    records: Tuple[FlowChangeRecord, ...] = ()
+    refusals: Tuple[FlowRefusal, ...] = ()
+
+
+def flow_change_attribution(run: FlowRunResult) -> FlowChangeAttribution:
+    """Project a flow run's OWN record onto the diff's census input.
+
+    Summary:
+        Tuple-copy ``run.change_records`` / ``run.refusals`` into the frozen
+        :class:`FlowChangeAttribution` — the single construction point so the
+        diff generators never read the run record's mutable lists mid-render.
+
+    Args:
+        run (FlowRunResult): The run that produced the diff's image B.
+
+    Returns:
+        FlowChangeAttribution: The census input (empty tuples on a run whose
+        PATCH arms produced nothing — the section then states that explicitly).
+
+    Dependencies:
+        Used by:
+            - s19_app.tui.app (the A2B diff report trigger, batch-95 inc-004b)
+            - tests/test_changes_symbol_entries.py (TC-717)
+    """
+    return FlowChangeAttribution(
+        records=tuple(run.change_records),
+        refusals=tuple(run.refusals),
+    )
+
+
+def _record_produced_runs(
+    record: FlowChangeRecord, runs: Sequence[DiffRun]
+) -> List[DiffRun]:
+    """Return every differing run whose half-open range intersects the entry's.
+
+    The exactness law (LLR-143.2): a run names an entry IFF the entry's
+    address range produced run bytes — ``run.start < record.address_end and
+    record.address_start < run.end`` on the half-open spans.
+    """
+    return [
+        run
+        for run in runs
+        if run.start < record.address_end and record.address_start < run.end
+    ]
+
+
+def _flow_change_attribution_lines(
+    attribution: FlowChangeAttribution,
+    runs: Sequence[DiffRun],
+) -> List[str]:
+    """Render the ``## Flow change attribution`` section (LLR-143.2).
+
+    Summary:
+        One table row per retained change record: the change document, the
+        symbol when present (the address always), the length, the disposition
+        (a refused/blocked record reads as such — never silently dropped) and
+        the differing runs the entry produced — ``(no diff)`` when an applied
+        entry's bytes produced none, ``—`` for a record that never wrote.
+        Runs NO change produced (a CRC region, an out-of-flow edit) are listed
+        explicitly, and every named refusal becomes a bullet naming the change
+        document, the symbol/address it refused and its code. File-derived
+        cells pass :func:`_md_cell` (S-F2); addresses/lengths are int-derived.
+
+    Args:
+        attribution (FlowChangeAttribution): The flow's own record.
+        runs (Sequence[DiffRun]): The differing runs in scope (the
+            filter-matched subset when a report filter is active, so the
+            attribution can never contradict the run table it follows).
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included; the empty case
+        (no records and no refusals) states ``- (no flow changes recorded)``.
+
+    Dependencies:
+        Uses:
+            - _record_produced_runs / _md_cell / _kind_label
+        Used by:
+            - generate_diff_report
+    """
+    lines = ["## Flow change attribution", ""]
+    if not attribution.records and not attribution.refusals:
+        lines.extend(["- (no flow changes recorded)", ""])
+        return lines
+    if attribution.records:
+        lines.extend(
+            [
+                "| Change document | Symbol | Address | Length | Disposition "
+                "| Diff runs |",
+                "|---|---|---|---|---|---|",
+            ]
+        )
+        for record in attribution.records:
+            symbol_cell = _md_cell(record.symbol) if record.symbol else "-"
+            produced = _record_produced_runs(record, runs)
+            if produced:
+                runs_cell = ", ".join(
+                    f"0x{run.start:08X}–0x{run.end:08X}" for run in produced
+                )
+            elif record.disposition == DISPOSITION_APPLIED:
+                runs_cell = "(no diff)"
+            else:
+                runs_cell = "—"
+            lines.append(
+                f"| {_md_cell(record.change_doc_ref)} | {symbol_cell} "
+                f"| 0x{record.address_start:08X} "
+                f"| {record.address_end - record.address_start} "
+                f"| {_md_cell(record.disposition)} | {runs_cell} |"
+            )
+        lines.append("")
+    unattributed = [
+        run
+        for run in runs
+        if not _record_produced_runs_any(run, attribution.records)
+    ]
+    for run in unattributed:
+        lines.append(
+            f"- 0x{run.start:08X}–0x{run.end:08X} "
+            f"{_kind_label(run.kind)}: no flow change"
+        )
+    for refusal in attribution.refusals:
+        symbol_part = (
+            f" symbol '{_md_cell(refusal.symbol)}'" if refusal.symbol else ""
+        )
+        address_part = (
+            f" @ 0x{refusal.address:08X}" if refusal.address is not None else ""
+        )
+        lines.append(
+            f"- refused: {_md_cell(refusal.change_doc_ref)}{symbol_part}"
+            f"{address_part} [{_md_cell(refusal.code)}] "
+            f"{_md_cell(refusal.message)}"
+        )
+    if unattributed or attribution.refusals:
+        lines.append("")
+    return lines
+
+
+def _record_produced_runs_any(
+    run: DiffRun, records: Sequence[FlowChangeRecord]
+) -> bool:
+    """Whether ANY retained change record intersects ``run``."""
+    return any(
+        run.start < record.address_end and record.address_start < run.end
+        for record in records
+    )
+
+
+def flow_change_census_complete(
+    attribution: FlowChangeAttribution, lines: Sequence[str]
+) -> bool:
+    """The census predicate: every flow change the attribution enumerates is
+    referenced by the rendered section (LLR-143.2's 100% law, checkable).
+
+    Summary:
+        True when each retained record is named — its change document AND its
+        resolved address both appear — and each named refusal appears with its
+        document and code. The TC-718 battery arm drives this against a
+        section rendered from an attribution that DROPPED one flow change: the
+        predicate goes False — a census that cannot fail is not a census.
+
+    Args:
+        attribution (FlowChangeAttribution): The full enumeration the flow
+            run retained (the reference population).
+        lines (Sequence[str]): A rendered ``## Flow change attribution``
+            section — from any attribution input.
+
+    Returns:
+        bool: ``True`` when the section references 100% of the population.
+
+    Dependencies:
+        Used by:
+            - tests/test_changes_symbol_entries.py (TC-717 / TC-718 arm)
+    """
+    body = "\n".join(lines)
+    rows = [ln for ln in lines if ln.startswith("| ")]
+    for record in attribution.records:
+        # Row-scoped, not substring-scoped: an address can legitimately recur
+        # inside ANOTHER row's run-range cell (``0x00001000–0x00001002`` ends
+        # where the next entry starts), so the identity check pins the row's
+        # own Change-document and Address CELLS.
+        address_cell = f"0x{record.address_start:08X}"
+        doc_cell = _md_cell(record.change_doc_ref)
+        if not any(
+            doc_cell in row
+            and address_cell in [cell.strip() for cell in row.split("|")]
+            for row in rows
+        ):
+            return False
+    for refusal in attribution.refusals:
+        if _md_cell(refusal.change_doc_ref) not in body:
+            return False
+        if f"[{_md_cell(refusal.code)}]" not in body:
+            return False
+    return True
+
+
 def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
     """
     Summary:
@@ -1228,6 +1476,7 @@ def generate_diff_report(
     linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
     filename_stem: Optional[str] = None,
     report_filter: Optional["ReportFilterMatcher"] = None,
+    flow_changes: Optional["FlowChangeAttribution"] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -1283,6 +1532,18 @@ def generate_diff_report(
             first block after the title (S-F6), and a zero-match section
             body becomes the loud notice. ``None`` (the default) leaves the
             output BYTE-IDENTICAL to the pre-batch-35 behavior (LLR-054.4).
+        flow_changes (Optional[FlowChangeAttribution]): batch-95 inc-004b
+            (LLR-143.2) — the OWN record of the flow run that produced this
+            diff's image B (:func:`flow_change_attribution`). When given, a
+            ``## Flow change attribution`` section renders after the run
+            sections: every flow change is referenced (each differing run
+            attributed to the entries that produced it by address-range
+            intersection; applied entries with no diff appear as ``(no
+            diff)``; skipped/blocked records and named refusals are listed
+            as such — never silently dropped), attributed against the
+            FILTER-MATCHED runs so it can never contradict the run table.
+            ``None`` (the shipped default) leaves the output BYTE-IDENTICAL
+            to the pre-change-5c behavior — a B that is NOT a flow product.
 
     Returns:
         DiffReportResult: ``written=True`` with the path on success, or
@@ -1388,6 +1649,16 @@ def generate_diff_report(
                 runs=filtered_runs,
             )
         )
+    if flow_changes is not None:
+        # batch-95 inc-004b (LLR-143.2): the flow-change census rides the
+        # filtered runs — the attribution of a run the table does not show
+        # would contradict the document it sits in. Unfiltered, ``None``
+        # passes through (:func:`_apply_report_filter`'s byte-identity), so
+        # resolve it to the whole comparison exactly like the run table does.
+        census_runs = (
+            filtered_runs if filtered_runs is not None else comparison.runs
+        )
+        lines.extend(_flow_change_attribution_lines(flow_changes, census_runs))
 
     target = dest_dir / filename
     target.write_text("\n".join(lines), encoding="utf-8")
@@ -1588,9 +1859,13 @@ def _html_linkage(entries: Sequence["ChangeSummaryEntry"]) -> List[str]:
         ]
     )
     for index, entry in enumerate(entries, start=1):
+        # batch-95 inc-004b (LLR-143.1): the change's OWN A2L symbol (the
+        # change-5 forward reference) wins over the best-effort reverse
+        # linkage — the _linkage_table_lines law, md/html pair consistent.
+        entry_symbol = entry.symbol or entry.linkage_symbol
         symbol = (
-            _esc(_strip_ctl(entry.linkage_symbol))
-            if entry.linkage_symbol is not None
+            _esc(_strip_ctl(entry_symbol))
+            if entry_symbol is not None
             else "-"
         )
         lines.append(
@@ -1677,6 +1952,76 @@ def _html_run_rows(
             f"<td>{_esc(_annotate_run(run, symbol_addresses))}</td></tr>"
         )
     lines.append("</table>")
+    return lines
+
+
+def _html_flow_change_attribution(
+    attribution: FlowChangeAttribution,
+    runs: Sequence[DiffRun],
+) -> List[str]:
+    """Build the HTML flow-change attribution (LLR-143.2) — the Markdown
+    :func:`_flow_change_attribution_lines` mirror, every value ctl-stripped
+    then ``html.escape``-d (md/html pair consistency).
+    """
+    lines = ["<h2>Flow change attribution</h2>"]
+    if not attribution.records and not attribution.refusals:
+        lines.append("<p>No flow changes recorded.</p>")
+        return lines
+    if attribution.records:
+        lines.extend(
+            [
+                "<table>",
+                "<tr><th>Change document</th><th>Symbol</th><th>Address</th>"
+                "<th>Length</th><th>Disposition</th><th>Diff runs</th></tr>",
+            ]
+        )
+        for record in attribution.records:
+            symbol = (
+                _esc(_strip_ctl(record.symbol)) if record.symbol else "-"
+            )
+            produced = _record_produced_runs(record, runs)
+            if produced:
+                runs_cell = ", ".join(
+                    f"0x{run.start:08X}–0x{run.end:08X}" for run in produced
+                )
+            elif record.disposition == DISPOSITION_APPLIED:
+                runs_cell = "(no diff)"
+            else:
+                runs_cell = "—"
+            lines.append(
+                f"<tr><td>{_esc(_strip_ctl(record.change_doc_ref))}</td>"
+                f"<td>{symbol}</td>"
+                f"<td>0x{record.address_start:08X}</td>"
+                f"<td>{record.address_end - record.address_start}</td>"
+                f"<td>{_esc(_strip_ctl(record.disposition))}</td>"
+                f"<td>{_esc(runs_cell)}</td></tr>"
+            )
+        lines.append("</table>")
+    unattributed = [
+        run
+        for run in runs
+        if not _record_produced_runs_any(run, attribution.records)
+    ]
+    for run in unattributed:
+        lines.append(
+            f"<p>0x{run.start:08X}–0x{run.end:08X} "
+            f"{_esc(_kind_label(run.kind))}: no flow change</p>"
+        )
+    for refusal in attribution.refusals:
+        symbol_part = (
+            f" symbol '{_esc(_strip_ctl(refusal.symbol))}'"
+            if refusal.symbol
+            else ""
+        )
+        address_part = (
+            f" @ 0x{refusal.address:08X}" if refusal.address is not None else ""
+        )
+        lines.append(
+            f"<p>refused: {_esc(_strip_ctl(refusal.change_doc_ref))}"
+            f"{symbol_part}{address_part} "
+            f"[{_esc(_strip_ctl(refusal.code))}] "
+            f"{_esc(_strip_ctl(refusal.message))}</p>"
+        )
     return lines
 
 
@@ -1891,6 +2236,7 @@ def generate_diff_report_html(
     linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
     filename_stem: Optional[str] = None,
     report_filter: Optional["ReportFilterMatcher"] = None,
+    flow_changes: Optional["FlowChangeAttribution"] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -1941,6 +2287,12 @@ def generate_diff_report_html(
             title (S-F6), loud zero-match notice, filter name ``_esc``-d
             (LLR-055.4). ``None`` (the default) leaves the output
             BYTE-IDENTICAL to the pre-batch-35 behavior (LLR-054.4).
+        flow_changes (Optional[FlowChangeAttribution]): batch-95 inc-004b
+            (LLR-143.2) — same semantics as :func:`generate_diff_report`:
+            the flow run's own record when image B is a flow product; a
+            ``Flow change attribution`` section renders after the run
+            sections (escaped, md/html pair consistent). ``None`` leaves
+            the output BYTE-IDENTICAL to the pre-change-5c behavior.
 
     Returns:
         DiffReportResult: ``written=True`` with the ``.html`` path on success,
@@ -2057,6 +2409,13 @@ def generate_diff_report_html(
                 runs=filtered_runs,
             )
         )
+    if flow_changes is not None:
+        # batch-95 inc-004b (LLR-143.2): the md twin's census, attributed
+        # against the same (unfiltered-resolved) runs.
+        census_runs = (
+            filtered_runs if filtered_runs is not None else comparison.runs
+        )
+        lines.extend(_html_flow_change_attribution(flow_changes, census_runs))
     lines.extend(["</body>", "</html>"])
 
     target = dest_dir / filename

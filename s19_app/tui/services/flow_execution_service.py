@@ -57,7 +57,9 @@ from .flow_model import (
     CrcBlock,
     Finding,
     Flow,
+    FlowChangeRecord,
     FlowContext,
+    FlowRefusal,
     FlowRunResult,
     FusedFlowRunResult,
     PatchBlock,
@@ -116,10 +118,16 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
           naming the reference.
         - PATCH → ``read_change_document`` (with the patch's effective A2L
           context — its own ``a2l_ref`` override, else the SOURCE block's) →
-          ``apply_change_document`` (mutates ``mem_map``).
+          ``apply_change_document`` (mutates ``mem_map``); batch-95 inc-004b
+          (LLR-143.1/.2) retains every arm's per-entry change identities
+          (``result.change_records``) and named refusals
+          (``result.refusals``) — the run's own record for the reports.
         - CHECK → ``read_change_document`` → ``run_check_document`` (read-only,
           image passed through unchanged; never aborts the chain — LLR-086.4).
         - WRITE-OUT → ``save_patched_image(source_kind=fmt)`` → written path.
+        - REPORT → ``write_flow_report`` composes from ``FlowReportState``
+          (batch-95 inc-004b carries the retained change records — the
+          change-attribution section, LLR-143.1).
 
     Dependencies:
         Uses:
@@ -141,6 +149,11 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # this stays ``None`` and the reader refuses them named (no implicit A2L
     # — ``ctx.a2l_data``, the project's loaded A2L, is never consulted).
     declared_a2l: Optional[dict] = None
+    # batch-95 inc-004b (LLR-143.1): the SOURCE block's DECLARED ref string,
+    # retained so each PATCH arm's effective reference (its own override, else
+    # this declaration, else None) lands in the run's change record — the
+    # "resolved against" attribution. Never the implicit ctx.a2l_data.
+    source_a2l_ref: Optional[str] = None
     aborted = False
 
     for index, block in enumerate(flow.blocks):
@@ -223,6 +236,7 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             f"read: {type(exc).__name__}",
                         )
                         continue
+                    source_a2l_ref = block.a2l_ref
                 run_a2l_data = (
                     declared_a2l if declared_a2l is not None else ctx.a2l_data
                 )
@@ -309,6 +323,43 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 summary = apply_change_document(
                     document, mem_map, ranges, ctx.mac_records, a2l_tags
                 )
+                # batch-95 inc-004b (LLR-143.1/.2): retain the arm's per-entry
+                # change identities and its named refusals — the run's OWN
+                # record, from which the flow report's change-attribution
+                # section and the A2B diff's flow-change census enumerate what
+                # the flow did (previously reduced to "applied N entries" and
+                # discarded). The effective reference is the patch's override,
+                # else the SOURCE declaration, else None — never implicit.
+                effective_a2l_ref = block.a2l_ref or source_a2l_ref
+                for entry in summary.entries:
+                    result.change_records.append(
+                        FlowChangeRecord(
+                            block_index=index,
+                            change_doc_ref=block.change_doc_ref,
+                            a2l_ref=effective_a2l_ref,
+                            entry_type=entry.entry_type,
+                            symbol=entry.symbol,
+                            address_start=entry.address_start,
+                            address_end=entry.address_end,
+                            disposition=entry.disposition,
+                            before_bytes=entry.before_bytes,
+                            after_bytes=entry.after_bytes,
+                        )
+                    )
+                for issue in summary.issues:
+                    if issue.severity is not ValidationSeverity.ERROR:
+                        continue
+                    result.refusals.append(
+                        FlowRefusal(
+                            block_index=index,
+                            change_doc_ref=block.change_doc_ref,
+                            a2l_ref=effective_a2l_ref,
+                            code=issue.code,
+                            symbol=issue.symbol,
+                            address=issue.address,
+                            message=issue.message,
+                        )
+                    )
                 applied = summary.counts.get("applied", 0)
                 result.block_results.append(
                     BlockResult(index, kind, BLOCK_STATUS_OK,
@@ -526,6 +577,10 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     pre_crc_ranges=list(result.pre_crc_ranges),
                     written_paths=list(result.written_paths),
                     project_dir=ctx.project_dir,
+                    # batch-95 inc-004b (LLR-143.1): the change records
+                    # retained SO FAR — a positional report attributes only
+                    # the patches before it (D-2), exactly like the ledger.
+                    change_records=list(result.change_records),
                 )
                 try:
                     report_path = write_flow_report(report_state, ctx.project_dir)

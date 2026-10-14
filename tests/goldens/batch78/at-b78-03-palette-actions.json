@@ -35,5 +35,6 @@
   "page_up_context",
   "patch_undo",
   "patch_redo",
-  "open_settings_menu"
+  "open_settings_menu",
+  "open_split_join_export"
 ]

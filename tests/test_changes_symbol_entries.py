@@ -1,4 +1,5 @@
-"""Change-5 BACKEND tests — batch-95 increment 003a (HLR-141/142, P-16..P-23).
+"""Change-5 BACKEND tests — batch-95 increment 003a (HLR-141/142, P-16..P-23),
+extended at increment 004b (HLR-143, the report attribution — LLR-143.1/.2).
 
 # TC-712 — the symbol-reference form in the v2 wire (LLR-141.1): symbol
   resolution == the tag map (0 drift); the canonical entry carries the symbol
@@ -18,17 +19,32 @@
   resolves the project-root A2L; no-project mode resolves under the
   .s19tool\\workarea\\ containment root; a reference in neither home refuses
   the run naming it.
-# TC-718 — the change-5 negative-control battery (the 5a/5b arms): the
+# TC-716 — the report attribution (LLR-143.1): the apply summary carries the
+  entry's own symbol; the project report's Modifications table, the diff
+  report's Change-entry linkage table and the FLOW report's Change
+  attribution section name every change by its symbol when present AND
+  always by its resolved address (before/after bytes == the applied bytes;
+  zero applied changes renders the section empty, never absent).
+# TC-717 — the A2B diff reference-all law (LLR-143.2): a diff over an image
+  a flow produced references 100% of the flow's changes — each differing run
+  attributed to the entries that produced it, applied entries with no diff
+  as explicit no-diff references, named refusals listed as such; a B that is
+  NOT a flow product renders the shipped report unchanged.
+# TC-718 — the change-5 negative-control battery (the 5a/5b/5c arms): the
   unresolved-symbol refusal names the symbol; the shipped v2.0 reader on
   canonical symbol entries (leniency); the symbol-replaces-address wire form
-  dropped by CHG-ADDRESS-SYNTAX; every refused encode limb named.
+  dropped CHG-ADDRESS-SYNTAX; every refused encode limb named; the diff block
+  omitting one flow change — the census predicate goes RED.
 
 RED counterfactuals (executed, per family — see the increment packet):
   wire — stubbing the ``symbol`` read in ``changes/io.py::_parse_entry``
   reddens the TC-712 resolution/refusal arms; picker — breaking the signed
   range limb in ``a2l.py::encode_physical_to_raw_bytes`` reddens the
   TC-713/718 out-of-range arm; flow — forcing ``a2l_context=None`` in
-  ``flow_execution_service.py`` reddens the TC-714 declared-ref arm.
+  ``flow_execution_service.py`` reddens the TC-714 declared-ref arm;
+  census — dropping one record from the attribution enumeration in
+  ``diff_report_service.py::_flow_change_attribution_lines`` reddens the
+  TC-717 reference-all arm (sha256-verified restore).
 """
 
 from __future__ import annotations
@@ -57,10 +73,29 @@ from s19_app.tui.changes import (
     serialize_change_document,
 )
 from s19_app.tui.changes.io import parse_change_document
+from s19_app.tui.changes.model import (
+    DISPOSITION_DOMAIN,
+    ChangeSummary,
+    ChangeSummaryEntry,
+)
+from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.change_service import (
     ChangeService,
     list_a2l_symbol_names,
     resolve_symbol_entry,
+)
+from s19_app.tui.services.compare_service import (
+    SOURCE_EXTERNAL,
+    ImageSource,
+    compare_images,
+)
+from s19_app.tui.services.diff_report_service import (
+    FlowChangeAttribution,
+    _flow_change_attribution_lines,
+    flow_change_attribution,
+    flow_change_census_complete,
+    generate_diff_report,
+    generate_diff_report_html,
 )
 from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
@@ -71,6 +106,7 @@ from s19_app.tui.services.flow_model import (
     Flow,
     FlowContext,
     PatchBlock,
+    ReportBlock,
     SourceBlock,
     WriteOutBlock,
 )
@@ -81,7 +117,14 @@ from s19_app.tui.services.flow_persistence_service import (
     flow_to_dict,
 )
 from s19_app.tui.services.load_service import build_loaded_s19
-from s19_app.tui.services.variant_execution_service import MANIFEST_PATH_ESCAPE
+from s19_app.tui.services.report_service import (
+    ReportOptions,
+    generate_project_report,
+)
+from s19_app.tui.services.variant_execution_service import (
+    MANIFEST_PATH_ESCAPE,
+    VariantExecutionResult,
+)
 from s19_app.validation.model import ValidationSeverity
 
 #: Minimal CLEAN S19 — 4 bytes (01 02 03 04) at 0x1000 (checksum-verified),
@@ -962,3 +1005,437 @@ def test_tc715_reference_outside_guard_refused_like_any_ref(tmp_path: Path) -> N
     result = run_flow(flow, FlowContext(project_dir=project))
     assert result.status == FLOW_STATUS_ERROR
     assert "MANIFEST-PATH-ESCAPE" in result.block_results[0].diagnostics[0]
+
+
+# ===========================================================================
+# TC-716 — the report attribution (LLR-143.1): every change named by its
+# symbol when present AND always by its resolved address
+# ===========================================================================
+
+
+def test_tc716_summary_entry_carries_symbol(a2l_payload: dict) -> None:
+    """TC-716 (LLR-143.1, the summary seat): the apply summary carries the
+    entry's OWN A2L symbol — stamped from the resolved wire entry, serialized
+    in ``to_dict`` — while the reverse linkage limb stays separate."""
+    doc = parse_change_document(
+        _change_doc([_symbol_entry("Speed", 0x1000, (0x64, 0x00))]),
+        a2l_context=a2l_payload,
+    )
+    mem_map = {0x1000: 1, 0x1001: 2}
+    summary = apply_change_document(doc, mem_map, [(0x1000, 0x1004)], None, None)
+    entry = summary.entries[0]
+    assert entry.symbol == "Speed"
+    assert entry.linkage_symbol is None
+    assert summary.to_dict()["entries"][0]["symbol"] == "Speed"
+    # an address-form entry keeps the byte-stable ``None``.
+    plain_doc = parse_change_document(
+        _change_doc([{"type": "bytes", "address": "0x00001000", "bytes": "64 00"}])
+    )
+    plain_map = {0x1000: 1, 0x1001: 2}
+    plain = apply_change_document(plain_doc, plain_map, [(0x1000, 0x1004)], None, None)
+    assert plain.entries[0].symbol is None
+    assert plain.to_dict()["entries"][0]["symbol"] is None
+
+
+def test_tc716_project_report_modifications_attribute_symbol_and_address(
+    tmp_path: Path,
+) -> None:
+    """TC-716 (LLR-143.1, the project-report seat): every Modifications row
+    names the change by its OWN symbol when present AND always by its resolved
+    address; the address-only row keeps the shipped best-effort linkage
+    fallback (and its address)."""
+    symbol_entry = ChangeSummaryEntry(
+        entry_type="bytes",
+        address_start=0x1000,
+        address_end=0x1002,
+        before_bytes=(0x01, 0x02),
+        after_bytes=(0x64, 0x00),
+        disposition="applied",
+        linkage="a2l",
+        linkage_symbol="ZRev",   # reverse linkage — must LOSE to the own symbol
+        symbol="Speed",
+    )
+    address_entry = ChangeSummaryEntry(
+        entry_type="bytes",
+        address_start=0x2000,
+        address_end=0x2001,
+        before_bytes=(0x07,),
+        after_bytes=(0x08,),
+        disposition="applied",
+        linkage="standalone",
+        linkage_symbol=None,
+        symbol=None,
+    )
+    counts = {
+        token: (2 if token == "applied" else 0) for token in DISPOSITION_DOMAIN
+    }
+    summary = ChangeSummary(
+        source_path=Path("changes.json"),
+        kind="change",
+        encoding="utf-8",
+        value_mode="text",
+        timestamp_utc="2026-10-13T12:00:00+00:00",
+        variant_id=None,
+        counts=counts,
+        entries=[symbol_entry, address_entry],
+    )
+    results = [
+        VariantExecutionResult(
+            variant_id="a",
+            status="ok",
+            change_summaries=[summary],
+        )
+    ]
+    variant_set = ProjectVariantSet(
+        project_name="proj",
+        variants=(
+            VariantDescriptor(variant_id="a", path=Path("a.s19"), file_type="s19"),
+        ),
+        active_id="a",
+    )
+    path = generate_project_report(
+        tmp_path, results, ReportOptions(), variant_set=variant_set
+    )
+    text = path.read_text(encoding="utf-8")
+    section = text.split("### Modifications")[1]
+    rows = [ln for ln in section.splitlines() if ln.startswith("| 0x")]
+    assert len(rows) == 2, "one row per applied entry — 0 unlisted"
+    speed_row = next(ln for ln in rows if "0x00001000" in ln)
+    cells = [cell.strip() for cell in speed_row.strip("|").split("|")]
+    assert cells[0] == "0x00001000", "the resolved address is always named"
+    assert cells[5] == "Speed", "the OWN symbol wins over the reverse linkage"
+    address_row = next(ln for ln in rows if "0x00002000" in ln)
+    cells = [cell.strip() for cell in address_row.strip("|").split("|")]
+    assert cells[0] == "0x00002000"
+    assert cells[5] == "-", "an address-only change renders no symbol"
+
+
+def test_tc716_diff_linkage_table_prefers_entry_symbol() -> None:
+    """TC-716 (LLR-143.1, the diff linkage seat): the Change-entry linkage
+    table names the change by its OWN symbol when present (md + html), the
+    shipped reverse linkage remains the fallback for address-only entries."""
+    from s19_app.tui.services.diff_report_service import (
+        _html_linkage,
+        _linkage_table_lines,
+    )
+
+    def _entry(symbol: str | None, linkage_symbol: str | None) -> ChangeSummaryEntry:
+        return ChangeSummaryEntry(
+            entry_type="bytes",
+            address_start=0x1000,
+            address_end=0x1002,
+            before_bytes=(0x01, 0x02),
+            after_bytes=(0x64, 0x00),
+            disposition="applied",
+            linkage="a2l",
+            linkage_symbol=linkage_symbol,
+            symbol=symbol,
+        )
+
+    row = next(
+        ln
+        for ln in _linkage_table_lines([_entry("Speed", "ZRev")])
+        if ln.startswith("| 1 |")
+    )
+    assert "Speed" in row and "ZRev" not in row
+    row = next(
+        ln
+        for ln in _linkage_table_lines([_entry(None, "ZRev")])
+        if ln.startswith("| 1 |")
+    )
+    assert "ZRev" in row, "the shipped fallback holds for address-only entries"
+    # the HTML twin carries the same preference (md/html pair consistency).
+    html_row = next(
+        ln
+        for ln in _html_linkage([_entry("Speed", "ZRev")])
+        if ln.startswith("<tr><td>")
+    )
+    assert "Speed" in html_row and "ZRev" not in html_row
+
+
+def test_tc716_flow_report_change_attribution_section(tmp_path: Path) -> None:
+    """TC-716 (LLR-143.1, the flow-report seat): the Change attribution
+    section lists every change the flow's patch arms applied — one row per
+    applied entry (0 unlisted), each naming the symbol when present AND the
+    resolved address, with the exact before/after bytes and the A2L reference
+    the entry resolved against."""
+    project = _make_project(
+        tmp_path,
+        {
+            "prg.s19": _S19_CLEAN,
+            "cal.a2l": _A2L_TEXT,
+            "c1.json": _change_doc(
+                [
+                    _symbol_entry("Speed", 0x1000, (0x64, 0x00)),
+                    {"type": "bytes", "address": "0x00001002", "bytes": "03"},
+                ]
+            ),
+            "c3.json": _change_doc(
+                [{"type": "bytes", "address": "0x00002000", "bytes": "AA"}]
+            ),
+        },
+    )
+    flow = Flow(
+        name="attribution",
+        blocks=[
+            SourceBlock("prg.s19", a2l_ref="cal.a2l"),
+            PatchBlock("c1.json"),
+            PatchBlock("c3.json"),
+            WriteOutBlock("out.s19"),
+            ReportBlock(),
+        ],
+    )
+    result = run_flow(flow, FlowContext(project_dir=project))
+    assert result.status == FLOW_STATUS_OK
+    reports = sorted((project / "reports").glob("*.md"))
+    assert len(reports) == 1
+    text = reports[0].read_text(encoding="utf-8")
+    assert "## Change attribution" in text
+    section = text.split("## Change attribution")[1]
+    rows = [ln for ln in section.splitlines() if ln.startswith("| #")]
+    assert len(rows) == 2, "rows == the applied entries (0 unlisted)"
+    speed_row = next(ln for ln in rows if "0x00001000" in ln)
+    assert "| #2 |" in speed_row, "the row names the patch arm that applied it"
+    assert "Speed" in speed_row, "the symbol when present"
+    assert "01 02" in speed_row and "64 00" in speed_row, "the before/after bytes"
+    assert "cal\\.a2l" in speed_row, "the A2L reference it resolved against"
+    noop_row = next(ln for ln in rows if "0x00001002" in ln)
+    assert "03" in noop_row
+    assert "0x00002000" not in section, (
+        "a skipped-outside entry is not an applied row (the census lists it)"
+    )
+    # the section sits between the ledger and the footprint, per SECTION_HEADINGS
+    assert text.find("## Change attribution") > text.find("## Pipeline ledger")
+    assert text.find("## Change attribution") < text.find("## Image footprint")
+
+
+def test_tc716_change_attribution_empty_renders_never_absent(
+    tmp_path: Path,
+) -> None:
+    """TC-716 (LLR-143.1 boundary): a flow that applied nothing renders the
+    section EMPTY — the header and an explicit none-marker, never absent, and
+    no attribution table at all."""
+    project = _make_project(tmp_path, {"prg.s19": _S19_CLEAN})
+    flow = Flow(
+        name="no-changes",
+        blocks=[SourceBlock("prg.s19"), ReportBlock()],
+    )
+    result = run_flow(flow, FlowContext(project_dir=project))
+    assert result.status == FLOW_STATUS_OK
+    reports = sorted((project / "reports").glob("*.md"))
+    assert len(reports) == 1
+    text = reports[0].read_text(encoding="utf-8")
+    assert "## Change attribution" in text
+    section = text.split("## Change attribution")[1]
+    assert "- (no changes applied)" in section
+    assert "| Patch |" not in section, "the empty case grows no table rows"
+
+
+# ===========================================================================
+# TC-717 — the A2B diff reference-all law (LLR-143.2): a diff over an image
+# a flow produced references 100% of the flow's changes
+# ===========================================================================
+
+
+def _census_flow_result(tmp_path: Path):
+    """Run the census fixture flow and diff its source against the output.
+
+    The flow: Speed @0x1000 (produces the run), a no-op address entry
+    @0x1002 (applied, no diff), a refused Ghost entry (dropped at read) and
+    a skipped-outside entry @0x2000 — so the census sees every disposition.
+    """
+    project = _make_project(
+        tmp_path,
+        {
+            "prg.s19": _S19_CLEAN,
+            "cal.a2l": _A2L_TEXT,
+            "c1.json": _change_doc(
+                [
+                    _symbol_entry("Speed", 0x1000, (0x64, 0x00)),
+                    {"type": "bytes", "address": "0x00001002", "bytes": "03"},
+                ]
+            ),
+            "c2.json": _change_doc([_symbol_entry("Ghost", 0x1003, (0x09,))]),
+            "c3.json": _change_doc(
+                [{"type": "bytes", "address": "0x00002000", "bytes": "AA"}]
+            ),
+        },
+    )
+    flow = Flow(
+        name="census",
+        blocks=[
+            SourceBlock("prg.s19", a2l_ref="cal.a2l"),
+            PatchBlock("c1.json"),
+            PatchBlock("c2.json"),
+            PatchBlock("c3.json"),
+            WriteOutBlock("out.s19"),
+        ],
+    )
+    result = run_flow(flow, FlowContext(project_dir=project))
+    assert result.status == FLOW_STATUS_OK
+    out_path = result.written_paths[0]
+    comparison = compare_images(
+        ImageSource(
+            SOURCE_EXTERNAL, raw_path=str(project / "prg.s19"), label="prg.s19"
+        ),
+        ImageSource(SOURCE_EXTERNAL, raw_path=str(out_path), label="out.s19"),
+    )
+    assert not comparison.refused
+    return project, result, comparison
+
+
+def _census_maps(project: Path, result) -> tuple[dict[int, int], dict[int, int]]:
+    return (
+        _reload_s19(project / "prg.s19"),
+        _reload_s19(result.written_paths[0]),
+    )
+
+
+def test_tc717_flow_produced_image_diff_references_all_flow_changes(
+    tmp_path: Path,
+) -> None:
+    """TC-717 (LLR-143.2, the law): the A2B diff over the flow's output
+    references 100% of the flow's changes — each differing run attributed to
+    the entries that produced it, the no-diff entry explicit, the skipped
+    record and the named refusal listed as such (0 unreferenced, 0 dropped)."""
+    project, result, comparison = _census_flow_result(tmp_path)
+    attribution = flow_change_attribution(result)
+    assert len(attribution.records) == 3, "Speed + no-op + skipped-outside"
+    assert len(attribution.refusals) == 1
+    mem_a, mem_b = _census_maps(project, result)
+    md = generate_diff_report(
+        comparison,
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=project,
+        flow_changes=attribution,
+    )
+    assert md.written
+    text = md.path.read_text(encoding="utf-8")
+    assert "## Flow change attribution" in text
+    section = text.split("## Flow change attribution")[1]
+    # the census predicate over the SHIPPED document: 100% referenced.
+    assert flow_change_census_complete(attribution, section.splitlines())
+    # the differing run names its producing entry (and only that entry).
+    speed_row = next(ln for ln in section.splitlines() if "| Speed |" in ln)
+    assert "0x00001000–0x00001002" in speed_row
+    noop_row = next(ln for ln in section.splitlines() if "| 0x00001002 |" in ln)
+    assert "(no diff)" in noop_row, "an applied entry with no diff is explicit"
+    assert "0x00001000–0x00001002" not in noop_row, (
+        "exactness: the run names an entry IFF its range produced run bytes"
+    )
+    skipped_row = next(ln for ln in section.splitlines() if "| 0x00002000 |" in ln)
+    assert "skipped-outside" in skipped_row, "a skipped record is listed as such"
+    refusal_line = next(
+        ln for ln in section.splitlines() if ln.startswith("- refused:")
+    )
+    assert "c2.json" in refusal_line
+    assert "CHG-SYMBOL-UNRESOLVED" in refusal_line
+    assert "'Ghost'" in refusal_line, "the named refusal names the symbol"
+    assert ": no flow change" not in section, (
+        "the single differing run is attributed — no orphan run"
+    )
+
+
+def test_tc717_non_flow_b_renders_the_shipped_report_unchanged(
+    tmp_path: Path,
+) -> None:
+    """TC-717 (LLR-143.2 boundary): when B is NOT a flow product (no
+    flow_changes passed) the diff renders byte-identically in both formats —
+    no attribution section at all."""
+    from datetime import datetime, timezone
+
+    project, result, comparison = _census_flow_result(tmp_path)
+    mem_a, mem_b = _census_maps(project, result)
+    clock = datetime(2026, 10, 13, 12, 0, 0, tzinfo=timezone.utc)
+    plain = generate_diff_report(
+        comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=project, now_fn=lambda: clock,
+    )
+    explicit_none = generate_diff_report(
+        comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=project, now_fn=lambda: clock, flow_changes=None,
+    )
+    text = plain.path.read_text(encoding="utf-8")
+    assert "## Flow change attribution" not in text
+    assert "## Runs" in text and "## Hex windows" in text, (
+        "the shipped sections are untouched"
+    )
+    assert plain.path.read_bytes() == explicit_none.path.read_bytes(), (
+        "flow_changes=None is byte-identical to the shipped call shape"
+    )
+    html = generate_diff_report_html(
+        comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=project, now_fn=lambda: clock,
+    )
+    assert "Flow change attribution" not in html.path.read_text(encoding="utf-8")
+
+
+def test_tc717_html_flow_change_attribution_pairs_the_markdown(
+    tmp_path: Path,
+) -> None:
+    """TC-717 (LLR-143.2, the HTML twin): the self-contained HTML report
+    carries the same census — every change referenced, the refusal named."""
+    project, result, comparison = _census_flow_result(tmp_path)
+    attribution = flow_change_attribution(result)
+    mem_a, mem_b = _census_maps(project, result)
+    html = generate_diff_report_html(
+        comparison,
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=project,
+        flow_changes=attribution,
+    )
+    assert html.written
+    text = html.path.read_text(encoding="utf-8")
+    assert "<h2>Flow change attribution</h2>" in text
+    assert "Speed" in text and "0x00001002" in text and "0x00002000" in text
+    assert "CHG-SYMBOL-UNRESOLVED" in text and "Ghost" in text
+
+
+# ===========================================================================
+# TC-718 — the change-5 negative-control battery: the 5c arm
+# ===========================================================================
+
+
+def test_tc718_battery_diff_block_omitting_one_flow_change_red(
+    tmp_path: Path,
+) -> None:
+    """TC-718 (battery 5c arm): the reference-all law is a live guard — drop
+    ONE flow change from the block's enumeration and the census predicate
+    goes RED; the shipped generator's section passes the same predicate."""
+    project, result, comparison = _census_flow_result(tmp_path)
+    attribution = flow_change_attribution(result)
+    full = _flow_change_attribution_lines(attribution, comparison.runs)
+    assert flow_change_census_complete(attribution, full)
+    dropped = FlowChangeAttribution(
+        records=attribution.records[:-1], refusals=attribution.refusals
+    )
+    incomplete = _flow_change_attribution_lines(dropped, comparison.runs)
+    assert not flow_change_census_complete(attribution, incomplete), (
+        "a block omitting one flow change must fail the census"
+    )
+    # the hardest omission: a no-diff entry whose address recurs inside the
+    # producing run's range cell — the predicate pins the row's OWN cells.
+    noop = next(r for r in attribution.records if r.address_start == 0x1002)
+    rest = tuple(r for r in attribution.records if r is not noop)
+    masked = _flow_change_attribution_lines(
+        FlowChangeAttribution(records=rest, refusals=attribution.refusals),
+        comparison.runs,
+    )
+    assert not flow_change_census_complete(attribution, masked), (
+        "even a change whose address recurs in a run-range cell must not "
+        "vanish from the census"
+    )
+    mem_a, mem_b = _census_maps(project, result)
+    md = generate_diff_report(
+        comparison,
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=project,
+        flow_changes=attribution,
+    )
+    section = md.path.read_text(encoding="utf-8").split(
+        "## Flow change attribution"
+    )[1]
+    assert flow_change_census_complete(attribution, section.splitlines())

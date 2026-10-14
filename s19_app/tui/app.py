@@ -112,6 +112,7 @@ from .services.compare_service import (
     compare_images,
 )
 from .services.diff_report_service import (
+    flow_change_attribution,
     generate_diff_report,
     generate_diff_report_html,
 )
@@ -146,6 +147,7 @@ from .services.project_gather_service import (
 from .services import folder_open_service
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, WindowSection
+from .segment_split_view import SplitJoinWindow
 from .services.validation_service import (
     build_mac_coverage_strip,
     build_validation_report,
@@ -1453,6 +1455,11 @@ class S19TuiApp(App):
         # N1: the active rail screen, so the Legend modal can scope its rows to
         # what THIS screen paints (updated by ``action_show_screen``).
         self._active_screen_key: str = "workspace"
+        #: batch-95 change 4 (LLR-135.6): the rail screen the palette-first
+        #: Split / Join / Export window replaced, so its Esc closes back to
+        #: exactly where the operator was. ``workspace`` is the pre-change
+        #: startup state and the fallback for a direct palette open.
+        self._split_join_return_screen: str = "workspace"
         self._a2l_cache_key: Optional[tuple[str, int, int]] = None
         self._a2l_cache_data: Optional[dict[str, Any]] = None
         self._a2l_enriched_tags: list[dict[str, Any]] = []
@@ -1575,24 +1582,6 @@ class S19TuiApp(App):
         #: joins as the second consumer.
         self._report_filter_path: Optional[Path] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
-
-    def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
-        # region agent log
-        try:
-            payload = {
-                "sessionId": "cdc3df",
-                "runId": run_id,
-                "hypothesisId": hypothesis_id,
-                "location": location,
-                "message": message,
-                "data": data,
-                "timestamp": int(time.time() * 1000),
-            }
-            with (self.base_dir / "debug-cdc3df.log").open("a", encoding="utf-8") as handle:
-                handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
-        except Exception:
-            pass
-        # endregion
 
     def _flush_logger(self) -> None:
         """
@@ -1980,6 +1969,7 @@ class S19TuiApp(App):
                 self._compose_screen_flow(),
                 self._compose_screen_checks(),
                 self._compose_screen_crc_designer(),
+                self._compose_screen_split_join(),
                 id="workspace_body",
             ),
             id="workspace_shell",
@@ -2397,6 +2387,40 @@ class S19TuiApp(App):
             classes="db-screen hidden",
         )
 
+    def _compose_screen_split_join(self) -> WindowSection:
+        """
+        Summary:
+            Build the Split / Join / Export screen (``#screen_split_join``,
+            batch-95 change 4 / US-129, HLR-135) — the grafted terminal
+            design (V1's cockpit chassis + V2's wide-regime band and the
+            split-mode per-file gantt) as a ``WindowSection`` on the
+            inc-003c seam: the title row carries title + ``?`` usage-help
+            chip ONLY (HLR-139 contracts exactly four ``📂`` chips — this
+            window gets none), and the focused-``?`` binding opens the
+            authored ``split_join_export`` section. The window is
+            palette-first with NO rail key (ruling Q6/7a): it mounts
+            hidden beside the ten rail screens and opens from the ``^K``
+            palette entry named "Split / Join / Export"
+            (``action_open_split_join_export``); ``Esc`` closes it back to
+            the rail screen it replaced.
+
+        Args:
+            None
+
+        Returns:
+            WindowSection: ``#screen_split_join`` (``classes="db-screen
+            hidden"``) holding the whole graft chassis; the panel widget
+            owns its plan/visor state and reads the loaded image/A2L live.
+
+        Dependencies:
+            Uses:
+                - ``SplitJoinWindow`` / ``titled_header`` /
+                  ``WindowHelpChip``
+            Used by:
+                - ``compose``
+        """
+        return SplitJoinWindow()
+
     def on_flow_builder_panel_run_requested(
         self, event: "FlowBuilderPanel.RunRequested"
     ) -> None:
@@ -2457,7 +2481,13 @@ class S19TuiApp(App):
             return
         scope = getattr(event, "scope", FLOW_SCOPE_SINGLE)
         if scope == FLOW_SCOPE_SINGLE:
-            panel.render_result(run_flow(event.flow, FlowContext(project_dir=project_dir)))
+            # batch-95 inc-004b (LLR-143.2): retain the run result so the A2B
+            # diff report can later attribute an image B this flow produced —
+            # the provenance seat mirrors the retained _diff_last_result.
+            self._last_flow_run = run_flow(
+                event.flow, FlowContext(project_dir=project_dir)
+            )
+            panel.render_result(self._last_flow_run)
             return
         if self._variant_set is None or not self._variant_set.variants:
             panel.render_result(
@@ -5166,6 +5196,21 @@ class S19TuiApp(App):
             a2l_records=a2l_tags,
             mac_records=mac_records,
         )
+        # batch-95 inc-004b (LLR-143.2): when image B is a product of the last
+        # flow run, the A2B diff must reference ALL the flow's changes — the
+        # run's own record (change_records + named refusals) rides the kwargs
+        # as the flow-change census. A B from anywhere else leaves the report
+        # byte-identical to the shipped output.
+        last_flow_run = getattr(self, "_last_flow_run", None)
+        image_b_path = getattr(result.image_b, "path", None) if result else None
+        if last_flow_run is not None and image_b_path:
+            written = {
+                Path(p).resolve() for p in last_flow_run.written_paths
+            }
+            if Path(image_b_path).resolve() in written and (
+                last_flow_run.change_records or last_flow_run.refusals
+            ):
+                kwargs["flow_changes"] = flow_change_attribution(last_flow_run)
         diff_source = (
             project_dir.name if project_dir is not None else (dest_input or "-")
         )
@@ -5993,7 +6038,13 @@ class S19TuiApp(App):
     #: One extra command-palette command outside ``BINDINGS``: the viewer
     #: page-size settings menu lost its ``#view_bar`` trigger in increment 2
     #: (G-1) — it is resurfaced here so it stays keyboard-reachable (C-9).
-    EXTRA_PALETTE_ENTRIES = (("Viewer settings", "open_settings_menu"),)
+    #: batch-95 change 4 (HLR-135, ruling Q6/7a): the Split / Join / Export
+    #: screen is palette-first and binds NO rail key — its one palette entry
+    #: (named exactly "Split / Join / Export") opens it.
+    EXTRA_PALETTE_ENTRIES = (
+        ("Viewer settings", "open_settings_menu"),
+        ("Split / Join / Export", "open_split_join_export"),
+    )
 
     def _build_palette_entries(self) -> tuple[PaletteEntry, ...]:
         """
@@ -6087,6 +6138,14 @@ class S19TuiApp(App):
                 container.remove_class("hidden")
             else:
                 container.add_class("hidden")
+        # batch-95 change 4 (LLR-135.6): any rail key closes the
+        # palette-first Split / Join / Export window — it is not in
+        # SCREEN_CONTAINER_IDS (the TC-B79-03 census stays at the ten rail
+        # screens), so the swap hides it here.
+        try:
+            self.query_one("#screen_split_join").add_class("hidden")
+        except Exception:
+            pass
         self.query_one(Rail).set_active(screen_key)
         self._apply_empty_state()
         if screen_key == "diff":
@@ -6098,6 +6157,52 @@ class S19TuiApp(App):
             # Lazy read-only mirror rebuilt on entry (batch-49, LLR-083.6);
             # checks state changes only on run/undo/redo, so no load hook.
             self.update_checks_view()
+
+    def action_open_split_join_export(self) -> None:
+        """
+        Summary:
+            Open the Split / Join / Export screen (batch-95 change 4,
+            HLR-135; LLR-135.6): the palette-first, rail-less entry — the
+            ``^K`` palette command named exactly "Split / Join / Export"
+            dispatches here. The window rides the rail body beside the ten
+            rail screens but is NOT in ``SCREEN_CONTAINER_IDS`` (ruling
+            Q6/7a pins zero rail keys; TC-B79-03 pins that map's census at
+            the ten rail screens) — this action hides all ten rail
+            containers, shows ``#screen_split_join``, and remembers the
+            active rail screen so ``Esc`` (the window's own binding) closes
+            back to exactly where the operator was.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_active_screen_key`` is stashed on
+              ``_split_join_return_screen`` and then set to
+              ``"split_join"`` so the find/go-to keys degrade to the
+              honest "no such input on this screen" status notice while the
+              window is up (the Legend scope falls back to the full table
+              for an unmapped key, the shipped fallback). The rail's active
+              marker is untouched — there is no rail item for this screen.
+            - The window's ``refresh_window`` re-reads the loaded image +
+              A2L and focuses the range table.
+
+        Dependencies:
+            Uses:
+                - ``SplitJoinWindow`` / ``SCREEN_CONTAINER_IDS``
+            Used by:
+                - The ``^K`` palette entry "Split / Join / Export"
+                - ``action_show_screen`` (the reverse hide on any rail key)
+        """
+        self._split_join_return_screen = self._active_screen_key
+        for container_id in self.SCREEN_CONTAINER_IDS.values():
+            self.query_one(f"#{container_id}").add_class("hidden")
+        window = self.query_one("#screen_split_join", SplitJoinWindow)
+        window.remove_class("hidden")
+        self._active_screen_key = "split_join"
+        window.refresh_window()
 
     def action_show_help_panel(self) -> None:
         """
@@ -7397,20 +7502,6 @@ class S19TuiApp(App):
     def _load_path_from_user_input(self, path: Path) -> None:
         """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
         normalized = resolve_input_path(path, self.base_dir)
-        self.logger.info("DBG H4 path resolution: input=%s resolved=%s", path, normalized)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H4",
-            location="s19_app/tui/app.py:_load_path_from_user_input",
-            message="Resolved path for load",
-            data={
-                "input_path": str(path),
-                "resolved_path": str(normalized) if normalized else None,
-                "suffix": normalized.suffix.lower() if normalized else None,
-            },
-        )
-        # endregion
         if not normalized:
             self.set_status(f"File not found: {path}")
             self.logger.warning("File not found: %s", path)
@@ -7418,16 +7509,6 @@ class S19TuiApp(App):
         suffix = normalized.suffix.lower()
         if suffix in A2L_EXTENSIONS:
             self.load_a2l_from_path(path)
-            self.logger.info("DBG H4 returned from load_a2l_from_path: resolved=%s", normalized)
-            # region agent log
-            self._debug_log(
-                run_id="initial",
-                hypothesis_id="H4",
-                location="s19_app/tui/app.py:_load_path_from_user_input",
-                message="Returned from load_a2l_from_path",
-                data={"resolved_path": str(normalized)},
-            )
-            # endregion
         elif suffix in SUPPORTED_EXTENSIONS:
             self.load_from_path(path)
         else:
@@ -7460,16 +7541,6 @@ class S19TuiApp(App):
             Used by:
                 - ``action_load_file`` (LoadFileScreen result callback)
         """
-        self.logger.info("DBG H4 load dialog callback entry: path=%s", path)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H4",
-            location="s19_app/tui/app.py:_handle_load_dialog",
-            message="Entered load dialog callback",
-            data={"path_is_none": path is None, "path": str(path) if path else None},
-        )
-        # endregion
         if path is None:
             return
         self.logger.info("Load phase boundary: modal_dismiss_scheduled path=%s", path)
@@ -7479,16 +7550,6 @@ class S19TuiApp(App):
         # the copy/parse/install pipeline because dismiss() invokes this callback
         # synchronously before scheduling the pop.
         self.call_after_refresh(self._load_path_from_user_input, path)
-        self.logger.info("DBG H4 load dialog callback exit (deferred): path=%s", path)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H4",
-            location="s19_app/tui/app.py:_handle_load_dialog",
-            message="Scheduled deferred load after modal pop",
-            data={"path": str(path)},
-        )
-        # endregion
 
     def load_from_path(self, path: Path) -> None:
         """
@@ -7626,46 +7687,13 @@ class S19TuiApp(App):
         parse_started = time.perf_counter()
         self.current_a2l_data = self._load_a2l_data_with_cache(copied)
         parse_elapsed = time.perf_counter() - parse_started
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H1",
-            location="s19_app/tui/app.py:load_a2l_from_path",
-            message="A2L parse stage complete",
-            data={
-                "path": str(copied),
-                "size_bytes": copied_size,
-                "parse_elapsed_seconds": round(parse_elapsed, 3),
-                "tag_count": len((self.current_a2l_data or {}).get("tags", [])),
-                "section_count": len((self.current_a2l_data or {}).get("sections", [])),
-            },
-        )
-        # endregion
         self._log_a2l_parse_summary(copied, self.current_a2l_data, parse_elapsed)
         if self.current_file:
             self.current_file.a2l_path = copied
             self.current_file.a2l_data = self.current_a2l_data
         view_started = time.perf_counter()
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H1",
-            location="s19_app/tui/app.py:load_a2l_from_path",
-            message="Entering update_a2l_view",
-            data={"tag_count": len((self.current_a2l_data or {}).get("tags", []))},
-        )
-        # endregion
         self.update_a2l_view()
         view_elapsed = time.perf_counter() - view_started
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H1",
-            location="s19_app/tui/app.py:load_a2l_from_path",
-            message="Finished update_a2l_view",
-            data={"view_elapsed_seconds": round(view_elapsed, 3)},
-        )
-        # endregion
         if view_elapsed > self.slow_parse_warn_seconds:
             self.logger.warning(
                 "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
@@ -7683,16 +7711,6 @@ class S19TuiApp(App):
         self._refresh_loaded_panel()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
-        self.logger.info("DBG H5 load_a2l_from_path reached completion: path=%s", copied)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H5",
-            location="s19_app/tui/app.py:load_a2l_from_path",
-            message="A2L load function reached completion",
-            data={"path": str(copied)},
-        )
-        # endregion
         self.logger.info("A2L loaded: %s", copied)
 
         if self.current_project:
@@ -9708,6 +9726,40 @@ class S19TuiApp(App):
         """
         self._apply_prepared_load(PreparedLoad(loaded=loaded), path, load_started)
 
+    def watch_current_file(self) -> None:
+        """
+        Summary:
+            Refresh the palette-first Split / Join / Export window
+            (batch-95 change 4) whenever the loaded image changes — its
+            segment sources (the image's ranges, the coverage sweep, the
+            default stem) are a live VIEW over ``current_file``, so a load
+            or an unload while the window is open must re-plan the band,
+            not leave the previous image's rows addressable.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Re-resolves ``#screen_split_join`` and calls its
+              ``refresh_window``; a missing tree (headless tests assigning
+              ``current_file`` before mount) is tolerated, matching
+              ``_apply_empty_state``'s documented no-op.
+
+        Dependencies:
+            Uses:
+                - ``SplitJoinWindow``
+            Used by:
+                - The ``current_file`` reactive on every install/unload.
+        """
+        try:
+            window = self.query_one("#screen_split_join", SplitJoinWindow)
+        except Exception:
+            return
+        window.refresh_window()
+
     def _apply_prepared_load(
         self, prepared: PreparedLoad, path: Path, load_started: float
     ) -> None:
@@ -11373,13 +11425,6 @@ class S19TuiApp(App):
         summary_label = self.query_one("#a2l_tags_summary", Label)
         self._a2l_row_key_to_tag = {}
         a2l_table.clear(columns=False)
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H3",
-            location="s19_app/tui/app.py:update_a2l_tags_view",
-            message="Entered update_a2l_tags_view",
-            data={"incoming_tag_count": len(tags)},
-        )
         if not tags:
             self._a2l_window_start = 0
             summary_label.update("No A2L tags.")
@@ -11424,13 +11469,6 @@ class S19TuiApp(App):
         summary_text.append("  ·  ")
         summary_text.append(f"{in_image} in image", style=GREEN)
         summary_label.update(summary_text)
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H3",
-            location="s19_app/tui/app.py:update_a2l_tags_view",
-            message="Finished update_a2l_tags_view",
-            data={"rendered_tag_rows": len(visible_tags), "total_rows": total_tags, "start": start, "end": end},
-        )
         self.logger.info(
             "Load phase boundary: populate_a2l_table_done rows=%d total=%d elapsed=%.3f",
             len(visible_tags),

@@ -355,6 +355,13 @@ class ChangeSummaryEntry:
         linkage_symbol (Optional[str]): The matching MAC/A2L symbol name when
             linked (MAC name preferred on a ``both`` classification);
             ``None`` when standalone or the matching record is unnamed.
+        symbol (Optional[str]): The entry's OWN A2L reference for a change-5
+            symbol-referenced entry (HLR-141) — the FORWARD direction, stamped
+            verbatim from ``ChangeEntry.symbol`` at apply time (batch-95
+            inc-004b, the LLR-143.1 report-attribution carrier). Distinct from
+            ``linkage_symbol``, which is the best-effort REVERSE classification.
+            ``None`` for a plain address-form entry. Additive; default ``None``
+            keeps every shipped constructor call unchanged.
 
     Returns:
         None: Dataclass container.
@@ -378,6 +385,7 @@ class ChangeSummaryEntry:
     disposition: str
     linkage: str
     linkage_symbol: Optional[str]
+    symbol: Optional[str] = None
 
 
 @dataclass(slots=True)
@@ -541,6 +549,10 @@ class ChangeSummary:
                     "disposition": entry.disposition,
                     "linkage": entry.linkage,
                     "linkage_symbol": entry.linkage_symbol,
+                    # batch-95 inc-004b (LLR-143.1): the entry's own A2L
+                    # symbol rides the serialized entry — additive key,
+                    # ``None`` for address-form entries.
+                    "symbol": entry.symbol,
                 }
                 for entry in self.entries
             ],

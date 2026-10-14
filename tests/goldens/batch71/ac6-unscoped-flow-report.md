@@ -14,6 +14,12 @@
 | 4 | CRC | ● ok | injected 1 CRC region |
 | 5 | WRITE\_OUT | ● ok | wrote out\.s19 |
 
+## Change attribution
+
+| Patch | Change document | Address | Length | Before | After | Symbol | A2L reference |
+|---|---|---|---|---|---|---|---|
+| #2 | patch\.json | 0x00001000 | 1 | 01 | AA | - | - |
+
 ## Image footprint
 
 - **Before CRC:** 0x00001000–0x00001004  (5 bytes)

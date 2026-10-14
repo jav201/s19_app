@@ -270,7 +270,8 @@ def apply_change_document(
         ``None`` — stamped later by the save-back flow) plus one
         :class:`ChangeSummaryEntry` per document entry in document order,
         each with exact ``before_bytes`` (applied entries only) /
-        ``after_bytes`` and the informative linkage classification.
+        ``after_bytes``, the informative linkage classification, and the
+        entry's own A2L ``symbol`` when symbol-referenced (LLR-143.1).
 
     Raises:
         KeyError: If an ``INSIDE`` entry addresses a byte missing from
@@ -348,6 +349,11 @@ def apply_change_document(
                 disposition=disposition,
                 linkage=linkage,
                 linkage_symbol=linkage_symbol,
+                # batch-95 inc-004b (LLR-143.1): the entry's own A2L symbol
+                # (the change-5 forward reference) rides the summary — the
+                # report attribution names the change by its symbol when
+                # present and always by its resolved address.
+                symbol=entry.symbol,
             )
         )
 

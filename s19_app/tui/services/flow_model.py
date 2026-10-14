@@ -301,6 +301,121 @@ class BlockResult:
 
 
 @dataclass(slots=True)
+class FlowChangeRecord:
+    """One per-entry change record a flow run retained from a PATCH arm
+    (batch-95 inc-004b, change-5c — LLR-143.1's run-side record).
+
+    ``run_flow`` used to reduce each PATCH arm to an ``"applied N entries"``
+    summary line and discard the per-entry detail — which left nothing from
+    which a report could attribute the flow's changes. This record retains
+    ONE per-entry identity (its OWN A2L symbol when symbol-referenced, always
+    its resolved address, the applied byte runs, the disposition) together
+    with the arm it came from and the A2L reference the entry resolved
+    against (the patch's override, else the SOURCE block's declaration).
+
+    Args:
+        block_index (int): The PATCH block's position in the flow.
+        change_doc_ref (str): The project-relative change document ref the
+            entry was read from (file-derived — markup-safe on render).
+        a2l_ref (Optional[str]): The A2L reference the entry resolved against
+            (``PatchBlock.a2l_ref`` override, else the SOURCE block's declared
+            ref, else ``None`` — an address-form change-set under no declared
+            reference). LLR-143.1's "resolved against" column.
+        entry_type (str): The source entry's kind — ``"string"`` / ``"bytes"``.
+        symbol (Optional[str]): The entry's OWN A2L symbol for a change-5
+            symbol-referenced entry; ``None`` for the address form.
+        address_start (int): Inclusive start of the addressed byte range.
+        address_end (int): Exclusive end — ``address_end - address_start``
+            is the encoded byte length.
+        disposition (str): One token of the change-set
+            :data:`DISPOSITION_DOMAIN` — ``applied`` / ``skipped-*`` /
+            ``blocked`` (a refused document blocks every entry it still
+            carried).
+        before_bytes (Optional[Tuple[int, ...]]): The prior image bytes over
+            the addressed range — ``None`` for every non-``applied``
+            disposition (mirrors ``ChangeSummaryEntry.before_bytes``).
+        after_bytes (Tuple[int, ...]): The entry's encoded run.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``flow_execution_service.run_flow`` (one per
+          ``ChangeSummaryEntry`` of every PATCH arm's apply summary), in arm
+          then document order; consumed by ``flow_report_service`` (the
+          change-attribution section) and by ``diff_report_service`` (the
+          A2B flow-change census over a flow-produced image, LLR-143.2).
+
+    Dependencies:
+        Used by:
+            - flow_execution_service.run_flow
+            - flow_report_service / diff_report_service (batch-95 inc-004b)
+    """
+
+    block_index: int
+    change_doc_ref: str
+    a2l_ref: Optional[str]
+    entry_type: str
+    symbol: Optional[str]
+    address_start: int
+    address_end: int
+    disposition: str
+    before_bytes: Optional[Tuple[int, ...]]
+    after_bytes: Tuple[int, ...]
+
+
+@dataclass(slots=True)
+class FlowRefusal:
+    """One named refusal a flow run retained from a PATCH arm's read
+    (batch-95 inc-004b, change-5c — LLR-143.2's "a named refusal is still an
+    attribution line" carrier).
+
+    A change-set read that refuses an entry (change-5:
+    ``CHG-SYMBOL-UNRESOLVED`` / ``CHG-SYMBOL-VALUE``, …) DROPS the entry — the
+    summary has no per-entry record of it, so without this record the refusal
+    would be silently absent from every downstream report. It retains the
+    refusal's code, the symbol/address it names, and the arm it fired in.
+
+    Args:
+        block_index (int): The PATCH block's position in the flow.
+        change_doc_ref (str): The project-relative change document ref
+            (file-derived — markup-safe on render).
+        a2l_ref (Optional[str]): The effective A2L reference (override, else
+            SOURCE declaration, else ``None``) — as for
+            :class:`FlowChangeRecord`.
+        code (str): The refusal's finding code (e.g.
+            ``CHG-SYMBOL-UNRESOLVED``).
+        symbol (Optional[str]): The symbol the refusal names, when it names
+            one (the issues' ``symbol`` field); ``None`` otherwise.
+        address (Optional[int]): The address the refusal names, when it names
+            one; ``None`` otherwise.
+        message (str): The refusal's one-line message (already names the
+            symbol/reference — file-derived, markup-safe on render).
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``flow_execution_service.run_flow`` (one per
+          ERROR-severity issue of every PATCH arm's read/apply); consumed by
+          ``diff_report_service`` (the A2B flow-change census).
+
+    Dependencies:
+        Used by:
+            - flow_execution_service.run_flow
+            - diff_report_service (batch-95 inc-004b)
+    """
+
+    block_index: int
+    change_doc_ref: str
+    a2l_ref: Optional[str]
+    code: str
+    symbol: Optional[str]
+    address: Optional[int]
+    message: str
+
+
+@dataclass(slots=True)
 class FlowRunResult:
     """The whole-flow run outcome — always well-formed, never raised.
 
@@ -325,6 +440,19 @@ class FlowRunResult:
             to (and equals) the SOURCE/post-patch footprint; when no CRC block
             grows the image it equals ``image_ranges`` (before == after).
             Additive; empty when no image was ever loaded.
+        change_records (List[FlowChangeRecord]): The run's OWN record of every
+            change entry its PATCH arms read — one :class:`FlowChangeRecord`
+            per summary entry, in arm then document order (batch-95 inc-004b,
+            change-5c LLR-143.1/143.2: the retention from which the flow
+            report's change-attribution section and the A2B diff's flow-change
+            census enumerate the flow's changes — ``run_flow`` previously
+            discarded the per-entry detail). Additive per §6.3 R-6; empty when
+            no PATCH arm ran.
+        refusals (List[FlowRefusal]): The run's OWN record of every named
+            refusal its PATCH arms' reads produced — one :class:`FlowRefusal`
+            per ERROR-severity issue (batch-95 inc-004b, LLR-143.2: "a named
+            refusal is still an attribution line, never silently dropped").
+            Additive per §6.3 R-6; empty when nothing was refused.
     """
 
     status: str
@@ -333,6 +461,8 @@ class FlowRunResult:
     diagnostics: List[str] = field(default_factory=list)
     image_ranges: List[Tuple[int, int]] = field(default_factory=list)
     pre_crc_ranges: List[Tuple[int, int]] = field(default_factory=list)
+    change_records: List[FlowChangeRecord] = field(default_factory=list)
+    refusals: List[FlowRefusal] = field(default_factory=list)
 
 
 @dataclass(slots=True)
