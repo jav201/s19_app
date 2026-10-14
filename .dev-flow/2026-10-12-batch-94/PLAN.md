@@ -19,7 +19,7 @@ out-of-scope carries · test ledger · decision log (the human-readable mirror o
 | Project | s19_app |
 | Batch | 2026-10-12-batch-94 |
 | Objective | Cambio1-7: Flow Builder por bloques (fb_a) + Flow Execution (fx_a) + split Patch/Check Editor (pe_a/ce_b) -- A2B configurable por bloque con procedencia en el reporte, check-spec .chk.json (write/validate only), control secuencial(default)/paralelo, ruteo de cables refinado. Design input: 4 SVG ganadores en G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/. Coordination: COORDINACION-batch92.md (overlap screens_directionb.py con batch-93 -- second-editor-rebases rule). |
-| Last updated | PDR (sealed) · 2026-10-13 |
+| Last updated | P3 · increment 001 gated · 2026-10-13 |
 | Standing authorization | Operator (Javier), 2026-10-13, answering the P0 gate kickoff: *"1.Si, autorizados; 2.autorizo los merges; 3.Modo full."* — read as: **(1) end-to-end autonomy** over the gates this batch commissions; **(2) merge authority granted — and the merge stays gated**: after the PR is opened and CI is green, one final independent PR-level `qa-reviewer` pass over the WHOLE merged diff vs `main` must come back clean before the agent merges; a HIGH finding blocks the merge and returns to the operator; **(3) mode `full` confirmed**. Autonomy is never silent: every autonomous decision is summarized in this PLAN's decision log, `state.json.decisions_log`, the postmortem decisions summary, and carried to the vault at `/dev-flow-sync`. Per `shared-batch.md` §Batch-kickoff authorization: per-batch, never carried from a prior batch; the `standing_authorization` key is deleted from `state.json` with this cell its one record. |
 | First gate | Record-seed gate (pre-P0): exit 0 — `0 block · 374 notice · 48 n/a`; `V7` raised no finding (bundle mirror `2026-10-12-rev102` self-consistent, 57 declared files both directions). Tool-proving run, not the batch. |
 | Premises / RC-1 | Verified `origin/main` tip at intake: **`1a0eff6`** (2026-10-13; RC-2 answered). Two more RC-1 rebases the same day (legends batch close + completion); `base_ref` re-stamped per RC-1's literal rule to **`8e056bd`** (HEAD at the stamp; peer-verified reading). Flow currency (C-45 PULL): bundle mirror, not a git checkout — probe = `V7` + `FLOW-VERSION.md` `2026-10-12-rev102`. Premises: `01-requirements.md` §2.7 (9 rows, all TRUE). |
@@ -52,7 +52,7 @@ Stations: ARQ/PDR discharged 2026-10-13; DDR ahead at P4.
 
 ## Where we are
 
-P0, ARQ, P1, P2 and PDR gates CLOSED 2026-10-13 under the standing grant (decisions_log entries 1–5). The PDR record is sealed: **approved with conditions** (5, each with a named discharge gate). Current station: **P3 — Inc-001** (the Patch/Check Editor split + rework + `.chk.json`), then Inc-002 (fb_a builder + the `flow_screens.py` move), Inc-003 (fx_a execution), Inc-004 (warnings triage).
+P0, ARQ, P1, P2, PDR gates and **increment 001** CLOSED 2026-10-13 under the standing grant (decisions_log entries 1–6). The editors shipped: pe_b rework + ce_a Check Editor + `.chk.json` + A2B addendum + rail 11 (24 AT/TC nodes). Mid-increment, batch-95 landed 4 increments on main — two RC-1 rebases absorbed them (union resolutions, both lanes green). Current: **Inc-002** (fb_a Flow Builder + the `flow_screens.py` move) — its cut starts with RC-1 (main +3 at Inc-001's gate) + the C-1/C-2 conditions + a re-verified B2 census against batch-95's `flow_model.py`.
 
 ## Objective
 
@@ -71,7 +71,7 @@ P0, ARQ, P1, P2 and PDR gates CLOSED 2026-10-13 under the standing grant (decisi
 | US-007 (Cambio7, Flow Execution) | contracted → Inc-003 | HLR-017–021 |
 | US-008/US-009 | OUT | file to lane A at close |
 | P0 / ARQ / P1 / P2 / PDR | CLOSED 2026-10-13 | decisions_log 1–5 |
-| P3 | current | Inc-001 next |
+| P3 | Inc-001 GATED 2026-10-13 | packet + battery + code-review clean (after the F1 fold); Inc-002 next |
 
 ## Roadmap + increment plan
 
@@ -93,10 +93,14 @@ P0, ARQ, P1, P2 and PDR gates CLOSED 2026-10-13 under the standing grant (decisi
 | 2026-10-13 | **PDR: rail keys `=` (Check Editor) + `]` (Flow Execution), `show=False`; help-panel discoverability; probe-verified at 80×24 + 120×30; F-keys rejected (terminal swallow)** | R-1 closed by executed probe; 38-key census, zero collisions; the contract's ATs stay key-independent |
 | 2026-10-13 | PDR: freeze set D1–D5 phased (ActionRequested + `.chk.json` at Inc-001; `flow_screens` at Inc-002; template/chain-set halves Inc-002/003; rail completes at Inc-003) | the map §11 pending rows |
 | 2026-10-13 | PDR: naming — the shipped twins follow the graduation call **pe_b + ce_a (ce_b folded)**; "pe_a/ce_b" remains §2.6 shorthand; PLAN flipped now, map text at the Inc-002 map-delta | contract HLR-001/003 rationales ratify the graduation call |
+| 2026-10-13 | Inc-001 gated: the editors shipped (4 source files at cap; 24 AT/TC nodes; rail 10→11 with `=`); the battery 23 arms all RED (5 inert arms re-asserted in fix round A); code-review found F1 (a duplicated `push_screen(LoadGuardScreen())` — two stacked modals, execution-proven), folded and re-verified clean | HLR-001..011 realized; the union tree carries batch-95's four increments green |
+| 2026-10-13 | batch-95 coordination: two RC-1 rebases (union in `app.py`, corpus 173); Inc-002 must re-verify its B2 census against batch-95's `flow_model.py` changes | the second-editor-rebases rule, applied at each cut |
 
 ## Risks / watch-items
 
-- PDR conditions: C-1 (Inc-002), C-2 (Inc-002 re-run), C-3 (Inc-003), C-ux-2 (Inc-001) — each discharged by reading the named artifact at its gate.
+- PDR conditions: C-1 (Inc-002), C-2 (Inc-002 re-run), C-3 (Inc-003), C-ux-2 (Inc-001 — discharged in the fold) — each discharged by reading the named artifact at its gate.
+- batch-95 is ACTIVE on main (4 increments landed during Inc-001; +3 more at gate time) — RC-1 at every Inc-002/003/004 cut; the coordination note carries the intersection register.
+- Inc-002's B2 census must re-run against the rebased tree (batch-95 touched `flow_model.py`); the `BLOCK_A2B` placement re-verified against R8.
 - Carried minors: ux#3 chrome dirty-indicator render assertion (Inc-001 or recorded-outside); ux#6 help-panel painted assertion (Inc-001 one-liner); qa#6 LLR-002.2 declared-none (open, P3).
 - A1–A6 assumption register (proposal §6): boxed-budget fits verified per increment by TC-B94-09/AT-B94-03 (Inc-001), the canvas ATs (Inc-002), the lanes ATs (Inc-003); A4 real-terminal key delivery = operator field-check at the increment demos; A5 parallel-chains state isolation pinned by AT-B94-21's error arm; A6 emitted forms pasted per C-42.
 - `screens_directionb.py` carries batch-93's Memory Map work — full `test_tui_directionb.py` guard host (C-34) at every render increment's gate; snapshot drift per-cell (C-22/C-28).
