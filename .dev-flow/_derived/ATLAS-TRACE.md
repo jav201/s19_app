@@ -3,7 +3,7 @@
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
+registry: 1499 rows — BURNED 422 · LIVE 974 · RESERVED 80 · RETIRED 23
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -1490,8 +1490,8 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `TC-703` | LIVE | batch-95 |  |
 | `TC-704` | LIVE | batch-95 |  |
 | `TC-705` | LIVE | batch-95 |  |
-| `TC-706` | RESERVED | batch-95 |  |
-| `TC-707` | RESERVED | batch-95 |  |
+| `TC-706` | LIVE | batch-95 |  |
+| `TC-707` | LIVE | batch-95 |  |
 | `TC-708` | RESERVED | batch-95 |  |
 | `TC-709` | RESERVED | batch-95 |  |
 | `TC-710` | RESERVED | batch-95 |  |
@@ -1507,7 +1507,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1588 unique id(s)
+## family US/HLR/LLR — 1594 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1516,6 +1516,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `HLR-001..005` | batches |
 | `HLR-001..008` | batches |
 | `HLR-001..009` | batches |
+| `HLR-001..011` | batches |
 | `HLR-001..HLR-003` | batches |
 | `HLR-001..HLR-005` | batches |
 | `HLR-001..HLR-008` | batches |
@@ -1700,10 +1701,11 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `HLR-131` | batches, canon, tests |
 | `HLR-132` | batches, canon, tests |
 | `HLR-133` | batches, canon, tests |
-| `HLR-134` | batches, canon |
+| `HLR-134` | batches, canon, tests |
 | `HLR-137` | tests |
 | `HLR-138` | tests |
 | `HLR-139` | tests |
+| `HLR-140` | tests |
 | `HLR-141` | tests |
 | `HLR-6` | batches |
 | `HLR-64` | batches |
@@ -2592,6 +2594,9 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `LLR-139.2` | tests |
 | `LLR-139.3` | tests |
 | `LLR-139.x` | tests |
+| `LLR-140.1` | tests |
+| `LLR-140.1..140.2` | tests |
+| `LLR-140.2` | tests |
 | `LLR-141.1` | tests |
 | `LLR-141.2` | tests |
 | `LLR-142.1` | tests |
@@ -2966,6 +2971,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `US-126` | batches |
 | `US-127` | batches |
 | `US-128` | batches |
+| `US-129` | tests |
 | `US-77` | canon |
 | `US-77-1` | batches |
 | `US-77-2` | batches, canon |
@@ -3275,7 +3281,7 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1650 unique id(s)
+## family AT/TC — 1652 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4759,6 +4765,8 @@ registry: 1499 rows — BURNED 422 · LIVE 972 · RESERVED 82 · RETIRED 23
 | `TC-703` | tests |
 | `TC-704` | tests |
 | `TC-705` | tests |
+| `TC-706` | tests |
+| `TC-707` | tests |
 | `TC-712` | tests |
 | `TC-713` | tests |
 | `TC-714` | tests |
