@@ -279,7 +279,8 @@ def copy_into_workarea(
             finding S-N02).
 
     Returns:
-        Path: Absolute path of the file written inside ``destination``. Name collisions are
+        Path: Absolute path of the file written inside ``destination``. A byte-identical
+            target is reused as-is (bug B8 content dedup); divergent name collisions are
             resolved by appending ``_<N>`` before the suffix.
 
     Raises:
@@ -297,8 +298,9 @@ def copy_into_workarea(
         - Locate the ``.s19tool/workarea`` ancestor of ``destination``; reject when missing
           (closes blocker S-001).
         - Enforce ``max_size_bytes`` on ``source.stat().st_size`` (closes major S-003).
-        - Create the destination directory and copy the source, deduplicating the filename
-          on collision.
+        - Create the destination directory and copy the source. A colliding target
+          with identical bytes is returned without a new copy (bug B8); a colliding
+          target with divergent bytes is deduplicated by appending ``_<N>``.
 
     Dependencies:
         Uses:
@@ -346,6 +348,14 @@ def copy_into_workarea(
     resolved_destination.mkdir(parents=True, exist_ok=True)
     target = resolved_destination / resolved_source.name
     if target.exists():
+        # Content dedup (bug B8): a byte-identical re-load reuses the existing
+        # target instead of suffixing a duplicate copy (same idiom as the
+        # project gather's byte-compare refresh in project_gather_service).
+        try:
+            if target.read_bytes() == resolved_source.read_bytes():
+                return target
+        except OSError:
+            pass  # an unreadable target is not trusted; fall through to the name-dedup suffix
         stem = resolved_source.stem
         suffix = resolved_source.suffix
         counter = 1

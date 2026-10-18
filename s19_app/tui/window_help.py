@@ -10,15 +10,18 @@ stock ``HelpPanel`` — the global ``question_mark`` binding (action
 window-focused path claims the key (LLR-140.1).
 
 The modal is the shipped :class:`~s19_app.tui.screens.VariantHelpScreen`
-pattern (``screens.py:416``) generalized to nine sections: the title +
-numbered steps render through a ``markup=False`` ``Static`` so the copy is
-verbatim — no Rich/console-markup parsing of the file-derived strings. The
-copy lives in ONE editable home — :data:`WINDOW_HELP_SECTIONS` below — a
-faithful port of the operator-authored ``prototypes/cambios_10_12_2026/
-help_sections.md`` (that md stays the source draft; the shipped copy lives
-here, LLR-140.2). The numbering is generated at render time so the operator
-can delete/reorder steps freely (the md's own drafting notes) without ever
-leaving a gap in the sequence.
+pattern (``screens.py:416``) generalized to the authored sections: the
+title + numbered steps render through a ``markup=False`` ``Static`` so the
+copy is verbatim — no Rich/console-markup parsing of the file-derived
+strings. The copy lives in ONE editable home — :data:`WINDOW_HELP_SECTIONS`
+below — a faithful port of the operator-authored ``prototypes/cambios_10_12_2026/
+help_sections.md`` (that md stays the source draft for the nine window
+sections; the shipped copy lives here, LLR-140.2). The numbering is
+generated at render time so the operator can delete/reorder steps freely
+(the md's own drafting notes) without ever leaving a gap in the sequence.
+A tenth section (``changes_file_notation``, batch-96 / TC-1802) is
+code-authored beside the md port — it documents the v2 change-set JSON
+notation for hand-editing and is NOT part of the md fidelity census.
 
 The ninth section (``split_join_export``) ships NOW but its window is
 change 4 (inc-004) — no placeholder window is invented; a future seat calls
@@ -45,9 +48,11 @@ logger = logging.getLogger(__name__)
 # SCREEN_CONTAINER_IDS keys (``patch`` / ``checks`` / ``crc_designer`` /
 # ``map`` / ``flow`` / ``a2l`` / ``workspace``), the Reports modal uses
 # ``reports``, and the ninth authored section (Split / Join / Export) is
-# ``split_join_export`` — reserved for the inc-004 window. Every step is a
-# verbatim port of help_sections.md (numbers stripped; they re-render as
-# ``N.`` at compose time).
+# ``split_join_export`` — reserved for the inc-004 window. Every one of
+# those nine steps is a verbatim port of help_sections.md (numbers
+# stripped; they re-render as ``N.`` at compose time). The tenth key,
+# ``changes_file_notation`` (batch-96 / TC-1802), is code-authored next to
+# them — NOT an md port — and documents the v2 change-set file notation.
 
 WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     "patch": {
@@ -214,6 +219,50 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "join writes one `‹stem›_joined.‹ext›`.",
         ),
     },
+    #: Tenth section (batch-96, TC-1802 — the 2026-10-18 PDF-bug request):
+    #: CODE-authored (NOT ported from help_sections.md, so TC-707's md
+    #: fidelity census stays scoped to the nine sections above). Documents
+    #: the v2 change-set file notation (changes/io.py LLR-001.1/.2) so an
+    #: operator can hand-write a change-set JSON in a text editor. Ships
+    #: copy-only like ``split_join_export`` — no window key is consumed.
+    "changes_file_notation": {
+        "title": "Changes file notation",
+        "steps": (
+            "A change-set file is ONE JSON object (UTF-8) that you can "
+            "hand-write in any text editor, then load (`^L`) or paste into "
+            "the Patch Editor's JSON EDIT pane. The five envelope fields "
+            "are required: `format` = `s19app-changeset`, `version` = "
+            "`2.0`, `kind` = `change` (modifications) or `check` "
+            "(expected values), `encoding` = a text codec such as `utf-8`, "
+            "and `value_mode` = `text` or `codes`.",
+            "`entries` is the array of changes, applied in document order. "
+            "Each entry carries `type` — `bytes` or `string` — and an "
+            "`address`; a `bytes` entry adds `bytes` (uppercase two-hex-"
+            "digit tokens separated by spaces, e.g. `DE AD BE EF`), while "
+            "a `string` entry adds `value` — the literal text under "
+            "`value_mode: text`, or an array of code points under `codes`.",
+            "`address` is a `0x…` hex string such as `0x800020` (a plain "
+            "non-negative integer also parses). An entry may add the "
+            "optional `symbol` with an A2L tag name, but the resolved "
+            "address always stays beside it; unknown extra keys are "
+            "ignored on load.",
+            "The smallest hand-written change-set — one 4-byte patch at "
+            "`0x800020`:\n"
+            "```json\n"
+            "{\n"
+            '  "format": "s19app-changeset",\n'
+            '  "version": "2.0",\n'
+            '  "kind": "change",\n'
+            '  "encoding": "utf-8",\n'
+            '  "value_mode": "text",\n'
+            '  "entries": [\n'
+            '    {"type": "bytes", "address": "0x800020", "bytes": '
+            '"DE AD BE EF"}\n'
+            "  ]\n"
+            "}\n"
+            "```",
+        ),
+    },
 }
 
 #: The eight shipped surfaces that seat an affordance (the ninth section,
@@ -278,7 +327,7 @@ class WindowHelpScreen(ModalScreen[None]):
 
     Summary:
         Generalizes the shipped :class:`VariantHelpScreen` pattern from
-        one fixed paragraph to the authored nine-section census: the body
+        one fixed paragraph to the authored sections: the body
         renders the section's numbered steps through a ``markup=False``
         ``Static`` — the copy is operator-editable file-derived text, so
         no Rich/console-markup metacharacter (``**`` / backticks /

@@ -5506,6 +5506,65 @@ class S19TuiApp(App):
             return ImageSource(kind=SOURCE_PROJECT_VARIANT, variant_id=variant_id)
         return ImageSource(kind=SOURCE_EXTERNAL, raw_path=raw_path)
 
+    def _diff_sources_identical(self, event: AbDiffPanel.CompareRequested) -> bool:
+        """
+        Summary:
+            Detect an A↔B compare request whose two sides resolve to the same
+            on-disk file, which would silently compare the image against
+            itself (BUG B7, operator report 2026-10-18): the B path input
+            keeps its stale previous value when the OS clipboard paste fails
+            silently (see ``OsClipboardInput.action_paste``), so the request
+            arrives with the A path on both sides. The parse/compare itself
+            has no cache — this stale-input routing is the whole bug.
+
+        Args:
+            event (AbDiffPanel.CompareRequested): The raw image-pair selection.
+
+        Returns:
+            bool: ``True`` when both sides are the same file: identical raw
+            strings, or two external paths that both resolve through
+            ``resolve_input_path`` to the same file. Variant-vs-variant with
+            the same id also counts; anything else (including an
+            unresolvable side, which the service will refuse named) is
+            ``False``.
+
+        Data Flow:
+            - Same variant id on both selects → identical.
+            - Mixed kinds (variant vs external) → never identical.
+            - External/external: identical raw strings → identical; otherwise
+              resolve both against ``self.base_dir`` with the same
+              ``resolve_input_path`` the compare flow uses and compare.
+
+        Dependencies:
+            Uses:
+                - ``resolve_input_path``
+            Used by:
+                - ``_apply_compare_request`` (early guard)
+        """
+        if event.variant_a is not None or event.variant_b is not None:
+            return (
+                event.variant_a is not None
+                and event.variant_a == event.variant_b
+            )
+        raw_a = (event.path_a or "").strip()
+        raw_b = (event.path_b or "").strip()
+        # Empty-on-both-sides is NOT "the same file" — it is "no file at
+        # all", and the service's own refusal names the empty side. Routing
+        # it here would replace that named diagnostic with a misleading
+        # same-file message (caught by the diff suites driving the shipped
+        # button with untouched inputs).
+        if raw_a and raw_a == raw_b:
+            return True
+        if not raw_a or not raw_b:
+            return False
+        resolved_a = resolve_input_path(Path(raw_a), self.base_dir)
+        resolved_b = resolve_input_path(Path(raw_b), self.base_dir)
+        return (
+            resolved_a is not None
+            and resolved_b is not None
+            and resolved_a == resolved_b
+        )
+
     async def on_ab_diff_panel_compare_requested(
         self, event: AbDiffPanel.CompareRequested
     ) -> None:
@@ -5563,6 +5622,18 @@ class S19TuiApp(App):
                 - Textual message dispatch for ``AbDiffPanel``
         """
         panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        # BUG B7 guard (operator report 2026-10-18): a silently failed OS
+        # clipboard paste leaves the B path input with its stale previous
+        # value, so the request arrives as A-vs-A and the operator reads it
+        # as "only one file was ever loaded". Refuse before any compare work
+        # and name the likely cause instead of comparing a file to itself.
+        if self._diff_sources_identical(event):
+            panel.set_status(
+                "Compare refused: both sides are the same file — the B path "
+                "was not updated (clipboard paste failed?)",
+                "sev-error",
+            )
+            return
         loaded = self.current_file
         mac_records = loaded.mac_records if loaded is not None else None
         result = compare_images(

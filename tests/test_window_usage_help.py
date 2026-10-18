@@ -19,7 +19,7 @@ Coverage map (test -> TC -> LLR):
   / ``test_tc707_copy_matches_help_sections_md_verbatim`` /
   ``test_tc707_numbering_generated_sequential`` /
   ``test_tc707_boundary_no_orphan_seats_no_blank_modal``: the data home holds
-  exactly the nine authored sections under the windows' keys, each >= 3
+  the nine md-authored sections under the windows' keys, each >= 3
   numbered steps; the copy is a verbatim port of the operator's md (every
   shipped step string occurs in it, the md's per-section numbering is
   sequential and matches the step counts); the ``N.`` numbering is generated
@@ -27,6 +27,11 @@ Coverage map (test -> TC -> LLR):
   limbs — a key with no section opens nothing (never a blank modal), the
   chip/screen constructors refuse to seat an unknown key, and the eight
   shipped seats are exactly the nine keys minus ``split_join_export``.
+  Scope note (batch-96): the three md-fidelity census tests iterate
+  ``_EXPECTED_KEYS`` — the nine ``help_sections.md`` sections — because
+  that contract froze at batch-95; the data home's tenth section
+  (``changes_file_notation``, code-authored, TC-1802) is censused in
+  tests/test_changes_file_notation_help.py instead.
 - TC-706 / LLR-140.1 — ``test_tc706_affordance_opens_window_section_modal``
   (parametrized over all 8 windows): pressing the ``?`` chip pushes
   ``WindowHelpScreen`` with that window's section — the modal title is the
@@ -147,14 +152,24 @@ async def _open_via_chip(app: S19TuiApp, pilot, screen_key: str, chip_id: str):
 
 
 def test_tc707_section_census_nine_sections_min_three_steps() -> None:
-    """TC-707 (LLR-140.2 census): exactly the nine authored sections under
-    the windows' keys, each >= 3 non-empty numbered steps and a title —
-    9/9 keys, 9/9 with >= 3 steps."""
-    assert frozenset(WINDOW_HELP_SECTIONS) == _EXPECTED_KEYS, (
-        "the data home must hold exactly the nine authored sections, keyed "
+    """TC-707 (LLR-140.2 census): the nine md-authored sections stay present
+    under the windows' keys, each >= 3 non-empty numbered steps and a title —
+    9/9 keys, 9/9 with >= 3 steps.
+
+    Scope note (batch-96 / TC-1802): the census is deliberately scoped to
+    ``_EXPECTED_KEYS`` — the nine sections ported from ``help_sections.md``
+    — because that md-fidelity contract froze at batch-95. The data home
+    has since grown a tenth, CODE-authored section
+    (``changes_file_notation``) that is not an md port; its presence and
+    the exact ten-key census are asserted by tests/
+    test_changes_file_notation_help.py (TC-1802), not here.
+    """
+    assert _EXPECTED_KEYS <= frozenset(WINDOW_HELP_SECTIONS), (
+        "the data home must still hold the nine md-authored sections, keyed "
         "by the windows' keys"
     )
-    for key, section in WINDOW_HELP_SECTIONS.items():
+    for key in _EXPECTED_KEYS:
+        section = WINDOW_HELP_SECTIONS[key]
         assert isinstance(section["title"], str) and section["title"], key
         steps = section["steps"]
         assert isinstance(steps, tuple) and len(steps) >= 3, (
@@ -169,11 +184,16 @@ def test_tc707_section_census_nine_sections_min_three_steps() -> None:
 
 def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
     """TC-707 (LLR-140.2, the operator-editable home): every shipped step
-    string is a verbatim port of ``help_sections.md`` — the md is the
-    source draft, so a drifted copy edit reddens here against the source."""
+    string of the nine md-authored sections is a verbatim port of
+    ``help_sections.md`` — the md is the source draft, so a drifted copy
+    edit reddens here against the source. The batch-96
+    ``changes_file_notation`` section is code-authored (not an md port);
+    it is iterated here only if it ever lands in the md, and is covered by
+    TC-1802 otherwise."""
     md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
     normalized_md = re.sub(r"\s+", " ", md_text)
-    for key, section in WINDOW_HELP_SECTIONS.items():
+    for key in _EXPECTED_KEYS:
+        section = WINDOW_HELP_SECTIONS[key]
         title = str(section["title"])
         assert title in normalized_md, (
             f"{key}: the section title {title!r} must appear in the md"
@@ -204,7 +224,10 @@ def test_tc707_numbering_generated_sequential() -> None:
         f"every authored section must be found in the md by its title; "
         f"matched: {sorted(md_numbered_counts)}"
     )
-    for key in WINDOW_HELP_SECTIONS:
+    # Scoped to the nine md-authored sections: the batch-96
+    # ``changes_file_notation`` section is not an md port (its rendered
+    # numbering is covered by TC-1802).
+    for key in _EXPECTED_KEYS:
         body = section_body_text(key)
         paragraphs = body.split("\n\n")
         for number, paragraph in enumerate(paragraphs, start=1):

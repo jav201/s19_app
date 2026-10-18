@@ -501,12 +501,14 @@ def test_at109_no_regression_non_curve_map_untouched(tmp_path: Path) -> None:
     )
     assert meas["length"] == 1
     # (c) a synthetic CHARACTERISTIC whose header anchors no recognised kind →
-    #     char_type None (not CURVE/MAP) so the summer is not invoked → length None
+    #     B6 salvage keeps the raw kind + live address, but it is still not
+    #     CURVE/MAP, so the summer is not invoked → length None
     no_kind = _write_a2l(
         tmp_path, cname="C_NK", char_type="NOTAKIND", deposit="RL_NK",
         layout_lines=["FNC_VALUES 1 UBYTE"], axes=[("STD_AXIS", 4)], name="nk.a2l",
     )
-    assert no_kind["char_type"] is None
+    assert no_kind["char_type"] == "NOTAKIND"
+    assert no_kind["address"] == 0x1000
     assert no_kind["length"] is None
     # (d) the demo CUBOID (char_type-gate exclusion) stays None
     assert _demo_char("ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS")["length"] is None

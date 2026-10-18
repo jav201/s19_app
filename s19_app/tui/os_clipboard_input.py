@@ -367,6 +367,10 @@ class OsClipboardInput(Input):
         if not text:
             # Every source empty — surface a warning so the user knows
             # nothing was pasted and can reach for the OS-level shortcut.
+            # Selecting the current content marks the field as "stale —
+            # retype or re-paste", so a later compare cannot ride an
+            # unnoticed old value (BUG B7, 2026-10-18).
+            self.select_all()
             try:
                 self.app.notify(
                     _PASTE_FAIL_NOTIFICATION,

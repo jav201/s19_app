@@ -39,6 +39,9 @@ def test_copy_into_workarea_creates_unique_names(tmp_path):
     source.write_text("S0", encoding="utf-8")
 
     first = copy_into_workarea(source, workarea)
+    # Bug B8 content dedup: a byte-identical re-load reuses the target, so this
+    # name-dedup regression needs DIVERGENT bytes to force the ``_<N>`` suffix.
+    source.write_text("S0-updated", encoding="utf-8")
     second = copy_into_workarea(source, workarea)
 
     assert first.exists()
@@ -46,6 +49,7 @@ def test_copy_into_workarea_creates_unique_names(tmp_path):
     assert first.name == "sample.s19"
     assert second.name.startswith("sample_")
     assert second.name.endswith(".s19")
+    assert second.read_text(encoding="utf-8") == "S0-updated"
 
 
 def test_find_repo_root_detects_marker(tmp_path):

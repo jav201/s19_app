@@ -481,7 +481,11 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
         reading the 7 positional mandatory params from there:
         ``Type Address Deposit MaxDiff Conversion LowerLimit UpperLimit``. Fails
         closed (returns ``None``) when no kind token is present or fewer than 7
-        tokens follow it — never raises ``IndexError``.
+        tokens follow it — never raises ``IndexError``. A header whose ``Type``
+        is a tool-specific kind outside ``CHARACTERISTIC_KINDS`` (B6 — the
+        vendor layouts with ``DIRECT``/``NO_AXIS_PTS_*``) is salvaged: the raw
+        kind is kept and the same 7 params are read from the shaped Type slot,
+        so the label keeps its live address instead of degrading to ``None``.
 
     Args:
         tokens (list[str]): Comment-stripped, quote-respecting header tokens
@@ -497,12 +501,14 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
 
     Data Flow:
         - Find the first token in ``CHARACTERISTIC_KINDS`` (the anchor).
+        - No known kind → fall back to ``_extended_kind_anchor`` (B6 salvage).
         - Slice 7 params from the anchor; ``None`` if the slice is short.
         - Parse the address via ``int(x, 0)``; ``ValueError`` → ``None`` address.
 
     Dependencies:
         Uses:
-            - ``CHARACTERISTIC_KINDS``
+            - ``CHARACTERISTIC_KINDS`` ; ``MEASUREMENT_BODY_KEYWORDS`` ;
+              ``_extended_kind_anchor``
         Used by:
             - ``parse_characteristic_header`` ; ``assemble_characteristic_header``
 
@@ -524,6 +530,12 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
             anchor = idx
             break
     if anchor is None:
+        # B6: an extended tool-specific kind is not in CHARACTERISTIC_KINDS,
+        # but a header whose Type slot is followed by a parseable address is
+        # still ASAP2-shaped — salvage it so the label survives (raw kind,
+        # live address) instead of losing the whole header to address=None.
+        anchor = _extended_kind_anchor(tokens)
+    if anchor is None:
         return None
     params = tokens[anchor : anchor + 7]
     if len(params) < 7:
@@ -542,6 +554,36 @@ def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
         "upper_limit": params[6],
         "datatype": None,
     }
+
+
+def _extended_kind_anchor(tokens: list[str]) -> Optional[int]:
+    """Locate a shaped ``Type`` slot carrying an unknown (extended) kind.
+
+    B6: some tools emit a CHARACTERISTIC whose ``Type`` is outside
+    ``CHARACTERISTIC_KINDS`` (e.g. the vendor kind paired with the
+    ``FNC_VALUES … DIRECT / NO_AXIS_PTS_*`` layouts). The first pass then finds
+    no anchor and the whole header — address included — used to be discarded.
+    A token is a salvage anchor only when it can plausibly BE a Type: not a
+    known kind, not a body keyword, not itself a number, and immediately
+    followed by an ``int(x, 0)``-parseable address with ≥7 params remaining.
+    Everything else (keyword bodies like ``ECU_ADDRESS 0x… LENGTH …``) still
+    yields ``None``.
+    """
+    for idx in range(0, len(tokens) - 6):
+        candidate = tokens[idx]
+        if candidate in CHARACTERISTIC_KINDS or candidate in MEASUREMENT_BODY_KEYWORDS:
+            continue
+        try:
+            int(candidate, 0)
+            continue  # an address/number token, never a Type identifier
+        except ValueError:
+            pass
+        try:
+            int(tokens[idx + 1], 0)
+        except (ValueError, IndexError):
+            continue  # no parseable address right after → not a header Type slot
+        return idx
+    return None
 
 
 def parse_characteristic_header(line: str) -> Optional[dict]:
@@ -567,7 +609,7 @@ def assemble_characteristic_header(lines: list[str]) -> Optional[dict]:
         Optional[dict]: Same shape as ``parse_characteristic_header`` (shipped
         keys ``char_type``/``address_inline``/``deposit``/``max_diff``/
         ``conversion``/``lower_limit``/``upper_limit``/``datatype``), or ``None``
-        when no kind token / fewer than 7 params.
+        when no kind token / no shaped extended-kind slot / fewer than 7 params.
 
     Raises:
         None.
@@ -1043,14 +1085,11 @@ def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: d
                     break
     if decode_token is None:
         return None
+    # B6: token[1] of every ASAM RECORD_LAYOUT component line is the POSITION
+    # INDEX, never a count — the first line's first number must not inflate
+    # the decode unit (only the full multi-line span via
+    # ``_record_layout_full_span`` may sum counts).
     element_count = 1
-    if tokens:
-        try:
-            numeric = [int(tok, 0) for tok in tokens if tok.replace("-", "").isdigit()]
-            if numeric:
-                element_count = max(1, numeric[0])
-        except ValueError:
-            element_count = 1
     byte_size = DATATYPE_SIZES.get(decode_token, 0) * max(1, element_count)
     return {
         "decode_type": decode_token,

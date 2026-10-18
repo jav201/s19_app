@@ -107,7 +107,14 @@ from tools.id_registry import (
 # batch-94 Inc-004 (2026-10-14): 179 -> 180, measured — the issues-triage
 # increment adds ``tests/test_tui_issues_triage_b94.py`` (AT-B94-14,
 # TC-B94-18, 19).
-EXPECTED_SCANNED_TEST_FILES = 180
+# batch-96 pdf-bugs (2026-10-18): 180 -> 184, measured — the operator's
+# 2026-10-18 scan ships four modules: ``tests/test_copy_into_workarea_content_dedup.py``
+# (B8 content dedup, TC-1800), ``tests/test_diff_same_path_guard.py`` (B7 the
+# same-file compare guard, TC-1801), ``tests/test_changes_file_notation_help.py``
+# (the changes-file notation help section, TC-1802) and
+# ``tests/test_a2l_record_layout_address.py`` (B6 the extended-kind header
+# salvage, TC-1803).
+EXPECTED_SCANNED_TEST_FILES = 184
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds
