@@ -19,7 +19,7 @@ out-of-scope carries · test ledger · decision log (the human-readable mirror o
 | Project | s19_app |
 | Batch | 2026-10-12-batch-94 |
 | Objective | Cambio1-7: Flow Builder por bloques (fb_a) + Flow Execution (fx_a) + split Patch/Check Editor (pe_a/ce_b) -- A2B configurable por bloque con procedencia en el reporte, check-spec .chk.json (write/validate only), control secuencial(default)/paralelo, ruteo de cables refinado. Design input: 4 SVG ganadores en G:/My Drive/dev-flow-radiografia/Refactor_10_11_26/Prototipos/. Coordination: COORDINACION-batch92.md (overlap screens_directionb.py con batch-93 -- second-editor-rebases rule). |
-| Last updated | P3 · increment 002 gated · 2026-10-13 |
+| Last updated | P3 · increment 003 gated · 2026-10-14 |
 | Standing authorization | Operator (Javier), 2026-10-13, answering the P0 gate kickoff: *"1.Si, autorizados; 2.autorizo los merges; 3.Modo full."* — read as: **(1) end-to-end autonomy** over the gates this batch commissions; **(2) merge authority granted — and the merge stays gated**: after the PR is opened and CI is green, one final independent PR-level `qa-reviewer` pass over the WHOLE merged diff vs `main` must come back clean before the agent merges; a HIGH finding blocks the merge and returns to the operator; **(3) mode `full` confirmed**. Autonomy is never silent: every autonomous decision is summarized in this PLAN's decision log, `state.json.decisions_log`, the postmortem decisions summary, and carried to the vault at `/dev-flow-sync`. Per `shared-batch.md` §Batch-kickoff authorization: per-batch, never carried from a prior batch; the `standing_authorization` key is deleted from `state.json` with this cell its one record. |
 | First gate | Record-seed gate (pre-P0): exit 0 — `0 block · 374 notice · 48 n/a`; `V7` raised no finding (bundle mirror `2026-10-12-rev102` self-consistent, 57 declared files both directions). Tool-proving run, not the batch. |
 | Premises / RC-1 | Verified `origin/main` tip at intake: **`1a0eff6`** (2026-10-13; RC-2 answered). Two more RC-1 rebases the same day (legends batch close + completion); `base_ref` re-stamped per RC-1's literal rule to **`8e056bd`** (HEAD at the stamp; peer-verified reading). Flow currency (C-45 PULL): bundle mirror, not a git checkout — probe = `V7` + `FLOW-VERSION.md` `2026-10-12-rev102`. Premises: `01-requirements.md` §2.7 (9 rows, all TRUE). |
@@ -52,7 +52,7 @@ Stations: ARQ/PDR discharged 2026-10-13; DDR ahead at P4.
 
 ## Where we are
 
-P0, ARQ, P1, P2, PDR gates and **increment 001** CLOSED 2026-10-13 under the standing grant (decisions_log entries 1–6). The editors shipped: pe_b rework + ce_a Check Editor + `.chk.json` + A2B addendum + rail 11 (24 AT/TC nodes). Mid-increment, batch-95 landed 4 increments on main — two RC-1 rebases absorbed them (union resolutions, both lanes green). Current: **Inc-003** (fx_a Flow Execution) — its cut starts with RC-1 #6 (main +2 at Inc-002's gate; five RC-1 rebases so far, all union-resolved with both lanes green). Inc-001 and Inc-002 are gated (decisions_log 7).
+P0, ARQ, P1, P2, PDR gates and **increment 001** CLOSED 2026-10-13 under the standing grant (decisions_log entries 1–6). The editors shipped: pe_b rework + ce_a Check Editor + `.chk.json` + A2B addendum + rail 11 (24 AT/TC nodes). Mid-increment, batch-95 landed 4 increments on main — two RC-1 rebases absorbed them (union resolutions, both lanes green). Current: **Inc-004** (Issues warnings triage, US-004 — 1 source file, `issues_view.py`) — the LAST increment. Inc-001/002/003 are gated (decisions_log 8); the rail is complete at 12; batch-95 is CLOSED (six RC-1 rebases total, all union-resolved).
 
 ## Objective
 
@@ -71,7 +71,7 @@ P0, ARQ, P1, P2, PDR gates and **increment 001** CLOSED 2026-10-13 under the sta
 | US-007 (Cambio7, Flow Execution) | contracted → Inc-003 | HLR-017–021 |
 | US-008/US-009 | OUT | file to lane A at close |
 | P0 / ARQ / P1 / P2 / PDR | CLOSED 2026-10-13 | decisions_log 1–5 |
-| P3 | Inc-001 + Inc-002 GATED 2026-10-13 | both packets + batteries + code-reviews clean; Inc-003 (fx_a) next |
+| P3 | Inc-001/002/003 GATED | all packets + batteries + reviews clean (Inc-003: clean with 2 LOWs recorded); Inc-004 next |
 
 ## Roadmap + increment plan
 
@@ -96,6 +96,8 @@ P0, ARQ, P1, P2, PDR gates and **increment 001** CLOSED 2026-10-13 under the sta
 | 2026-10-13 | Inc-001 gated: the editors shipped (4 source files at cap; 24 AT/TC nodes; rail 10→11 with `=`); the battery 23 arms all RED (5 inert arms re-asserted in fix round A); code-review found F1 (a duplicated `push_screen(LoadGuardScreen())` — two stacked modals, execution-proven), folded and re-verified clean | HLR-001..011 realized; the union tree carries batch-95's four increments green |
 | 2026-10-13 | batch-95 coordination: FIVE RC-1 rebases so far (unions in `app.py`, `flow_execution_service.py`, `diff_report_service.py`, the tc028 allow-set, corpus 173→177); both lanes green at every union | the second-editor-rebases rule, applied at each cut |
 | 2026-10-13 | Inc-002 gated: fb_a shipped at `flow_screens.py` (B2 done; C-2 reproduced), A2B block additive to batch-95's shapes (86 compat green), templates with dedup; C-1 discharged; review clean (one LOW → lane A: the stale SaveFlowScreen overwrite-notice) | HLR-013..016 realized |
+| 2026-10-14 | Inc-003 gated: fx_a shipped — lanes/rebind/mode/run-log, chain-set runner (barrier-proven parallel), provenance report, ChainSet envelope; rail 12 with `]` (D5 complete; C-3 discharged); battery 15/15 RED after a C-56 catch; review clean (2 LOWs) | HLR-017..021 realized; only AT-B94-14 unlanded |
+| 2026-10-14 | batch-95 IFC debt declared: its closed record's 5 blocks (2 V10 + 3 V14) are pre-existing-on-main baseline; crossed with the 0-new rule; permanent fix proposed in the coordination note | V53 — no re-anchoring another lane's sealed record |
 
 ## Risks / watch-items
 
