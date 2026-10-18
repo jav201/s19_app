@@ -143,6 +143,11 @@
    "station": "P3",
    "date": "2026-10-14",
    "decision": "increment 003 approved under the standing authorization -- the fx_a Flow Execution shipped: FlowExecutionPanel (lanes/rebind/mode/run-log), the chain-set runner (sequential default, barrier-proven parallel-per-chain, per-run provenance, the chain-set report), the ChainSet envelope (workarea-contained, fail-closed), rail 12 with ']' (D5 freeze complete, C-3 discharged: AT-B94-02 pins its pilot sizes incl. the 80x24 arm, rail 12 rows measured); battery 10 arms 15/15 RED after an honest C-56 first-round catch (2 test-side defects fixed and the full battery re-run); code-reviewer clean (2 LOWs: the move-aside hash skew L1, the empty-outputs leniency L2 -- both recorded); the gate's 6 BLOCKs are walked past and declared: 1 station-expected V2 (AT-B94-14 -> Inc-004, the only unlanded AT) + 5 PRE-EXISTING-ON-MAIN blocks in batch-95's CLOSED record (2 V10 multi-owner nodes + 3 V14 prose-consumers in its IFC blocks -- byte-equal to origin/main since rebase #6; routed to the validator-gate owners via the coordination note, not introduced by this batch); Inc-004 (Issues warnings triage, 1 source file) is the last increment."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "increment 004 approved under the standing authorization -- the Issues warnings triage shipped: view-level reclassification over the contract's 21-family curated set (all 1023 findings to INFO with justification; FROBNICATE and non-curated names stay warnings), the engine frozen and byte-pinned in-run (TC-B94-18 + battery arm 06), the strip/summary folded to the single arithmetic site (2/4 source), AT-B94-14 the LAST acceptance id -- ALL 24 AT-B94 ids are now landed and the V2 station-expected family is EMPTY at this gate; battery 7 arms 12/12 RED; code-reviewer clean with the judgment question answered (no HLR-012 violation on the shipped surface; F1 workspace-stats raw tally = major recorded with owner P4-or-lane-A; F2 filter chrome = minor recorded); the gate's remaining 5 BLOCKs are the batch-95 closed-record baseline (2 V10 + 3 V14, byte-equal to main since rebase #6, declared and routed via the coordination note); P3 is COMPLETE -- the DDR is next, then P4 validation."
   }
  ],
  "obsidian_synced": false,
