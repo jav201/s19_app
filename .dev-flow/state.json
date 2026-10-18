@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P3",
+ "current_station": "P4",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -148,6 +148,16 @@
    "station": "P3",
    "date": "2026-10-18",
    "decision": "increment 004 approved under the standing authorization -- the Issues warnings triage shipped: view-level reclassification over the contract's 21-family curated set (all 1023 findings to INFO with justification; FROBNICATE and non-curated names stay warnings), the engine frozen and byte-pinned in-run (TC-B94-18 + battery arm 06), the strip/summary folded to the single arithmetic site (2/4 source), AT-B94-14 the LAST acceptance id -- ALL 24 AT-B94 ids are now landed and the V2 station-expected family is EMPTY at this gate; battery 7 arms 12/12 RED; code-reviewer clean with the judgment question answered (no HLR-012 violation on the shipped surface; F1 workspace-stats raw tally = major recorded with owner P4-or-lane-A; F2 filter chrome = minor recorded); the gate's remaining 5 BLOCKs are the batch-95 closed-record baseline (2 V10 + 3 V14, byte-equal to main since rebase #6, declared and routed via the coordination note); P3 is COMPLETE -- the DDR is next, then P4 validation."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "P3 complete under the standing authorization -- all four increments gated (001 editors, 002 fb_a Flow Builder + B2, 003 fx_a Flow Execution + rail 12, 004 warnings triage); 24/24 AT ids landed; the DDR ran with three lenses and its record is sealed (approved with conditions; COND-1 the map flip discharged pre-seal in the same commit; COND-2 the AT-B94-24 two-node realization ratified); DDR is next."
+  },
+  {
+   "station": "DDR",
+   "date": "2026-10-18",
+   "decision": "DDR gate closed under the standing authorization -- every PDR condition discharged by re-reading (C-1..C-3, C-ux-1/2); carried notes: F3 the registry count line reconciles at P4, F4 the owner rulings (Inc-004 F1/F2 workspace-stats + filter chrome, the snapshot regen owner, A4 the operator field check) ride the P4/close review; the P4 gate suite runs in the background; Phase 4 validation is next."
   }
  ],
  "obsidian_synced": false,
