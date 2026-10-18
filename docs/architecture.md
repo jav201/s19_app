@@ -25,10 +25,10 @@ The CLI (`s19_app/cli.py`) is a separate, simpler consumer: it reaches the parse
 
 The TUI uses the **Direction B (Rail + Command)** layout introduced by batch `2026-05-20-batch-02`. Two persistent navigation surfaces are mounted on every screen:
 
-- **Activity rail (left).** Exactly ten ordered items bound to keys `1`–`0`, with exactly one active marker, glyph + per-item ASCII fallback. Rail items toggle ten sibling screen containers via the `.hidden` CSS class (not a `push_screen` stack), so the rail and command bar stay persistently mounted.
+- **Activity rail (left).** Exactly twelve ordered items — keys `1`–`0` plus two non-digit bindings, `=` (Check Editor) and `]` (Flow Execution), both `show=False` (batch-94's R-1 closure; probe evidence `evidence/pdr_rail_key_probe.txt` + `evidence/inc003_rail12_probe.txt`) — with exactly one active marker, glyph + per-item ASCII fallback. Rail items toggle twelve sibling screen containers via the `.hidden` CSS class (not a `push_screen` stack), so the rail and command bar stay persistently mounted.
 - **Command bar (top).** Searchable command palette (`Ctrl+K`), find input (`/` → routes to `find_string_in_mem`), go-to-address input (`g` → routes to `_handle_goto`), plus the project-name / A2L-filename status labels.
 
-### The ten rail screens
+### The twelve rail screens
 
 | Key | Container id | Screen | Status |
 |---|---|---|---|
@@ -36,14 +36,16 @@ The TUI uses the **Direction B (Rail + Command)** layout introduced by batch `20
 | 2 | `#screen_a2l` | A2L Explorer (symbol table + hex pane) | functional; enriched tags, 19-field filter, windowed rendering |
 | 3 | `#screen_mac` | MAC View (record table + hex pane) | functional; per-row status, malformed lines flagged not dropped |
 | 4 | `#screen_map` | Memory Map | functional — real coverage from `LoadedFile.ranges` plus entropy bands from `services/entropy_service.py` |
-| 5 | `#screen_issues` | Issues Report | functional — grouped, filterable, paged view of the validation engine's findings |
+| 5 | `#screen_issues` | Issues Report | functional — grouped, filterable, paged view of the validation engine's findings; batch-94 triages curated standard A2L blocks to INFO |
 | 6 | `#screen_patch` | Patch Editor | **functional** — change-set rows, validate/check, save/load v2 JSON, apply + patched-image emit, undo/redo |
+| = | `#screen_check_editor` | Check Editor | **functional** (batch-94 Inc-001) — write/validate `.chk.json` check specs, struck-APPLY no-apply doctrine |
 | 7 | `#screen_diff` | A↔B Diff | **functional** — second-image load, classified diff runs, Markdown/HTML report |
-| 8 | `#screen_flow` | Flow Builder | **functional** — typed block chain, `flow.json` persistence, variant-scoped execution with fused report |
+| 8 | `#screen_flow` | Flow Builder | **functional** — fb_a palette/canvas block builder with typed cables, template save/load (moved to `flow_screens.py`, batch-94 Inc-002) |
+| ] | `#screen_flow_execution` | Flow Execution | **functional** (batch-94 Inc-003) — per-chain lanes, input rebinding, sequential(default)/parallel runs, chain-set save/load |
 | 9 | `#screen_checks` | Checks | functional — read-only grouped-by-outcome mirror of the last check run |
 | 0 | `#screen_crc_designer` | CRC Designer | functional — parametric CRC form, preset catalogue, live known-answer verdict, `*.crc.json` templates |
 
-Fourteen modal screens complement the rail (load file, save/load project, variant select/help, change-set and entry JSON editors, flow save/load, confirm-discard, confirm-write, legend, report viewer, operations). The batch-02 **Bookmarks** screen no longer exists — the rail's last three slots are Flow Builder, Checks and CRC Designer.
+Fourteen modal screens complement the rail (load file, save/load project, variant select/help, change-set and entry JSON editors, flow save/load, confirm-discard, confirm-write, legend, report viewer, operations). The batch-02 **Bookmarks** screen no longer exists — the rail's last three slots are Flow Execution, Checks and CRC Designer (batch-94 grew the rail 10→12: Check Editor on `=`, Flow Execution on `]`, both `show=False`).
 
 ### Two-regime responsive layout
 
@@ -360,11 +362,11 @@ Loses `safe_text` + `_CONTROL_SCRUB` (→ `utils.py`, R6/R7); becomes their cons
 
 **Registered as flow input for batch-92 (from the batch record §6.3 — checker expressiveness).** The staleness checker's `startswith(prefix + "/")` rule cannot express a hole in `s19_app/**` — the same expressive limit as the root-level `setup.py` case named above. The rule should either admit exclusion patterns or state that sub-package carve-outs are expressed as in-product declarations (as `render/` is declared here); otherwise a future genuinely-independent render interface silently reads as *stale map*.
 
-### Batch-94 declarations — the editor split and the flow surfaces *(planned)*
+### Batch-94 declarations — the editor split and the flow surfaces
 
-*`2026-10-12-batch-94` (Cambio1–7: Patch/Check Editor split + rework, Flow Builder redesign, Flow Execution). The six-module cut stands: the one NEW module is declared at **sub-module granularity inside product**, following the `render/` precedent (batch-92 rationale #1's overlap rule). All entries below are **planned** — each lands with its increment and the declaration's tense flips then. Evidence: the batch record's `design/module-map-delta.md` (authored at ARQ); spike design input `flow_bench.NOTES.md` / `editor_bench.NOTES.md` (operator decisions D1–D5).*
+*`2026-10-12-batch-94` (Cambio1–7: Patch/Check Editor split + rework, Flow Builder redesign, Flow Execution). The six-module cut stands: the one NEW module is declared at **sub-module granularity inside product**, following the `render/` precedent (batch-92 rationale #1's overlap rule). **All entries below landed** — each declaration names the increment that landed it (Inc-001…004) and the batch-94 work is complete. Evidence: the batch record's `design/module-map-delta.md` (authored at ARQ, landed with the batch's close); spike design input `flow_bench.NOTES.md` / `editor_bench.NOTES.md` (operator decisions D1–D5).*
 
-#### NEW `s19_app/tui/flow_screens.py` (planned, Inc-002/003)
+#### NEW `s19_app/tui/flow_screens.py` (landed — Inc-002 fb_a step, Inc-003 fx_a step)
 
 | Viewpoint | Declaration |
 |---|---|
@@ -375,31 +377,31 @@ Loses `safe_text` + `_CONTROL_SCRUB` (→ `utils.py`, R6/R7); becomes their cons
 | **Deps — allowed** | `textual`, `s19_app.utils.safe_text` (C-17 sink), `tui/insight_style` constants, read-only engine/types. |
 | **Deps — forbidden** | `s19_app.validation` internals beyond the read-only consumer posture; `tui/services/*` imports into view logic (routing messages out, services in — never called directly). |
 
-#### CHANGED `s19_app/tui/screens_directionb.py` (planned, Inc-001, Inc-002 step)
+#### CHANGED `s19_app/tui/screens_directionb.py` (landed — Inc-001 editor split, Inc-002 B2 vacate)
 
-Keeps: every existing surface (Memory Map from batch-93, the A↔B Diff host, the editors' siblings). **Inc-001:** `PatchEditorPanel` is reworked in place (pe_a: single-file editing — variant selector removed, Edit-JSON + validate flow, dirty-guarded Load, Apply-loaded-changes) and gains its check twin `CheckEditorPanel` (ce_b: report-oriented, `.chk.json` content panel, write/validate only). **Inc-002 step:** loses `FlowBuilderPanel` (→ `flow_screens.py`, B2 move census below). Remains the Direction-B shell; the C-34 full-guard-host obligation stays with this file for every render increment that touches it.
+Keeps: every existing surface (Memory Map from batch-93, the A↔B Diff host, the editors' siblings). **Inc-001:** `PatchEditorPanel` is reworked in place (pe_b: single-file editing — variant selector removed, Edit-JSON + validate flow, dirty-guarded Load, Apply-loaded-changes) and gains its check twin `CheckEditorPanel` (ce_a: report-oriented, `.chk.json` content panel, write/validate only). *(Naming ratified per the contract's HLR-001/003 rationales: the shipped twins are **pe_b + ce_a with ce_b folded in** — the spike's "pe_a/ce_b" survives only as §2.6 shorthand in older contract text.)* **Inc-002 step:** loses `FlowBuilderPanel` (→ `flow_screens.py`, B2 move census below). Remains the Direction-B shell; the C-34 full-guard-host obligation stays with this file for every render increment that touches it.
 
-#### CHANGED `s19_app/tui/services/flow_*` (planned, Inc-002/003)
+#### CHANGED `s19_app/tui/services/flow_*` (landed — Inc-002 builder/A2B/templates, Inc-003 execution/chain-set)
 
 The flow services (`flow_model.py`, `flow_execution_service.py`, `flow_report_service.py`, `flow_fused_report_service.py` — all existing) grow the execution semantics US-005/007 require: builder templates (flow save/load beyond today's `flow.json`), chain composition with per-chain input provenance recorded in the report (operator decision D1), sequential(default)/parallel-per-chain run control (D4), chain-set save/load (inputs + outputs, US-007). The A2B diff block is configurable per block with both inputs declared as flow-output-or-file and the provenance stated in the report. Dependency direction unchanged: services consume `changes/` + `operations/` + engine read-only; the view (`flow_screens`) never enters them.
 
-#### CHANGED `s19_app/tui/changes/io.py` (planned, Inc-001)
+#### CHANGED `s19_app/tui/changes/io.py` (landed — Inc-001)
 
-Gains the **suffix-distinguished** `.chk.json` save/load path: same `s19app-changeset` v2 wire grammar, `kind="check"` documents, no schema change (operator ruling from the spike — no `from`/`to` fields, `DUMMY_CHANGESET_TEXT` shape at `io.py:136` is the reference). **No change to `apply.py` is needed for the "check files must never apply" ruling — `apply_change_document` already gates on `kind != "change"` (zero writes); the ce_b panel adds no apply path.** The A2B Diff file dropdown gains the check-spec listing (suffix-filtered, same directory).
+Gains the **suffix-distinguished** `.chk.json` save/load path: same `s19app-changeset` v2 wire grammar, `kind="check"` documents, no schema change (operator ruling from the spike — no `from`/`to` fields, `DUMMY_CHANGESET_TEXT` shape at `io.py:136` is the reference). **No change to `apply.py` is needed for the "check files must never apply" ruling — `apply_change_document` already gates on `kind != "change"` (zero writes); the ce_a panel adds no apply path.** The A2B Diff file dropdown gains the check-spec listing (suffix-filtered, same directory).
 
-#### CHANGED `s19_app/tui/app.py` (planned, all increments)
+#### CHANGED `s19_app/tui/app.py` (landed — Inc-001…004)
 
-Rail grows **10 → 12** surfaces: `Check Editor` and `Flow Execution` entries (placement + key binding decided at P1/PDR — the `1`–`0` key space is exhausted, a stated design question, not silently resolved here). Routing handlers for the two new panels (message → service, the §4 pattern); the guard-host rail census constants (`EXPECTED_RAIL`, screen counts) move with the increments that land the surfaces.
+Rail grew **10 → 12** surfaces: the `Check Editor` and `Flow Execution` entries landed with keys `=` and `]` respectively — both `show=False`, ratified at the PDR by the executed rail-key probe (the `1`–`0` digit space is exhausted; the F-key candidates were rejected as terminal-swallow hazards). Routing handlers for the two new panels (message → service, the §4 pattern); the guard-host rail census constants (`EXPECTED_RAIL`, screen counts) moved with the landing increments (11 at Inc-001, 12 at Inc-003, LLR-002.2 — never before).
 
-#### The US-004 seam — a frozen-layer flag (decided at P1, not here)
+#### The US-004 seam — a frozen-layer flag (decided at P1: view-level; landed Inc-004)
 
-The warnings triage (`A2L_UNRECOGNIZED_BLOCK` class) has two candidate seams: **parser-level** recognition in `s19_app/tui/a2l.py` / `s19_app/validation/rules.py` (both frozen per §7) — which "changes the engine's stability story and must be called out in the requirements phase" — or **view-level** reclassification in the Issues surface. ARQ declares the candidates and their costs; P1 picks with the freeze consequence stated. No module boundary moves either way.
+The warnings triage (`A2L_UNRECOGNIZED_BLOCK` class) has two candidate seams: **parser-level** recognition in `s19_app/tui/a2l.py` / `s19_app/validation/rules.py` (both frozen per §7) — which "changes the engine's stability story and must be called out in the requirements phase" — or **view-level** reclassification in the Issues surface. ARQ declared the candidates and their costs; P1 picked the **view-level** seam (R12) with the freeze consequence stated, and it shipped in Inc-004: the curated-set reclassification in `issues_view.py` with the engine frozen (the in-run byte-check, TC-B94-18). No module boundary moves either way.
 
-#### Batch-94 dependency amendments (planned)
+#### Batch-94 dependency amendments (landed)
 
-**New edges (allowed, declared):** `flow_screens → utils.safe_text` / `insight_style` (view posture, same as `screens_directionb`) · `services/flow_* → changes/io.py` (`.chk.json` path) — both the permitted directions.
+**New edges (allowed, declared):** `flow_screens → utils.safe_text` / `insight_style` (view posture, same as `screens_directionb`) · `services/flow_* → changes/io.py` (`.chk.json` path) — both the permitted directions · `flow_screens → services/flow_model` (read-only data import of the block-type constants/dataclasses — `A2BBlock` / `BLOCK_A2B` at `flow_screens.py:71-75`, landed with Inc-002's A2B block; the view→model posture per `screens_directionb.py`'s historic idiom, declared at the PDR so a future dependency radiografía does not "fix" it).
 
-**B2 move census owed (Inc-002):** `FlowBuilderPanel`'s address change `screens_directionb → flow_screens` triggers the reader census (C-14): `grep -rl "FlowBuilderPanel\|screen_flow" tests/ s19_app/` — known consumers today: `tests/test_flow_builder_render.py`, `tests/test_flow_crc_block.py`, `tests/test_flow_crc_ribbon.py`, the guard host (`test_tui_directionb.py` rail/screen census), `app.py` routing. The census re-runs at the increment cut and its output lands in the packet.
+**B2 move census (Inc-002 — executed):** `FlowBuilderPanel`'s address change `screens_directionb → flow_screens` triggers the reader census (C-14): `grep -rl "FlowBuilderPanel\|screen_flow" tests/ s19_app/` — known consumers today: `tests/test_flow_builder_render.py`, `tests/test_flow_crc_block.py`, `tests/test_flow_crc_ribbon.py`, the guard host (`test_tui_directionb.py` rail/screen census), `app.py` routing. The census re-ran at the increment cut and its output lands in the packet.
 
 **Parallelisation-rule verdict (mechanical):** with the flow surfaces **in** `screens_directionb.py`, Inc-001 ∩ Inc-002 = {`screens_directionb.py`} ∪ {`app.py`} ≠ {} — the increments would not be parallelisable. The rule's second exit is taken **here in ARQ**: the module boundary moves (`flow_screens.py`), after which Inc-001's and Inc-002/003's file sets are disjoint except `app.py` rail rows, which are touched by every increment sequentially anyway. In this batch the increments still run sequentially (A4 not fired, one worktree); the re-cut is what keeps the increments separable for review and future parallel lanes.
 
@@ -456,12 +458,12 @@ trigger A3 and is never done inside a lane):
 | `utils.safe_text` contract | product (`s19_app/utils.py`) | **security contract** (context viewpoint feeding the security family): delete every C0/DEL/C1 codepoint (`_CONTROL_SCRUB`, LLR-116.7), wrap the remainder as a literal `Text` — never `Text.from_markup` (C-17). The batch-77 precedent stands: the move must not weaken or split the two halves. Oracle: the hostile-input acceptance tests (`tests/test_tui_hostile_map.py`, `test_tui_checks_view.py`, `test_tui_issues_view.py`) | standing contract, carried with the function to its new address |
 | `tui/__init__` re-export surface | product (`s19_app/tui/__init__.py`) | the 3 range_index names are **removed** (US-92-2, breaking-by-design, consumer set fully enumerated in the batch record §5); the renderer names stay, repointed to `render.hexview` | change lands with batch-92 Inc-A |
 
-**Batch-94 interface amendments** (from `2026-10-12-batch-94`; planned — each freezes at its increment's PDR when it lands; changing any of them is trigger A3 and is never done inside a lane):
+**Batch-94 interface amendments** (from `2026-10-12-batch-94`; landed — all five froze at their named increments (`PDR-2026-10-12-batch-94#D1`–`#D5`); changing any of them is trigger A3 and is never done inside a lane):
 
 | Surface | Owner | Contract | Frozen? |
 |---|---|---|---|
-| `PatchEditorPanel.ActionRequested` contract | product (`s19_app/tui/screens_directionb.py`) | the message family the panel emits and `app.py`/`screens.py` consume (edit-json requests, entry edit-json, variant help — the variant request **retires** with the variant selector, US-002); the split adds the ce_b twin's sibling messages. Consumer set enumerated at P1 | pending — freezes at Inc-001's PDR |
-| `.chk.json` artifact contract | product (`s19_app/tui/changes/io.py`) | the v2 grammar with `kind="check"`, distinguished from patch files by **suffix** in the A2B Diff dropdown listing; **write/validate only — never applied** (`apply.py`'s `kind != "change"` gate is the enforcement, not convention); consumed by the A2B Diff report builder (provenance in report) | pending — freezes at Inc-001's PDR |
-| `flow_screens` module surface | product (`s19_app/tui/flow_screens.py`) | the two panel classes + message types of R8; `FlowBuilderPanel`'s address change is B2 — the reader census output lands in Inc-002's packet | pending — freezes at Inc-002's PDR |
-| flow template / chain-set artifacts | product (`s19_app/tui/services/flow_*`) | the persisted JSON shapes: builder templates (flow save/load) and chain-sets (chains + inputs + outputs, US-007); input provenance recorded per run in the report (operator decision D1); sequential(default)/parallel-per-chain control (D4) | pending — freezes at Inc-002/003's PDR |
-| rail invariant | product (`s19_app/tui/app.py`) | "exactly ten ordered items bound to `1`–`0`" becomes twelve surfaces; the census constants (`EXPECTED_RAIL`, screen counts) and the guard-host assertions move with the landing increments — never before (a census updated early green-lights nothing) | pending — moves with each landing increment |
+| `PatchEditorPanel.ActionRequested` contract | product (`s19_app/tui/screens_directionb.py`) | the message family the panel emits and `app.py`/`screens.py` consume (edit-json requests, entry edit-json, variant help — the variant request **retires** with the variant selector, US-002); the split adds the ce_a twin's sibling messages. Consumer set enumerated at P1 | **✅ frozen at Inc-001** (`PDR-2026-10-12-batch-94#D1`) |
+| `.chk.json` artifact contract | product (`s19_app/tui/changes/io.py`) | the v2 grammar with `kind="check"`, distinguished from patch files by **suffix** in the A2B Diff dropdown listing; **write/validate only — never applied** (`apply.py`'s `kind != "change"` gate is the enforcement, not convention); consumed by the A2B Diff report builder (provenance in report) | **✅ frozen at Inc-001** (`PDR-2026-10-12-batch-94#D2`) |
+| `flow_screens` module surface | product (`s19_app/tui/flow_screens.py`) | the two panel classes + message types of R8; `FlowBuilderPanel`'s address change is B2 — the reader census output landed in Inc-002's packet | **✅ frozen at Inc-002** (`PDR-2026-10-12-batch-94#D3`) |
+| flow template / chain-set artifacts | product (`s19_app/tui/services/flow_*`) | the persisted JSON shapes: builder templates (flow save/load) and chain-sets (chains + inputs + outputs, US-007); input provenance recorded per run in the report (operator decision D1); sequential(default)/parallel-per-chain control (D4) | **✅ frozen in halves — template at Inc-002, chain-set at Inc-003** (`PDR-2026-10-12-batch-94#D4`) |
+| rail invariant | product (`s19_app/tui/app.py`) | "exactly ten ordered items bound to `1`–`0`" became twelve surfaces (`=` Check Editor, `]` Flow Execution, both `show=False`); the census constants (`EXPECTED_RAIL`, screen counts) moved with the landing increments — 11 at Inc-001, 12 at Inc-003 — never before (a census updated early green-lights nothing) | **✅ frozen complete at Inc-003 (12 entries)** (`PDR-2026-10-12-batch-94#D5`) |
