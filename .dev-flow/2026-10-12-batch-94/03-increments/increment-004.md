@@ -1,4 +1,4 @@
-# Increment 004 — US-004 · HLR-012 · `Issues warnings triage`
+# Increment 004 — HLR-012 · `Issues warnings triage`
 
 > **Artifact language**
 > This template is the canonical **English scaffold**. Generate the artifact in the batch's development
@@ -112,10 +112,10 @@ One row per file. `Kind` is one of `source` · `test` · `doc` · `config` · `g
 
 | File | Kind | Traces to | Change |
 |---|---|---|---|
-| `s19_app/tui/issues_view.py` | source | US-004 · HLR-012 · LLR-012.1/.2 | +256/−5 (261 lines total, `git diff --numstat 3d76f2a..b43f8ad`) — `CURATED_STANDARD_A2L_BLOCKS` (the 21-family curated set) + `a2l_reclassified_severity` (the public predicate) + `A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION` (author constant) + `_UNRECOGNIZED_BLOCK_RE` (the emitter-anchored strict shape) + `adjust_counts_for_a2l_triage` (the single arithmetic site) + the `render_groups` row remap (`dataclasses.replace` presentation copy, caller counts verbatim) + the module-doc seam note (no engine import) |
-| `s19_app/tui/app.py` | source | US-004 · HLR-012 · LLR-012.2 | +53/−14 (67 lines total) — the fold: the strip/summary painters' three raw severity counts and the grouped panel's `group_counts` now ride `adjust_counts_for_a2l_triage` (import + two call sites + the two doc notes); zero-delta → identical bytes to the pre-Inc-004 painters |
-| `tests/test_tui_issues_triage_b94.py` | test | US-004 · HLR-012 · LLR-012.1/.2 | NEW — 525 lines, 3 nodes: AT-B94-14 (the fixture-scale shipped-surface drive: the 1 023-census arm, the tail-window no-drop arm, the mixed arm, the negative control, the app-chrome arm) + TC-B94-18 (membership + the in-run engine byte-check) + TC-B94-19 (the panel matrix: split, empty state, the byte-identical no-op, the C-17 hostile arm) |
-| `tests/test_id_registry.py` | test | US-004 · HLR-012 | corpus census `EXPECTED_SCANNED_TEST_FILES` 179→180, measured (this increment's 1 new file) |
+| `s19_app/tui/issues_view.py` | source | HLR-012 · LLR-012.1/.2 | +256/−5 (261 lines total, `git diff --numstat 3d76f2a..b43f8ad`) — `CURATED_STANDARD_A2L_BLOCKS` (the 21-family curated set) + `a2l_reclassified_severity` (the public predicate) + `A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION` (author constant) + `_UNRECOGNIZED_BLOCK_RE` (the emitter-anchored strict shape) + `adjust_counts_for_a2l_triage` (the single arithmetic site) + the `render_groups` row remap (`dataclasses.replace` presentation copy, caller counts verbatim) + the module-doc seam note (no engine import) |
+| `s19_app/tui/app.py` | source | HLR-012 · LLR-012.2 | +53/−14 (67 lines total) — the fold: the strip/summary painters' three raw severity counts and the grouped panel's `group_counts` now ride `adjust_counts_for_a2l_triage` (import + two call sites + the two doc notes); zero-delta → identical bytes to the pre-Inc-004 painters |
+| `tests/test_tui_issues_triage_b94.py` | test | HLR-012 · LLR-012.1/.2 | NEW — 525 lines, 3 nodes: AT-B94-14 (the fixture-scale shipped-surface drive: the 1 023-census arm, the tail-window no-drop arm, the mixed arm, the negative control, the app-chrome arm) + TC-B94-18 (membership + the in-run engine byte-check) + TC-B94-19 (the panel matrix: split, empty state, the byte-identical no-op, the C-17 hostile arm) |
+| `tests/test_id_registry.py` | test | HLR-012 | corpus census `EXPECTED_SCANNED_TEST_FILES` 179→180, measured (this increment's 1 new file) |
 
 | Count | Value |
 |---|---|
