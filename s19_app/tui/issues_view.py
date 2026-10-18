@@ -18,6 +18,26 @@ markup-parsing widget over the raw value. A loaded symbol such as ``sensor[red]`
 ``.symbol``/``.code`` are never scrubbed upstream (``validation/model.py`` is
 engine-frozen), so this render layer is the sole defense.
 
+Batch-94 Inc-004 (US-004 / HLR-012 / LLR-012.1/.2) adds the
+``A2L_UNRECOGNIZED_BLOCK`` warnings triage (Cambio4): findings whose block
+name belongs to the curated ASAP2 standard-keyword set
+(:data:`CURATED_STANDARD_A2L_BLOCKS`, seeded from the executed 2026-10-13
+fixture tally) are reclassified WARNING → INFO at presentation time in
+:meth:`GroupedIssuesPanel.render_groups` — reclassification, never suppression
+(D-6) — with the author-constant justification
+:data:`A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION` rendered at the INFO group.
+The remap is a presentation-level copy (``dataclasses.replace``); the caller's
+issue list is never mutated. Count triage is CALLER-owned:
+:func:`adjust_counts_for_a2l_triage` (built on the same
+:func:`a2l_reclassified_severity` predicate) adjusts the severity-strip /
+summary counters and the panel's ``group_counts`` in ``app.py``, so every
+painted surface reports one consistent triaged census; the panel mounts the
+caller-supplied counts verbatim and remaps rows only. The engine
+(``validation/rules.py`` / ``tui/a2l.py``) stays frozen (D-1) and is
+deliberately NOT imported here — the curated set is view-owned, and the
+engine constant's byte-unchanged proof lives in
+``tests/test_tui_issues_triage_b94.py`` (TC-B94-18).
+
 No engine code is imported here — the widgets receive their data via
 ``GroupedIssuesPanel.render_groups`` and emit an ``IssueRow.Selected`` message
 back to ``app.py`` (which drives ``_update_issues_hex_pane``); colour flows
@@ -26,7 +46,9 @@ exclusively through the frozen ``css_class_for_severity`` (no hard-coded hex).
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence
+import re
+from dataclasses import replace
+from typing import Dict, Iterable, List, Optional, Sequence
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -94,6 +116,195 @@ _STRIP_SEVERITY_STYLE: Dict[ValidationSeverity, str] = {
 #: Micro-bar cell count for the severity strip — a coarse glance cue, matching
 #: the MAC coverage strip's fixed small scale (batch-49, LLR-082.1).
 _ISSUES_STRIP_BAR_WIDTH: int = 5
+
+#: Curated ASAP2 standard-keyword set (batch-94 Inc-004, LLR-012.1): the
+#: block names whose ``A2L_UNRECOGNIZED_BLOCK`` findings the Issues surface
+#: presents as INFO instead of WARNING. Seeded from the executed 2026-10-13
+#: tally over ``examples/case_00_public/software_a.a2l`` — the 21 families
+#: pasted in ``.dev-flow/2026-10-12-batch-94/evidence/p1_probe_a2l_unrecognized.txt``
+#: are this set's lineage (437 REF_CHARACTERISTIC + 221 REF_MEASUREMENT +
+#: 180 AXIS_DESCR + 69 COMPU_VTAB_RANGE + 69 SUB_GROUP + 22 DEF_CHARACTERISTIC
+#: + 6 PAGE + 3 SEGMENT + 3 SUB_FUNCTION + 2 PROTOCOL_LAYER + 1 each of
+#: A2ML/CAN_FD/DAQ/EVENT/FORMULA/MOD_COMMON/MOD_PAR/PAG/STIM/
+#: TIMESTAMP_SUPPORTED/XCP_ON_CAN = 1 023 findings). View-owned policy
+#: constant: the engine's ``RECOGNIZED_A2L_BLOCKS`` (``validation/rules.py``)
+#: stays frozen (D-1) and is deliberately NOT imported here — the two sets
+#: are disjoint by construction (the emitter only fires for names the engine
+#: does NOT recognize), and the engine constant's byte-unchanged check lives
+#: in ``tests/test_tui_issues_triage_b94.py`` (TC-B94-18).
+CURATED_STANDARD_A2L_BLOCKS: frozenset[str] = frozenset(
+    {
+        "A2ML",
+        "AXIS_DESCR",
+        "CAN_FD",
+        "COMPU_VTAB_RANGE",
+        "DAQ",
+        "DEF_CHARACTERISTIC",
+        "EVENT",
+        "FORMULA",
+        "MOD_COMMON",
+        "MOD_PAR",
+        "PAG",
+        "PAGE",
+        "PROTOCOL_LAYER",
+        "REF_CHARACTERISTIC",
+        "REF_MEASUREMENT",
+        "SEGMENT",
+        "STIM",
+        "SUB_FUNCTION",
+        "SUB_GROUP",
+        "TIMESTAMP_SUPPORTED",
+        "XCP_ON_CAN",
+    }
+)
+
+#: Reclassification justification (LLR-012.2) rendered at the INFO group when
+#: the mounted window carries reclassified rows. An author constant — no
+#: file-derived text — so it is markup-safe by construction (C-17); composed
+#: through ``safe_text`` like every other string in this module.
+A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION: str = (
+    "Standard ASAP2 keyword (curated set) — reclassified WARNING → INFO per "
+    "the Cambio4 triage: standard vocabulary the parser surfaces as "
+    "unrecognized; it represents no defect."
+)
+
+#: Emitter-anchored shape of an ``A2L_UNRECOGNIZED_BLOCK`` message
+#: (``validation/rules.py`` emits exactly ``f"Unrecognized A2L block
+#: '{section_name}'."`` with the name already stripped + uppercased). A
+#: message that does not match this strict shape — including any hostile
+#: file-derived token with markup metacharacters — is NEVER reclassified:
+#: the predicate fails closed and the row keeps its engine severity.
+_UNRECOGNIZED_BLOCK_RE = re.compile(r"^Unrecognized A2L block '([A-Z0-9_]+)'\.$")
+
+
+def a2l_reclassified_severity(issue: ValidationIssue) -> Optional[ValidationSeverity]:
+    """The Inc-004 reclassification predicate (HLR-012 / LLR-012.1/.2).
+
+    Summary:
+        For a WARNING ``A2L_UNRECOGNIZED_BLOCK`` finding whose message matches
+        the emitter's exact shape and whose block name is a member of
+        :data:`CURATED_STANDARD_A2L_BLOCKS`, return ``ValidationSeverity.INFO``
+        — the curated standard-keyword names are informational, not warnings.
+        Every other finding returns ``None``: non-``A2L_UNRECOGNIZED_BLOCK``
+        codes, non-WARNING severities, messages that fail the strict emitter
+        shape, and names outside the curated set (the executed ``FROBNICATE``
+        negative control) all keep their engine severity and stay warnings.
+
+    Args:
+        issue (ValidationIssue): The already-computed finding to classify.
+
+    Returns:
+        Optional[ValidationSeverity]: ``INFO`` when the finding is
+        reclassified, else ``None``.
+
+    Data Flow:
+        - Read-only over ``issue``: the severity remap happens at the single
+          row-mounting caller (:meth:`GroupedIssuesPanel.render_groups`) via
+          ``dataclasses.replace`` — this predicate never mutates.
+        - The block name is extracted for a MEMBERSHIP TEST only; it never
+          reaches a rendered string (the justification is an author
+          constant), so the C-17 safe path is untouched.
+
+    Dependencies:
+        Uses:
+            - :data:`CURATED_STANDARD_A2L_BLOCKS` / :data:`_UNRECOGNIZED_BLOCK_RE`
+        Used by:
+            - :func:`adjust_counts_for_a2l_triage` /
+              :meth:`GroupedIssuesPanel.render_groups`
+            - ``s19_app/tui/app.py`` (the strip / summary / group-counts
+              painters — the fold round, HLR-012 "every presentation")
+            - ``tests/test_tui_issues_triage_b94.py`` (TC-B94-19)
+
+    Example:
+        >>> issue = ValidationIssue(
+        ...     code="A2L_UNRECOGNIZED_BLOCK", severity=ValidationSeverity.WARNING,
+        ...     message="Unrecognized A2L block 'REF_CHARACTERISTIC'.",
+        ...     artifact="a2l",
+        ... )
+        >>> a2l_reclassified_severity(issue) is ValidationSeverity.INFO
+        True
+        >>> bad = ValidationIssue(
+        ...     code="A2L_UNRECOGNIZED_BLOCK", severity=ValidationSeverity.WARNING,
+        ...     message="Unrecognized A2L block 'FROBNICATE'.", artifact="a2l",
+        ... )
+        >>> a2l_reclassified_severity(bad) is None
+        True
+    """
+    if (
+        issue.code != "A2L_UNRECOGNIZED_BLOCK"
+        or issue.severity is not ValidationSeverity.WARNING
+    ):
+        return None
+    match = _UNRECOGNIZED_BLOCK_RE.match(issue.message or "")
+    if match is None or match.group(1) not in CURATED_STANDARD_A2L_BLOCKS:
+        return None
+    return ValidationSeverity.INFO
+
+
+def adjust_counts_for_a2l_triage(
+    counts: Dict[ValidationSeverity, int],
+    issues: Iterable[ValidationIssue],
+) -> Dict[ValidationSeverity, int]:
+    """Apply the Inc-004 triage delta to a severity-count map (HLR-012).
+
+    Summary:
+        Count the findings ``issues`` that :func:`a2l_reclassified_severity`
+        remaps (WARNING → INFO) and move that delta from WARNING to INFO in
+        ``counts``. This is the ONE arithmetic site for the triage, shared by
+        every whole-list painter — ``S19TuiApp`` 's severity strip, summary
+        line and the grouped panel's ``group_counts`` — so the surfaces can
+        never disagree. The panel itself mounts caller-supplied counts
+        verbatim (LLR-042.6); it only remaps ROWS.
+
+    Args:
+        counts (Dict[ValidationSeverity, int]): Raw per-severity counts.
+        issues (Iterable[ValidationIssue]): The list the counts were derived
+            from (whole filtered list, or the whole unfiltered list).
+
+    Returns:
+        Dict[ValidationSeverity, int]: ``counts`` UNCHANGED (the same object)
+        when the delta is zero — the no-reclassification no-op, byte-identical
+        to the pre-Inc-004 painters; otherwise a copy with
+        ``WARNING -= reclassified`` and ``INFO += reclassified``.
+
+    Data Flow:
+        - Single pass over ``issues`` through the predicate; no mutation of
+          either argument.
+
+    Dependencies:
+        Uses:
+            - :func:`a2l_reclassified_severity`
+        Used by:
+            - ``S19TuiApp.update_validation_issues_view`` /
+              ``_render_validation_issues_groups``
+            - ``tests/test_tui_issues_triage_b94.py`` (AT-B94-14)
+
+    Example:
+        >>> issue = ValidationIssue(
+        ...     code="A2L_UNRECOGNIZED_BLOCK", severity=ValidationSeverity.WARNING,
+        ...     message="Unrecognized A2L block 'PAGE'.", artifact="a2l",
+        ... )
+        >>> adjust_counts_for_a2l_triage(
+        ...     {ValidationSeverity.WARNING: 1, ValidationSeverity.INFO: 0}, [issue]
+        ... ) == {ValidationSeverity.WARNING: 0, ValidationSeverity.INFO: 1}
+        True
+        >>> raw = {ValidationSeverity.WARNING: 2}
+        >>> adjust_counts_for_a2l_triage(raw, []) is raw
+        True
+    """
+    reclassified = sum(
+        1 for issue in issues if a2l_reclassified_severity(issue) is not None
+    )
+    if not reclassified:
+        return counts
+    adjusted = dict(counts)
+    adjusted[ValidationSeverity.WARNING] = (
+        adjusted.get(ValidationSeverity.WARNING, 0) - reclassified
+    )
+    adjusted[ValidationSeverity.INFO] = (
+        adjusted.get(ValidationSeverity.INFO, 0) + reclassified
+    )
+    return adjusted
 
 
 def build_issues_severity_strip(error: int, warning: int, info: int) -> Text:
@@ -381,12 +592,30 @@ class GroupedIssuesPanel(ScrollableContainer):
             nothing to group; a truncation note is appended when ``truncated``
             OR the display cap hid rows on this page (LLR-042.6).
 
+            Batch-94 Inc-004 (HLR-012 / LLR-012.2): before grouping, WARNING
+            ``A2L_UNRECOGNIZED_BLOCK`` rows whose block name is curated
+            standard ASAP2 vocabulary are remapped to INFO via
+            :func:`a2l_reclassified_severity` — a presentation-level
+            ``dataclasses.replace`` copy, never a mutation of the caller's
+            list. The header counts are the caller-supplied ``group_counts``
+            VERBATIM (LLR-042.6) — the caller owns count triage through
+            :func:`adjust_counts_for_a2l_triage`, so the strip, the summary
+            line and this panel can never disagree; the panel remaps rows
+            only. When the window carries no reclassifiable row the render
+            is byte-identical to the pre-Inc-004 grouping. The justification
+            :data:`A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION` renders
+            immediately after the INFO group header whenever the mounted
+            window carries at least one reclassified row. Genuinely unknown
+            blocks (the executed ``FROBNICATE`` negative control) and every
+            other code/severity keep their engine classification.
+
         Args:
             window_issues (Sequence[ValidationIssue]): The bounded paging
                 window of issues to mount as rows (already filtered + sliced by
                 the caller — this widget mounts exactly these, never more).
             group_counts (Dict[ValidationSeverity, int]): Whole-(filtered)-list
-                issue count per severity, used verbatim for the header counts.
+                issue count per severity, used verbatim for the header counts
+                (triaged by the caller when it carries reclassifiable rows).
             truncated (bool): ``True`` when the filtered list is larger than the
                 window, so a "more on other pages" note is appended.
 
@@ -394,30 +623,52 @@ class GroupedIssuesPanel(ScrollableContainer):
             None
 
         Data Flow:
-            - ``remove_children`` then ``mount`` the header/row widgets; no data
-              is derived here beyond grouping the passed window by severity.
+            - Classify each windowed issue once (``a2l_reclassified_severity``);
+              the remapped severity drives row placement and the justification
+              note; ``group_counts`` is mounted verbatim.
+            - ``remove_children`` then ``mount`` the header/justification/row
+              widgets; the caller's ``ValidationIssue`` objects are read-only.
 
         Dependencies:
             Uses:
                 - ``IssueGroupHeader`` / ``IssueRow`` / ``safe_text``
+                - :func:`a2l_reclassified_severity` /
+                  :data:`A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION`
             Used by:
                 - ``S19TuiApp.update_validation_issues_view``
+                - ``tests/test_tui_issues_triage_b94.py`` (AT-B94-14 /
+                  TC-B94-19)
         """
         self.remove_children()
         if not window_issues and not any(group_counts.values()):
             self.mount(Static(safe_text(self.EMPTY_TEXT), classes="issues-empty-note sev-neutral"))
             return
+        classified = [
+            (issue, a2l_reclassified_severity(issue)) for issue in window_issues
+        ]
+        reclassified = sum(1 for _, severity in classified if severity is not None)
+        display_issues: List[ValidationIssue] = [
+            issue if severity is None else replace(issue, severity=severity)
+            for issue, severity in classified
+        ]
         widgets: List[Static] = []
         remaining = _GROUP_DISPLAY_MAX
         capped = False
         for severity in SEVERITY_ORDER:
             group_rows = [
-                issue for issue in window_issues if issue.severity == severity
+                issue for issue in display_issues if issue.severity == severity
             ]
             if not group_rows:
                 continue
             count = group_counts.get(severity, len(group_rows))
             widgets.append(IssueGroupHeader(severity, count))
+            if severity is ValidationSeverity.INFO and reclassified:
+                widgets.append(
+                    Static(
+                        safe_text(A2L_BLOCK_RECLASSIFICATION_JUSTIFICATION),
+                        classes="issue-reclassify-note sev-neutral",
+                    )
+                )
             shown = group_rows[:remaining] if remaining > 0 else []
             widgets.extend(IssueRow(issue) for issue in shown)
             remaining -= len(shown)

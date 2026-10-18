@@ -1,0 +1,5 @@
+before: 6311f7c3a98bd876a68717a5c2d5b2e98382662d9ebd5eef02e528e7d10db89b
+after:  6311f7c3a98bd876a68717a5c2d5b2e98382662d9ebd5eef02e528e7d10db89b
+restore proven: True
+run tail: no tests ran in 0.00s
+verdict: RED (KILLED — trigger absent, collection failed)

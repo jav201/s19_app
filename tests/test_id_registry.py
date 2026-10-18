@@ -104,7 +104,10 @@ from tools.id_registry import (
 # increment adds ``tests/test_tui_flow_execution_b94.py`` (AT-B94-02, 19..24,
 # TC-B94-08, 26, 27, 29) and ``tests/test_flow_chainset_b94.py`` (TC-B94-05,
 # 28, 30, 31).
-EXPECTED_SCANNED_TEST_FILES = 179
+# batch-94 Inc-004 (2026-10-14): 179 -> 180, measured — the issues-triage
+# increment adds ``tests/test_tui_issues_triage_b94.py`` (AT-B94-14,
+# TC-B94-18, 19).
+EXPECTED_SCANNED_TEST_FILES = 180
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds
