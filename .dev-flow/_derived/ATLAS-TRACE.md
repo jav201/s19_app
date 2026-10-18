@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1544,9 +1544,9 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `HLR-016` | batches, canon, tests |
 | `HLR-017` | batches, canon, tests |
 | `HLR-018` | batches, canon, tests |
-| `HLR-019` | batches, canon |
+| `HLR-019` | batches, canon, tests |
 | `HLR-020` | batches, canon, tests |
-| `HLR-021` | batches, canon |
+| `HLR-021` | batches, canon, tests |
 | `HLR-022` | batches, canon |
 | `HLR-023` | batches, canon |
 | `HLR-024` | batches, canon, tests |
@@ -1967,14 +1967,14 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-017.3` | batches, canon, tests |
 | `LLR-017.4` | batches, tests |
 | `LLR-018.1` | batches, canon, tests |
-| `LLR-018.2` | batches |
+| `LLR-018.2` | batches, tests |
 | `LLR-019` | batches |
 | `LLR-019.1` | batches, canon, tests |
-| `LLR-019.2` | batches |
+| `LLR-019.2` | batches, tests |
 | `LLR-020.1` | batches, canon, tests |
-| `LLR-020.2` | batches |
+| `LLR-020.2` | batches, tests |
 | `LLR-021` | batches |
-| `LLR-021.1` | batches, canon |
+| `LLR-021.1` | batches, canon, tests |
 | `LLR-021.2` | batches |
 | `LLR-022.1` | batches, canon, tests |
 | `LLR-022.2` | batches, canon |
@@ -2887,7 +2887,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `US-005` | batches, canon |
 | `US-006` | batches, canon, tests |
 | `US-006..US-009` | batches |
-| `US-007` | batches, canon |
+| `US-007` | batches, canon, tests |
 | `US-008` | batches, canon, tests |
 | `US-009` | batches, canon |
 | `US-01` | batches, canon, tests |
@@ -3964,7 +3964,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `AT-B88-08` | batches |
 | `AT-B88-09` | batches |
 | `AT-B94-01` | batches, tests |
-| `AT-B94-02` | batches |
+| `AT-B94-02` | batches, tests |
 | `AT-B94-03` | batches, tests |
 | `AT-B94-04` | batches, tests |
 | `AT-B94-05` | batches, tests |
@@ -3981,12 +3981,12 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `AT-B94-16` | batches, tests |
 | `AT-B94-17` | batches, tests |
 | `AT-B94-18` | batches, tests |
-| `AT-B94-19` | batches |
-| `AT-B94-20` | batches |
-| `AT-B94-21` | batches |
-| `AT-B94-22` | batches |
-| `AT-B94-23` | batches |
-| `AT-B94-24` | batches |
+| `AT-B94-19` | batches, tests |
+| `AT-B94-20` | batches, tests |
+| `AT-B94-21` | batches, tests |
+| `AT-B94-22` | batches, tests |
+| `AT-B94-23` | batches, tests |
+| `AT-B94-24` | batches, tests |
 | `TC-001` | batches, canon, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |
@@ -4962,11 +4962,11 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-B94-02` | batches, tests |
 | `TC-B94-03` | batches, tests |
 | `TC-B94-04` | batches, tests |
-| `TC-B94-05` | batches |
+| `TC-B94-05` | batches, tests |
 | `TC-B94-06` | batches, tests |
 | `TC-B94-07` | batches, tests |
 | `TC-B94-07b` | tests |
-| `TC-B94-08` | batches |
+| `TC-B94-08` | batches, tests |
 | `TC-B94-09` | batches, tests |
 | `TC-B94-10` | batches, tests |
 | `TC-B94-11` | batches, tests |
@@ -4984,9 +4984,9 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-B94-23` | batches, tests |
 | `TC-B94-24` | batches, tests |
 | `TC-B94-25` | batches, tests |
-| `TC-B94-26` | batches |
-| `TC-B94-27` | batches |
-| `TC-B94-28` | batches |
-| `TC-B94-29` | batches |
-| `TC-B94-30` | batches |
-| `TC-B94-31` | batches |
+| `TC-B94-26` | batches, tests |
+| `TC-B94-27` | batches, tests |
+| `TC-B94-28` | batches, tests |
+| `TC-B94-29` | batches, tests |
+| `TC-B94-30` | batches, tests |
+| `TC-B94-31` | batches, tests |
