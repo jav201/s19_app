@@ -1507,7 +1507,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1632 unique id(s)
+## family US/HLR/LLR — 1635 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1536,13 +1536,14 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `HLR-009` | batches, tests |
 | `HLR-010` | batches, tests |
 | `HLR-011` | batches, tests |
-| `HLR-012` | batches |
+| `HLR-012` | batches, tests |
 | `HLR-013` | batches, canon, tests |
 | `HLR-013..016` | batches |
 | `HLR-014` | batches, canon, tests |
 | `HLR-015` | batches, canon, tests |
 | `HLR-016` | batches, canon, tests |
 | `HLR-017` | batches, canon, tests |
+| `HLR-017..021` | batches |
 | `HLR-018` | batches, canon, tests |
 | `HLR-019` | batches, canon, tests |
 | `HLR-020` | batches, canon, tests |
@@ -2074,7 +2075,9 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-042.7` | batches, canon, tests |
 | `LLR-042.8` | batches, tests |
 | `LLR-042.9` | batches, tests |
+| `LLR-042.9-pinned` | batches |
 | `LLR-042.N` | batches |
+| `LLR-042.x` | batches |
 | `LLR-043` | batches |
 | `LLR-043-retire.1` | batches |
 | `LLR-043-retire.2` | batches |
@@ -2883,7 +2886,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `US-002..005` | batches |
 | `US-002..US-005` | batches |
 | `US-003` | batches, canon, tests |
-| `US-004` | batches, canon |
+| `US-004` | batches, canon, tests |
 | `US-005` | batches, canon |
 | `US-006` | batches, canon, tests |
 | `US-006..US-009` | batches |
@@ -3976,7 +3979,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `AT-B94-11` | batches, tests |
 | `AT-B94-12` | batches, tests |
 | `AT-B94-13` | batches, tests |
-| `AT-B94-14` | batches |
+| `AT-B94-14` | batches, tests |
 | `AT-B94-15` | batches, tests |
 | `AT-B94-16` | batches, tests |
 | `AT-B94-17` | batches, tests |
@@ -4976,8 +4979,8 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-B94-15` | batches, tests |
 | `TC-B94-16` | batches, tests |
 | `TC-B94-17` | batches, tests |
-| `TC-B94-18` | batches |
-| `TC-B94-19` | batches |
+| `TC-B94-18` | batches, tests |
+| `TC-B94-19` | batches, tests |
 | `TC-B94-20` | batches, tests |
 | `TC-B94-21` | batches, tests |
 | `TC-B94-22` | batches, tests |
