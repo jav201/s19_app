@@ -1,0 +1,311 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.......................ss............................................... [  2%]
+........................................F............................... [  4%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+......x................................................................. [ 60%]
+......................................F................................. [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+.......................................................................F [ 84%]
+.......................................................................x [ 86%]
+......................................................................xx [ 88%]
+xxxxxxxxxxxxxxxxxxxxxxxxxxx............................................. [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+..................................x..................................... [ 98%]
+..............FF.......................................                  [100%]
+================================== FAILURES ===================================
+______________ test_at_b83_08_tree_holds_no_assembled_selectors _______________
+
+    def test_at_b83_08_tree_holds_no_assembled_selectors() -> None:
+        """The premise that makes the detector cheap: no flow tracking is needed.
+    
+        Meaningful only because the fixture above proves detection works. If this ever goes
+        red, 'recognise the site' has stopped being sufficient and the design needs revisiting
+        -- which is the point of the guard.
+        """
+        from pathlib import Path
+        from tools.address_census import census
+    
+        root = Path(__file__).resolve().parent.parent
+        data = census(root)
+        odd = [s for s in data.sites if s.form.startswith("other:")]
+>       assert not odd, (
+            "address arguments outside {literal, name, fstring} appeared: "
+            + ", ".join(f"{s.file}:{s.line} {s.form}" for s in odd[:10])
+        )
+E       AssertionError: address arguments outside {literal, name, fstring} appeared: s19_app/tui/screens_directionb.py:8289 other:Call
+E       assert not [AddressSite(file='s19_app/tui/screens_directionb.py', line=8289, api='mount', form='other:Call', shape=None, interp=[], note='')]
+
+tests\test_address_census.py:309: AssertionError
+__________________ test_tc024_report_trigger_surfaces_paths ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_tc024_report_trigger_surf0')
+
+    def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
+        """A successful report trigger surfaces both written paths (LLR-005.4).
+    
+        Intent: after a comparison, the Report button generates BOTH the Markdown
+        and HTML reports via the diff-report service and the status line shows a
+        filename matching each regex.
+        """
+        import s19_app.tui.app as app_mod
+        from s19_app.tui.services.diff_report_service import (
+            DIFF_REPORT_FILENAME_REGEX,
+            DIFF_REPORT_HTML_FILENAME_REGEX,
+            DiffReportResult,
+        )
+    
+        fake = _diff_result([(0x10, 0x14, "changed")])
+        md_path = tmp_path / "20260101T000000Z-diff-report.md"
+        html_path = tmp_path / "20260101T000000Z-diff-report.html"
+    
+        def _gen_md(*_a, **_k):
+            md_path.write_text("md", encoding="utf-8")
+            return DiffReportResult(path=md_path, written=True)
+    
+        def _gen_html(*_a, **_k):
+            html_path.write_text("html", encoding="utf-8")
+            return DiffReportResult(path=html_path, written=True)
+    
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("diff")
+                await pilot.pause()
+                await _b78_press_compare(app, pilot)
+                app.query_one("#diff_report_button").press()
+                # batch-68 N5: the two generators now run on a worker thread, so
+                # the status is written after this handler returns. A bare pause()
+                # passed only because the fake generators are instant — a race this
+                # suite must not depend on.
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                return str(app.query_one("#diff_status").render())
+    
+        monkey = pytest.MonkeyPatch()
+        monkey.setattr(app_mod, "compare_images", lambda *a, **k: fake)
+        monkey.setattr(app_mod, "generate_diff_report", _gen_md)
+        monkey.setattr(app_mod, "generate_diff_report_html", _gen_html)
+        try:
+            status = asyncio.run(_drive())
+        finally:
+            monkey.undo()
+    
+        assert DIFF_REPORT_FILENAME_REGEX.search(md_path.name)
+        assert DIFF_REPORT_HTML_FILENAME_REGEX.search(html_path.name)
+>       assert md_path.name in status and html_path.name in status, (
+            f"the status must show both written report paths; status was {status!r}"
+        )
+E       AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+E       assert ('20260101T000000Z-diff-report.md' in 'Compared A.s19 vs B.s19: 1 runs.')
+E        +  where '20260101T000000Z-diff-report.md' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_tc024_report_trigger_surf0/20260101T000000Z-diff-report.md').name
+
+tests\test_tui_diff_screen.py:523: AssertionError
+___________ test_at064c_edit_json_disabled_for_file_backed_document ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20757/test_at064c_edit_json_disabled0')
+
+    def test_at064c_edit_json_disabled_for_file_backed_document(
+        tmp_path: Path,
+    ) -> None:
+        """Edit JSON is DISABLED for a file-backed doc → no popup, no clobber.
+    
+        Intent (AT-064c, US-064b / LLR-064b.4, A-01 data-loss guard): after a
+        FILE load (``source_path is not None``) the Edit-JSON control is disabled
+        and the popup cannot open — so the stale ``DUMMY_CHANGESET_TEXT`` buffer
+        can never be Confirmed to ``load_text``-REPLACE the loaded document. The
+        test also drives the mechanism directly (posting ``EditJsonRequested``) to
+        prove the handler's guard refuses to push the modal and mutates nothing.
+        For a paste-authored doc (``source_path is None``) the same control is
+        ENABLED and the popup opens — the two states asserted in ONE node so the
+        guard is a real discriminator (C-10), not a constant.
+        """
+        from textual.widgets import Button
+    
+        from s19_app.tui.screens import ChangeSetJsonScreen
+    
+        doc_path = _write_v2_document(
+            tmp_path / "loaded.json",
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+        )
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x222", "value": "PASTED"}]
+        )
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                # (a) FILE-backed document → source_path not None → disabled.
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+                await pilot.pause()
+                outcomes["file_source"] = (
+                    app._change_service.document.source_path is not None
+                )
+                outcomes["disabled_when_file"] = app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                outcomes["entries_before"] = _entry_addresses(app)
+    
+                # Drive the mechanism directly — the guard must refuse to push.
+                panel.post_message(
+                    PatchEditorPanel.EditJsonRequested(paste_text="{}")
+                )
+                await pilot.pause()
+                outcomes["popup_after_guarded_open"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                outcomes["entries_after_guarded_open"] = _entry_addresses(app)
+    
+                # (b) PASTE-authored document → source_path None → enabled + opens.
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["paste_source_none"] = (
+                    app._change_service.document.source_path is None
+                )
+                outcomes["enabled_when_paste"] = not app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                app.query_one("#patch_edit_json_button", Button).press()
+                await pilot.pause()
+                outcomes["popup_opens_for_paste"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        # (a) file-backed → disabled, guarded open is a no-op, 0 clobber.
+        assert outcomes["file_source"] is True
+        assert outcomes["disabled_when_file"] is True, (
+            "Edit JSON must be DISABLED when a file-backed document is loaded"
+        )
+        assert outcomes["popup_after_guarded_open"] is False, (
+            "the guard must refuse to push the popup over a file-backed document"
+        )
+        assert outcomes["entries_after_guarded_open"] == outcomes[
+            "entries_before"
+        ], "a guarded open must not mutate the loaded document (no clobber)"
+        # (b) paste-authored → enabled, popup opens.
+>       assert outcomes["paste_source_none"] is True
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:3357: AssertionError
+______________ test_tc707_copy_matches_help_sections_md_verbatim ______________
+
+    def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
+        """TC-707 (LLR-140.2, the operator-editable home): every shipped step
+        string is a verbatim port of ``help_sections.md`` — the md is the
+        source draft, so a drifted copy edit reddens here against the source."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+__________________ test_tc707_numbering_generated_sequential __________________
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+============================== warnings summary ===============================
+..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
+  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=9908281;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+5 failed, 3040 passed, 2 skipped, 21 deselected, 32 xfailed, 1 warning in 3483.60s (0:58:03)

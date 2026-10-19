@@ -163,6 +163,21 @@
    "station": "P4",
    "date": "2026-10-18",
    "decision": "P4 gate run ONE (2026-10-18, 1:07:40, 3025 passed / 20 failed) reconciled by a two-sided probe: 16 of 20 are BATCH-94 regressions (green on pristine origin/main, red here, deterministic) with 5 root causes -- (1) the Inc-001 check_spec kwargs TypeError kills ALL A2B HTML diff reports (app.py forwards to generate_diff_report_html which lacks the params -- a shipped defect), (2) the new diff_check_row eats the diff hex area (0-5 rows at the B78 sizes, C-13 violation), (3) the Inc-001 auto-height overrides defeat the json-window fill tcss (4 fill invariants broken), (4) the two ratified rail bindings trip the B78/81 UNSANCTIONED-bindings censuses, (5) four census/DOM/token reconciliations (strip restructure walk, refresh_check_results census 2->3, the safe_text import census new file, the TC-337 token lost in the variants rewrite); 2 are the documented load-flake family, 2 are batch-95's pre-existing TC-707 missing-file pair. Feedback edge: black-box fails from implementation defects (requirements are right) => ITERATE-TO-FIX to P3. LESSON (postmortem): the per-increment reverse censuses keyed on symbol names, missing the SURFACE families (diff screen, patch strips) -- the P4 probe caught what the increment censuses did not."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "P4 fix round 1 closed (d552f34): the 5 root causes from gate run ONE all fixed -- 16/16 B-nodes green (p4fix_suite transcripts), guard host 184; rebase #7 (batch-96 spec-only, zero conflicts) followed."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "P4 gate run TWO reconciled (3040 passed / 5 failed): the two-sided probe round 2 found 1 B (fix round 1's own Call-form mount address-arg vs the AT-B83-08 census) + 2 C (tc024, at064c -- green on quiet isolate); fix round 2 (c18d181) hoisted the query to a name -- 24 green."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "P4 gate run THREE (definitive, c18d181 on origin/main 121feaa, 0:58:06): 3040 passed / 5 failed / 32 xfailed -- 0 NEW deterministic failures attributable to batch-94 (2 A: batch-95's TC-707 pair; 3 C: the load-modulated family, isolate-green p4_run3_isolate_3nodes.txt); the qa-reviewer reconciliation returns PASS-WITH-NOTES."
   }
  ],
  "obsidian_synced": false,
