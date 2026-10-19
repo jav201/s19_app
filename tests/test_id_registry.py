@@ -114,7 +114,14 @@ from tools.id_registry import (
 # (the changes-file notation help section, TC-1802) and
 # ``tests/test_a2l_record_layout_address.py`` (B6 the extended-kind header
 # salvage, TC-1803).
-EXPECTED_SCANNED_TEST_FILES = 184
+# batch-96 features (2026-10-18): 184 -> 189, measured — five modules:
+# ``tests/test_flow_external_step_b96.py`` (the external-step block port,
+# TC-1804), ``tests/test_a2l_record_layout_walker.py`` (the per-component
+# RECORD_LAYOUT walker, TC-1810/1811), ``tests/test_clipboard_tk_singleton.py``
+# (the Tk root singleton, TC-1815), ``tests/test_a2l_curve_description.py``
+# (the curve description, TC-1820..1822) and ``tests/test_flow_funnel_b96.py``
+# (the funnel + block copy/paste, TC-1816..1819).
+EXPECTED_SCANNED_TEST_FILES = 189
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

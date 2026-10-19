@@ -1,6 +1,48 @@
 # Batch-96 — pendientes del PDF del operador (2026-10-18)
 
 Fuente: `G:/My Drive/Scan_20261018_153449.pdf` (scan 4 páginas, doodles ignorados).
+
+## ESTADO (2026-10-18, features completas)
+
+- **Fixes (mergeados a main, `bd42d8d`)**: B8 copias duplicadas (TC-1800),
+  B7 guard mismo-path (TC-1801) + ayuda notación JSON (TC-1802) +
+  B6 salvage kind extendido (TC-1803).
+- **Bloque paso externo**: IMPLEMENTADO en el árbol real (port del prototipo
+  aprobado `prototypes/external-step-block/`, TC-1804) — modelo, persistencia
+  V5, builder (palette EXT-STEP + fila de config + strip de sesión), ejecución
+  (pausa "ESPERANDO HUMANO" + confirmación + copia de la salida a la sesión).
+  `set_session_dir` cableado desde `_handle_load_project` (app.py) — el strip
+  muestra el dir real del proyecto activo. Incluye el fix del glifo de cable
+  `_wire_drop` (└→┌ en el aterrizaje, revisión del operador).
+- **Funnel**: IMPLEMENTADO (TC-1816/1817) — tabla nombre→valor a nivel Flow,
+  persistencia V4b, sustitución `${NAME}` en change-docs al ejecutar el brazo
+  PATCH (placeholder exacto, mayúsculas; no declarado → intacto + notice
+  nombrada, nunca error); CHECK fuera de scope deliberado.
+- **Copy/paste de bloques**: IMPLEMENTADO (TC-1818/1819) — pick por nº de
+  ledger, clipboard interno por wire format real (nunca instancia), paste
+  re-valida contra los bloques actuales; refs A2B verbatim (documentado).
+- **R5 walker**: IMPLEMENTADO (TC-1810/1811) — walker por-componente con
+  offsets+alineación, DIRECT standalone tolerado, ejes externos vía
+  max_axis_points de la CHARACTERISTIC referenciada, encode de curvas.
+  Límites: encode de ejes externos no resuelto, un solo COMPU_METHOD para
+  eje+valores, MAP COL_DIR consume en orden de componentes.
+- **E9 descripción de curvas**: IMPLEMENTADO (TC-1820..1822) — tecla `d` en la
+  vista A2L, modal con tabla x→y física (COMPU_METHOD punto a punto, eje con su
+  propia conversión), descripción larga del COMPU_METHOD extraída, puntos
+  fuera de límites marcados. Límites: MAP 2-D aplanado con nota, FLOAT16 sin
+  decode.
+- **E singleton Tk**: IMPLEMENTADO (TC-1815) — root lazy creado una vez en el
+  main thread, destrucción única, fallback a ctypes/PowerShell intacto.
+
+Supersessiones registradas: TC-035 y AT-B94-24 actualizados a la doctrina B8
+(reuso por contenido idéntico; `_1` solo para bytes divergentes).
+
+Follow-ups declarados: picker de archivos real en el diálogo de confirmación
+del paso externo; documentar la acción `d` en la ayuda por ventana; MAP 2-D
+como grid; encode de ejes externos.
+
+## Historial de la spec (las secciones siguientes quedan como registro)
+
 Los 4 fixes ejecutables sin interferir con el batch-94 ya están en esta rama
 (commit `041bb84`: B8 copias duplicadas TC-1800, B7 guard mismo-path TC-1801,
 ayuda notación JSON TC-1802, B6 salvage kind extendido A2L TC-1803).
