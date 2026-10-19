@@ -30,8 +30,8 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P5",
- "phase_status": "not-started",
+ "current_station": "P6",
+ "phase_status": "closed",
  "stations_active": [
   "P0",
   "ARQ",
@@ -193,6 +193,11 @@
    "station": "P4",
    "date": "2026-10-18",
    "decision": "P4 gate PASSED under the standing authorization -- verdict PASS-WITH-NOTES (the qa-reviewer reconciliation, 04-validation.md): the definitive gate run THREE (c18d181 on origin/main 121feaa, 3040 passed / 5 failed / 32 xfailed, 0:58:06, orchestrator-run per C-25) carries 0 NEW deterministic failures attributable to batch-94 (2 A: batch-95's TC-707 pair; 3 C: the load-modulated family, isolate-green); Layer A 31/31 + Layer B 24/24 reconciled with executors attributed; the 16 run-ONE escaped regressions closed in two orchestrator-owned fix rounds with red-pre/green-post pairs; notes N-1..N-6 named with owners; P5 postmortem is next."
+  },
+  {
+   "station": "P5",
+   "date": "2026-10-18",
+   "decision": "P5 postmortem + P6 docs closed under the standing authorization -- the postmortem (architect+qa co-authored, 47 findings 43 closed 4 open with owners, the P4 root-cause chain, 15 next-batch items) + the traceability matrix (42 LLR + 24 AT rows, zero gaps) + functionality + executive summary + 3 mermaid diagrams; the canon folded 52 ids (21 HLR + 31 LLR, 0 refused); the lane-A backlog reconciled (15 carries, header refreshed to origin/main 121feaa); the batch closes P6."
   }
  ],
  "obsidian_synced": false,
