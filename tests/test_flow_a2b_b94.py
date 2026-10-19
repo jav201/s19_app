@@ -141,7 +141,12 @@ def test_tc_b94_21_loader_refuses_a2b_binding_arm(tmp_path: Path) -> None:
     """TC-B94-21 invalid arm (LLR-013.2/014.1): an A2B block whose bindings
     both point at files — illegal wiring — is refused AT LOAD (whole-flow
     fail-closed), never mounted; a binding object of the wrong shape and a
-    file ref escaping the project are refused with the loader's own codes."""
+    file ref escaping the project are refused with the loader's own codes.
+    The traversal arm sweeps EVERY separator convention (backslash, forward,
+    mixed): the branch set is the grammar, not the host platform — on POSIX
+    a raw backslash traversal is one literal filename, so the refusal must
+    come from the loader's normalized pre-reject, not the OS's separator
+    semantics (the PR #211 CI fix)."""
     project = _make_project(tmp_path, {"prg.s19": _S19_A, "base.s19": _S19_A})
 
     def _envelope(image_a: dict, image_b: dict) -> dict:
@@ -171,15 +176,25 @@ def test_tc_b94_21_loader_refuses_a2b_binding_arm(tmp_path: Path) -> None:
     assert flow is None
     assert any(f.code == fps.FLOW_BAD_FIELD for f in findings)
 
-    escaping = _envelope(
-        {"source": "flow", "ref": "0"},
-        {"source": "file", "ref": "..\\..\\evil.s19"},
-    )
-    flow, findings = fps.dict_to_flow(escaping, project)
-    assert flow is None
-    assert any(
-        f.code in (fps.FLOW_UNSAFE_REF, "MANIFEST-PATH-ESCAPE") for f in findings
-    )
+    # Traversal refuses AT LOAD in EVERY separator convention — the branch
+    # set is the wire grammar, not the platform (C-10): the loader normalizes
+    # separators before its pre-reject, so all three shapes must refuse with
+    # the loader's own codes on any host.
+    for traversal_ref in (
+        "..\\..\\evil.s19",  # the CI-reduced Windows shape
+        "../../evil.s19",  # POSIX shape
+        "..\\../evil.s19",  # mixed shape
+    ):
+        escaping = _envelope(
+            {"source": "flow", "ref": "0"},
+            {"source": "file", "ref": traversal_ref},
+        )
+        flow, findings = fps.dict_to_flow(escaping, project)
+        assert flow is None, traversal_ref
+        assert any(
+            f.code in (fps.FLOW_UNSAFE_REF, "MANIFEST-PATH-ESCAPE")
+            for f in findings
+        ), traversal_ref
 
 
 # --------------------------------------------------------------------------- #

@@ -22,11 +22,14 @@ Finding taxonomy (OQ-1, §6.2 — mixed and honest):
 - ``FLOW-*`` codes are the loader's OWN envelope/schema/block findings.
 - ``MANIFEST-*`` codes travel VERBATIM with the reused guard — the reader sees
   exactly which component fired. The loader never rewrites them.
-- ``FLOW-UNSAFE-REF`` is the one loader-side path-shape reject that closes a gap
+- ``FLOW-UNSAFE-REF`` is the loader-side path-shape reject that closes the gaps
   the reused guard does not cover: a Windows *drive-relative* ref (``C:foo`` —
-  a drive letter with no root). ``PureWindowsPath("C:foo").is_absolute()`` is
+  a drive letter with no root), and an A2B file-binding ref whose separators
+  normalize to a traversal (``..`` component). ``PureWindowsPath("C:foo").is_absolute()`` is
   ``False``, so the guard's absolute-path arms miss it, yet joining it against a
-  project on a different drive escapes the work area. Rejected loader-side
+  project on a different drive escapes the work area; a backslash traversal
+  reads as one in-project literal on a POSIX host, so the guard's
+  ``resolve()`` containment arm misses it. Both rejected loader-side
   WITHOUT forking the guard (AMD-11/F4).
 """
 
@@ -34,7 +37,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ...validation.model import ValidationIssue, ValidationSeverity
@@ -97,8 +100,10 @@ FLOW_SCHEMA_UNSUPPORTED = "FLOW-SCHEMA-UNSUPPORTED"
 FLOW_UNKNOWN_KIND = "FLOW-UNKNOWN-KIND"
 FLOW_BAD_FIELD = "FLOW-BAD-FIELD"
 FLOW_UNSAFE_OUTPUT_NAME = "FLOW-UNSAFE-OUTPUT-NAME"
-#: Loader-side path-shape reject for a Windows drive-relative READ ref (the gap
-#: the reused guard's ``is_absolute()`` arms miss — AMD-11/F4).
+#: Loader-side path-shape reject for a Windows drive-relative READ ref or an
+#: A2B file-binding traversal ref after separator normalization (the gaps
+#: the reused guard's ``is_absolute()`` / POSIX ``resolve()`` arms miss —
+#: AMD-11/F4 and the PR #211 CI fix).
 FLOW_UNSAFE_REF = "FLOW-UNSAFE-REF"
 
 #: kind → (required ref field | None, enum fields {name: allowed values}).
@@ -561,8 +566,11 @@ def _parse_a2b_entry(
     Summary:
         Strict keys ``{kind, image_a, image_b}`` (schema v1 is strict); each
         binding is an object of exactly ``{source, ref}`` with a known source
-        discriminator; a ``file`` binding rides the SAME drive-relative
-        pre-reject + reused containment guard as every other READ ref; a
+        discriminator; a ``file`` binding's separators normalize to ``/``
+        BEFORE the SAME drive-relative pre-reject + reused containment guard
+        as every other READ ref, with a traversal (``..`` component) pre-reject
+        beside the drive-relative one (the refusal is platform-independent —
+        the wire grammar is Windows-shaped but must refuse on any host); a
         ``flow`` binding keeps its decimal index grammar (range/kind checks
         ride the model's wiring matrix). ANY problem appends one finding and
         returns ``None`` — the whole-flow fail-closed aggregate still applies.
@@ -625,13 +633,24 @@ def _parse_a2b_entry(
             return None
         ref = ref.strip()
         if source == A2B_INPUT_FILE:
-            if _is_drive_relative(ref):
+            # The binding ref is WIRE text and the operator file grammar is
+            # Windows-shaped, so normalize its separators to '/' BEFORE the
+            # shape pre-rejects and the reused containment guard. On a POSIX
+            # host a backslash is an ordinary filename character: without this
+            # the guard's resolve() reads '..\..\evil.s19' as ONE in-project
+            # literal and the traversal loads — the refusal must hold on any
+            # host (batch-94 CI fix, PR #211). The loaded binding carries the
+            # normalized (canonical wire) form.
+            wire_ref = ref
+            ref = ref.replace("\\", "/")
+            if _is_drive_relative(ref) or ".." in PurePosixPath(ref).parts:
                 findings.append(
                     _finding(
                         FLOW_UNSAFE_REF,
-                        f"{label} (a2b) {field}.ref {ref!r} is a Windows "
-                        "drive-relative path - refs resolve against the "
-                        "project directory only",
+                        f"{label} (a2b) {field}.ref {wire_ref!r} is not a "
+                        "plain project-relative ref (a drive-relative or "
+                        "traversal path) - refs resolve against the project "
+                        "directory only",
                     )
                 )
                 return None

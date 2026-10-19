@@ -347,6 +347,10 @@ def test_tc_b94_18_curated_set_and_engine_freeze() -> None:
     run the engine freeze holds: no diff vs ``main`` over ``validation/rules.py``
     and ``tui/a2l.py`` and the worktree bytes equal ``main``'s blobs (CRLF-aware).
     Adding a non-standard name to the set, or any engine edit, turns this RED.
+    The freeze arm rides the proven TC-027 idiom: where the ``main`` ref is
+    absent (the CI PR checkout fetches the PR head only) the arm SKIPS instead
+    of erroring — on a checkout that has ``main`` (local runs, the post-merge
+    gate) both byte-equality assertions keep their full teeth, same run.
     """
     assert CURATED_STANDARD_A2L_BLOCKS == EXPECTED_SEED_SET, (
         set(CURATED_STANDARD_A2L_BLOCKS) ^ set(EXPECTED_SEED_SET)
@@ -358,29 +362,41 @@ def test_tc_b94_18_curated_set_and_engine_freeze() -> None:
     assert "FROBNICATE" not in CURATED_STANDARD_A2L_BLOCKS
     assert "" not in CURATED_STANDARD_A2L_BLOCKS
 
-    # Engine freeze, same run — the proven TC-027 idiom plus a CRLF-aware
-    # byte-equality against ``main``'s blobs (the checkout may carry CRLF).
+    # Engine freeze, same run — the proven TC-027 idiom (check=True, skip on
+    # CalledProcessError / FileNotFoundError) plus a CRLF-aware byte-equality
+    # against ``main``'s blobs (the checkout may carry CRLF). The CI PR
+    # checkout fetches the PR head only, so ``main`` does not resolve there:
+    # the arm skips instead of dying with exit 128 — exactly how
+    # tests/test_engine_unchanged.py stays green on CI. Where ``main`` exists
+    # (local runs, the post-merge gate) both assertions still bite, same run.
     frozen_paths = ["s19_app/validation/rules.py", "s19_app/tui/a2l.py"]
-    completed = subprocess.run(
-        ["git", "diff", "--name-only", "main", "--", *frozen_paths],
-        cwd=_REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    changed = [line for line in completed.stdout.splitlines() if line.strip()]
-    assert changed == [], changed
-    for frozen in frozen_paths:
-        blob = subprocess.run(
-            ["git", "show", f"main:{frozen}"],
+    try:
+        completed = subprocess.run(
+            ["git", "diff", "--name-only", "main", "--", *frozen_paths],
             cwd=_REPO_ROOT,
             capture_output=True,
+            text=True,
             check=True,
-        ).stdout
-        worktree = (_REPO_ROOT / frozen).read_bytes().replace(b"\r\n", b"\n")
-        assert hashlib.sha256(worktree).hexdigest() == hashlib.sha256(
-            blob.replace(b"\r\n", b"\n")
-        ).hexdigest(), frozen
+        )
+        changed = [line for line in completed.stdout.splitlines() if line.strip()]
+        assert changed == [], changed
+        for frozen in frozen_paths:
+            blob = subprocess.run(
+                ["git", "show", f"main:{frozen}"],
+                cwd=_REPO_ROOT,
+                capture_output=True,
+                check=True,
+            ).stdout
+            worktree = (_REPO_ROOT / frozen).read_bytes().replace(b"\r\n", b"\n")
+            assert hashlib.sha256(worktree).hexdigest() == hashlib.sha256(
+                blob.replace(b"\r\n", b"\n")
+            ).hexdigest(), frozen
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        pytest.skip(
+            "git is unavailable or the 'main' ref is missing in this "
+            "environment — TC-B94-18's engine-freeze arm cannot run: "
+            f"{exc}"
+        )
 
 
 # ---------------------------------------------------------------------------
