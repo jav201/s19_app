@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P3",
+ "current_station": "P5",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -178,6 +178,21 @@
    "station": "P3",
    "date": "2026-10-18",
    "decision": "P4 gate run THREE (definitive, c18d181 on origin/main 121feaa, 0:58:06): 3040 passed / 5 failed / 32 xfailed -- 0 NEW deterministic failures attributable to batch-94 (2 A: batch-95's TC-707 pair; 3 C: the load-modulated family, isolate-green p4_run3_isolate_3nodes.txt); the qa-reviewer reconciliation returns PASS-WITH-NOTES."
+  },
+  {
+   "station": "P3",
+   "date": "2026-10-18",
+   "decision": "P3 re-closure after the iterate-to-fix: the fix rounds restored the pre-existing invariants the P4 gate caught -- no design characteristic or interface changed (the PDR re-opening rule does not fire); the increments stand as gated."
+  },
+  {
+   "station": "DDR",
+   "date": "2026-10-18",
+   "decision": "DDR re-walk: the sealed record stands (approved with conditions, both discharged); the fix rounds touched no frozen interface (D1-D5 verified intact in the fix-round censuses)."
+  },
+  {
+   "station": "P4",
+   "date": "2026-10-18",
+   "decision": "P4 gate PASSED under the standing authorization -- verdict PASS-WITH-NOTES (the qa-reviewer reconciliation, 04-validation.md): the definitive gate run THREE (c18d181 on origin/main 121feaa, 3040 passed / 5 failed / 32 xfailed, 0:58:06, orchestrator-run per C-25) carries 0 NEW deterministic failures attributable to batch-94 (2 A: batch-95's TC-707 pair; 3 C: the load-modulated family, isolate-green); Layer A 31/31 + Layer B 24/24 reconciled with executors attributed; the 16 run-ONE escaped regressions closed in two orchestrator-owned fix rounds with red-pre/green-post pairs; notes N-1..N-6 named with owners; P5 postmortem is next."
   }
  ],
  "obsidian_synced": false,
