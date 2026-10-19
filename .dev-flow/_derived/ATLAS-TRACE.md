@@ -3322,7 +3322,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1667 unique id(s)
+## family AT/TC — 1668 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3973,6 +3973,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `AT-B94-05` | batches, tests |
 | `AT-B94-06` | batches, tests |
 | `AT-B94-07` | batches, tests |
+| `AT-B94-07b` | batches |
 | `AT-B94-08` | batches, tests |
 | `AT-B94-09` | batches, tests |
 | `AT-B94-10` | batches, tests |
