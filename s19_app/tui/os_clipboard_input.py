@@ -25,8 +25,13 @@ This module supplies :class:`OsClipboardInput`, a drop-in replacement for
 ``Input`` whose ``action_paste`` reads the OS clipboard through a
 **layered cascade**:
 
-    1. ``tkinter.Tk().clipboard_get()`` — Python stdlib, no extra runtime
-       dep. Works in the vast majority of cases.
+    1. ``tkinter`` ``clipboard_get()`` through a **process-wide singleton
+       root** — Python stdlib, no extra runtime dep. The ``tk.Tk()`` root
+       is created exactly once, in the main thread (Tk pins its interpreter
+       to the creating thread, and on Windows repeated create/destroy
+       cycles in one process can fail persistently after the first — the
+       BUG B7 residual root cause), reused for every read, and destroyed
+       once at process exit. Works in the vast majority of cases.
     2. ``ctypes`` against the Win32 clipboard API — no window, no event
        loop, immune to the transient states where Tk's implicit Tcl
        interpreter would raise ``TclError``.
@@ -46,9 +51,11 @@ guessing why the paste did nothing.
 from __future__ import annotations
 
 import asyncio
+import atexit
 import logging
 import subprocess
 import sys
+import threading
 import time
 from typing import Callable, Optional
 
@@ -76,28 +83,135 @@ _PASTE_FAIL_NOTIFICATION = (
 )
 
 
-def _read_via_tk() -> Optional[str]:
-    """Layer 1 — ``tkinter.Tk().clipboard_get()`` with short retries."""
+def _create_tk_root() -> Optional[object]:
+    """Create a single withdrawn ``tkinter.Tk`` root.
+
+    Must be called from the MAIN thread only: Tk binds its interpreter to
+    the creating thread, and on Windows repeated create/destroy cycles of
+    ``tk.Tk()`` in the same process can fail persistently after the first
+    one (BUG B7 residual root cause, 2026-10-18). Returns ``None`` when
+    tkinter is unavailable or the root cannot be created (headless / no
+    display), in which case the cascade falls through to the ctypes /
+    PowerShell layers unchanged.
+    """
     try:
         import tkinter as tk
     except Exception as exc:  # pragma: no cover — Tk is stdlib on CPython.
-        logger.debug("_read_via_tk: tkinter unavailable: %s", exc)
+        logger.debug("_create_tk_root: tkinter unavailable: %s", exc)
         return None
-    for attempt in range(_TK_RETRIES):
-        root = None
+    try:
+        root = tk.Tk()
+        root.withdraw()
+    except Exception as exc:
+        logger.debug("_create_tk_root: tk.Tk() failed: %s", exc)
+        return None
+    return root
+
+
+class _TkRootSingleton:
+    """Process-wide lazy singleton for the layer-1 Tk clipboard root.
+
+    Exactly one ``tk.Tk()`` is created per process, in the main thread, and
+    it is destroyed exactly once at process exit (``atexit``). Reads via
+    ``clipboard_get`` may run on an executor thread once the root exists —
+    the stateful create/destroy lifecycle is what Tk pins to the main
+    thread, and that lifecycle lives entirely in this class.
+    """
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._root: Optional[object] = None
+        # Sticky negative: once creation failed (no tkinter / headless) do
+        # not pay the import + failure cost on every paste.
+        self._unavailable = False
+        # Seam for tests / diagnostics: name of the thread that created
+        # the root (creation is only ever attempted on the main thread).
+        self.creator_thread: Optional[str] = None
+
+    def get_or_create(self) -> Optional[object]:
+        """Return the shared root, creating it when called on the main thread.
+
+        Returns ``None`` when tk is unavailable, when creation previously
+        failed, or when called off the main thread before the root exists
+        (creation is main-thread-only; the executor reader then yields to
+        the next cascade layer — ``action_paste`` primes the root from the
+        main thread before entering the executor).
+        """
+        with self._lock:
+            if self._root is not None:
+                return self._root
+            if self._unavailable:
+                return None
+            if threading.current_thread() is not threading.main_thread():
+                return None
+            root = _create_tk_root()
+            if root is None:
+                self._unavailable = True
+                return None
+            self._root = root
+            self.creator_thread = threading.current_thread().name
+            atexit.register(_destroy_tk_root_singleton)
+            return self._root
+
+    def get_existing(self) -> Optional[object]:
+        """Return the shared root if it already exists, else ``None``."""
+        with self._lock:
+            return self._root
+
+
+def _destroy_tk_root_singleton() -> None:
+    """Destroy the shared root exactly once, at process exit."""
+    with _TK_ROOT._lock:
+        root = _TK_ROOT._root
+        _TK_ROOT._root = None
+    if root is not None:
         try:
-            root = tk.Tk()
-            root.withdraw()
+            root.destroy()
+        except Exception:  # pragma: no cover — best-effort at exit.
+            pass
+
+
+_TK_ROOT = _TkRootSingleton()
+
+
+def _prime_tk_root() -> None:
+    """Create the shared Tk root NOW when running on the main thread.
+
+    ``OsClipboardInput.action_paste`` primes the root from the app's event
+    loop (the main thread, where Tk demands creation) before dispatching
+    the cascade to the executor, so the executor thread never attempts a
+    Tk creation. Off-main-thread calls are a no-op: the reader will then
+    fall through to layer 2/3.
+    """
+    if threading.current_thread() is threading.main_thread():
+        _TK_ROOT.get_or_create()
+
+
+def _read_via_tk() -> Optional[str]:
+    """Layer 1 — read via the process-wide Tk root with short retries.
+
+    The root is a lazy singleton (see :class:`_TkRootSingleton`): created
+    once in the main thread, reused for every read, destroyed once at
+    process exit. This function never creates the root off the main thread
+    — the pre-fix create/destroy-per-paste cycle killed layer 1 permanently
+    mid-session on Windows (BUG B7, 2026-10-18).
+
+    Thread-safety note: ``clipboard_get`` on the already-created root from
+    an executor thread is accepted here — the call is a single synchronous
+    Win32 clipboard read through the Tcl interpreter and does not touch the
+    root's event loop; only root creation/destruction is main-thread-pinned.
+    """
+    for attempt in range(_TK_RETRIES):
+        root = _TK_ROOT.get_or_create()
+        if root is None:
+            # tk unavailable, creation previously failed, or we are off the
+            # main thread before the root exists — let the cascade move on.
+            return None
+        try:
             text = root.clipboard_get()
         except Exception as exc:
             logger.debug("_read_via_tk attempt %d failed: %s", attempt, exc)
             text = None
-        finally:
-            if root is not None:
-                try:
-                    root.destroy()
-                except Exception:  # pragma: no cover — best-effort cleanup.
-                    pass
         if isinstance(text, str):
             return text
         time.sleep(_TK_RETRY_DELAY_S)
@@ -330,7 +444,10 @@ class OsClipboardInput(Input):
         - ``action_paste`` (bound to Ctrl+V by ``Input.BINDINGS``) is
           async so the cascade runs off the UI event loop via
           ``loop.run_in_executor`` — otherwise the worst-case PowerShell
-          subprocess (up to 500 ms) would freeze the terminal.
+          subprocess (up to 500 ms) would freeze the terminal. Before
+          entering the executor it primes the process-wide Tk root on the
+          main thread (see :func:`_prime_tk_root`), so the Tk layer is
+          only ever *read* from the executor thread.
         - The executor call yields to :func:`read_os_clipboard`; on
           ``None`` we fall back to ``self.app.clipboard``. On non-empty
           text, only the first line of the payload is inserted, matching
@@ -354,6 +471,12 @@ class OsClipboardInput(Input):
     """
 
     async def action_paste(self) -> None:
+        # Prime the process-wide Tk root on the UI thread (the main thread,
+        # where Tk demands creation) BEFORE the cascade runs in the executor
+        # — creating/destroying tk.Tk() from the executor thread is what
+        # used to kill layer 1 permanently mid-session (BUG B7 residual,
+        # 2026-10-18). Priming is a no-op once the root exists.
+        _prime_tk_root()
         # Run the cascade off the UI event loop. Even the fast tk layer
         # blocks synchronously (~89 ms measured), and the PowerShell
         # rescue can spend up to 500 ms in a blocking subprocess. Both
