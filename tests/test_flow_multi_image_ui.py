@@ -22,7 +22,7 @@ from textual.widgets import Button, Select
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.models import VariantDescriptor
-from s19_app.tui.screens_directionb import FlowBuilderPanel
+from s19_app.tui.flow_screens import FlowBuilderPanel
 from s19_app.tui.services.flow_execution_service import run_flow, run_flow_over_variants
 from s19_app.tui.services.flow_model import (
     FLOW_SCOPE_ALL_VARIANTS,

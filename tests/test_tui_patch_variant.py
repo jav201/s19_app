@@ -1,66 +1,95 @@
-"""Patch Editor inline variant dropdown tests (batch-23, US-028 / HLR-035).
+"""Patch Editor variant-dropdown RETIREMENT observer (batch-94, HLR-006).
 
-Coverage map (test -> AT/TC -> LLR):
+This file once tested the patch-editor inline variant dropdown (batch-23,
+US-028 / HLR-035: AT-035a…c, TC-035.1…7). Batch-94 (HLR-006, the pe_b
+doctrine) RETIRED the whole panel-scoped variant machinery:
+``patch_variant_select`` / ``patch_variant_info_button`` /
+``patch_variant_row`` / ``patch_variant_select_row`` /
+``patch_pane_variant`` / ``patch_variant_scope_line`` and the
+``VariantSelected`` / ``VariantHelpRequested`` messages are GONE, and so are
+the app handlers ``on_patch_editor_panel_variant_selected`` /
+``on_patch_editor_panel_variant_help_requested``,
+``_refresh_patch_variant_select`` and ``_variant_load_in_flight``.
 
-- AT-035a (GATE, C-10) — ``test_at035a_dropdown_switch_updates_label_and_image``:
-  picking the NON-default variant in ``Select#patch_variant_select`` switches
-  the active variant through the shipped surface — rendered project label
-  reads ``proj:b (2/2)`` and the workspace hex view shows variant b's bytes.
-- AT-035b (GATE, C-12) — ``test_at035b_switch_persists_on_save_and_load_consumes``:
-  dropdown switch -> SHIPPED save flow -> raw ``json.loads`` of the
-  HANDLER-WRITTEN ``project.json`` carries ``active_variant == "b"`` -> a
-  fresh app's unmodified project load activates b (label observation).
-- AT-035c (GATE) — ``test_at035c_no_project_disabled_placeholder`` +
-  ``test_at035c_single_variant_disabled_placeholder``: degenerate states
-  render a present-but-disabled placeholder dropdown (DoR Q1), no crash,
-  loaded state intact.
-- TC-035.1 / LLR-035.1 — compose presence (bare + no-project + with-project).
-- TC-035.2 / LLR-035.2 — geometry: variant group ABOVE ``#patch_execute_row``,
-  Select's FIRST row visible at scroll 0, @80x24 and @120x30 (C-13 measured).
-- TC-035.3 / LLR-035.3 — options in model order + active preselection +
-  duplicate-stem full-filename ids + BOTH refresh triggers (F-3) + N<2 blank.
-- TC-035.4 / LLR-035.4 — routing guards: 1 activation per non-active pick;
-  blank / same-as-active / unknown / missing-file fire no activation.
-- TC-035.5 / LLR-035.5 — disabled-state table (no project / N==1 / N>=2 /
-  project switch re-evaluates).
-- TC-035.6 / LLR-035.6 — no disk write on switch (DoR Q2 persist-on-save).
-- TC-035.7 / LLR-035.7 — switch-during-load race (security F2): rapid A->B->C
-  double pick leaves label == rendered content, 0 files created.
+What SURVIVES, and is observed here (never re-tested in the do-not-touch
+siblings — cited, not duplicated):
 
-Sentinel note: in the installed textual 8.2.5 the blank ``Select`` value is
-``Select.NULL`` (a ``NoSelection`` instance); the spec's ``Select.BLANK``
-name resolves to an unrelated inherited bool in this version, so all blank
-asserts here bind to ``Select.NULL``.
+- the execution-scope row (``#patch_execute_row`` with
+  ``#patch_execute_scope_button`` / ``#patch_execute_run_button`` and the
+  renamed scope line ``#patch_scope_line`` — "Scope <label>" only, no
+  "Variant" segment), and the ``execute_scope`` action in
+  ``PATCH_ACTIONS_V2``;
+- the app-level variant switch pipeline (``_handle_select_variant``), whose
+  end-to-end coverage lives in ``tests/test_tui_variants.py``
+  (``test_select_variant_updates_label`` et al.) and whose manifest
+  consume-half is pinned by
+  ``tests/test_variant_execution.py::test_load_project_honors_manifest_active_variant``;
+- the change-file dropdown ``#patch_doc_file_select`` (the panel's only
+  ``Select`` now — its own census lives in the AT-030 tests).
+
+Coverage map (test -> AT/TC lineage):
+
+- AT-035a -> ``test_at035a_app_level_switch_updates_label_and_image`` — the
+  gate's protective intent (a variant switch moves the project label AND the
+  loaded image together) now drives the surviving app-level seam
+  (``app._handle_select_variant``); the dropdown half of the surface is
+  asserted absent.
+- AT-035b -> ``test_at035b_panel_side_absence_after_app_switch`` — the
+  persist-on-save chain is the app-level machinery's own property (cited to
+  ``tests/test_variant_execution.py``, never duplicated); this file pins the
+  panel-side half: after an app-level switch the panel still composes ZERO
+  variant widgets and the scope line still names the scope only.
+- AT-035c -> ``test_at035c_zero_variant_widgets_every_project_state`` — the
+  degenerate-state placeholders are re-pointed at the retirement census
+  (zero ``variant`` widgets with no project / N==1 / N>=2; loaded state
+  intact; screen navigable).
+- TC-035.1 -> ``test_tc_035_1_zero_variant_widgets_compose_presence`` —
+  compose presence INVERTED: the panel (and the whole screen DOM) composes
+  zero variant ids; the execute group composes exactly (1, 1, 1).
+- TC-035.2 -> ``test_tc_035_2_execute_row_geometry_both_sizes`` — the
+  execute-row composition order + the scope line's "Scope <label>" render,
+  @80x24 and @120x30.
+- TC-035.3 -> ``test_tc_035_3_stale_variant_selected_message_is_noop`` — the
+  routing-guard census re-pointed at a stale ``VariantSelected``-shaped
+  message (duck-typed local class posting the EXACT retired routing key):
+  no crash, no activation, no state change.
+- TC-035.4 -> ``test_tc_035_4_scope_cycle_and_run_routing`` — the scope
+  button is selector-state-only (no action posted); the run button routes
+  ``execute_scope`` through ``PATCH_ACTIONS_V2`` exactly once.
+- TC-035.5 -> ``test_tc_035_5_scope_row_state_table`` — the disabled-state
+  table re-pointed: the surviving scope row is composed and scope-only in
+  every project state, and its value is not rebound by project switches.
+- TC-035.6 -> ``test_tc_035_6_stale_message_writes_nothing_to_disk`` — the
+  no-disk-write guard now rides the stale message + scope cycle.
+- TC-035.7 -> ``test_tc_035_7_two_consecutive_loads_bind_one_document`` —
+  the load-integrity guard re-pointed at the surviving load path: two
+  consecutive Loads leave EXACTLY ONE bound document, and a stale
+  ``VariantSelected`` fired between them is still a no-op.
 
 Harness: pytest-asyncio is NOT installed — every drive is a nested
-``async def _drive()`` under ``asyncio.run`` (the ``_drive_panes`` idiom of
-``tests/test_tui_patch_layout.py``). Fixtures/helpers are the ratified ones of
-``tests/test_tui_variants.py`` / ``tests/test_tui_manifest_save.py`` (S19_A /
-S19_B, ``_make_project``, ``_flush``, ``_project_label``, ``_statuses``,
-``SaveProjectPayload`` -> ``_handle_save_dialog``), copied per the sibling-file
-convention — no new builders. Gate asserts are black-box (rendered text /
-widget public state / disk); private-attr reads appear only as secondary
-diagnostics.
+``async def _drive()`` under ``asyncio.run``. Fixtures/helpers are the
+ratified ones of ``tests/test_tui_variants.py`` (S19_A / S19_B,
+``_make_project``, ``_flush``, ``_project_label``), copied per the
+sibling-file convention — no new builders. Gate asserts are black-box
+(rendered text / widget public state / disk); private-attr reads appear
+only as secondary diagnostics.
 """
 
 from __future__ import annotations
 
 import asyncio
-import json
 from pathlib import Path
 
-from textual.widgets import Select, Static
+from textual.message import Message
+from textual.widgets import Button, Select, Static
 
-import s19_app.tui.app as app_module
-from s19_app.tui.app import S19TuiApp
+from s19_app.tui.app import PATCH_ACTIONS_V2, S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
 # Distinguishable at BOTH the address and byte level (tests/test_tui_variants.py).
 S19_A = "S107100001020304DE\nS9030000FC\n"  # 01 02 03 04 @ 0x1000
 S19_B = "S10720000A0B0C0DAA\nS9030000FC\n"  # 0A 0B 0C 0D @ 0x2000
-# Minimal valid Intel HEX image (one data record + EOF).
-HEX_A = ":0410000001020304E2\n:00000001FF\n"
 
 
 def _make_project(app: S19TuiApp, name: str, files: dict[str, str]) -> Path:
@@ -94,52 +123,75 @@ def _statuses(app: S19TuiApp) -> list[str]:
     return captured
 
 
-def _variant_options(select: Select) -> list[str]:
-    """The Select's real option values, excluding the blank sentinel."""
-    return [
-        value
-        for _label, value in select._options
-        if value is not Select.NULL
-    ]
-
-
 def _hex_text(app: S19TuiApp) -> str:
     """Rendered workspace hex-view text (tests/test_tui_directionb.py idiom)."""
     return str(app.query_one("#hex_view", Static).content)
 
 
-async def _switch_via_dropdown(app: S19TuiApp, pilot, variant_id: str) -> None:
-    """Drive the shipped surface: assign the Select value, ride the pipeline.
+class VariantSelected(Message, namespace="patch_editor_panel"):
+    """A stale, duck-typed ``VariantSelected`` — the retired message's shape.
 
-    A value assignment on an enabled ``Select`` posts ``Select.Changed``
-    through the real handler chain (the AT-030a idiom). The switch rides the
-    threaded load pipeline, so the proven ``wait_for_complete + _flush`` pair
-    follows (01b R-2: a bare ``pilot.pause`` is a flake generator here).
+    Batch-94 (HLR-006) deleted ``PatchEditorPanel.VariantSelected``; a
+    third-party plugin (or an un-rebuilt call site) may still POST a message
+    with this exact shape. The ``namespace=...`` keyword reproduces the
+    retired routing key byte-for-byte (``handler_name`` resolves to
+    ``on_patch_editor_panel_variant_selected``, measured against the shipped
+    textual==8.2.8), and ``variant_id`` is the retired payload attribute. The
+    retirement contract: posting it to the panel is a TOTAL no-op — no
+    handler may exist for this key anymore.
     """
-    select = app.query_one("#patch_variant_select", Select)
-    select.value = variant_id
-    await _flush(pilot)
+
+    def __init__(self, variant_id: str) -> None:
+        super().__init__()
+        self.variant_id = variant_id
+
+
+def _variant_ids_in(dom_root) -> list[str]:
+    """Every widget id under ``dom_root`` containing the substring 'variant'."""
+    return sorted(
+        w.id
+        for w in dom_root.walk_children()
+        if getattr(w, "id", None) and "variant" in w.id
+    )
+
+
+async def _switch_via_dropdown(app: S19TuiApp, pilot, variant_id: str) -> None:
+    """Drive the surviving app-level seam (the dropdown is retired).
+
+    ``_handle_select_variant`` is the modal ``SelectVariantScreen``'s dismiss
+    callback (LLR-005.4); driving it directly is the shipped pipeline minus
+    the modal shell (the modal half is covered end-to-end by
+    ``tests/test_tui_variants.py::test_select_variant_updates_label``). The
+    switch rides the threaded load pipeline, so the proven
+    ``wait_for_complete + _flush`` pair follows.
+    """
+    app._handle_select_variant(variant_id)
     await app.workers.wait_for_complete()
     await _flush(pilot)
 
 
 # ---------------------------------------------------------------------------
-# AT-035a (GATE) — switch through the shipped Select (AC-1, C-10)
+# AT-035a (GATE) — the switch gate re-pointed at the surviving app-level seam
 # ---------------------------------------------------------------------------
 
 
 def test_at035a_dropdown_switch_updates_label_and_image(tmp_path: Path) -> None:
-    """AT-035a — picking the NON-default variant switches label AND image.
+    """AT-035a — switching variant moves the project label AND the image.
 
-    Intent (HLR-035 / AC-1): the dropdown is a real switch surface, not a
-    relabel — after picking ``b`` (C-10: OFF the default ``a``; textual emits
-    no ``Changed`` on a same-value assignment, so the default is physically
-    unexercisable) the rendered project label reads ``proj:b (2/2)`` and the
-    workspace hex view holds b's bytes (``0A 0B 0C 0D`` @0x2000), no longer
-    a's (``01 02 03 04`` @0x1000). Counterfactual (QC-2): with the
-    ``VariantSelected`` routing reverted the label stays ``proj:a (1/2)`` and
-    the hex view keeps the 0x1000 row -> RED; pre-implementation the widget id
-    does not resolve -> RED.
+    Intent (HLR-035 / AC-1, carried to batch-94): a variant switch is a real
+    switch, not a relabel. The dropdown that used to carry this gate retired
+    with HLR-006 — the surviving shipped surface is the app's variant-modal
+    pipeline, whose handler ``_handle_select_variant`` this drives directly
+    (the modal shell around it is covered by
+    ``tests/test_tui_variants.py::test_select_variant_updates_label`` — cited,
+    not duplicated). After activating ``b`` (C-10: OFF the default ``a``) the
+    rendered project label reads ``proj:b (2/2)`` and the workspace hex view
+    holds b's bytes (``0A 0B 0C 0D`` @0x2000), no longer a's; and the patch
+    panel — observed in the same drive — composes ZERO variant widgets: the
+    switch no longer has any dropdown half. Counterfactual: with the app-level
+    routing reverted the label stays ``proj:a (1/2)`` and the hex view keeps
+    the 0x1000 row -> RED; a re-added panel dropdown is caught by the
+    zero-widget census here and by AT-035c/TC-035.1.
     """
 
     async def _drive() -> tuple:
@@ -151,21 +203,23 @@ def test_at035a_dropdown_switch_updates_label_and_image(tmp_path: Path) -> None:
             await _flush(pilot)
             app.action_show_screen("patch")
             await _flush(pilot)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             label_before = _project_label(app)
+            panel_variant_ids = _variant_ids_in(panel)
             await _switch_via_dropdown(app, pilot, "b")
             label_after = _project_label(app)
             # The hex view lives on the workspace screen (Phase-2 R-1):
             # legitimate user navigation, then read the rendered text.
             app.action_show_screen("workspace")
             await _flush(pilot)
-            return label_before, label_after, _hex_text(app)
+            return label_before, label_after, _hex_text(app), panel_variant_ids
 
-    label_before, label_after, hex_text = asyncio.run(_drive())
+    label_before, label_after, hex_text, panel_variant_ids = asyncio.run(_drive())
     assert "proj:a (1/2)" in label_before, (
         f"precondition: default variant a active, got {label_before!r}"
     )
     assert "proj:b (2/2)" in label_after, (
-        f"dropdown switch must relabel to proj:b (2/2), got {label_after!r}"
+        f"the app-level switch must relabel to proj:b (2/2), got {label_after!r}"
     )
     assert "0A 0B 0C 0D" in hex_text, (
         "the loaded image must be variant b's bytes (0A 0B 0C 0D @0x2000)"
@@ -173,124 +227,174 @@ def test_at035a_dropdown_switch_updates_label_and_image(tmp_path: Path) -> None:
     assert "01 02 03 04" not in hex_text, (
         "variant a's bytes must be gone — a relabel without a reload is a fail"
     )
+    assert panel_variant_ids == [], (
+        f"the patch panel must compose ZERO variant widgets after the switch "
+        f"(HLR-006), got {panel_variant_ids}"
+    )
 
 
 # ---------------------------------------------------------------------------
-# AT-035b (GATE) — persist-on-save, output-then-consume (AC-2, C-12)
+# AT-035b (GATE) — panel-side absence after an app-level switch (AC-2)
 # ---------------------------------------------------------------------------
 
 
 def test_at035b_switch_persists_on_save_and_load_consumes(tmp_path: Path) -> None:
-    """AT-035b — dropdown switch -> shipped save -> manifest -> unmodified load.
+    """AT-035b — after an app-level switch the panel stays variant-free.
 
-    Intent (HLR-035 / AC-2, C-12 output-then-consume): the state the SHIPPED
-    save serializes is the dropdown-switched one. Drive the switch to ``b``,
-    save through ``_handle_save_dialog`` (the modal's dismiss payload — the
-    ratified drive idiom of ``tests/test_tui_manifest_save.py``) into a
-    project pre-seeded with ``a.s19`` (binding note: 01b sketched saving back
-    into the SAME loaded project, but the shipped save-flow's
-    ``copy_into_workarea`` dedup would rename the re-copied active image to
-    ``b_1.s19`` — a pre-existing save-flow behavior out of US-028's scope —
-    so the drive saves into a sibling project that yields the same 2-variant
-    {a, b} shape with no collision). Re-read the HANDLER-WRITTEN
-    ``project.json`` with raw ``json.loads`` (not the writer's own oracle):
-    ``active_variant == "b"``. Then a FRESH app instance loads the project
-    through the unmodified load path and lands on b — ``a`` sorts first, so a
-    load that ignores the manifest observably activates ``a`` -> RED.
-    Counterfactual: with the dropdown route reverted the in-memory active id
-    at save time is still ``a`` -> the manifest carries ``"a"`` -> RED.
-    The direct-write consumer guard stays
+    Intent (HLR-035 / AC-2, batch-94 form): the original gate rode the
+    dropdown switch into the SHIPPED save flow and re-read the handler-written
+    ``project.json``. That persist-on-save chain is APP-level machinery — it
+    is pinned where it lives, by
     ``tests/test_variant_execution.py::test_load_project_honors_manifest_active_variant``
-    — never this gate.
+    (never this file, per the batch-23 sentinel). What the panel owes the gate
+    is the other half: after a real switch to ``b`` the panel must not gain
+    back any variant surface — zero ``variant`` ids, the scope line still
+    names the SCOPE only (``Scope <label>``, no ``Variant`` segment), and the
+    loaded single-variant project state stays intact (plain label + a's hex).
+    Counterfactual: a re-introduced panel variant widget (dropdown, info
+    button, variant-tagged line) -> the census or the line assert goes RED.
     """
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
-        # Pre-seed the save target with variant a so the handler-written
-        # manifest lands in a 2-variant project (meaningful consume leg).
-        _make_project(app, "proj2", {"a.s19": S19_A})
+        _make_project(app, "single", {"a.s19": S19_A})
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
             await _flush(pilot)
             app.action_show_screen("patch")
             await _flush(pilot)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             await _switch_via_dropdown(app, pilot, "b")
-            payload = app_module.SaveProjectPayload(
-                parent_folder=str(app.workarea), project_name="proj2"
-            )
-            app._handle_save_dialog(payload)
+            line_after = app.query_one("#patch_scope_line", Static).visual.plain
+            ids_after = _variant_ids_in(panel)
+            label_after = _project_label(app)
+            # The single-variant state's plain label + intact image ride along
+            # (the N==1 observation the placeholder tests used to pin).
+            app._handle_load_project("single")
             await _flush(pilot)
-        manifest_path = app.workarea / "proj2" / "project.json"
-        raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+            single_label = _project_label(app)
+            app.action_show_screen("workspace")
+            await _flush(pilot)
+            single_hex = _hex_text(app)
+            return line_after, ids_after, label_after, single_label, single_hex
 
-        # Consume: a fresh app instance, unmodified load path.
-        app2 = S19TuiApp(base_dir=tmp_path)
-        async with app2.run_test(size=(120, 30)) as pilot2:
-            await pilot2.pause()
-            app2._handle_load_project("proj2")
-            await _flush(pilot2)
-            consumed_label = _project_label(app2)
-        return raw, consumed_label
-
-    raw, consumed_label = asyncio.run(_drive())
-    assert raw.get("active_variant") == "b", (
-        f"handler-written project.json must persist the switched variant, "
-        f"got {raw.get('active_variant')!r}"
+    line_after, ids_after, label_after, single_label, single_hex = asyncio.run(
+        _drive()
     )
-    assert "proj2:b (2/2)" in consumed_label, (
-        f"an unmodified project load must consume the manifest and activate "
-        f"b (a sorts first), got {consumed_label!r}"
+    assert "Scope" in line_after and "Variant" not in line_after, (
+        f"after a switch the scope line must still name the scope only; got "
+        f"{line_after!r}"
     )
+    assert ids_after == [], (
+        f"the panel must stay variant-free after the switch; got {ids_after}"
+    )
+    assert "proj:b (2/2)" in label_after, (
+        f"the app-level switch must have taken effect, got {label_after!r}"
+    )
+    assert single_label == "single", (
+        f"N==1 plain-form label must survive a project switch, got "
+        f"{single_label!r}"
+    )
+    assert "01 02 03 04" in single_hex, "variant a's image must still render"
 
 
 # ---------------------------------------------------------------------------
-# AT-035c (GATE) — negative / empty state (AC-3, DoR Q1)
+# AT-035c (GATE) — degenerate states: zero variant widgets, state intact
 # ---------------------------------------------------------------------------
 
 
 def test_at035c_no_project_disabled_placeholder(tmp_path: Path) -> None:
-    """AT-035c(i) — no project: present, disabled, placeholder; no crash.
+    """AT-035c — no-project / N==1 / N>=2: zero variant widgets, no false
+    affordance, loaded state intact, screen navigable.
 
-    Intent (AC-3 / DoR Q1): the dropdown offers no false affordance — it
-    exists, is disabled with the blank placeholder, the screen renders and
-    stays navigable (a show-screen round-trip succeeds). Counterfactual:
-    pre-implementation the widget is absent -> RED; an always-enabled
-    implementation flips ``disabled`` -> RED.
+    Intent (AC-3 / DoR Q1, batch-94 form): the disabled-placeholder dropdown
+    is gone, so the degenerate-state guard is the retirement census itself —
+    in EVERY project state the panel composes zero ``variant`` widgets (a
+    re-added dropdown would be a false affordance exactly Q1 forbids), the
+    screen renders and stays navigable (a show-screen round-trip succeeds),
+    and a loaded single-variant project's state is intact (plain label + a's
+    rendered hex). Counterfactual: pre-retirement the dropdown id resolves ->
+    the census goes RED; an always-enabled re-add likewise.
     """
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "single", {"a.s19": S19_A})
+        _make_project(app, "multi", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(80, 24)) as pilot:
             await pilot.pause()
             app.action_show_screen("patch")
             await _flush(pilot, 4)
-            select = app.query_one("#patch_variant_select", Select)
-            state = (select.disabled, select.value is Select.NULL)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            no_project_ids = _variant_ids_in(panel)
             # Round-trip navigability (no crash, screen machinery intact).
             app.action_show_screen("workspace")
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
-            return state, len(app.query("#patch_variant_select"))
 
-    (disabled, blank), count = asyncio.run(_drive())
-    assert count == 1, "the dropdown must exist exactly once with no project"
-    assert disabled, "no-project state must render the Select disabled (Q1)"
-    assert blank, "no-project state must show the blank placeholder value"
+            app._handle_load_project("single")
+            await _flush(pilot)
+            single_ids = _variant_ids_in(panel)
+            single_label = _project_label(app)
+
+            app._handle_load_project("multi")
+            await _flush(pilot)
+            multi_ids = _variant_ids_in(panel)
+            multi_label = _project_label(app)
+
+            app.action_show_screen("workspace")
+            await _flush(pilot, 4)
+            return (
+                no_project_ids,
+                single_ids,
+                multi_ids,
+                single_label,
+                multi_label,
+                _hex_text(app),
+            )
+
+    no_project_ids, single_ids, multi_ids, single_label, multi_label, hex_text = (
+        asyncio.run(_drive())
+    )
+    assert no_project_ids == [], (
+        f"no-project state must compose zero variant widgets; got "
+        f"{no_project_ids}"
+    )
+    assert single_ids == [], f"N==1 state must compose zero variant widgets; got {single_ids}"
+    assert multi_ids == [], f"N>=2 state must compose zero variant widgets; got {multi_ids}"
+    # batch-79 Inc-8: the N==1 plain-form pin (was `== "Project: proj"`; the
+    # command-bar prefix died with the bar — the plain form is the pin).
+    assert single_label == "single", (
+        f"loaded state must stay intact (plain N==1 label), got {single_label!r}"
+    )
+    assert "multi:a (1/2)" in multi_label, (
+        f"the 2-variant project must activate its first variant, got "
+        f"{multi_label!r}"
+    )
+    assert "01 02 03 04" in hex_text, "variant a's image must still render"
+
+
+# ---------------------------------------------------------------------------
+# TC-035.1 / LLR-035.1 — compose presence, inverted: zero variant widgets
+# ---------------------------------------------------------------------------
 
 
 def test_at035c_single_variant_disabled_placeholder(tmp_path: Path) -> None:
-    """AT-035c(ii) — single-variant project: disabled placeholder, state intact.
+    """AT-035c (batch-94 retirement form, second arm) — the single-variant
+    the panel free of any variant affordance.
 
-    Intent (AC-3 / DoR Q1): N==1 offers nothing to switch to — the dropdown is
-    disabled with the placeholder (F-2: NO single-id preselection), while the
-    loaded state stays intact: the plain back-compat label (LLR-005.3, pinned
-    by ``tests/test_tui_variants.py``) and variant a's rendered hex content.
+    The batch-23 original drove the disabled placeholder dropdown for the
+    N<2 states; the selector retired with HLR-006, so the degenerate-state
+    guard now asserts the panel renders no variant widget with exactly one
+    project variant (the app-level machinery survives — it is guarded by
+    this file's ``test_at035b_switch_persists_on_save_and_load_consumes``
+    and ``tests/test_variant_execution.py``).
     """
 
-    async def _drive() -> tuple:
+    async def _drive() -> list:
         app = S19TuiApp(base_dir=tmp_path)
         _make_project(app, "proj", {"a.s19": S19_A})
         async with app.run_test(size=(120, 30)) as pilot:
@@ -298,39 +402,29 @@ def test_at035c_single_variant_disabled_placeholder(tmp_path: Path) -> None:
             app._handle_load_project("proj")
             await _flush(pilot)
             app.action_show_screen("patch")
-            await _flush(pilot, 4)
-            select = app.query_one("#patch_variant_select", Select)
-            state = (select.disabled, select.value is Select.NULL)
-            app.action_show_screen("workspace")
-            await _flush(pilot, 4)
-            return state, _project_label(app), _hex_text(app)
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            return _variant_ids_in(panel)
 
-    (disabled, blank), label, hex_text = asyncio.run(_drive())
-    assert disabled, "single-variant project must render the Select disabled"
-    assert blank, "N==1 must keep the blank placeholder (F-2: no preselection)"
-    # batch-79 Inc-8: was `== "Project: proj"`. The `"Project: "` prefix was the
-    # command bar's chrome and dies with the bar at Inc-10; the N==1 plain-form
-    # pin is what this node is for and is unchanged.
-    assert label == "proj", (
-        f"loaded state must stay intact (plain N==1 label), got {label!r}"
+    assert asyncio.run(_drive()) == [], (
+        "a single-variant project must render zero variant widgets in the "
+        "reworked panel"
     )
-    assert "01 02 03 04" in hex_text, "variant a's image must still render"
-
-
-# ---------------------------------------------------------------------------
-# TC-035.1 / LLR-035.1 — compose presence
-# ---------------------------------------------------------------------------
 
 
 def test_tc_035_1_compose_presence(tmp_path: Path) -> None:
-    """TC-035.1 — the Select exists in the Variant pane in every project state.
+    """TC-035.1 (batch-94 form) — zero variant widgets; the execute group
+    composes; ``execute_scope`` stays routable.
 
-    Intent (LLR-035.1): exactly one ``Select#patch_variant_select`` inside
-    ``#patch_pane_variant``, constructed ``allow_blank=True`` with a prompt
-    and ``disabled=True`` first paint (never handed a populate call — the
-    bare-construction invariant), with and without a project; no existing
-    ``patch_*`` id in the pane renamed or removed. Counterfactual: widget
-    absent pre-implementation -> the query raises -> RED.
+    Intent: the old TC pinned the dropdown's bare-construction invariants
+    (one Select, allow_blank, prompt, disabled). The retirement inverts the
+    census: on bare first paint the panel — and the whole screen DOM — holds
+    ZERO widgets whose id contains ``variant`` (no selector, no help button,
+    no variant rows), while the SURVIVING execution-scope group composes
+    exactly once (row / scope button / run button) and its ``execute_scope``
+    action remains a member of ``PATCH_ACTIONS_V2``. Counterfactual: any
+    re-added ``*variant*`` widget -> RED; a retired ``execute_scope`` action
+    -> the membership assert goes RED.
     """
 
     async def _drive() -> tuple:
@@ -338,50 +432,54 @@ def test_tc_035_1_compose_presence(tmp_path: Path) -> None:
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            # Bare first paint — the patch screen has NOT been activated, so
-            # no populate call has run yet (the set_change_files W2 idiom).
-            pane = app.query_one("#patch_pane_variant")
-            select = pane.query_one("#patch_variant_select", Select)
+            # Bare first paint — the patch screen has NOT been activated.
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            bare_panel_ids = _variant_ids_in(panel)
+            bare_screen_ids = _variant_ids_in(app.screen)
             bare = (
-                len(pane.query("#patch_variant_select")),
-                select.disabled,
-                select._allow_blank,
-                str(select.prompt),
-            )
-            execute_ids = (
-                len(pane.query("#patch_execute_row")),
-                len(pane.query("#patch_execute_scope_button")),
-                len(pane.query("#patch_execute_run_button")),
+                len(panel.query("#patch_execute_row")),
+                len(panel.query("#patch_execute_scope_button")),
+                len(panel.query("#patch_execute_run_button")),
             )
             app._handle_load_project("proj")
             await _flush(pilot)
             app.action_show_screen("patch")
             await _flush(pilot, 4)
-            with_project = len(pane.query("#patch_variant_select"))
-            return bare, execute_ids, with_project
+            loaded_panel_ids = _variant_ids_in(panel)
+            return bare_panel_ids, bare_screen_ids, bare, loaded_panel_ids
 
-    (count, disabled, allow_blank, prompt), execute_ids, with_project = (
-        asyncio.run(_drive())
+    bare_panel_ids, bare_screen_ids, bare, loaded_panel_ids = asyncio.run(_drive())
+    assert bare_panel_ids == [], (
+        f"bare construction must compose zero variant widgets in the panel; "
+        f"got {bare_panel_ids}"
     )
-    assert count == 1, "exactly one variant Select on bare construction"
-    assert disabled, "first paint must be disabled (LLR-035.1 / F-8)"
-    assert allow_blank, "the Select must be constructed allow_blank=True"
-    assert prompt, "the Select must carry a placeholder prompt"
-    assert execute_ids == (1, 1, 1), (
-        "no existing patch_* id in the pane may be renamed or removed"
+    assert bare_screen_ids == [], (
+        f"zero variant-widget ids may exist ANYWHERE in the screen DOM; got "
+        f"{bare_screen_ids}"
     )
-    assert with_project == 1, "exactly one variant Select with a project loaded"
+    assert bare == (1, 1, 1), (
+        "the surviving execute group must compose exactly once (row / scope "
+        f"button / run button), got {bare}"
+    )
+    assert "execute_scope" in PATCH_ACTIONS_V2, (
+        "the execute_scope action must remain in the routable PATCH_ACTIONS_V2 "
+        "set after the variant retirement"
+    )
+    assert loaded_panel_ids == [], (
+        f"a project load must not re-introduce variant widgets; got "
+        f"{loaded_panel_ids}"
+    )
 
 
 # ---------------------------------------------------------------------------
-# TC-035.2 / LLR-035.2 — top-of-pane composition order + geometry (C-13)
+# TC-035.2 / LLR-035.2 — the execute-row composition + scope-line geometry
 # ---------------------------------------------------------------------------
 
 
 def _drive_variant_geometry(
     tmp_path: Path, size: tuple[int, int]
 ) -> dict[str, object]:
-    """Capture Variant-pane geometry at ``size`` (the ``_drive_panes`` idiom)."""
+    """Capture execute-row geometry at ``size`` (the ``_drive_panes`` idiom)."""
 
     async def _run() -> dict[str, object]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -389,185 +487,102 @@ def _drive_variant_geometry(
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
-            pane = app.query_one("#patch_pane_variant")
-            select = app.query_one("#patch_variant_select", Select)
-            vrow = app.query_one("#patch_variant_row")
-            erow = app.query_one("#patch_execute_row")
-            children = [child.id for child in pane.children]
+            row = app.query_one("#patch_execute_row")
+            scope_line = app.query_one("#patch_scope_line", Static)
+            child_ids = [child.id for child in row.children if child.id]
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             return {
-                "scroll_y": pane.scroll_offset.y,
-                "content_y": pane.content_region.y,
-                "content_bottom": pane.content_region.bottom,
-                "pane_right": pane.region.right,
-                "select_y": select.region.y,
-                "select_right": select.region.right,
-                "vrow_y": vrow.region.y,
-                "erow_region": (
-                    erow.region.x,
-                    erow.region.y,
-                    erow.region.width,
-                    erow.region.height,
+                "child_ids": child_ids,
+                "line_plain": scope_line.visual.plain,
+                "line_markup": scope_line._render_markup,
+                "row_region": (
+                    row.region.x,
+                    row.region.y,
+                    row.region.width,
+                    row.region.height,
                 ),
-                "children": children,
+                # Structural parentage, not viewport position: the row rides
+                # the panel's (single, scrolled) content — at 80x24 its y
+                # legitimately lies below the panel's visible fold (FOLD-8).
+                "row_in_panel": row in panel.walk_children(),
             }
 
     return asyncio.run(_run())
 
 
 def test_tc_035_2_variant_group_above_execute_row(tmp_path: Path) -> None:
-    """TC-035.2 — the Select renders above the fold, execute group below.
+    """TC-035.2 — the execute row composes in order; the line reads 'Scope
+    <label>' at both regimes.
 
-    Intent (LLR-035.2 / C-13 MEASURED): at both supported sizes the variant
-    group composes ABOVE ``#patch_execute_row`` and the Select control's
-    FIRST row lies within the pane's visible ``content_region`` at scroll 0
-    (qa MINOR-3: a border-only overlap is not operable), with no right-edge
-    clip. The compose order is asserted structurally (child order) because a
-    fully-scrolled-out execute row @80x24 reports the compositor NULL region;
-    the ``region.y`` ordering is asserted whenever the row is mapped (always
-    @120x30, where the 6-row pane holds both groups). Counterfactual: compose
-    the group below the execute row, or lose the ``height: auto`` row rules
-    (1fr split clips the Select) -> RED.
+    Intent (batch-94 form): the variant group's geometry guard (group above
+    the execute row, Select's first row on screen at scroll 0) retires with
+    the group. What survives and is measured here: at BOTH supported sizes
+    ``#patch_execute_row`` composes its buttons group above the scope line
+    (``['patch_execute_buttons', 'patch_scope_line']`` — the scope button and
+    the run button live inside the group), the line renders ``Scope <label>``
+    from the panel's own closed vocabulary (markup disabled — C-17), and the
+    row is laid out inside the panel. Counterfactual: re-add a variant row
+    above the execute row -> the child-order assert goes RED; a markup-enabled
+    or variant-tagged line -> the render asserts go RED.
     """
     for size_label, size in (("80x24", (80, 24)), ("120x30", (120, 30))):
         dims = _drive_variant_geometry(tmp_path / size_label, size)
-        assert dims["children"] == ["patch_variant_row", "patch_execute_row"], (
-            f"@{size_label}: compose order must be variant group first, "
-            f"got {dims['children']}"
+        assert dims["child_ids"] == [
+            "patch_execute_buttons",
+            "patch_scope_line",
+        ], (
+            f"@{size_label}: the execute row must compose the buttons group "
+            f"then the scope line, got {dims['child_ids']}"
         )
-        assert dims["scroll_y"] == 0, f"@{size_label}: pane must start unscrolled"
-        assert dims["content_y"] <= dims["select_y"] < dims["content_bottom"], (
-            f"@{size_label}: the Select's first row {dims['select_y']} must lie "
-            f"within the visible pane rows "
-            f"[{dims['content_y']}, {dims['content_bottom']})"
+        assert "Scope" in dims["line_plain"], (
+            f"@{size_label}: the line must name the scope; got "
+            f"{dims['line_plain']!r}"
         )
-        assert dims["select_right"] <= dims["pane_right"], (
-            f"@{size_label}: the Select must not clip past the pane right edge"
+        assert "Variant" not in dims["line_plain"], (
+            f"@{size_label}: the line must carry NO Variant segment "
+            f"(HLR-006); got {dims['line_plain']!r}"
         )
-        erow_x, erow_y, erow_w, erow_h = dims["erow_region"]
-        if erow_w and erow_h:  # mapped (not fully scrolled out of view)
-            assert dims["vrow_y"] < erow_y, (
-                f"@{size_label}: variant group (y={dims['vrow_y']}) must sit "
-                f"above the execute row (y={erow_y})"
-            )
+        assert "active variant" in dims["line_plain"], (
+            f"@{size_label}: the default scope label must render; got "
+            f"{dims['line_plain']!r}"
+        )
+        assert dims["line_markup"] is False, (
+            f"@{size_label}: the scope line must keep markup disabled (C-17)"
+        )
+        _x, _row_y, _w, row_h = dims["row_region"]
+        assert row_h > 0, (
+            f"@{size_label}: the execute row must be laid out (non-zero "
+            f"height); region={dims['row_region']}"
+        )
+        assert dims["row_in_panel"] is True, (
+            f"@{size_label}: the execute row must live inside the panel's tree"
+        )
 
 
 # ---------------------------------------------------------------------------
-# TC-035.3 / LLR-035.3 — options refresh + active preselection (F-2/F-3/F-4)
+# TC-035.3 / LLR-035.3 — the stale-message no-op (routing guards re-pointed)
 # ---------------------------------------------------------------------------
 
 
 def test_tc_035_3_options_order_preselection_and_triggers(tmp_path: Path) -> None:
-    """TC-035.3 — model-order options, active preselect, both F-3 triggers.
+    """TC-035.3 — a stale ``VariantSelected``-shaped message is a total no-op.
 
-    Intent (LLR-035.3): (a) a 3-variant project lists exactly the ordered
-    ``(name.lower(), name)`` ids with ``value == active_id`` on patch-screen
-    activation (trigger 1); (b) duplicate stems list FULL FILENAMES (the E6
-    rule); (c) a variant-set change WHILE the patch screen is shown (external
-    load appends a variant) re-populates without re-activation (trigger 2),
-    flipping N==1 blank/disabled to the 2-variant enabled state with the new
-    active preselected. F-4 rides implicitly: every repopulate here emits the
-    ``Changed(NULL)`` + ``Changed(active)`` echo pair and must trigger no
-    reload (the label would flap and workers would spawn — TC-035.4 pins the
-    count). Counterfactual: drop the populate call -> empty/stale options ->
-    RED; preselect a single id at N==1 -> RED.
-    """
-
-    async def _drive() -> tuple:
-        # (a) ordering trio (tests/test_workspace_variants.py fixture names).
-        app = S19TuiApp(base_dir=tmp_path / "t1")
-        _make_project(
-            app,
-            "proj3",
-            {"zeta.s19": S19_A, "Alpha.s19": S19_A, "mid.s19": S19_A},
-        )
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app._handle_load_project("proj3")
-            await _flush(pilot)
-            app.action_show_screen("patch")
-            await _flush(pilot, 4)
-            select = app.query_one("#patch_variant_select", Select)
-            trio = (_variant_options(select), select.value, select.disabled)
-
-        # (b) duplicate stems -> ids are FULL FILENAMES.
-        app_dup = S19TuiApp(base_dir=tmp_path / "t2")
-        _make_project(app_dup, "projdup", {"fw.s19": S19_A, "fw.hex": HEX_A})
-        async with app_dup.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app_dup._handle_load_project("projdup")
-            await _flush(pilot)
-            app_dup.action_show_screen("patch")
-            await _flush(pilot, 4)
-            select = app_dup.query_one("#patch_variant_select", Select)
-            dup = (_variant_options(select), select.value)
-
-        # (c) trigger 2 — variant-set change while the patch screen is shown.
-        app_grow = S19TuiApp(base_dir=tmp_path / "t3")
-        external = tmp_path / "t3" / "b.s19"
-        external.write_text(S19_B, encoding="utf-8")
-        _make_project(app_grow, "projgrow", {"a.s19": S19_A})
-        async with app_grow.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app_grow._handle_load_project("projgrow")
-            await _flush(pilot)
-            app_grow.action_show_screen("patch")
-            await _flush(pilot, 4)
-            select = app_grow.query_one("#patch_variant_select", Select)
-            before = (
-                _variant_options(select),
-                select.value is Select.NULL,
-                select.disabled,
-            )
-            app_grow.load_from_path(external)  # appends variant b (E5a-2)
-            await app_grow.workers.wait_for_complete()
-            await _flush(pilot)
-            after = (_variant_options(select), select.value, select.disabled)
-        return trio, dup, before, after
-
-    trio, dup, before, after = asyncio.run(_drive())
-    assert trio == (["Alpha", "mid", "zeta"], "Alpha", False), (
-        f"3-variant options must be the ordered ids with the active "
-        f"preselected and the control enabled, got {trio}"
-    )
-    assert dup == (["fw.hex", "fw.s19"], "fw.hex"), (
-        f"duplicate stems must list FULL FILENAMES in order, got {dup}"
-    )
-    assert before == ([], True, True), (
-        f"N==1 must leave empty options + blank value + disabled (F-2), "
-        f"got {before}"
-    )
-    assert after == (["a", "b"], "b", False), (
-        f"a variant append while the screen is shown must repopulate to the "
-        f"new set with the new active preselected (F-3 trigger 2), got {after}"
-    )
-
-
-# ---------------------------------------------------------------------------
-# TC-035.4 / LLR-035.4 — routing guards + echo-loop suppression
-# ---------------------------------------------------------------------------
-
-
-def test_tc_035_4_routing_guards(tmp_path: Path) -> None:
-    """TC-035.4 — one activation per real pick; guards fire no activation.
-
-    Intent (LLR-035.4): the route reuses ``_handle_select_variant`` wholesale.
-    A non-active pick invokes it exactly once; a blank pick is filtered in
-    the panel (never posted); a same-as-active ``VariantSelected`` (the F-4
-    repopulate echo) is dropped in the app handler; an unknown id dies at the
-    existing unknown-id guard (status line, no crash, active unchanged); a
-    missing-file pick dies at the existing missing-file guard. Activation
-    count is the white-box probe (a wrapper around the routed method);
-    label/active observables are the behavioral cross-check. Counterfactual:
-    route raw values without the short-circuits -> the repopulate echo pair
-    re-activates on every refresh (count > 1) -> RED.
+    Intent (batch-94 form): the old TC's populate/preselect/trigger census
+    rode the dropdown. Its ROUTING-GUARD half survives as the retirement
+    contract: a message carrying the retired shape — the exact routing key
+    (``on_patch_editor_panel_variant_selected``, via ``namespace=``) plus a
+    ``variant_id`` payload — posted to the panel must do NOTHING: no crash,
+    no app-level activation (``_handle_select_variant`` call count stays 0),
+    no label movement, no scope-value change, and the surviving change-file
+    dropdown's options are untouched. This is the plugin-compat guard: an
+    un-rebuilt call site posting the old message must not wedge the editor.
+    Counterfactual: any surviving handler for the retired key -> the count or
+    label assert goes RED.
     """
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
-        project_dir = _make_project(
-            app, "proj", {"a.s19": S19_A, "b.s19": S19_B, "c.s19": S19_A}
-        )
-        statuses = _statuses(app)
+        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         calls: list[str] = []
         original = app._handle_select_variant
         app._handle_select_variant = (  # type: ignore[method-assign]
@@ -580,76 +595,163 @@ def test_tc_035_4_routing_guards(tmp_path: Path) -> None:
             app.action_show_screen("patch")
             await _flush(pilot, 4)
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            select = app.query_one("#patch_variant_select", Select)
+            label_before = _project_label(app)
+            select = app.query_one("#patch_doc_file_select", Select)
+            options_before = len(select._options)
+            scope_before = panel._execute_scope
 
-            # Non-active pick -> exactly one activation.
-            await _switch_via_dropdown(app, pilot, "b")
-            after_switch = (list(calls), _project_label(app))
-
-            # Same-as-active echo (the F-4 pair's second half) -> dropped.
-            panel.post_message(PatchEditorPanel.VariantSelected("b"))
-            await _flush(pilot, 4)
-            after_echo = list(calls)
-
-            # Blank pick -> filtered in the panel, nothing posted.
-            select.value = Select.NULL
-            await _flush(pilot, 4)
-            after_blank = list(calls)
-
-            # Unknown/stale id -> existing guard: status, no crash.
-            panel.post_message(PatchEditorPanel.VariantSelected("ghost"))
-            await _flush(pilot, 4)
-            await app.workers.wait_for_complete()
-            after_ghost = (list(calls), _project_label(app))
-
-            # Missing file -> existing guard: status, no load.
-            (project_dir / "c.s19").unlink()
-            panel.post_message(PatchEditorPanel.VariantSelected("c"))
+            panel.post_message(VariantSelected("b"))
             await _flush(pilot, 4)
             await app.workers.wait_for_complete()
             await _flush(pilot, 4)
-            after_missing = (list(calls), _project_label(app))
-        return after_switch, after_echo, after_blank, after_ghost, after_missing, statuses
 
-    after_switch, after_echo, after_blank, after_ghost, after_missing, statuses = (
-        asyncio.run(_drive())
+            label_after = _project_label(app)
+            options_after = len(select._options)
+            select_after = select.value
+            return (
+                calls,
+                label_before,
+                label_after,
+                scope_before,
+                panel._execute_scope,
+                options_before,
+                options_after,
+                select_after,
+            )
+
+    (
+        calls,
+        label_before,
+        label_after,
+        scope_before,
+        scope_after,
+        options_before,
+        options_after,
+        select_after,
+    ) = asyncio.run(_drive())
+    assert calls == [], (
+        f"a stale VariantSelected must never reach the app-level activation "
+        f"pipeline, got calls={calls}"
     )
-    assert after_switch[0] == ["b"], (
-        f"a non-active pick must invoke the activation pipeline exactly once "
-        f"(repopulate echoes absorbed), got {after_switch[0]}"
+    assert label_before == label_after and "proj:a (1/2)" in label_after, (
+        f"the stale message must not switch the active variant: "
+        f"{label_before!r} -> {label_after!r}"
     )
-    assert "proj:b (2/3)" in after_switch[1]
-    assert after_echo == ["b"], (
-        f"a same-as-active VariantSelected must fire no activation, "
-        f"got {after_echo}"
+    assert scope_after == scope_before, (
+        f"the stale message must not move the execution scope: "
+        f"{scope_before!r} -> {scope_after!r}"
     )
-    assert after_blank == ["b"], (
-        f"a blank pick must be filtered in the panel, got {after_blank}"
+    assert options_after == options_before, (
+        "the surviving change-file dropdown's options must be untouched by "
+        "the stale message"
     )
-    assert after_ghost[0] == ["b", "ghost"], "unknown id routes to the guard"
-    assert "proj:b (2/3)" in after_ghost[1], "unknown id must not switch"
-    assert any("Variant not found: ghost" in m for m in statuses), (
-        f"the existing unknown-id guard must surface its warning; {statuses}"
-    )
-    assert "proj:b (2/3)" in after_missing[1], "missing file must not switch"
-    assert any("Variant file missing: c.s19" in m for m in statuses), (
-        f"the existing missing-file guard must surface its warning; {statuses}"
+    assert select_after is Select.NULL, (
+        "the change-file dropdown must stay on the blank sentinel (no "
+        "false preselection from the stale message)"
     )
 
 
 # ---------------------------------------------------------------------------
-# TC-035.5 / LLR-035.5 — disabled-state table (DoR Q1)
+# TC-035.4 / LLR-035.4 — scope cycle posts nothing; the run routes once
+# ---------------------------------------------------------------------------
+
+
+def test_tc_035_4_routing_guards(tmp_path: Path) -> None:
+    """TC-035.4 — the scope button is selector-state-only; the run button
+    routes ``execute_scope`` exactly once.
+
+    Intent (batch-94 form): the old TC counted activations through the
+    dropdown route. The surviving routing facts: pressing
+    ``#patch_execute_scope_button`` posts NO action (it cycles
+    ``_execute_scope`` and re-renders the two views — button label and scope
+    line — itself), while pressing ``#patch_execute_run_button`` routes one
+    ``execute_scope`` action through ``PATCH_ACTIONS_V2`` into
+    ``_trigger_execute_scope`` carrying the cycled scope. With no project
+    loaded the app guard answers one status line — the routed call is counted
+    by the white-box probe; the status is the behavioral cross-check.
+    Counterfactual: a scope-button that also posts an action -> count > 1 ->
+    RED; a run button that drops the action -> RED.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        triggers: list[str] = []
+        original = app._trigger_execute_scope
+        app._trigger_execute_scope = (  # type: ignore[method-assign]
+            lambda scope: (triggers.append(scope), original(scope))[1]
+        )
+        statuses = _statuses(app)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await _flush(pilot, 4)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            scope_button = app.query_one("#patch_execute_scope_button", Button)
+            scope_line = app.query_one("#patch_scope_line", Static)
+
+            assert "active variant" in scope_line.visual.plain
+            scope_button.press()
+            await pilot.pause()
+
+            after_cycle = (
+                panel._execute_scope,
+                str(scope_button.label),
+                scope_line.visual.plain,
+                list(triggers),
+            )
+
+            app.query_one("#patch_execute_run_button", Button).press()
+            await pilot.pause()
+            after_run = (list(triggers), list(statuses))
+            return after_cycle, after_run
+
+    after_cycle, after_run = asyncio.run(_drive())
+    scope_value, button_label, line_plain, triggers_after_cycle = after_cycle
+    triggers_after_run, statuses = after_run
+
+    assert scope_value == "all", (
+        f"one press must cycle active -> all, got {scope_value!r}"
+    )
+    assert "all variants" in button_label, (
+        f"the button label must follow the cycle; got {button_label!r}"
+    )
+    assert "Scope" in line_plain and "all variants" in line_plain, (
+        f"the scope line must render the SAME cycled state; got {line_plain!r}"
+    )
+    assert "Variant" not in line_plain, (
+        f"the line must never gain a Variant segment; got {line_plain!r}"
+    )
+    assert triggers_after_cycle == [], (
+        "the scope button is selector-state-only — it must post no routed "
+        f"action, got triggers={triggers_after_cycle}"
+    )
+    assert triggers_after_run == ["all"], (
+        f"the run button must route execute_scope exactly once with the "
+        f"cycled scope, got {triggers_after_run}"
+    )
+    assert any("no project variants" in m for m in statuses), (
+        f"with no project the execute guard must answer one status line; "
+        f"{statuses}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-035.5 / LLR-035.5 — the scope row across project states (state table)
 # ---------------------------------------------------------------------------
 
 
 def test_tc_035_5_disabled_state_table(tmp_path: Path) -> None:
-    """TC-035.5 — disabled == (N < 2), re-evaluated on project switches.
+    """TC-035.5 — the surviving scope row is state-independent and scope-only.
 
-    Intent (LLR-035.5 / Q1): no project -> disabled + blank; N==1 -> disabled;
-    N>=2 -> enabled; switching to another project re-evaluates (the trigger is
-    owned by LLR-035.3 per F-3). The pane geometry stays stable across the
-    states (same widget, no layout jump — the disabled flag, not removal).
-    Counterfactual: invert or omit the N<2 branch -> RED.
+    Intent (batch-94 form): the old disabled-state table (disabled == N < 2)
+    retired with the dropdown. The surviving invariant: the execute row
+    composes in EVERY project state (no project / N==1 / N>=2), the scope line
+    always reads ``Scope <label>`` — never a ``Variant`` segment, regardless
+    of how many variants the project has — and the scope value is the PANEL's
+    own selector state: a project switch does not rebind it. The row's
+    window's border chrome stays the JSON window (the row now rides the JSON
+    window dock). Counterfactual: a variant-count-dependent scope line ->
+    RED; a project switch that resets the cycled scope -> RED.
     """
 
     async def _drive() -> tuple:
@@ -660,146 +762,254 @@ def test_tc_035_5_disabled_state_table(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("patch")
             await _flush(pilot, 4)
-            select = app.query_one("#patch_variant_select", Select)
-            no_project = (select.disabled, select.value is Select.NULL)
-            region_before = app.query_one("#patch_pane_variant").region
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            row = app.query_one("#patch_execute_row")
+            no_project = (
+                len(panel.query("#patch_execute_row")),
+                row.parent.id,
+                app.query_one("#patch_scope_line", Static).visual.plain,
+            )
+
+            # Cycle the scope BEFORE any project load.
+            app.query_one("#patch_execute_scope_button", Button).press()
+            await pilot.pause()
+            cycled = panel._execute_scope
 
             app._handle_load_project("multi")
             await _flush(pilot)
-            multi = select.disabled
+            multi = app.query_one("#patch_scope_line", Static).visual.plain
+            multi_scope = panel._execute_scope
+            row_window_after_multi = row.parent.id
 
             app._handle_load_project("single")
             await _flush(pilot)
-            single = (select.disabled, select.value is Select.NULL)
-            region_after = app.query_one("#patch_pane_variant").region
-            return no_project, multi, single, region_before == region_after
+            single = app.query_one("#patch_scope_line", Static).visual.plain
+            single_scope = panel._execute_scope
+            return (
+                no_project,
+                cycled,
+                multi,
+                multi_scope,
+                row_window_after_multi,
+                single,
+                single_scope,
+            )
 
-    no_project, multi, single, region_stable = asyncio.run(_drive())
-    assert no_project == (True, True), "no project -> disabled + blank"
-    assert multi is False, "N>=2 -> enabled"
-    assert single == (True, True), (
-        "switching to a single-variant project must re-evaluate to disabled"
+    (
+        no_project,
+        cycled,
+        multi,
+        multi_scope,
+        row_window_after_multi,
+        single,
+        single_scope,
+    ) = asyncio.run(_drive())
+    assert no_project[0] == 1, (
+        f"the execute row must compose with no project loaded; got {no_project}"
     )
-    assert region_stable, "pane geometry must be stable across the states (Q1)"
+    assert no_project[1] == "patch_win_json" and row_window_after_multi == (
+        "patch_win_json"
+    ), (
+        "the execute row must ride the JSON window's dock in every state; "
+        f"got {no_project[1]!r} / {row_window_after_multi!r}"
+    )
+    assert "Scope" in no_project[2] and "Variant" not in no_project[2], (
+        f"the no-project line must be scope-only; got {no_project[2]!r}"
+    )
+    assert "Scope" in multi and "Variant" not in multi, (
+        f"an N>=2 project's line must STILL name no variant (HLR-006); got "
+        f"{multi!r}"
+    )
+    assert "Scope" in single and "Variant" not in single, (
+        f"an N==1 project's line must name no variant either; got {single!r}"
+    )
+    assert multi_scope == cycled == single_scope == "all", (
+        "the scope selector state must survive project switches (it is "
+        f"panel-local state): cycled={cycled!r} multi={multi_scope!r} "
+        f"single={single_scope!r}"
+    )
 
 
 # ---------------------------------------------------------------------------
-# TC-035.6 / LLR-035.6 — persist-on-save only, no disk write on switch (Q2)
+# TC-035.6 / LLR-035.6 — no disk write from the stale path (Q2)
 # ---------------------------------------------------------------------------
 
 
 def test_tc_035_6_switch_writes_nothing_to_disk(tmp_path: Path) -> None:
-    """TC-035.6 — a dropdown switch alone touches no project file.
+    """TC-035.6 — the stale message and the scope cycle touch no project file.
 
-    Intent (LLR-035.6 / DoR Q2): the switch updates only in-memory state via
-    the existing pipeline; ``project.json`` is written exclusively by the
-    save flow. For a never-saved project the manifest stays ABSENT and the
-    project directory's file set and bytes are unchanged after a switch
-    (0 bytes changed, 0 files created). The positive persist chain is
-    AT-035b's gate. Counterfactual: an Option-C write-on-switch creates or
-    rewrites the manifest -> RED.
+    Intent (LLR-035.6 / DoR Q2, batch-94 form): the switch's no-disk-write
+    guard retires from the dropdown to the surviving surfaces — a stale
+    ``VariantSelected`` and a scope cycle are pure in-memory state; for a
+    never-saved project the manifest stays ABSENT and the project directory's
+    file set and bytes are unchanged (0 bytes changed, 0 files created). The
+    positive persist chain stays where it lives (cited to
+    ``tests/test_variant_execution.py``). Counterfactual: an Option-C write-on-
+    switch path re-wired to the stale message -> RED.
     """
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
-        project_dir = _make_project(
-            app, "proj", {"a.s19": S19_A, "b.s19": S19_B}
-        )
+        project_dir = _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             app._handle_load_project("proj")
             await _flush(pilot)
             app.action_show_screen("patch")
             await _flush(pilot, 4)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             snapshot_before = {
                 p.name: p.read_bytes() for p in sorted(project_dir.iterdir())
             }
             manifest_before = (project_dir / "project.json").exists()
-            await _switch_via_dropdown(app, pilot, "b")
+
+            panel.post_message(VariantSelected("b"))
+            for _ in range(2):  # cycle the scope twice (full loop)
+                app.query_one("#patch_execute_scope_button", Button).press()
+                await pilot.pause()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+
             snapshot_after = {
                 p.name: p.read_bytes() for p in sorted(project_dir.iterdir())
             }
             manifest_after = (project_dir / "project.json").exists()
-            return manifest_before, manifest_after, snapshot_before, snapshot_after
+            return (
+                manifest_before,
+                manifest_after,
+                snapshot_before,
+                snapshot_after,
+            )
 
     manifest_before, manifest_after, before, after = asyncio.run(_drive())
     assert manifest_before is False, "precondition: never-saved project"
     assert manifest_after is False, (
-        "a dropdown switch must NOT create project.json (Q2 persist-on-save)"
+        "the stale message / scope cycle must NOT create project.json"
     )
     assert before == after, (
-        "a dropdown switch must change no project file (0 bytes, 0 files)"
+        "the stale path must change no project file (0 bytes, 0 files)"
     )
 
 
 # ---------------------------------------------------------------------------
-# TC-035.7 / LLR-035.7 — switch-during-load integrity (security F2)
+# TC-035.7 / LLR-035.7 — load integrity: two Loads bind exactly one document
 # ---------------------------------------------------------------------------
+
+
+def _write_v2_document(path: Path, entries: list[dict]) -> Path:
+    """Write a v2 ``s19app-changeset`` JSON document fixture."""
+    import json
+
+    path.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": entries,
+            }
+        ),
+        encoding="utf-8",
+    )
+    return path
 
 
 def test_tc_035_7_rapid_double_pick_stays_consistent(tmp_path: Path) -> None:
-    """TC-035.7 — a pick during an in-flight load is suppressed, state coherent.
+    """TC-035.7 — load A then load B: exactly ONE document stays bound, and a
+    stale ``VariantSelected`` fired between the loads is still a no-op.
 
-    Intent (LLR-035.7, security F2): with picks b then c issued back-to-back
-    (c arrives while b's threaded load is in flight), the
-    suppress-while-loading guard drops c — the finally-rendered image, the
-    stamped active id, and the label all refer to the SAME variant (b), the
-    dropdown re-syncs to it, NO file is created in the project directory (the
-    phantom ``«stem»_1.s19`` side-door), and the suppression is surfaced in
-    the status line. ``c.s19`` deliberately carries variant a's bytes so a
-    mislabeled c-load is caught by the content assert. Counterfactual: an
-    unguarded single-slot ``_pending_variant_id`` lets c's pick re-stamp
-    mid-flight -> mislabeled state or a phantom project-dir copy -> RED.
+    Intent (LLR-035.7, security F2 — re-pointed): the old guard raced a
+    dropdown pick against an in-flight load. The surviving load-integrity
+    contract: the panel's load path (typed path + the REAL Load control) is
+    re-entrant — loading document B over document A leaves EXACTLY ONE bound
+    document (``ChangeService.document.source_path`` is B, the service rows
+    and the entries table hold B's entries only, no A residue), the dirty
+    flag stays cleared by each successful load (writer w4), and a stale
+    ``VariantSelected`` posted between the two loads changes nothing (no
+    crash, no extra activation). Counterfactual: a load that stacks a second
+    document (or leaves A's rows rendered) -> RED.
     """
 
     async def _drive() -> tuple:
-        app = S19TuiApp(base_dir=tmp_path)
-        project_dir = _make_project(
-            app, "proj", {"a.s19": S19_A, "b.s19": S19_B, "c.s19": S19_A}
+        import json
+
+        doc_a = _write_v2_document(
+            tmp_path / "doc_a.json",
+            [{"type": "string", "address": "0x100", "value": "alpha"}],
         )
-        statuses = _statuses(app)
+        doc_b = _write_v2_document(
+            tmp_path / "doc_b.json",
+            [
+                {"type": "string", "address": "0x200", "value": "bravo"},
+                {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+            ],
+        )
+        calls: list[str] = []
+        app = S19TuiApp(base_dir=tmp_path)
+        original = app._handle_select_variant
+        app._handle_select_variant = (  # type: ignore[method-assign]
+            lambda vid: (calls.append(vid), original(vid))[1]
+        )
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            app._handle_load_project("proj")
-            await _flush(pilot)
             app.action_show_screen("patch")
             await _flush(pilot, 4)
-            select = app.query_one("#patch_variant_select", Select)
-            files_before = sorted(p.name for p in project_dir.iterdir())
-            # Rapid double pick: no event-loop yield between the two — c's
-            # Changed is handled while b's load worker is still in flight.
-            select.value = "b"
-            select.value = "c"
-            await _flush(pilot)
-            await app.workers.wait_for_complete()
-            await _flush(pilot)
-            label = _project_label(app)
-            value = select.value
-            files_after = sorted(p.name for p in project_dir.iterdir())
-            active_id = app._variant_set.active_id  # secondary diagnostic
-            app.action_show_screen("workspace")
-            await _flush(pilot, 4)
-            return label, value, files_before, files_after, active_id, statuses, _hex_text(app)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            service = app._change_service
 
-    label, value, files_before, files_after, active_id, statuses, hex_text = (
-        asyncio.run(_drive())
+            async def _load(path: Path) -> None:
+                app.query_one("#patch_doc_path_input").value = str(path)
+                app.query_one("#patch_doc_load_button", Button).press()
+                await _flush(pilot, 4)
+
+            await _load(doc_a)
+            after_a = (
+                service.document.source_path,
+                len(service.document.entries),
+                panel._dirty,  # the Load guard's own flag (diagnostic read)
+            )
+
+            # Stale message BETWEEN the two loads — the F2 race shape.
+            panel.post_message(VariantSelected("b"))
+            await _flush(pilot, 2)
+
+            await _load(doc_b)
+            after_b = (
+                service.document.source_path,
+                [entry.address for entry in service.document.entries],
+                len(service.rows(None)),
+                panel._dirty,
+            )
+
+            table = app.query_one("#patch_doc_entries_table")
+            return after_a, after_b, table.row_count, calls, app
+
+    after_a, after_b, table_rows, calls, _app = asyncio.run(_drive())
+    assert after_a[0] is not None and after_a[0].name == "doc_a.json", (
+        f"load A must bind document A, got {after_a[0]!r}"
     )
-    # Timing assumption (review F2): c's queued VariantSelected message is
-    # pumped before b's ms-scale parse worker can apply, so the in-flight
-    # suppress drops c and b wins. If this node ever flakes on a loaded CI
-    # box, a c-coherent outcome is LLR-legal — check this window first.
-    assert "proj:b (2/3)" in label, (
-        f"the first pick (b) must win and the label must say so, got {label!r}"
+    assert after_a[1] == 1 and after_a[2] is False, (
+        f"load A must bind exactly A's one entry and clear the dirty flag "
+        f"(writer w4), got {after_a}"
     )
-    assert "0A 0B 0C 0D" in hex_text and "01 02 03 04" not in hex_text, (
-        "the rendered image must be the SAME variant the label names (b)"
+    source_b, addresses_b, rows_b, dirty_b = after_b
+    assert source_b is not None and source_b.name == "doc_b.json", (
+        f"load B must REPLACE the bound document with B, got {source_b!r}"
     )
-    assert value == "b", f"the dropdown must re-sync to the real active id, got {value!r}"
-    assert active_id == "b", f"active_id diagnostic disagrees: {active_id!r}"
-    assert files_after == files_before, (
-        f"the interleaving must create NO project file (phantom copy guard): "
-        f"{files_before} -> {files_after}"
+    assert len(addresses_b) == 2 and all(
+        addr in (0x200, 0x300) for addr in addresses_b
+    ), f"no residue of A may stay bound; got entries at {addresses_b}"
+    assert rows_b == 2, (
+        f"the service rows must render B's two entries only, got {rows_b}"
     )
-    assert any("Variant switch ignored" in m for m in statuses), (
-        f"the suppressed pick must be surfaced in the status line; {statuses}"
+    assert dirty_b is False, "the second successful load must keep the panel clean"
+    assert table_rows == 2, (
+        f"the entries table must show exactly B's two rows, got {table_rows}"
+    )
+    assert calls == [], (
+        f"the stale message fired between the loads must stay a no-op; "
+        f"activations={calls}"
     )

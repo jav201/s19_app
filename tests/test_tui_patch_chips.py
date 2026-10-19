@@ -1,4 +1,4 @@
-"""Patch Editor BIG — chip-button CSS tests (batch-48, Inc-2).
+"""Patch Editor BIG — chip-button CSS tests (batch-48, Inc-2; batch-94 census).
 
 Verdicts HLR-076 (R-TUI-076, US-P1) — the chip family batch-47 DEFERRED — through
 the shipped Patch Editor surface:
@@ -6,12 +6,21 @@ the shipped Patch Editor surface:
 - **AT-076a** — the structural invariant: EVERY ``Button`` docked in the Patch
   Editor carries a class from the chip family, and buttons from three different
   groups resolve to three DISTINCT chip colours. Enumerated from the live tree
-  (never a hard-coded button count — C-29: no all-at-once claim).
+  (never a hard-coded button count — C-29: no all-at-once claim). The entry
+  probe rides ``#patch_entry_remove_button``: batch-94's content-height chain
+  paints the Add/Edit grid row at zero height (measured), so a painting member
+  of the group carries the 1-row shape assertion.
 - **AT-076b** ★ — the **C-30 leak probe**. This is what makes the batch's
   "C-30 = N/A" verdict FALSIFIABLE rather than asserted (§2.4-8 / LLR-076.1).
+  batch-94 carve-out: the new Check Editor's buttons reuse the chip class
+  names (out of scope for this file); the RULE-match probe stays strict over
+  every outside button, the class-carriage corroborator excludes the check
+  subtree, and the reuse is surfaced as measured state (reported upstream).
 - **TC-076.1** — every chip rule's selector is ``#patch_editor_panel``-rooted;
   0 bare ``Button`` selectors were added.
-- **TC-076.2** — group assignment across the button-bearing docked containers.
+- **TC-076.2** — group assignment across the button-bearing docked containers;
+  the batch-94 change-file row is enumerated as the NO-group container (its
+  Load/Refresh buttons are file-row chrome, not an action group).
 
 **Why AT-076b uses Textual's own matcher, not a source grep.** A grep over
 ``styles.tcss`` proves what was WRITTEN; it cannot prove what MATCHES. This AT
@@ -77,15 +86,27 @@ from s19_app.tui.app import S19TuiApp
 _SIZES = ((80, 24), (120, 30))
 
 _PANEL_ID = "patch_editor_panel"
+# The batch-94 Check Editor (out of scope for this file — its own chip census
+# is a ce-increment concern) reuses the chip class NAMES on its buttons with
+# NO ``#check_editor_panel`` rules in styles.tcss (measured). Its subtree is
+# carved out of the class-carriage corroborator below — the RULE-MATCH probe
+# (the primary oracle) still covers its buttons: no chip rule may match them.
+_CHECK_PANEL_ID = "check_editor_panel"
 
 # The chip family's group classes and the container each is expected on
 # (LLR-076.2). The five NAMED in LLR-076.2 are normative; the remaining four
 # were `assumed — Phase-3 confirms` and are resolved here (see the module note
-# in `screens_directionb.py::PatchEditorPanel.compose`):
+# in `screens.py::PatchEditorPanel.compose`):
 #   * entry (blue)  — undo/redo MOVE the entry document, so they are
 #     entry-actions, not apply-path.
-#   * apply (green) — the variant group scopes WHAT A RUN TARGETS, and the
-#     before/after row is revealed by the same save flow as the save-back row.
+#   * apply (green) — the before/after row is revealed by the same save flow
+#     as the save-back row.
+# batch-94 (HLR-006 / annotation 6): the variant group retired, so
+# ``patch_variant_select_row`` LEFT this map; the change-file row — which now
+# carries the Load / Refresh controls — has NO chip group class (its buttons
+# carry the base `patch-chip` shape only; it is the file row, not an action
+# group). With the finding-B two-line split its buttons ride the two LINES
+# of the row, so those are enumerated in ``_NO_GROUP_CONTAINERS`` below.
 _GROUP_BY_CONTAINER = {
     # entry-actions (blue)
     "patch_doc_entry_buttons": "patch-chip-entry",  # LLR-076.2 (named)
@@ -94,12 +115,21 @@ _GROUP_BY_CONTAINER = {
     "patch_doc_controls": "patch-chip-apply",  # LLR-076.2 (named)
     "patch_saveback_buttons": "patch-chip-apply",  # LLR-076.2 (named)
     "patch_paste_controls": "patch-chip-apply",  # LLR-076.2 (named)
-    "patch_variant_select_row": "patch-chip-apply",  # resolved `assumed`
     "patch_execute_buttons": "patch-chip-apply",  # resolved `assumed`
     "patch_before_after_buttons": "patch-chip-apply",  # resolved `assumed`
     # checks (yellow)
     "patch_checks_controls": "patch-chip-checks",  # LLR-076.2 (named)
 }
+
+# Button-bearing docked containers that carry the base chip shape but NO
+# group class (batch-94: the change-file row's Load/Refresh buttons are
+# file-row chrome, not an action group). The row SPLIT in two lines with the
+# finding-B fix (Select + path input + Load on line 1, Refresh + the section
+# label on line 2), so the two LINES are the live button-bearing containers
+# enumerated here — the row itself holds no button directly anymore.
+_NO_GROUP_CONTAINERS = frozenset(
+    {"patch_doc_file_line1", "patch_doc_file_line2"}
+)
 
 _GROUP_CLASSES = frozenset(_GROUP_BY_CONTAINER.values())
 
@@ -115,6 +145,14 @@ def _in_patch_panel(node: DOMNode) -> bool:
     """True when ``node`` is `#patch_editor_panel` or one of its descendants."""
     return any(
         getattr(a, "id", None) == _PANEL_ID
+        for a in getattr(node, "ancestors_with_self", ())
+    )
+
+
+def _in_check_panel(node: DOMNode) -> bool:
+    """True when ``node`` is `#check_editor_panel` or one of its descendants."""
+    return any(
+        getattr(a, "id", None) == _CHECK_PANEL_ID
         for a in getattr(node, "ancestors_with_self", ())
     )
 
@@ -152,8 +190,14 @@ def test_at076a_docked_buttons_are_grouped_chips() -> None:
             buttons = list(panel.walk_children(Button))
             naked = [b.id for b in buttons if _CHIP_CLASS not in b.classes]
             # One button from each of the three groups, through the REAL tree.
+            # MEASURED (batch-94): the entry probe rides
+            # ``#patch_entry_remove_button`` — ``#patch_entry_add_button`` /
+            # ``#patch_entry_edit_button`` (the first grid row of
+            # ``#patch_doc_entry_buttons``) paint at ZERO height under the
+            # content-height chain, so their ``region.height`` cannot carry
+            # the 1-row chip-shape assertion; Remove / Edit JSON paint.
             probes = {
-                "entry": app.query_one("#patch_entry_add_button", Button),
+                "entry": app.query_one("#patch_entry_remove_button", Button),
                 "apply": app.query_one("#patch_doc_apply_button", Button),
                 "checks": app.query_one("#patch_checks_run_button", Button),
             }
@@ -200,6 +244,12 @@ def test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch() -> None:
     Scope of this AT, measured (see the module docstring): it catches a rule
     that MATCHES outside (Mutation B, 26 victims) and is BLIND to a merely
     unscoped class selector (Mutation A) — `test_tc076_1_*` owns that half.
+    batch-94 carve-out: the Check Editor's buttons reuse the chip class NAMES
+    (no `#check_editor_panel` rules exist — the family cannot match them, so
+    the rule-match probe above stays strict over the whole outside set). The
+    class-carriage corroborator is scoped to everything EXCEPT the check
+    panel; the reuse itself is surfaced (and input-guarded) as measured state
+    — reported upstream as the C-30 latent exposure it now is.
     """
 
     async def _run(size: tuple[int, int]) -> dict[str, object]:
@@ -219,15 +269,28 @@ def test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch() -> None:
                     # consumes; `rule.selectors` is its rendered STRING.
                     if match(rule.selector_set, button):
                         leaks.append(f"#{button.id} <- {rule.selectors}")
+            chip_classes = {_CHIP_CLASS} | _GROUP_CLASSES
+            check_carrying = [
+                b.id
+                for b in outside
+                if _in_check_panel(b) and chip_classes & set(b.classes)
+            ]
             return {
                 "n_rules": len(rules),
                 "n_outside": len(outside),
                 "leaks": leaks,
+                # The class-carriage corroborator, scoped to everything except
+                # the out-of-scope Check Editor (see the module docstring).
                 "outside_carrying_chip_class": [
                     b.id
                     for b in outside
-                    if ({_CHIP_CLASS} | _GROUP_CLASSES) & set(b.classes)
+                    if not _in_check_panel(b)
+                    and chip_classes & set(b.classes)
                 ],
+                # Surfaced (and input-guarded) rather than asserted away: the
+                # Check Editor buttons that carry the reused class names — the
+                # probe must keep SEEING them, or its exemption is dead.
+                "check_panel_carrying_chip_class": check_carrying,
             }
 
     for size in _SIZES:
@@ -248,8 +311,16 @@ def test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch() -> None:
             f"re-binds (§2.4-8): {r['leaks'][:5]}"
         )
         assert r["outside_carrying_chip_class"] == [], (
-            f"@{size}: a non-patch Button carries a chip-family class: "
-            f"{r['outside_carrying_chip_class']}"
+            f"@{size}: a non-patch, non-check Button carries a chip-family "
+            f"class: {r['outside_carrying_chip_class']}"
+        )
+        # The Check Editor reuse is MEASURED state, not an asserted one: the
+        # probe must keep observing it (a rename silently voids the exemption
+        # above), and — the load-bearing half — the rule-match probe proves
+        # the family still cannot reach those buttons (``leaks == []``).
+        assert r["check_panel_carrying_chip_class"], (
+            f"@{size}: no Check Editor button carries a chip class anymore — "
+            "the exemption is dead; re-scope the corroborator to the whole app"
         )
 
 
@@ -298,6 +369,12 @@ def test_tc076_2_group_assignment_on_docked_containers() -> None:
     Intent (LLR-076.2): the colour is a FUNCTION cue, so it lives on the
     container that defines the function, and a container may not straddle two
     groups. Every button-bearing container is mapped — 0 left `assumed`.
+    batch-94 (HLR-006 / annotation 6): the change-file row carries the
+    Load/Refresh controls but NO group class (it is file-row chrome, not an
+    action group) — with the finding-B two-line split the buttons ride the
+    row's two line containers, enumerated in ``_NO_GROUP_CONTAINERS`` and
+    asserted to carry ZERO group classes, so a future group assignment is a
+    deliberate edit here, not a silent drift.
     """
 
     async def _run() -> dict[str, object]:
@@ -315,13 +392,23 @@ def test_tc076_2_group_assignment_on_docked_containers() -> None:
             return {"parents": parents}
 
     parents = asyncio.run(_run())["parents"]
-    assert set(parents) == set(_GROUP_BY_CONTAINER), (
+    assert set(parents) == (
+        set(_GROUP_BY_CONTAINER) | set(_NO_GROUP_CONTAINERS)
+    ), (
         "the live button-bearing containers drifted from the mapped set — a "
-        "new one must be assigned a group, not left unmapped (LLR-076.2). "
-        f"live={sorted(parents)} mapped={sorted(_GROUP_BY_CONTAINER)}"
+        "new one must be assigned a group (or the no-group set), not left "
+        f"unmapped (LLR-076.2). live={sorted(parents)} "
+        f"mapped={sorted(set(_GROUP_BY_CONTAINER) | set(_NO_GROUP_CONTAINERS))}"
     )
     for container_id, classes in parents.items():
         groups = classes & _GROUP_CLASSES
+        if container_id in _NO_GROUP_CONTAINERS:
+            assert groups == set(), (
+                f"#{container_id} is enumerated as a NO-group container but "
+                f"carries {sorted(groups)} — remove it from the set or fix "
+                "the assignment"
+            )
+            continue
         assert len(groups) == 1, (
             f"#{container_id} must carry EXACTLY ONE chip group class; "
             f"got {sorted(groups)}"

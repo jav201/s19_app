@@ -82,6 +82,9 @@ __all__ = [
     "DOCUMENT_KINDS",
     "VALUE_MODES",
     "DEFAULT_CHANGE_FILE_NAME",
+    "CHECK_SPEC_SUFFIX",
+    "is_check_spec_name",
+    "list_change_documents",
     "DUMMY_CHANGESET_TEXT",
     "READ_SIZE_CAP_BYTES",
     "MF_ENTRY_COUNT_CEILING",
@@ -140,6 +143,14 @@ VALUE_MODES = frozenset({"text", "codes"})
 
 #: The default change-file name a save uses when the caller passes none.
 DEFAULT_CHANGE_FILE_NAME = "changes.json"
+
+#: The check-spec file suffix (batch-94, US-003 / D3): a v2 document saved by
+#: the Check Editor under a ``.chk.json`` name is a check spec — writable and
+#: validatable, never applied (the ``kind != "change"`` gate is the no-apply
+#: enforcement). The double suffix is PRESERVED by :func:`_safe_name` (the
+#: name already ends with ``.json``), so the suffix distinction survives the
+#: write path unchanged (TC-B94-13).
+CHECK_SPEC_SUFFIX = ".chk.json"
 
 #: A syntactically valid ``s19app-changeset`` (kind=change) carrying FAKE
 #: values only, pre-loaded into the Patch Editor paste field as a format
@@ -1615,7 +1626,10 @@ def _safe_name(file_name: str) -> str:
     Returns:
         str: The bare name (``Path.name`` — directory components stripped)
         with a ``.json`` suffix forced on. An empty result falls back to
-        :data:`DEFAULT_CHANGE_FILE_NAME`.
+        :data:`DEFAULT_CHANGE_FILE_NAME`. A check-spec double suffix
+        (``baseline.chk.json``) is preserved verbatim — the name already ends
+        with ``.json`` — so the batch-94 suffix distinction survives the
+        save boundary (LLR-009.1, TC-B94-13).
 
     Data Flow:
         - Strip any directory component with ``Path(...).name``.
@@ -1631,6 +1645,68 @@ def _safe_name(file_name: str) -> str:
     if not bare.lower().endswith(".json"):
         bare = f"{bare}.json"
     return bare
+
+
+def is_check_spec_name(name: str) -> bool:
+    """Report whether a change-file name is a check spec (``.chk.json``).
+
+    Summary:
+        The suffix distinction of batch-94 (US-003 / D3): ``hotfix.pch.json``
+        is a patch change-set, ``baseline.chk.json`` is a check spec. The
+        check-spec discriminator is the FILE NAME suffix, never the document
+        content — the v2 grammar discriminates ``kind`` but one schema family
+        carries both (R10).
+
+    Args:
+        name (str): The bare file name (already reduced by the caller's scan).
+
+    Returns:
+        bool: ``True`` when the name carries the :data:`CHECK_SPEC_SUFFIX`
+            double suffix (case-insensitive on the inner token, matching the
+            ``.json`` suffix rule of :func:`_safe_name`).
+
+    Dependencies:
+        Used by:
+            - list_change_documents consumers (the file dropdowns' labels)
+    """
+    lowered = str(name).lower()
+    return lowered.endswith(CHECK_SPEC_SUFFIX)
+
+
+def list_change_documents(patches_dir: Path) -> list[tuple[str, bool]]:
+    """Scan a patches folder for change documents, suffix-tagged (LLR-010.1).
+
+    Summary:
+        Return the sorted ``(name, is_check_spec)`` pair for every ``*.json``
+        file under ``patches_dir`` — the suffix-aware listing helper the file
+        dropdowns consume (the Patch Editor change-file dropdown, the Check
+        Editor spec dropdown and the A2B Diff check-spec dropdown all list
+        patch files AND check specs from the same directory, displaying the
+        check specs with the CHECK distinction).
+
+    Args:
+        patches_dir (Path): The patches folder (``workarea/patches/``). A
+            missing folder yields an empty list, never a raise.
+
+    Returns:
+        list[tuple[str, bool]]: ``(bare name, is_check_spec_name(name))``
+            pairs, sorted by name (deterministic — F-Q2), symlinks SKIPPED
+            (the read-path security fold at discovery time, F1).
+
+    Dependencies:
+        Uses:
+            - is_check_spec_name
+        Used by:
+            - S19TuiApp._scan_patch_change_files
+    """
+    if not patches_dir.is_dir():
+        return []
+    pairs = [
+        (match.name, is_check_spec_name(match.name))
+        for match in patches_dir.glob("*.json")
+        if not match.is_symlink()
+    ]
+    return sorted(pairs, key=lambda pair: pair[0])
 
 
 # ---------------------------------------------------------------------------

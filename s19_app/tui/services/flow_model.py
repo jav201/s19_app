@@ -31,6 +31,18 @@ BLOCK_CRC = "crc"
 #: Ref-less report block (batch-53 FB-P1, D2 / AMD-5) — persists + round-trips;
 #: content generation is deferred to FB-P1b (run_flow treats it as a no-op).
 BLOCK_REPORT = "report"
+#: A2B diff block (batch-94 Inc-002, HLR-013/014) — compares two images (each a
+#: flow output OR an external file; ≥1 MUST come from the current flow) and
+#: emits a diff report stating each input's provenance.
+BLOCK_A2B = "a2b"
+
+#: A2B input-binding source discriminators (HLR-014). ``flow`` binds the
+#: output of an UPSTREAM block of the CURRENT flow (never another flow — the
+#: index grammar makes a cross-flow source unrepresentable); ``file`` binds a
+#: project-relative image file through the same containment guard as every
+#: other block ref.
+A2B_INPUT_FLOW = "flow"
+A2B_INPUT_FILE = "file"
 
 #: WRITE-OUT emit formats — the ``save_patched_image`` ``source_kind`` values.
 WRITE_FMT_S19 = "s19"
@@ -202,6 +214,146 @@ class CrcBlock:
 
 
 @dataclass(frozen=True)
+class A2BInputBinding:
+    """One image input binding for an A2B diff block (HLR-014).
+
+    Args:
+        source (str): :data:`A2B_INPUT_FLOW` (an upstream block's output of the
+            CURRENT flow) or :data:`A2B_INPUT_FILE` (a project-relative image
+            file).
+        ref (str): For ``flow`` — the 0-based index of the producing block in
+            the flow's block list, decimal string (the UI surfaces it 1-based
+            as ``#<n>``); the index grammar references only THIS flow's own
+            upstream blocks, so a cross-flow source is unrepresentable, and
+            validation bounds it to image-producing blocks. For ``file`` — a
+            project-relative S19/HEX filename, resolved through the manifest
+            containment guard at load and run (never an absolute/escaping
+            path), same grammar as every other block ref.
+    """
+
+    source: str
+    ref: str
+
+
+@dataclass(frozen=True)
+class A2BBlock:
+    """Diff block — compare two images and emit an A2B diff report.
+
+    Each image input binds independently to a flow output or an external
+    file; wiring validation (:func:`validate_a2b_bindings`) requires at least
+    one input from the current flow ("para no falsear reportes", the operator
+    ruling) and refuses both-external pairs, downstream/self references and
+    non-image-producing sources. The run executes through the existing
+    diff-report service and the report states each input's provenance
+    (LLR-013.3/014.2).
+
+    Args:
+        image_a (A2BInputBinding): Binding for report image A.
+        image_b (A2BInputBinding): Binding for report image B.
+    """
+
+    image_a: A2BInputBinding
+    image_b: A2BInputBinding
+    kind: str = BLOCK_A2B
+
+
+def parse_a2b_binding(text: str) -> "Optional[A2BInputBinding]":
+    """Parse the operator-typed A2B binding text into a binding (or ``None``).
+
+    Summary:
+        The fb_a wiring grammar: ``#<n>`` (n ≥ 1, 1-based as numbered on the
+        canvas) binds the output of upstream block n of the current flow —
+        stored 0-based; any other non-empty text is a project-relative file
+        ref. Empty/unparseable text refuses (``None``), so a refused binding
+        never reaches the flow.
+
+    Args:
+        text (str): The raw binding input (operator-typed, untrusted text).
+
+    Returns:
+        Optional[A2BInputBinding]: The parsed binding, or ``None`` when the
+        text is empty or the ``#<n>`` grammar is malformed.
+    """
+    text = text.strip()
+    if not text:
+        return None
+    if text.startswith("#"):
+        digits = text[1:]
+        if digits.isdigit() and int(digits) >= 1:
+            return A2BInputBinding(source=A2B_INPUT_FLOW, ref=str(int(digits) - 1))
+        return None
+    return A2BInputBinding(source=A2B_INPUT_FILE, ref=text)
+
+
+#: Block kinds whose output IS an image — the only legal targets of an A2B
+#: flow binding (an A2B's report output or a ref-less REPORT marker can never
+#: feed an image input).
+_A2B_IMAGE_OUTPUT_KINDS = frozenset(
+    {BLOCK_SOURCE, BLOCK_PATCH, BLOCK_CRC, BLOCK_WRITE_OUT, BLOCK_CHECK}
+)
+
+
+def validate_a2b_bindings(
+    block: "A2BBlock",
+    upstream_blocks: "Sequence[FlowBlock]",
+) -> "List[str]":
+    """Validate an A2B block's bindings against its upstream blocks (HLR-014).
+
+    Summary:
+        The wiring-time accept/refuse matrix (LLR-014.1): accepted (flow,flow),
+        (flow,file), (file,flow); refused (file,file), a flow index that is
+        out of range / downstream / self, a flow binding to a block whose
+        output is not an image (A2B/REPORT), and any malformed binding. A
+        non-empty return is the refusal reason list — the caller refuses the
+        wiring (0 reports produced for refused bindings).
+
+    Args:
+        block (A2BBlock): The block whose bindings are validated.
+        upstream_blocks (Sequence[FlowBlock]): The blocks BEFORE this block in
+            the current flow (the only legal flow-binding targets).
+
+    Returns:
+        List[str]: Refusal reasons; empty when the binding is legal.
+    """
+    reasons: List[str] = []
+    flow_count = 0
+    for label, binding in (("image_a", block.image_a), ("image_b", block.image_b)):
+        if binding.source == A2B_INPUT_FILE:
+            if not binding.ref.strip():
+                reasons.append(f"{label}: file binding has an empty ref")
+            continue
+        if binding.source != A2B_INPUT_FLOW:
+            reasons.append(
+                f"{label}: unknown binding source {binding.source!r} "
+                f"(expected {A2B_INPUT_FLOW!r} or {A2B_INPUT_FILE!r})"
+            )
+            continue
+        flow_count += 1
+        ref = binding.ref.strip()
+        if not ref.isdigit():
+            reasons.append(f"{label}: flow binding ref {ref!r} is not a block index")
+            continue
+        index = int(ref)
+        if index >= len(upstream_blocks):
+            reasons.append(
+                f"{label}: flow binding references block {index + 1}, but only "
+                f"{len(upstream_blocks)} upstream block(s) exist in this flow"
+            )
+            continue
+        if upstream_blocks[index].kind not in _A2B_IMAGE_OUTPUT_KINDS:
+            reasons.append(
+                f"{label}: block {index + 1} ({upstream_blocks[index].kind}) "
+                "produces no image output"
+            )
+    if flow_count == 0:
+        reasons.append(
+            "at least one A2B input must come from the current flow "
+            "(both-external pairs would false the report)"
+        )
+    return reasons
+
+
+@dataclass(frozen=True)
 class ReportBlock:
     """Report block — a ref-less terminal marker that a flow produces a report.
 
@@ -218,9 +370,10 @@ class ReportBlock:
 
 
 #: A tracer-slice block (SOURCE/PATCH/CHECK/WRITE-OUT + the batch-52 CRC block +
-#: the batch-53 ref-less REPORT block).
+#: the batch-53 ref-less REPORT block + the batch-94 A2B diff block).
 FlowBlock = Union[
-    SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock, ReportBlock
+    SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock, ReportBlock,
+    A2BBlock,
 ]
 
 

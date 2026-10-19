@@ -18,7 +18,7 @@ from pathlib import Path
 from textual.widgets import Button, Select, Static
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens_directionb import (
+from s19_app.tui.flow_screens import (
     FlowBuilderPanel,
     _memory_ribbon_text,
 )

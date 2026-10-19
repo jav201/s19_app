@@ -1,0 +1,27 @@
+arms: 7 node-runs: 12
+before: a70e08decbe6c5afbad0eac5513b255a3bbce88735553e4b2d5ec56c88a56e23  (s19_app\validation\rules.py)
+before: 1c2c200367299b361a6e6ab5b55e8c4f9c94a8f0cfebd7d431b4591ef97a8d37  (s19_app\tui\app.py)
+before: 96f29f49422bce0d5f0278d97fc05caeeeed17fcd4d759fd787ef3b9b65605cf  (s19_app\tui\issues_view.py)
+CLEAN-TREE BASELINE:
+  tests/test_tui_issues_triage_b94.py::test_at_b94_14_fixture_triage_through_surface
+  tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freeze
+  tests/test_tui_issues_triage_b94.py::test_tc_b94_19_panel_reclassification_matrix
+    baseline tail: 3 passed in 6.36s
+baseline exit: 0
+arm01 predicate returns None (the triage never fires) [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 2.64s
+arm01 predicate returns None (the triage never fires) [test_tc_b94_19_panel_reclassification_matrix]: RED (KILLED) :: 1 failed in 1.91s
+arm02 justification note dropped from the INFO group [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 2.53s
+arm02 justification note dropped from the INFO group [test_tc_b94_19_panel_reclassification_matrix]: RED (KILLED) :: 1 failed in 1.82s
+arm03 count helper neutralized (delta always zero) [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 4.65s
+arm04 row remap dropped (rows keep WARNING) [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 2.47s
+arm04 row remap dropped (rows keep WARNING) [test_tc_b94_19_panel_reclassification_matrix]: RED (KILLED) :: 1 failed in 1.91s
+arm05 FROBNICATE admitted to the curated set [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 2.72s
+arm05 FROBNICATE admitted to the curated set [test_tc_b94_18_curated_set_and_engine_freeze]: RED (KILLED) :: 1 failed in 0.51s
+arm05 FROBNICATE admitted to the curated set [test_tc_b94_19_panel_reclassification_matrix]: RED (KILLED) :: 1 failed in 1.84s
+arm06 frozen engine constant touched [test_tc_b94_18_curated_set_and_engine_freeze]: RED (KILLED) :: 1 failed in 0.55s
+arm07 panel group_counts not triaged (strip/summary triaged) [test_at_b94_14_fixture_triage_through_surface]: RED (KILLED) :: 1 failed in 4.44s
+after:  a70e08decbe6c5afbad0eac5513b255a3bbce88735553e4b2d5ec56c88a56e23  (s19_app\validation\rules.py)
+after:  1c2c200367299b361a6e6ab5b55e8c4f9c94a8f0cfebd7d431b4591ef97a8d37  (s19_app\tui\app.py)
+after:  96f29f49422bce0d5f0278d97fc05caeeeed17fcd4d759fd787ef3b9b65605cf  (s19_app\tui\issues_view.py)
+RESTORE PROVEN (hash identical) for every mutated file
+TOTALS: 12 node-runs | RED 12 | SURVIVED 0 | CRASH/BAD 0

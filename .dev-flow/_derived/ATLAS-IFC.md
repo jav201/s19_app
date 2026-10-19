@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: ef4561d60ce65e0f | corpus: 72 requirement files | corpus digest: b922b9e262c326c7 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-18 FLOW declaration(s) · 8 COMPONENT declaration(s) · 677 declared requirement heading ids — one row per declaration.
+24 FLOW declaration(s) · 12 COMPONENT declaration(s) · 679 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -91,6 +91,32 @@
 - node `LegendScreen API + other-view byte-identical control` — owner LLR-132.3
 - node `live-sourced band key` — owner LLR-132.4
 - node `command-bar interlock` — owner LLR-133.1
+
+### FLOW `check_spec_to_diff_report` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1031
+- node `write_change_document (Check Editor write action)` — owner LLR-009.1
+- node `parse_change_document + read_change_document (A2B Diff load)` — owner LLR-010.1
+- node `generate_diff_report addendum (check-spec append)` — owner LLR-010.2
+
+### FLOW `a2l_file_to_issues_triage` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1050
+- node `validate_a2l_structure section classification (engine, frozen)` — owner LLR-012.1
+- node `curated-set reclassification policy (view layer)` — owner LLR-012.2
+
+### FLOW `flow_template_to_execution` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1065
+- node `save_flow_json (builder template save)` — owner LLR-015.1
+- node `load_flow_json + dict_to_flow (execution import)` — owner LLR-017.1
+
+### FLOW `chain_set_save_load` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1080
+- node `chain-set serializer (chains + input bindings + outputs)` — owner LLR-021.1
+- node `chain-set loader (reload + provenance rebind)` — owner LLR-021.2
+
+### FLOW `block_input_provenance_to_report` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1095
+- node `binding validation (flow-output-or-file, >=1 from current flow)` — owner LLR-014.1
+- node `provenance line emission in the A2B report` — owner LLR-014.2
+
+### FLOW `rail_selection_to_panel_mount` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1110
+- node `RAIL_ENTRIES census + key/click routing (app.py action_show_screen)` — owner LLR-002.1
+- node `check-editor panel mounting` — owner LLR-001.2
+- node `flow-execution panel mounting` — owner LLR-017.1
 
 ### FLOW `the amendment, from the operator's eye to one word of chrome` — .dev-flow/2026-10-13-batch-94/01-requirements.md:126
 - node `the legend spec sheet's fourth box title (screens.py _box)` — owner HLR-134
@@ -261,6 +287,52 @@
 |---|---|---|---|---|
 | `markup-safe Text` | `s19_app.utils.safe_text` | None | 14 declared | LLR-003.2 |
 
+### COMPONENT `check_editor_panel` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1131
+- inputs : selected_a2l_tags: list[dict] ; check_spec_entries: list[ChangeEntry] ; spec_file_listing: list[str]
+- outputs : 
+- parent : workspace_shell
+- surface : Check Editor (rail surface, Inc-001)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `collector_rows` | `query("#check-editor-panel parameter-collector"), INDEXED POSITIONALLY` | per declared spec entries | 0 declared | LLR-001.1 |
+| `spec_write_path` | `query("#check-editor-panel write-action result")` | 1 | 1 declared | LLR-009.1 |
+
+### COMPONENT `patch_editor_panel` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1153
+- inputs : change_document: ChangeDocument|None ; folder_listing: list[str] ; loaded_image: mem_map|ranges|None
+- outputs : 
+- parent : workspace_shell
+- surface : Patch Editor (reworked, Inc-001)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `entries_table_rows` | `query("#patch_doc_entries_table"), INDEXED POSITIONALLY` | per loaded document entries | 2 declared | LLR-004.1 |
+| `json_editor_region` | `query("#patch-editor-json-region")` | 1 | 0 declared | LLR-003.1 |
+| `load_guard_popup` | `query("#patch-load-guard-popup")` | 1 | 0 declared | LLR-005.2 |
+
+### COMPONENT `flow_builder_panel` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1182
+- inputs : template_listing: list[str] ; loaded_artifacts: list[str]
+- outputs : 
+- parent : workspace_shell
+- surface : Flow Builder (fb_a redesign; address moves screens_directionb -> flow_screens, B2)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `canvas_blocks` | `query("#flow-builder-canvas .flow-block"), INDEXED POSITIONALLY` | per placed blocks | 1 declared | LLR-013.1 |
+| `template_save_name` | `query("#flow-builder-save-result")` | 1 | 0 declared | LLR-015.1 |
+
+### COMPONENT `flow_execution_panel` — .dev-flow/2026-10-12-batch-94/01-requirements.md:1204
+- inputs : template_listing: list[str] ; chain_input_files: list[str] ; run_mode: "sequential"|"parallel"
+- outputs : 
+- parent : workspace_shell
+- surface : Flow Execution (fx_a, Inc-003)
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `run_lanes` | `query("#flow-execution-lanes .flow-lane"), INDEXED POSITIONALLY` | per imported chains | 1 declared | LLR-017.1 |
+| `run_log` | `query("#flow-run-log")` | 1 | 0 declared | LLR-020.1 |
+| `chain_set_save_result` | `query("#flow-set-save-result")` | 1 | 0 declared | LLR-021.1 [+ABSORBED] |
+
 ### COMPONENT `split_join_engine` — .dev-flow/2026-10-13-batch-95/01-requirements.md:840
 - gap : str ; pad_byte: int ; fmt: str ; stem: str ; pattern: str ; destination: Path
 - inputs : image: S19File|IntelHexFile ; segments: SegRow[] ; selection: set[int] ; mode: str ;
@@ -287,8 +359,12 @@
 
 - [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:824: FLOW a2l_referenced_patch: node `the flow blocks' A2L reference resolution (project / workspace homes)` names 2 owners (LLR-142.1, LLR-142.2) — a node has exactly one owner; split it into one node per owning requirement
 - [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:828: FLOW a2l_referenced_patch: node `report attribution + the A2B diff reference block` names 2 owners (LLR-143.1, LLR-143.2) — a node has exactly one owner; split it into one node per owning requirement
-- [-] V11  01-requirements.md: 86 OUTPUT(s), each with an address and a declared consumer list
+- [-] V11  01-requirements.md: 96 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1131: COMPONENT check_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1153: COMPONENT patch_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1182: COMPONENT flow_builder_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1204: COMPONENT flow_execution_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:540: COMPONENT loaded_panel/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -311,7 +387,7 @@
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:592: COMPONENT screen_workspace/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:602: COMPONENT screen_workspace/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-86/01-requirements.md:623: COMPONENT screen_workspace/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:850: COMPONENT workspace_body/body_root: reached by 5 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, tests/test_tui_map_big.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:850: COMPONENT workspace_body/body_root: reached by 6 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, tests/test_tui_map_big.py, tests/test_tui_patch_editor_b94.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:865: COMPONENT workspace_body/screen_slot_set: reached by 3 undeclared file(s) — s19_app/tui/open_folder_chip.py, tests/test_open_folder_chips.py, tests/test_window_usage_help.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:871: COMPONENT workspace_body/a2l_screen: reached by 3 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:880: COMPONENT workspace_body/mac_screen: reached by 2 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -319,7 +395,7 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:898: COMPONENT workspace_body/issues_screen: reached by 5 undeclared file(s) — REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss, tests/test_tui_issues_view.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:909: COMPONENT workspace_body/patch_screen: reached by 1 undeclared file(s) — docs/architecture.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:917: COMPONENT workspace_body/diff_screen: reached by 1 undeclared file(s) — docs/architecture.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:926: COMPONENT workspace_body/flow_screen: reached by 5 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, .fast-dev-flow/archive/2026-07-14-batch44-flow-builder-spec.md, REQUIREMENTS.md, docs/architecture.md, tests/test_flow_builder_render.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:926: COMPONENT workspace_body/flow_screen: reached by 9 undeclared file(s) — .fast-dev-flow/ADR-flow-builder-tracer.md, .fast-dev-flow/archive/2026-07-14-batch44-flow-builder-spec.md, REQUIREMENTS.md, docs/architecture.md, s19_app/tui/flow_screens.py, tests/test_flow_builder_render.py, tests/test_tui_flow_builder_b94.py, tests/test_tui_flow_execution_b94.py, tests/test_tui_snapshot.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:933: COMPONENT workspace_body/checks_screen: reached by 3 undeclared file(s) — docs/architecture.md, prototypes/legend_n8.INVENTORY.md, s19_app/tui/styles.tcss. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:942: COMPONENT workspace_body/crc_designer_screen: reached by 3 undeclared file(s) — docs/architecture.md, docs/crc-algorithm-designer/01-requirements.md, s19_app/tui/crc_designer_view.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:950: COMPONENT workspace_body/screen_root: reached by 5 undeclared file(s) — .fast-dev-flow/archive/2026-07-20-unload-feature-spec.md, REQUIREMENTS.md, docs/architecture.md, prototypes/legend_n8.INVENTORY.md, tests/test_segment_split_window.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -341,8 +417,9 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1151: COMPONENT workspace_body/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1161: COMPONENT workspace_body/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-10-12-batch-94/01-requirements.md:1158: COMPONENT patch_editor_panel/entries_table_rows: reached by 14 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, s19_app/tui/services/change_service.py, s19_app/tui/styles.tcss, tests/test_tui_checks_screen.py, tests/test_tui_patch_big.py, tests/test_tui_patch_card.py, tests/test_tui_patch_checks_strip.py, tests/test_tui_patch_editor_b94.py, tests/test_tui_patch_editor_v2.py, tests/test_tui_patch_glyphs.py, tests/test_tui_patch_layout.py, tests/test_tui_patch_variant.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  01-requirements.md: 9 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text, split_join_engine/output_files, split_join_engine/memory_segment_rows, change_set_wire/resolved_entries. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
 - [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `none — the first consumer is the screen's export action and the batch's own` names a file that is not there — the contract points at nothing
 - [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `TCs` names a file that is not there — the contract points at nothing
 - [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `no shipped consumer indexes it` names a file that is not there — the contract points at nothing
-- [-] V19  01-requirements.md: 8 COMPONENT id(s), each declared exactly once
+- [-] V19  01-requirements.md: 12 COMPONENT id(s), each declared exactly once

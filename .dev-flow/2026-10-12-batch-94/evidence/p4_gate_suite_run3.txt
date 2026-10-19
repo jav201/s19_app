@@ -1,0 +1,369 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.......................ss............................................... [  2%]
+........................................................................ [  4%]
+.............F.......................................................... [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+......x................................................................. [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+..........................................F............................. [ 84%]
+...........F...........................................................x [ 86%]
+......................................................................xx [ 88%]
+xxxxxxxxxxxxxxxxxxxxxxxxxxx............................................. [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+..................................x..................................... [ 98%]
+..............FF.......................................                  [100%]
+================================== FAILURES ===================================
+____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_at_061a_persistent_contro0')
+
+    def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back reveals a persistent report control that survives an unrelated
+        action, writes the same report pair on activation, and hides on a new load.
+    
+        Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+        surface. After a successful save-back (the path that today fires only the
+        transient ``notify``), a persistent, queryable control
+        (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+        is shown. Activating it routes to the EXISTING ``action_before_after_report``
+        writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+        produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+        diff heading + the provenance header), not merely "a file was written" (C-10).
+    
+        Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+        a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+        an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+        This proxy asserts widget durability, NOT the notify wall-clock TTL.
+    
+        Activation mechanism: the control is activated through the real button-press
+        dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+        → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+        ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+        ``action_before_after_report``; the message routing is exercised end-to-end.
+    
+        Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+        is re-hidden — a stale "report ready" offer must not persist once the editing
+        context (``last_summary``) has cleared.
+    
+        Counterfactual (RED, C-20): pre-implementation there is no
+        ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+        the transient-only notify cannot satisfy this node.
+        """
+        from textual.css.query import NoMatches
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _drive_apply(app, pilot)
+    
+                # Before the save-back the persistent control must be hidden.
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_before_saveback"] = row.has_class("hidden")
+    
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["revealed_after_saveback"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Persistence proxy: an unrelated action + re-render must NOT drop
+                # the control (a notify Toast would be gone).
+                _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                button = panel.query_one("#patch_before_after_button", Button)
+                outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Activate through the real button-press dispatch (not a proxy call).
+                statuses = _statuses(app)
+                before = _report_names(reports_dir)
+                button.press()
+                await pilot.pause()
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+    
+                # Clear-on-context boundary: a new load re-hides the control.
+                (tmp_path / "changes.json").write_text(
+                    '{"version": 2, "changes": []}', encoding="utf-8"
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    tmp_path / "changes.json"
+                )
+                panel.request_action("load_doc")
+                await pilot.pause()
+                try:
+                    outcomes["hidden_after_new_load"] = panel.query_one(
+                        "#patch_before_after_row"
+                    ).has_class("hidden")
+                except NoMatches:  # pragma: no cover - row must persist as a widget
+                    outcomes["hidden_after_new_load"] = True
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["hidden_before_saveback"], (
+            "AT-061a: the report control must be hidden before any save-back"
+        )
+>       assert outcomes["revealed_after_saveback"], (
+            "AT-061a: a successful save-back must reveal the persistent control"
+        )
+E       AssertionError: AT-061a: a successful save-back must reveal the persistent control
+E       assert False
+
+tests\test_before_after_report.py:1182: AssertionError
+_________ test_saveback_width_32_packs_wide_records_and_populates_s0 __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_saveback_width_32_packs_w0')
+
+    def test_saveback_width_32_packs_wide_records_and_populates_s0(
+        tmp_path: Path,
+    ) -> None:
+        """AT-015.1 — selecting 32 bytes/line on the real save-back surface
+        writes a .s19 whose S3 data records pack >16 (and ≤32) data bytes, whose
+        S0 header is populated, and whose firmware DATA-record map re-parses
+        byte-equal to the patched image.
+    
+        Intent (C3, two-layer): observe the user-facing US-015 outcome THROUGH the
+        shipped Patch Editor save-back widget — cycle the selector OFF 32 and back
+        (F1: exercise the button's press path, not the bare default), press the
+        real Write-file button, then read the written file off disk and verify it
+        with the frozen ``S19File`` reader. A service-level call would not prove
+        the operator's selector choice reaches the bytes on disk.
+        """
+        image_path = _make_wide_s19_image(tmp_path)
+        written, intended = _drive_saveback_width(
+            tmp_path, image_path, 32, exercise_toggle=True
+        )
+    
+>       assert written is not None, "the 32-byte confirm must write a file"
+E       AssertionError: the 32-byte confirm must write a file
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:1129: AssertionError
+________________________ test_at077c_stale_provenance _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20766/test_at077c_stale_provenance0')
+
+    def test_at077c_stale_provenance(tmp_path: Path) -> None:
+        """Mutating the document reverts every glyph to ``·`` — three ways.
+    
+        Intent (AT-077c ★, LLR-077.2, GATE-BLOCKING — the wrong-answer class):
+        ``last_check_result`` is NOT reset by document mutation (only by undo/redo),
+        so without the provenance stamp a mutated document is index-aligned onto a
+        stale result and rows are labelled with verdicts belonging to entries that
+        no longer exist at that index. There is no error path — the table simply
+        lies.
+    
+        Three arms, each through a REAL button:
+    
+          (a) ``#patch_entry_add_button``    — count grows
+          (b) ``#patch_entry_remove_button`` — count shrinks
+          (c) ``#patch_entry_edit_button``   — **count UNCHANGED**, bytes replaced
+    
+        Arm (c) is the counterfactual that makes this AT non-vacuous: a
+        count-equality guard passes (a) and (b) and silently mislabels (c). Measured
+        (M-3): weakening the signature to ``len(entries)`` fails arm (c) ALONE.
+    
+        The **non-invalidation** arm is asserted first and is equally load-bearing:
+        without it, an implementation that renders ``·`` unconditionally passes
+        every other assertion here.
+        """
+        image = _write_image(tmp_path / "image.s19", _BRANCH_IMAGE)
+    
+        def _drive(mutate) -> list[str]:
+            async def _run() -> list[str]:
+                doc = _write_check_document(
+                    tmp_path / f"checks-{id(mutate)}.json", list(_BRANCH_ENTRIES)
+                )
+                app = S19TuiApp(base_dir=tmp_path)
+                async with app.run_test(size=(120, 30)) as pilot:
+                    await pilot.pause()
+                    app.load_selected_file(image)
+                    await pilot.pause()
+                    _open_patch(app, doc)
+                    await pilot.pause()
+                    _run_checks(app)
+                    await pilot.pause()
+                    assert _glyphs(app) != [GLYPH_NO_RESULT] * 3, (
+                        "PRECONDITION: the run must render real verdicts before the "
+                        "mutation, or the post-mutation assertion is vacuous"
+                    )
+                    mutate(app)
+                    await pilot.pause()
+                    return _glyphs(app)
+    
+            return asyncio.run(_run())
+    
+        def _no_mutation(app: S19TuiApp) -> None:
+            pass
+    
+        def _add(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x200"
+            app.query_one("#patch_entry_value_input", Input).value = "added"
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+            app.query_one("#patch_entry_add_button", Button).press()
+    
+        def _remove(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x110"
+            app.query_one("#patch_entry_remove_button", Button).press()
+    
+        def _edit_in_place(app: S19TuiApp) -> None:
+            # Same address, NEW bytes -> the entry count is IDENTICAL.
+            app.query_one("#patch_entry_address_input", Input).value = "0x100"
+            app.query_one("#patch_entry_value_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = "DE AD"
+            app.query_one("#patch_entry_edit_button", Button).press()
+    
+        # Non-invalidation FIRST — the anti-vacuity arm.
+        unchanged = _drive(_no_mutation)
+        assert unchanged == [GLYPH_PASS, GLYPH_FAIL, GLYPH_UNCHECKABLE], (
+            "with NO mutation the stamp must still match and the glyphs must "
+            f"render; got {unchanged!r}. If this reads all-'·' the implementation "
+            "refuses unconditionally and every arm below is vacuous."
+        )
+    
+        for arm, mutate, expected_rows in (
+            ("(a) add_entry", _add, 4),
+            ("(b) remove_entry", _remove, 2),
+            ("(c) in-place edit, COUNT UNCHANGED", _edit_in_place, 3),
+        ):
+            glyphs = _drive(mutate)
+>           assert len(glyphs) == expected_rows, (
+                f"arm {arm}: the mutation must actually have taken effect; "
+                f"expected {expected_rows} rows, got {len(glyphs)}"
+            )
+E           AssertionError: arm (b) remove_entry: the mutation must actually have taken effect; expected 2 rows, got 3
+E           assert 3 == 2
+E            +  where 3 = len(['✓', '✗', '◐'])
+
+tests\test_tui_patch_glyphs.py:400: AssertionError
+______________ test_tc707_copy_matches_help_sections_md_verbatim ______________
+
+    def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
+        """TC-707 (LLR-140.2, the operator-editable home): every shipped step
+        string is a verbatim port of ``help_sections.md`` — the md is the
+        source draft, so a drifted copy edit reddens here against the source."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+__________________ test_tc707_numbering_generated_sequential __________________
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+============================== warnings summary ===============================
+..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
+  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=10665722;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - Asserti...
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+5 failed, 3040 passed, 2 skipped, 21 deselected, 32 xfailed, 1 warning in 3486.37s (0:58:06)

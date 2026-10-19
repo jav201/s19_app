@@ -1,0 +1,27 @@
+ M s19_app/tui/app.py
+ M s19_app/tui/flow_screens.py
+ M s19_app/tui/services/flow_execution_service.py
+ M s19_app/tui/services/flow_persistence_service.py
+ M tests/test_id_registry.py
+ M tests/test_tui_commandbar.py
+ M tests/test_tui_directionb.py
+ M tests/test_tui_snapshot.py
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_battery.py
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_changed_files.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_engine_guard.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_move_aside.py
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_rail12_probe.py
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_rail12_probe.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_b95_compat.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_commandbar.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_directionb.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_editors.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_flow_family.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_goldens_ac6.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_goldens_batch35.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_new_files.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_patch_family.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_registry_guard.txt
+?? .dev-flow/2026-10-12-batch-94/evidence/inc003_suite_snapshot.txt
+?? tests/test_flow_chainset_b94.py
+?? tests/test_tui_flow_execution_b94.py

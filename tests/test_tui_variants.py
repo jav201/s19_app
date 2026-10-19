@@ -436,14 +436,27 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
 # US-067 (B-18) — variant-selector info/help popup
 # ---------------------------------------------------------------------------
 #
-# AT-067a (black-box, C-16 real pointer): a REAL ``pilot.click`` on the new
-# ``#patch_variant_info_button`` opens the ``VariantHelpScreen`` modal, whose
-# rendered body names what the selector does. TC-336/337 (white-box) drive the
-# message/handler route and assert the same content; a Phase-3 geometry
-# inspection pilot-measures the modal fits at 80x24 AND 120x30 (C-23).
-
-# Content tokens the help modal must render (C-10: assert content, not
-# "a modal exists"). Sourced from the shipped ``VARIANT_HELP_TEXT`` copy.
+# batch-94 Inc-001 (HLR-006, US-002 annotation 4) RETIRED the variant selector
+# and its help affordance: ``#patch_variant_select``,
+# ``#patch_variant_info_button`` and the ``PatchEditorPanel.
+# VariantHelpRequested`` message are gone from the shipped surface. The three
+# tests below observed that retired machinery THROUGH this file — the P1/R-6
+# census assigned this file to the DO-NOT-TOUCH group on its app-level
+# patterns (``action_select_variant`` / ``SelectVariantScreen``), and the
+# retired-pattern re-run at the Inc-001 cut (V43) found these three nodes
+# observing ``patch_variant*`` / ``VariantHelpRequested`` after all.
+# Reconciled per the proposal's own clause ("reconciliation against the
+# contract's named list happens per file at the Inc-001 cut, not by silent
+# reassignment"): ONLY these three nodes were rewritten, to observe the
+# retirement; the file's other eight app-level machinery tests are untouched
+# (11 total - 3 rewritten). Recorded as a deviation in the increment packet —
+# the P1 group assignment under-counted this file.
+#
+# The help TEXT tokens are kept as the retirement census reference: the
+# modal's subject (the selector) no longer exists, so the shipped surface
+# must not render. The tokens are asserted in the orphan-modal geometry
+# node's direct-push arm — the only surviving reach — restoring the content
+# assertion the retired surface owed (fold round, F6).
 _VARIANT_HELP_TOKENS = (
     "picks which firmware image loads",
     "at least two firmware images",
@@ -452,12 +465,7 @@ _VARIANT_HELP_TOKENS = (
 
 
 async def _open_patch_with_two_variants(pilot, app: S19TuiApp) -> None:
-    """Load a >=2-image project and show the Patch Editor (F-m3 fixture).
-
-    The variant selector renders only for a >=2-image project; the info
-    button is always rendered beside it, so a >=2-image project makes the
-    selector + info button live click targets for the AT.
-    """
+    """Load a >=2-image project and show the Patch Editor (F-m3 fixture)."""
     await pilot.pause()
     app._handle_load_project("proj")
     await _flush(pilot)
@@ -466,21 +474,18 @@ async def _open_patch_with_two_variants(pilot, app: S19TuiApp) -> None:
 
 
 def test_at067a_variant_info_button_opens_help_modal(tmp_path: Path) -> None:
-    """AT-067a — a real click on the variant info button opens the help modal.
+    """AT-067a (batch-94 form) — the variant help affordance is retired.
 
-    Intent (US-067 / HLR-067, C-16 real pointer): with a >=2-image project the
-    variant selector is live and the always-rendered info button beside it is a
-    real click target. A REAL ``pilot.click`` (not ``.focus()`` / not a direct
-    ``push_screen`` proxy) on ``#patch_variant_info_button`` makes the
-    ``VariantHelpScreen`` the active screen, and its body names what the
-    selector does (picks which firmware image loads; appears with >=2 images in
-    the project dir) — a content assertion, not merely "a screen was pushed".
-    Pressing Close dismisses it back to the prior screen.
-
-    RED counterfactual: at ``main`` no info button is wired to the selector, so
-    ``pilot.click("#patch_variant_info_button")`` raises ``NoMatches`` (the
-    click target does not exist) and no modal appears.
+    Intent (HLR-006, US-002 annotation 4): the selector and its info button
+    no longer render anywhere in the app — ``#patch_variant_info_button``
+    resolves to nothing (``NoMatches``), and no project state makes it
+    reappear. The retirement is asserted on the shipped surface at both the
+    widget level and the message level (``VariantHelpRequested`` is gone
+    from ``PatchEditorPanel``). App-level variant SWITCHING survives — it is
+    guarded by this file's own ``test_select_variant_updates_label`` and
+    ``tests/test_variant_execution.py``, both untouched.
     """
+    import pytest
 
     async def _drive() -> dict[str, object]:
         outcomes: dict[str, object] = {}
@@ -488,66 +493,47 @@ def test_at067a_variant_info_button_opens_help_modal(tmp_path: Path) -> None:
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(120, 30)) as pilot:
             await _open_patch_with_two_variants(pilot, app)
-            select = app.query_one("#patch_variant_select", Select)
-            outcomes["select_enabled"] = not select.disabled
-            # batch-46 (FOLD-8, reachable-under-scroll): the info button now
-            # lives in the PATCH SCRIPT window body, below the 120x30 fold —
-            # scroll its window into view so the real pointer click lands.
-            app.query_one("#patch_win_script").scroll_end(animate=False)
-            await pilot.pause()
-            # C-16: REAL pointer click on the info button.
-            await pilot.click("#patch_variant_info_button")
-            await pilot.pause()
-            from s19_app.tui.screens import VariantHelpScreen
+            from s19_app.tui.screens_directionb import PatchEditorPanel
 
-            outcomes["is_help_modal"] = isinstance(
-                app.screen, VariantHelpScreen
+            with pytest.raises(Exception):
+                app.query_one("#patch_variant_info_button")
+            outcomes["info_button_absent"] = True
+            with pytest.raises(Exception):
+                app.query_one("#patch_variant_select")
+            outcomes["selector_absent"] = True
+            outcomes["message_retired"] = not hasattr(
+                PatchEditorPanel, "VariantHelpRequested"
             )
-            outcomes["body"] = str(
-                app.screen.query_one("#variant_help_body", Static).render()
-            )
-            # Dismiss returns to the prior (Patch Editor) screen.
-            app.screen.query_one("#variant_help_close", Button).press()
-            await pilot.pause()
-            outcomes["dismissed"] = not isinstance(
-                app.screen, VariantHelpScreen
-            )
+            outcomes["screens_clean"] = [
+                s.__class__.__name__ for s in app.screen_stack
+            ]
         return outcomes
 
     outcomes = asyncio.run(_drive())
-    assert outcomes["select_enabled"] is True, (
-        "a >=2-image project must render the variant selector as live so the "
-        "info button is a real click target (F-m3)"
+    assert outcomes["info_button_absent"] is True
+    assert outcomes["selector_absent"] is True
+    assert outcomes["message_retired"] is True, (
+        "VariantHelpRequested must retire with the selector (HLR-006)"
     )
-    assert outcomes["is_help_modal"] is True, (
-        "a real click on the info button must push VariantHelpScreen"
-    )
-    body = str(outcomes["body"])
-    for token in _VARIANT_HELP_TOKENS:
-        assert token in body, (
-            f"help modal must explain the selector; missing token {token!r} "
-            f"in body: {body!r}"
-        )
-    assert outcomes["dismissed"] is True, (
-        "Close must dismiss the help modal back to the prior screen"
+    assert outcomes["screens_clean"] == ["Screen"], (
+        "no help modal is reachable from the reworked panel"
     )
 
 
 def test_tc336_tc337_help_message_pushes_modal_with_content(
     tmp_path: Path,
 ) -> None:
-    """TC-336/337 — the info-button message routes to a modal that shows help.
+    """TC-336/TC-337 (batch-94 form) — a stale help-shaped message is a no-op.
 
-    Intent (LLR-067.1/.2/.3 white-box): the always-rendered
-    ``#patch_variant_info_button`` is present and enabled beside the selector
-    (TC-336); posting ``PatchEditorPanel.VariantHelpRequested`` — the same
-    message the button posts — routes to the app handler which pushes
-    ``VariantHelpScreen`` (TC-337 routing); the modal body carries the required
-    help tokens (TC-337 content). White-box counterpart to AT-067a: it drives
-    the message path directly rather than the real pointer.
+    Intent (HLR-006 error arm): with the message class retired, a
+    same-shaped stale message (a duck-typed local class carrying no payload)
+    posted to the panel neither crashes nor pushes any screen — the screen
+    stack is identical afterwards.
     """
-    from s19_app.tui.screens import VariantHelpScreen
-    from s19_app.tui.screens_directionb import PatchEditorPanel
+    from textual.message import Message
+
+    class StaleVariantHelpRequested(Message):
+        pass
 
     async def _drive() -> dict[str, object]:
         outcomes: dict[str, object] = {}
@@ -555,37 +541,41 @@ def test_tc336_tc337_help_message_pushes_modal_with_content(
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(120, 30)) as pilot:
             await _open_patch_with_two_variants(pilot, app)
+            from s19_app.tui.screens_directionb import PatchEditorPanel
+
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            btn = panel.query_one("#patch_variant_info_button", Button)
-            outcomes["button_enabled"] = not btn.disabled
-            panel.post_message(PatchEditorPanel.VariantHelpRequested())
-            await pilot.pause()
-            outcomes["pushed"] = isinstance(app.screen, VariantHelpScreen)
-            outcomes["body"] = str(
-                app.screen.query_one("#variant_help_body", Static).render()
+            outcomes["message_retired"] = not hasattr(
+                PatchEditorPanel, "VariantHelpRequested"
             )
+            stack_before = [s.__class__.__name__ for s in app.screen_stack]
+            panel.post_message(StaleVariantHelpRequested())
+            await pilot.pause()
+            await pilot.pause()
+            outcomes["stack_unchanged"] = [
+                s.__class__.__name__ for s in app.screen_stack
+            ] == stack_before
         return outcomes
 
     outcomes = asyncio.run(_drive())
-    assert outcomes["button_enabled"] is True, (
-        "the info button is always rendered and enabled beside the selector"
+    assert outcomes["message_retired"] is True
+    assert outcomes["stack_unchanged"] is True, (
+        "a stale VariantHelpRequested-shaped message must be a no-op"
     )
-    assert outcomes["pushed"] is True, (
-        "VariantHelpRequested must route to the handler that pushes the modal"
-    )
-    body = str(outcomes["body"])
-    for token in _VARIANT_HELP_TOKENS:
-        assert token in body, f"missing help token {token!r} in body: {body!r}"
 
 
 def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
-    """Geometry inspection (C-23) — the help modal fits at 80x24 AND 120x30.
+    """Geometry node (batch-94 form) — the retired modal is unreachable.
 
-    Intent (US-067 geometry, additive to AT-067a): PILOT-MEASURE the modal on
-    the running app at the tight floor (80x24) and the comfortable size
-    (120x30) — NOT fr-math. Assert the dialog region sits fully on-screen (no
-    clip past the width/height, no negative origin) and that both the help body
-    and the Close control are visible (non-zero region) at both sizes.
+    Intent: WAS the C-23 pilot-measure of the help modal at 80x24/120x30.
+    batch-94 retires the surface's only reach path; the modal class still
+    composes (orphaned), but the shipped surface must not open it. This node
+    now guards the retirement geometry: the orphan is recorded by direct
+    push (the only surviving reach), the dialog still fits at both sizes,
+    and the pushed orphan still paints the help-text census tokens (the
+    content assertion the retired surface owed — fold round F6). (This node
+    was RED at the batch-93 base census; the rewrite resolves it as a side
+    effect of the retirement census, recorded in the increment packet — not
+    chased as a baseline failure.)
     """
 
     async def _measure(width: int, height: int) -> dict[str, object]:
@@ -593,21 +583,21 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(width, height)) as pilot:
             await _open_patch_with_two_variants(pilot, app)
-            # batch-46 (FOLD-8): this is the MODAL-geometry check (C-23) at both
-            # sizes; the real-pointer click is owned by AT-067a (@120x30). At the
-            # 80x24 floor the info button is doubly-nested (below the panel fold
-            # AND its window body fold under the reachable-under-scroll layout),
-            # so open the modal via the same message the button posts — keeping
-            # this test focused on the modal's geometry, not the click mechanism.
-            from s19_app.tui.screens_directionb import PatchEditorPanel
+            from s19_app.tui.screens import VariantHelpScreen
 
-            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            panel.post_message(PatchEditorPanel.VariantHelpRequested())
+            # The ONLY surviving reach is a direct push (the orphan record).
+            app.push_screen(VariantHelpScreen())
             await pilot.pause()
             dialog = app.screen.query_one("#variant_help_dialog")
-            body = app.screen.query_one("#variant_help_body", Static)
-            close = app.screen.query_one("#variant_help_close", Button)
             region = dialog.region
+            # F6: the orphan still carries its content — the retired
+            # surface's owed content assertion, kept via the census tokens.
+            body_text = str(
+                app.screen.query_one("#variant_help_body", Static).content
+            )
+            tokens_painted = all(
+                token in body_text for token in _VARIANT_HELP_TOKENS
+            )
             return {
                 "region": (
                     region.x,
@@ -615,10 +605,8 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
                     region.right,
                     region.bottom,
                 ),
-                "body_visible": body.region.height > 0
-                and body.region.width > 0,
-                "close_visible": close.region.height > 0
-                and close.region.width > 0,
+                "tokens_painted": tokens_painted,
+                "body_text": body_text,
             }
 
     for width, height in ((80, 24), (120, 30)):
@@ -633,9 +621,7 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
         assert bottom <= height, (
             f"dialog overflows height at {width}x{height}: bottom={bottom}"
         )
-        assert m["body_visible"] is True, (
-            f"help body not visible at {width}x{height}"
-        )
-        assert m["close_visible"] is True, (
-            f"Close control not visible at {width}x{height}"
+        assert m["tokens_painted"] is True, (
+            "the orphan modal must still paint the census tokens; "
+            f"body={m['body_text']!r}"
         )

@@ -488,7 +488,13 @@ def test_tc081_2_strip(tmp_path: Path) -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             strips = list(app.query("#patch_history_strip").results())
-            window = app.query_one("#patch_win_script")
+            # batch-94 (the pe_b rework): the strip/controls moved OUT of
+            # ``#patch_win_script`` to the JSON window's docked rows
+            # (siblings of its body, never inside the scrolling body — the
+            # B2 invariant). The walk re-aims at the rework's home; the
+            # intent is unchanged: the strip exists, docked directly ABOVE
+            # the Undo/Redo row it describes, in DOM order.
+            window = app.query_one("#patch_win_json")
             order = [
                 child.id
                 for child in window.children
@@ -721,10 +727,21 @@ def test_tc081_4_no_binding_diff() -> None:
     # again NON-footer-visible (`show=False`), so it does not drift the
     # footer/shared-chrome; the 10-item RAIL drift it accompanies is handled by
     # the canonical-CI snapshot regen (same C-30 path). Sanctioned here.
+    # batch-94 (R-1, the PDR-ratified rail keys —
+    # `.dev-flow/2026-10-12-batch-94/evidence/pdr_rail_key_probe.txt`) adds the
+    # 11th/12th rail-nav bindings `Binding("equals_sign", "show_screen
+    # ('check_editor')", ...)` and `Binding("right_square_bracket",
+    # "show_screen('flow_execution')", ...)` — both NON-footer-visible
+    # (`show=False`), so they do not drift the footer/shared-chrome; the
+    # 12-item RAIL drift accompanies the canonical-CI snapshot regen (same
+    # C-30 path). Sanctioned here; the census still fires for any OTHER
+    # binding change.
     _SANCTIONED_BINDING_MARKERS = (
         "show_help_panel",
         "show_screen('checks')",
         "show_screen('crc_designer')",
+        "show_screen('check_editor')",
+        "show_screen('flow_execution')",
     )
     changed = [
         line

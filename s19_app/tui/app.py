@@ -37,12 +37,20 @@ from .changes import STATUS_VERIFIED, VerifyResult
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from ..render.hexview import build_row_bases, find_string_in_mem, render_hex_view_text
 from ..utils import safe_text
+from .changes.check import run_check_document
+from .changes.io import (
+    list_change_documents,
+    parse_change_document,
+    read_change_document,
+    write_change_document,
+)
+from .changes.model import ChangeDocument, ChangeEntry
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet
 from .operations import get_operation, list_operation_ids
 from .os_clipboard_input import OsClipboardInput
-from .rail import Rail, RailItem
+from .rail import Rail, RailEntry, RailItem, RAIL_ENTRIES
 from .screens import (
     ChangeSetJsonScreen,
     ConfirmDiscardScreen,
@@ -57,14 +65,15 @@ from .screens import (
     SaveProjectPayload,
     SaveProjectScreen,
     SelectVariantScreen,
-    VariantHelpScreen,
 )
+from .flow_screens import FlowBuilderPanel, FlowExecutionPanel
 from .screens_directionb import (
     AbDiffPanel,
-    FlowBuilderPanel,
+    CheckEditorPanel,
     CoverageStats,
     EmptyStatePanel,
     LoadedArtifactsPanel,
+    LoadGuardScreen,
     MemoryMapPanel,
     PatchEditorPanel,
     bytes_per_cell,
@@ -93,6 +102,7 @@ from .issues_view import (
     _GROUP_DISPLAY_MAX,
     GroupedIssuesPanel,
     IssueRow,
+    adjust_counts_for_a2l_triage,
     build_issues_severity_strip,
 )
 from .checks_view import (
@@ -201,6 +211,31 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
         "refresh_doc",
     }
 )
+
+#: The batch-94 (LLR-002.1/.2, LLR-001.2) rail order — the ten shipped entries
+#: plus the Check Editor inserted after Patch Editor (the R-1 closure: ``=``
+#: binding, ``show=False``) and the Flow Execution entry inserted after Flow
+#: Builder (Inc-003, the ``]`` binding — the 12-entry census completes the D5
+#: freeze). Built HERE (the sole rail/routing/scan site) rather than in
+#: ``rail.py`` so the rework stays inside the increment's four-file SOURCE
+#: budget; ``rail.py``'s ``RAIL_ENTRIES`` stays the batch-93 record. The
+#: glyph/ascii pairs are the Phase-3 chrome census: ``✔``/``K`` — CHECK-family
+#: glyph, ``K`` free in the ASCII table (``C`` belongs to Checks); ``▶``/``>``
+#: — the fx_a run glyph (▶ is the spike's running-status glyph), ``>`` free.
+#: The guard-host census constants move with this increment (test-side,
+#: LLR-002.2 — never before).
+RAIL_ENTRIES_B94: tuple[RailEntry, ...] = (
+    RAIL_ENTRIES[:6]
+    + (RailEntry("check_editor", "✔", "K", "Check Editor"),)
+    + RAIL_ENTRIES[6:8]
+    + (RailEntry("flow_execution", "▶", ">", "Flow Execution"),)
+    + RAIL_ENTRIES[8:]
+)
+
+#: The Check Editor's routable action set (LLR-001.2) — write and validate
+#: only; the no-apply doctrine (LLR-009.3) means the set has no apply member
+#: by construction. A non-member action is one status error, never a crash.
+CHECK_EDITOR_ACTIONS: frozenset[str] = frozenset({"write_doc", "validate_doc"})
 
 
 #: Upper bound on a synthesized S0 header payload (US-015 / LLR-015.2): the
@@ -1378,8 +1413,15 @@ class S19TuiApp(App):
         Binding("4", "show_screen('map')", "Memory Map", show=False),
         Binding("5", "show_screen('issues')", "Issues Report", show=False),
         Binding("6", "show_screen('patch')", "Patch Editor", show=False),
+        # batch-94 (R-1 closure, probe-verified `evidence/pdr_rail_key_probe.txt`):
+        # the digit row is exhausted at 10 surfaces, so the Check Editor binds
+        # `=` — the number row's right-hand neighbour, `show=False` so the
+        # footer stays uncrowded (C-13) and discoverable through the `?` help
+        # panel. Flow Execution rides `]` (batch-94 Inc-003, the R-1 closure).
+        Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),
         Binding("7", "show_screen('diff')", "A2B Diff", show=False),
         Binding("8", "show_screen('flow')", "Flow Builder", show=False),
+        Binding("right_square_bracket", "show_screen('flow_execution')", "Flow Execution", show=False),
         Binding("9", "show_screen('checks')", "Checks", show=False),
         Binding("0", "show_screen('crc_designer')", "CRC Designer", show=False),
         ("plus", "page_next_context", "Page+"),
@@ -1530,6 +1572,13 @@ class S19TuiApp(App):
         #: Most recent A↔B comparison result, retained so the diff-report
         #: trigger (LLR-005.4) can report the same comparison the panel shows.
         self._diff_last_result: Optional[Any] = None
+        #: The check spec loaded into the A2B Diff dropdown (batch-94,
+        #: LLR-010.1/.2) — the document whose declared fields ride the next
+        #: emitted diff report as the ``## Checks`` addendum. ``None`` is
+        #: the "no check spec" state (the dropdown's blank option); only a
+        #: clean ``kind="check"`` document is ever stashed here.
+        self._diff_check_spec: Optional[ChangeDocument] = None
+        self._diff_check_spec_name: str = ""
         #: Monotonic count of COMPLETED A↔B compare requests (batch-78 Inc-2,
         #: gate review F7). Incremented on EVERY exit path of
         #: ``on_ab_diff_panel_compare_requested`` — refusal, load failure,
@@ -1956,8 +2005,11 @@ class S19TuiApp(App):
         )
         # Activity rail (left) + the 8-screen workspace body (right).
         # The rail emits `Rail.Selected`; `on_rail_selected` routes it.
+        # batch-94: the rail carries the 12-entry B94 order (Check Editor
+        # after Patch Editor, Flow Execution after Flow Builder) — see
+        # `RAIL_ENTRIES_B94`.
         yield Horizontal(
-            Container(Rail(active="workspace"), id="rail_slot"),
+            Container(Rail(entries=RAIL_ENTRIES_B94, active="workspace"), id="rail_slot"),
             Container(
                 self._compose_screen_workspace(),
                 self._compose_screen_a2l(),
@@ -1965,8 +2017,10 @@ class S19TuiApp(App):
                 self._compose_screen_map(),
                 self._compose_screen_issues(),
                 self._compose_screen_patch(),
+                self._compose_screen_check_editor(),
                 self._compose_screen_diff(),
                 self._compose_screen_flow(),
+                self._compose_screen_flow_execution(),
                 self._compose_screen_checks(),
                 self._compose_screen_crc_designer(),
                 self._compose_screen_split_join(),
@@ -2347,6 +2401,40 @@ class S19TuiApp(App):
             classes="db-screen hidden",
         )
 
+    def _compose_screen_flow_execution(self) -> Container:
+        """Build the Flow Execution rail screen (``#screen_flow_execution``).
+
+        Summary:
+            The batch-94 Inc-003 fx_a surface (US-007, HLR-017…021) — one
+            :class:`FlowExecutionPanel` mounted between Flow Builder and
+            Checks (the R-1 order). The panel is presentational: Import… /
+            Run / Save Set / Load Set post ``FlowExecutionPanel.*`` messages
+            that the ``on_flow_execution_panel_*`` handlers route — template
+            import through the hardened ``load_flow_json``, the run through
+            the service's ``run_chain_set``, the set through
+            ``save_chain_set`` / ``load_chain_set``. A plain Container (not a
+            ``WindowSection``): ``window_help.py``'s section table is
+            batch-95's frozen surface and names no ``flow_execution`` section,
+            so this window ships no focused-``?`` chip rather than forking
+            the frozen table.
+
+        Returns:
+            Container: ``#screen_flow_execution`` holding the title row and
+            the ``FlowExecutionPanel``. Hidden at startup.
+
+        Dependencies:
+            Uses:
+                - ``FlowExecutionPanel`` / ``titled_header``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            titled_header("Flow Execution"),
+            FlowExecutionPanel(),
+            id="screen_flow_execution",
+            classes="db-screen hidden",
+        )
+
     def _compose_screen_crc_designer(self) -> Container:
         """
         Summary:
@@ -2610,6 +2698,243 @@ class S19TuiApp(App):
 
         self.push_screen(LoadFlowScreen(flows, project_dir), _do_load)
 
+    # -- Flow Execution (fx_a, batch-94 Inc-003; US-007, HLR-017…021) ---------
+
+    def _prefill_flow_execution_sets(self) -> None:
+        """Repopulate the set picker on entry (LLR-021.2's restore seam)."""
+        from .services.flow_persistence_service import list_chain_sets
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        panel.set_available_sets(
+            list_chain_sets(project_dir) if project_dir is not None else []
+        )
+
+    def on_flow_execution_panel_import_requested(
+        self, event: "FlowExecutionPanel.ImportRequested"
+    ) -> None:
+        """Import a builder template as a new lane (HLR-017, LLR-017.1).
+
+        Summary:
+            Resolve the active project, list ``flows/*.json``, and open the
+            existing :class:`LoadFlowScreen` picker (its Import… arm copies
+            an external template into ``flows/`` containment-guarded, so the
+            operator can import from anywhere). On a chosen stem, load through
+            the fail-closed ``load_flow_json``: a valid template mounts one
+            lane via :meth:`FlowExecutionPanel.add_lane`; a rejection paints
+            the import notice (0 lanes mounted — LLR-017.1's invalid arm). A
+            cancelled picker changes nothing (the cancel arm).
+
+        Args:
+            event (FlowExecutionPanel.ImportRequested): The import request
+                (no payload).
+        """
+        from .services.flow_persistence_service import (
+            FLOWS_SUBDIR,
+            list_saved_flows,
+            load_flow_json,
+        )
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_import_refusal(
+                "?", [self._flow_issue("no project loaded - load or save a project first")]
+            )
+            return
+        flows = list_saved_flows(project_dir)
+
+        def _do_import(stem: Optional[str]) -> None:
+            if stem is None:
+                return  # cancelled — 0 lanes mounted (LLR-017.1 cancel arm)
+            flow_path = project_dir / FLOWS_SUBDIR / f"{stem}.json"
+            loaded, findings = load_flow_json(flow_path, project_dir)
+            if loaded is None:
+                panel.render_import_refusal(stem, findings)
+                return
+            panel.add_lane(stem, loaded)
+
+        self.push_screen(LoadFlowScreen(flows, project_dir), _do_import)
+
+    @staticmethod
+    def _flow_issue(message: str):
+        from ..validation.model import ValidationIssue, ValidationSeverity
+
+        return ValidationIssue(
+            code="FX-NO-PROJECT",
+            severity=ValidationSeverity.ERROR,
+            message=message,
+            artifact="flow",
+        )
+
+    def on_flow_execution_panel_run_requested(
+        self, event: "FlowExecutionPanel.RunRequested"
+    ) -> None:
+        """Run the lane set and paint the fx_a lanes + run log (HLR-019/020).
+
+        Summary:
+            Translate the panel's lane payloads into the service's
+            ``ChainSpec`` plan (per-chain independent bindings, LLR-018) and
+            dispatch ``run_chain_set`` — sequential default, parallel per
+            chain when the operator drove the mode control (LLR-019.2's C-10
+            non-default arm). The service wraps the union ``run_flow`` per
+            chain; this handler re-implements no block semantics. The record
+            comes back to :meth:`FlowExecutionPanel.render_run` for the lanes
+            + the run-log strip; a no-project state paints the log error
+            instead of running.
+
+        Args:
+            event (FlowExecutionPanel.RunRequested): Carries the lanes, the
+                mode token, and the set name.
+        """
+        from .services.flow_execution_service import ChainSpec, run_chain_set
+        from .services.flow_model import FlowContext
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_run_error(
+                "no project loaded - load or save a project first"
+            )
+            return
+        chains = [
+            ChainSpec(
+                name=lane.name,
+                template=lane.template,
+                flow=lane.flow,
+                bindings=dict(lane.bindings),
+            )
+            for lane in event.lanes
+        ]
+        record = run_chain_set(
+            chains,
+            FlowContext(project_dir=project_dir),
+            mode=event.mode,
+            set_name=event.set_name,
+        )
+        panel.render_run(record)
+
+    def on_flow_execution_panel_save_requested(
+        self, event: "FlowExecutionPanel.SaveRequested"
+    ) -> None:
+        """Persist the chain set to ``flowsets/<name>.json`` (HLR-021).
+
+        Summary:
+            Translate the lane payloads into the ``ChainSetEntry`` envelope
+            (chains + bound inputs + recorded outputs, LLR-021.1) and write
+            through ``save_chain_set`` — the sanitiser is the write-side
+            containment authority; an empty set (0 lanes) or an un-sanitisable
+            name writes NOTHING and surfaces one status line. A successful
+            save marks the panel saved (identity = the stem).
+
+        Args:
+            event (FlowExecutionPanel.SaveRequested): Carries the lanes and
+                the raw operator-typed name.
+        """
+        from .services.flow_persistence_service import ChainSet, ChainSetEntry, save_chain_set
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("No project loaded - load or save a project first.")
+            return
+        chain_set = ChainSet(
+            name=event.raw_name.strip() or "chain-set",
+            chains=tuple(
+                ChainSetEntry(
+                    chain=lane.name,
+                    template=lane.template,
+                    # lane.bindings rides as (index, ref) pairs — the panel's
+                    # effective-input contract (>=1 input per chain).
+                    inputs=tuple(sorted(lane.bindings)),
+                    outputs=tuple(lane.outputs),
+                )
+                for lane in event.lanes
+            ),
+        )
+        saved = save_chain_set(chain_set, event.raw_name, project_dir)
+        if saved is None:
+            self.set_status(
+                "Chain set not saved - the set is empty or the name sanitised away."
+            )
+            return
+        panel.mark_saved(saved.stem)
+        self._prefill_flow_execution_sets()
+
+    async def on_flow_execution_panel_load_set_requested(
+        self, event: "FlowExecutionPanel.LoadSetRequested"
+    ) -> None:
+        """Reload a saved set and restore its lanes for a re-run (LLR-021.2).
+
+        Summary:
+            Load the set fail-closed through ``load_chain_set`` (a corrupt set
+            is refused with the notice, 0 lanes change). For every chain,
+            re-load its template through the hardened ``load_flow_json`` and
+            restore the lane with its bound inputs + recorded outputs; a
+            chain whose template is gone is skipped and NAMED in the notice.
+            A bound input whose file moved is NOT a refusal — the lane mounts
+            with the per-lane provenance-mismatch notice (LLR-021.2's error
+            arm: never a silent stale run).
+
+        Args:
+            event (FlowExecutionPanel.LoadSetRequested): Carries the chosen
+                ``flowsets/<stem>.json`` identity.
+        """
+        from .services.flow_persistence_service import (
+            FLOWS_SUBDIR,
+            load_chain_set,
+            load_flow_json,
+        )
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("No project loaded - load or save a project first.")
+            return
+        set_path = project_dir / "flowsets" / f"{event.stem}.json"
+        loaded, findings = load_chain_set(set_path, project_dir)
+        if loaded is None:
+            first = findings[0].message if findings else "unreadable set"
+            panel.render_set_refusal(event.stem, findings)
+            self.set_status(f"Chain set load refused: {first}")
+            return
+        # A successful reload REPLACES the lanes with the restored set (the
+        # C-12 chain: the reloaded set is what re-runs, never a merge). The
+        # lane clearing is awaited — the restored lanes mount onto the emptied
+        # container, never a half-removed tree.
+        await panel.begin_set_restore(event.stem)
+        skipped: List[str] = []
+        restored = 0
+        for entry in loaded.chains:
+            template_path = project_dir / FLOWS_SUBDIR / f"{entry.template}.json"
+            flow, template_findings = load_flow_json(template_path, project_dir)
+            if flow is None:
+                skipped.append(entry.chain)
+                continue
+            bindings = {index: ref for index, ref in entry.inputs}
+            missing = [
+                ref
+                for ref in bindings.values()
+                if not (project_dir / ref).exists()
+            ]
+            panel.restore_lane(
+                entry.chain,
+                entry.template,
+                flow,
+                bindings,
+                entry.outputs,
+                missing,
+            )
+            restored += 1
+        notices: List[str] = []
+        if skipped:
+            notices.append(
+                "chain(s) skipped, template missing: " + ", ".join(skipped)
+            )
+        if restored:
+            notices.append(f"{restored} chain(s) restored")
+        panel.restore_set(event.stem, restored, notices)
+
     def _compose_screen_patch(self) -> Container:
         """
         Summary:
@@ -2649,6 +2974,38 @@ class S19TuiApp(App):
             ),
             PatchEditorPanel(),
             id="screen_patch",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_check_editor(self) -> Container:
+        """Build the Check Editor rail screen (``#screen_check_editor``).
+
+        Summary:
+            The batch-94 (US-003, HLR-001) check twin of the Patch Editor —
+            one ``CheckEditorPanel`` (the ce_a collector) mounted as its own
+            rail surface between Patch Editor and A2B Diff (the R-1 order).
+            The panel is presentational: its controls emit
+            ``CheckEditorPanel.ActionRequested`` messages that
+            ``on_check_editor_panel_action_requested`` routes — the write
+            assembles the ``kind="check"`` document and calls
+            ``changes.io.write_change_document``; the validate rides
+            ``changes.check.run_check_document``. No schema/model logic is
+            built here (C-7).
+
+        Returns:
+            Container: ``#screen_check_editor`` holding a title label and a
+            ``CheckEditorPanel``. Hidden at startup.
+
+        Dependencies:
+            Uses:
+                - ``CheckEditorPanel``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("Check Editor", classes="db-screen-title"),
+            CheckEditorPanel(),
+            id="screen_check_editor",
             classes="db-screen hidden",
         )
 
@@ -2738,30 +3095,27 @@ class S19TuiApp(App):
                         "Patch Editor: enter a change-file path to load."
                     )
                 else:
-                    result = service.load(event.path_text, self.base_dir)
-                    self._report_change_result(result)
+                    self._patch_editor_load(panel, event.path_text)
             elif event.action == "parse_paste":
                 panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
                 result = service.load_text(event.paste_text)
                 self._report_change_result(result)
+                # w4 (LLR-005.1): a successful paste parse rebinds BOTH
+                # regions to the parsed document — the dirty state of the
+                # replaced buffer is gone with it.
+                if result.ok:
+                    panel.mark_loaded()
             elif event.action == "refresh_doc":
-                panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
-                # US-064a / LLR-064a.1: re-read the CURRENTLY-LOADED document
-                # from disk to reflect external edits. Source is the document's
-                # own ``source_path`` (the file it was loaded from), NOT the
-                # live ``#patch_doc_path_input`` value (A-03) — a post-load path
-                # edit is "load", not "refresh". Reuses the validated
-                # ``ChangeService.load`` seam (size-cap + resolve_input_path +
-                # collect-don't-abort). A paste-authored / empty document has no
-                # ``source_path`` → the existing load guard, not a crash.
-                source_path = service.document.source_path
-                if source_path is None:
-                    self.set_status(
-                        "Patch Editor: enter a change-file path to load."
-                    )
-                else:
-                    result = service.load(str(source_path), self.base_dir)
-                    self._report_change_result(result)
+                # batch-94 (annotation 6 / HLR-008 / LLR-008.2): Refresh
+                # repopulates the file dropdown from the patches-folder
+                # scan — "Refresh Files in Folder". The loaded document is
+                # NOT re-read, remounted or reloaded: a refresh that mutates
+                # the bound document is the negative control. (This
+                # supersedes batch-37 US-064a's re-read semantics per the
+                # operator's annotation 6 — recorded in the increment
+                # packet's amendment note.)
+                self._prefill_patch_change_files()
+                self.set_status("Patch Editor: file list refreshed.")
             elif event.action == "validate_doc":
                 self._report_change_result(service.validate(loaded_ranges))
             elif event.action == "apply_doc":
@@ -2792,13 +3146,18 @@ class S19TuiApp(App):
                             f"{loaded.file_type} save-back not supported"
                         )
             elif event.action == "save_doc":
-                self._report_change_result(
-                    # Change 1 (HLR-138): a NEW change-set defaults INTO the
-                    # project (``patches/``, or ``checks/`` for a check
-                    # document) when a project is active; without one the
-                    # COMMON patches library keeps the write.
-                    service.save(self.base_dir, dest_dir=self._change_doc_save_home())
+                # Change 1 (HLR-138): a NEW change-set defaults INTO the
+                # project (``patches/``, or ``checks/`` for a check
+                # document) when a project is active; without one the
+                # COMMON patches library keeps the write.
+                result = service.save(
+                    self.base_dir, dest_dir=self._change_doc_save_home()
                 )
+                self._report_change_result(result)
+                # w3 (LLR-005.1): a clean save clears the dirty flag — it
+                # must not survive its own save.
+                if result.ok:
+                    panel.mark_saved()
                 # R2 / LLR-030.3: a save while the patch screen is open must
                 # appear in the dropdown without re-activation.
                 self._prefill_patch_change_files()
@@ -2974,36 +3333,6 @@ class S19TuiApp(App):
                 - Textual message dispatch for ``PatchEditorPanel``
         """
         self.action_before_after_report()
-
-    def on_patch_editor_panel_variant_help_requested(
-        self, event: PatchEditorPanel.VariantHelpRequested
-    ) -> None:
-        """
-        Summary:
-            Open the variant-selector help modal (:class:`VariantHelpScreen`)
-            when the operator presses ``#patch_variant_info_button``
-            (US-067 / LLR-067.2). A pure trigger: the message carries no
-            payload and the modal is static discovery help, so this handler
-            just pushes the screen — no variant-set access, no state read.
-
-        Args:
-            event (PatchEditorPanel.VariantHelpRequested): The payload-free
-                info-button trigger.
-
-        Returns:
-            None
-
-        Data Flow:
-            - ``push_screen(VariantHelpScreen())``; the modal dismisses itself
-              via its Close button (no result callback needed).
-
-        Dependencies:
-            Uses:
-                - ``VariantHelpScreen``
-            Used by:
-                - Textual message dispatch for ``PatchEditorPanel``
-        """
-        self.push_screen(VariantHelpScreen())
 
     def _refresh_patch_history_view(self) -> None:
         """
@@ -3258,15 +3587,21 @@ class S19TuiApp(App):
     def _apply_changeset_json_edit(self, edited: Optional[str]) -> None:
         """
         Summary:
-            Apply the JSON popup's Confirm result (US-064b / LLR-064b.2): write
-            the edited text back to ``#patch_paste_text`` and route it through
-            the EXISTING ``parse_paste`` → ``ChangeService.load_text`` seam by
-            posting the panel's ``ActionRequested(parse_paste)`` — the SAME
-            message the inline "Parse pasted" button posts — so no new
-            parse/apply path is introduced and the collect-don't-abort
-            re-render (entries table / issue lines / Edit-JSON enable-sync)
-            happens through the one action handler. Cancel (``None``) is a
-            no-op: the document and buffer are left unchanged.
+            Apply the JSON popup's Confirm result (US-064b / LLR-064b.2,
+            amended by batch-94 LLR-004.1/.2): write the edited text back to
+            ``#patch_paste_text`` and route it through the EXISTING
+            ``parse_paste`` → ``ChangeService.load_text`` seam by posting the
+            panel's ``ActionRequested(parse_paste)`` — the SAME message the
+            inline "Parse pasted" button posts — so no new parse/apply path
+            is introduced and the collect-don't-abort re-render (entries
+            table / issue lines / Edit-JSON enable-sync) happens through the
+            one action handler. Batch-94 amendment (HLR-004 invalid arm):
+            when the edited text does NOT parse clean, the confirm surfaces
+            the collected issues and LEAVES the bound document and the
+            entries table untouched — an invalid edit can never clobber the
+            table (the parse_paste arm keeps its replace-on-confirm shape
+            for the inline paste button; the popup's re-point to the guard
+            is what LLR-004.2 pins). Cancel (``None``) is a no-op.
 
         Args:
             edited (Optional[str]): The edited JSON on Confirm, or ``None`` on
@@ -3277,17 +3612,38 @@ class S19TuiApp(App):
 
         Data Flow:
             - ``None`` → return (Cancel; document unchanged).
-            - else → set ``#patch_paste_text`` to ``edited`` and post
+            - Invalid text → ``_report_change_result`` with the parse's
+              collected issues; the document/table are NOT touched.
+            - Valid text → set ``#patch_paste_text`` to ``edited`` and post
               ``PatchEditorPanel.ActionRequested(action="parse_paste",
               paste_text=edited)`` to re-use the existing paste apply arm.
 
         Dependencies:
             Uses:
+                - ``parse_change_document`` (the batch-94 validity pre-check)
                 - ``PatchEditorPanel.ActionRequested`` / ``load_text`` seam
             Used by:
                 - ``on_patch_editor_panel_edit_json_requested`` (push callback)
         """
         if edited is None:
+            return
+        # batch-94 (LLR-004.2): the validity pre-check decides whether the
+        # confirm may touch the bound document at all.
+        parsed = parse_change_document(edited)
+        if parsed.has_errors:
+            from .services.change_service import ChangeActionResult
+
+            self._report_change_result(
+                ChangeActionResult(
+                    message=(
+                        f"Edit JSON refused: {parsed.kind} text carries "
+                        f"{sum(1 for i in parsed.issues if i.severity.value == 'error')} "
+                        "error(s) — the document is unchanged."
+                    ),
+                    issues=list(parsed.issues),
+                    ok=False,
+                )
+            )
             return
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         self.query_one("#patch_paste_text", TextArea).text = edited
@@ -4481,7 +4837,12 @@ class S19TuiApp(App):
         """
         return Container(
             Label("A2B Diff", classes="db-screen-title"),
-            AbDiffPanel(),
+            # batch-94 P4 fix (RC-2): the compose-time patches-folder listing
+            # decides whether the panel composes its check-spec row at all —
+            # the panel cannot scan for itself, and an empty listing must not
+            # reserve the row's rows against the hex panes. The live listing
+            # still rides ``set_check_files`` on every diff activation.
+            AbDiffPanel(check_files=self._scan_patch_change_files()),
             id="screen_diff",
             classes="db-screen hidden",
         )
@@ -4517,6 +4878,22 @@ class S19TuiApp(App):
             else []
         )
         panel.set_variants(variants)
+
+    def _prefill_diff_check_files(self) -> None:
+        """Populate the A2B Diff check-spec dropdown (LLR-010.1).
+
+        Summary:
+            Hand the patches-folder scan (patch ``*.json`` AND check-spec
+            ``*.chk.json`` files, sorted, symlinks skipped) to
+            ``AbDiffPanel.set_check_files`` so the dropdown lists both kinds
+            suffix-distinguished. Called on diff-screen activation; a
+            not-yet-mounted panel is tolerated as a no-op.
+        """
+        try:
+            panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        except Exception:
+            return
+        panel.set_check_files(self._scan_patch_change_files())
 
     def _patches_dir(self) -> Path:
         """Return the dedicated patches folder path (``workarea/patches/``).
@@ -4621,14 +4998,12 @@ class S19TuiApp(App):
             ['changes-1.json', 'changes.json']
         """
         patches_dir = self._patches_dir()
-        if not patches_dir.is_dir():
-            return []
-        names = [
-            match.name
-            for match in patches_dir.glob("*.json")
-            if not match.is_symlink()
-        ]
-        return sorted(names)
+        # batch-94 (LLR-010.1): the scan lists BOTH patch ``*.json`` and
+        # check-spec ``*.chk.json`` files from the same directory (the glob
+        # already matches both); the suffix-aware helper keeps the symlink
+        # fold (F1) and the deterministic sort (F-Q2) in one place, and the
+        # ``is_check_spec`` half rides to the dropdowns' labels.
+        return [name for name, _is_check in list_change_documents(patches_dir)]
 
     def _report_filters_dir(self) -> Optional[Path]:
         """Resolve the active project's report-filters directory (US-056).
@@ -4742,143 +5117,6 @@ class S19TuiApp(App):
             return
         panel.set_change_files(self._scan_patch_change_files())
 
-    def _refresh_patch_variant_select(self) -> None:
-        """Re-evaluate the Patch Editor variant dropdown from app state (US-028).
-
-        Summary:
-            Populate ``Select#patch_variant_select`` from the active project's
-            ``ProjectVariantSet`` (LLR-035.3): with N >= 2 variants, one
-            ``(variant_id, variant_id)`` option per variant in model order
-            with the value pre-selected to ``active_id``; with N < 2 or no
-            project, ``set_variants([])`` leaves the blank placeholder with
-            the control disabled (LLR-035.5, DoR Q1). Called on patch-screen
-            activation and — via ``update_project_labels``, which every
-            variant-set mutation site already funnels through — whenever the
-            variant set or the active variant changes while the screen is
-            shown (the F-3 trigger set). The repopulate's
-            ``Changed(Select.NULL)`` + ``Changed(active_id)`` echo pair (F-4) is
-            absorbed by the handler chain's short-circuits (LLR-035.4).
-
-        Args:
-            None
-
-        Returns:
-            None
-
-        Data Flow:
-            - ``self._variant_set`` → ``(variant_id, variant_id)`` option
-              pairs (mirrors ``_prefill_diff_variants``) →
-              ``PatchEditorPanel.set_variants``.
-            - A not-yet-mounted panel (headless unit path) is tolerated as a
-              no-op, matching ``_prefill_patch_change_files``.
-
-        Dependencies:
-            Uses:
-                - ``PatchEditorPanel.set_variants``
-            Used by:
-                - ``action_show_screen`` (patch activation)
-                - ``update_project_labels`` (variant-set change trigger)
-        """
-        try:
-            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        except Exception:
-            return
-        variant_set = self._variant_set
-        if variant_set is None or len(variant_set.variants) < 2:
-            panel.set_variants([])
-            return
-        options = [
-            (variant.variant_id, variant.variant_id)
-            for variant in variant_set.variants
-        ]
-        panel.set_variants(options, variant_set.active_id)
-
-    def _variant_load_in_flight(self) -> bool:
-        """Report whether a load is still in flight (LLR-035.7 race guard).
-
-        Summary:
-            True while a variant activation (or any load) has not finished
-            installing: either ``_pending_variant_id`` is stamped but not yet
-            consumed by ``_apply_prepared_load``, or a ``"load"``-group
-            worker is still unfinished. The variant-dropdown handler
-            suppresses new picks while this holds — the suppress-while-loading
-            mechanism chosen for LLR-035.7 (security F2): it touches the
-            shared load pipeline nowhere, so the modal path is demonstrably
-            unaffected.
-
-        Args:
-            None
-
-        Returns:
-            bool: ``True`` when a pick must be suppressed.
-
-        Data Flow:
-            - ``self._pending_variant_id`` (stamped at dispatch, consumed on
-              the main thread at apply) OR any unfinished worker in the
-              ``"load"`` group of ``self.workers``.
-
-        Dependencies:
-            Uses:
-                - ``self.workers`` (Textual ``WorkerManager``)
-            Used by:
-                - ``on_patch_editor_panel_variant_selected``
-        """
-        if self._pending_variant_id is not None:
-            return True
-        return any(
-            worker.group == "load" and not worker.is_finished
-            for worker in self.workers
-        )
-
-    def on_patch_editor_panel_variant_selected(
-        self, event: PatchEditorPanel.VariantSelected
-    ) -> None:
-        """Route a Variant-pane dropdown pick to the activation pipeline (US-028).
-
-        Summary:
-            Hand the picked id wholesale to ``_handle_select_variant``
-            (LLR-035.4) — reusing its guards (no set / unknown id / missing
-            file) and its ``_pending_variant_id`` → ``load_from_path`` →
-            ``_apply_prepared_load`` stamping without duplicating any of
-            them. Two short-circuits fire no activation: a pick equal to the
-            current ``active_id`` (absorbs the F-4 repopulate echo — no
-            redundant reload loop), and a pick arriving while a prior load is
-            still in flight (LLR-035.7 suppress-while-loading; the stale
-            display value self-heals when the in-flight activation completes
-            and LLR-035.3 re-syncs the dropdown).
-
-        Args:
-            event (PatchEditorPanel.VariantSelected): Carries the picked
-                variant id (the panel already filtered the blank sentinel
-                ``Select.NULL``).
-
-        Returns:
-            None
-
-        Data Flow:
-            - same-as-active → drop; ``_variant_load_in_flight`` → drop with
-              a status line; else ``_handle_select_variant(variant_id)``.
-
-        Dependencies:
-            Uses:
-                - ``_variant_load_in_flight`` / ``_handle_select_variant``
-            Used by:
-                - Textual message dispatch (the panel's ``VariantSelected``)
-        """
-        variant_set = self._variant_set
-        if variant_set is not None and event.variant_id == variant_set.active_id:
-            return
-        if self._variant_load_in_flight():
-            self.set_status(
-                "Variant switch ignored - a load is already in progress."
-            )
-            self.logger.info(
-                "Variant pick '%s' suppressed: load in flight (LLR-035.7).",
-                event.variant_id,
-            )
-            return
-        self._handle_select_variant(event.variant_id)
-
     def on_patch_editor_panel_change_file_selected(
         self, event: PatchEditorPanel.ChangeFileSelected
     ) -> None:
@@ -4925,35 +5163,324 @@ class S19TuiApp(App):
                 "the patches folder — not loaded."
             )
             return
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        self._patch_editor_load(panel, str(candidate))
+
+    def _patch_editor_load(self, panel: PatchEditorPanel, path_text: str) -> None:
+        """The shared change-document load seam (LLR-008.1, batch-94).
+
+        Summary:
+            Route one concrete path through the validated
+            ``ChangeService.load`` seam (size-cap + resolve_input_path +
+            collect-don't-abort), surface the result, and — on success —
+            clear the dirty flag (writer w4: a successful load rebinds BOTH
+            editor regions to the loaded document, so its unsaved-state
+            history is gone). The typed-path Load control, the change-file
+            dropdown and the dirty-guard popup's accept branch are the three
+            call sites; the post-load re-render tail lives in
+            :meth:`_patch_editor_load_tail` so no site can drift.
+        """
         service = self._change_service
-        result = service.load(str(candidate), self.base_dir)
+        result = service.load(path_text, self.base_dir)
         self._report_change_result(result)
+        if result.ok:
+            panel.mark_loaded()
+        self._patch_editor_load_tail(panel)
+
+    def _patch_editor_load_tail(self, panel: PatchEditorPanel) -> None:
+        """Re-render the panel after any document load (the shared tail).
+
+        Refreshes the entries table (with the loaded image's memory map for
+        the before/after card) and the declaration-fault listing, then
+        re-applies the three A-01 file-backed guards (Edit-JSON, Undo/Redo
+        with the history strip, per-entry Edit-JSON) — one tail, three call
+        sites, no drift.
+        """
+        service = self._change_service
         loaded = self.current_file
         loaded_ranges = loaded.ranges if loaded is not None else None
-        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        # batch-48 (LLR-080.2) — site 3 of 5 (the change-file load path).
+        # batch-48 (LLR-080.2) — the load path's memory-map push.
         panel.refresh_entries(
             service.rows(loaded_ranges),
             mem_map=loaded.mem_map if loaded is not None else None,
         )
         panel.refresh_issues(service.issue_lines())
-        # US-064b / LLR-064b.4 A-01 guard: a dropdown-picked file is file-backed
-        # (``source_path is not None``) → disable Edit-JSON (no clobber path).
+        # US-064b / LLR-064b.4 A-01 guard: a file-backed document disables
+        # Edit-JSON (no clobber path).
         panel.set_edit_json_enabled(service.document.source_path is None)
-        # US-068a / LLR-068a.4 A-01 guard: same file-backed doc → disable
-        # Undo/Redo so the history path cannot clobber it either.
-        # batch-48 LLR-081.3 (writer census, site 3 of 3): a dropdown-picked
-        # file is always file-backed, so `enabled` is False here and the strip
-        # renders `history off` regardless of the depths. The depths are pushed
-        # anyway — the census is the contract, and a site that happens to be
-        # redundant TODAY is the one that silently misreports when the A-01
-        # guard's condition changes.
+        # US-068a / LLR-068a.4 A-01 guard: same for Undo/Redo, with the
+        # history-strip render (batch-48 LLR-081.3 writer census).
         panel.set_undo_redo_enabled(
             service.document.source_path is None, service.history_depths()
         )
-        # US-068b / LLR-068b.4 A-01 guard: same file-backed doc → disable the
-        # per-entry JSON edit so it cannot clobber the loaded document either.
+        # US-068b / LLR-068b.4 A-01 guard: same for the per-entry JSON edit.
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
+
+    def on_patch_editor_panel_dirty_load_requested(
+        self, event: PatchEditorPanel.DirtyLoadRequested
+    ) -> None:
+        """Raise the dirty-load guard popup (HLR-005 / LLR-005.2).
+
+        Summary:
+            The Load control fired while unsaved edits exist. Push
+            :class:`LoadGuardScreen`; its boolean answer routes the two
+            policy branches (C-10): ACCEPT continues the load of exactly the
+            path the operator typed (through the shared
+            :meth:`_patch_editor_load` seam — the dirty flag's clear rides
+            that seam's success arm), CANCEL retains the document, its rows
+            and the dirty flag, and loads nothing.
+        """
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        path_text = event.path_text
+
+        def _answer(accepted: bool) -> None:
+            if not accepted:
+                self.set_status("Patch Editor: load cancelled — changes kept.")
+                return
+            if not path_text.strip():
+                self.set_status(
+                    "Patch Editor: enter a change-file path to load."
+                )
+                return
+            self._patch_editor_load(panel, path_text)
+
+        self.push_screen(LoadGuardScreen(), _answer)
+
+    # ------------------------------------------------------------------
+    # Check Editor (batch-94, US-003 — the ce_a collector)
+    # ------------------------------------------------------------------
+
+    def _prefill_check_editor(self) -> None:
+        """Populate the Check Editor collector on screen entry (LLR-001.2).
+
+        Summary:
+            Hand the suffix-distinguished patches-folder listing to the
+            spec dropdown and the loaded A2L's measurable parameters to the
+            picker. A not-yet-mounted panel (headless unit path) is
+            tolerated as a no-op, matching ``_prefill_patch_change_files``.
+        """
+        try:
+            panel = self.query_one("#check_editor_panel", CheckEditorPanel)
+        except Exception:
+            return
+        panel.set_spec_files(self._scan_patch_change_files())
+        tags = self._compute_a2l_enriched_tags()
+        measurable = [
+            tag for tag in tags if isinstance(tag.get("address"), int)
+        ]
+        panel.set_a2l_parameters(measurable)
+
+    def _check_items_to_document(
+        self, items: Sequence[dict]
+    ) -> tuple[ChangeDocument, int]:
+        """Assemble the ``kind="check"`` document from collector items (LLR-009.1).
+
+        Summary:
+            One :class:`ChangeEntry` per collected field, in collector order,
+            with the EXPECTED bytes read from the loaded image's memory map
+            at ``[address, address + size)`` — a check spec asserts the
+            current image state. A field whose address is missing, negative
+            or not fully mapped in the loaded image cannot declare expected
+            bytes and is SKIPPED (counted in the return); with no image
+            loaded every field is skipped and the EMPTY spec still writes
+            (LLR-009.1's empty arm). No bytes are ever written to the image
+            — the document is data, and the apply gate is what keeps it
+            inert (LLR-009.3).
+        """
+        from .changes.io import FORMAT_ID, FORMAT_VERSION
+
+        loaded = self.current_file
+        mem_map = loaded.mem_map if loaded is not None else None
+        entries: list[ChangeEntry] = []
+        skipped = 0
+        for item in items:
+            address = item.get("address")
+            size = int(item.get("size") or 1)
+            if not isinstance(address, int) or address < 0 or size <= 0:
+                skipped += 1
+                continue
+            expected: list[int] = []
+            if mem_map is not None:
+                for offset in range(size):
+                    byte = mem_map.get(address + offset)
+                    if byte is None:
+                        expected = []
+                        break
+                    expected.append(int(byte))
+            if not expected:
+                skipped += 1
+                continue
+            entries.append(
+                ChangeEntry("bytes", address, tuple(expected), value=None)
+            )
+        return (
+            ChangeDocument(
+                format=FORMAT_ID,
+                version=FORMAT_VERSION,
+                kind="check",
+                encoding="utf-8",
+                value_mode="text",
+                entries=entries,
+            ),
+            skipped,
+        )
+
+    def on_check_editor_panel_action_requested(
+        self, event: CheckEditorPanel.ActionRequested
+    ) -> None:
+        """Route a Check Editor write/validate action (LLR-001.2/.009).
+
+        Summary:
+            Exactly the two :data:`CHECK_EDITOR_ACTIONS` — a non-member
+            action is one status error, never a crash. ``write_doc``
+            assembles the ``kind="check"`` document (expected bytes from the
+            loaded image), writes it through ``changes.io.
+            write_change_document`` under the operator's name (the
+            ``.chk.json`` suffix is preserved by ``_safe_name``), surfaces
+            the outcome and refreshes the folder listing so the new spec
+            appears suffix-distinguished in every dropdown. ``validate_doc``
+            assembles the same document and runs it through the shipped
+            ``run_check_document`` (no image → every entry ``uncheckable``),
+            feeding one verdict row per entry back to the panel.
+        """
+        panel = self.query_one("#check_editor_panel", CheckEditorPanel)
+        if event.action not in CHECK_EDITOR_ACTIONS:
+            self.set_status(
+                f"Check Editor: unsupported action {event.action!r}"
+            )
+            return
+        loaded = self.current_file
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        mac_records = loaded.mac_records if loaded is not None else None
+        a2l_tags = self._compute_a2l_enriched_tags() or None
+        document, skipped = self._check_items_to_document(event.items)
+        file_name = event.file_name_text.strip() or "spec.chk.json"
+        if skipped:
+            self.set_status(
+                f"Check Editor: {skipped} field(s) outside the loaded "
+                "image — not declared."
+            )
+        if event.action == "write_doc":
+            path, issues = write_change_document(
+                document, self.base_dir, file_name
+            )
+            for issue in issues:
+                self.set_status(
+                    f"[{issue.code}] {issue.severity.value}: {issue.message}"
+                )
+            if path is None:
+                self.set_status("Check Editor: spec NOT written.")
+            else:
+                self.set_status(
+                    f"Check Editor: wrote {path.name} "
+                    f"({len(document.entries)} fields, kind=check)."
+                )
+                # The new spec joins the suffix-distinguished listings.
+                self._prefill_check_editor()
+                self._prefill_patch_change_files()
+                self._prefill_diff_check_files()
+        else:  # validate_doc
+            result = run_check_document(
+                document,
+                loaded.mem_map if loaded is not None else None,
+                loaded_ranges,
+                mac_records,
+                a2l_tags,
+            )
+            if result.run_blocked_reason_code is not None:
+                self.set_status(
+                    f"Check Editor: run blocked — {result.run_blocked_reason}"
+                )
+            aggregates = result.aggregates
+            self.set_status(
+                "Checks: {passed} passed, {failed} failed, "
+                "{uncheckable} uncheckable".format(
+                    passed=aggregates.get("passed", 0),
+                    failed=aggregates.get("failed", 0),
+                    uncheckable=aggregates.get("uncheckable", 0),
+                )
+            )
+            rows: list[tuple[str, str]] = []
+            for record in result.entries:
+                token = str(getattr(record, "result", "uncheckable"))
+                severity = {
+                    "pass": ValidationSeverity.OK,
+                    "fail": ValidationSeverity.ERROR,
+                }.get(token, ValidationSeverity.WARNING)
+                start = int(getattr(record, "address_start", 0))
+                end = int(getattr(record, "address_end", start + 1))
+                expected = " ".join(
+                    f"{byte:02X}"
+                    for byte in (getattr(record, "expected_bytes", ()) or ())
+                )
+                actual_bytes = getattr(record, "actual_bytes", None)
+                actual = (
+                    " ".join(f"{byte:02X}" for byte in actual_bytes)
+                    if actual_bytes is not None
+                    else "-"
+                )
+                reason = getattr(record, "reason", None)
+                suffix = f" ({reason})" if reason else ""
+                rows.append(
+                    (
+                        f"0x{start:X}-0x{end - 1:X} expected [{expected}] "
+                        f"actual [{actual}] -> {token}{suffix}",
+                        css_class_for_severity(severity),
+                    )
+                )
+            panel.refresh_check_results(rows, "validation complete")
+
+    def on_check_editor_panel_spec_file_selected(
+        self, event: CheckEditorPanel.SpecFileSelected
+    ) -> None:
+        """Load a dropdown-chosen spec into the collector (LLR-009.1 read arm).
+
+        Summary:
+            Re-resolve the picked filename under the patches folder (the F1
+            containment guard, mirroring the patch editor's change-file
+            handler), read it through the shipped ``read_change_document``
+            seam and, for a clean ``kind="check"`` document, mirror the
+            declared fields into the collector via
+            :meth:`CheckEditorPanel.load_spec`. A failing read surfaces its
+            collected issues on the status path (never silently loaded);
+            a non-check document is refused with its kind named.
+        """
+        patches_dir = self._patches_dir().resolve()
+        raw = self._patches_dir() / event.filename
+        candidate = raw.resolve()
+        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+            self.set_status(
+                f"Check Editor: file {event.filename!r} is outside the "
+                "patches folder — not loaded."
+            )
+            return
+        document = read_change_document(str(candidate), self.base_dir)
+        if document.has_errors:
+            for issue in document.issues:
+                self.set_status(
+                    f"[{issue.code}] {issue.severity.value}: {issue.message}"
+                )
+            self.set_status("Check Editor: spec NOT loaded.")
+            return
+        if document.kind != "check":
+            self.set_status(
+                f"Check Editor: {event.filename!r} is a kind="
+                f"{document.kind!r} document — not a check spec."
+            )
+            return
+        items = [
+            {
+                "address": entry.address,
+                "size": max(1, len(entry.encoded_bytes)),
+            }
+            for entry in document.entries
+        ]
+        panel = self.query_one("#check_editor_panel", CheckEditorPanel)
+        panel.load_spec(items, event.filename)
+        self.set_status(
+            f"Check Editor: loaded {event.filename!r} "
+            f"({len(items)} fields)."
+        )
 
     def _diff_image_source(self, variant_id: Optional[str], raw_path: str) -> ImageSource:
         """
@@ -5146,6 +5673,71 @@ class S19TuiApp(App):
                 failed_sides.append(image.label or str(image.path))
         return mem_map_a, mem_map_b, failed_sides
 
+    def on_ab_diff_panel_check_file_selected(
+        self, event: AbDiffPanel.CheckFileSelected
+    ) -> None:
+        """Load a check spec for the diff report addendum (LLR-010.1/.2).
+
+        Summary:
+            The operator picked a file from the check-spec dropdown. The
+            blank pick (``""``) clears the stashed spec — the next report
+            emits no addendum. A concrete pick re-resolves under the patches
+            folder (the F1 containment guard, mirroring the patch editor's
+            change-file handler) and reads through the shipped
+            ``read_change_document`` seam. Only a clean ``kind="check"``
+            document is stashed for the report; a failing read surfaces its
+            collected issues (never silently loaded) and a non-check
+            document is refused with its kind named — patch files stay
+            listed and loadable, but they add no check addendum (the kind
+            gate is the enforcement, LLR-009.3's sibling ruling).
+        """
+        panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        if not event.filename:
+            self._diff_check_spec = None
+            self._diff_check_spec_name = ""
+            panel.set_status("Check spec: none — the report gains no addendum.")
+            return
+        patches_dir = self._patches_dir().resolve()
+        raw = self._patches_dir() / event.filename
+        candidate = raw.resolve()
+        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+            self._diff_check_spec = None
+            self._diff_check_spec_name = ""
+            panel.set_status(
+                f"Check spec: {event.filename!r} is outside the patches "
+                "folder — not loaded.",
+                "sev-warning",
+            )
+            return
+        document = read_change_document(str(candidate), self.base_dir)
+        if document.has_errors:
+            self._diff_check_spec = None
+            self._diff_check_spec_name = ""
+            messages = "; ".join(
+                f"[{issue.code}] {issue.severity.value}: {issue.message}"
+                for issue in document.issues[:3]
+            )
+            panel.set_status(
+                f"Check spec not loaded — {messages}", "sev-warning"
+            )
+            return
+        if document.kind != "check":
+            self._diff_check_spec = None
+            self._diff_check_spec_name = ""
+            panel.set_status(
+                f"Check spec: {event.filename!r} is a kind="
+                f"{document.kind!r} document, not a check spec — the report "
+                "gains no addendum.",
+                "sev-warning",
+            )
+            return
+        self._diff_check_spec = document
+        self._diff_check_spec_name = event.filename
+        panel.set_status(
+            f"Check spec {event.filename!r} loaded — {len(document.entries)} "
+            "declared field(s) will ride the report."
+        )
+
     def on_ab_diff_panel_report_requested(
         self, event: AbDiffPanel.ReportRequested
     ) -> None:
@@ -5195,6 +5787,11 @@ class S19TuiApp(App):
             dest_input=dest_input,
             a2l_records=a2l_tags,
             mac_records=mac_records,
+            # batch-94 (LLR-010.2): the stashed check spec rides the report
+            # as the ``## Checks`` addendum; ``None`` (the default) leaves
+            # the emitted report byte-identical to the pre-batch-94 form.
+            check_spec=self._diff_check_spec,
+            check_spec_name=self._diff_check_spec_name,
         )
         # batch-95 inc-004b (LLR-143.2): when image B is a product of the last
         # flow run, the A2B diff must reference ALL the flow's changes — the
@@ -5947,9 +6544,10 @@ class S19TuiApp(App):
         self.logger.info("A2L JSON exported: %s", output)
 
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
-    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks,
-    #: CRC Designer — the rail order of the keymap proposal (keys 1-9 then 0
-    #: for the 10th; batch-49 LLR-083.2, batch-58 LLR-V1.1).
+    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Check Editor, Diff,
+    #: Flow, Flow Execution, Checks, CRC Designer — the batch-94 rail order
+    #: (RAIL_ENTRIES_B94; Check Editor after Patch Editor LLR-002.1, Flow
+    #: Execution after Flow Builder US-007).
     SCREEN_CONTAINER_IDS = {
         "workspace": "screen_workspace",
         "a2l": "screen_a2l",
@@ -5957,8 +6555,10 @@ class S19TuiApp(App):
         "map": "screen_map",
         "issues": "screen_issues",
         "patch": "screen_patch",
+        "check_editor": "screen_check_editor",
         "diff": "screen_diff",
         "flow": "screen_flow",
+        "flow_execution": "screen_flow_execution",
         "checks": "screen_checks",
         "crc_designer": "screen_crc_designer",
     }
@@ -5997,8 +6597,10 @@ class S19TuiApp(App):
         "map": None,
         "issues": None,
         "patch": None,
+        "check_editor": None,
         "diff": None,
         "flow": None,
+        "flow_execution": None,
         "checks": None,
         "crc_designer": None,
     }
@@ -6150,13 +6752,42 @@ class S19TuiApp(App):
         self._apply_empty_state()
         if screen_key == "diff":
             self._prefill_diff_variants()
+            self._prefill_diff_check_files()
         elif screen_key == "patch":
             self._prefill_patch_change_files()
-            self._refresh_patch_variant_select()
+            # batch-94 P4 fix (RC-3): apply the panel's window geometry NOW,
+            # from the laid-out workspace (the panel's height is the
+            # workspace's minus the 2-row screen-title chrome — measured at
+            # every shipped size), so the show's relayout lands on the right
+            # regime in ONE pass. From the panel's own ``on_resize`` the
+            # same application would arrive one reflow too late for
+            # single-pump drivers (the panel may not read ``self.app``, C-7,
+            # so the app threads the figure in — the ``refresh_entries``
+            # data-in idiom). A not-yet-mounted panel/workspace is tolerated
+            # as a no-op (the ``_prefill_*`` idiom) — ``on_resize`` applies
+            # the geometry once the tree exists.
+            from .screens_directionb import PatchEditorPanel
+
+            try:
+                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+                workspace_rows = self.query_one("#workspace_body").region.height
+            except Exception:
+                pass
+            else:
+                panel._apply_window_geometry(max(0, workspace_rows - 2))
+        elif screen_key == "check_editor":
+            # batch-94 (LLR-001.2): the collector is populated on entry — the
+            # suffix-distinguished spec dropdown from the folder scan, and the
+            # A2L parameter picker from the loaded A2L.
+            self._prefill_check_editor()
         elif screen_key == "checks":
             # Lazy read-only mirror rebuilt on entry (batch-49, LLR-083.6);
             # checks state changes only on run/undo/redo, so no load hook.
             self.update_checks_view()
+        elif screen_key == "flow_execution":
+            # batch-94 Inc-003 (LLR-021.2): the set picker repopulates on
+            # entry, the ``_prefill_check_editor`` idiom.
+            self._prefill_flow_execution_sets()
 
     def action_open_split_join_export(self) -> None:
         """
@@ -8378,6 +9009,10 @@ class S19TuiApp(App):
             Compute the aggregate validation-issue counts + paging summary line,
             push them into the ``#validation_issues_summary`` ``Label``, and
             render the grouped Issues view via ``_render_validation_issues_groups``.
+            Batch-94 Inc-004 (HLR-012): the counts are triaged through
+            ``adjust_counts_for_a2l_triage`` — curated ``A2L_UNRECOGNIZED_BLOCK``
+            names count as INFO, not WARNING, in the strip + summary + panel
+            headers alike.
 
         Args:
             None
@@ -8410,9 +9045,37 @@ class S19TuiApp(App):
         # Whole-list severity distribution (batch-49, LLR-082.2) — computed
         # before the empty-filter short-circuit so the strip reflects the full
         # distribution (a 0/0/0 boundary only when the list is truly empty).
-        error_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.ERROR)
-        warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
-        info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
+        # Batch-94 Inc-004 (HLR-012, the fold round): the counts ride the
+        # view's ``adjust_counts_for_a2l_triage`` — curated-name
+        # ``A2L_UNRECOGNIZED_BLOCK`` findings move WARNING → INFO in the
+        # strip, the summary line AND the grouped panel's ``group_counts``
+        # (all three through this one helper), so the operator's headline
+        # counters stop broadcasting the triaged rows as warnings. Zero
+        # reclassifiable rows → the identical dict, byte-for-byte the
+        # pre-Inc-004 painters.
+        severity_counts = adjust_counts_for_a2l_triage(
+            {
+                ValidationSeverity.ERROR: sum(
+                    1
+                    for item in self._validation_issues
+                    if item.severity == ValidationSeverity.ERROR
+                ),
+                ValidationSeverity.WARNING: sum(
+                    1
+                    for item in self._validation_issues
+                    if item.severity == ValidationSeverity.WARNING
+                ),
+                ValidationSeverity.INFO: sum(
+                    1
+                    for item in self._validation_issues
+                    if item.severity == ValidationSeverity.INFO
+                ),
+            },
+            self._validation_issues,
+        )
+        error_count = severity_counts[ValidationSeverity.ERROR]
+        warning_count = severity_counts[ValidationSeverity.WARNING]
+        info_count = severity_counts[ValidationSeverity.INFO]
         self._update_issues_severity_strip(error_count, warning_count, info_count)
         if not filtered:
             summary_label.update("No validation issues.")
@@ -8506,17 +9169,23 @@ class S19TuiApp(App):
             total, self._validation_issues_window_start, page_size
         )
         window = filtered[start:end]
-        group_counts = {
-            ValidationSeverity.ERROR: sum(
-                1 for item in filtered if item.severity == ValidationSeverity.ERROR
-            ),
-            ValidationSeverity.WARNING: sum(
-                1 for item in filtered if item.severity == ValidationSeverity.WARNING
-            ),
-            ValidationSeverity.INFO: sum(
-                1 for item in filtered if item.severity == ValidationSeverity.INFO
-            ),
-        }
+        # Inc-004 (HLR-012): the panel mounts these counts verbatim — triage
+        # them here (same helper as the strip/summary) so the group headers
+        # agree with the headline counters; the panel remaps the rows itself.
+        group_counts = adjust_counts_for_a2l_triage(
+            {
+                ValidationSeverity.ERROR: sum(
+                    1 for item in filtered if item.severity == ValidationSeverity.ERROR
+                ),
+                ValidationSeverity.WARNING: sum(
+                    1 for item in filtered if item.severity == ValidationSeverity.WARNING
+                ),
+                ValidationSeverity.INFO: sum(
+                    1 for item in filtered if item.severity == ValidationSeverity.INFO
+                ),
+            },
+            filtered,
+        )
         panel.render_groups(window, group_counts, truncated=(end - start) < total)
 
     def on_issue_row_selected(self, event: "IssueRow.Selected") -> None:
@@ -11786,11 +12455,9 @@ class S19TuiApp(App):
               ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
               the active variant; single-variant projects keep the plain
               project name (LLR-005.3 back-compat).
-            - Chains ``_refresh_patch_variant_select`` (US-028 / LLR-035.3):
-              every variant-set mutation site (project load/save, variant
-              append, activation apply) already funnels through this
-              refresh, so the Patch Editor's variant dropdown re-syncs on
-              the same trigger set with no extra call sites.
+            - batch-94 (HLR-006): the ``_refresh_patch_variant_select`` chain
+              retired with the Patch Editor variant selector — the project
+              label refresh no longer touches the editor's dropdown.
 
         Dependencies:
             Uses:
@@ -11800,7 +12467,6 @@ class S19TuiApp(App):
                 - ``_refresh_loaded_panel`` (the second context surface)
                 - ``_compose_context_line`` (bounds the two halves against each
                   other so neither can evict the other — see its own docstring)
-                - ``_refresh_patch_variant_select``
             Used by:
                 - Project / A2L load handlers
                 - ``_apply_unload`` (post-unload refresh)
@@ -11861,7 +12527,8 @@ class S19TuiApp(App):
         # "Replacing" was discharged across Inc-7 + Inc-10 rather than inside
         # either one, and no increment ever had to choose between a green gate
         # and an honest one.
-        self._refresh_patch_variant_select()
+        # batch-94 (HLR-006): the variant-select refresh chain is gone — the
+        # Patch Editor no longer carries a variant dropdown to re-sync.
         # batch-95 change 2 (HLR-139): the open-folder chips dim/enabled state
         # keys off the same project context, so the one project-refresh seam
         # re-resolves every mounted chip (the modal Reports chip re-resolves on

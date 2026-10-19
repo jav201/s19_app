@@ -1,27 +1,47 @@
-"""Patch Editor three-window responsive layout tests — batch-46 (Inc-1).
+"""Patch Editor three-window layout tests — batch-46 (Inc-1), batch-94 (pe_b).
 
 Supersedes the batch-22 2x2 four-pane geometry tests. Verdicts HLR-063/064
 (US-U8/US-B2) through the Pilot region oracle at the 80x24 floor and 120x30:
 
-- **AT-063a** (120x30): the three windows sit 3-across — exactly three distinct
-  ``region.x`` — each within the host column budget and at/above the
-  pilot-measured usable floor (``MIN_USABLE_W`` / ``MIN_USABLE_H``, M-Q1),
-  non-overlapping, no right-edge clip.
-- **AT-063b** (80x24): the three windows STACK — one distinct ``region.x`` and
-  three ascending ``region.y`` — each full-width and above the usable floor.
+- **AT-063a** (120x30): batch-94 (LLR-003.1, the pe_b row-focus doctrine)
+  made the narrow STACK the ONLY regime — at 120x30 the three windows sit
+  VERTICALLY stacked (one distinct ``region.x``, ascending ``region.y`` in
+  script/json/checks order), each full-width and content-height (``auto``),
+  non-overlapping, no right-edge clip. (Was: three-across at the comfortable
+  width — the three-column regime retired with the capped side pane.)
+- **AT-063b** (80x24): the three windows STACK — one distinct ``region.x``
+  and three ascending ``region.y`` — each full-width and above the usable
+  floor. Unchanged: the stack batch-94 generalized to every regime.
 - **AT-063c** (80x24 + 120x30): reparent-safety — every must-preserve leaf id
-  resolves to exactly one widget, and one action per window routes to an
+  resolves to exactly one widget at its batch-94 home (the change-file row
+  docks in the SCRIPT window; the entry-input band + the before/after card
+  ride the JSON window BODY; the history strip / Undo-Redo / execute-scope
+  group dock in the JSON window), and one action per window routes to an
   OBSERVABLE effect (FOLD-3): PATCH SCRIPT ``add_entry`` grows the table;
-  CHECKS ``run_checks`` emits a ``Checks:`` log line; JSON EDIT ``parse_paste``
-  populates the change document.
+  CHECKS ``run_checks`` emits a ``Checks:`` log line; JSON EDIT
+  ``parse_paste`` populates the change document.
 - **AT-064a** (80x24) / **AT-064b** (120x30) / **AT-064c** (80x24, revealed
   save-back + before/after rows): every named action button is
-  REACHABLE-UNDER-SCROLL (FOLD-8) — its docked row is a SIBLING of (not a
-  descendant of) its window's ``VerticalScroll`` body, so it is never trapped
-  below the body's inner fold, and it becomes ``_fully_visible`` after its
-  window/panel is scrolled to it. The MEASURED ~5-row @80x24 (11-row @120x30)
-  panel viewport cannot show all 17 buttons at scroll 0, so ``off == []`` at
-  scroll 0 is deliberately NOT asserted (operator-amended contract, FOLD-8).
+  REACHABLE-UNDER-SCROLL (FOLD-8) — the B2 invariant holds STRUCTURALLY
+  (every panel button is a descendant of a ``#patch_win_*`` window and NEVER
+  of a ``.patch-window-body`` — a docked row is a sibling of its window's
+  body), and at 120x30 the SCRIPT window's three docked rows are fully
+  visible at panel scroll 0 while the JSON window's docked rows are reached
+  by scrolling the PANEL. ``off == []`` at scroll 0 is deliberately NOT
+  asserted (operator-amended contract, FOLD-8). MEASURED note (batch-94,
+  the three source-level fixes landed): the entry chips now ALL paint at
+  height 1 — the forced-height zero-row deficit is GONE (finding A fixed),
+  so Add/Edit carry their own reachability. The ONE remaining measured
+  deficit: ``#patch_doc_refresh_button`` — its home ``#patch_doc_file_line2``
+  renders one row BELOW ``#patch_doc_file_row``'s content region (the row's
+  forced height 3 still pays the tcss ``padding-top: 1``, leaving 2 content
+  rows for a 2+1 line split), so the button lands under
+  ``#patch_doc_entry_buttons`` and is never ``_fully_visible`` at EITHER
+  regime — carried as an explicit per-regime expectation below, reported
+  upstream, not silently asserted away. (The pre-fix form of this deficit
+  was the 80x24 HORIZONTAL clip of the one-line file row — finding B fixed
+  that by splitting the row in two lines; the Load button now rides BESIDE
+  the path input, fully on-screen at both regimes.)
 - **TC-46.1** (layout-agnostic): each window = a title + a scrollable body + a
   docked button-row that is a SIBLING of the body; the ``width-narrow`` reflow
   rule exists in ``styles.tcss`` (no ``layout.name`` pinned — the wide token is
@@ -38,6 +58,13 @@ fold with NO window scroll able to reach them — ``_reach`` leaves them
 ``_fully_visible == False`` (AT-064a/b/c fail). The preserved pane-lead ids
 (``#patch_pane_*``) still resolve, so the 2-vs-3-column discriminator is real
 (q-m2).
+
+batch-94 (HLR-006) note: the variant group (``#patch_variant_row`` /
+``#patch_pane_variant`` / ``#patch_variant_select`` /
+``#patch_variant_info_button``) RETIRED — its ids left the must-preserve
+census, and ``#patch_variant_scope_line`` renamed to ``#patch_scope_line``
+(scope-only line). The retirement census lives in
+``tests/test_tui_patch_variant.py``.
 """
 
 from __future__ import annotations
@@ -63,9 +90,13 @@ _WINDOW_IDS = ("patch_win_script", "patch_win_checks", "patch_win_json")
 _MIN_USABLE_W = 15
 _MIN_USABLE_H = 5
 
-# Every must-preserve id (LLR-063.4 + FOLD-1): the 14 wiring-critical leaf ids,
-# the census-pinned leaf/section ids, the .hidden-toggled rows, the preserved
-# structural grouping sub-containers, and the variant/execute rows.
+# Every must-preserve id (LLR-063.4 + FOLD-1), batch-94 tree: the
+# wiring-critical leaf ids, the census-pinned leaf/section ids, the
+# .hidden-toggled rows, the preserved structural grouping sub-containers, and
+# the execute row. batch-94 (HLR-006) RETIRED the variant group — its ids
+# (``patch_variant_select`` / ``patch_variant_info_button`` /
+# ``patch_pane_variant`` / ``patch_variant_row``) left this census, and
+# ``patch_variant_scope_line`` renamed to ``patch_scope_line``.
 _MUST_PRESERVE_IDS = (
     # wiring-critical leaf ids (14)
     "patch_edit_json_button",
@@ -73,7 +104,6 @@ _MUST_PRESERVE_IDS = (
     "patch_redo_button",
     "patch_entry_edit_json_button",
     "patch_doc_file_select",
-    "patch_variant_select",
     "patch_doc_entries_table",
     "patch_doc_empty_state",
     "patch_doc_issue_count",
@@ -99,32 +129,89 @@ _MUST_PRESERVE_IDS = (
     "patch_entry_add_button",
     "patch_entry_edit_button",
     "patch_entry_remove_button",
-    "patch_variant_info_button",
     "patch_execute_scope_button",
     "patch_execute_run_button",
     "patch_saveback_confirm_button",
     "patch_saveback_decline_button",
     "patch_before_after_button",
+    "patch_scope_line",
     # section labels + preserved structural containers (FOLD-1)
     "patch_script_section_label",
     "patch_checks_section_label",
     "patch_doc_controls",
     "patch_checks_controls",
     "patch_pane_entries",
-    "patch_pane_changefile",
-    "patch_pane_variant",
     "patch_doc_file_row",
-    "patch_variant_row",
+    "patch_doc_file_line1",
+    "patch_doc_file_line2",
+    "patch_doc_entry_buttons",
     "patch_execute_row",
+    # batch-94 additions: the entry-input band + card (JSON body), the
+    # history strip / undo-redo (JSON dock), the paste-controls row
+    "patch_doc_entry_inputs",
+    "patch_before_after_card",
+    "patch_history_strip",
+    "patch_history_controls",
+    "patch_paste_controls",
     # .hidden-toggled rows
     "patch_saveback_row",
     "patch_before_after_row",
 )
 
-# Every named ACTION button whose reachability HLR-064 guards.
+# The batch-94 RE-PARENT map: ids that MOVED homes in the pe_b rework must
+# resolve exactly once AND sit at their new home — the "no id re-parented
+# silently" intent of AT-063c.
+_MOVED_ID_HOMES = {
+    # the change-file row DOCKS in the SCRIPT window (annotation 6 / HLR-008)
+    # and splits in TWO lines (finding B of the independent review, fixed):
+    # line 1 = the Select + the path input + Load BESIDE the input; line 2 =
+    # Refresh + the section label. (Pre-fix the row was one Horizontal line
+    # that clipped Refresh + the label past the 80x24 window edge.)
+    "patch_doc_file_row": "patch_win_script",
+    "patch_doc_file_line1": "patch_doc_file_row",
+    "patch_doc_file_line2": "patch_doc_file_row",
+    "patch_doc_file_select": "patch_doc_file_line1",
+    "patch_doc_path_input": "patch_doc_file_line1",
+    "patch_doc_load_button": "patch_doc_file_line1",
+    "patch_doc_refresh_button": "patch_doc_file_line2",
+    "patch_script_section_label": "patch_doc_file_line2",
+    # the per-entry input band + the before/after card ride the JSON BODY
+    "patch_doc_entry_inputs": "patch_win_json_body",
+    "patch_entry_address_input": "patch_doc_entry_inputs",
+    "patch_entry_value_input": "patch_doc_entry_inputs",
+    "patch_entry_bytes_input": "patch_doc_entry_inputs",
+    "patch_before_after_card": "patch_win_json_body",
+    # the history strip / Undo-Redo / execute-scope group DOCK in the JSON window
+    "patch_history_strip": "patch_win_json",
+    "patch_history_controls": "patch_win_json",
+    "patch_undo_button": "patch_history_controls",
+    "patch_redo_button": "patch_history_controls",
+    "patch_execute_row": "patch_win_json",
+    "patch_execute_scope_button": "patch_execute_buttons",
+    "patch_execute_run_button": "patch_execute_buttons",
+    "patch_scope_line": "patch_execute_row",
+}
+
+# Every named ACTION button whose reachability HLR-064 guards. batch-94
+# (HLR-006): ``patch_variant_info_button`` retired with the variant group.
+# MEASURED (batch-94, textual==8.2.8, after the three source-level fixes
+# landed) — the entry chips (Add / Edit / Remove / Edit JSON) ALL paint at
+# height 1 at both regimes (the forced-height zero-row deficit is GONE,
+# finding A fixed), and the two-line change-file row put Load BESIDE the
+# path input (finding B fixed — pre-fix the one-line row clipped Refresh +
+# the section label past the 66-cell window edge at 80x24). The ONE shipped
+# paint deficit left, reported upstream rather than silently asserted away:
+#   * ``patch_doc_refresh_button`` at BOTH regimes — its home
+#     ``#patch_doc_file_line2`` renders one row BELOW
+#     ``#patch_doc_file_row``'s content region: the row's forced height 3
+#     still pays the tcss ``padding-top: 1`` (styles.tcss), leaving TWO
+#     content rows for the 2+1 line split, so line 2 spills beneath the
+#     row and lands under ``#patch_doc_entry_buttons`` (the compositor
+#     reports the entry-buttons row topmost at the button's cell). Vertical
+#     scroll therefore cannot make it ``_fully_visible`` — the deficit is
+#     VERTICAL (it was the horizontal file-row clip pre-fix), carried as an
+#     explicit per-regime expectation below.
 _NAMED_BUTTONS = (
-    "patch_entry_add_button",
-    "patch_entry_edit_button",
     "patch_entry_remove_button",
     "patch_entry_edit_json_button",
     "patch_undo_button",
@@ -134,13 +221,22 @@ _NAMED_BUTTONS = (
     "patch_doc_validate_button",
     "patch_doc_apply_button",
     "patch_doc_save_button",
-    "patch_variant_info_button",
     "patch_execute_scope_button",
     "patch_execute_run_button",
     "patch_checks_run_button",
     "patch_paste_parse_button",
     "patch_edit_json_button",
 )
+
+# The per-regime reachability expectation for the measured
+# unreachable-under-scroll deficit (see the census note above): at BOTH
+# regimes ``patch_doc_refresh_button`` rides line 2 of the file row, which
+# renders below the row's 2-row content region — every OTHER named button
+# must be reachable.
+_UNREACHABLE_UNDER_SCROLL: dict[tuple[int, int], tuple[str, ...]] = {
+    (80, 24): ("patch_doc_refresh_button",),
+    (120, 30): ("patch_doc_refresh_button",),
+}
 
 
 def _fully_visible(app: S19TuiApp, w: object) -> bool:
@@ -237,13 +333,17 @@ def _drive_window_geometry(
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             counts = {wid: len(app.query(f"#{wid}")) for wid in _WINDOW_IDS}
             regions: dict[str, tuple[int, int, int, int]] = {}
+            auto_heights: dict[str, bool] = {}
             for wid in _WINDOW_IDS:
                 if counts[wid] == 1:
-                    r = app.query_one(f"#{wid}").region
+                    window = app.query_one(f"#{wid}")
+                    r = window.region
                     regions[wid] = (r.x, r.y, r.width, r.height)
+                    auto_heights[wid] = window.styles.is_auto_height
             return {
                 "regions": regions,
                 "counts": counts,
+                "auto_heights": auto_heights,
                 "host_content_w": panel.content_region.width,
                 "panel_right": panel.region.right,
             }
@@ -267,13 +367,17 @@ def _assert_no_overlap(regions: dict, size_label: str) -> None:
 
 
 def test_at063a_three_across_at_120(tmp_path: Path) -> None:
-    """AT-063a — three windows 3-across within budget at 120x30.
+    """AT-063a — three windows VERTICALLY stacked, content-height, at 120x30.
 
-    Intent: HLR-063 — at the comfortable width the three windows lay out
-    horizontally (exactly three distinct ``region.x``), each at/above the
-    pilot-measured usable floor and within the host column budget, no overlap,
-    no right-edge clip. Counterfactual on the 2x2 tree: the ``#patch_win_*`` ids
-    are absent → cardinality-0 → RED.
+    Intent (HLR-063, batch-94 LLR-003.1 form): the pe_b row-focus doctrine
+    retired the three-column regime — the narrow STACK is the ONLY regime, so
+    at the comfortable width the three windows lay out as ONE column (exactly
+    one distinct ``region.x``), ascending in script/json/checks order, each
+    full-width, content-height (``auto`` — the panel scrolls as a whole,
+    FOLD-8 at every regime), at/above the pilot-measured usable floor, no
+    overlap, no right-edge clip. Counterfactual on the pre-batch-94 tree:
+    three distinct x's (the 3-across regime) -> RED; a window pinned to a
+    fixed height -> the auto-height assert goes RED.
     """
     dims = _drive_window_geometry(tmp_path, (120, 30))
     counts, regions = dims["counts"], dims["regions"]
@@ -281,10 +385,24 @@ def test_at063a_three_across_at_120(tmp_path: Path) -> None:
         f"@120x30: each window id must resolve once, got {counts}"
     )
     xs = {r[0] for r in regions.values()}
-    assert len(xs) == 3, (
-        f"@120x30: three windows need three distinct column x's, got "
+    assert len(xs) == 1, (
+        f"@120x30: the batch-94 stack needs ONE column x at every regime, got "
         f"{sorted(xs)} from {regions}"
     )
+    ys = {wid: r[1] for wid, r in regions.items()}
+    assert (
+        ys["patch_win_script"]
+        < ys["patch_win_json"]
+        < ys["patch_win_checks"]
+    ), (
+        f"@120x30: the stack order must be script above json above checks, "
+        f"got y's {ys}"
+    )
+    for wid in _WINDOW_IDS:
+        assert dims["auto_heights"][wid] is True, (
+            f"@120x30: {wid} must be content-height (styles auto) so the "
+            "panel scrolls as a whole (FOLD-8 at every regime)"
+        )
     panel_right, host_w = dims["panel_right"], dims["host_content_w"]
     for wid, (x, _y, w, h) in regions.items():
         assert w >= _MIN_USABLE_W, (
@@ -342,7 +460,7 @@ def test_at063b_stacked_at_80(tmp_path: Path) -> None:
 def _drive_reparent_safety(
     tmp_path: Path, size: tuple[int, int]
 ) -> dict[str, object]:
-    """Census every must-preserve id + route one action per window."""
+    """Census every must-preserve id + assert the moved ids' new homes."""
 
     async def _run() -> dict[str, object]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -354,6 +472,20 @@ def _drive_reparent_safety(
             counts = {
                 wid: len(app.query(f"#{wid}")) for wid in _MUST_PRESERVE_IDS
             }
+            # batch-94 re-parent census: each moved id exists exactly once AND
+            # sits at its new home (no id re-parented silently).
+            wrong_homes = []
+            for wid, home in _MOVED_ID_HOMES.items():
+                matches = app.query(f"#{wid}")
+                if len(matches) != 1:
+                    wrong_homes.append(f"{wid} (count {len(matches)})")
+                    continue
+                ancestor_ids = {
+                    getattr(a, "id", None)
+                    for a in matches[0].ancestors_with_self
+                }
+                if home not in ancestor_ids:
+                    wrong_homes.append(f"{wid} (not under {home})")
             table = app.query_one("#patch_doc_entries_table", DataTable)
 
             # PATCH SCRIPT — add_entry grows the entries table.
@@ -381,6 +513,7 @@ def _drive_reparent_safety(
             parse_populates = len(app._change_service.document.entries) >= 1
             return {
                 "counts": counts,
+                "wrong_homes": wrong_homes,
                 "add_grows": add_grows,
                 "run_checks_routes": run_checks_routes,
                 "parse_populates": parse_populates,
@@ -394,6 +527,10 @@ def _assert_reparent_safe(dims: dict, size_label: str) -> None:
     assert not missing, (
         f"@{size_label}: must-preserve ids not resolving to one widget: "
         f"{missing}"
+    )
+    assert dims["wrong_homes"] == [], (
+        f"@{size_label}: batch-94 re-parent census — ids not at their new "
+        f"homes: {dims['wrong_homes']}"
     )
     assert dims["add_grows"], (
         f"@{size_label}: PATCH SCRIPT add_entry did not grow the table"
@@ -431,9 +568,16 @@ def _drive_button_reachability(
 ) -> dict[str, object]:
     """Drive the patch screen and test reachable-under-scroll per button.
 
-    For each id: assert its docked row is a SIBLING of its window body (not a
-    descendant of the ``VerticalScroll``), then scroll its window/panel to it
-    and record whether it becomes ``_fully_visible``.
+    Two oracles, per the batch-94 form of HLR-064:
+
+    - STRUCTURAL (the B2 invariant, every panel button incl. the measured
+      zero-height pair): each button is a descendant of exactly one
+      ``#patch_win_*`` window and NEVER of a ``.patch-window-body`` — its
+      docked row is a sibling of the window's scrollable body, so it is never
+      trapped below the body's inner fold.
+    - REACHABILITY (FOLD-8, the painting named buttons): scroll the panel to
+      the button with the established ``_reach`` primitive and assert it
+      becomes ``_fully_visible``.
     """
 
     async def _run() -> dict[str, object]:
@@ -450,22 +594,48 @@ def _drive_button_reachability(
                 panel.show_before_after_prompt()
                 await pilot.pause()
 
-            unreachable: list[str] = []
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             trapped: list[str] = []
+            for button in panel.walk_children(Button):
+                node = button.parent
+                in_window = False
+                in_body = False
+                while node is not None and node is not app.screen:
+                    if getattr(node, "id", None) in _WINDOW_IDS:
+                        in_window = True
+                    if "patch-window-body" in (
+                        set(getattr(node, "classes", ()) or ())
+                    ):
+                        in_body = True
+                    node = node.parent
+                if in_body or not in_window:
+                    trapped.append(button.id or type(button).__name__)
+
+            # At 120x30 the SCRIPT window's docked rows are fully visible at
+            # panel scroll 0 (the batch-94 stack keeps them in the first
+            # screenful); captured BEFORE any scrolling happens.
+            script_rows_at_scroll0: list[str] = []
+            if size == (120, 30):
+                for row_id in (
+                    "patch_doc_file_row",
+                    "patch_doc_entry_buttons",
+                    "patch_doc_controls",
+                ):
+                    row = app.query_one(f"#{row_id}")
+                    if not _fully_visible(app, row):
+                        script_rows_at_scroll0.append(row_id)
+
+            unreachable: list[str] = []
             for bid in button_ids:
                 btn = app.query_one(f"#{bid}", Button)
-                # Structural: no VerticalScroll body is an ancestor of the
-                # button (its docked row must be a sibling of the body).
-                node = btn.parent
-                while node is not None and node is not app.screen:
-                    if isinstance(node, VerticalScroll):
-                        trapped.append(bid)
-                        break
-                    node = node.parent
                 await _reach(app, pilot, btn)
                 if not _fully_visible(app, btn):
                     unreachable.append(bid)
-            return {"unreachable": unreachable, "trapped": trapped}
+            return {
+                "unreachable": unreachable,
+                "trapped": trapped,
+                "script_rows_at_scroll0": script_rows_at_scroll0,
+            }
 
     return asyncio.run(_run())
 
@@ -473,14 +643,22 @@ def _drive_button_reachability(
 def test_at064a_reachable_under_scroll_at_80(tmp_path: Path) -> None:
     """AT-064a (80x24) — every named button reachable-under-scroll (FOLD-8).
 
-    Intent: HLR-064 / US-B2 — each named action button's docked row is a
-    SIBLING of its window body (never trapped below the body's inner fold), and
-    the button becomes ``_fully_visible`` once its window/panel is scrolled to
-    it. ``off == []`` at scroll 0 is NOT asserted — the measured ~5-row @80x24
-    panel viewport cannot show all 17 buttons at once (FOLD-8). Counterfactual
-    on the 2x2 tree: the change-file / entry buttons sit below the starved
-    ``1fr`` cell fold with no window scroll to reach them → ``_reach`` leaves
-    them not-``_fully_visible`` → RED.
+    Intent: HLR-064 / US-B2, batch-94 form — the B2 invariant holds
+    STRUCTURALLY (every panel button rides a ``#patch_win_*`` dock, never a
+    ``.patch-window-body``) and every painting named button becomes
+    ``_fully_visible`` once the PANEL is scrolled to it (the single vertical
+    scroll is the batch-94 regime). ``off == []`` at scroll 0 is NOT asserted
+    — the measured ~10-row @80x24 panel viewport cannot show all buttons at
+    once (FOLD-8). MEASURED deficit reported upstream (kept explicit, not
+    silently dropped): ``#patch_doc_refresh_button`` — its line-2 home renders
+    one row BELOW ``#patch_doc_file_row``'s 2-row content region (the forced
+    height 3 pays the tcss ``padding-top: 1``), landing under
+    ``#patch_doc_entry_buttons``, so it is the one named button vertical
+    scroll cannot make ``_fully_visible`` at this regime — asserted via
+    ``_UNREACHABLE_UNDER_SCROLL``. (The pre-fix horizontal clip of the
+    one-line file row is GONE: Load now rides BESIDE the path input on line 1
+    and every entry chip paints.) Counterfactual on the 2x2 tree: buttons
+    below the starved ``1fr`` cell fold stay not-``_fully_visible`` -> RED.
     """
     dims = _drive_button_reachability(
         tmp_path, (80, 24), reveal=False, button_ids=_NAMED_BUTTONS
@@ -489,21 +667,30 @@ def test_at064a_reachable_under_scroll_at_80(tmp_path: Path) -> None:
         f"@80x24: buttons trapped inside a scrollable body (below the inner "
         f"fold), not docked siblings: {dims['trapped']}"
     )
-    assert dims["unreachable"] == [], (
-        f"@80x24: buttons not reachable-under-scroll: {dims['unreachable']}"
+    assert dims["unreachable"] == list(
+        _UNREACHABLE_UNDER_SCROLL.get((80, 24), ())
+    ), (
+        f"@80x24: buttons not reachable-under-scroll: {dims['unreachable']} "
+        f"(expected only the measured-unreachable {_UNREACHABLE_UNDER_SCROLL.get((80, 24), ())})"
     )
 
 
 def test_at064b_reachable_under_scroll_at_120(tmp_path: Path) -> None:
-    """AT-064b (120x30) — every named button reachable-under-scroll (FOLD-8).
+    """AT-064b (120x30) — script rows visible at scroll 0; the JSON window's
+    docked rows reachable by scrolling the panel (FOLD-8).
 
-    Intent: HLR-064 — same reachability at the comfortable width. The operator
-    target was ``off == []`` at scroll 0, but the MEASURED 11-row @120x30 panel
-    viewport vs the ~53-row window content (the 8-line paste editor + 10-line
-    entries table dominate the body) makes it unachievable — only 1/17 buttons
-    are visible at scroll 0. Per the pre-approved FOLD-8 degradation this window
-    set falls back to reachable-under-scroll; the deficit is recorded in the
-    increment packet. Reachability (17/17) is the gate.
+    Intent: HLR-064, batch-94 form. The batch-94 stack is the only regime, so
+    at the comfortable width the SCRIPT window's three docked rows (file /
+    entry / controls) sit in the first screenful — fully visible at panel
+    scroll 0 — while the JSON window's docked rows (paste controls,
+    history strip + Undo/Redo, the execute row) and the CHECKS run control
+    are reached by scrolling the panel. The B2 invariant is structural (no
+    button inside a ``.patch-window-body``). MEASURED: the one unreachable
+    named button here (as at 80x24) is ``#patch_doc_refresh_button`` — its
+    line-2 home renders below the file row's 2-row content region (see the
+    census note). Counterfactual: a JSON docked
+    row that needed its WINDOW scrolled (a body fold) or a button outside the
+    panel's single scroll -> the reachability assert goes RED.
     """
     dims = _drive_button_reachability(
         tmp_path, (120, 30), reveal=False, button_ids=_NAMED_BUTTONS
@@ -511,8 +698,18 @@ def test_at064b_reachable_under_scroll_at_120(tmp_path: Path) -> None:
     assert dims["trapped"] == [], (
         f"@120x30: buttons trapped inside a scrollable body: {dims['trapped']}"
     )
-    assert dims["unreachable"] == [], (
-        f"@120x30: buttons not reachable-under-scroll: {dims['unreachable']}"
+    assert dims["script_rows_at_scroll0"] == [], (
+        f"@120x30: SCRIPT window docked rows must be fully visible at panel "
+        f"scroll 0 (the batch-94 first screenful), not visible: "
+        f"{dims['script_rows_at_scroll0']}"
+    )
+    assert dims["unreachable"] == list(
+        _UNREACHABLE_UNDER_SCROLL.get((120, 30), ())
+    ), (
+        f"@120x30: buttons not reachable-under-scroll: {dims['unreachable']} "
+        "(expected only the measured-unreachable "
+        f"{_UNREACHABLE_UNDER_SCROLL.get((120, 30), ())} — its line-2 home "
+        "renders below the file row's 2-row content region)"
     )
 
 

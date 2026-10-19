@@ -1,0 +1,8 @@
+
+29 mismatched snapshots
+
+View the failure report.
+
+C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html
+
+3 passed, 29 xfailed, 1 warning in 110.20s (0:01:50)

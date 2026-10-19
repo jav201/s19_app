@@ -1,0 +1,14 @@
+RAIL_ENTRIES count: 10
+   1. key='workspace' label='Workspace'
+   2. key='a2l'  label='A2L Explorer'
+   3. key='mac'  label='MAC View'
+   4. key='map'  label='Memory Map'
+   5. key='issues' label='Issues Report'
+   6. key='patch' label='Patch Editor'
+   7. key='diff' label='A2B Diff'
+   8. key='flow' label='Flow Builder'
+   9. key='checks' label='Checks'
+  10. key='crc_designer' label='CRC Designer'
+binding key space consumed: 10 of '1'..'0' (10 slots)
+
+PROBE OK

@@ -1,0 +1,41 @@
+compare result fields: ['diagnostics', 'image_a', 'image_b', 'notes', 'refused', 'runs', 'stats']
+generate_diff_report -> written=True path=C:\Users\jjgh8\AppData\Local\Temp\tmpiq8o9lan\20261013T140431Z-p1_probe.md
+report line count: 442
+== emitted header (first 30 lines, verbatim) ==
+001| # Diff report
+002| 
+003| - Generated (UTC): 2026-10-13T14:04:31.144838+00:00
+004| - Tool version: 0.1.0
+005| - Image A: prg [external] path=`C:\Users\jjgh8\Github\s19_app-b94\examples\case_00_public\prg.s19` parse-errors=0
+006| - Image B: sample [external] path=`C:\Users\jjgh8\Github\s19_app-b94\examples\case_00_public\s19_sample.s19` parse-errors=0
+007| - Image A artifacts: summary=none; a2l=absent; mac=absent
+008| - Image B artifacts: summary=none; a2l=absent; mac=absent
+009| 
+010| ## Statistics
+011| 
+012| | Classification | Runs | Bytes |
+013| |---|---|---|
+014| | changed | 0 | 0 |
+015| | only in A | 11 | 3968 |
+016| | only in B | 2 | 260 |
+017| 
+018| ## Runs
+019| 
+020| | Start | End | Length | Classification | Symbols |
+021| |---|---|---|---|---|
+022| | 0x00000000 | 0x00000012 | 18 | only in B | - |
+023| | 0x000017E0 | 0x000017E1 | 1 | only in A | - |
+024| | 0x000017E8 | 0x000017EA | 2 | only in A | - |
+025| | 0x000017F0 | 0x000017FA | 10 | only in A | - |
+026| | 0x00008000 | 0x000080F2 | 242 | only in B | - |
+027| | 0x0000EB00 | 0x0000EB02 | 2 | only in A | - |
+028| | 0x0000EB04 | 0x0000EB07 | 3 | only in A | - |
+029| | 0x0000EB08 | 0x0000FA2E | 3878 | only in A | - |
+030| | 0x0000FCB0 | 0x0000FCEC | 60 | only in A | - |
+== the provenance-addressable lines ==
+  '- Image A: prg [external] path=`C:\\Users\\jjgh8\\Github\\s19_app-b94\\examples\\case_00_public\\prg.s19` parse-errors=0'
+  '- Image B: sample [external] path=`C:\\Users\\jjgh8\\Github\\s19_app-b94\\examples\\case_00_public\\s19_sample.s19` parse-errors=0'
+  '- Image A artifacts: summary=none; a2l=absent; mac=absent'
+  '- Image B artifacts: summary=none; a2l=absent; mac=absent'
+
+PROBE OK

@@ -9,11 +9,17 @@ Verdicts HLR-075 (R-TUI-075, US-P1) through the shipped Patch Editor surface:
 - **AT-075b** — every entries cell is a Rich ``Text`` and the kind/address/value
   cells carry >=3 DISTINCT style tokens (structural invariant, C-29-safe —
   never "K columns fit"), over both a ``string``- and a ``bytes``-kind row.
-- **AT-075c** — the variant+scope line moves off its default when the REAL
-  ``#patch_execute_scope_button`` is clicked (C-10(a)).
-- **AT-075d** ★★ — GATE-BLOCKING C-17: a project-file-derived variant id
-  carrying each MD-1 payload renders VERBATIM on the variant/scope line with no
-  payload-derived span and no ``MarkupError``.
+- **AT-075c** — the execution-scope line (``#patch_scope_line``, the batch-94
+  rename of the retired ``#patch_variant_scope_line``) moves off its default
+  when the REAL ``#patch_execute_scope_button`` is clicked (C-10(a)). Batch-94
+  (HLR-006) retired the variant half of the line: it now renders
+  ``Scope <label>`` only — the "Variant" segment's absence is asserted.
+- **AT-075d** ★★ — GATE-BLOCKING C-17: re-pointed with the line. The variant
+  id can no longer reach any panel sink (the dropdown retired with HLR-006 and
+  the scope line is fed by the panel's own closed vocabulary), so each MD-1
+  payload is injected into that vocabulary and must still render VERBATIM on
+  the surviving line — the sink-construction guard (markup disabled +
+  ``Text``-built) survives the retirement.
 - **AT-075e** ★★ — GATE-BLOCKING C-17 (LLR-075.6): the entries table is a LIVE
   ``Text.from_markup`` sink at HEAD. See the sink note below.
 
@@ -46,6 +52,16 @@ rejects the unquoted value). AT-075d's "no ``MarkupError``" clause names
 path and could not be dodged without weakening the AT — i.e. exactly the
 partial-fix trap BL-1 names. Fixed at the panel's render boundary (literal
 ``Text`` labels); ``app.py`` unchanged.
+
+**batch-94 (HLR-006) RETIRED that sink with the variant group it rode.**
+``#patch_variant_select`` and ``PatchEditorPanel.set_variants`` are GONE, so
+the variant-select-label arm of AT-075f re-points at the surviving
+change-file dropdown's OPTION CENSUS (``#patch_doc_file_select`` —
+``set_change_files`` wraps every label in ``safe_text``); the ``MarkupError``
+crash class the old arm exercised through ``set_variants`` is now covered by
+the entries-table arm (AT-075e) and the change-file arm (AT-075f), both of
+which drive the real populator. AT-075d re-points at ``#patch_scope_line`` —
+the surviving Text-built, markup-disabled line.
 
 **Inc-1b — the class is THREE sites wide; the other two are now closed.** The
 Inc-1 security review probed every ``Select`` option-label site against the
@@ -444,12 +460,12 @@ def test_at075b_role_colours(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# AT-075c — the variant + scope line (LLR-075.3)
+# AT-075c — the execution-scope line (LLR-075.3, batch-94 form)
 # ===========================================================================
 
 
 def _scope_line(app: S19TuiApp) -> Content:
-    """Return the variant/scope line's RENDER-PATH content.
+    """Return the scope line's RENDER-PATH content.
 
     At the ``textual==8.2.8`` pin ``Static.update(Text)`` visualises the Rich
     ``Text`` into a ``textual.content.Content`` via ``Content.from_rich_text``
@@ -457,21 +473,27 @@ def _scope_line(app: S19TuiApp) -> Content:
     the real render path, and reading it (rather than the ``Text`` the test
     itself built) is what keeps the C-17 assertion non-tautological: it
     observes what the widget will actually paint.
+
+    batch-94 (HLR-006): the line renamed ``#patch_variant_scope_line`` ->
+    ``#patch_scope_line`` and now renders ``Scope <label>`` ONLY — the
+    variant segment retired with the selector.
     """
     from textual.widgets import Static
 
-    return app.query_one("#patch_variant_scope_line", Static).visual
+    return app.query_one("#patch_scope_line", Static).visual
 
 
 def test_at075c_variant_scope_line(tmp_path: Path) -> None:
     """The scope line moves off its default when the REAL button is clicked.
 
-    Intent (AT-075c, LLR-075.3, C-10(a)): today the execution scope is legible
-    ONLY from ``#patch_execute_scope_button``'s own label — the analyst cannot
-    see what a run would target without decoding a button. This drives the REAL
-    button to a NON-DEFAULT value and asserts the observed line CHANGED
-    (``active variant`` -> ``all variants``). Asserting only the default would
-    pass against a line hard-wired to the default.
+    Intent (AT-075c, LLR-075.3, C-10(a), batch-94 form): the execution scope
+    is legible from ``#patch_scope_line`` — the surviving half of the retired
+    variant/scope line (HLR-006). This drives the REAL scope button to a
+    NON-DEFAULT value and asserts the observed line CHANGED (``active
+    variant`` -> ``all variants``). Asserting only the default would pass
+    against a line hard-wired to the default. The line must also name the
+    SCOPE only: a re-appearing ``Variant`` segment is the retirement
+    regression this now guards.
     """
 
     async def _drive() -> dict[str, str]:
@@ -496,17 +518,15 @@ def test_at075c_variant_scope_line(tmp_path: Path) -> None:
 
     outcomes = asyncio.run(_drive())
 
-    assert "Variant" in outcomes["before"] and "Scope" in outcomes["before"], (
-        f"the line must read 'Variant <id> · Scope <label>'; got "
-        f"{outcomes['before']!r}"
+    assert "Scope" in outcomes["before"], (
+        f"the line must read 'Scope <label>'; got {outcomes['before']!r}"
+    )
+    assert "Variant" not in outcomes["before"], (
+        "batch-94 (HLR-006): the retired variant segment must NOT render on "
+        f"the surviving line; got {outcomes['before']!r}"
     )
     assert "active variant" in outcomes["before"], (
         f"the default scope label must render; got {outcomes['before']!r}"
-    )
-    # The no-variant boundary: a neutral placeholder, never a crash.
-    assert "Variant -" in outcomes["before"], (
-        "with no project loaded the line must show the neutral variant "
-        f"placeholder; got {outcomes['before']!r}"
     )
     # C-10(a) — the observed value MOVED off its default.
     assert "all variants" in outcomes["after"], (
@@ -520,18 +540,28 @@ def test_at075c_variant_scope_line(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# AT-075d ★★ — GATE-BLOCKING C-17: the variant/scope line (LLR-075.4)
+# AT-075d ★★ — GATE-BLOCKING C-17: the surviving scope line (LLR-075.4)
 # ===========================================================================
 
 
 @pytest.mark.parametrize("payload", MD1_PAYLOADS)
-def test_at075d_c17_variant(tmp_path: Path, payload: str) -> None:
-    """A hostile project-derived variant id renders literally on the line.
+def test_at075d_c17_variant(
+    tmp_path: Path, payload: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A hostile payload renders literally on the surviving scope line.
 
-    Intent (AT-075d ★★, LLR-075.4): the variant id reaching ``set_variants``
-    is PROJECT-FILE-DERIVED, so the NEW variant/scope line is a new sink for
-    untrusted text. Each MD-1 payload must appear VERBATIM in the line's
-    ``Text.plain``, contribute no ``link`` span, and raise NO ``MarkupError``.
+    Intent (AT-075d ★★, LLR-075.4, batch-94 form): the variant id that used
+    to reach this line through ``set_variants`` was PROJECT-FILE-DERIVED; the
+    dropdown and ``set_variants`` retired with HLR-006, and the surviving
+    ``#patch_scope_line`` is fed by the panel's own closed vocabulary
+    (``_SCOPE_LABELS``) — no file-derived text can reach it anymore. The
+    sink-construction guard survives the retirement: injecting each MD-1
+    payload INTO that vocabulary (the ``monkeypatch`` rides the class dict and
+    is restored after the test) and re-rendering through the REAL
+    ``_refresh_scope_line`` path must still render the payload VERBATIM in the
+    line's ``Text.plain``, contribute no ``link`` span, and raise NO
+    ``MarkupError``. A future re-wiring of file-derived text onto this line is
+    the regression this catches.
 
     NOT "no span": ``label_value`` legitimately applies its own LABEL/CYAN
     spans, so a blanket ``spans == []`` here would assert a falsehood. The
@@ -540,7 +570,7 @@ def test_at075d_c17_variant(tmp_path: Path, payload: str) -> None:
     link filter catches the one span class that injects without consuming.
 
     The counterfactual is an f-string into markup
-    (``f"Variant {variant_id}"`` handed to a markup-enabled ``Static``):
+    (``f"Scope: {label}"`` handed to a markup-enabled ``Static``):
     ``[red]PWNED[/red]`` would inject a span and ``[/nope]`` would crash.
     """
 
@@ -551,44 +581,56 @@ def test_at075d_c17_variant(tmp_path: Path, payload: str) -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            # The real ingress: app.py is the only populator of the dropdown,
-            # and it hands the project's variant ids straight through.
-            panel.set_variants([(payload, payload), ("other", "other")], payload)
+            # The hostile "label" rides the line's own closed vocabulary —
+            # the only ingress the retired line has left (the real one is
+            # author constants; a regression that re-wires file-derived text
+            # here meets exactly this payload).
+            monkeypatch.setitem(
+                PatchEditorPanel._SCOPE_LABELS, "active", payload
+            )
+            panel._refresh_scope_line()
             await pilot.pause()
             return _scope_line(app)
 
     line = asyncio.run(_drive())
 
     assert isinstance(line, Content), (
-        f"the variant/scope line must visualise to a textual Content, not a "
+        f"the scope line must visualise to a textual Content, not a "
         f"{type(line).__name__}"
     )
     assert payload in line.plain, (
-        f"the hostile variant id {payload!r} must render VERBATIM on the "
-        f"line; got {line.plain!r}"
+        f"the hostile payload {payload!r} must render VERBATIM on the "
+        f"surviving line; got {line.plain!r}"
     )
     injected = [
         span for span in line.spans if "link" in str(span.style)
     ]
     assert injected == [], (
-        f"variant id {payload!r} injected link span(s) {injected!r} — project "
-        "file data must never inject a link"
+        f"payload {payload!r} injected link span(s) {injected!r} — the line "
+        "must never inject a link from its rendered text"
     )
 
 
 # ===========================================================================
 # AT-075f ★★ — GATE-BLOCKING C-17: the Select OPTION LABEL, all three sites
-# (Inc-1b — closes F4: AT-075d guarded this sink only by ACCIDENT)
+# (Inc-1b — closes F4: a crash-only guard passes while span injection ships)
 # ===========================================================================
 #
 # WHY THIS AT EXISTS (F4, the security review's MEDIUM finding). AT-075d reads
-# only `#patch_variant_scope_line` — it never observes the Select's own label.
-# It catches the Select sink ONLY through the crash path: `[/nope]` and
-# `[link=…]` raise `MarkupError` out of `set_variants`, so the test errors out.
-# But `[red]PWNED[/red]` does NOT raise — on a `str` label it silently mangles
-# `plain` to 'PWNED' and injects `Span(0,5,'red')`, and AT-075d STILL PASSES.
-# A regression to `str` labels would therefore ship the span-injection class
-# undetected. This AT asserts the `SelectCurrent` `#label` VISUAL directly.
+# the scope line only — it never observes a Select's own label. A `str` label
+# on a markup-enabled `SelectCurrent` silently mangles
+# `[red]PWNED[/red]` to plain 'PWNED' with an injected span while NO crash
+# fires anywhere — a regression to `str` labels would ship the
+# span-injection class undetected by any crash-path clause. This AT asserts
+# the `SelectCurrent` `#label` VISUAL directly.
+#
+# batch-94 (HLR-006): the third site this AT once guarded
+# (`#patch_variant_select`) RETIRED with the panel variant group; its arm
+# re-points at the surviving change-file dropdown's OPTION CENSUS
+# (`#patch_doc_file_select`) — `set_change_files` wraps every label in
+# `safe_text`, so the stored option label is a literal `Text`. The census arm
+# below is the peer of AT-075d's line arm: it reads the labels the dropdown
+# will paint, not the strings the test passed in.
 #
 # TWO MARKUP ENGINES ARE IN PLAY — do not conflate them:
 #   * `rich.text.Text.from_markup`   — the DataTable cell path (AT-075e).
@@ -644,26 +686,67 @@ def _assert_label_literal(line: Content, payload: str, site: str) -> None:
 
 
 @pytest.mark.parametrize("payload", MD1_PAYLOADS)
-def test_at075f_c17_patch_variant_select_label(tmp_path: Path, payload: str) -> None:
-    """``#patch_variant_select``: a hostile variant id renders literally.
+def test_at075f_c17_patch_variant_select_label(
+    tmp_path: Path, payload: str
+) -> None:
+    """``#patch_variant_select``'s arm, re-pointed: the change-file OPTION
+    CENSUS renders a hostile filename literally.
 
-    Intent: ``app.py:3744`` maps each project ``variant.variant_id`` to BOTH
-    the option label and its value. The label is the sink. Ingress is the REAL
-    populator, ``PatchEditorPanel.set_variants``.
+    Intent (batch-94, HLR-006): the variant dropdown and ``set_variants``
+    retired, so the label-sink this arm once guarded is gone. The surviving
+    panel ``Select`` — ``#patch_doc_file_select`` — has the SAME exposure
+    class (its labels are filenames read off disk, handed to the dropdown by
+    ``set_change_files``), and its option labels are the payload's new home:
+    every stored option label must be a literal ``Text`` whose plain is the
+    payload's non-control projection (``safe_text`` scrub — LLR-116.7) with
+    ZERO spans — the clause a crash-only guard cannot see. The displayed
+    label arm (the hostile option SELECTED, read through the real
+    ``SelectCurrent`` render path) rides along via the shared helper; the
+    populator is the real one, ``panel.set_change_files``.
     """
 
-    async def _drive() -> Content:
+    async def _drive() -> tuple[Content, list[Text]]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            panel.set_variants([(payload, payload), ("other", "other")], payload)
+            panel.set_change_files([payload, "other.json"])
             await pilot.pause()
-            return _select_label_visual(app, "#patch_variant_select")
+            select = app.query_one("#patch_doc_file_select", Select)
+            # The stored OPTION labels — the census the dropdown will paint
+            # for EVERY option, not only the displayed one. The blank
+            # sentinel option (allow_blank) carries an empty str label and
+            # is not part of the census (the Select.NULL idiom).
+            option_labels = [
+                label
+                for label, value in select._options
+                if value is not Select.NULL
+            ]
+            # Select the hostile option so its label becomes the displayed one.
+            select.value = payload
+            await pilot.pause()
+            return _select_label_visual(app, "#patch_doc_file_select"), option_labels
 
-    _assert_label_literal(asyncio.run(_drive()), payload, "#patch_variant_select")
+    line, option_labels = asyncio.run(_drive())
+    _assert_label_literal(line, payload, "#patch_doc_file_select")
+    # The census clauses (the arm the displayed-label half cannot see):
+    assert option_labels, "the dropdown must carry the hostile option at all"
+    hostile = option_labels[0]
+    assert isinstance(hostile, Text), (
+        f"the stored option label is a {type(hostile).__name__}, not a "
+        "rich.text.Text — a str label IS the live Content.from_markup sink"
+    )
+    assert hostile.plain == _scrub(payload), (
+        f"the hostile filename {payload!r} must render VERBATIM "
+        f"(non-control) in the option label; got {hostile.plain!r}"
+    )
+    assert list(hostile.spans) == [], (
+        f"the option label {payload!r} produced span(s) {list(hostile.spans)!r}"
+        " — a literal safe_text label carries NO spans; any span here is "
+        "markup the file-derived text itself named"
+    )
 
 
 @pytest.mark.parametrize("payload", MD1_PAYLOADS)

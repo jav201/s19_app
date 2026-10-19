@@ -8,6 +8,14 @@ mirrors ``variant_execution_service._execute_one_variant``'s discipline —
 collect-don't-abort, per-block isolation, ``len(block_results) ==
 len(flow.blocks)`` — but over an EXPLICIT block list.
 
+batch-94 Inc-003 (US-007, fx_a) adds the CHAIN-SET orchestration layer at the
+bottom of this module: :func:`run_chain_set` wraps ``run_flow`` per chain
+(never re-implementing block semantics) — per-chain input rebinding by a
+per-run copy of the template's blocks (LLR-018), sequential-default /
+parallel-per-chain dispatch with per-lane failure isolation (LLR-019, A5),
+and the chain-set report with one provenance line per consumed input
+(LLR-020.2, the C-42 paste pinned by TC-B94-30).
+
 Security (batch-44 pre-code security review):
 
 - **F1** — the reused readers apply NO path containment, so EVERY file ref
@@ -25,10 +33,14 @@ No Textual import (service-layer contract C-7).
 
 from __future__ import annotations
 
-from dataclasses import replace
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field, replace
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
+from ...compare import ComparisonResult, ImageRef, diff_mem_maps
 from ...core import S19File
 from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
@@ -40,7 +52,13 @@ from ..changes import (
 from ..changes.check import run_check_document
 from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
+from .compare_service import SOURCE_EXTERNAL
+from .diff_report_service import generate_diff_report
+from .markdown_safety import md_code, md_safe
 from .flow_model import (
+    A2BBlock,
+    A2B_INPUT_FILE,
+    A2B_INPUT_FLOW,
     BLOCK_STATUS_ERROR,
     BLOCK_STATUS_NOTICES,
     BLOCK_STATUS_OK,
@@ -57,6 +75,7 @@ from .flow_model import (
     CrcBlock,
     Finding,
     Flow,
+    FlowBlock,
     FlowChangeRecord,
     FlowContext,
     FlowRefusal,
@@ -72,7 +91,16 @@ from .flow_fused_report_service import (
     build_fused_report_state,
     write_fused_flow_report,
 )
-from .flow_report_service import FlowReportState, write_flow_report
+from .flow_report_service import (
+    REPORT_BODY_TIMESTAMP_FORMAT,
+    FlowReportState,
+    write_flow_report,
+)
+from .report_service import (
+    REPORTS_DIR_NAME,
+    REPORT_TIMESTAMP_FORMAT,
+    document_bytes,
+)
 from .load_service import build_loaded_hex, build_loaded_s19
 from .variant_execution_service import (
     MANIFEST_PATH_ESCAPE,
@@ -128,14 +156,21 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
         - REPORT → ``write_flow_report`` composes from ``FlowReportState``
           (batch-95 inc-004b carries the retained change records — the
           change-attribution section, LLR-143.1).
+        - A2B (batch-94 Inc-002, LLR-013.3/014.2) → each input resolved
+          independently (file binding: F1 guard + headless loaders; flow
+          binding: per-block image snapshots) → ``diff_mem_maps`` →
+          ``generate_diff_report`` under ``reports/``. A sink: the threaded
+          image passes through unchanged; a failed report records an error
+          without aborting (the REPORT-block idiom).
 
     Dependencies:
         Uses:
             - _resolve_manifest_entry (F1 containment)
             - build_loaded_s19 / build_loaded_hex / enrich_tags_and_render
             - read_change_document / apply_change_document / save_patched_image
+            - diff_mem_maps / generate_diff_report (A2B arm, reuse-not-fork)
         Used by:
-            - s19_app.tui.screens_directionb.FlowBuilderPanel (rail-8 Run)
+            - s19_app.tui.flow_screens.FlowBuilderPanel (rail-8 Run)
     """
     result = FlowRunResult(status=FLOW_STATUS_OK)
     mem_map: Optional[dict] = None
@@ -155,6 +190,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # "resolved against" attribution. Never the implicit ctx.a2l_data.
     source_a2l_ref: Optional[str] = None
     aborted = False
+    # batch-94 Inc-002 (LLR-014): per-block image snapshots, consumed by
+    # downstream A2B flow bindings (`#k` references an upstream block's
+    # output). Captured only when the flow actually carries an A2B block, so
+    # the tracer chains pay nothing. A shallow dict copy per boundary is
+    # enough: PATCH mutates in place (the copy freezes the boundary), CRC
+    # reassigns to a fresh map (inject_crcs builds a working copy).
+    snapshots: Optional[Dict[int, Tuple[dict, List[Tuple[int, int]]]]] = (
+        {} if any(isinstance(b, A2BBlock) for b in flow.blocks) else None
+    )
 
     for index, block in enumerate(flow.blocks):
         kind = getattr(block, "kind", "?")
@@ -543,6 +587,146 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         BlockResult(index, kind, BLOCK_STATUS_OK, summary)
                     )
 
+            elif isinstance(block, A2BBlock):
+                # batch-94 Inc-002 (LLR-013.3/014.2): run the A2B diff through
+                # the EXISTING diff-report service — the app computes no report
+                # content. Each input resolves independently: a file binding
+                # through the F1 containment guard + the headless loaders; a
+                # flow binding through the per-block snapshots. Wiring
+                # validation (≥1 from this flow, no both-external pair) ran at
+                # build/load time, so a refused binding never reaches this arm;
+                # an upstream block that failed still leaves NO snapshot and
+                # fails this block closed with a named diagnostic (error arm,
+                # LLR-014.2 — and the generic upstream skip keeps the rest
+                # `skipped`). The block is a SINK: the threaded image passes
+                # through unchanged, so a failed report records an error but
+                # does NOT abort the chain (the REPORT-block idiom).
+                sides: List[Tuple[dict, str, str, str, int]] = []
+                side_failed = False
+                for side, binding in (
+                    ("A", block.image_a),
+                    ("B", block.image_b),
+                ):
+                    if binding.source == A2B_INPUT_FILE:
+                        issues = []
+                        path = _resolve_manifest_entry(
+                            ctx.project_dir, binding.ref,
+                            f"A2BBlock.image_{side.lower()}", issues,
+                        )
+                        if path is None or not path.exists():
+                            aborted = _record_error(
+                                result, index, kind, "input unresolved",
+                                issues,
+                                f"A2B image {side} file not found or not "
+                                "inside the project",
+                            )
+                            side_failed = True
+                            break
+                        try:
+                            if path.suffix.lower() in (".hex", ".ihex"):
+                                loaded_side = build_loaded_hex(
+                                    path, IntelHexFile(str(path)), None,
+                                    ctx.a2l_data,
+                                )
+                            else:
+                                loaded_side = build_loaded_s19(
+                                    path, S19File(str(path)), None,
+                                    ctx.a2l_data,
+                                )
+                        except Exception as exc:  # noqa: BLE001 - per-input arm
+                            aborted = _record_error(
+                                result, index, kind, "input unreadable", [],
+                                f"A2B image {side}: "
+                                f"{type(exc).__name__}: {exc}",
+                            )
+                            side_failed = True
+                            break
+                        # HLR-016: the report identity is file-derived — the
+                        # bare label rides the escaper (Mode A) and the path
+                        # rides the code-span form (Mode B, the truth table).
+                        # Both are IDENTITY on clean values, so the external
+                        # arm keeps the producer's established emitted form
+                        # (C-42 paste, TC-B94-24); flow-arm values are
+                        # model-derived vocabulary and need no scrub.
+                        sides.append(
+                            (
+                                loaded_side.mem_map or {},
+                                md_safe(path.stem, limit=120),
+                                SOURCE_EXTERNAL,
+                                md_code(str(path)),
+                                len(getattr(loaded_side, "errors", None) or []),
+                            )
+                        )
+                    else:
+                        ref = binding.ref.strip()
+                        snap = snapshots.get(int(ref)) if ref.isdigit() else None
+                        if snap is None:
+                            aborted = _record_error(
+                                result, index, kind,
+                                "flow output unavailable", [],
+                                f"A2B image {side}: flow block "
+                                f"{int(ref) + 1 if ref.isdigit() else ref} "
+                                "produced no image (failed or skipped upstream)",
+                            )
+                            side_failed = True
+                            break
+                        producer = flow.blocks[int(ref)]
+                        name = f"block {int(ref) + 1} ({producer.kind}).out"
+                        sides.append(
+                            (
+                                snap[0],
+                                f"{producer.kind}.out",
+                                A2B_INPUT_FLOW,
+                                name,
+                                0,
+                            )
+                        )
+                if side_failed:
+                    continue
+                mem_map_a, label_a, src_a, path_a, err_a = sides[0]
+                mem_map_b, label_b, src_b, path_b, err_b = sides[1]
+                runs, stats = diff_mem_maps(mem_map_a, mem_map_b)
+                comparison = ComparisonResult(
+                    image_a=ImageRef(
+                        label=label_a, path=path_a, source_kind=src_a,
+                        variant_id=None, parse_error_count=err_a,
+                    ),
+                    image_b=ImageRef(
+                        label=label_b, path=path_b, source_kind=src_b,
+                        variant_id=None, parse_error_count=err_b,
+                    ),
+                    runs=runs,
+                    stats=stats,
+                )
+                try:
+                    # Fixed stem (never flow.name — operator text): the report
+                    # filename stays inside the producer's M-5 scheme.
+                    report = generate_diff_report(
+                        comparison,
+                        mem_map_a=mem_map_a,
+                        mem_map_b=mem_map_b,
+                        project_dir=ctx.project_dir,
+                        filename_stem="flow-a2b",
+                    )
+                except Exception as exc:  # noqa: BLE001 - degrade, never abort
+                    result.block_results.append(
+                        BlockResult(index, kind, BLOCK_STATUS_ERROR,
+                                    "report write failed",
+                                    [f"{type(exc).__name__}: {exc}"])
+                    )
+                else:
+                    if not report.written:
+                        result.block_results.append(
+                            BlockResult(index, kind, BLOCK_STATUS_ERROR,
+                                        "report write failed",
+                                        list(report.diagnostics))
+                        )
+                    else:
+                        result.block_results.append(
+                            BlockResult(index, kind, BLOCK_STATUS_OK,
+                                        f"wrote reports/{report.path.name}")
+                        )
+
             elif isinstance(block, ReportBlock) and ctx.defer_report:
                 # batch-70 FB-P2 (D-4): under a fused run the report is written
                 # ONCE, by run_flow_over_variants, with a section per variant.
@@ -605,6 +789,16 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 aborted = _record_error(
                     result, index, kind, "unknown block", [],
                     f"unknown block kind {kind!r}",
+                )
+            # batch-94 Inc-002: freeze the threaded image at this boundary for
+            # downstream A2B flow bindings (only when the flow carries an A2B
+            # block, so tracer chains pay nothing). Only a branch that ran
+            # clean reaches here — every abort path above `continue`d — so the
+            # snapshot always names a successfully produced image.
+            if snapshots is not None and mem_map is not None:
+                snapshots[index] = (
+                    dict(mem_map),
+                    [(int(s), int(e)) for s, e in ranges] if ranges else [],
                 )
         except Exception as exc:  # noqa: BLE001 - per-block isolation (F5)
             result.block_results.append(
@@ -926,3 +1120,412 @@ def _record_error(
         BlockResult(index, kind, BLOCK_STATUS_ERROR, summary, diagnostics)
     )
     return True
+
+
+# ---------------------------------------------------------------------------
+# batch-94 Inc-003 — the chain-set runner (fx_a, US-007; HLR-017…021).
+#
+# The UNION :func:`run_flow` above keeps owning BLOCK semantics; this layer
+# only ORCHESTRATES it per chain: substitute each chain's bound input refs
+# into a copy of the template's blocks (LLR-018.2 — the template itself is
+# never mutated), dispatch sequential-by-default or parallel-per-chain
+# (LLR-019), and emit the chain-set report with one provenance line per
+# consumed input (LLR-020.2, the C-42 paste lives in TC-B94-30).
+# ---------------------------------------------------------------------------
+
+#: Run-mode tokens (LLR-019.1/.2). The operator control defaults to
+#: ``sequential``; ``parallel`` rides the same per-chain isolation boundary.
+CHAIN_RUN_SEQUENTIAL = "sequential"
+CHAIN_RUN_PARALLEL = "parallel"
+CHAIN_RUN_MODES = (CHAIN_RUN_SEQUENTIAL, CHAIN_RUN_PARALLEL)
+
+#: The chain-set report filename stem (M-5 idiom: ``<ts>-chain-set-report.md``).
+CHAIN_SET_REPORT_STEM = "chain-set-report"
+
+#: Status → ledger glyph (enum-derived, never file-derived).
+_CHAIN_STATUS_GLYPH = {
+    FLOW_STATUS_OK: "✓",
+    FLOW_STATUS_ISSUES: "◈",
+    FLOW_STATUS_ERROR: "✗",
+}
+
+
+@dataclass(frozen=True)
+class ChainSpec:
+    """One chain of the set: a loaded template + its bound input overrides.
+
+    Args:
+        name (str): The lane name (unique inside the set — the panel
+            uniquifies duplicate template imports with the ``_<N>`` idiom).
+        template (str): The ``flows/<stem>.json`` template reference (the
+            saved-template identity, LLR-021.1's one-template-ref-per-chain).
+        flow (Flow): The loaded template (owned copy — the runner substitutes
+            bindings into a per-run copy, never mutating this object).
+        bindings (Dict[int, str]): SOURCE block index → project-relative file
+            ref override for THIS run (LLR-018.1 — per-chain independent
+            state). An empty mapping runs the template's own refs.
+    """
+
+    name: str
+    template: str
+    flow: Flow
+    bindings: Dict[int, str] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
+class ChainRunOutcome:
+    """One chain's isolated run outcome inside the set.
+
+    ``len(block_results) == len(flow.blocks)`` holds per chain (the union
+    run_flow's contract), so a failed chain still records its ``skipped``
+    tail — the fx_a log's "later blocks read skipped" arm (LLR-020.1).
+
+    Args:
+        chain (str): The lane name (file-derived on render — markup-safe).
+        template (str): The template stem the chain was imported from.
+        status (str): The chain's own terminal status (``ok`` /
+            ``completed-with-issues`` / ``error``).
+        block_results (List[BlockResult]): Per-block outcomes in chain order.
+        written_paths (List[Path]): The chain's regenerated outputs.
+        inputs (List[Tuple[str, str]]): Per-run input provenance — one
+            ``(bound ref, resolved absolute path)`` per consumed input, in
+            SOURCE-block order (LLR-020.2; the resolved half is ``""`` when
+            the ref failed containment — the chain records why it failed).
+        started_at (float): Monotonic clock reading at chain start.
+        finished_at (float): Monotonic clock reading at chain end. The
+            (started_at, finished_at) pair is the elapsed-window oracle the
+            sequential/parallel arms assert on (LLR-019).
+        diagnostics (List[str]): Whole-chain notes.
+    """
+
+    chain: str
+    template: str
+    status: str
+    block_results: List[BlockResult] = field(default_factory=list)
+    written_paths: List[Path] = field(default_factory=list)
+    inputs: List[Tuple[str, str]] = field(default_factory=list)
+    started_at: float = 0.0
+    finished_at: float = 0.0
+    diagnostics: List[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class ChainSetRunRecord:
+    """The whole-set run record — the fx_a run-log's data source.
+
+    Args:
+        mode (str): The dispatched mode — ``sequential`` (default) or
+            ``parallel`` (LLR-019.2's captured-value assertion arm: the field
+            MUST differ between the untouched default arm and the driven
+            non-default arm, C-10).
+        outcomes (List[ChainRunOutcome]): One per chain, in lane order —
+            a chain that failed never drops its sibling (A5 / LLR-019.2's
+            error arm), and the order never depends on which thread finished
+            first (parallel collects futures in submission order).
+        report_path (Optional[Path]): The emitted chain-set report
+            (LLR-020.2), or ``None`` when nothing ran or the write degraded.
+        diagnostics (List[str]): Whole-set notes.
+    """
+
+    mode: str
+    outcomes: List[ChainRunOutcome] = field(default_factory=list)
+    report_path: Optional[Path] = None
+    diagnostics: List[str] = field(default_factory=list)
+
+
+def _chain_blocks_with_bindings(
+    flow: Flow, bindings: Dict[int, str]
+) -> List[FlowBlock]:
+    """Return the template's blocks with bound SOURCE refs substituted.
+
+    LLR-018.2: the run consumes each chain's OWN bindings — a per-run copy is
+    built (``SourceBlock`` is frozen — ``dataclasses.replace``) so the loaded
+    template object and the ``flows/*.json`` file are never mutated (D-2's
+    unscoped-run precedent: the binding lives on the run, not the blocks).
+    A binding whose index is not a SOURCE block is ignored (trusted-side UI
+    state only ever binds SOURCE inputs).
+    """
+    blocks = list(flow.blocks)
+    for index, ref in bindings.items():
+        if 0 <= index < len(blocks) and isinstance(blocks[index], SourceBlock):
+            blocks[index] = replace(blocks[index], image_ref=ref)
+    return blocks
+
+
+def _chain_inputs(
+    ctx: FlowContext, blocks: Sequence[FlowBlock]
+) -> List[Tuple[str, str]]:
+    """Per-run input provenance for one chain — (bound ref, resolved path).
+
+    Every consumed input (each SOURCE block, in block order) resolves through
+    the SAME reused containment guard the run itself uses, so the report's
+    provenance half can never name a file the run was not allowed to read. A
+    ref the guard rejects records ``""`` — the run's own block result carries
+    the containment finding (the chain fails closed, LLR-018.2's invalid arm).
+    """
+    inputs: List[Tuple[str, str]] = []
+    for block in blocks:
+        if not isinstance(block, SourceBlock):
+            continue
+        issues: List[ValidationIssue] = []
+        resolved = _resolve_manifest_entry(
+            ctx.project_dir, block.image_ref, "ChainSpec.input", issues
+        )
+        inputs.append((block.image_ref, str(resolved) if resolved else ""))
+    return inputs
+
+
+def run_chain_set(
+    chains: Sequence[ChainSpec],
+    ctx: FlowContext,
+    mode: str = CHAIN_RUN_SEQUENTIAL,
+    *,
+    set_name: str = "chain-set",
+    run_one: Optional[Callable[[Flow, FlowContext], FlowRunResult]] = None,
+    clock: Optional[Callable[[], float]] = None,
+) -> ChainSetRunRecord:
+    """Run a chain set — sequential by default, parallel-per-chain on demand.
+
+    Summary:
+        The fx_a orchestration layer (HLR-017…021): for each chain, substitute
+        its bound input refs into a per-run copy of the template and execute
+        the UNION :func:`run_flow` — block semantics are never re-implemented
+        here. Sequential mode (the default, LLR-019.1) runs lane order;
+        parallel mode (LLR-019.2) submits every chain to a thread pool before
+        waiting on any, with per-chain isolation — a failing chain records its
+        own outcome and 0 siblings halt (the A5 assumption: each chain threads
+        its own ``(mem_map, ranges)`` pair, exactly as the sequential executor
+        does). After the last chain, the chain-set report (one provenance line
+        per consumed input, LLR-020.2) is written under ``reports/``; a
+        failed write is RECORDED, never raised (the fused-report idiom).
+
+    Args:
+        chains (Sequence[ChainSpec]): The lanes to run, in lane order.
+        ctx (FlowContext): The project directory + optional MAC/A2L context.
+        mode (str): ``CHAIN_RUN_SEQUENTIAL`` (default) or ``CHAIN_RUN_PARALLEL``.
+        set_name (str): The set's display name for the report header
+            (operator text — rendered through ``md_safe`` at emission).
+        run_one (Optional[Callable]): The per-chain executor; defaults to
+            :func:`run_flow`. The AC seam — it makes the EXECUTION itself
+            directly observable (mirrors ``run_flow_over_variants.run_one``).
+        clock (Optional[Callable[[], float]]): The monotonic clock; defaults
+            to :func:`time.perf_counter`. The elapsed-window seam.
+
+    Returns:
+        ChainSetRunResult: One :class:`ChainRunOutcome` per chain in lane
+        order, the captured mode, the report path, and whole-set notes.
+
+    Raises:
+        ValueError: When ``mode`` is not one of ``CHAIN_RUN_MODES``
+            (trusted-side caller — the panel's select only offers the two).
+
+    Data Flow:
+        - ``chains`` → per-chain bound copy → ``run_flow`` → outcomes.
+        - outcomes → :func:`compose_chain_set_report` → ``reports/<ts>-chain-set-report.md``.
+
+    Dependencies:
+        Uses:
+            - run_flow (block semantics, reuse-not-fork)
+            - _resolve_manifest_entry (the provenance seam, reused guard)
+            - compose_chain_set_report / write_chain_set_report
+        Used by:
+            - s19_app.tui.app.on_flow_execution_panel_run_requested
+    """
+    if mode not in CHAIN_RUN_MODES:
+        raise ValueError(f"unknown chain-run mode {mode!r}")
+    execute = run_one if run_one is not None else run_flow
+    tick = clock if clock is not None else time.perf_counter
+    record = ChainSetRunRecord(mode=mode)
+    if not chains:
+        record.diagnostics.append("no chains in set - nothing was executed")
+        return record
+
+    def _run_one(spec: ChainSpec) -> ChainRunOutcome:
+        started = tick()
+        blocks = _chain_blocks_with_bindings(spec.flow, spec.bindings)
+        inputs = _chain_inputs(ctx, blocks)
+        bound_flow = Flow(
+            name=spec.flow.name,
+            blocks=blocks,
+            schema_version=spec.flow.schema_version,
+        )
+        try:
+            result = execute(bound_flow, ctx)
+        except Exception as exc:  # noqa: BLE001 - per-chain isolation (A5)
+            # run_flow is itself non-raising, so reaching here means an
+            # injected executor or a future regression broke that contract.
+            # Isolating it is the point: the remaining chains still run.
+            result = FlowRunResult(
+                status=FLOW_STATUS_ERROR,
+                diagnostics=[f"{type(exc).__name__}: {exc}"],
+            )
+        finished = tick()
+        return ChainRunOutcome(
+            chain=spec.name,
+            template=spec.template,
+            status=result.status,
+            block_results=list(result.block_results),
+            written_paths=list(result.written_paths),
+            inputs=inputs,
+            started_at=started,
+            finished_at=finished,
+            diagnostics=list(result.diagnostics),
+        )
+
+    if mode == CHAIN_RUN_PARALLEL:
+        with ThreadPoolExecutor(max_workers=len(chains), thread_name_prefix="fx-chain") as pool:
+            record.outcomes.extend(pool.map(_run_one, chains))
+    else:
+        for spec in chains:
+            record.outcomes.append(_run_one(spec))
+
+    try:
+        record.report_path = write_chain_set_report(record, set_name, ctx.project_dir)
+    except Exception as exc:  # noqa: BLE001 - degrade, never lose the run
+        # Mirrors the fused-report idiom: a failed write is RECORDED, not
+        # swallowed, and never costs the operator the run's results.
+        record.diagnostics.append(
+            f"chain-set report write failed: {type(exc).__name__}: {exc}"
+        )
+    return record
+
+
+def compose_chain_set_report(
+    record: ChainSetRunRecord,
+    set_name: str,
+    generated_at: datetime,
+) -> str:
+    """Compose the chain-set report — pure and deterministic (LLR-020.2).
+
+    Summary:
+        Emit, in order: a header block (set name, generated timestamp, the
+        captured MODE — LLR-019.2's persisted arm — and chain count), the
+        **Chain ledger** table (one row per chain with its terminal status
+        and elapsed window), and the **Input provenance** section — exactly
+        ONE line per consumed chain input, ``- Chain <name> input <j>: <ref>
+        [bound] path=<code-span>``, the C-42 emitted form TC-B94-30 pins.
+        Every file-derived field passes :func:`md_safe` / :func:`md_code`
+        (the chain name, template stem, bound ref); every glyph, label and
+        number is enum/int-derived.
+
+    Args:
+        record (ChainSetRunResult): The completed set run.
+        set_name (str): The set's display name (operator text).
+        generated_at (datetime): The generation instant (injected — the same
+            record and instant always produce byte-identical output).
+
+    Returns:
+        str: The markdown document.
+
+    Dependencies:
+        Uses:
+            - md_safe / md_code (markdown_safety — the C-17 render seam)
+        Used by:
+            - write_chain_set_report
+    """
+    lines: List[str] = [
+        f"# Chain-set report — {md_safe(set_name, limit=120)}",
+        "",
+        f"- **Generated:** {generated_at.strftime(REPORT_BODY_TIMESTAMP_FORMAT)}",
+        f"- **Mode:** {record.mode}",
+        f"- **Chains:** {len(record.outcomes)}",
+        "",
+        "## Chain ledger",
+        "",
+        "| # | Chain | Template | Status | Blocks | Elapsed |",
+        "|---|-------|----------|--------|--------|---------|",
+    ]
+    for position, outcome in enumerate(record.outcomes, start=1):
+        glyph = _CHAIN_STATUS_GLYPH.get(outcome.status, "·")
+        elapsed = outcome.finished_at - outcome.started_at
+        lines.append(
+            f"| {position} | {md_safe(outcome.chain, limit=64)} | "
+            f"{md_safe(outcome.template, limit=64)} | "
+            f"{glyph} {md_safe(outcome.status, limit=32)} | "
+            f"{len(outcome.block_results)} | {elapsed:.3f}s |"
+        )
+    lines.extend(["", "## Input provenance", ""])
+    for outcome in record.outcomes:
+        for index, (ref, resolved) in enumerate(outcome.inputs, start=1):
+            lines.append(
+                f"- Chain {md_safe(outcome.chain, limit=64)} input {index}: "
+                f"{md_safe(ref, limit=120)} [bound] "
+                f"path=`{md_code(resolved)}`"
+            )
+    if not any(outcome.inputs for outcome in record.outcomes):
+        lines.append("- (no inputs consumed)")
+    lines.extend(
+        [
+            "",
+            "---",
+            "*Generated by the s19_app Flow Execution (chain-set run).*",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def _chain_set_report_filename(dest_dir: Path, timestamp: datetime) -> str:
+    """Build the chain-set report filename — the M-5 idiom with its own stem.
+
+    ``<ts>-chain-set-report.md``, then ``<ts>-01-chain-set-report.md`` ..
+    ``<ts>-99-`` on a same-second collision (the ``_diff_report_filename``
+    pattern applied unchanged) — never a silent overwrite.
+    """
+    base = timestamp.strftime(REPORT_TIMESTAMP_FORMAT)
+    candidate = f"{base}-{CHAIN_SET_REPORT_STEM}.md"
+    if not (dest_dir / candidate).exists():
+        return candidate
+    for counter in range(1, 100):
+        candidate = f"{base}-{counter:02d}-{CHAIN_SET_REPORT_STEM}.md"
+        if not (dest_dir / candidate).exists():
+            return candidate
+    raise FileExistsError(
+        f"100 chain-set reports already exist for second {base} - refusing "
+        "to overwrite an existing report"
+    )
+
+
+def _default_chain_set_now() -> datetime:
+    """The chain-set report clock — UTC, like every report producer."""
+    return datetime.now(timezone.utc)
+
+
+def write_chain_set_report(
+    record: ChainSetRunRecord,
+    set_name: str,
+    project_dir: Path,
+    now_fn=None,
+) -> Path:
+    """Compose and write the chain-set report under ``<project>/reports/``.
+
+    Summary:
+        Create the reports directory, pick a non-colliding name via
+        :func:`_chain_set_report_filename` (the M-5 scheme), and write UTF-8
+        through :func:`document_bytes` (the BOM/encoding seam every report
+        producer shares). No file-derived string reaches the path: the
+        directory is code-derived and the filename is timestamp-derived, so a
+        hostile set NAME can only ever appear in report CONTENT (escaped).
+
+    Args:
+        record (ChainSetRunResult): The completed set run.
+        set_name (str): The set's display name.
+        project_dir (Path): The active project directory.
+        now_fn (Optional[Callable[[], datetime]]): Injectable clock; defaults
+            to :func:`_default_chain_set_now`.
+
+    Returns:
+        Path: The written report path.
+
+    Dependencies:
+        Uses:
+            - compose_chain_set_report / _chain_set_report_filename
+        Used by:
+            - run_chain_set
+    """
+    clock = now_fn if now_fn is not None else _default_chain_set_now
+    generated_at = clock()
+    reports_dir = Path(project_dir) / REPORTS_DIR_NAME
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    target = reports_dir / _chain_set_report_filename(reports_dir, generated_at)
+    target.write_bytes(document_bytes(compose_chain_set_report(record, set_name, generated_at)))
+    return target

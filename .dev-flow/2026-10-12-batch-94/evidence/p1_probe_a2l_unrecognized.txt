@@ -1,0 +1,30 @@
+fixture          : examples\case_00_public\software_a.a2l (5193091 bytes)
+tags             : 13990
+top-level sections: 1
+issues total     : 1023  by severity: {'WARNING': 1023}
+issues by code   : {'A2L_UNRECOGNIZED_BLOCK': 1023}
+A2L_UNRECOGNIZED_BLOCK count: 1023
+per-block tally  :
+    437  Unrecognized A2L block 'REF_CHARACTERISTIC'.
+    221  Unrecognized A2L block 'REF_MEASUREMENT'.
+    180  Unrecognized A2L block 'AXIS_DESCR'.
+     69  Unrecognized A2L block 'COMPU_VTAB_RANGE'.
+     69  Unrecognized A2L block 'SUB_GROUP'.
+     22  Unrecognized A2L block 'DEF_CHARACTERISTIC'.
+      6  Unrecognized A2L block 'PAGE'.
+      3  Unrecognized A2L block 'SEGMENT'.
+      3  Unrecognized A2L block 'SUB_FUNCTION'.
+      2  Unrecognized A2L block 'PROTOCOL_LAYER'.
+      1  Unrecognized A2L block 'A2ML'.
+      1  Unrecognized A2L block 'CAN_FD'.
+      1  Unrecognized A2L block 'DAQ'.
+      1  Unrecognized A2L block 'EVENT'.
+      1  Unrecognized A2L block 'FORMULA'.
+      1  Unrecognized A2L block 'MOD_COMMON'.
+      1  Unrecognized A2L block 'MOD_PAR'.
+      1  Unrecognized A2L block 'PAG'.
+      1  Unrecognized A2L block 'STIM'.
+      1  Unrecognized A2L block 'TIMESTAMP_SUPPORTED'.
+      1  Unrecognized A2L block 'XCP_ON_CAN'.
+RECOGNIZED_A2L_BLOCKS has 15 entries
+parse errors     : 0

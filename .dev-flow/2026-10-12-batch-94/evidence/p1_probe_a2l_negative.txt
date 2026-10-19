@@ -1,0 +1,3 @@
+WARNING A2L_UNRECOGNIZED_BLOCK    Unrecognized A2L block 'FROBNICATE'.
+unknown-block warnings on synthetic fixture: 1
+NEGATIVE CONTROL OK: the unknown block warns; the recognized one does not

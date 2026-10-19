@@ -676,6 +676,12 @@ _B78_DIFF_HEIGHT_ARTIFACT = "at-b78-33-diff-hex-a-height.json"
 #: (see test_at_b78_03's batch-95 note and the artifact's tail).
 _B78_ARTIFACT_DIGESTS = {
     _B78_PAYLOAD_ARTIFACT: "713be432b69cb2e0",
+    # batch-95 change 4 (LLR-135.6) amended the freeze by ONE hand-appended
+    # action ("open_split_join_export", a reviewed contract amendment — see
+    # test_at_b78_03's batch-95 note and the artifact's tail), so the digest
+    # follows the artifact bytes: a567d55d7ea155f3. batch-94's Check Editor
+    # palette addition is NOT an artifact amendment — it is pinned as a named
+    # live-only delta in test_at_b78_03, so it does not move this digest.
     _B78_PALETTE_ARTIFACT: "a567d55d7ea155f3",
     _B78_DIFF_HEIGHT_ARTIFACT: "167c7a4dd5ac5821",
 }
@@ -1243,8 +1249,8 @@ def test_at_b78_08_and_11_status_bar_names_both_on_every_screen(
         base.mkdir()
         observed = asyncio.run(_drive(size, base))
 
-        assert len(observed) == 10, (
-            f"@{size}: all 10 screens must be visited; got {len(observed)}"
+        assert len(observed) == 12, (
+            f"@{size}: all 12 screens must be visited; got {len(observed)}"
         )
         for screen, (text, height) in observed.items():
             assert "demoproj" in text, (
@@ -1388,7 +1394,7 @@ def test_tc_b79_01_a_long_project_cannot_evict_the_a2l(tmp_path: Path) -> None:
 
     for size in ((80, 24), (120, 30), (160, 40)):
         seen = asyncio.run(_drive(size))
-        assert len(seen) == 10, f"@{size}: all 10 screens; got {len(seen)}"
+        assert len(seen) == 12, f"@{size}: all 12 screens; got {len(seen)}"
         missing_project = [k for k, (p, _) in seen.items() if not p]
         missing_a2l = [k for k, (_, a) in seen.items() if not a]
         # Co-assertion (C-40): BOTH halves, in the same run. Asserting only the
@@ -1559,8 +1565,8 @@ def test_tc_b79_03_the_find_goto_map_covers_every_screen() -> None:
     The claim is worth making true rather than deleting: `LLR-119.1`'s
     acceptance criteria names exactly this set equality, and it is the guard
     that makes a screen added later FAIL here instead of silently joining the
-    notice path. It is incidentally covered today — an 11th screen breaks
-    `AT-B78-04` or `AT-B78-05`'s `len == 7` — but incidental coverage is not
+    notice path. It is incidentally covered today — a new screen
+    breaks `AT-B78-04` or `AT-B78-05`'s per-screen counts — but incidental coverage is not
     what the comment promised a reader.
     """
     assert set(S19TuiApp._FIND_GOTO_INPUTS) == set(S19TuiApp.SCREEN_CONTAINER_IDS), (
@@ -1572,8 +1578,12 @@ def test_tc_b79_03_the_find_goto_map_covers_every_screen() -> None:
     )
     # Co-assertion (C-40): both sets non-empty. Two empty sets are equal, and a
     # renamed attribute resolving to `{}` would satisfy the clause above.
-    assert len(S19TuiApp.SCREEN_CONTAINER_IDS) == 10, (
-        f"the map is quantified over 10 screens; found "
+    # batch-94: the rail carries 12 screens — the Check Editor inserted
+    # after Patch Editor on the `=` binding (LLR-002.1) and Flow Execution
+    # after Flow Builder on the `]` binding (US-007, Inc-003). The census
+    # moves WITH the landing increment (LLR-002.2's analog for this guard).
+    assert len(S19TuiApp.SCREEN_CONTAINER_IDS) == 12, (
+        f"the map is quantified over 12 screens; found "
         f"{len(S19TuiApp.SCREEN_CONTAINER_IDS)} -- if this moved, the equality "
         f"above may be comparing two things that both shrank"
     )
@@ -2159,7 +2169,9 @@ def test_at_b78_05_the_seven_non_owning_screens_notice_exactly_once(
 
     The oracle is therefore the SEQUENCE of emitted notices, captured through
     `set_status` -- the repo's established idiom (`_statuses` in
-    `tests/test_tui_patch_variant.py`) -- paired with the rendered `#log_line_4`
+    `tests/test_tui_patch_variant.py`, retained when that file became the
+    batch-94 variant-RETIREMENT observer) -- paired with the rendered
+    `#log_line_4`
     so the operator-visible deliverable is asserted too, not just the call.
     """
 
@@ -2200,11 +2212,12 @@ def test_at_b78_05_the_seven_non_owning_screens_notice_exactly_once(
 
     notice_screens, observed, raised, tail = asyncio.run(_drive())
 
-    assert len(notice_screens) == 7, (
-        f"the notice path must be 7 of 10 screens; got {len(notice_screens)}: "
-        f"{notice_screens}"
+    assert len(notice_screens) == 9, (
+        f"the notice path must be 9 of 12 screens (3 find/goto owners; batch-94 "
+        f"added the Check Editor and Flow Execution, both non-owners); got "
+        f"{len(notice_screens)}: {notice_screens}"
     )
-    assert len(observed) == 7, (
+    assert len(observed) == 9, (
         f"every non-owning screen must have been exercised; got {sorted(observed)}"
     )
     # The GATE: exactly one notice per key, on every non-owning screen.
@@ -2570,7 +2583,7 @@ def test_at_b78_01_the_row_is_absent_and_the_palette_survives(tmp_path: Path) ->
 
     per_screen, palette_is_direct_child = asyncio.run(_drive())
 
-    assert len(per_screen) == 10, f"all 10 screens; got {len(per_screen)}"
+    assert len(per_screen) == 12, f"all 12 screens; got {len(per_screen)}"
     for key, (present, slot_height) in per_screen.items():
         assert not present, (
             f"on {key!r} these deleted ids still resolve: {present}"
@@ -2618,8 +2631,8 @@ def test_at_b78_02_ctrl_k_opens_the_palette_everywhere(tmp_path: Path) -> None:
 
     opened = asyncio.run(_drive())
 
-    assert len(opened) == 10 and all(opened.values()), (
-        f"`ctrl+k` must open the palette on all 10 screens; got {opened}"
+    assert len(opened) == 12 and all(opened.values()), (
+        f"`ctrl+k` must open the palette on all 12 screens; got {opened}"
     )
 
 
@@ -2663,21 +2676,35 @@ def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
 
     observed = asyncio.run(_drive())
 
-    # batch-95 change 4 (LLR-135.6, ruling Q6/7a) amended the freeze by ONE
-    # hand-appended action — "open_split_join_export", the palette-first
-    # Split / Join / Export screen entry. The original 37 rows stay frozen
-    # (nothing was regenerated — regenerating would restore the tautology
-    # this node exists to break); the amendment is an explicit, reviewed
-    # contract change, recorded here and in the artifact's tail.
+    # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+    # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+    # "open_split_join_export", the palette-first Split / Join / Export screen
+    # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+    # reviewed amendment (a REGENERATION would restore the tautology this
+    # node exists to break). batch-94's two non-digit rail bindings are NOT
+    # in the freeze — each is pinned as a named live-only delta below
+    # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
     assert len(expected) == 38, (
         f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
         f"one batch-95 amendment; it has {len(expected)} -- if this fails "
         f"the artifact was REGENERATED, which restores the tautology"
     )
-    assert observed == list(expected), (
-        f"the palette action set must equal the Inc-0 freeze.\n"
-        f"missing: {sorted(set(expected) - set(observed))}\n"
-        f"unexpected: {sorted(set(observed) - set(expected))}"
+    live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+    for added in live_deltas:
+        assert added in observed, (
+            f"a non-digit rail binding must add exactly one palette action "
+            f"({added!r}); observed={observed!r}"
+        )
+    observed_pre_change = [
+        a for a in observed if a not in live_deltas
+    ]
+    assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+        "each live-only delta must appear exactly once (no duplicates)"
+    )
+    assert observed_pre_change == list(expected), (
+        f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+        f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+        f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
     )
 
 

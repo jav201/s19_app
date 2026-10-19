@@ -1,0 +1,1345 @@
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.......................ss............................................... [  2%]
+.....................................................................F.. [  4%]
+.............F.......................................................... [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+F....................................................................... [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+......x................................................................. [ 60%]
+.........................................F................F...........F. [ 63%]
+......F.F.F............................................................. [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+......F..........................................................F...... [ 84%]
+........................F.F.............FF.F.F.........................x [ 86%]
+...............F......................................................xx [ 88%]
+xxxxxxxxxxxxxxxxxxxxxxxxxxx............................................. [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+..................................x..................................... [ 98%]
+..............FF.......................................                  [100%]
+================================== FAILURES ===================================
+___________ test_at286_every_live_id_token_occurs_in_its_nodes_file ___________
+
+    def test_at286_every_live_id_token_occurs_in_its_nodes_file() -> None:
+        """AT-286 (a) — every LIVE id's dash token occurs in a file its nodes name."""
+        registry = load_registry(registry_path(ROOT))
+        tokens_cache: Dict[str, Set[str]] = {}
+        problems: List[str] = []
+        for entry in registry.entries:
+            if entry.status != "LIVE":
+                continue
+            named_files = sorted({ref.split("::", 1)[0] for ref in entry.nodes})
+            for rel in named_files:
+                if rel not in tokens_cache:
+                    path = ROOT / rel
+                    tokens_cache[rel] = (
+                        {t.raw for t, _ in iter_tokens(read_text(path))}
+                        if path.is_file()
+                        else set()
+                    )
+            if not any(entry.id in tokens_cache[rel] for rel in named_files):
+                problems.append(
+                    f"{entry.id} is LIVE but its dash token occurs in none of {named_files}"
+                )
+>       assert not problems, "token-invisible LIVE ids:\n  - " + "\n  - ".join(problems)
+E       AssertionError: token-invisible LIVE ids:
+E           - TC-337 is LIVE but its dash token occurs in none of ['tests/test_tui_variants.py']
+E       assert not ["TC-337 is LIVE but its dash token occurs in none of ['tests/test_tui_variants.py']"]
+
+tests\test_batch91_registry_hygiene.py:63: AssertionError
+____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_061a_persistent_contro0')
+
+    def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back reveals a persistent report control that survives an unrelated
+        action, writes the same report pair on activation, and hides on a new load.
+    
+        Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+        surface. After a successful save-back (the path that today fires only the
+        transient ``notify``), a persistent, queryable control
+        (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+        is shown. Activating it routes to the EXISTING ``action_before_after_report``
+        writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+        produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+        diff heading + the provenance header), not merely "a file was written" (C-10).
+    
+        Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+        a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+        an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+        This proxy asserts widget durability, NOT the notify wall-clock TTL.
+    
+        Activation mechanism: the control is activated through the real button-press
+        dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+        → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+        ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+        ``action_before_after_report``; the message routing is exercised end-to-end.
+    
+        Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+        is re-hidden — a stale "report ready" offer must not persist once the editing
+        context (``last_summary``) has cleared.
+    
+        Counterfactual (RED, C-20): pre-implementation there is no
+        ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+        the transient-only notify cannot satisfy this node.
+        """
+        from textual.css.query import NoMatches
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _drive_apply(app, pilot)
+    
+                # Before the save-back the persistent control must be hidden.
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_before_saveback"] = row.has_class("hidden")
+    
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["revealed_after_saveback"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Persistence proxy: an unrelated action + re-render must NOT drop
+                # the control (a notify Toast would be gone).
+                _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                button = panel.query_one("#patch_before_after_button", Button)
+                outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Activate through the real button-press dispatch (not a proxy call).
+                statuses = _statuses(app)
+                before = _report_names(reports_dir)
+                button.press()
+                await pilot.pause()
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+    
+                # Clear-on-context boundary: a new load re-hides the control.
+                (tmp_path / "changes.json").write_text(
+                    '{"version": 2, "changes": []}', encoding="utf-8"
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    tmp_path / "changes.json"
+                )
+                panel.request_action("load_doc")
+                await pilot.pause()
+                try:
+                    outcomes["hidden_after_new_load"] = panel.query_one(
+                        "#patch_before_after_row"
+                    ).has_class("hidden")
+                except NoMatches:  # pragma: no cover - row must persist as a widget
+                    outcomes["hidden_after_new_load"] = True
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["hidden_before_saveback"], (
+            "AT-061a: the report control must be hidden before any save-back"
+        )
+        assert outcomes["revealed_after_saveback"], (
+            "AT-061a: a successful save-back must reveal the persistent control"
+        )
+        assert outcomes["queryable_after_unrelated_action"], (
+            "AT-061a: the control must survive an unrelated action (persistence "
+            "proxy) — a transient notify would be gone"
+        )
+    
+        new_files = outcomes["new_files"]
+        md_new = [n for n in new_files if n.endswith(".md")]
+        html_new = [n for n in new_files if n.endswith(".html")]
+>       assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+            f"AT-061a: activating the control must write one md + one html pair, "
+            f"got {new_files}; statuses: {outcomes['statuses']}"
+        )
+E       AssertionError: AT-061a: activating the control must write one md + one html pair, got []; statuses: []
+E       assert (0 == 2)
+E        +  where 0 = len([])
+
+tests\test_before_after_report.py:1193: AssertionError
+_____________________ test_tc653_safe_text_import_census ______________________
+
+    def test_tc653_safe_text_import_census() -> None:
+        """TC-653 — live-tree AST census over the safe_text move (LLR-003.1/003.3)."""
+        # LLR-003.1: exactly one definition site per symbol in the product tree,
+        # and it is s19_app/utils.py.
+        def_sites: dict = {}
+        scrub_sites: dict = {}
+        for path in sorted(PRODUCT_ROOT.rglob("*.py")):
+            if "__pycache__" in path.parts:
+                continue
+            module = _product_module_of(path)
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            for node in ast.walk(tree):
+                if (
+                    isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    and node.name == "safe_text"
+                ):
+                    def_sites.setdefault(module, []).append(node.lineno)
+                if isinstance(node, ast.Assign):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id == "_CONTROL_SCRUB":
+                            scrub_sites.setdefault(module, []).append(node.lineno)
+        assert sorted(def_sites) == [UTILS_MODULE], (
+            f"safe_text must be defined only at {UTILS_MODULE}, found: {def_sites}"
+        )
+        assert sorted(scrub_sites) == [UTILS_MODULE], (
+            f"_CONTROL_SCRUB must be defined only at {UTILS_MODULE}, found: {scrub_sites}"
+        )
+    
+        # LLR-003.3: the measured consumer set imports the NAME safe_text from
+        # s19_app.utils — set-equality, drift in either direction fails.
+        names = _census_names(PRODUCT_ROOT, _product_package_of, _product_module_of)
+        importers = names.get((UTILS_MODULE, "safe_text"), set())
+>       assert importers == MEASURED_SAFE_TEXT_CONSUMERS, (
+            f"safe_text importer set drifted from the measured set: "
+            f"extra={sorted(importers - MEASURED_SAFE_TEXT_CONSUMERS)} "
+            f"missing={sorted(MEASURED_SAFE_TEXT_CONSUMERS - importers)}"
+        )
+E       AssertionError: safe_text importer set drifted from the measured set: extra=['s19_app.tui.flow_screens'] missing=[]
+E       assert {'s19_app.tui...s_directionb'} == {'s19_app.tui...s_directionb'}
+E         
+E         Extra items in the left set:
+E         's19_app.tui.flow_screens'
+E         Use -v to get more diff
+
+tests\test_import_census.py:219: AssertionError
+_____________ test_at_b78_33_compaction_enlarges_the_result_area ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_33_compaction_enla0')
+
+    def test_at_b78_33_compaction_enlarges_the_result_area(tmp_path: Path) -> None:
+        """AT-B78-33 / TC-B78-35 - compaction actually gives rows to the results.
+    
+        Intent (WHY this is a gate and the row-height clause alone is not): an
+        implementation that shrinks the three control rows to one line each and
+        leaves the result area at zero satisfies every "height == 1" predicate and
+        delivers NOTHING to the operator - that is the precise state LLR-125.2
+        exists to forbid. So the load-bearing clause here is the strict INCREASE of
+        ``#diff_hex_a``'s content height against Inc-0's frozen pre-change capture,
+        and the three 1-row clauses ride in the SAME run so neither half can be
+        green while the other is false.
+    
+        132x44 is the size at which this is observable with no Lane-1 work: the
+        result area already has content rows there today, so compaction alone moves
+        a number that is not zero on either side of the change.
+    
+        The threshold is read from disk. An inline literal would be a C-36 phantom
+        the moment anything upstream of the panel's row budget moves, and - worse -
+        the pre-change value can never be re-measured after this increment edits
+        ``styles.tcss``.
+        """
+        baseline = _b78_diff_height_baseline()
+    
+        # The artifact must be about the widget and the terminal this test drives;
+        # otherwise "greater than baseline" compares two different layouts (Inc-0
+        # captured three artifacts at three different sizes).
+        assert baseline["widget"] == "#diff_hex_a", (
+            "the Inc-0 artifact describes a different widget than AT-B78-33 observes"
+        )
+        size = tuple(baseline["terminal"])
+        assert len(size) == 2, "the artifact's terminal must be a (width, height) pair"
+    
+        geometry = _b78_diff_geometry(tmp_path, size)
+        observed_content, observed_painted = geometry["#diff_hex_a"]
+    
+        # The gate, asserted on the PAINTED content layer.
+        #
+        # `baseline["clipped_height"]` (11) is deliberately NOT used. Inc-0 captured
+        # it with the metric spec Sec.5.1 rule 1 prescribes, which this module no
+        # longer uses because it is wrong twice over (see
+        # `_b78_painted_content_height`): 11 is a border-box figure that counts this
+        # widget's 4 rows of chrome, and comparing a corrected observation against
+        # it would compare two different quantities and call the difference a gain.
+        # `content_height` IS metric-independent - it is `widget.size.height` - so
+        # the pre-change 7 is a sound baseline for both clauses below.
+>       assert observed_content > baseline["content_height"], (
+            f"compaction must give the freed rows to the result area: "
+            f"#diff_hex_a content height {observed_content} is not greater than the "
+            f"pre-change {baseline['content_height']} captured at {size} by Inc-0"
+        )
+E       AssertionError: compaction must give the freed rows to the result area: #diff_hex_a content height 5 is not greater than the pre-change 7 captured at (132, 44) by Inc-0
+E       assert 5 > 7
+
+tests\test_tui_diff_screen.py:692: AssertionError
+________ test_at_b78_31_written_report_is_complete_under_display_caps _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_31_written_report_0')
+
+    def test_at_b78_31_written_report_is_complete_under_display_caps(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-31 (PIN, green today) - the WRITTEN report holds every run of the
+        comparison while the panel paints only the capped subset (LLR-122.4, G-9).
+    
+        Intent: the operator's evidence artifact must not silently inherit a
+        DISPLAY budget. The panel caps because a terminal has finite rows; the
+        report has no such constraint and is the thing that gets attached to a
+        change record. An implementation that fed the report the panel's stored
+        runs - the shortest possible edit, `runs=panel._runs` - would still render
+        a correct-looking panel, still write a well-formed report, and silently drop
+        every run past the cap.
+    
+        Falsifiability: the observation is C-12 output-then-consume. Both files are
+        produced by the REAL generators through the shipped Report button and then
+        RE-READ FROM DISK; nothing in the expectation comes from `panel._runs`, from
+        the generators, or from `DISPLAY_MAX_RUNS`. The expectation is the fixture's
+        own run list, which the test authored before the app ever saw it. The
+        declared mutation (route the report off the panel's capped runs) drops the
+        written count to the cap and reddens the completeness clause itself.
+    
+        Non-vacuity: a completeness claim proves nothing on a fixture that never
+        capped, so the painted count is captured IN THE SAME RUN and asserted
+        strictly smaller. The constant-quoting guard is asserted LAST (Inc-2 F-1:
+        a guard placed ahead of the substantive clauses reddens first and the
+        subject never runs).
+        """
+        from s19_app.tui.screens_directionb import AbDiffPanel
+    
+        total = _B78_OVER_CAP_RUNS
+        runs = [(i * 16, i * 16 + 4, "changed") for i in range(total)]
+        expected_starts = [start for start, _end, _kind in runs]
+        dest_dir = tmp_path / "b78_report_dest"
+        dest_dir.mkdir()
+    
+        async def _after(app, pilot):
+            md_path, html_path = await _b78_press_report(app, pilot, dest_dir)
+            painted = len(list(_b78_run_list(app).query(_B78_RUN_ENTRY)))
+            return (
+                md_path.read_text(encoding="utf-8"),
+                html_path.read_text(encoding="utf-8"),
+                painted,
+            )
+    
+>       md_text, html_text, painted = _b78_drive_compare(
+            tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+        )
+
+tests\test_tui_diff_screen.py:1937: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_tui_diff_screen.py:305: in _b78_drive_compare
+    return asyncio.run(_drive())
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_diff_screen.py:300: in _drive
+    return await after(app, pilot)
+tests\test_tui_diff_screen.py:1929: in _after
+    md_path, html_path = await _b78_press_report(app, pilot, dest_dir)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+dest_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_31_written_report_0/b78_report_dest')
+
+    async def _b78_press_report(app, pilot, dest_dir: Path) -> tuple[Path, Path]:
+        """Press the shipped Report button and wait for THIS press's worker to finish.
+    
+        Not a pause, and not ``workers.wait_for_complete()`` either (C-78-xii, one
+        layer further out than Inc-2's compare driver). ``Button.press()`` only
+        POSTS ``Pressed``; the handler that starts the ``@work(thread=True)`` worker
+        has not run yet, so a worker-set wait taken immediately after the press
+        observes an EMPTY set and returns at once - the same shape as waiting on
+        queue idleness for a suspended coroutine. Measured: worker set **0**
+        immediately after ``press()``, and ``wait_for_complete()`` returning in
+        **0.8 ms** against a generator sleeping 1000 ms.
+    
+        EDGE, NOT LEVEL (Inc-3 addendum F1). The first form of this driver polled
+        ``#diff_status`` for the success sentinel, which is a LEVEL: on a second
+        press the PREVIOUS press's success line already satisfies it, so the wait
+        returned after 0.8 ms with the generators still running and both globs
+        empty. The wait is now armed on an EDGE - a strictly increasing count of
+        status messages emitted AFTER the observer is installed, which is after the
+        comparison and immediately before the press. A line written by an earlier
+        press is therefore not merely unlikely to satisfy this wait; it is
+        unreachable by it.
+    
+        The observer wraps ``panel.set_status`` and DELEGATES to it - it substitutes
+        nothing, and the app still writes its own surface. ``set_status`` is the
+        right signal because ``_start_diff_report_worker`` writes it through
+        ``call_from_thread``, and ``call_from_thread`` blocks the worker until the
+        callback has run on the UI thread. Observing the message therefore
+        happens-after both files are written and closed, which is exactly the
+        precondition a re-read needs.
+    
+        The wait is TOTAL: every failure arm of the worker is a named, loud raise,
+        so the caller can never proceed on a stale or missing file.
+    
+        GUARANTEE, stated exactly (C-78-xiii). For each call, this driver either
+        returns the two paths written by THAT call's worker, or raises. It holds per
+        press and is re-armed on every call, so repeated presses against one panel
+        are covered. It does NOT serialise concurrent presses: the group is
+        ``exclusive=True``, so a second press while the first worker runs cancels
+        the first, and this driver would report the surviving worker's message.
+        Nothing in this suite presses twice concurrently, and a caller that needs
+        that must arm its own wait rather than assume this one covers it.
+        """
+        from s19_app.tui.screens_directionb import AbDiffPanel
+    
+        panel = app.query_one("#ab_diff_panel", AbDiffPanel)
+        app.query_one("#diff_report_dest").value = str(dest_dir)
+    
+        emitted: list[str] = []
+        shipped_set_status = panel.set_status
+    
+        def _observe(message, *args, **kwargs):
+            emitted.append(str(message))
+            return shipped_set_status(message, *args, **kwargs)
+    
+        # The FILE check is an edge too. Its first form asserted the destination
+        # holds exactly one report of each kind, which silently assumes the
+        # destination started empty - the same level-vs-edge mistake as the status
+        # wait, one clause down, and it fired on a CORRECT second press.
+        md_before = set(dest_dir.glob("*-diff-report.md"))
+        html_before = set(dest_dir.glob("*-diff-report.html"))
+    
+        panel.set_status = _observe
+        try:
+            before = len(emitted)
+            app.query_one("#diff_report_button").press()
+            for _ in range(750):
+                if len(emitted) > before:
+                    break
+                await pilot.pause(0.02)
+            else:
+                raise AssertionError(
+                    f"the report worker never completed: `panel.set_status` was not "
+                    f"called once across 750 pumped turns after the Report press. "
+                    f"#diff_status still reads "
+                    f"{str(app.query_one('#diff_status').render())!r}, which is the "
+                    f"line that was there BEFORE this press. Every assertion after "
+                    f"this point would be reading a file that was never written."
+                )
+        finally:
+            del panel.set_status
+    
+        message = emitted[before]
+        for arm in _B78_REPORT_FAILED:
+            if arm in message:
+>               raise AssertionError(
+                    f"the report worker took a FAILURE arm, so no complete file "
+                    f"exists to observe; it emitted {message!r}"
+                )
+E               AssertionError: the report worker took a FAILURE arm, so no complete file exists to observe; it emitted "Diff report failed: TypeError: generate_diff_report_html() got an unexpected keyword argument 'check_spec'"
+
+tests\test_tui_diff_screen.py:1818: AssertionError
+______________ test_at_b78_23_no_wrapped_row_in_the_wide_regime _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_23_no_wrapped_row_0')
+
+    def test_at_b78_23_no_wrapped_row_in_the_wide_regime(tmp_path: Path) -> None:
+        """AT-B78-23 (GATE) - at 160x40 no emitted hex row wraps.
+    
+        Intent: HLR-124 / LLR-124.2 - "in the first two regimes each hex window's
+        content width shall be at least the width of the widest row
+        `hexview.render_hex_view` emits". The shipped three-way `1fr` split gave
+        `#diff_hex_a` 39 cells at 160x40 against a 79-cell row, so every hex row
+        wrapped at every supported width and a byte column lined up nowhere.
+    
+        Both quantities are MEASURED, neither is a literal: the window's width off
+        the live widget, the row width by calling the producer. A hard-coded 79 would
+        be a phantom the day HEX_WIDTH changes, and it would also hide the F-1
+        producer confusion that cost this batch three lanes' work.
+    
+        C-40, and M3 is the specific trap: a width clause alone is invariant under
+        total vertical invisibility - at 120x30 on the shipped tree `#diff_hex_a`'s
+        clipped region is (width 30, height 0), so a window can be "unwrapped" while
+        painting nothing at all. The painted height >= 1 co-assertion is what makes
+        the width clause mean the operator can see a row.
+    
+        The wide regime's own property rides here too: the run list is BESIDE the
+        window (LLR-124.2), which is what distinguishes this regime from the
+        fallback one where the same width clause also holds.
+        """
+        widest = _b78_widest_emitted_hex_row()
+        measured = _b78_regime_probe(tmp_path, _B78_INC5_WIDE)
+    
+        assert measured["regimes"] == ["diff-wide"], (
+            f"{_B78_INC5_WIDE} is at or above the wide breakpoint and must select "
+            f"exactly the wide regime; classes are {measured['regimes']}"
+        )
+        assert measured["hex_a_width"] >= widest, (
+            f"at {_B78_INC5_WIDE} the hex window must fit an unwrapped emitted row: "
+            f"#diff_hex_a content width {measured['hex_a_width']} < widest emitted "
+            f"row {widest} (measured by calling render_hex_view at test time)"
+        )
+>       assert measured["hex_a_painted"] >= _B78_WINDOW_HEADER_ROWS + 1, (
+            f"an unwrapped window that paints no HEX ROW delivers nothing: screen "
+            f"line 0 is the 'Image A - Run #...' header, so a painted content height "
+            f"of 1 is ZERO bytes on the operator's screen. Painted height is "
+            f"{measured['hex_a_painted']}. (Gate F-3: the `>= 1` form this replaces "
+            f"was green at zero bytes, and passed only because 160x40 happens to "
+            f"paint 2 - a one-row margin, not a property the assertion pinned)"
+        )
+E       AssertionError: an unwrapped window that paints no HEX ROW delivers nothing: screen line 0 is the 'Image A - Run #...' header, so a painted content height of 1 is ZERO bytes on the operator's screen. Painted height is 0. (Gate F-3: the `>= 1` form this replaces was green at zero bytes, and passed only because 160x40 happens to paint 2 - a one-row margin, not a property the assertion pinned)
+E       assert 0 >= (1 + 1)
+
+tests\test_tui_diff_screen.py:2878: AssertionError
+____________ test_tc_b78_52_pagination_reaches_bytes_past_the_pane ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc_b78_52_pagination_reac0')
+
+    def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> None:
+        """TC-B78-52 - the selected run's bytes past the visible rows are reachable.
+    
+        Intent: LLR-124.3 - "the selected run's bytes beyond the visible rows shall
+        be reachable by pagination". Inc-4 left this open by design (its R-6: a run
+        longer than the pane overflows invisibly) and named Inc-5 as the owner.
+    
+        The fixture's run is deliberately far longer than any supported pane, so the
+        un-paged window is bounded by the run +/- context FLOOR rather than by the
+        pane, which is the only state in which anything is out of reach. The
+        precondition is asserted: with a short run the whole window fits and every
+        clause below would be vacuously true.
+    
+        Page 0 is asserted to be unchanged, because that is the clause that keeps
+        every HLR-123 acceptance sound - AT-B78-22's exact address set is read from
+        an un-paged window, and a pagination that re-based page 0 would silently
+        move it.
+    
+        **Run at BOTH regimes, per-arm (CC-1), from the Inc-5 gate's F-2.** The first
+        draft gated `[` / `]` on the fallback regime, which was a capability
+        INVERSION: measured on this same run, the wide regime's capacity is 1 at both
+        160x40 and 139x40 while 132x44's is 7, so the operator on the WIDEST
+        supported terminal could see 1 of 66 rows with no key to reach the rest,
+        while the one on a narrower terminal reached all of them. Overflow is a
+        property of the run against the pane, never of the regime - so the fix
+        REMOVED a condition, and this arm is what keeps it removed.
+        """
+        long_run = (0x1000, 0x1000 + 0x400, "changed")
+    
+        async def _after(app, pilot):
+            first = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+            capacity = app.query_one("#ab_diff_panel")._window_row_capacity()
+            app.set_focus(app.query_one("#diff_compare_button"))
+            await pilot.press("right_square_bracket")
+            await pilot.pause()
+            paged = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+            paged_b = _b78_window_rows(_b78_window_text(app, "#diff_hex_b"))
+            await pilot.press("left_square_bracket")
+            await pilot.pause()
+            back = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+            # Paging past the end must be a no-op, not an empty window.
+            for _ in range(200):
+                await pilot.press("right_square_bracket")
+            await pilot.pause()
+            far = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+            regimes = sorted(
+                name
+                for name in app.query_one("#ab_diff_panel").classes
+                if name.startswith("diff-")
+            )
+            return first, capacity, paged, paged_b, back, far, regimes
+    
+        # Both regimes. The wide arm is the one F-2 added: same run, same clauses.
+        for size, expected_regime in ((_B78_AT_SIZE, "diff-fallback"), (_B78_INC5_WIDE, "diff-wide")):
+            (
+                first, capacity, paged, paged_b, back, far, regimes
+            ) = _b78_drive_compare(tmp_path, size, _diff_result([long_run]), after=_after)
+    
+            assert regimes == [expected_regime], (
+                f"{size}: precondition - this arm must exercise the {expected_regime} "
+                f"regime, or it is not the arm it claims to be; classes {regimes}"
+            )
+>           assert capacity > 0, (
+                f"{size}: precondition - the pane must have a positive row capacity, "
+                f"or paging has no page size to move by"
+            )
+E           AssertionError: (160, 40): precondition - the pane must have a positive row capacity, or paging has no page size to move by
+E           assert 0 > 0
+
+tests\test_tui_diff_screen.py:3336: AssertionError
+_____________ test_tc_b78_54_the_height_floor_delivers_a_hex_row ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc_b78_54_the_height_floo0')
+
+    def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
+        """TC-B78-54 - the height floor is only right if a HEX ROW is visible AT it.
+    
+        Intent: the sibling clause for `_DIFF_MIN_H` that `TC-B78-31` already carries
+        for `_DIFF_MIN_W` ("the floor is only the right floor if the window is
+        unwrapped AT it"). Minted at the Inc-5 gate, where its absence was the
+        compounding half of F-1: **the height axis was the one axis this increment
+        changed and the only regime axis with no boundary node**, and `TC-B78-32`'s
+        height arm sits at `_DIFF_MIN_H - 1` and asserts only that a notice appears.
+        Applying `TC-B78-31`'s own standard to the height axis is what surfaces the
+        defect, and it would have failed.
+    
+        Why the metric is HEX ROWS and not painted content rows: `_render_run_windows`
+        writes `f"Image A - {header}\\n{text}"`, so screen line 0 is the header and a
+        painted content height of 1 delivers ZERO bytes. Shipped against the weaker
+        metric, heights 26-27 declared the terminal deliverable, HID the notice, and
+        showed a header and nothing else - strictly worse than 25, where the operator
+        is at least told why. The spec carries both metrics (Sec.2.8 D-1's "one
+        visible content row" against normative `LLR-125.2`'s "one hex row of
+        content"); `LLR-125.2` governs and this node is what holds the line.
+    
+        The fixture's run is longer than any supported pane, so the window is never
+        the binding limit and what is measured is the PANE's budget, not the run's.
+        Both sides are read, as `TC-B78-31` does for the width axis.
+        """
+        long_run = [(0x1000, 0x1000 + 0x400, "changed")]
+    
+        async def _measure(app, pilot):
+            from textual.widgets import Static
+    
+            window = app.query_one("#diff_hex_a", Static)
+            rows = _b78_window_rows(str(window.render()))
+            painted = _b78_painted_content_height(window)
+            return {
+                "regimes": sorted(
+                    name
+                    for name in app.query_one("#ab_diff_panel").classes
+                    if name.startswith("diff-")
+                ),
+                "notice_shown": app.query_one("#diff_size_notice").display,
+                "painted": painted,
+                "emitted": len(rows),
+                "visible_hex": max(0, min(painted - _B78_WINDOW_HEADER_ROWS, len(rows))),
+            }
+    
+        async def _after(app, pilot):
+            # batch-79 Inc-11: `_b78_hide_command_bar` is deleted. It simulated the
+            # Inc-10 reclaim by hiding `#command_bar_row` while that row still
+            # existed. `HLR-118` deleted the row, so the helper's query matched
+            # nothing and it became a permanent no-op whose "the reclaim is
+            # ASSERTED, not assumed" clause could never execute again. The node now
+            # measures the real tree with no simulation at all, which is what the
+            # helper's own docstring said would happen once Inc-10 landed.
+            return await _measure(app, pilot)
+    
+        at = _b78_drive_compare(
+            tmp_path, (120, _DIFF_MIN_H), _diff_result(long_run), after=_after
+        )
+        below = _b78_regime_probe(tmp_path, (120, _DIFF_MIN_H - 1))
+    
+        # Precondition: the run must overflow the pane, or the pane is not what is
+        # being measured and the floor could be an artefact of a short fixture.
+        assert at["emitted"] > at["visible_hex"], (
+            f"precondition: the fixture's run must exceed the pane at the floor, or "
+            f"this node measures the RUN and not the pane; emitted {at['emitted']}, "
+            f"visible {at['visible_hex']}"
+        )
+    
+        # --- AT the floor: deliverable, and it actually delivers ---
+        assert at["regimes"] == ["diff-fallback"], (
+            f"at exactly _DIFF_MIN_H the terminal must be deliverable; classes are "
+            f"{at['regimes']}"
+        )
+        assert not at["notice_shown"], (
+            "at exactly _DIFF_MIN_H the terminal is deliverable and must NOT show "
+            "the notice"
+        )
+>       assert at["visible_hex"] >= 1, (
+            f"_DIFF_MIN_H is only the right floor if at least one HEX ROW is visible "
+            f"AT it: painted content height {at['painted']}, of which "
+            f"{_B78_WINDOW_HEADER_ROWS} is the 'Image A - Run #...' header, leaving "
+            f"{at['visible_hex']} hex rows. A floor that declares a terminal "
+            f"deliverable and then shows a header and nothing else is WORSE than the "
+            f"notice it replaces"
+        )
+E       AssertionError: _DIFF_MIN_H is only the right floor if at least one HEX ROW is visible AT it: painted content height 1, of which 1 is the 'Image A - Run #...' header, leaving 0 hex rows. A floor that declares a terminal deliverable and then shows a header and nothing else is WORSE than the notice it replaces
+E       assert 0 >= 1
+
+tests\test_tui_diff_screen.py:3498: AssertionError
+_______________ test_at_b78_32_app_bindings_block_is_untouched ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_b78_32_app_bindings_bl0')
+
+    def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+        """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+    
+        RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+    
+        The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+        ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+        MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+        and **eight** entries sit BELOW it and outside the range --
+        ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+        ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+        from batch-40 S2. An entry added or removed among those eight leaves the
+        range-based predicate GREEN, so the guard would report "untouched" for a
+        block that was touched. It fails in the safe-looking direction.
+    
+        ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+        SIXTH merge gate measured it.** Both were wrong, and the second followed from
+        the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+        so believing the boundary sat there silently dropped ``plus``/``minus`` from
+        the inventory. The figure came in from Phase 0's premise table and was
+        carried through two rewrites of this very paragraph without being
+        re-executed -- including one whose stated purpose was removing false
+        references from it. *A figure inherited inside a sentence you are editing is
+        still an inherited figure.* The paragraph's THESIS is unaffected: the range
+        does stop mid-block, entries do escape the predicate, and the node's
+        assertions never depended on the count.
+    
+        It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+        batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+        written and survived three Phase-2 rounds -- because a line range looks like
+        a measurement. A code comment in ``screens_directionb.py`` carried the
+        CORRECT extent, so the two artifacts disagreed and the code was right.
+    
+        **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+        took three commits to get there.** Numbers still appear below, and they are
+        NARRATION -- the record of which ranges were claimed and how each was wrong.
+        Read none of them as an address. (Two earlier drafts got this wrong in
+        opposite directions: the first claimed "EVERY line number is now gone" while
+        five remained, and the fifth gate then noted that one of the survivors,
+        ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+        which is exactly what makes narration read as a pointer. The wording above
+        is scoped to POINTERS for that reason.)
+        The first pass cited
+        ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+        ``:6822``. The second pass removed that one and left the block's own range
+        ``1338-1392`` in place -- and the very next commit added an import at the
+        top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+        been "corrected" was **also wrong on arrival**.
+    
+        So the docstring arguing that a line range is "one insertion away from
+        failing the same silent way" demonstrated the claim three times on itself.
+        Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
+        go stale is the whole point of the node below.
+    
+        A corrected range would not fix this, and this batch proved it twice: any
+        edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+        within days -- one of them wrong the moment it was written. This
+        resolves the block from the CLASS instead, which no line movement can blind,
+        and pins two independent projections of it.
+        """
+        rows = _b79_app_binding_rows()
+    
+        # The FULL row set, frozen. The node pinned only a count plus a key-only
+        # projection of the shown bindings until the independent review measured the
+        # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+        # and description were certified by the count alone. Executed, all three of
+        # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+        # key changed, and one hidden removed while another was added. The shown
+        # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+        # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+        #
+        # The spec's line-range predicate would have caught every one of those. The
+        # re-authoring is still right about range fragility, but it was not the
+        # strict improvement the Inc-6 record claimed: its counterfactual was an
+        # ADDITION, the one class a count can see. A frozen row set is a superset of
+        # both old projections and no line movement blinds it.
+>       assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+            "the App BINDINGS block must be byte-for-byte the committed set. "
+            f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+            f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+        )
+E       AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('equals_sign', "show_screen('check_editor')", 'Check Editor', False), ('right_square_bracket', "show_screen('flow_execution')", 'Flow Execution', False)]; removed: []
+E       assert frozenset({('... False), ...}) == frozenset({('... False), ...})
+E         
+E         Extra items in the left set:
+E         ('right_square_bracket', "show_screen('flow_execution')", 'Flow Execution', False)
+E         ('equals_sign', "show_screen('check_editor')", 'Check Editor', False)
+E         Use -v to get more diff
+
+tests\test_tui_diff_screen.py:3871: AssertionError
+___________________________ test_tc078_3_both_sites ___________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc078_3_both_sites0')
+
+    def test_tc078_3_both_sites(tmp_path: Path) -> None:
+        """Both app.py call sites pass the aggregates (the writer census).
+    
+        Intent (LLR-078.3): the post-run site and the history-refresh site are the
+        only two writers. If either omits the counts the strip and ``check_rows()``
+        read different states — the exact shape of the batch-38 Inc-4 F1 defect.
+        This is a SOURCE-level census (the behavioural arms are AT-078a for the
+        post-run site and AT-078c for the history site); it exists so a THIRD call
+        site added later cannot quietly skip the argument.
+    
+        ⚠ The census walks the AST, NOT ``source.count("…")``. My first draft
+        counted substrings and read **3** ``check_aggregates()`` sites against 2
+        calls — it was matching my own explanatory COMMENT. A prose-matching oracle
+        is not a census; it fails on documentation and passes on a renamed call.
+        """
+        from s19_app.tui import app as app_module
+    
+        tree = ast.parse(inspect.getsource(app_module))
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "refresh_check_results"
+        ]
+    
+>       assert len(calls) == 2, (
+            f"the writer census pins TWO refresh_check_results call sites; found "
+            f"{len(calls)}. A new site must pass the aggregates and be recorded here."
+        )
+E       AssertionError: the writer census pins TWO refresh_check_results call sites; found 3. A new site must pass the aggregates and be recorded here.
+E       assert 3 == 2
+E        +  where 3 = len([<ast.Call object at 0x000002421014F210>, <ast.Call object at 0x0000024201AD1A50>, <ast.Call object at 0x0000024203BE6110>])
+
+tests\test_tui_patch_checks_strip.py:645: AssertionError
+______________ test_at057b_regroup_wiring_and_binding_regression ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at057b_regroup_wiring_and0')
+
+    def test_at057b_regroup_wiring_and_binding_regression(
+        tmp_path: Path,
+    ) -> None:
+        """AT-057b (regression) — every button and the `b` binding behave as
+        pre-batch after the regroup.
+    
+        Intent: HLR-057 / LLR-057.3 — the regroup is compose + CSS only. Press
+        each of the five buttons through the shipped widget (``button.press()``,
+        the AT-032b idiom) and assert its pre-batch observable per button: Load
+        populates the entries table from the typed path, Validate posts the
+        ``Validate:`` status line, Apply posts ``Apply:``, Save writes exactly
+        one ``changes*.json`` under the work area, and Run checks on a
+        kind=change document posts the batch-33 ``Checks: not run`` loud block.
+        The app-level ``b`` binding stays bound to ``before_after_report``
+        (app.py BINDINGS). Counterfactual: dropping a button id from the
+        ``on_button_pressed`` dict or re-keying `b` makes its arm RED.
+        """
+        from textual.binding import Binding
+        from textual.widgets import Button, DataTable
+    
+        doc_path = _write_v2_document(
+            tmp_path / "changes-at057b.json",
+            [
+                {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+                {"type": "string", "address": "0x200", "value": "REV"},
+            ],
+        )
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+    
+                _set_entry_inputs(app, path_text=str(doc_path))
+                app.query_one("#patch_doc_load_button", Button).press()
+                await pilot.pause()
+                outcomes["loaded_rows"] = table.row_count
+    
+                app.query_one("#patch_doc_validate_button", Button).press()
+                await pilot.pause()
+                outcomes["validate_line"] = any(
+                    line.startswith("Validate:") for line in app.log_lines
+                )
+    
+                app.query_one("#patch_doc_apply_button", Button).press()
+                await pilot.pause()
+                outcomes["apply_line"] = any(
+                    line.startswith("Apply:") for line in app.log_lines
+                )
+    
+                app.query_one("#patch_doc_save_button", Button).press()
+                await pilot.pause()
+                workarea = tmp_path / ".s19tool" / "workarea"
+                outcomes["saved_files"] = len(
+                    list(workarea.rglob("changes*.json"))
+                )
+    
+                app.query_one("#patch_checks_run_button", Button).press()
+                await pilot.pause()
+                outcomes["checks_line"] = any(
+                    "Checks: not run" in line for line in app.log_lines
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["loaded_rows"] == 2, "Load must populate the table"
+        assert outcomes["validate_line"] is True, "Validate: line must post"
+        assert outcomes["apply_line"] is True, "Apply: line must post"
+        assert outcomes["saved_files"] == 1, "Save must write one change file"
+>       assert outcomes["checks_line"] is True, (
+            "Run checks must post the batch-33 loud doc-kind block"
+        )
+E       AssertionError: Run checks must post the batch-33 loud doc-kind block
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:2554: AssertionError
+_____________________________ test_tc081_2_strip ______________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_tc081_2_strip0')
+
+    def test_tc081_2_strip(tmp_path: Path) -> None:
+        """The strip resolves once, above its buttons, fed by a defaulted parameter.
+    
+        Intent (LLR-081.2, C-7): DOM order is asserted because "the strip labels
+        the Undo/Redo row" is a reading-order claim no functional AT can see (the
+        Inc-4 M-5 lesson). The panel is a VIEW: it must not import the service layer
+        nor reach ``self.app``, or the Patch screen stops being testable without a
+        full app.
+    
+        The ``_nodes``/``_context`` arm is §2.4-10 — those names shadow Textual
+        ``Widget`` internals and produce a silent mount crash / idle boot deadlock
+        with NO traceback. The literal is BOUND to the class first (the Inc-4 F3
+        fix): a bare ``names & set(dir(Widget))`` check is constant-true and passes
+        without importing anything.
+        """
+    
+        async def _drive() -> tuple[int, list[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                strips = list(app.query("#patch_history_strip").results())
+                window = app.query_one("#patch_win_script")
+                order = [
+                    child.id
+                    for child in window.children
+                    if child.id in ("patch_history_strip", "patch_history_controls")
+                ]
+                return len(strips), order
+    
+        count, order = asyncio.run(_drive())
+    
+        assert count == 1, f"the strip must resolve EXACTLY once; got {count} nodes"
+>       assert order == ["patch_history_strip", "patch_history_controls"], (
+            "the strip must sit directly ABOVE the Undo/Redo row it describes, as "
+            f"a docked sibling (never inside the scrolling body); DOM order is {order!r}"
+        )
+E       AssertionError: the strip must sit directly ABOVE the Undo/Redo row it describes, as a docked sibling (never inside the scrolling body); DOM order is []
+E       assert [] == ['patch_histo...ory_controls']
+E         
+E         Right contains 2 more items, first extra item: 'patch_history_strip'
+E         Use -v to get more diff
+
+tests\test_tui_patch_history_strip.py:502: AssertionError
+________________________ test_tc081_4_no_binding_diff _________________________
+
+    def test_tc081_4_no_binding_diff() -> None:
+        """The batch adds no App-level `Binding(` — C-28's census does not fire.
+    
+        Intent (LLR-081.4): the key hints are panel-local TEXT. C-28 fires when an
+        increment adds/removes/changes an App-level ``Binding(show=True)`` or any
+        shared-chrome element, which drifts EVERY screen's snapshot (the batch-45
+        F-1 lesson: 18 unexpected cells). Recording the disposition as an executable
+        guard keeps the snapshot census bounded to the 2 patch cells instead of
+        re-opening it at a gate.
+    
+        The ``ctrl+z`` / ``ctrl+y`` bindings already exist (batch-40 S2); this
+        increment DISPLAYS them and does not touch them.
+        """
+        try:
+            completed = subprocess.run(
+                ["git", "diff", "main", "--", "s19_app/tui/app.py"],
+                cwd=_repo_root(),
+                capture_output=True,
+                text=True,
+                # batch-79 Inc-11: `encoding` is EXPLICIT, and it is a real defect
+                # fix rather than tidiness. `text=True` alone decodes with
+                # `locale.getpreferredencoding()` -- **cp1252** on this Windows
+                # host -- so any non-cp1252 codepoint anywhere in the diff of
+                # `app.py` raises `UnicodeDecodeError` on a subprocess reader
+                # thread, `completed.stdout` comes back `None`, and this guard dies
+                # with `AttributeError: 'NoneType' object has no attribute
+                # 'splitlines'` instead of reporting a binding change.
+                #
+                # Observed exactly that way: adding a CJK string to another test
+                # module put byte 0x8f in the diff and took this node down. The
+                # guard greps for `Binding(`, which is pure ASCII, so
+                # `errors="replace"` cannot hide a real hit -- it only stops
+                # unrelated prose from silencing the guard.
+                encoding="utf-8",
+                errors="replace",
+                check=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            # Match the established frozen-guard convention
+            # (test_engine_unchanged.py:151): when git is unavailable or the
+            # 'main' ref is missing (e.g. CI's shallow/detached checkout, which
+            # does not fetch the main branch), this cross-``main`` diff cannot
+            # run — SKIP, do not error. The binding-drift verdict is a dev-time
+            # guard; the local increment gate is where it is authoritative.
+            pytest.skip(
+                "git is unavailable or the 'main' ref is missing in this "
+                f"environment — TC-081.4's binding-diff arm cannot run: {exc}"
+            )
+        # The discoverability-help-panel batch deliberately adds ONE App-level
+        # binding — the footer-visible `?` → `show_help_panel` (the whole point of
+        # that batch) — and handles the resulting shared-chrome snapshot drift via
+        # `test_tui_snapshot._discoverability_drift_marks`. It is a sanctioned
+        # exception; the C-28 census still fires for any OTHER binding change.
+        # batch-49 (HLR-083) deliberately adds the ninth rail-nav binding
+        # `Binding("9", "show_screen('checks')", "Checks", show=False)` — a
+        # NON-footer-visible (`show=False`) navigation key, so it does not drift the
+        # footer/shared-chrome; the 9-item RAIL drift it accompanies is handled by
+        # the canonical-CI snapshot regen (spec R-5 / C-30). Sanctioned here.
+        # batch-58 (LLR-V1.1) adds the tenth rail-nav binding
+        # `Binding("0", "show_screen('crc_designer')", "CRC Designer", show=False)` —
+        # again NON-footer-visible (`show=False`), so it does not drift the
+        # footer/shared-chrome; the 10-item RAIL drift it accompanies is handled by
+        # the canonical-CI snapshot regen (same C-30 path). Sanctioned here.
+        _SANCTIONED_BINDING_MARKERS = (
+            "show_help_panel",
+            "show_screen('checks')",
+            "show_screen('crc_designer')",
+        )
+        changed = [
+            line
+            for line in completed.stdout.splitlines()
+            if line.startswith(("+", "-"))
+            and not line.startswith(("+++", "---"))
+            and "Binding(" in line
+            and not any(marker in line for marker in _SANCTIONED_BINDING_MARKERS)
+        ]
+>       assert not changed, (
+            "this batch must add no UNSANCTIONED App-level Binding — a shared-chrome "
+            "binding drifts every screen's snapshot (C-28), so any addition must be "
+            "paired with a snapshot drift-mark. Changed lines:\n"
+            + "\n".join(changed)
+        )
+E       AssertionError: this batch must add no UNSANCTIONED App-level Binding — a shared-chrome binding drifts every screen's snapshot (C-28), so any addition must be paired with a snapshot drift-mark. Changed lines:
+E         +        Binding("equals_sign", "show_screen('check_editor')", "Check Editor", show=False),
+E         +        Binding("right_square_bracket", "show_screen('flow_execution')", "Flow Execution", show=False),
+E       assert not ['+        Binding("equals_sign", "show_screen(\'check_editor\')", "Check Editor", show=False),', '+        Binding("right_square_bracket", "show_screen(\'flow_execution\')", "Flow Execution", show=False),']
+
+tests\test_tui_patch_history_strip.py:737: AssertionError
+_____________ test_ac1_editor_fills_json_window_when_room_exists ______________
+
+    def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+        """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+    
+        C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+        region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+        is 26 rows and its bottom is flush with the JSON body's content region; under
+        a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+        by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+        which also fails the ``> 8`` assertion — so this arm cannot green on an
+        invisible widget.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                app.action_show_screen("patch")
+                await pilot.pause()
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+>       assert editor_h > 8, (
+            f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+            f"has free vertical space (120x50); painted region.height is {editor_h}"
+        )
+E       AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 8
+E       assert 8 > 8
+
+tests\test_tui_patch_json.py:1258: AssertionError
+______________ test_ac1b_editor_holds_min_floor_at_primary_size _______________
+
+    def test_ac1b_editor_holds_min_floor_at_primary_size() -> None:
+        """At 120x30 the editor still consumes its window and never shrinks below 8.
+    
+        Growth is NOT observable at 120x30 (the ~15-row ``#workspace_shell`` ceiling
+        — see the section header), so this is a no-regression / floor arm, NOT a
+        growth arm. It pins two painted facts: the editor keeps its usable height
+        (>= the min-height floor of 8, i.e. the flex rule did not let it collapse to
+        7 as a bare ``1fr`` would), and it still reaches the JSON body bottom (no new
+        empty band introduced at this size).
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_PRIMARY) as pilot:
+                app.action_show_screen("patch")
+                await pilot.pause()
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                body = _json_window_bodies(app)["patch_win_json"]
+                return (
+                    editor.region.height,
+                    editor.region.bottom,
+                    body.content_region.bottom,
+                )
+    
+        editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+        assert editor_h >= 8, (
+            f"the min-height floor must keep the editor usable at the primary size; "
+            f"painted region.height is {editor_h} (a bare 1fr would collapse to 7)"
+        )
+>       assert editor_bottom >= body_bottom, (
+            f"the editor must still reach the JSON body bottom at 120x30 (no new "
+            f"empty band); editor bottom {editor_bottom} vs body bottom {body_bottom}"
+        )
+E       AssertionError: the editor must still reach the JSON body bottom at 120x30 (no new empty band); editor bottom 27 vs body bottom 46
+E       assert 27 >= 46
+
+tests\test_tui_patch_json.py:1299: AssertionError
+_______________ test_ac3_fill_does_not_leak_to_sibling_windows ________________
+
+    def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+        """The 1fr fill is scoped to the JSON window; CHECKS / SCRIPT are untouched.
+    
+        MEASURED at 120x50, where the discriminator is sharpest: the JSON body fills
+        its tall window (~28 of 29 rows), but the CHECKS window — whose content is a
+        few rows — must NOT stretch to fill its equally-tall window. Had the shared
+        ``.patch-window-body`` rule been given ``1fr`` (the C-30 leak this guards),
+        the CHECKS body would stretch too. The SCRIPT body stays content-driven
+        (its own tall table), i.e. ``height: auto`` behaviour unchanged.
+        """
+    
+        async def _run() -> dict[str, tuple[int, int]]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                app.action_show_screen("patch")
+                await pilot.pause()
+                out = {}
+                for wid, body in _json_window_bodies(app).items():
+                    win = app.query_one(f"#{wid}")
+                    out[wid] = (win.content_region.height, body.region.height)
+                return out
+    
+        dims = asyncio.run(_run())
+        json_win_h, json_body_h = dims["patch_win_json"]
+        checks_win_h, checks_body_h = dims["patch_win_checks"]
+        script_win_h, script_body_h = dims["patch_win_script"]
+    
+        # The JSON body DID fill its window (the intended effect / the contrast).
+>       assert json_body_h >= json_win_h - 2, (
+            f"the JSON body should fill its window; body {json_body_h} vs window "
+            f"content {json_win_h}"
+        )
+E       AssertionError: the JSON body should fill its window; body 27 vs window content 34
+E       assert 27 >= (34 - 2)
+
+tests\test_tui_patch_json.py:1378: AssertionError
+______________________ test_ac5_gauge_stays_above_editor ______________________
+
+    def test_ac5_gauge_stays_above_editor() -> None:
+        """The cap gauge renders above the (now taller) editor and is not overlapped.
+    
+        MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+        region sits strictly above the editor's, so the editor's growth pushes DOWN
+        from the gauge rather than displacing or overlapping it.
+        """
+    
+        async def _run() -> tuple[int, int, int]:
+            app = S19TuiApp()
+            async with app.run_test(size=_FILL_TALL) as pilot:
+                app.action_show_screen("patch")
+                await pilot.pause()
+                gauge = app.query_one("#patch_paste_gauge", Static)
+                editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+                return gauge.region.bottom, editor.region.y, editor.region.height
+    
+        gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+>       assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+E       AssertionError: precondition: the editor must have grown at 120x50
+E       assert 8 > 8
+
+tests\test_tui_patch_json.py:1467: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20463/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024203C44380>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote ['20260710T120000Z-diff-report.md']
+E       assert {'20260710T12...ff-report.md'} == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+______________ test_tc707_copy_matches_help_sections_md_verbatim ______________
+
+    def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
+        """TC-707 (LLR-140.2, the operator-editable home): every shipped step
+        string is a verbatim port of ``help_sections.md`` — the md is the
+        source draft, so a drifted copy edit reddens here against the source."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+__________________ test_tc707_numbering_generated_sequential __________________
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+
+tests\test_window_usage_help.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b94/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b94\\prototypes\\cambios_10_12_2026\\help_sections.md'
+
+..\..\anaconda3\Lib\pathlib.py:1013: FileNotFoundError
+============================== warnings summary ===============================
+..\..\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367
+  C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_textual_snapshot.py:367: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=8484161;file://C:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app-b94\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_batch91_registry_hygiene.py::test_at286_every_live_id_token_occurs_in_its_nodes_file
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_import_census.py::test_tc653_safe_text_import_census - Asse...
+FAILED tests/test_tui_diff_screen.py::test_at_b78_33_compaction_enlarges_the_result_area
+FAILED tests/test_tui_diff_screen.py::test_at_b78_31_written_report_is_complete_under_display_caps
+FAILED tests/test_tui_diff_screen.py::test_at_b78_23_no_wrapped_row_in_the_wide_regime
+FAILED tests/test_tui_diff_screen.py::test_tc_b78_52_pagination_reaches_bytes_past_the_pane
+FAILED tests/test_tui_diff_screen.py::test_tc_b78_54_the_height_floor_delivers_a_hex_row
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_checks_strip.py::test_tc078_3_both_sites - Assert...
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_2_strip - AssertionE...
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff - ...
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac1b_editor_holds_min_floor_at_primary_size
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+20 failed, 3025 passed, 2 skipped, 21 deselected, 32 xfailed, 1 warning in 4060.87s (1:07:40)

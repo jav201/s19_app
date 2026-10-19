@@ -2256,26 +2256,107 @@ def test_tc051_4_hostile_encoding_sibling_through_load_funnel(
 # AT-057 — patch-editor control regroup (HLR-057 / US-057, batch-35)
 # ===========================================================================
 
-# LLR-057.1 — every pre-batch widget id in the change-file pane
-# (screens_directionb.py `#patch_pane_changefile` sub-tree) must survive the
-# regroup. This is the LLR's 15-id census, asserted verbatim.
+# LLR-057.1 — every widget id in the change-file surface must survive the
+# regroup. batch-35 listed 15 ids under `#patch_doc_controls` (the mixed
+# Load/Refresh/Validate/Apply/Save row) and `#patch_pane_changefile`; the
+# batch-94 pe_b rework (annotation 6 / HLR-008 + the three source-level
+# fixes) RESTATED both anchors, so this is the post-rework census, asserted
+# verbatim:
+#   * the change-file row DOCKS in the PATCH SCRIPT window and splits in TWO
+#     lines (finding B fixed): Select + path input + Load BESIDE the input on
+#     line 1, Refresh + the section label on line 2 — Load/Refresh LEFT
+#     `#patch_doc_controls`, which now holds exactly Validate / **Apply
+#     loaded changes** / Save.
+#   * `#patch_pane_changefile` RETIRED (the pre-batch grouping container is
+#     gone); `patch_variant_select` / `patch_variant_info_button` retired
+#     with the batch-94 variant group (HLR-006).
+#   * the entry-input band (Address / String value / Bytes) + the
+#     before/after card ride the JSON window BODY (below the paste editor).
+#   * the history strip / Undo-Redo / execute-scope group + the paste
+#     controls DOCK in the JSON window (siblings of its body).
+# Each mapped id is also pinned to its DIRECT parent below (the "no id
+# re-parented silently" intent of the batch-94 `_MOVED_ID_HOMES` census in
+# `tests/test_tui_patch_layout.py`, re-asserted at the surface level here).
 _PRESERVED_REGROUP_IDS = (
     "patch_doc_file_select",
     "patch_doc_path_input",
     "patch_doc_load_button",
+    "patch_doc_refresh_button",
+    "patch_script_section_label",
+    "patch_doc_file_row",
+    "patch_doc_file_line1",
+    "patch_doc_file_line2",
+    "patch_doc_controls",
     "patch_doc_validate_button",
     "patch_doc_apply_button",
     "patch_doc_save_button",
+    "patch_checks_section_label",
+    "patch_checks_controls",
     "patch_checks_run_button",
-    "patch_doc_controls",
     "patch_checks_help",
-    "patch_doc_file_row",
-    "patch_paste_text",
-    "patch_paste_parse_button",
+    "patch_doc_entry_inputs",
+    "patch_entry_address_input",
+    "patch_entry_value_input",
+    "patch_entry_bytes_input",
+    "patch_before_after_card",
+    "patch_history_strip",
+    "patch_history_controls",
+    "patch_undo_button",
+    "patch_redo_button",
+    "patch_execute_row",
+    "patch_execute_scope_button",
+    "patch_execute_run_button",
+    "patch_scope_line",
     "patch_paste_controls",
     "patch_paste_row",
-    "patch_pane_changefile",
+    "patch_paste_text",
+    "patch_paste_parse_button",
 )
+
+# The post-rework DIRECT-parent census (see the note above): every id maps to
+# the widget it must be a direct child of — the batch-94 homes.
+_REGROUP_PARENTAGE = {
+    # the change-file row docks in the PATCH SCRIPT window, split in two lines
+    "patch_doc_file_row": "patch_win_script",
+    "patch_doc_file_line1": "patch_doc_file_row",
+    "patch_doc_file_line2": "patch_doc_file_row",
+    "patch_doc_file_select": "patch_doc_file_line1",
+    "patch_doc_path_input": "patch_doc_file_line1",
+    "patch_doc_load_button": "patch_doc_file_line1",
+    "patch_doc_refresh_button": "patch_doc_file_line2",
+    "patch_script_section_label": "patch_doc_file_line2",
+    # the document controls hold exactly Validate / Apply loaded changes / Save
+    "patch_doc_controls": "patch_win_script",
+    "patch_doc_validate_button": "patch_doc_controls",
+    "patch_doc_apply_button": "patch_doc_controls",
+    "patch_doc_save_button": "patch_doc_controls",
+    # the Checks section: label + the Run-checks/help controls
+    "patch_checks_section_label": "patch_win_checks",
+    "patch_checks_controls": "patch_win_checks",
+    "patch_checks_run_button": "patch_checks_controls",
+    "patch_checks_help": "patch_checks_controls",
+    # the entry-input band + the before/after card ride the JSON window BODY
+    "patch_doc_entry_inputs": "patch_win_json_body",
+    "patch_entry_address_input": "patch_doc_entry_inputs",
+    "patch_entry_value_input": "patch_doc_entry_inputs",
+    "patch_entry_bytes_input": "patch_doc_entry_inputs",
+    "patch_before_after_card": "patch_win_json_body",
+    # the history strip / Undo-Redo / execute-scope group dock in the JSON
+    # window (siblings of the body, never inside it — the B2 invariant)
+    "patch_history_strip": "patch_win_json",
+    "patch_history_controls": "patch_win_json",
+    "patch_undo_button": "patch_history_controls",
+    "patch_redo_button": "patch_history_controls",
+    "patch_execute_row": "patch_win_json",
+    "patch_execute_scope_button": "patch_execute_buttons",
+    "patch_execute_run_button": "patch_execute_buttons",
+    "patch_scope_line": "patch_execute_row",
+    # the paste controls dock in the JSON window; the editor rides its body
+    "patch_paste_controls": "patch_win_json",
+    "patch_paste_parse_button": "patch_paste_controls",
+    "patch_paste_row": "patch_win_json_body",
+    "patch_paste_text": "patch_paste_row",
+}
 
 
 def test_at057a_two_labeled_sections_ids_and_parentage(
@@ -2284,15 +2365,20 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
     """AT-057a (gate) — two labeled sections; ids + AT-032a span survive.
 
     Intent: HLR-057 / LLR-057.1/057.2 — with the Patch Editor open, the
-    operator sees a patch-script section label above ``#patch_doc_controls``
-    (now holding exactly the Load/Validate/Apply/Save buttons) and a checks
-    section label above the new ``#patch_checks_controls`` container holding
-    the Run-checks button and its help text. All 15 pre-batch widget ids
-    remain queryable and the locked AT-032a token span still renders in
-    ``#patch_checks_help`` (the regroup moves the label's container, never
-    its text). Counterfactual (QC-2): revert to the batch-22 mixed five-button
-    row ⇒ the section labels and ``#patch_checks_controls`` resolve to no
-    widget → RED (recorded at increment Inc-5 as the live RED).
+    operator sees a "Patch script" section label riding the change-file row
+    (batch-94/finding B: on file-row LINE 2, beside Refresh, above the
+    Load/Refresh file controls) and a "Checks" section label above
+    ``#patch_checks_controls`` (the Run-checks button + its help text). The
+    post-rework id census (``_PRESERVED_REGROUP_IDS``) resolves verbatim —
+    every id at its batch-94 home (``_REGROUP_PARENTAGE``): the file-row
+    controls under the row's two lines, the entry-input band + before/after
+    card in the JSON window body, the history strip / Undo-Redo / execute
+    group + paste controls docked in the JSON window — and the locked
+    AT-032a token span still renders in ``#patch_checks_help`` (the rework
+    moves containers, never the help text). Counterfactual (QC-2): revert to
+    the batch-22 mixed five-button row ⇒ the section labels /
+    ``#patch_checks_controls`` / the batch-94 homes resolve wrong → RED
+    (recorded at increment Inc-5 as the live RED).
     """
     from textual.widgets import Button, Label
 
@@ -2314,8 +2400,24 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
                 for wid in _PRESERVED_REGROUP_IDS
                 if len(app.query(f"#{wid}")) == 1
             ]
+            outcomes["wrong_parents"] = [
+                f"{wid} (under {got!r})"
+                for wid, parent in _REGROUP_PARENTAGE.items()
+                if len(app.query(f"#{wid}")) == 1
+                and (got := getattr(app.query_one(f"#{wid}").parent, "id", None))
+                != parent
+            ]
+            outcomes["script_label_parent"] = getattr(
+                app.query_one("#patch_script_section_label", Label).parent,
+                "id",
+                None,
+            )
+            outcomes["checks_label_y"] = app.query_one(
+                "#patch_checks_section_label", Label
+            ).region.y
             run_button = app.query_one("#patch_checks_run_button", Button)
             outcomes["run_parent"] = getattr(run_button.parent, "id", None)
+            outcomes["run_y"] = run_button.region.y
             help_label = app.query_one("#patch_checks_help", Label)
             outcomes["help_parent"] = getattr(help_label.parent, "id", None)
             outcomes["help_text"] = str(help_label.render())
@@ -2336,6 +2438,18 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
         "missing preserved ids: "
         f"{set(_PRESERVED_REGROUP_IDS) - set(outcomes['present_ids'])}"
     )
+    assert outcomes["wrong_parents"] == [], (
+        "ids not at their batch-94 homes: "
+        f"{outcomes['wrong_parents']}"
+    )
+    assert outcomes["script_label_parent"] == "patch_doc_file_line2", (
+        "the 'Patch script' section label must ride file-row line 2 beside "
+        f"Refresh (finding B), got {outcomes['script_label_parent']!r}"
+    )
+    assert outcomes["checks_label_y"] < outcomes["run_y"], (
+        "the 'Checks' section label must sit ABOVE the Run-checks button in "
+        "the CHECKS window"
+    )
     assert outcomes["run_parent"] == "patch_checks_controls", (
         f"Run checks must live under #patch_checks_controls, got "
         f"{outcomes['run_parent']!r}"
@@ -2345,21 +2459,22 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
         f"{outcomes['help_parent']!r}"
     )
     assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
-        "the locked AT-032a token span must survive the regroup, got "
+        "the locked AT-032a token span must survive the rework, got "
         f"{outcomes['help_text']!r}"
     )
     assert outcomes["controls_button_ids"] == [
-        "patch_doc_load_button",
-        "patch_doc_refresh_button",
         "patch_doc_validate_button",
         "patch_doc_apply_button",
         "patch_doc_save_button",
     ], (
-        # batch-37 (US-064a / LLR-064a.1): Refresh is added to the patch-script
-        # controls row after Load (additive; Load/Validate/Apply/Save order and
-        # ids preserved, LLR-064a.2). Supersedes the batch-35 four-button pin.
-        "#patch_doc_controls must retain Load/Refresh/Validate/Apply/Save, "
-        f"got {outcomes['controls_button_ids']}"
+        # batch-94 (annotation 6 / HLR-008): Load and Refresh moved up into
+        # the change-file row beside the path input, so #patch_doc_controls
+        # holds exactly Validate / **Apply loaded changes** / Save. This
+        # supersedes the batch-37 five-button pin (Load/Refresh/Validate/
+        # Apply/Save) — refresh semantics moved with it (see AT-064a/TC-328).
+        "#patch_doc_controls must retain exactly Validate/Apply/Save "
+        f"(Load/Refresh live in the change-file row), got "
+        f"{outcomes['controls_button_ids']}"
     )
 
 
@@ -2448,13 +2563,16 @@ def test_at057b_regroup_wiring_and_binding_regression(
 
 
 # ---------------------------------------------------------------------------
-# AT-058b / LLR-058.3 — zero behaviour change: the 15-id census + the
+# AT-058b / LLR-058.3 — zero behaviour change: the 14-id census + the
 # check-run wiring survive the batch-36 paste-group reparent (US-058).
 # ---------------------------------------------------------------------------
 
-# The 15 patch-editor widget ids that the compose+CSS-only reparent must
+# The 14 patch-editor widget ids that the compose+CSS-only reparent must
 # preserve (LLR-058.3). #patch_paste_text / #patch_paste_parse_button move to
 # a new parent cell but stay globally queryable by the same id.
+# batch-94 (HLR-006): ``patch_variant_select`` LEFT the census — the variant
+# dropdown retired with the panel variant group (its observer is
+# ``tests/test_tui_patch_variant.py``).
 _PATCH_PRESERVED_IDS = (
     "patch_doc_entries_table",
     "patch_doc_path_input",
@@ -2467,7 +2585,6 @@ _PATCH_PRESERVED_IDS = (
     "patch_checks_help",
     "patch_paste_text",
     "patch_paste_parse_button",
-    "patch_variant_select",
     "patch_execute_run_button",
     "patch_saveback_name_input",
     "patch_saveback_confirm_button",
@@ -2480,9 +2597,11 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
     Intent: LLR-058.3 (US-058) — the batch-36 change is compose-tree + CSS
     only; moving ``#patch_paste_row`` out of ``#patch_pane_changefile`` into its
     own panel cell must not drop any widget id or alter any handler / binding.
-    Assert (a) all 15 preserved ids resolve to exactly one widget after the
+    Assert (a) all 14 preserved ids resolve to exactly one widget after the
     reparent (the save-back ids are queried once its hidden row is composed —
-    it is composed, just ``.hidden``), (b) the AT-032a locked ``#patch_checks_help``
+    it is composed, just ``.hidden``; the census shrank from 15 at batch-94:
+    ``patch_variant_select`` retired with the HLR-006 variant group), (b) the
+    AT-032a locked ``#patch_checks_help``
     token span is unchanged, and (c) the AT-032b run_checks idiom still routes
     (pressing ``#patch_checks_run_button`` posts the "Checks:" status line —
     C-12: the status line is produced by the real handler, not injected).
@@ -2503,7 +2622,7 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
 
-            # (a) 15-id census — each id resolves to exactly one widget.
+            # (a) 14-id census — each id resolves to exactly one widget.
             outcomes["id_counts"] = {
                 wid: len(app.query(f"#{wid}")) for wid in _PATCH_PRESERVED_IDS
             }
@@ -2590,19 +2709,27 @@ def _entry_addresses(app: S19TuiApp) -> list[str]:
 def test_at064a_refresh_rereads_edited_file_into_editor(
     tmp_path: Path,
 ) -> None:
-    """Refresh re-reads the loaded change file from disk into the editor.
+    """Refresh repopulates the file dropdown; the loaded doc is NOT re-read.
 
-    Intent (AT-064a, US-064a / LLR-064a.1, C-12 output-then-consume): the
-    operator loads a change file, the file is then edited EXTERNALLY (a new
-    entry at a NEW address), the operator presses Refresh, and the entries
-    table reflects the NEW on-disk content — asserting the SPECIFIC new
-    address (content, C-10), not merely that the table re-rendered. The AT
-    drives the REAL ``#patch_doc_refresh_button`` press through
-    ``on_button_pressed`` and reads the table the real ``ChangeService.load``
-    handler produced — never a value the test injected into the table.
+    Intent (AT-064a, batch-94 HLR-008 / annotation 6 / LLR-008.2 — SUPERSEDES
+    batch-37 US-064a's re-read semantics): Refresh is now "Refresh Files in
+    Folder" — it repopulates the change-file dropdown from the
+    ``workarea/patches/`` scan and NEVER re-reads or mutates the loaded
+    document. The drive adds a NEW change file to ``patches/`` MID-DRIVE and
+    edits the loaded file on disk EXTERNALLY, then presses the REAL
+    ``#patch_doc_refresh_button`` through ``on_button_pressed``:
+
+    (a) the dropdown options equal the patches-folder scan — the NEW file
+        appears (content, C-10), and it was NOT listed before Refresh;
+    (b) the loaded document is byte-identical to before — same object
+        identity, same source_path, same entries (the externally-added 0x555
+        does NOT appear) — a refresh that mutates the bound document is the
+        negative control;
+    (c) the status line names the folder refresh.
     """
-    from textual.widgets import Button, Input
+    from textual.widgets import Button, Input, Select
 
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
     doc_path = _write_v2_document(
         tmp_path / "editable.json",
         [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
@@ -2621,9 +2748,17 @@ def test_at064a_refresh_rereads_edited_file_into_editor(
             panel.request_action("load_doc")
             await pilot.pause()
             outcomes["before"] = _entry_addresses(app)
+            document_before = app._change_service.document
+            outcomes["document_before"] = document_before
+            select = app.query_one("#patch_doc_file_select", Select)
+            outcomes["options_before"] = _select_option_values(select)
 
-            # External edit: the SAME file now declares a NEW entry at a NEW
-            # address that did not exist in the first on-disk version.
+            # Mid-drive folder growth + an EXTERNAL edit of the loaded file.
+            late_path = _write_v2_document(
+                patches / "late-arrival.json",
+                [{"type": "string", "address": "0x999", "value": "LATE"}],
+            )
+            assert late_path.exists()
             _write_v2_document(
                 doc_path,
                 [
@@ -2638,35 +2773,78 @@ def test_at064a_refresh_rereads_edited_file_into_editor(
             app.query_one("#patch_doc_refresh_button", Button).press()
             await pilot.pause()
             outcomes["after"] = _entry_addresses(app)
+            outcomes["document_after"] = app._change_service.document
+            outcomes["source_after"] = (
+                app._change_service.document.source_path
+            )
+            outcomes["options_after"] = _select_option_values(select)
+            outcomes["scan_after"] = app._scan_patch_change_files()
+            outcomes["status_line"] = any(
+                "file list refreshed" in line for line in app.log_lines
+            )
         return outcomes
 
     outcomes = asyncio.run(_drive())
+    document_before = outcomes.pop("document_before")
+    document_after = outcomes.pop("document_after")
+    # (a) the dropdown now lists the folder scan — the late file appears, and
+    # only because Refresh repopulated it (it was absent before).
+    assert "late-arrival.json" not in outcomes["options_before"], (
+        f"the mid-drive file must not be listed before Refresh; got "
+        f"{outcomes['options_before']!r}"
+    )
+    assert "late-arrival.json" in outcomes["options_after"], (
+        "after Refresh the dropdown must list the NEW patches/ file; got "
+        f"{outcomes['options_after']!r}"
+    )
+    assert sorted(outcomes["options_after"]) == sorted(
+        outcomes["scan_after"]
+    ), (
+        "the dropdown options must EQUAL the patches-folder scan after "
+        f"Refresh; got {outcomes['options_after']!r} vs scan "
+        f"{outcomes['scan_after']!r}"
+    )
+    assert outcomes["status_line"] is True, (
+        "Refresh must surface the 'file list refreshed' status line"
+    )
+    # (b) the loaded document is untouched — identity, source, entries — even
+    # though its on-disk file now declares 0x555.
     assert "0x555" not in outcomes["before"], (
         "the new entry must not exist before the external edit + refresh"
     )
-    assert "0x555" in outcomes["after"], (
-        "after Refresh the entries table must show the NEW on-disk entry "
-        f"(0x555); got {outcomes['after']!r}"
+    assert document_after is document_before, (
+        "Refresh must NOT re-read/replace the loaded document object"
+    )
+    assert outcomes["source_after"] == document_before.source_path, (
+        "Refresh must not rebind the loaded document's source_path"
+    )
+    assert outcomes["after"] == outcomes["before"], (
+        "Refresh must not mutate the loaded document's entries — the "
+        f"externally-added 0x555 must stay absent; got {outcomes['after']!r}"
     )
     assert "0x100" in outcomes["after"], (
-        "the pre-existing entry must survive the refresh re-read"
+        "the pre-existing entry must survive the folder refresh untouched"
     )
 
 
 def test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded(
     tmp_path: Path,
 ) -> None:
-    """Refresh re-reads ``document.source_path``, never the widget value.
+    """Refresh never re-reads a document: not the source, not the widget path.
 
-    Intent (TC-328, LLR-064a.1, A-03): (a) after a load, editing
-    ``#patch_doc_path_input`` to point at a DIFFERENT file must NOT redirect
-    refresh — refresh re-reads the file the document was loaded from
-    (``ChangeService.document.source_path``), so the OTHER file's entry never
-    appears; (b) with no document loaded (``source_path is None``), Refresh
-    is a safe no-op that surfaces the existing load guard and does not crash.
+    Intent (TC-328, batch-94 HLR-008 / annotation 6 / LLR-008.2 — SUPERSEDES
+    the batch-37 A-03 re-read semantics): (a) after a load, pointing
+    ``#patch_doc_path_input`` at a DIFFERENT file and pressing Refresh must
+    NOT redirect ANY read — the loaded document keeps its identity, its
+    source_path and its exact entries (the OTHER file's 0xABC never appears,
+    and the source file's 0x100 stays); (b) with no document loaded, Refresh
+    is still a safe "Refresh Files in Folder" — it repopulates the dropdown
+    and posts the status line, never crashes, and leaves the document
+    unloaded (source_path None, table empty).
     """
-    from textual.widgets import Button, Input
+    from textual.widgets import Button, Input, Select
 
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
     loaded_doc = _write_v2_document(
         tmp_path / "loaded.json",
         [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
@@ -2684,26 +2862,43 @@ def test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded(
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            select = app.query_one("#patch_doc_file_select", Select)
 
-            # (b) No document loaded yet -> source_path is None -> refresh
-            # is a no-op guard, not a crash.
+            # (b) No document loaded yet -> Refresh must not crash and must
+            # not conjure a document: the folder scan still runs (dropdown ==
+            # scan) and the status line names the folder refresh.
             outcomes["source_before"] = (
                 app._change_service.document.source_path
             )
+            _write_v2_document(
+                patches / "only-after-refresh.json",
+                [{"type": "string", "address": "0x777", "value": "FOLDER"}],
+            )
             app.query_one("#patch_doc_refresh_button", Button).press()
             await pilot.pause()
-            outcomes["guard_line"] = any(
-                "enter a change-file path to load" in line
-                for line in app.log_lines
+            outcomes["status_line"] = any(
+                "file list refreshed" in line for line in app.log_lines
             )
             outcomes["rows_after_noop"] = _entry_addresses(app)
+            outcomes["options_after_unloaded_refresh"] = (
+                _select_option_values(select)
+            )
+            outcomes["scan_after_unloaded_refresh"] = (
+                app._scan_patch_change_files()
+            )
+            outcomes["source_after_unloaded"] = (
+                app._change_service.document.source_path
+            )
 
             # (a) Load a file, then point the widget at a DIFFERENT file.
             _set_entry_inputs(app, path_text=str(loaded_doc))
             panel.request_action("load_doc")
             await pilot.pause()
+            document_before = app._change_service.document
+            outcomes["document_before"] = document_before
+            outcomes["entries_before"] = _entry_addresses(app)
             outcomes["source_after_load"] = (
-                app._change_service.document.source_path is not None
+                document_before.source_path is not None
             )
             app.query_one(
                 "#patch_doc_path_input", Input
@@ -2711,22 +2906,41 @@ def test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded(
 
             app.query_one("#patch_doc_refresh_button", Button).press()
             await pilot.pause()
+            outcomes["document_after"] = app._change_service.document
             outcomes["addresses"] = _entry_addresses(app)
         return outcomes
 
     outcomes = asyncio.run(_drive())
-    # (b) no-op guard when unloaded.
+    document_before = outcomes.pop("document_before")
+    document_after = outcomes.pop("document_after")
+    # (b) unloaded arm: a safe folder refresh, not a crash, no document.
     assert outcomes["source_before"] is None
-    assert outcomes["guard_line"] is True, (
-        "Refresh with no document loaded must surface the load guard"
+    assert outcomes["status_line"] is True, (
+        "Refresh with no document loaded must still surface the folder-"
+        "refresh status line"
     )
     assert outcomes["rows_after_noop"] == [], (
         "Refresh with no document must not populate the table"
     )
-    # (a) refresh re-read the source_path file, NOT the widget's other file.
+    assert outcomes["source_after_unloaded"] is None, (
+        "Refresh with no document must not conjure one (source_path stays None)"
+    )
+    assert sorted(outcomes["options_after_unloaded_refresh"]) == sorted(
+        outcomes["scan_after_unloaded_refresh"]
+    ), (
+        "the unloaded Refresh must still repopulate the dropdown from the "
+        f"folder scan; got {outcomes['options_after_unloaded_refresh']!r}"
+    )
+    # (a) the loaded document is identity- and content-pinned: refresh reads
+    # NOTHING — neither the widget's other file nor even its own source file.
     assert outcomes["source_after_load"] is True
-    assert "0x100" in outcomes["addresses"], (
-        "refresh must re-read the loaded document's source_path file"
+    assert document_after is document_before, (
+        "Refresh must not re-read/replace the loaded document object (A-03)"
+    )
+    assert outcomes["entries_before"] == ["0x100"]
+    assert outcomes["addresses"] == ["0x100"], (
+        "the loaded document's entries must be untouched by Refresh; got "
+        f"{outcomes['addresses']!r}"
     )
     assert "0xABC" not in outcomes["addresses"], (
         "refresh must NOT redirect to the widget path-input value (A-03); "
@@ -3356,17 +3570,27 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
     )
 
     async def _click(pilot: object, app: S19TuiApp, selector: str) -> None:
-        """Drive a REAL pointer click on a PATCH SCRIPT docked control (C-16).
+        """Drive a REAL pointer click on a panel control (C-16).
 
-        batch-46: the Add / Undo / Redo / entry buttons are docked siblings of
-        the PATCH SCRIPT window body, below it. Scroll the WINDOW
-        (``#patch_win_script`` — the scroll container that reveals the docked
-        rows, not the body) to its end so the control row is on-screen, then
+        batch-94: the panel is the ONE vertical scroll (all three
+        ``#patch_win_*`` windows are content-height ``auto``, stacked
+        script→json→checks), so the docked rows — the entry chips in the
+        SCRIPT window and the history strip / Undo-Redo in the JSON window —
+        are reached by scrolling the PANEL, not a window. Scroll
+        ``#patch_editor_panel`` so the target control is on-screen, then
         ``pilot.click`` delivers a genuine mouse event to the button (no
         ``.focus()``, no direct handler / service call).
         """
-        app.query_one("#patch_win_script").scroll_end(animate=False)
-        await pilot.pause()
+        panel = app.query_one("#patch_editor_panel")
+        target = app.query_one(selector)
+        for _ in range(4):
+            panel.scroll_y = max(
+                0,
+                target.region.y
+                - panel.content_region.y
+                + panel.scroll_offset.y,
+            )
+            await pilot.pause()
         await pilot.click(selector)
         await pilot.pause()
 

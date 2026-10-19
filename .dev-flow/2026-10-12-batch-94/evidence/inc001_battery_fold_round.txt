@@ -1,0 +1,228 @@
+=== FOLD ROUND (F1) ===
+re-run of battery arms 05/06 against the strengthened tests (fold round)
+command: python -B .dev-flow/2026-10-12-batch-94/evidence/inc001_battery.py 05,06
+
+==============================================================================
+inc001 mutation battery — batch-94 increment 001 (tip b6f974f)
+cwd: C:\Users\jjgh8\Github\s19_app-b94
+==============================================================================
+subset mode: arms ['05', '06']
+
+[phase 0] resolving node ids via pytest --collect-only
+
+[phase 1] arms: 2; node-runs: 2
+
+[phase 2] clean-tree baseline (all 27 nodes, ONE pytest run)
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..                                                                       [100%]
+2 passed in 5.71s
+  baseline exit: 0 (expect 0)
+
+[phase 3] mutation battery
+
+--- arm 05: s19_app/tui/screens_directionb.py
+    note: dirty-load guard suppressed: no LoadGuard popup
+    edit: '            if self._dirty:'
+          -> '            if False:'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_at_b94_06_dirty_load_accept_loss ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18928/test_at_b94_06_dirty_load_acce0')
+
+    def test_at_b94_06_dirty_load_accept_loss(tmp_path: Path) -> None:
+        """AT-B94-06 — the warning pops; accept loads the target, flag clear.
+    
+        Intent (HLR-005, C-10 branch 1): with unsaved edits, Load raises the
+        guard popup; accepting loses the edits and loads the path input's
+        document — the table shows the target's rows and the dirty flag clears.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "target.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                await _seed_dirty_state(app, pilot)
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                assert panel._dirty, "precondition: the panel is dirty"
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "target.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                popup_shown = len(app.screen.query("#load_guard_title")) == 1
+                await _press_screen_button(app, pilot, "#load_guard_accept")
+                await pilot.pause()
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                return (
+                    popup_shown,
+                    table.row_count,
+                    panel._dirty,
+                    len(app.query_one("#patch_doc_path_input", Input).value),
+                    any(isinstance(s, LoadGuardScreen) for s in app.screen_stack),
+                )
+    
+>       popup_shown, rows, dirty, _path_len, guard_left = asyncio.run(_drive())
+
+tests\test_tui_patch_editor_b94.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+..\..\anaconda3\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+..\..\anaconda3\Lib\asyncio\base_events.py:687: in run_until_complete
+    return future.result()
+tests\test_tui_patch_editor_b94.py:393: in _drive
+    await _press_screen_button(app, pilot, "#load_guard_accept")
+tests\test_tui_patch_editor_b94.py:140: in _press_screen_button
+    app.screen.query_one(button_id, Button).focus()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Screen(id='_default'), selector = '#load_guard_accept'
+expect_type = <class 'textual.widgets._button.Button'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#load_guard_accept' on Screen(id='_default')
+
+..\..\anaconda3\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+1 failed in 2.41s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 05 [tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss]: RED (KILLED)
+
+--- arm 06: s19_app/tui/screens_directionb.py
+    note: LoadGuard cancel arm dismisses-with-loss (True instead of False)
+    edit: '        elif button_id == "load_guard_cancel":\r\n            event.stop()\r\n            self.dismiss(False)'
+          -> '        elif button_id == "load_guard_cancel":\r\n            event.stop()\r\n            self.dismiss(True)'
+    before: 9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552
+  $ C:\Users\jjgh8\anaconda3\python.exe -B -m pytest -q -p no:cacheprovider --color=no tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+C:\Users\jjgh8\anaconda3\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________________ test_at_b94_07_dirty_load_cancel_keeps ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-18929/test_at_b94_07_dirty_load_canc0')
+
+    def test_at_b94_07_dirty_load_cancel_keeps(tmp_path: Path) -> None:
+        """AT-B94-07 — cancel retains 100% of prior rows and the dirty flag.
+    
+        Intent (HLR-005, C-10 branch 2): cancel aborts the load — the two prior
+        rows survive, the flag stays set, and the target document is not
+        mounted.
+        """
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            patches = _patches_dir(app)
+            (patches / "target.json").write_text(VALID_ONE, encoding="utf-8")
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await pilot.press("6")
+                await pilot.pause()
+                await _seed_dirty_state(app, pilot)
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    patches / "target.json"
+                )
+                await _press_button(app, pilot, "#patch_doc_load_button")
+                await pilot.pause()
+                await _press_screen_button(app, pilot, "#load_guard_cancel")
+                await pilot.pause()
+                await pilot.pause()
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                bound = len(app._change_service.document.entries)
+                return (
+                    table.row_count,
+                    panel._dirty,
+                    bound,
+                    any(isinstance(s, LoadGuardScreen) for s in app.screen_stack),
+                )
+    
+        rows, dirty, bound, guard_left = asyncio.run(_drive())
+>       assert rows == 2, f"100% of the prior rows are retained, got {rows}"
+E       AssertionError: 100% of the prior rows are retained, got 1
+E       assert 1 == 2
+
+tests\test_tui_patch_editor_b94.py:450: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+1 failed in 2.92s
+    after:  9b8f5ada1621c4966be0b686e45980eafbd2b7f65e82a0a7c0d7d722d979b552 restore-ok=True
+    arm 06 [tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps]: RED (KILLED)
+
+==============================================================================
+VERDICT TABLE (arm -> node -> edit anchor -> verdict -> restore)
+==============================================================================
+arm 05 | tests/test_tui_patch_editor_b94.py::test_at_b94_06_dirty_load_accept_loss
+    edit:             if self._dirty:... | RED (KILLED) | restore-hash OK
+    note: dirty-load guard suppressed: no LoadGuard popup
+arm 06 | tests/test_tui_patch_editor_b94.py::test_at_b94_07_dirty_load_cancel_keeps
+    edit:         elif button_id == "load_guard_cancel":... | RED (KILLED) | restore-hash OK
+    note: LoadGuard cancel arm dismisses-with-loss (True instead of False)
+------------------------------------------------------------------------------
+TOTALS: 2 node-runs | RED 2 | SURVIVED 0 | CRASH/BAD 0
+runner exit: 0 (all arms killed)
+
+=== FOLD ROUND (F1) ===

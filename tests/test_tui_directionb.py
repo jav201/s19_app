@@ -125,15 +125,20 @@ from textual.binding import Binding
 from textual.widgets import Input
 
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.app import RAIL_ENTRIES_B94 as RAIL_ENTRIES
 from s19_app.tui.command_bar import CommandBar
 from s19_app.tui.insight_style import human_bytes
 from s19_app.tui.models import LoadedFile
-from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
+from s19_app.tui.rail import Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
 from s19_app.tui.screens_directionb import MemoryMapPanel
 
 
-# The 10 Direction B rail screen container ids, in rail order (keys 1-9 then 0).
+# The 12 Direction B rail screen container ids, in rail order (keys 1-9 then
+# 0 for the 10th digit-bound screen; batch-94 LLR-002.1 inserts the Check
+# Editor after Patch Editor on the `=` binding and US-007 inserts Flow
+# Execution after Flow Builder on the `]` binding — the digits still bind the
+# ten pre-batch-94 screens).
 SCREEN_IDS = [
     "screen_workspace",
     "screen_a2l",
@@ -141,8 +146,10 @@ SCREEN_IDS = [
     "screen_map",
     "screen_issues",
     "screen_patch",
+    "screen_check_editor",
     "screen_diff",
     "screen_flow",
+    "screen_flow_execution",
     "screen_checks",
     "screen_crc_designer",
 ]
@@ -155,19 +162,36 @@ SCREEN_KEYS = [
     "map",
     "issues",
     "patch",
+    "check_editor",
     "diff",
     "flow",
+    "flow_execution",
     "checks",
     "crc_designer",
 ]
 
-# Rail keys in rail order: digits 1-9 then 0 for the 10th screen (keys 1-9 exhausted).
+# The digit-bound screens: keys 1-9 and 0 bind the ten pre-batch-94 screens
+# (the digit row was exhausted at 10 surfaces — batch-94 R-1); the Check
+# Editor routes through the `equals_sign` binding and Flow Execution through
+# the `right_square_bracket` binding instead, so the digit census derives by
+# excluding both, in rail order.
+_NON_DIGIT_SCREEN_KEYS = ("check_editor", "flow_execution")
+DIGIT_SCREEN_IDS = [
+    sid for key, sid in zip(SCREEN_KEYS, SCREEN_IDS)
+    if key not in _NON_DIGIT_SCREEN_KEYS
+]
+DIGIT_SCREEN_KEYS = [key for key in SCREEN_KEYS if key not in _NON_DIGIT_SCREEN_KEYS]
+
+# Rail keys in rail order: digits 1-9 then 0 for the 10th digit-bound screen.
 RAIL_KEYS_IN_ORDER = "1234567890"
 
 # Consistency guard (C-28 rail census): the test enumerations MUST track the
 # production rail — a future rail add/remove that skips these trips loudly here.
 assert len(SCREEN_IDS) == len(SCREEN_KEYS) == len(RAIL_ENTRIES), (
     "rail census drift: SCREEN_IDS/SCREEN_KEYS must match len(RAIL_ENTRIES)"
+)
+assert len(DIGIT_SCREEN_IDS) == len(RAIL_KEYS_IN_ORDER) == 10, (
+    "digit census drift: exactly ten digit-bound screens"
 )
 
 
@@ -246,14 +270,14 @@ def test_tc003_rail_keys_1_to_9_route_screens(tmp_path: Path) -> None:
         result: dict[str, list[str]] = {}
         async with app.run_test() as pilot:
             await pilot.pause()
-            for digit, expected_id in zip("123456789", SCREEN_IDS):
+            for digit, expected_id in zip("123456789", DIGIT_SCREEN_IDS):
                 await pilot.press(digit)
                 await pilot.pause()
                 result[digit] = _visible_screens(app)
         return result
 
     per_digit = asyncio.run(_drive())
-    for digit, expected_id in zip("123456789", SCREEN_IDS):
+    for digit, expected_id in zip("123456789", DIGIT_SCREEN_IDS):
         assert per_digit[digit] == [expected_id], (
             f"Key '{digit}' should activate {expected_id}, "
             f"got {per_digit[digit]}"
@@ -461,10 +485,15 @@ def test_tc037_scaffold_screens_carry_empty_state(tmp_path: Path) -> None:
 # Increment 3 — activity rail widget + rail navigation wiring
 # ===========================================================================
 
-# The 10 rail items, in rail order, paired with their screen key and the
+# The 12 rail items, in rail order, paired with their screen key and the
 # normative LLR-001.3 glyph -> screen mapping table (Unicode + ASCII).
 # batch-49 (LLR-083.1): Checks appended as the 9th entry on key 9.
 # batch-58 (LLR-V1.1): CRC Designer appended as the 10th entry on key 0.
+# batch-94 (LLR-002.1): Check Editor inserted after Patch Editor on the
+# `=` binding; Flow Execution inserted after Flow Builder on the `]` binding
+# (the digit row was exhausted at 10 surfaces — R-1 closure). The glyph/ascii
+# pairs are the Phase-3 chrome census (✔ / K — C is Checks; ▶ / > — the fx_a
+# run glyph).
 EXPECTED_RAIL = [
     ("workspace", "◫", "#"),
     ("a2l", "≡", "="),
@@ -472,10 +501,19 @@ EXPECTED_RAIL = [
     ("map", "▤", "M"),
     ("issues", "!", "!"),
     ("patch", "✎", "P"),
+    ("check_editor", "✔", "K"),
     ("diff", "⏚", "D"),
     ("flow", "✦", "F"),
+    ("flow_execution", "▶", ">"),
     ("checks", "☑", "C"),
     ("crc_designer", "⊕", "R"),
+]
+
+# The digit-bound EXPECTED_RAIL rows (the Check Editor routes via `=` and
+# Flow Execution via `]`, not a digit) — the digit-routing tests zip these
+# with "123456789"/"0".
+DIGIT_EXPECTED_RAIL = [
+    entry for entry in EXPECTED_RAIL if entry[0] not in _NON_DIGIT_SCREEN_KEYS
 ]
 
 
@@ -485,12 +523,15 @@ EXPECTED_RAIL = [
 
 
 def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
-    """The activity rail composes exactly 9 items in the keymap rail order.
+    """The activity rail composes exactly 12 items in the keymap rail order.
 
-    Intent: LLR-001.1 / batch-49 LLR-083.1 — the rail is fixed at nine items,
-    ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks. Each
-    item's 1-based position is its ``1``-``9`` keymap key, and that key
-    routes the item's screen via ``action_show_screen``.
+    Intent: LLR-001.1 / batch-49 LLR-083.1 / batch-94 LLR-002.1 — the rail
+    is fixed at twelve items, ordered Workspace, A2L, MAC, Map, Issues,
+    Patch, Check Editor, Diff, Flow, Flow Execution, Checks, CRC Designer.
+    Each digit-bound item's 1-based position is its keymap key; the Check
+    Editor (position 7) routes through the ``=`` binding and Flow Execution
+    (position 10) through the ``]`` binding (batch-94 R-1 — the digit row
+    was exhausted at 10 surfaces).
     """
 
     async def _drive() -> tuple[list[str], list[int]]:
@@ -506,8 +547,8 @@ def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
     assert keys == [key for key, _, _ in EXPECTED_RAIL], (
         f"Rail item order should match the keymap rail order, got {keys}"
     )
-    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (
-        f"Rail items must be positioned 1-10 in order, got {positions}"
+    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], (
+        f"Rail items must be positioned 1-12 in order, got {positions}"
     )
 
 
@@ -516,7 +557,8 @@ def test_tc001_rail_keys_1_to_9_route_through_rail_items(tmp_path: Path) -> None
 
     Intent: LLR-001.1 / batch-49 LLR-083.1 — each rail item is bound to its
     ``1``-``9`` key. The digit keys must route to the same screen that rail
-    item represents, so keyboard navigation and the rail agree.
+    item represents, so keyboard navigation and the rail agree. Batch-94:
+    the digit rows skip the Check Editor (position 7) — it binds ``=``.
     """
 
     async def _drive() -> dict[str, str]:
@@ -524,14 +566,14 @@ def test_tc001_rail_keys_1_to_9_route_through_rail_items(tmp_path: Path) -> None
         result: dict[str, str] = {}
         async with app.run_test() as pilot:
             await pilot.pause()
-            for digit, (screen_key, _, _) in zip("123456789", EXPECTED_RAIL):
+            for digit, (screen_key, _, _) in zip("123456789", DIGIT_EXPECTED_RAIL):
                 await pilot.press(digit)
                 await pilot.pause()
                 result[digit] = app.query_one(Rail).active_key
         return result
 
     per_digit = asyncio.run(_drive())
-    for digit, (screen_key, _, _) in zip("123456789", EXPECTED_RAIL):
+    for digit, (screen_key, _, _) in zip("123456789", DIGIT_EXPECTED_RAIL):
         assert per_digit[digit] == screen_key, (
             f"Key '{digit}' should activate rail item '{screen_key}', "
             f"got '{per_digit[digit]}'"
@@ -626,7 +668,7 @@ def test_tc002_active_marker_moves_and_clears_previous(tmp_path: Path) -> None:
         f"After activating item 3 only MAC should be active, got {after_mac}"
     )
     for digit, state in zip("123456789", key_states):
-        screen_key = EXPECTED_RAIL[int(digit) - 1][0]
+        screen_key = DIGIT_EXPECTED_RAIL[int(digit) - 1][0]
         assert state == [screen_key], (
             f"Key '{digit}': exactly the '{screen_key}' item must be "
             f"active, got {state}"
@@ -708,7 +750,12 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             # Force the fallback mode by re-mounting the rail in ASCII mode.
             slot = app.query_one("#rail_slot")
             await app.query_one(Rail).remove()
-            await slot.mount(Rail(active="workspace", ascii_mode=True))
+            # batch-94: the shipped rail is the 12-entry B94 order (rail.py's
+            # RAIL_ENTRIES stays the batch-93 record) — the fallback census
+            # exercises the same entries the app composes.
+            await slot.mount(
+                Rail(entries=RAIL_ENTRIES, active="workspace", ascii_mode=True)
+            )
             await pilot.pause()
             return [
                 (item.entry.key, item.current_glyph)
@@ -716,13 +763,46 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             ]
 
     rendered = asyncio.run(_drive())
-    assert len(rendered) == 10, f"expected 10 rail items, got {len(rendered)}"
+    assert len(rendered) == 12, f"expected 12 rail items, got {len(rendered)}"
     for (screen_key, glyph), (exp_key, _, exp_ascii) in zip(rendered, EXPECTED_RAIL):
         assert screen_key == exp_key, f"order: {screen_key} != {exp_key}"
         assert glyph == exp_ascii, (
             f"In ASCII mode rail item '{screen_key}' should render "
             f"{exp_ascii!r}, got {glyph!r}"
         )
+
+
+def test_tc001_equals_sign_routes_check_editor_screen(tmp_path: Path) -> None:
+    """The ``=`` binding mounts the Check Editor (batch-94 R-1 re-verification).
+
+    Intent: LLR-002.1 / the R-1 closure — the Check Editor's key binding is
+    ``equals_sign``, ``show=False`` (footer uncrowded, C-13), routing through
+    the shipped ``action_show_screen`` path exactly as the probe verified
+    (``evidence/pdr_rail_key_probe.txt``). The digit bindings must keep
+    routing their pre-batch-94 screens (no digit was stolen), and selecting
+    "Patch Editor" still mounts the patch panel (the twins stay distinct —
+    AT-B94-01's negative control).
+    """
+
+    async def _drive() -> tuple[list[str], list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("equals_sign")
+            await pilot.pause()
+            after_equals = _visible_screens(app)
+            await pilot.press("6")
+            await pilot.pause()
+            after_six = _visible_screens(app)
+            return after_equals, after_six
+
+    after_equals, after_six = asyncio.run(_drive())
+    assert after_equals == ["screen_check_editor"], (
+        f"'=' should mount exactly the Check Editor screen, got {after_equals}"
+    )
+    assert after_six == ["screen_patch"], (
+        f"'6' should still mount the Patch Editor, got {after_six}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -5794,7 +5874,8 @@ def test_tc028_no_new_processing_module_added_outside_view_layer() -> None:
     # join) is likewise deliberately added at the package root beside the
     # other headless engines — the newer requirement supersedes the invariant
     # for this one module too; the guard still flags any OTHER unexpected
-    # root module.
+    # root module. (Both lanes carried this entry — the RC-1 rebase
+    # resolution and inc-003d's official census — deduped to one.)
     engine_root_modules = {
         "__init__.py",
         "cli.py",
@@ -6224,7 +6305,9 @@ def test_tc028_no_new_processing_module_added_outside_view_layer_inc10() -> None
     # batch-95 inc-001 (HLR-137, US-129): ``segment_ops.py`` — the headless
     # Split/Join/Export engine (range slicer + BIN emitter + pad-byte fill
     # emitter + join) — added at the package root by design for the same
-    # reason; the guard still flags any OTHER unexpected root module.
+    # reason; the guard still flags any OTHER unexpected root module. (Both
+    # lanes carried this entry — the RC-1 rebase resolution and inc-003d's
+    # official census — deduped to one.)
     engine_root_modules = {
         "__init__.py",
         "cli.py",
@@ -6290,7 +6373,9 @@ def test_tc028_patch_editor_renderer_invokes_no_patch_logic() -> None:
     # this test guards. The allowlist extends the same way inc-003d extended
     # the tc028 root-module census for segment_ops.py: the newer requirement
     # supersedes the invariant for these NAMED view-shell widgets, and the
-    # guard still flags any OTHER unexpected call.
+    # guard still flags any OTHER unexpected call. (Both lanes carried this
+    # extension — the RC-1 rebase resolution and C-25's official census —
+    # deduped to one.)
     assert calls <= {
         "Container",
         "Label",
@@ -6609,8 +6694,11 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
 
     Intent: LLR-013.1 — the activity rail is mouse-clickable; it must also
     be fully keyboard-driven. Pressing each of keys ``1``-``9`` then ``0``
-    (the 10th screen; keys 1-9 exhausted) activates the matching rail screen
-    and moves the single active marker, with no mouse.
+    (the ten digit-bound screens; keys 1-9 exhausted) activates the matching
+    rail screen and moves the single active marker, with no mouse. Batch-94:
+    the Check Editor is keyboard-reachable through its own ``=`` binding
+    (asserted by ``test_tc001_equals_sign_routes_check_editor_screen``) —
+    the digit row was exhausted at 10 surfaces (R-1).
     """
 
     async def _drive() -> list[tuple[str, str, str]]:
@@ -6618,7 +6706,7 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
         seen: list[tuple[str, str, str]] = []
         async with app.run_test() as pilot:
             await pilot.pause()
-            for key, screen_key in zip(RAIL_KEYS_IN_ORDER, SCREEN_KEYS):
+            for key, screen_key in zip(RAIL_KEYS_IN_ORDER, DIGIT_SCREEN_KEYS):
                 await pilot.press(key)
                 await pilot.pause()
                 visible = _visible_screens(app)
@@ -8184,6 +8272,103 @@ def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) ->
     assert "from_markup" not in source, "issues_view must not call Text.from_markup"
     assert "markup=True" not in source, "issues_view must not enable markup on file text"
 
+    # batch-94 Inc-001 (architect finding 3): the from_markup census extends
+    # to the reworked screens_directionb.py surfaces (the Patch Editor rework
+    # + the NEW Check Editor + the A2B check-spec dropdown all render
+    # file-derived text). AST-based (C-42 mechanic 5), not a regex: prose in
+    # comments names the sink and a line-oriented scan would false-positive.
+    import ast as _ast
+
+    import s19_app.tui.screens_directionb as _sdb
+
+    sdb_source = _P(_sdb.__file__).read_text(encoding="utf-8")
+    tree = _ast.parse(sdb_source)
+    from_markup_calls = [
+        node.lineno
+        for node in _ast.walk(tree)
+        if isinstance(node, _ast.Call)
+        and isinstance(node.func, _ast.Attribute)
+        and node.func.attr == "from_markup"
+    ]
+    assert from_markup_calls == [], (
+        "screens_directionb.py must not call from_markup — file-derived text "
+        f"renders through literal Text (C-17); found at {from_markup_calls}"
+    )
+    # markup=True census: exactly ONE pre-existing site — the batch-78 diff
+    # run-list label — and its interpolations are the closed _KIND_MARKUP /
+    # _KIND_LABEL vocabulary plus derived integers (addresses/classification
+    # tokens), never a file-derived string. A SECOND site (or an
+    # interpolation outside that allow-list) is a new sink, not a comment.
+    markup_true_sites = []
+    for node in _ast.walk(tree):
+        if not isinstance(node, _ast.Call):
+            continue
+        if any(
+            kw.arg == "markup"
+            and isinstance(kw.value, _ast.Constant)
+            and kw.value.value is True
+            for kw in node.keywords
+        ):
+            markup_true_sites.append(node)
+    assert len(markup_true_sites) == 1, (
+        "screens_directionb.py must carry exactly one markup=True site (the "
+        f"batch-78 diff run-list label); found {len(markup_true_sites)}"
+    )
+    allowed_interpolations = {"colour", "label", "index", "start", "end"}
+    (site,) = markup_true_sites
+    format_args = [
+        arg for arg in site.args if isinstance(arg, _ast.JoinedStr)
+    ]
+    interpolations = {
+        node.value.id
+        for arg in format_args
+        for node in _ast.walk(arg)
+        if isinstance(node, _ast.FormattedValue)
+        and isinstance(node.value, _ast.Name)
+    }
+    assert interpolations <= allowed_interpolations, (
+        "the diff run-list markup label may interpolate only the closed "
+        f"vocabulary {sorted(allowed_interpolations)} — found "
+        f"{sorted(interpolations)}"
+    )
+
+    # batch-94 Inc-002 (architect finding 3, second extension): the census
+    # FOLLOWS the moved panel — flow_screens.py (the fb_a Flow Builder, R8/B2)
+    # must carry zero from_markup and zero markup=True sites: every
+    # file-derived string rides ``safe_text`` into ``markup=False`` Statics or
+    # literal ``Text`` appends (the canvas grid is append-built).
+    import s19_app.tui.flow_screens as _fsc
+
+    fsc_source = _P(_fsc.__file__).read_text(encoding="utf-8")
+    fsc_tree = _ast.parse(fsc_source)
+    fsc_from_markup = [
+        node.lineno
+        for node in _ast.walk(fsc_tree)
+        if isinstance(node, _ast.Call)
+        and isinstance(node.func, _ast.Attribute)
+        and node.func.attr == "from_markup"
+    ]
+    assert fsc_from_markup == [], (
+        "flow_screens.py must not call from_markup — file-derived text "
+        f"renders through literal Text (C-17); found at {fsc_from_markup}"
+    )
+    fsc_markup_true_sites = [
+        node.lineno
+        for node in _ast.walk(fsc_tree)
+        if isinstance(node, _ast.Call)
+        and any(
+            kw.arg == "markup"
+            and isinstance(kw.value, _ast.Constant)
+            and kw.value.value is True
+            for kw in node.keywords
+        )
+    ]
+    assert fsc_markup_true_sites == [], (
+        "flow_screens.py must carry zero markup=True sites (canvas, ledger, "
+        f"notices and result panes are all markup=False); found "
+        f"{fsc_markup_true_sites}"
+    )
+
 
 # ===========================================================================
 # batch-28 (R-TUI-042) — Increment 3: US-040 Workspace dense-cockpit signal
@@ -8937,7 +9122,11 @@ def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "ob
 # ===========================================================================
 
 # Pinned copy — 01-requirements §3.1 / LLR-065.1 / LLR-065.2 (verbatim).
-PATCH_DOC_SECTION_TITLE = "Change document (JSON)"
+# batch-94 Inc-001: the in-body section-title Label retired with the pe_b
+# rework (batch-48 Amendment D precedent — the window's border title
+# supersedes the in-body title; the protected property "the window
+# self-describes as the change-document surface" rides the border title).
+PATCH_DOC_SECTION_TITLE = "¹PATCH SCRIPT"
 PATCH_DOC_PATH_PLACEHOLDER = (
     "or type a path to the same change-set JSON "
     "(alternative to the patches/ dropdown)"
@@ -8949,9 +9138,9 @@ def _patch_label_and_placeholder(tmp_path: Path) -> tuple[str, str]:
 
     Summary:
         Drive ``S19TuiApp`` headlessly, activate the Patch Editor rail screen,
-        and read the two rendered strings that US-065 relabels: the
-        entries-pane change-document section-title ``Label`` (``:1854``, the
-        only ``patch-section-title`` inside ``#patch_pane_entries``) and the
+        and read the two rendered strings that US-065 relabels: the SCRIPT
+        window's border title (batch-94 form — the in-body
+        ``patch-section-title`` Label retired with the rework) and the
         ``#patch_doc_path_input`` free-path placeholder (``:1904``).
 
     Args:
@@ -8989,10 +9178,9 @@ def _patch_label_and_placeholder(tmp_path: Path) -> tuple[str, str]:
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
-            label = app.query_one(
-                "#patch_pane_entries .patch-section-title", Label
-            )
-            title = str(label.render())
+            # batch-94: the title is the SCRIPT window's border title (the
+            # in-body Label retired with the rework).
+            title = app.query_one("#patch_win_script").border_title
             placeholder = app.query_one(
                 "#patch_doc_path_input", Input
             ).placeholder
@@ -9009,14 +9197,17 @@ def test_at065a_change_doc_label_reads_as_dropdown_alternative(
     Intent: US-065 (R-TUI-054) — a Patch Editor user reads the free-path field
     as an alternative way to point at the SAME primary change-set (not a second
     / "v2" file). Black-box through the shipped ``PatchEditorPanel`` surface:
-    the entries-pane section-title ``Label`` renderable and the
+    the SCRIPT window's border title (the in-body Label retired at
+    batch-94 with the pe_b rework — the border title supersedes it per the
+    batch-48 Amendment D precedent) and the
     ``#patch_doc_path_input`` placeholder are asserted verbatim, the
     alternative-to-dropdown tokens are present, and the substring ``v2`` is
     absent from BOTH (C-10 content assertion, not merely non-empty).
 
     RED counterfactual: at ``main`` the title is ``"Change document (v2 JSON)"``
     and the placeholder ``"path to v2 change-set .json"`` — the verbatim-equality
-    and "no v2" assertions fail.
+    and "no v2" assertions fail. (Batch-94 note: the title observable moved to
+    the border title; the placeholder pin is unchanged.)
     """
     title, placeholder = _patch_label_and_placeholder(tmp_path)
 
@@ -9041,7 +9232,8 @@ def test_tc332_change_doc_copy_pins_verbatim(tmp_path: Path) -> None:
     """TC-332: the two rendered strings equal the pinned copy verbatim.
 
     Intent: LLR-065.1 / LLR-065.2 — white-box pin of the exact composed copy.
-    The rendered ``#patch_pane_entries`` section-title ``Label`` and the
+    The rendered SCRIPT-window border title (batch-94 form — the in-body
+    Label retired with the rework) and the
     ``#patch_doc_path_input`` placeholder must equal the module-level pinned
     constants byte-for-byte (the single source of truth the wording is locked
     to), with ``v2`` absent from both.

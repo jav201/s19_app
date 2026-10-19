@@ -93,7 +93,21 @@ from tools.id_registry import (
 # increment adds ``tests/test_segment_split_window.py`` (the HLR-135
 # Split/Join/Export window TCs); inc-004b itself extends the existing
 # ``tests/test_changes_symbol_entries.py`` (no new module).
-EXPECTED_SCANNED_TEST_FILES = 172
+# batch-94 Inc-001 (2026-10-13): 172 -> 175, measured — the editors increment
+# adds ``tests/test_tui_check_editor.py``, ``tests/test_tui_patch_editor_b94.py``
+# and ``tests/test_tui_check_chain_b94.py``; the RC-1 mid-batch rebase unions
+# both lanes' additions (172 + 3 batch-94 = 175 at Inc-001).
+# batch-94 Inc-002 (2026-10-14): 175 -> 177, measured — the flow-builder
+# increment adds ``tests/test_tui_flow_builder_b94.py`` (AT-B94-15..18,
+# TC-B94-20) and ``tests/test_flow_a2b_b94.py`` (TC-B94-04, 21..25).
+# batch-94 Inc-003 (2026-10-14): 177 -> 179, measured — the flow-execution
+# increment adds ``tests/test_tui_flow_execution_b94.py`` (AT-B94-02, 19..24,
+# TC-B94-08, 26, 27, 29) and ``tests/test_flow_chainset_b94.py`` (TC-B94-05,
+# 28, 30, 31).
+# batch-94 Inc-004 (2026-10-14): 179 -> 180, measured — the issues-triage
+# increment adds ``tests/test_tui_issues_triage_b94.py`` (AT-B94-14,
+# TC-B94-18, 19).
+EXPECTED_SCANNED_TEST_FILES = 180
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds
