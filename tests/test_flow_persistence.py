@@ -469,15 +469,26 @@ def test_import_copies_then_loads_the_copy_not_the_source(
 def test_import_dedups_second_import_of_same_name(
     project_dir: Path, tmp_path: Path
 ) -> None:
-    """A second import of the same filename dedups to ``_1``; both loadable (TC-035)."""
+    """Second import of the same filename: content-identical reuses the target
+    (B8/TC-1800 — no extra copy); DIVERGENT content dedups to ``_1``; both
+    loadable (TC-035, superseded to the B8 doctrine 2026-10-18)."""
     external = tmp_path / "flow.json"
     external.write_text(json.dumps(flow_to_dict(_good_flow())), encoding="utf-8")
 
     first = import_flow_file(external, project_dir)
+    # Identical bytes: the existing copy is reused — no duplicate lands.
     second = import_flow_file(external, project_dir)
-    assert first != second
-    assert second.stem.endswith("_1")
-    for copied in (first, second):
+    assert second == first
+
+    # Divergent bytes under the same name: the ``_1`` dedup idiom survives.
+    external.write_text(
+        json.dumps(flow_to_dict(Flow(name="other", blocks=[ReportBlock()]))),
+        encoding="utf-8",
+    )
+    third = import_flow_file(external, project_dir)
+    assert third != first
+    assert third.stem.endswith("_1")
+    for copied in (first, third):
         reloaded, findings = load_flow_json(copied, project_dir)
         assert findings == [] and reloaded is not None
 

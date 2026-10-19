@@ -21,6 +21,7 @@ from s19_app.tui.services import flow_persistence_service as fps
 from s19_app.tui.services.flow_model import (
     BLOCK_A2B,
     BLOCK_CRC,
+    BLOCK_EXTERNAL_STEP,
     BLOCK_PATCH,
 )
 from s19_app.tui.services.load_service import build_loaded_s19
@@ -168,8 +169,11 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
 
     palette_kinds, canvas, screen_box, canvas_width = asyncio.run(_drive())
 
-    # Palette exposes exactly the three fb_a placeable types.
-    assert sorted(palette_kinds) == sorted([BLOCK_PATCH, BLOCK_CRC, BLOCK_A2B])
+    # Palette exposes exactly the fb_a placeable types (batch-96 adds the
+    # external-step type to the batch-94 three).
+    assert sorted(palette_kinds) == sorted(
+        [BLOCK_PATCH, BLOCK_CRC, BLOCK_A2B, BLOCK_EXTERNAL_STEP]
+    )
     # Box-drawn blocks with typed stubs and >=1 cable run (fb_a geometry).
     assert "PATCH" in canvas and "WRITE-OUT" in canvas
     assert "prg.s19" in canvas  # SOURCE chip
@@ -454,13 +458,15 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
         _drive((120, 30))
     )
     assert palette_count == 1  # one palette rail…
-    assert palette_buttons == 3  # …carrying the three placeable types
+    # …carrying the four placeable types (batch-96 adds the external step).
+    assert palette_buttons == 4
     assert canvas_count == 1  # …one framed canvas
-    assert len(FlowBuilderPanel._PALETTE_TYPES) == 3  # 3 placeable types
+    assert len(FlowBuilderPanel._PALETTE_TYPES) == 4  # 4 placeable types
     assert {kind for *_rest, kind in FlowBuilderPanel._PALETTE_TYPES} == {
         BLOCK_PATCH,
         BLOCK_CRC,
         BLOCK_A2B,
+        BLOCK_EXTERNAL_STEP,
     }
     # The source chip + two box blocks render >=1 cable run with typed stubs,
     # inside the boxed budget.
@@ -473,5 +479,5 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
     small_palette, small_buttons, small_canvas, small_text, _ = asyncio.run(
         _drive((80, 24))
     )
-    assert small_palette == 1 and small_buttons == 3 and small_canvas == 1
+    assert small_palette == 1 and small_buttons == 4 and small_canvas == 1
     assert "PATCH" in small_text

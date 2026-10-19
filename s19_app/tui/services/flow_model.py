@@ -11,13 +11,36 @@ This module is pure data (frozen block dataclasses + run-result containers);
 it imports stdlib only and carries NO Textual and NO execution logic
 (service-layer contract C-7). The blocks are JSON-serialisable by shape so
 batch-45 can persist a flow to ``flow.json`` without a model change.
+
+batch-96 B1 (spec "funnel de variables"): the FUNNEL is a flow-level table
+``Flow.funnel`` — an ordered list of ``(name, value)`` pairs declared beside
+the canvas, ONE per flow (each chain/flow resolves its own placeholders). It
+is deliberately NOT a block kind: it is flow-scoped declaration state, like
+the flow's name, and it must survive a flow with zero blocks; modeling it as
+a block would make it positional, executable and deletable, none of which a
+declaration table is. At run time, when a PATCH arm loads its change-doc
+JSON, the raw text passes through :func:`substitute_funnel` BEFORE the
+parse: every exact ``${NAME}`` token (``NAME = [A-Z0-9_]+``) with a
+declared entry is replaced by its value; an undeclared name stays intact
+and adds one named NOTICE to the block result (never a failure). The
+exact-token grammar (no loose-key regex) is pinned because a change-doc
+JSON has its own keys that are not variables.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 if TYPE_CHECKING:  # pragma: no cover - typing only, keeps the runtime stdlib-only
     from ..models import VariantDescriptor
@@ -35,6 +58,15 @@ BLOCK_REPORT = "report"
 #: flow output OR an external file; ≥1 MUST come from the current flow) and
 #: emits a diff report stating each input's provenance.
 BLOCK_A2B = "a2b"
+#: External-step block (prototype v3, spec "paso externo") — a human-gated
+#: step: TERMINAL (an exact command to run OUTSIDE the app) or MANUAL (an
+#: instruction shown to the user); in BOTH modes the block ALWAYS carries an
+#: instruction/command, a MANDATORY log (evidence text) and an output file
+#: (absolute path preferred). The run PAUSES ("esperando humano") until the
+#: log + output are confirmed; on confirm the flow COPIES the output file into
+#: the session's artifact folder (the run work area) and downstream blocks
+#: reference that copy.
+BLOCK_EXTERNAL_STEP = "external_step"
 
 #: A2B input-binding source discriminators (HLR-014). ``flow`` binds the
 #: output of an UPSTREAM block of the CURRENT flow (never another flow — the
@@ -43,6 +75,13 @@ BLOCK_A2B = "a2b"
 #: other block ref.
 A2B_INPUT_FLOW = "flow"
 A2B_INPUT_FILE = "file"
+
+#: External-step mode discriminators (spec v3). ``terminal`` — the
+#: instruction field carries the EXACT command to run outside the app;
+#: ``manual`` — it carries the instruction shown to the user.
+EXTERNAL_MODE_TERMINAL = "terminal"
+EXTERNAL_MODE_MANUAL = "manual"
+EXTERNAL_MODES = (EXTERNAL_MODE_TERMINAL, EXTERNAL_MODE_MANUAL)
 
 #: WRITE-OUT emit formats — the ``save_patched_image`` ``source_kind`` values.
 WRITE_FMT_S19 = "s19"
@@ -63,6 +102,10 @@ BLOCK_STATUS_SKIPPED = "skipped"
 #: Advisory outcome — the block ran, the image is intact, but it carries WARN
 #: findings (integrity notices, non-blocking check faults) (batch-51, LLR-085.1).
 BLOCK_STATUS_NOTICES = "notices"
+#: Waiting outcome (prototype v3, spec "paso externo") — an external-step
+#: block whose log + output have NOT been confirmed yet: the run is PAUSED
+#: ("esperando humano") and every downstream block is skipped.
+BLOCK_STATUS_WAITING = "waiting"
 
 #: Whole-flow outcome tokens.
 FLOW_STATUS_OK = "ok"
@@ -71,6 +114,10 @@ FLOW_STATUS_ERROR = "error"
 #: non-aborting block ``error``, or a WARN finding); distinct from ``error``
 #: (image broken, no/partial output) (batch-51, LLR-087.1).
 FLOW_STATUS_ISSUES = "completed-with-issues"
+#: Paused outcome (prototype v3, spec "paso externo") — the run stopped at an
+#: external-step block and waits for the human; the image is NOT broken (this
+#: is not ``error``), the run simply is not finished.
+FLOW_STATUS_PAUSED = "paused"
 
 #: Advisory finding severity (batch-51, LLR-085.1). ``FINDING_WARN`` is the
 #: non-aborting notice channel surfaced on ``BlockResult.findings``. The value
@@ -90,6 +137,62 @@ FLOW_SCOPE_ASSIGNMENTS = "assignments"
 FLOW_SCOPES = (FLOW_SCOPE_SINGLE, FLOW_SCOPE_ALL_VARIANTS, FLOW_SCOPE_ASSIGNMENTS)
 
 FINDING_WARN = "warn"
+
+#: FUNNEL (batch-96 B1, spec "funnel de variables"): the placeholder grammar.
+#: A funnel variable is the EXACT token ``${NAME}`` with
+#: ``NAME = [A-Z0-9_]+`` — no lowercase, no spaces, no nested braces. The
+#: exact-token rule is deliberate: a change-doc JSON carries its OWN keys
+#: (``type`` / ``address`` / ``bytes`` / …) that are NOT variables, so a
+#: loose-key regex or a bare ``$name`` form would rewrite document structure
+#: the operator never declared as a variable. Only the fully-braced,
+#: uppercase token is a variable reference; everything else passes through
+#: untouched.
+FUNNEL_NAME_MAX_LEN = 32
+FUNNEL_VALUE_MAX_LEN = 256
+FUNNEL_MAX_ENTRIES = 32
+FUNNEL_NAME_RE = re.compile(r"^[A-Z0-9_]{1,32}$")
+#: The placeholder scanner — matches ONLY the exact ``${NAME}`` token.
+FUNNEL_PLACEHOLDER_RE = re.compile(r"\$\{([A-Z0-9_]+)\}")
+
+
+def substitute_funnel(
+    text: str, funnel: "Sequence[Tuple[str, str]]"
+) -> "Tuple[str, List[str]]":
+    """Apply a flow-level funnel to a change-doc's raw JSON text (batch-96 B1).
+
+    Summary:
+        Every EXACT ``${NAME}`` occurrence whose NAME is declared in the
+        funnel is replaced by the declared value (a plain ``str.replace`` per
+        declared name — never a regex over the document's own keys). A
+        placeholder whose NAME is NOT declared is left INTACT and reported in
+        the returned missing list, so the caller can surface one named NOTICE
+        per undeclared variable (the run never fails for it). With an empty
+        funnel the text is returned byte-identical (the regression arm).
+
+    Args:
+        text (str): The raw change-document text (file-derived, pre-parse).
+        funnel (Sequence[Tuple[str, str]]): The flow's declared name→value
+            table (ordered pairs, as stored on :class:`Flow`).
+
+    Returns:
+        Tuple[str, List[str]]: ``(substituted_text, missing_names)`` —
+        ``missing_names`` is the sorted, de-duplicated list of placeholder
+        names that had no declared value.
+
+    Example:
+        >>> substitute_funnel('{"bytes": "${BOOST}"}', [("BOOST", "AB")])
+        ('{"bytes": "AB"}', [])
+        >>> substitute_funnel('{"v": "${MISSING}"}', [("BOOST", "AB")])
+        ('{"v": "${MISSING}"}', ['MISSING'])
+    """
+    table = dict(funnel)
+    for name, value in table.items():
+        if value:
+            text = text.replace("${" + name + "}", value)
+    missing = sorted(
+        {name for name in FUNNEL_PLACEHOLDER_RE.findall(text) if name not in table}
+    )
+    return text, missing
 
 
 @dataclass(frozen=True)
@@ -369,12 +472,65 @@ class ReportBlock:
     kind: str = BLOCK_REPORT
 
 
+@dataclass(frozen=True)
+class ExternalStepBlock:
+    """Human-gated step — run something OUTSIDE the app, then prove it.
+
+    The block carries, in BOTH modes: (1) the instruction (for
+    ``EXTERNAL_MODE_TERMINAL`` the EXACT command to run outside the app; for
+    ``EXTERNAL_MODE_MANUAL`` the instruction shown to the user), (2) a
+    MANDATORY log ref (evidence text — never optional), and (3) the expected
+    output file, an ABSOLUTE path preferred (it lives outside the project by
+    definition). The execution PAUSES here ("esperando humano") until the
+    log + output are confirmed; on confirm the flow COPIES the output into
+    the session's artifact folder (the run work area) and the confirmation
+    records the copied path so downstream blocks reference THAT copy. The
+    threaded image passes through unchanged — the step is human-gated, not
+    an image transform.
+
+    Args:
+        mode (str): ``EXTERNAL_MODE_TERMINAL`` (default) or
+            ``EXTERNAL_MODE_MANUAL``.
+        instruction (str): The command (TERMINAL) / instruction (MANUAL) —
+            operator text, markup-safe on render.
+        log_ref (str): The MANDATORY log file (evidence of the step) —
+            never optional; an empty one refuses the block at wiring time.
+        output_path (str): The expected output file; an ABSOLUTE path is
+            preferred. On confirm the file must exist and is copied into
+            the session artifact folder.
+    """
+
+    mode: str = EXTERNAL_MODE_TERMINAL
+    instruction: str = ""
+    log_ref: str = ""
+    output_path: str = ""
+    kind: str = BLOCK_EXTERNAL_STEP
+
+
+@dataclass(frozen=True)
+class ExternalStepConfirmation:
+    """The operator's confirmation of one external-step block.
+
+    Args:
+        block_index (int): The confirmed block's position in the flow.
+        log_ref (str): The log file the human produced (evidence).
+        source_path (str): The output file the human produced; the executor
+            copies it into the session artifact folder on confirm.
+    """
+
+    block_index: int
+    log_ref: str
+    source_path: str
+
+
 #: A tracer-slice block (SOURCE/PATCH/CHECK/WRITE-OUT + the batch-52 CRC block +
-#: the batch-53 ref-less REPORT block + the batch-94 A2B diff block).
+#: the batch-53 ref-less REPORT block + the batch-94 A2B diff block + the
+#: prototype-v3 external-step block).
 FlowBlock = Union[
     SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock, ReportBlock,
-    A2BBlock,
+    A2BBlock, ExternalStepBlock,
 ]
+
 
 
 @dataclass(frozen=True)
@@ -385,11 +541,22 @@ class Flow:
         name (str): The flow's display name.
         blocks (Sequence[FlowBlock]): The blocks in execution order.
         schema_version (int): For the batch-45 ``flow.json`` envelope.
+        funnel (Sequence[Tuple[str, str]]): The flow-level FUNNEL table
+            (batch-96 B1, spec "funnel de variables") — an ordered
+            name→value pair list declaring, AHEAD of the run, every
+            ``${NAME}`` placeholder a PATCH change-document may carry.
+            ONE table per flow (not a block kind — it is flow-scoped
+            state, declared beside the canvas in the builder); each flow /
+            chain resolves its own placeholders at run time. A placeholder
+            without a declared entry stays INTACT and surfaces a named
+            NOTICE (never a failure). Empty (the default) is today's
+            no-substitution behavior.
     """
 
     name: str
     blocks: Sequence[FlowBlock] = ()
     schema_version: int = 1
+    funnel: Sequence[Tuple[str, str]] = ()
 
 
 @dataclass(frozen=True)
@@ -420,6 +587,14 @@ class FlowContext:
             variant, because N files re-create the manual collation FB-P2
             exists to remove). Set by ``run_flow_over_variants``; ``False`` — the
             default — is today's per-run report.
+        external_confirmations (Optional[Mapping[int, ExternalStepConfirmation]]):
+            The operator confirmations for external-step blocks, keyed by
+            block index (prototype v3, spec "paso externo"). A block WITHOUT
+            a confirmation PAUSES the run ("esperando humano"); WITH one the
+            executor validates the log + output, copies the output into the
+            session artifact folder (``project_dir``) and the chain goes on.
+            ``None`` — the default — is an unattended run: every external
+            step pauses.
     """
 
     project_dir: Path
@@ -427,6 +602,7 @@ class FlowContext:
     a2l_data: Optional[dict] = None
     variant: Optional["VariantDescriptor"] = None
     defer_report: bool = False
+    external_confirmations: Optional[Mapping[int, "ExternalStepConfirmation"]] = None
 
 
 @dataclass(slots=True)

@@ -49,16 +49,23 @@ from .flow_model import (
     BLOCK_A2B,
     BLOCK_CHECK,
     BLOCK_CRC,
+    BLOCK_EXTERNAL_STEP,
     BLOCK_PATCH,
     BLOCK_REPORT,
     BLOCK_SOURCE,
     BLOCK_WRITE_OUT,
     CHECK_GATING_ADVISORY,
     CHECK_GATING_BLOCK_OWN,
+    EXTERNAL_MODES,
+    FUNNEL_MAX_ENTRIES,
+    FUNNEL_NAME_MAX_LEN,
+    FUNNEL_NAME_RE,
+    FUNNEL_VALUE_MAX_LEN,
     WRITE_FMT_HEX,
     WRITE_FMT_S19,
     CheckBlock,
     CrcBlock,
+    ExternalStepBlock,
     Flow,
     FlowBlock,
     PatchBlock,
@@ -124,6 +131,12 @@ _KIND_SPEC: Dict[str, Tuple[Optional[str], Dict[str, Set[str]]]] = {
     # bindings get the dedicated V5 arm below (strict keys {kind, image_a,
     # image_b}, per-binding grammar + containment).
     BLOCK_A2B: (None, {}),
+    # prototype v3 (spec "paso externo"): external_step carries NO project
+    # ref — its output path is an EXTERNAL absolute path by design. The
+    # dedicated V5 arm below validates strict keys {kind, mode, instruction,
+    # log_ref, output_path} with its own shape checks (the output path is
+    # containment-external, so the reused guard does NOT apply to it).
+    BLOCK_EXTERNAL_STEP: (None, {"mode": set(EXTERNAL_MODES)}),
 }
 
 #: READ-ref fields → containment-checked at load through the reused guard.
@@ -287,13 +300,30 @@ def flow_to_dict(flow: Flow) -> dict:
                     },
                 }
             )
+        elif isinstance(block, ExternalStepBlock):
+            blocks.append(
+                {
+                    "kind": block.kind,
+                    "mode": block.mode,
+                    "instruction": block.instruction,
+                    "log_ref": block.log_ref,
+                    "output_path": block.output_path,
+                }
+            )
         else:  # trusted-side serializer — an unknown model object is a bug
             raise TypeError(f"unserializable block type: {type(block)!r}")
-    return {
+    envelope = {
         "schema_version": flow.schema_version,
         "name": flow.name,
         "blocks": blocks,
     }
+    # batch-96 B1 (the funnel): the flow-level variable table rides the wire
+    # as [[name, value], …] pairs (the chain-set inputs idiom — a JSON object
+    # would coerce and a table is a map, not a payload). Absent when empty,
+    # so pre-B1 envelopes and new ones inter-read (the grammar is additive).
+    if flow.funnel:
+        envelope["funnel"] = [[name, value] for name, value in flow.funnel]
+    return envelope
 
 
 def dict_to_flow(
@@ -314,6 +344,8 @@ def dict_to_flow(
                                                                   → FLOW-SCHEMA-UNSUPPORTED
           V3  name (when present) is a non-empty str ≤ cap        → FLOW-BAD-FIELD
           V4  blocks is a list of FLOW_MIN..FLOW_MAX_BLOCKS       → FLOW-BAD-STRUCTURE
+          V4b funnel (OPTIONAL, batch-96 B1): a list of ≤32 unique
+              [NAME, value] pairs, NAME = [A-Z0-9_]                → FLOW-BAD-FIELD
           V5  per block: object; known kind; strict keys; required
               ref (ref-bearing kinds); valid enums                → FLOW-UNKNOWN-KIND /
                                                                      FLOW-BAD-FIELD
@@ -393,6 +425,53 @@ def dict_to_flow(
         )
         return None, findings
 
+    # V4b — funnel (batch-96 B1, ADDITIVE grammar): the optional flow-level
+    # variable table. ABSENT → () (today's behavior, pre-B1 envelopes load
+    # untouched). PRESENT → a list of at most FUNNEL_MAX_ENTRIES
+    # [name, value] pairs: name is a non-empty str of at most
+    # FUNNEL_NAME_MAX_LEN chars matching the EXACT placeholder charset
+    # [A-Z0-9_], value a non-empty str of at most FUNNEL_VALUE_MAX_LEN —
+    # and names must be UNIQUE (a table is a map). ANY malformed pair,
+    # duplicate or over-cap entry → FLOW-BAD-FIELD.
+    funnel: List[Tuple[str, str]] = []
+    funnel_raw = payload.get("funnel")
+    if funnel_raw is not None:
+        funnel_ok = isinstance(funnel_raw, list) and len(
+            funnel_raw
+        ) <= FUNNEL_MAX_ENTRIES
+        seen: Set[str] = set()
+        if funnel_ok:
+            for pair in funnel_raw:
+                if (
+                    not isinstance(pair, list)
+                    or len(pair) != 2
+                    or not isinstance(pair[0], str)
+                    or not FUNNEL_NAME_RE.match(pair[0].strip())
+                    or len(pair[0].strip()) > FUNNEL_NAME_MAX_LEN
+                    or not isinstance(pair[1], str)
+                    or not pair[1].strip()
+                    or len(pair[1]) > FUNNEL_VALUE_MAX_LEN
+                ):
+                    funnel_ok = False
+                    break
+                name = pair[0].strip()
+                if name in seen:
+                    funnel_ok = False
+                    break
+                seen.add(name)
+                funnel.append((name, pair[1]))
+        if not funnel_ok:
+            findings.append(
+                _finding(
+                    FLOW_BAD_FIELD,
+                    "flow funnel is not a list of unique "
+                    f"[NAME, value] pairs (NAME = [A-Z0-9_], ≤ "
+                    f"{FUNNEL_NAME_MAX_LEN} chars, non-empty value ≤ "
+                    f"{FUNNEL_VALUE_MAX_LEN} chars, at most "
+                    f"{FUNNEL_MAX_ENTRIES} entries)",
+                )
+            )
+
     project_root = project_dir.resolve()
     blocks: List[FlowBlock] = []
     for index, entry in enumerate(blocks_raw):
@@ -420,6 +499,14 @@ def dict_to_flow(
             )
             if block_a2b is not None:
                 blocks.append(block_a2b)
+            continue
+        # V5 (external-step arm, prototype v3) — the kind carries no project
+        # ref: its output path is external by design, so it gets the
+        # dedicated parser below (strict keys, per-field shape checks).
+        if kind == BLOCK_EXTERNAL_STEP:
+            block_ext = _parse_external_step_entry(entry, label, findings)
+            if block_ext is not None:
+                blocks.append(block_ext)
             continue
         ref_field, enum_fields = _KIND_SPEC[kind]
         allowed_keys = {"kind", *enum_fields}
@@ -551,7 +638,12 @@ def dict_to_flow(
     # FAIL-CLOSED aggregate: an executable pipeline is never partially loaded.
     if findings:
         return None, findings
-    return Flow(name=name, blocks=blocks, schema_version=FLOW_SCHEMA_VERSION), findings
+    return Flow(
+        name=name,
+        blocks=blocks,
+        schema_version=FLOW_SCHEMA_VERSION,
+        funnel=tuple(funnel),
+    ), findings
 
 
 def _parse_a2b_entry(
@@ -671,6 +763,106 @@ def _parse_a2b_entry(
         )
         return None
     return block
+
+
+def _parse_external_step_entry(
+    entry: Dict[str, Any],
+    label: str,
+    findings: List[ValidationIssue],
+) -> Optional[ExternalStepBlock]:
+    """V5 arm for the external_step kind — validate the human-gated step.
+
+    Summary:
+        Strict keys ``{kind, mode, instruction, log_ref, output_path}``
+        (schema v1 is strict). ``mode`` rides the generic enum check;
+        ``instruction`` and ``log_ref`` must be non-empty strings (the LOG
+        is MANDATORY — an empty one refuses the block); ``output_path``
+        must be non-empty — an ABSOLUTE path is preferred, a relative one
+        must be a plain name (no traversal / drive-relative shape, the V7
+        idiom) because it would resolve against the operator's CWD at
+        confirm time. The path is EXTERNAL by design, so the reused
+        containment guard does NOT apply (there is nothing to contain —
+        the confirm step copies the file INTO the session artifact folder).
+        ANY problem appends one finding and returns ``None``.
+    """
+    unknown = set(entry) - {"kind", "mode", "instruction", "log_ref", "output_path"}
+    if unknown:
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (external_step) carries unknown field(s) {sorted(unknown)} - "
+                f"schema v{FLOW_SCHEMA_VERSION} is strict",
+            )
+        )
+        return None
+    mode = entry.get("mode", "terminal")
+    if mode not in EXTERNAL_MODES:
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (external_step) mode {mode!r} is not one of "
+                f"{sorted(EXTERNAL_MODES)}",
+            )
+        )
+        return None
+    instruction = entry.get("instruction")
+    if not isinstance(instruction, str) or not instruction.strip():
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (external_step) needs a non-empty 'instruction' "
+                "(the exact command for mode=terminal, the shown instruction "
+                "for mode=manual)",
+            )
+        )
+        return None
+    log_ref = entry.get("log_ref")
+    if not isinstance(log_ref, str) or not log_ref.strip():
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (external_step) needs a non-empty 'log_ref' - the "
+                "log is MANDATORY evidence, never optional",
+            )
+        )
+        return None
+    output_path = entry.get("output_path")
+    if not isinstance(output_path, str) or not output_path.strip():
+        findings.append(
+            _finding(
+                FLOW_BAD_FIELD,
+                f"{label} (external_step) needs a non-empty 'output_path' - "
+                "the expected output file",
+            )
+        )
+        return None
+    output_path = output_path.strip()
+    if not Path(output_path).is_absolute():
+        # Relative output paths are accepted but must be plain names — the
+        # same WRITE-target shape pre-check as V7 (no traversal, not
+        # drive-relative, not hidden).
+        if (
+            "/" in output_path
+            or "\\" in output_path
+            or ".." in output_path
+            or _is_drive_relative(output_path)
+            or output_path.strip().startswith(".")
+        ):
+            findings.append(
+                _finding(
+                    FLOW_UNSAFE_OUTPUT_NAME,
+                    f"{label} (external_step) output_path {output_path!r} "
+                    "must be absolute, or a plain relative filename "
+                    "(no separators, no traversal)",
+                )
+            )
+            return None
+    return ExternalStepBlock(
+        mode=mode,
+        instruction=instruction.strip(),
+        log_ref=log_ref.strip(),
+        output_path=output_path,
+    )
 
 
 def load_flow_json(

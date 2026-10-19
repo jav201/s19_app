@@ -45,11 +45,13 @@ from ...core import S19File
 from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..changes import (
+    READ_SIZE_CAP_BYTES,
     apply_change_document,
     read_change_document,
     save_patched_image,
 )
 from ..changes.check import run_check_document
+from ..changes.io import parse_change_document
 from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
 from .compare_service import SOURCE_EXTERNAL
@@ -63,16 +65,20 @@ from .flow_model import (
     BLOCK_STATUS_NOTICES,
     BLOCK_STATUS_OK,
     BLOCK_STATUS_SKIPPED,
+    BLOCK_STATUS_WAITING,
     CHECK_GATING_BLOCK_OWN,
+    EXTERNAL_MODE_TERMINAL,
     FINDING_WARN,
     FLOW_STATUS_ERROR,
     FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
+    FLOW_STATUS_PAUSED,
     WRITE_FMT_HEX,
     WRITE_FMT_S19,
     BlockResult,
     CheckBlock,
     CrcBlock,
+    ExternalStepBlock,
     Finding,
     Flow,
     FlowBlock,
@@ -86,6 +92,7 @@ from .flow_model import (
     SourceBlock,
     VariantRunOutcome,
     WriteOutBlock,
+    substitute_funnel,
 )
 from .flow_fused_report_service import (
     build_fused_report_state,
@@ -112,6 +119,53 @@ from ..models import ProjectVariantSet, VariantDescriptor  # noqa: F401 - typing
 from ..operations.crc import check_regions, inject_crcs
 from ..operations.crc_config import parse_crc_config
 from ..operations.model import OperationInput
+from ..workspace import copy_into_workarea
+
+
+def _read_change_doc_with_funnel(
+    path: Path,
+    base_dir: Path,
+    funnel: "Sequence[Tuple[str, str]]",
+    a2l_context: Optional[dict],
+) -> "Tuple[ChangeDocument, List[str]]":
+    """Read a PATCH change-doc through the flow-level funnel (batch-96 B1).
+
+    Summary:
+        The file's raw text is read with the SAME pre-parse size cap the
+        plain reader enforces; over-cap or undecodable files FALL BACK to
+        the plain :func:`read_change_document` so its honest ``MF-*`` issues
+        surface verbatim (the funnel never weakens a reader guard). A
+        readable file passes through :func:`flow_model.substitute_funnel`
+        and is parsed by the shared :func:`parse_change_document` string
+        seam — the substitution happens on the TEXT, before the parse, so
+        placeholders can appear anywhere in the JSON (values, addresses,
+        refs). The returned missing list carries one entry per ``${NAME}``
+        token with no declared value (left intact in the text).
+
+    Args:
+        path (Path): The F1-resolved change-doc path (exists, contained).
+        base_dir (Path): The project dir handed to the fallback reader.
+        funnel (Sequence[Tuple[str, str]]): The flow's declared table.
+        a2l_context (Optional[dict]): The patch's effective A2L context.
+
+    Returns:
+        Tuple[ChangeDocument, List[str]]: The parsed document (source_path
+        pinned to ``path``) and the sorted, de-duplicated undeclared
+        placeholder names.
+    """
+    try:
+        if path.stat().st_size > READ_SIZE_CAP_BYTES:
+            raise OSError("over the read cap - the fallback reader reports it")
+        text = path.read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        return (
+            read_change_document(str(path), base_dir, a2l_context=a2l_context),
+            [],
+        )
+    substituted, missing = substitute_funnel(text, funnel)
+    document = parse_change_document(substituted, a2l_context=a2l_context)
+    document.source_path = path
+    return document, missing
 
 
 def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
@@ -146,9 +200,12 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
           naming the reference.
         - PATCH → ``read_change_document`` (with the patch's effective A2L
           context — its own ``a2l_ref`` override, else the SOURCE block's) →
-          ``apply_change_document`` (mutates ``mem_map``); batch-95 inc-004b
-          (LLR-143.1/.2) retains every arm's per-entry change identities
-          (``result.change_records``) and named refusals
+          ``apply_change_document`` (mutates ``mem_map``); batch-96 B1: when
+          the FLOW declares a funnel, the change-doc TEXT is substituted
+          BEFORE the parse (exact ``${NAME}`` tokens; undeclared names stay
+          intact + one named NOTICE each, never a failure); batch-95
+          inc-004b (LLR-143.1/.2) retains every arm's per-entry change
+          identities (``result.change_records``) and named refusals
           (``result.refusals``) — the run's own record for the reports.
         - CHECK → ``read_change_document`` → ``run_check_document`` (read-only,
           image passed through unchanged; never aborts the chain — LLR-086.4).
@@ -190,6 +247,11 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # "resolved against" attribution. Never the implicit ctx.a2l_data.
     source_a2l_ref: Optional[str] = None
     aborted = False
+    # prototype v3 (spec "paso externo"): the run PAUSED at an external-step
+    # block (waiting for the human). Like ``aborted`` it skips downstream
+    # blocks, but it is NOT an error — the image is intact and the run can
+    # continue once the operator confirms log + output.
+    paused = False
     # batch-94 Inc-002 (LLR-014): per-block image snapshots, consumed by
     # downstream A2B flow bindings (`#k` references an upstream block's
     # output). Captured only when the flow actually carries an A2B block, so
@@ -207,10 +269,14 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
         # one where the image broke, so the report still writes — carrying
         # ``aborted=True`` into its state (FAILED label). It does NOT clear the
         # flag: every block after it still skips.
-        if aborted and not isinstance(block, ReportBlock):
+        if (aborted or paused) and not isinstance(block, ReportBlock):
+            skip_reason = (
+                "skipped (upstream error)"
+                if aborted
+                else "skipped (waiting on external step)"
+            )
             result.block_results.append(
-                BlockResult(index, kind, BLOCK_STATUS_SKIPPED,
-                            "skipped (upstream error)")
+                BlockResult(index, kind, BLOCK_STATUS_SKIPPED, skip_reason)
             )
             continue
         try:
@@ -360,10 +426,24 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             f"read: {type(exc).__name__}",
                         )
                         continue
-                document = read_change_document(
-                    str(path), ctx.project_dir,
-                    a2l_context=patch_a2l_context,
-                )
+                # batch-96 B1 (the funnel): when the FLOW declares a variable
+                # table, the change-doc text passes through substitution
+                # BEFORE the parse — every exact ${NAME} token with a
+                # declared value is replaced; undeclared names stay intact
+                # and ride back as `funnel_missing` (one named NOTICE each,
+                # never a failure). With NO funnel the reader runs verbatim
+                # (today's path, untouched).
+                funnel_missing: List[str] = []
+                if flow.funnel:
+                    document, funnel_missing = _read_change_doc_with_funnel(
+                        path, ctx.project_dir, flow.funnel,
+                        patch_a2l_context,
+                    )
+                else:
+                    document = read_change_document(
+                        str(path), ctx.project_dir,
+                        a2l_context=patch_a2l_context,
+                    )
                 summary = apply_change_document(
                     document, mem_map, ranges, ctx.mac_records, a2l_tags
                 )
@@ -405,11 +485,25 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         )
                     )
                 applied = summary.counts.get("applied", 0)
-                result.block_results.append(
-                    BlockResult(index, kind, BLOCK_STATUS_OK,
-                                f"applied {applied} entr"
-                                f"{'y' if applied == 1 else 'ies'}")
+                patch_result = BlockResult(
+                    index, kind, BLOCK_STATUS_OK,
+                    f"applied {applied} entr"
+                    f"{'y' if applied == 1 else 'ies'}",
                 )
+                if funnel_missing:
+                    # batch-96 B1: an undeclared ${NAME} NEVER fails the run —
+                    # the placeholder rode into the doc intact, so the block
+                    # reports NOTICES with one named finding per variable.
+                    patch_result.status = BLOCK_STATUS_NOTICES
+                    patch_result.findings.extend(
+                        Finding(
+                            FINDING_WARN,
+                            f"funnel: ${{{name}}} no declarada en el flow — "
+                            "el placeholder queda intacto",
+                        )
+                        for name in funnel_missing
+                    )
+                result.block_results.append(patch_result)
 
             elif isinstance(block, WriteOutBlock):
                 if mem_map is None or ranges is None:
@@ -727,6 +821,72 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                                         f"wrote reports/{report.path.name}")
                         )
 
+            elif isinstance(block, ExternalStepBlock):
+                # prototype v3 (spec "paso externo"): a HUMAN-GATED step.
+                # WITHOUT a confirmation the run PAUSES here ("esperando
+                # humano") — the image is intact (NOT an error) and every
+                # downstream block skips until the operator confirms. WITH
+                # one, the executor validates the MANDATORY log evidence +
+                # the output file, COPIES the output into the session
+                # artifact folder (the project work area — the SAME
+                # copy_into_workarea WRITE idiom the imports use), records
+                # the copied path as a written artifact, and the chain goes
+                # on. The threaded image passes through UNCHANGED — the
+                # step is human-gated, not an image transform.
+                confirmations = ctx.external_confirmations or {}
+                confirmation = confirmations.get(index)
+                if confirmation is None:
+                    noun = (
+                        "comando" if block.mode == EXTERNAL_MODE_TERMINAL
+                        else "instruccion"
+                    )
+                    result.block_results.append(
+                        BlockResult(
+                            index, kind, BLOCK_STATUS_WAITING,
+                            f"paused - esperando humano: {noun} "
+                            f"'{block.instruction}' | LOG '{block.log_ref}' "
+                            f"+ SALIDA '{block.output_path}' pendientes",
+                        )
+                    )
+                    paused = True
+                    continue
+                log_path = Path(confirmation.log_ref)
+                if not log_path.is_absolute():
+                    log_path = Path(ctx.project_dir) / log_path
+                source_path = Path(confirmation.source_path)
+                if not log_path.is_file():
+                    aborted = _record_error(
+                        result, index, kind, "external step refused", [],
+                        f"log '{confirmation.log_ref}' no existe - la "
+                        "constancia es obligatoria, nunca opcional",
+                    )
+                    continue
+                if not source_path.is_file():
+                    aborted = _record_error(
+                        result, index, kind, "external step refused", [],
+                        f"salida '{confirmation.source_path}' no existe - "
+                        "correr el paso externo antes de confirmar",
+                    )
+                    continue
+                try:
+                    copied = copy_into_workarea(
+                        source_path, Path(ctx.project_dir)
+                    )
+                except Exception as exc:  # noqa: BLE001 - degrade, never abort ugly
+                    aborted = _record_error(
+                        result, index, kind, "external step copy failed", [],
+                        f"{type(exc).__name__}: {exc}",
+                    )
+                    continue
+                result.written_paths.append(copied)
+                result.block_results.append(
+                    BlockResult(
+                        index, kind, BLOCK_STATUS_OK,
+                        f"log '{log_path.name}' recibido · salida copiada a "
+                        f"{copied.name} (sesion)",
+                    )
+                )
+
             elif isinstance(block, ReportBlock) and ctx.defer_report:
                 # batch-70 FB-P2 (D-4): under a fused run the report is written
                 # ONCE, by run_flow_over_variants, with a section per variant.
@@ -810,8 +970,13 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # LLR-087.2: three-way roll-up. FAILED keys on `aborted` ALONE (an image
     # broken by a LOAD/PATCH/WRITE-OUT STOP); ISSUES when output was produced
     # with advisories (a notices/error block, or any WARN finding); else CLEAN.
+    # prototype v3: a PAUSED run (an unconfirmed external step) is terminal
+    # too — it is NOT FAILED (the image is intact) and NOT CLEAN (the run is
+    # not finished): it reports ``paused``.
     if aborted:
         result.status = FLOW_STATUS_ERROR
+    elif paused:
+        result.status = FLOW_STATUS_PAUSED
     elif any(
         br.status in {BLOCK_STATUS_NOTICES, BLOCK_STATUS_ERROR} or br.findings
         for br in result.block_results
@@ -1348,6 +1513,9 @@ def run_chain_set(
             name=spec.flow.name,
             blocks=blocks,
             schema_version=spec.flow.schema_version,
+            # batch-96 B1: the funnel is flow-scoped state, not a block — a
+            # bound per-run copy keeps the template's declared table.
+            funnel=spec.flow.funnel,
         )
         try:
             result = execute(bound_flow, ctx)

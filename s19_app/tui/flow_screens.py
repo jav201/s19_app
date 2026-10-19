@@ -31,6 +31,15 @@ same way. Every file-derived string renders through ``safe_text`` (C-17).
 
 No engine code is imported beyond the read-only flow-model data types; every
 file-derived string renders through ``safe_text`` (C-17).
+
+batch-96 B1/B2 additions: the FUNNEL table editor (a flow-level name→value
+declaration, batch-96 B1) and block COPY/PASTE (batch-96 B2) reuse the real
+persistence serializer/loader (``flow_persistence_service.flow_to_dict`` /
+``dict_to_flow``) — the clipboard stores the WIRE projection of one block,
+never a live instance, and paste re-validates the wire dict through the
+hardened loader against the current flow's own blocks. That is the second
+declared ``flow_screens → services`` edge; both are pure
+serialize/validate, no execution semantics.
 """
 
 from __future__ import annotations
@@ -66,8 +75,10 @@ from .insight_style import (
     RED,
     VALUE,
     DEPTH_BORDER,
+    YELLOW,
 )
 from .os_clipboard_input import OsClipboardInput
+from .services import flow_persistence_service as fps
 from .services.flow_model import (
     A2BBlock,
     A2B_INPUT_FILE,
@@ -75,23 +86,30 @@ from .services.flow_model import (
     BLOCK_A2B,
     BLOCK_CHECK,
     BLOCK_CRC,
+    BLOCK_EXTERNAL_STEP,
     BLOCK_PATCH,
     BLOCK_SOURCE,
     BLOCK_STATUS_ERROR,
     BLOCK_STATUS_NOTICES,
     BLOCK_STATUS_OK,
     BLOCK_STATUS_SKIPPED,
+    BLOCK_STATUS_WAITING,
     BLOCK_WRITE_OUT,
     CHECK_GATING_ADVISORY,
     CHECK_GATING_BLOCK_OWN,
+    EXTERNAL_MODE_MANUAL,
+    EXTERNAL_MODE_TERMINAL,
     FLOW_SCOPE_ALL_VARIANTS,
     FLOW_SCOPE_ASSIGNMENTS,
     FLOW_SCOPE_SINGLE,
     FLOW_STATUS_ERROR,
     FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
+    FLOW_STATUS_PAUSED,
+    FUNNEL_NAME_RE,
     CheckBlock,
     CrcBlock,
+    ExternalStepBlock,
     Flow,
     FlowBlock,
     FlowRunResult,
@@ -167,6 +185,12 @@ def _flow_block_label(block: FlowBlock) -> str:
             f"A2B-DIFF  {_binding_label(block.image_a)}  "
             f"vs  {_binding_label(block.image_b)}"
         )
+    if isinstance(block, ExternalStepBlock):
+        noun = "CMD" if block.mode == EXTERNAL_MODE_TERMINAL else "INSTR"
+        return (
+            f"EXT-STEP ({block.mode})  {noun} {block.instruction}  "
+            f"log {block.log_ref}  ->  {block.output_path}"
+        )
     if isinstance(block, ReportBlock):
         return "REPORT  (generation deferred - FB-P1b)"
     return "?"
@@ -182,6 +206,9 @@ _BLOCK_STATUS_SEV_CLASS = {
     BLOCK_STATUS_NOTICES: "sev-warning",
     BLOCK_STATUS_ERROR: "sev-error",
     BLOCK_STATUS_SKIPPED: "sev-neutral",
+    # prototype v3: a waiting external step is a PAUSE, not a failure —
+    # amber, the advisory carrier.
+    BLOCK_STATUS_WAITING: "sev-warning",
 }
 
 #: A per-status gutter glyph (enum-derived, never file-derived).
@@ -190,6 +217,10 @@ _BLOCK_STATUS_GLYPH = {
     BLOCK_STATUS_NOTICES: "◈",   # ◈ notices
     BLOCK_STATUS_ERROR: "✖",     # ✖ error
     BLOCK_STATUS_SKIPPED: "○",   # ○ skipped
+    # prototype v3: □ — a queued chain cell (the fx_a ▓/□ doctrine): a
+    # waiting external step is the chain waiting for the human. (⏸ U+23F8
+    # falls to a blue emoji in Windows Terminal even with VS15 — measured.)
+    BLOCK_STATUS_WAITING: "□",   # □ waiting (esperando humano)
 }
 
 #: Flow-status → (banner text, ``sev-*`` class) (LLR-088.5). The banner text is
@@ -199,6 +230,9 @@ _FLOW_STATUS_BANNER = {
     FLOW_STATUS_OK: ("CLEAN", "sev-ok"),
     FLOW_STATUS_ISSUES: ("ISSUES", "sev-warning"),
     FLOW_STATUS_ERROR: ("FAILED", "sev-error"),
+    # prototype v3 (spec "paso externo"): the paused banner — the run waits
+    # for the human at an external step.
+    FLOW_STATUS_PAUSED: ("PAUSED - ESPERANDO HUMANO", "sev-warning"),
 }
 
 #: The memory ribbon's fixed cell budget. A FIXED strip sized to clear the
@@ -300,6 +334,27 @@ _CANVAS_COLS = 88
 
 #: PLC block geometry: full-cell box width (the spike's 24-cell block).
 _BLOCK_W = 24
+
+#: External-step block geometry (prototype v3): the block carries the mode,
+#: the instruction/command, the MANDATORY log row and the output row — 24
+#: cells clip every real value, so the human-gated block paints wider (the
+#: same box composer, just a wider cell budget).
+_EXT_BLOCK_W = 44
+
+
+def _block_width(block: FlowBlock) -> int:
+    """The canvas cell budget of one block's box (EXT-STEP paints wider)."""
+    if isinstance(block, ExternalStepBlock):
+        return _EXT_BLOCK_W
+    return _BLOCK_W
+
+
+def _short_ext(text: str, width: int) -> str:
+    """Ellipsis-tail fit for a painted row (the lane-paint ``[:w-4]`` idiom,
+    but keeping the TAIL — paths keep their name, not their root)."""
+    if len(text) <= width:
+        return text
+    return "…" + text[-(width - 1):]
 
 #: Canvas styles — real palette hexes (``insight_style`` / ``render.format``
 #: tokens); one char + one style per cell, no cell carries two free variables.
@@ -408,10 +463,40 @@ def _wire_bend(g: _Grid, x_from: int, y_out: int, x_to: int, y_in: int) -> None:
     g.fill(x_from + 1, y_out, xv - x_from - 1, "─", _S_WIRE)
     g.put(xv, y_out, "┘", _S_WIRE)
     if y_out - y_in > 1:
-        g.fill(xv, y_in + 1, y_out - y_in - 1, "│", _S_WIRE)
+        for yy in range(y_in + 1, y_out):
+            g.put(xv, yy, "│", _S_WIRE)
     g.put(xv, y_in, "└", _S_WIRE)
     g.fill(xv + 1, y_in, x_to - xv - 1, "─", _S_WIRE)
     g.put(x_to, y_in, "├", _S_WIRE)
+
+
+def _wire_drop(
+    g: _Grid,
+    x_from: int,
+    y_out: int,
+    col_in: int,
+    y_dest: int,
+) -> None:
+    """Band-wrap drop (the chip-drop idiom): the next block wrapped to a new
+    band, so the threaded-image cable leaves the out stub, steps right one
+    cell, drops to the free row above the destination band and lands on the
+    block's TOP edge (``┬``, ``col_in`` clear of the title) — never crossing
+    a block cell."""
+    xv = x_from + 1
+    if col_in >= xv:
+        return  # no honest path — leave the blocks uncabled
+    y_tramo = y_dest - 1
+    g.put(x_from, y_out, "┤", _S_WIRE)
+    g.put(xv, y_out, "┐", _S_WIRE)
+    for yy in range(y_out + 1, y_tramo):
+        g.put(xv, yy, "│", _S_WIRE)
+    g.put(xv, y_tramo, "┘", _S_WIRE)
+    g.fill(col_in + 1, y_tramo, xv - col_in - 1, "─", _S_WIRE)
+    # Landing elbow: arriving from the right, turning DOWN into the block's
+    # top edge — ┌ (right+down). (A backwards └ here drew a spurious up-stub
+    # that read as a doubled line; caught in the operator's 2026-10-18 review.)
+    g.put(col_in, y_tramo, "┌", _S_WIRE)
+    g.put(col_in, y_dest, "┬", _S_WIRE)
 
 
 class FlowBuilderPanel(ScrollableContainer):
@@ -461,15 +546,27 @@ class FlowBuilderPanel(ScrollableContainer):
         ("CRC (template)", BLOCK_CRC),
         ("Write-out (file)", BLOCK_WRITE_OUT),
         ("A2B diff (2 inputs)", BLOCK_A2B),
+        # prototype v3 (spec "paso externo"): the human-gated step.
+        ("External step (human)", BLOCK_EXTERNAL_STEP),
+    ]
+
+    #: The external-step mode options (label, mode value) — TERMINAL runs an
+    #: exact command outside the app; MANUAL shows the instruction. Both
+    #: ALWAYS carry the mandatory log + the output file (spec v3).
+    _EXT_MODE_OPTIONS = [
+        ("Terminal (exact command)", EXTERNAL_MODE_TERMINAL),
+        ("Manual (instruction)", EXTERNAL_MODE_MANUAL),
     ]
 
     #: The fb_a palette rail — the three placeable block types the contract
     #: pins (TC-B94-20 census): patch / CRC / A2B-diff. Each button selects
     #: the matching ``#flow_kind`` entry (the chain kinds stay on the select).
+    #: prototype v3 adds the external-step type to the same rail idiom.
     _PALETTE_TYPES = (
         ("▣", "PATCH", BLOCK_PATCH),
         ("⊕", "CRC", BLOCK_CRC),
         ("⏚", "A2B-DIFF", BLOCK_A2B),
+        ("»", "EXT-STEP", BLOCK_EXTERNAL_STEP),
     )
 
     #: The CHECK per-block gating options (label, gating value) — the minimal
@@ -531,6 +628,31 @@ class FlowBuilderPanel(ScrollableContainer):
         self._flow_name: str = "flow"
         #: Unsaved-edits flag — glyph ``●`` (dirty) / ``✓`` (saved), C-10 primary.
         self._dirty: bool = False
+        #: The session artifact dir (the active project work area) — ALWAYS
+        #: shown under the add row (spec v3); set by the app via
+        #: :meth:`set_session_dir`.
+        self._session_dir: Optional[str] = None
+        #: The flow-level FUNNEL table (batch-96 B1) — ordered (name, value)
+        #: pairs declared beside the canvas; rides ``current_flow`` into
+        #: Run/Save and is restored by ``set_blocks``.
+        self._funnel: List[Tuple[str, str]] = []
+        #: The block COPY/PASTE clipboard (batch-96 B2) — the WIRE dict of
+        #: ONE block (the ``flow_to_dict`` projection), never a live
+        #: instance, so a paste always builds a fresh block object.
+        self._clipboard: Optional[dict] = None
+
+    def set_session_dir(self, path: str) -> None:
+        """Publish the session artifact dir (spec v3: ALWAYS on screen)."""
+        self._session_dir = path
+        try:
+            strip = self.query_one("#flow_ext_session", Static)
+        except Exception:
+            return  # not mounted yet — the compose default paints instead
+        strip.update(
+            safe_text(
+                f"sesión: {path} — al confirmar, la SALIDA se copia aquí"
+            )
+        )
 
     def compose(self) -> ComposeResult:
         yield Static(
@@ -545,45 +667,154 @@ class FlowBuilderPanel(ScrollableContainer):
             id="flow_help",
             markup=False,
         )
-        yield Horizontal(
+        palette_row = Horizontal(
             *(
                 Button(f"{glyph} {name}", id=f"flow_palette_{kind}")
                 for glyph, name, kind in self._PALETTE_TYPES
             ),
             id="flow_palette",
         )
-        yield Horizontal(
-            Select(
-                self._KIND_OPTIONS,
-                value=BLOCK_SOURCE,
-                allow_blank=False,
-                id="flow_kind",
-            ),
-            Select(
-                self._GATING_OPTIONS,
-                value=CHECK_GATING_ADVISORY,
-                allow_blank=False,
-                id="flow_gating",
-            ),
-            OsClipboardInput(
-                placeholder="ref (image / change-doc / output name)",
-                id="flow_ref",
-            ),
-            OsClipboardInput(
-                placeholder="image A — file or #n",
-                id="flow_ref_a",
-            ),
-            OsClipboardInput(
-                placeholder="image B — file or #n",
-                id="flow_ref_b",
-            ),
-            Button("Add", id="flow_add"),
+        palette_row.styles.height = 3
+        yield palette_row
+        kind_select = Select(
+            self._KIND_OPTIONS,
+            value=BLOCK_SOURCE,
+            allow_blank=False,
+            id="flow_kind",
+        )
+        kind_select.styles.width = 28
+        gating_select = Select(
+            self._GATING_OPTIONS,
+            value=CHECK_GATING_ADVISORY,
+            allow_blank=False,
+            id="flow_gating",
+        )
+        gating_select.styles.width = 18
+        ref_input = OsClipboardInput(
+            placeholder="ref (image / change-doc / output name)",
+            id="flow_ref",
+        )
+        ref_input.styles.width = 50
+        ref_a_input = OsClipboardInput(
+            placeholder="image A — file or #n",
+            id="flow_ref_a",
+        )
+        ref_a_input.styles.width = 22
+        ref_b_input = OsClipboardInput(
+            placeholder="image B — file or #n",
+            id="flow_ref_b",
+        )
+        ref_b_input.styles.width = 22
+        add_button = Button("Add", id="flow_add")
+        add_button.styles.width = 8
+        add_row = Horizontal(
+            kind_select,
+            gating_select,
+            ref_input,
+            ref_a_input,
+            ref_b_input,
+            add_button,
             id="flow_add_row",
         )
+        #: Altura explícita: los hijos (Select/Input/Button) miden 3 filas y
+        #: un Horizontal de altura 1 solapa al hermano siguiente (artefacto
+        #: de rasterización con overflow del panel).
+        add_row.styles.height = 3
+        yield add_row
+        # prototype v3 (spec "paso externo"): the external-step config row —
+        # mode, instruction/command, MANDATORY log ref, output path. Visible
+        # only when the kind select is on External step (the F3 idiom).
+        ext_mode_select = Select(
+            self._EXT_MODE_OPTIONS,
+            value=EXTERNAL_MODE_TERMINAL,
+            allow_blank=False,
+            id="flow_ext_mode",
+        )
+        ext_mode_select.styles.width = 26
+        ext_instruction_input = OsClipboardInput(
+            placeholder="comando exacto (terminal) / instrucción (manual)",
+            id="flow_ext_instruction",
+        )
+        ext_instruction_input.styles.width = 28
+        ext_log_input = OsClipboardInput(
+            placeholder="LOG — obligatorio (texto de constancia)",
+            id="flow_ext_log",
+        )
+        ext_log_input.styles.width = 26
+        ext_output_input = OsClipboardInput(
+            placeholder="SALIDA — path absoluto preferido",
+            id="flow_ext_output",
+        )
+        ext_output_input.styles.width = 28
+        ext_row = Horizontal(
+            ext_mode_select,
+            ext_instruction_input,
+            ext_log_input,
+            ext_output_input,
+            id="flow_ext_row",
+        )
+        ext_row.styles.height = 3
+        yield ext_row
+        #: The session directory is ALWAYS on screen (spec v3): on confirm the
+        #: flow copies the external step's output file INTO this folder and
+        #: downstream blocks reference that copy.
+        yield Static(
+            "sesión: (sin proyecto activo — el directorio de sesión se "
+            "muestra al cargar un proyecto)",
+            id="flow_ext_session",
+            markup=False,
+            classes="flow-node-summary sev-neutral",
+        )
+        # batch-96 B1: the FUNNEL editor — a collapsible flow-level table of
+        # ${NAME} → value declarations (one per flow), applied to PATCH
+        # change-doc texts at run time.
+        yield Button("Funnel (0)", id="flow_funnel_toggle")
+        funnel_name_input = OsClipboardInput(
+            placeholder="VARIABLE ([A-Z0-9_])",
+            id="flow_funnel_name",
+        )
+        funnel_name_input.styles.width = 24
+        funnel_value_input = OsClipboardInput(
+            placeholder="valor a sustituir",
+            id="flow_funnel_value",
+        )
+        funnel_value_input.styles.width = 30
+        funnel_add = Button("Añadir var", id="flow_funnel_add")
+        funnel_add.styles.width = 14
+        funnel_editor = Horizontal(
+            funnel_name_input,
+            funnel_value_input,
+            funnel_add,
+            id="flow_funnel_editor",
+        )
+        funnel_editor.styles.height = 3
+        yield funnel_editor
+        yield Static("", id="flow_funnel_list", markup=False)
+        # batch-96 B2: block COPY/PASTE — the canvas has no block selection,
+        # so the ledger number (1-based, empty = last) picks the block.
+        pick_input = OsClipboardInput(
+            placeholder="nº",
+            id="flow_pick",
+        )
+        pick_input.styles.width = 6
+        copy_button = Button("Copiar", id="flow_copy")
+        copy_button.styles.width = 10
+        paste_button = Button("Pegar", id="flow_paste")
+        paste_button.styles.width = 10
+        clip_status = Static("", id="flow_clip_status", markup=False)
+        clip_row = Horizontal(
+            pick_input,
+            copy_button,
+            paste_button,
+            clip_status,
+            id="flow_clip_row",
+        )
+        clip_row.styles.height = 3
+        yield clip_row
         yield Static(self._canvas_text(), id="flow_canvas", markup=False)
         yield Static("", id="flow_wiring_notice", markup=False)
         yield Static(self._blocks_text(), id="flow_blocks", markup=False)
-        yield Horizontal(
+        run_row = Horizontal(
             Select(
                 self._SCOPE_OPTIONS,
                 value=FLOW_SCOPE_SINGLE,
@@ -596,6 +827,8 @@ class FlowBuilderPanel(ScrollableContainer):
             Button("Load…", id="flow_load"),
             id="flow_run_row",
         )
+        run_row.styles.height = 3
+        yield run_row
         yield VerticalScroll(id="flow_result")
 
     # -- name strip (unchanged tracer contract) ------------------------------
@@ -631,7 +864,11 @@ class FlowBuilderPanel(ScrollableContainer):
     @property
     def current_flow(self) -> Flow:
         """The current composed flow (name = the display name), for Save."""
-        return Flow(name=self._flow_name, blocks=list(self._blocks))
+        return Flow(
+            name=self._flow_name,
+            blocks=list(self._blocks),
+            funnel=tuple(self._funnel),
+        )
 
     @property
     def is_dirty(self) -> bool:
@@ -654,8 +891,11 @@ class FlowBuilderPanel(ScrollableContainer):
         """
         self._blocks = list(flow.blocks)
         self._flow_name = name if name is not None else flow.name
+        #: batch-96 B1: a loaded flow's funnel table replaces the canvas one.
+        self._funnel = list(flow.funnel)
         self._dirty = False
         self._refresh_blocks()
+        self._refresh_funnel_list()
         self._refresh_name_strip()
         self.query_one("#flow_result", VerticalScroll).remove_children()
 
@@ -760,6 +1000,19 @@ class FlowBuilderPanel(ScrollableContainer):
                 chain_in,
                 ("out", scrub(f"{block.output_name} ({block.fmt})"), _S_OUT),
             ]
+        if isinstance(block, ExternalStepBlock):
+            # prototype v3 (spec "paso externo"): the block shows the mode's
+            # payload (the exact command for TERMINAL, the instruction for
+            # MANUAL), the MANDATORY log row and the output row. Rows are
+            # tail-fitted to the wider EXT-STEP box (paths keep their name).
+            inner = _EXT_BLOCK_W - 8
+            noun = "cmd" if block.mode == EXTERNAL_MODE_TERMINAL else "instr"
+            return [
+                chain_in,
+                ("in", scrub(f"{noun} {_short_ext(block.instruction, inner)}"), _S_VALUE),
+                ("out", scrub(f"log → {_short_ext(block.log_ref, inner - 5)}"), _S_OUT),
+                ("out", scrub(f"file → {_short_ext(block.output_path, inner - 7)}"), _S_OUT),
+            ]
         if isinstance(block, A2BBlock):
             return [
                 ("in", scrub(_binding_label(block.image_a)), _S_VALUE),
@@ -772,19 +1025,20 @@ class FlowBuilderPanel(ScrollableContainer):
 
     def _layout(
         self,
-    ) -> Tuple[List[Tuple[int, int, int, int]], dict[int, Tuple[int, int, int]], int]:
+    ) -> Tuple[List[Tuple[int, int, int, int, int]], dict[int, Tuple[int, int, int]], int]:
         """Walk the composed chain and lay out the fb_a canvas geometry.
 
         Returns:
             Tuple: ``(positions, chips, height)`` — ``positions`` holds one
-            ``(x, y, height, out_row)`` per NON-source block in block order;
-            ``chips`` maps source-block indices to ``(x, y, width)``; ``height``
-            is the grid row count. Bands wrap left→right; every caller of this
-            layout paints the SAME geometry (the canvas text and its height
-            can never diverge).
+            ``(x, y, height, out_row, width)`` per NON-source block in block
+            order (``width`` is the block's own box budget — EXT-STEP paints
+            wider); ``chips`` maps source-block indices to ``(x, y, width)``;
+            ``height`` is the grid row count. Bands wrap left→right; every
+            caller of this layout paints the SAME geometry (the canvas text
+            and its height can never diverge).
         """
         blocks = self._blocks
-        positions: List[Tuple[int, int, int, int]] = []  # x, y, h, out_row
+        positions: List[Tuple[int, int, int, int, int]] = []  # x, y, h, out_row, w
         chips: dict[int, Tuple[int, int, int]] = {}
         y = 4
         x = 2
@@ -800,14 +1054,15 @@ class FlowBuilderPanel(ScrollableContainer):
                 chips[index] = (x, y, w)
                 x += w + 6
                 continue
+            bw = _block_width(block)
             h = len(self._block_rows(block, index)) + 2
-            if x > 2 and x + _BLOCK_W > _CANVAS_COLS - 1:
+            if x > 2 and x + bw > _CANVAS_COLS - 1:
                 x = 2
                 y = band_bottom + 2
             out_row = y + h - 2  # the last IO row carries the block's output
-            positions.append((x, y, h, out_row))
+            positions.append((x, y, h, out_row, bw))
             band_bottom = max(band_bottom, y + h)
-            x += _BLOCK_W + 6
+            x += bw + 6
         height = max(band_bottom + 2, 6)
         return positions, chips, height
 
@@ -858,12 +1113,17 @@ class FlowBuilderPanel(ScrollableContainer):
         }
         for index in live:
             block = blocks[index]
-            x, y, h, _out_row = pos_of[index]
+            x, y, h, _out_row, w = pos_of[index]
             rows = self._block_rows(block, index)
-            _plc_block(
-                g, x, y, _BLOCK_W,
-                titles.get(block.kind, block.kind.upper()), rows,
-            )
+            if isinstance(block, ExternalStepBlock):
+                mode_tag = (
+                    "TERMINAL" if block.mode == EXTERNAL_MODE_TERMINAL
+                    else "MANUAL"
+                )
+                title = f"EXT-STEP · {mode_tag}"
+            else:
+                title = titles.get(block.kind, block.kind.upper())
+            _plc_block(g, x, y, w, title, rows)
 
         # Chip pass: source file chips with their drop onto the next block.
         for index, (cx, cy, w) in chips.items():
@@ -871,14 +1131,17 @@ class FlowBuilderPanel(ScrollableContainer):
             label = f"{label} ({blocks[index].file_type})"
             col = _chip(g, cx, cy, label, w)
             if index + 1 < len(blocks) and (index + 1) in pos_of:
-                nxt_x, nxt_y, _h, _o = pos_of[index + 1]
+                nxt_x, nxt_y, _h, _o, _w = pos_of[index + 1]
                 if nxt_y > cy + 3:
-                    g.fill(col, cy + 3, nxt_y - cy - 3, "│", _S_WIRE)
+                    for yy in range(cy + 3, nxt_y):
+                        g.put(col, yy, "│", _S_WIRE)
                 g.put(col, nxt_y, "┬", _S_WIRE)
 
         # Cable pass: threaded-image cables between consecutive blocks (never
         # INTO an A2B — its image inputs are explicit bindings), plus explicit
-        # A2B binding cables from the producing block's out stub.
+        # A2B binding cables from the producing block's out stub. A block that
+        # wrapped to a NEW band takes the chip-drop cable (_wire_drop), not
+        # the in-stub bend.
         for index in live:
             if index == 0:
                 continue
@@ -886,13 +1149,35 @@ class FlowBuilderPanel(ScrollableContainer):
             block = blocks[index]
             if not isinstance(block, A2BBlock) and (index - 1) in pos_of:
                 prev_pos = pos_of[index - 1]
-                _wire_bend(
-                    g,
-                    prev_pos[0] + _BLOCK_W - 1,
-                    prev_pos[3],
-                    pos[0],
-                    pos[1] + 1,
-                )
+                if prev_pos[1] != pos[1]:
+                    if isinstance(block, ExternalStepBlock):
+                        mode_tag = (
+                            "TERMINAL"
+                            if block.mode == EXTERNAL_MODE_TERMINAL
+                            else "MANUAL"
+                        )
+                        dest_title = f"[ EXT-STEP · {mode_tag} ]"
+                    else:
+                        dest_title = f"[ {titles.get(block.kind, block.kind.upper())} ]"
+                    drop_col = max(
+                        pos[0] + len(dest_title) + 3,
+                        pos[0] + pos[4] // 2,
+                    )
+                    _wire_drop(
+                        g,
+                        prev_pos[0] + prev_pos[4] - 1,
+                        prev_pos[3],
+                        drop_col,
+                        pos[1],
+                    )
+                else:
+                    _wire_bend(
+                        g,
+                        prev_pos[0] + prev_pos[4] - 1,
+                        prev_pos[3],
+                        pos[0],
+                        pos[1] + 1,
+                    )
             if isinstance(block, A2BBlock):
                 for binding, row in (
                     (block.image_a, 1),
@@ -905,7 +1190,7 @@ class FlowBuilderPanel(ScrollableContainer):
                         src_pos = pos_of[src]
                         _wire_bend(
                             g,
-                            src_pos[0] + _BLOCK_W - 1,
+                            src_pos[0] + src_pos[4] - 1,
                             src_pos[3],
                             pos[0],
                             pos[1] + row,
@@ -916,7 +1201,8 @@ class FlowBuilderPanel(ScrollableContainer):
                         col = cx + w // 2
                         target_row = pos[1] + row
                         if target_row > cy + 3:
-                            g.fill(col, cy + 3, target_row - cy - 3, "│", _S_WIRE)
+                            for yy in range(cy + 3, target_row):
+                                g.put(col, yy, "│", _S_WIRE)
                         g.put(col, target_row, "┬", _S_WIRE)
 
         return _join_lines(g.lines())
@@ -934,6 +1220,146 @@ class FlowBuilderPanel(ScrollableContainer):
     def _refresh_blocks(self) -> None:
         self.query_one("#flow_blocks", Static).update(self._blocks_text())
         self.query_one("#flow_canvas", Static).update(self._canvas_text())
+
+    # -- funnel (batch-96 B1) -------------------------------------------------
+
+    def _funnel_list_text(self) -> Text:
+        """One ``NAME = value`` line per declared variable (markup-safe)."""
+        if not self._funnel:
+            return safe_text(
+                "(funnel vacío — los ${NAME} de los change-docs pasan intactos)"
+            )
+        text = Text()
+        for name, value in self._funnel:
+            text.append(safe_text(f"${{{name}}} = "))
+            text.append(safe_text(value))
+            text.append("\n")
+        return text
+
+    def _refresh_funnel_list(self) -> None:
+        """Repaint the funnel table + the toggle's count badge."""
+        self.query_one("#flow_funnel_list", Static).update(self._funnel_list_text())
+        toggle = self.query_one("#flow_funnel_toggle", Button)
+        toggle.label = f"Funnel ({len(self._funnel)})"
+
+    def _add_funnel_entry(self) -> None:
+        """Declare (or update) one funnel variable from the editor row.
+
+        The name must match the EXACT placeholder charset ``[A-Z0-9_]`` and
+        the value must be non-empty; a refusal paints the wiring notice and
+        adds nothing. Re-declaring a name UPDATES its value (table
+        semantics — one value per name).
+        """
+        name = self.query_one("#flow_funnel_name", Input).value.strip()
+        value = self.query_one("#flow_funnel_value", Input).value
+        if not FUNNEL_NAME_RE.match(name):
+            self._show_wiring_notice(
+                "funnel rechazado: el nombre debe ser un placeholder "
+                "[A-Z0-9_] (p.ej. BOOST) — sin minúsculas ni espacios."
+            )
+            return
+        if not value.strip():
+            self._show_wiring_notice(
+                "funnel rechazado: el valor no puede estar vacío."
+            )
+            return
+        table = [(n, v) for n, v in self._funnel if n != name]
+        table.append((name, value))
+        self._funnel = table
+        self.query_one("#flow_funnel_name", Input).value = ""
+        self.query_one("#flow_funnel_value", Input).value = ""
+        self._show_wiring_notice("")
+        self._refresh_funnel_list()
+        self._mark_dirty()
+
+    # -- block copy/paste (batch-96 B2) ---------------------------------------
+
+    def _refresh_clip_status(self, message: str = "") -> None:
+        """Paint the clipboard status line (markup-safe)."""
+        self.query_one("#flow_clip_status", Static).update(safe_text(message))
+
+    def _copy_block(self) -> None:
+        """Serialize the picked block to the clipboard's WIRE dict.
+
+        The pick is the LEDGER number (1-based; empty = the last block).
+        The clipboard carries ``flow_to_dict``'s projection of that ONE
+        block — the same wire format persistence uses, never a live
+        instance, so a paste can never share mutable state.
+        """
+        raw = self.query_one("#flow_pick", Input).value.strip()
+        if raw:
+            if not raw.isdigit() or not (1 <= int(raw) <= len(self._blocks)):
+                self._show_wiring_notice(
+                    f"copiar rechazado: no hay bloque nº {raw} (hay "
+                    f"{len(self._blocks)})."
+                )
+                return
+            block = self._blocks[int(raw) - 1]
+        else:
+            if not self._blocks:
+                self._show_wiring_notice(
+                    "copiar rechazado: el canvas está vacío."
+                )
+                return
+            block = self._blocks[-1]
+        self._clipboard = fps.flow_to_dict(
+            Flow(name="clipboard", blocks=[block])
+        )["blocks"][0]
+        self._show_wiring_notice("")
+        self._refresh_clip_status(f"clipboard: {block.kind}")
+        self._mark_dirty()
+
+    def _paste_block(self) -> None:
+        """Paste the clipboard's wire dict as a NEW block.
+
+        An EMPTY clipboard is a friendly no-op (wiring notice, nothing
+        added, never a crash). The wire dict is re-validated through the
+        hardened loader against the CURRENT flow's own blocks, so an A2B
+        ``#<n>`` binding is checked against the real upstream context.
+        Pasted blocks keep their refs VERBATIM — a flow-bound A2B ref may
+        need re-editing after the paste (the minimal renumbering contract:
+        the builder never rewrites operator wiring silently). The ledger
+        numbers the pasted block anew; the clipboard survives the paste
+        (it can be pasted again).
+        """
+        if self._clipboard is None:
+            self._show_wiring_notice(
+                "pegar: el portapapeles está vacío — nada que pegar."
+            )
+            return
+        base: Optional[Path] = None
+        if self._session_dir:
+            base = Path(self._session_dir)
+        else:
+            # The shipped app publishes the active project through
+            # ``active_project_dir`` (the crc_designer_view idiom) — the
+            # paste validation base comes from there when the session strip
+            # was never set.
+            active = getattr(self.app, "active_project_dir", None)
+            base = active() if callable(active) else None
+        if base is None:
+            self._show_wiring_notice(
+                "pegar rechazado: cargue un proyecto (se valida contra el "
+                "directorio de sesión)."
+            )
+            return
+        wire_blocks = fps.flow_to_dict(self.current_flow)["blocks"]
+        envelope = {
+            "schema_version": 1,
+            "name": "clipboard-paste",
+            "blocks": [*wire_blocks, self._clipboard],
+        }
+        parsed, findings = fps.dict_to_flow(envelope, base)
+        if parsed is None or findings:
+            message = findings[0].message if findings else "bloque inválido"
+            self._show_wiring_notice(f"pegar rechazado: {message}")
+            return
+        block = parsed.blocks[-1]
+        self._blocks.append(block)
+        self._show_wiring_notice("")
+        self._refresh_blocks()
+        self._refresh_clip_status(f"pegado: {block.kind}")
+        self._mark_dirty()
 
     # -- wiring -------------------------------------------------------------
 
@@ -978,6 +1404,54 @@ class FlowBuilderPanel(ScrollableContainer):
         self._refresh_blocks()
         self._mark_dirty()
 
+    def _add_external_step_block(self) -> None:
+        """Build an external-step block from the config row (spec v3).
+
+        The LOG is MANDATORY (never optional) — an empty log ref refuses the
+        block with the wiring notice, exactly like a refused A2B binding. The
+        instruction and the output path must be non-empty too; the output
+        path prefers an ABSOLUTE one (a relative plain filename is accepted).
+        """
+        mode = str(self.query_one("#flow_ext_mode", Select).value)
+        instruction = self.query_one("#flow_ext_instruction", Input).value.strip()
+        log_ref = self.query_one("#flow_ext_log", Input).value.strip()
+        output_path = self.query_one("#flow_ext_output", Input).value.strip()
+        if not instruction:
+            noun = (
+                "el comando exacto" if mode == EXTERNAL_MODE_TERMINAL
+                else "la instrucción"
+            )
+            self._show_wiring_notice(
+                f"paso externo rechazado: falta {noun} a correr fuera de la app."
+            )
+            return
+        if not log_ref:
+            self._show_wiring_notice(
+                "paso externo rechazado: el LOG es OBLIGATORIO (texto de "
+                "constancia, nunca opcional)."
+            )
+            return
+        if not output_path:
+            self._show_wiring_notice(
+                "paso externo rechazado: falta el ARCHIVO DE SALIDA "
+                "(path absoluto preferido)."
+            )
+            return
+        self._show_wiring_notice("")
+        self._blocks.append(
+            ExternalStepBlock(
+                mode=mode,
+                instruction=instruction,
+                log_ref=log_ref,
+                output_path=output_path,
+            )
+        )
+        self.query_one("#flow_ext_instruction", Input).value = ""
+        self.query_one("#flow_ext_log", Input).value = ""
+        self.query_one("#flow_ext_output", Input).value = ""
+        self._refresh_blocks()
+        self._mark_dirty()
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id is not None and event.button.id.startswith(
             "flow_palette_"
@@ -990,6 +1464,9 @@ class FlowBuilderPanel(ScrollableContainer):
             kind = str(self.query_one("#flow_kind", Select).value)
             if kind == BLOCK_A2B:
                 self._add_a2b_block()
+                return
+            if kind == BLOCK_EXTERNAL_STEP:
+                self._add_external_step_block()
                 return
             ref = self.query_one("#flow_ref", Input).value
             gating = str(self.query_one("#flow_gating", Select).value)
@@ -1004,7 +1481,7 @@ class FlowBuilderPanel(ScrollableContainer):
         elif event.button.id == "flow_run":
             self.post_message(
                 self.RunRequested(
-                    Flow(name=self._flow_name, blocks=list(self._blocks)),
+                    self.current_flow,
                     str(self.query_one("#flow_scope", Select).value),
                 )
             )
@@ -1015,11 +1492,25 @@ class FlowBuilderPanel(ScrollableContainer):
         elif event.button.id == "flow_clear":
             had_blocks = bool(self._blocks)
             self._blocks.clear()
+            self._funnel.clear()
+            self._clipboard = None
             self._refresh_blocks()
+            self._refresh_funnel_list()
+            self._refresh_clip_status("")
             self._show_wiring_notice("")
             self.query_one("#flow_result", VerticalScroll).remove_children()
             if had_blocks:
                 self._mark_dirty()
+        elif event.button.id == "flow_funnel_toggle":
+            editor = self.query_one("#flow_funnel_editor")
+            editor.display = not editor.display
+            self.query_one("#flow_funnel_list").display = editor.display
+        elif event.button.id == "flow_funnel_add":
+            self._add_funnel_entry()
+        elif event.button.id == "flow_copy":
+            self._copy_block()
+        elif event.button.id == "flow_paste":
+            self._paste_block()
 
     def on_mount(self) -> None:
         # F3 (LLR-094.3): the per-block gating control is CHECK-only — hidden
@@ -1028,6 +1519,11 @@ class FlowBuilderPanel(ScrollableContainer):
         self._sync_kind_dependent_visibility(
             str(self.query_one("#flow_kind", Select).value)
         )
+        # batch-96 B1: the funnel editor starts COLLAPSED (a declaration
+        # table, not a canvas element) — the toggle opens it.
+        self.query_one("#flow_funnel_editor").display = False
+        self.query_one("#flow_funnel_list").display = False
+        self._refresh_funnel_list()
         self._show_wiring_notice("")
 
     def on_select_changed(self, event: Select.Changed) -> None:
@@ -1037,11 +1533,18 @@ class FlowBuilderPanel(ScrollableContainer):
 
     def _sync_kind_dependent_visibility(self, kind: str) -> None:
         """Show the gating control only for CHECK, the binding inputs only for
-        A2B, and the single ref for every other kind (F3)."""
+        A2B, the single ref for every other kind, and the external-step config
+        row only for EXTERNAL_STEP (F3)."""
         self.query_one("#flow_gating", Select).display = kind == BLOCK_CHECK
-        self.query_one("#flow_ref", Input).display = kind != BLOCK_A2B
+        # The single ref is for the ref-bearing kinds only — A2B wires two
+        # bindings, the external step its own config row (F3, spec v3).
+        self.query_one("#flow_ref", Input).display = kind not in (
+            BLOCK_A2B,
+            BLOCK_EXTERNAL_STEP,
+        )
         self.query_one("#flow_ref_a", Input).display = kind == BLOCK_A2B
         self.query_one("#flow_ref_b", Input).display = kind == BLOCK_A2B
+        self.query_one("#flow_ext_row").display = kind == BLOCK_EXTERNAL_STEP
 
     # -- run result ledger (Direction A Pipeline Ledger, unchanged) -----------
 
@@ -1292,6 +1795,10 @@ _FX_BAR_CELLS = 14
 _FX_BAR_DONE = "▓"
 _FX_BAR_GAP = "░"
 
+#: The pause shade (prototype v3) — bold YELLOW, the same hex as the
+#: ``.sev-warning`` class (insight_style is the token's home).
+_S_PAUSE = "bold " + YELLOW
+
 #: Terminal status → (glyph, shade style). Enum-derived, never file-derived
 #: (correctly outside the C-17 sweep, like ``_FLOW_STATUS_BANNER``).
 _FX_STATUS_STYLE = {
@@ -1299,6 +1806,9 @@ _FX_STATUS_STYLE = {
     FLOW_STATUS_OK: ("✓", _S_OUT),
     FLOW_STATUS_ISSUES: ("◈", _S_LABEL),
     FLOW_STATUS_ERROR: ("✗", _S_ERR),
+    # prototype v3 (spec "paso externo"): the PAUSED pair — □ (a queued chain
+    # cell, the fx_a ▓/□ doctrine) in bold yellow (the .sev-warning hex).
+    FLOW_STATUS_PAUSED: ("□", _S_PAUSE),
 }
 
 
@@ -1340,6 +1850,12 @@ class _FxLane:
     last_elapsed: float = 0.0
     fail_block: Optional[int] = None
     missing: List[str] = field(default_factory=list)
+    #: prototype v3: the external-step block index the chain is PAUSED at
+    #: (``None`` when not paused) — drives the pending log/output rows and
+    #: the confirm button.
+    paused_block: Optional[int] = None
+    #: The session artifact dir shown in the lane (spec v3: ALWAYS visible).
+    session_dir: str = ""
 
 
 def _fx_stamp(seconds: float) -> str:
@@ -1443,6 +1959,24 @@ class FlowExecutionPanel(ScrollableContainer):
             super().__init__()
             self.stem = stem
 
+    class ExternalStepConfirmed(Message):
+        """The operator confirmed a paused external step (spec v3).
+
+        Posted by the lane's confirm button; the app re-runs THAT lane with
+        the block's confirmation in the run context and hands the outcome
+        back via :meth:`apply_confirmed_run`.
+
+        Args:
+            lane_index (int): The paused lane's position.
+            block_index (int): The external-step block's position in the
+                lane's flow.
+        """
+
+        def __init__(self, lane_index: int, block_index: int) -> None:
+            super().__init__()
+            self.lane_index = lane_index
+            self.block_index = block_index
+
     def __init__(self) -> None:
         super().__init__(id="fx_panel")
         self._lanes: List[_FxLane] = []
@@ -1451,6 +1985,18 @@ class FlowExecutionPanel(ScrollableContainer):
         #: Unsaved-edits flag — glyph ● (dirty) / ✓ (saved), the C-10 idiom.
         self._dirty = False
         self._last_record = None
+        #: The retained run-log Text (append target for a lane's confirm
+        #: re-run — prototype v3).
+        self._log_text = Text()
+        #: The session artifact dir (spec v3: ALWAYS visible in every lane).
+        self._session_dir: str = ""
+
+    def set_session_dir(self, path: str) -> None:
+        """Publish the session artifact dir (spec v3) and repaint the lanes."""
+        self._session_dir = path
+        for index in range(len(self._lanes)):
+            self._lanes[index].session_dir = path
+            self._repaint_lane(index)
 
     # -- composition ---------------------------------------------------------
 
@@ -1468,7 +2014,7 @@ class FlowExecutionPanel(ScrollableContainer):
             id="fx_help",
             markup=False,
         )
-        yield Horizontal(
+        run_row = Horizontal(
             Button("Import…", id="fx_import"),
             Select(
                 self._MODE_OPTIONS,
@@ -1479,7 +2025,9 @@ class FlowExecutionPanel(ScrollableContainer):
             Button("Run", id="fx_run", variant="primary"),
             id="fx_run_row",
         )
-        yield Horizontal(
+        run_row.styles.height = 3
+        yield run_row
+        set_row = Horizontal(
             OsClipboardInput(placeholder="set name", id="fx_set_name"),
             Button("Save Set", id="fx_save"),
             Select(
@@ -1491,6 +2039,8 @@ class FlowExecutionPanel(ScrollableContainer):
             Button("Load Set", id="fx_load"),
             id="fx_set_row",
         )
+        set_row.styles.height = 3
+        yield set_row
         yield Static("", id="fx_notice", markup=False)
         yield ScrollableContainer(
             Horizontal(
@@ -1574,6 +2124,7 @@ class FlowExecutionPanel(ScrollableContainer):
             name=self._unique_lane_name(template),
             template=template,
             flow=flow,
+            session_dir=self._session_dir,
         )
         self._lanes.append(lane)
         empty = self.query_one("#fx_empty", Static)
@@ -1605,6 +2156,7 @@ class FlowExecutionPanel(ScrollableContainer):
             last_outputs=[Path(out) for out in outputs],
             last_status=FLOW_STATUS_OK if outputs else "",
             missing=list(missing),
+            session_dir=self._session_dir,
         )
         self._lanes.append(lane)
         self.query_one("#fx_empty", Static).display = False
@@ -1620,17 +2172,27 @@ class FlowExecutionPanel(ScrollableContainer):
             )
         ]
         for src_index in self._source_indices(lane.flow):
-            children.append(
-                Horizontal(
-                    OsClipboardInput(
-                        placeholder=f"input {src_index + 1} ref",
-                        id=f"fx_in_{index}_{src_index}",
-                        value=self._effective_ref(lane, src_index),
-                    ),
-                    Button("Bind", id=f"fx_bind_{index}_{src_index}"),
-                    id=f"fx_lane_{index}_edit_{src_index}",
-                )
+            edit_row = Horizontal(
+                OsClipboardInput(
+                    placeholder=f"input {src_index + 1} ref",
+                    id=f"fx_in_{index}_{src_index}",
+                    value=self._effective_ref(lane, src_index),
+                ),
+                Button("Bind", id=f"fx_bind_{index}_{src_index}"),
+                id=f"fx_lane_{index}_edit_{src_index}",
             )
+            edit_row.styles.height = 3
+            children.append(edit_row)
+        #: prototype v3: the confirm affordance for a PAUSED external step —
+        #: hidden until the lane's run pauses on one (spec v3 semantics: the
+        #: execution waits for the human until log + output are confirmed).
+        confirm = Button(
+            "✓ Confirmar paso externo",
+            id=f"fx_confirm_{index}",
+            variant="primary",
+        )
+        confirm.display = False
+        children.append(confirm)
         lane_widget = Vertical(*children, id=f"fx_lane_{index}", classes="fx-lane")
         lane_widget.styles.width = _FX_LANE_W + 2
         return lane_widget
@@ -1643,13 +2205,20 @@ class FlowExecutionPanel(ScrollableContainer):
 
     def _lane_paint(self, lane: _FxLane) -> Text:
         """Paint one lane box: name, template, block list, pinned inputs,
-        missing-input notices, and the shaded status bar (the fx_a density)."""
+        missing-input notices, the session dir (spec v3: ALWAYS), the paused
+        external-step pending rows, and the shaded status bar (fx_a density)."""
         src_indices = self._source_indices(lane.flow)
         kinds = " → ".join(block.kind for block in lane.flow.blocks)
+        ext_paused = (
+            lane.paused_block is not None
+            and lane.last_status == FLOW_STATUS_PAUSED
+        )
         rows = (
             2  # title + template/blocks lines
             + max(1, len(src_indices))  # pinned inputs
             + len(lane.missing)  # reload mismatch notices
+            + 1  # session dir (spec v3 — always)
+            + (2 if ext_paused else 0)  # pending LOG + SALIDA (spec v3)
             + 1  # status bar
         )
         g = _Grid(_FX_LANE_W, rows + 2)
@@ -1680,6 +2249,38 @@ class FlowExecutionPanel(ScrollableContainer):
                 _S_ERR,
             )
             row += 1
+        #: The session artifact dir is ALWAYS painted (spec v3) — on confirm
+        #: the external step's output is copied INTO it.
+        session = lane.session_dir or "(sin proyecto activo)"
+        g.put(
+            2,
+            row,
+            f"sesión: {_short_ext(safe_text(session).plain, _FX_LANE_W - 12)}",
+            _S_DIM,
+        )
+        row += 1
+        if ext_paused:
+            #: The pending evidence rows — the ⚠ idiom of the missing-input
+            #: notices, in the error shade: the MANDATORY log and the output
+            #: file are still owed by the human.
+            block = lane.flow.blocks[lane.paused_block]
+            log_ref = getattr(block, "log_ref", "?")
+            g.put(
+                2,
+                row,
+                ("⚠ LOG '" + safe_text(log_ref).plain + "' pendiente").replace(
+                    "—", "-"
+                )[: _FX_LANE_W - 4],
+                _S_ERR,
+            )
+            row += 1
+            g.put(
+                2,
+                row,
+                "⚠ SALIDA sin confirmar - esperando humano"[: _FX_LANE_W - 4],
+                _S_ERR,
+            )
+            row += 1
         glyph, style = _FX_STATUS_STYLE.get(lane.last_status, ("·", _S_DIM))
         blocks = max(1, len(lane.flow.blocks))
         if lane.last_status == FLOW_STATUS_OK:
@@ -1695,7 +2296,11 @@ class FlowExecutionPanel(ScrollableContainer):
         pct = round(100 * frac)
         g.put(2 + _FX_BAR_CELLS + 1, row, f"{pct:>3d}%", _S_VALUE)
         g.put(2 + _FX_BAR_CELLS + 6, row, glyph, style)
-        if lane.last_status:
+        if lane.last_status == FLOW_STATUS_PAUSED:
+            #: A paused lane has no terminal elapsed — the state word rides
+            #: the elapsed seat (cols 24..41, 16 of 18 cells — fits).
+            g.put(2 + _FX_BAR_CELLS + 9, row, "ESPERANDO HUMANO", _S_LABEL)
+        elif lane.last_status:
             g.put(
                 2 + _FX_BAR_CELLS + 9,
                 row,
@@ -1816,7 +2421,26 @@ class FlowExecutionPanel(ScrollableContainer):
                 ),
                 None,
             )
+            #: prototype v3: a WAITING block result is a PAUSED external step
+            #: — the bar stops there (``fail_block`` is "where the chain
+            #: stopped", the pause seat) and the confirm button mounts.
+            lane.paused_block = next(
+                (
+                    block_result.index
+                    for block_result in outcome.block_results
+                    if block_result.status == BLOCK_STATUS_WAITING
+                ),
+                None,
+            )
+            if lane.paused_block is not None:
+                lane.fail_block = lane.paused_block
             self._repaint_lane(lane_index)
+            try:
+                self.query_one(
+                    f"#fx_confirm_{lane_index}", Button
+                ).display = lane.paused_block is not None
+            except Exception:
+                pass  # lane widgets not mounted (pre-mount call) — no button
 
             log.append(f"{_fx_stamp(outcome.started_at - run_start)} ")
             log.append("▶ ", style=_S_LABEL)
@@ -1840,6 +2464,22 @@ class FlowExecutionPanel(ScrollableContainer):
                         style=_S_DIM,
                     )
                 log.append(" · chain halted\n", style=_S_DIM)
+            elif outcome.status == FLOW_STATUS_PAUSED:
+                #: The paused chain's inline line — names the block and the
+                #: MANDATORY log still owed (the ✗-line idiom, □ shade).
+                index = lane.paused_block if lane.paused_block is not None else 0
+                total = max(1, len(outcome.block_results))
+                block = lane.flow.blocks[index]
+                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
+                log.append("□ ", style=_S_PAUSE)
+                log.append(safe_text(outcome.chain))
+                log.append(
+                    f" · ESPERANDO HUMANO — paso externo (block "
+                    f"{index + 1}/{total}) · LOG "
+                    f"'{safe_text(getattr(block, 'log_ref', '?')).plain}' "
+                    f"pendiente\n",
+                    style=_S_DIM,
+                )
             else:
                 glyph, _ = _FX_STATUS_STYLE.get(outcome.status, ("·", _S_DIM))
                 log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
@@ -1853,9 +2493,52 @@ class FlowExecutionPanel(ScrollableContainer):
         for diagnostic in record.diagnostics:
             log.append(safe_text(diagnostic))
             log.append("\n")
+        self._log_text = log
         self.query_one("#fx_log", Static).update(log)
         if record.outcomes:
             self._mark_dirty()
+
+    def apply_confirmed_run(self, lane_index: int, record) -> None:
+        """Paint ONE lane's re-run after an external-step confirmation (v3).
+
+        The lane keeps its identity; only the run outcome is replaced — the
+        confirm button hides again and the run-log strip gains the re-run's
+        start/terminal lines under the paused entry.
+        """
+        lane = self._lanes[lane_index]
+        outcome = record.outcomes[0]
+        lane.last_status = outcome.status
+        lane.last_elapsed = outcome.finished_at - outcome.started_at
+        lane.last_outputs = list(outcome.written_paths)
+        lane.fail_block = next(
+            (
+                block_result.index
+                for block_result in outcome.block_results
+                if block_result.status == BLOCK_STATUS_ERROR
+            ),
+            None,
+        )
+        lane.paused_block = None
+        self._repaint_lane(lane_index)
+        try:
+            self.query_one(f"#fx_confirm_{lane_index}", Button).display = False
+        except Exception:
+            pass
+        log = self._log_text
+        log.append(f"{_fx_stamp(outcome.started_at)} ")
+        log.append("▶ ", style=_S_LABEL)
+        log.append(safe_text(outcome.chain))
+        log.append(" · re-run tras confirmar paso externo\n", style=_S_DIM)
+        glyph, _ = _FX_STATUS_STYLE.get(outcome.status, ("·", _S_DIM))
+        log.append(f"{_fx_stamp(outcome.finished_at)} ")
+        log.append(f"{glyph} ", style=_S_LABEL)
+        log.append(safe_text(outcome.chain))
+        log.append(" · done", style=_S_DIM)
+        if outcome.written_paths:
+            names = ", ".join(path.name for path in outcome.written_paths)
+            log.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
+        log.append("\n")
+        self.query_one("#fx_log", Static).update(log)
 
     def render_run_error(self, message: str) -> None:
         """Paint a no-project run refusal into the log strip (the Run idiom)."""
@@ -1946,6 +2629,16 @@ class FlowExecutionPanel(ScrollableContainer):
         elif button_id.startswith("fx_bind_"):
             parts = button_id.removeprefix("fx_bind_").split("_")
             self._rebind(int(parts[0]), int(parts[1]))
+        elif button_id.startswith("fx_confirm_"):
+            #: prototype v3: confirm a paused external step — the app re-runs
+            #: that lane with the confirmation in the run context.
+            lane_index = int(button_id.removeprefix("fx_confirm_"))
+            lane = self._lanes[lane_index]
+            if lane.paused_block is None:
+                return
+            self.post_message(
+                self.ExternalStepConfirmed(lane_index, lane.paused_block)
+            )
 
     def _rebind(self, lane_index: int, src_index: int) -> None:
         """Bind one lane's input — exactly that lane's record is written.
@@ -1984,6 +2677,8 @@ def _block_ref_noun(block: FlowBlock) -> Tuple[str, str]:
         return "config", block.config_ref
     if isinstance(block, WriteOutBlock):
         return "output", block.output_name
+    if isinstance(block, ExternalStepBlock):
+        return "log", block.log_ref
     return "ref", getattr(block, "kind", "?")
 
 

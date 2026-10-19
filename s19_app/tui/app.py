@@ -157,6 +157,8 @@ from .services.project_gather_service import (
 from .services import folder_open_service
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, WindowSection
+from .a2l_describe import CurveDescriptionScreen
+from .a2l import describe_curve_tag
 from .segment_split_view import SplitJoinWindow
 from .services.validation_service import (
     build_mac_coverage_strip,
@@ -1398,6 +1400,10 @@ class S19TuiApp(App):
         Binding("p", "load_project", "Load project", show=False),
         Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
+        # E9 (batch-96): describe the selected A2L tag (CURVE/MAP point
+        # table) — A2L-screen scoped inside the action; show=False keeps
+        # the footer uncrowded (C-13), discoverable via the `?` help panel.
+        Binding("d", "a2l_describe_tag", "Describe tag", show=False),
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
         Binding("k", "show_legend", "Legend", show=True),
@@ -2813,6 +2819,76 @@ class S19TuiApp(App):
             set_name=event.set_name,
         )
         panel.render_run(record)
+
+    def on_flow_execution_panel_external_step_confirmed(
+        self, event: "FlowExecutionPanel.ExternalStepConfirmed"
+    ) -> None:
+        """Re-run ONE lane with its paused external step confirmed (spec v3).
+
+        Summary:
+            prototype v3 (spec "paso externo"): the operator pressed the
+            lane's confirm button — the human ran the step OUTSIDE the app
+            and the MANDATORY log + the output file exist. Build that lane's
+            confirmation from the block's OWN declared fields (the log ref
+            and the absolute output path the operator configured), re-run
+            JUST that lane through the real ``run_chain_set`` with the
+            confirmation riding the run context, and hand the outcome back
+            to the panel's :meth:`FlowExecutionPanel.apply_confirmed_run`.
+            The executor validates the evidence, COPIES the output into the
+            session artifact folder and the chain continues; the lane's
+            remaining blocks execute.
+
+        Args:
+            event (FlowExecutionPanel.ExternalStepConfirmed): Carries the
+                lane index and the external-step block index.
+        """
+        from .services.flow_execution_service import ChainSpec, run_chain_set
+        from .services.flow_model import (
+            ExternalStepBlock,
+            ExternalStepConfirmation,
+            FlowContext,
+        )
+
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_run_error(
+                "no project loaded - load or save a project first"
+            )
+            return
+        specs = panel.lane_specs()
+        if event.lane_index >= len(specs):
+            return
+        spec = specs[event.lane_index]
+        if event.block_index >= len(spec.flow.blocks):
+            return
+        block = spec.flow.blocks[event.block_index]
+        if not isinstance(block, ExternalStepBlock):
+            return
+        confirmation = ExternalStepConfirmation(
+            block_index=event.block_index,
+            log_ref=block.log_ref,
+            source_path=block.output_path,
+        )
+        chains = [
+            ChainSpec(
+                name=spec.name,
+                template=spec.template,
+                flow=spec.flow,
+                bindings=dict(spec.bindings),
+            )
+        ]
+        ctx = FlowContext(
+            project_dir=project_dir,
+            external_confirmations={event.block_index: confirmation},
+        )
+        record = run_chain_set(
+            chains,
+            ctx,
+            mode="sequential",
+            set_name=str(self.query_one("#fx_set_name", Input).value),
+        )
+        panel.apply_confirmed_run(event.lane_index, record)
 
     def on_flow_execution_panel_save_requested(
         self, event: "FlowExecutionPanel.SaveRequested"
@@ -6614,6 +6690,60 @@ class S19TuiApp(App):
         self.set_status(f"A2L JSON saved: {output.name}")
         self.logger.info("A2L JSON exported: %s", output)
 
+    def action_a2l_describe_tag(self) -> None:
+        """Open the E9 parameter description for the selected A2L tag.
+
+        Summary:
+            The ``d`` action on the A2L Explorer: resolve the highlighted
+            ``#a2l_tags_list`` row to its enriched tag, build the E9
+            description (A2L metadata + decoded CURVE/MAP points from the
+            loaded image) and push the read-only modal. Self-guarding like
+            the dump/export actions: outside the A2L screen, with no A2L
+            loaded, or with no row under the cursor it is a no-op (a
+            scalar tag still opens — the modal shows its honest
+            ``not_a_curve`` header).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``describe_curve_tag`` / ``CurveDescriptionScreen``
+                - ``_a2l_row_key_to_tag`` (the row_key -> tag map the
+                  table render maintains)
+            Used by:
+                - the ``d`` binding (E9, batch-96)
+        """
+        if self._active_screen_key != "a2l" or not self.current_a2l_data:
+            return
+        try:
+            a2l_table = self.query_one("#a2l_tags_list", DataTable)
+        except Exception:
+            return
+        row_index = a2l_table.cursor_row
+        if row_index is None:
+            self.set_status("A2L: no tag row under the cursor.")
+            return
+        try:
+            row_key, _ = a2l_table.coordinate_to_cell_key((row_index, 0))
+        except Exception:
+            return
+        key_value = getattr(row_key, "value", row_key)
+        tag = (
+            self._a2l_row_key_to_tag.get(str(key_value))
+            if isinstance(key_value, str)
+            else None
+        )
+        if not isinstance(tag, dict):
+            self.set_status("A2L: no tag row under the cursor.")
+            return
+        mem_map = self.current_file.mem_map if self.current_file else None
+        description = describe_curve_tag(tag, self.current_a2l_data, mem_map)
+        self.push_screen(CurveDescriptionScreen(description))
+
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
     #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Check Editor, Diff,
     #: Flow, Flow Execution, Checks, CRC Designer — the batch-94 rail order
@@ -7988,6 +8118,24 @@ class S19TuiApp(App):
         )
         self.logger.warning("Manifest verify mismatch: %s", detail)
 
+    def _publish_flow_session_dir(self) -> None:
+        """Push the active project dir to the flow panels' session strip.
+
+        The external-step contract (spec v3, PENDIENTES-batch96) shows the
+        session artifacts dir at all times; the executor copies the confirmed
+        step output into this very dir (flow_execution_service), so the
+        displayed value IS the copy destination. No project -> "" restores
+        the panels' shipped default text.
+        """
+        project_dir = self.active_project_dir()
+        value = str(project_dir) if project_dir is not None else ""
+        for panel_type in (FlowBuilderPanel, FlowExecutionPanel):
+            try:
+                panel = self.query_one(panel_type)
+            except Exception:  # noqa: BLE001 - panels not mounted yet
+                continue
+            panel.set_session_dir(value)
+
     def _handle_load_project(self, name: Optional[str]) -> None:
         if name is None:
             self.logger.info("Load project canceled.")
@@ -8061,6 +8209,7 @@ class S19TuiApp(App):
         self.set_status(f"Loaded project '{name}' -> {status_target}")
         self.logger.info("Project loaded. name=%s file=%s mac=%s", name, selected_file, mac_file)
         self.update_project_labels()
+        self._publish_flow_session_dir()
 
     def list_projects(self) -> List[str]:
         projects = []

@@ -940,12 +940,16 @@ def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> 
     assert state["restored"] == {"base": {0: "variant_b.hex"}, "base_2": {0: "release.s19"}}, (
         state["restored"]
     )
-    # The re-run regenerated both chains' outputs — 2 fresh artifacts (the
-    # dedup-suffix idiom: a re-run never overwrites, it lands fresh files).
+    # The re-run regenerated both chains' outputs (statuses ok, one written
+    # path each). Fresh-artifact count: 0 — B8/TC-1800 (content-identical
+    # reload reuses the target, no `_1` duplicate) supersedes the old
+    # dedup-suffix idiom for the identical-bytes re-run; the C-12 substance
+    # (the RELOADED bindings are what re-run, named in the provenance below)
+    # is unchanged.
     assert state["statuses"] == ["ok", "ok"], state["statuses"]
     assert state["written"] == [1, 1], state["written"]
-    assert len(state["fresh_outputs"]) == 2, (
-        f"the re-run must regenerate 2 fresh outputs: {state['fresh_outputs']}"
+    assert state["fresh_outputs"] == [], (
+        f"an identical-bytes re-run reuses the existing outputs (B8): {state['fresh_outputs']}"
     )
     # The re-run's provenance names the RELOADED bindings.
     prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
