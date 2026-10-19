@@ -1533,10 +1533,10 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `HLR-007a` | batches |
 | `HLR-007b` | batches, tests |
 | `HLR-008` | batches, canon, tests |
-| `HLR-009` | batches, tests |
-| `HLR-010` | batches, tests |
-| `HLR-011` | batches, tests |
-| `HLR-012` | batches, tests |
+| `HLR-009` | batches, canon, tests |
+| `HLR-010` | batches, canon, tests |
+| `HLR-011` | batches, canon, tests |
+| `HLR-012` | batches, canon, tests |
 | `HLR-013` | batches, canon, tests |
 | `HLR-013..016` | batches |
 | `HLR-014` | batches, canon, tests |
@@ -1931,8 +1931,8 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-009.3` | batches, canon, tests |
 | `LLR-009.x` | batches |
 | `LLR-010` | batches |
-| `LLR-010.1` | batches, tests |
-| `LLR-010.2` | batches, tests |
+| `LLR-010.1` | batches, canon, tests |
+| `LLR-010.2` | batches, canon, tests |
 | `LLR-011` | batches |
 | `LLR-011.1` | batches, canon, tests |
 | `LLR-011.2` | batches, canon, tests |
@@ -1943,12 +1943,12 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-012.4` | batches, canon, tests |
 | `LLR-013` | batches |
 | `LLR-013.1` | batches, canon, tests |
-| `LLR-013.2` | batches, tests |
+| `LLR-013.2` | batches, canon, tests |
 | `LLR-013.3` | batches, canon, tests |
 | `LLR-013.x` | batches |
 | `LLR-014` | batches |
 | `LLR-014.1` | batches, canon, tests |
-| `LLR-014.2` | batches, tests |
+| `LLR-014.2` | batches, canon, tests |
 | `LLR-014.3` | batches, canon, tests |
 | `LLR-014.x` | batches |
 | `LLR-015` | batches |
@@ -1964,19 +1964,19 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `LLR-016.3` | batches |
 | `LLR-017` | batches |
 | `LLR-017.1` | batches, canon, tests |
-| `LLR-017.2` | batches, tests |
+| `LLR-017.2` | batches, canon, tests |
 | `LLR-017.3` | batches, canon, tests |
 | `LLR-017.4` | batches, tests |
 | `LLR-018.1` | batches, canon, tests |
-| `LLR-018.2` | batches, tests |
+| `LLR-018.2` | batches, canon, tests |
 | `LLR-019` | batches |
 | `LLR-019.1` | batches, canon, tests |
-| `LLR-019.2` | batches, tests |
+| `LLR-019.2` | batches, canon, tests |
 | `LLR-020.1` | batches, canon, tests |
-| `LLR-020.2` | batches, tests |
+| `LLR-020.2` | batches, canon, tests |
 | `LLR-021` | batches |
 | `LLR-021.1` | batches, canon, tests |
-| `LLR-021.2` | batches |
+| `LLR-021.2` | batches, canon |
 | `LLR-022.1` | batches, canon, tests |
 | `LLR-022.2` | batches, canon |
 | `LLR-023.1` | batches, canon |
