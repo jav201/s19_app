@@ -831,8 +831,13 @@ def extract_compu_methods(sections: list[dict]) -> dict[str, dict]:
         conversion_type = body_conversion[0] or meta_conversion[0]
         fmt = body_conversion[1] or meta_conversion[1]
         unit = body_conversion[2] or meta_conversion[2]
+        # E9 (batch-96): the COMPU_METHOD's long identifier — the quoted
+        # description on the /begin line — rides along for the parameter
+        # description. Purely additive: every pre-E9 key keeps its shape.
+        _parsed_name, long_identifier = parse_begin_meta(meta)
         method = {
             "name": method_name,
+            "long_identifier": long_identifier,
             "conversion_type": conversion_type,
             "format": fmt,
             "unit": unit,
@@ -1161,6 +1166,104 @@ def _inline_axis_counts(axis_meta: list[dict]) -> Optional[list[int]]:
     return counts
 
 
+def _positive_decimal_count(value: Any) -> Optional[int]:
+    """Cast a ``max_axis_points`` token to a positive int, else ``None``."""
+    try:
+        count = int(str(value).strip())
+    except (ValueError, TypeError):
+        return None
+    return count if count > 0 else None
+
+
+def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> Optional[list[int]]:
+    """
+    Summary:
+        R5 extension of :func:`_inline_axis_counts`: resolve the ordered axis
+        point-counts for a CURVE/MAP whose axis set MAY include external axes
+        (COM_AXIS / RES_AXIS / CURVE_AXIS via ``AXIS_PTS_REF``). Inline axes
+        count exactly as before; an external axis takes its count from the
+        referenced AXIS_PTS record — in the operator's files a CHARACTERISTIC
+        whose own ``axis_meta`` carries ``MaxAxisPoints`` — looked up BY NAME
+        in the completed tag list.
+
+    Args:
+        axis_meta (list[dict]): The tag's ``axis_meta`` entries (same shape
+            ``extract_a2l_tags`` builds: ``header_tokens``, ``max_axis_points``,
+            ``external``).
+        tags (list[dict]): The COMPLETED tag list of the parse payload — the
+            referenced AXIS_PTS CHARACTERISTIC may be declared after the
+            referencing CURVE/MAP, which is why this runs as a post-pass.
+
+    Returns:
+        Optional[list[int]]: One positive int per axis in AXIS_DESCR order when
+        every inline axis is derivable AND every external axis's reference
+        resolves to a tag with a positive numeric ``max_axis_points``;
+        else ``None`` (full-span-or-None — never an invented count).
+
+    Raises:
+        None: A non-numeric/negative count, an absent ``AXIS_PTS_REF`` name,
+            a dangling reference (no CHARACTERISTIC by that name), or a
+            referenced tag without axis_meta all degrade to ``None``.
+
+    Data Flow:
+        - Reject an empty axis list.
+        - Inline axis (no ``external`` flag): same contract as
+          ``_inline_axis_counts`` — kind must be in ``_DERIVABLE_AXIS_KINDS``,
+          count is the base-10 int of ``max_axis_points``.
+        - External axis: locate ``AXIS_PTS_REF`` in ``header_tokens`` and take
+          the NEXT token as the reference name; find the first tag with that
+          name; read its FIRST ``axis_meta`` entry's ``max_axis_points``. The
+          local AXIS_DESCR header value is deliberately NOT a fallback — ASAP2
+          documents it as "will be overwritten by max number of axis points of
+          AXIS_PTS", so using it could over-report the span.
+
+    Dependencies:
+        Uses:
+            - ``_DERIVABLE_AXIS_KINDS`` / ``_positive_decimal_count``
+        Used by:
+            - ``extract_a2l_tags`` R5 external-axis post-pass
+
+    Example:
+        >>> meta = [{"header_tokens": ["COM_AXIS", "NO_INPUT", "NO_CM", "8", "0", "255", "AXIS_PTS_REF", "AX"], "max_axis_points": "8", "external": True}]
+        >>> tags = [{"name": "AX", "axis_meta": [{"max_axis_points": "5"}]}]
+        >>> _axis_counts_resolving_external(meta, tags)
+        [5]
+    """
+    if not axis_meta:
+        return None
+    counts: list[int] = []
+    for axis in axis_meta:
+        header_tokens = axis.get("header_tokens") or []
+        if not header_tokens:
+            return None
+        if not axis.get("external"):
+            if header_tokens[0] not in _DERIVABLE_AXIS_KINDS:
+                return None
+            count = _positive_decimal_count(axis.get("max_axis_points"))
+            if count is None:
+                return None
+            counts.append(count)
+            continue
+        try:
+            ref_index = header_tokens.index("AXIS_PTS_REF")
+        except ValueError:
+            return None
+        if ref_index + 1 >= len(header_tokens):
+            return None
+        ref_name = header_tokens[ref_index + 1]
+        ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
+        if ref_tag is None:
+            return None
+        ref_meta = ref_tag.get("axis_meta") or []
+        if not ref_meta:
+            return None
+        count = _positive_decimal_count(ref_meta[0].get("max_axis_points"))
+        if count is None:
+            return None
+        counts.append(count)
+    return counts
+
+
 def align_up(o: int, a: int) -> int:
     """
     Summary:
@@ -1255,6 +1358,226 @@ def _collect_declared_alignments(lines: list[str]) -> Optional[dict[str, int]]:
     return declared
 
 
+#: RECORD_LAYOUT body components that carry input values in the encode
+#: direction (R5) — the encode consumes the operator's physical sequence for
+#: these and only these; ``NO_AXIS_PTS_*`` / ``NO_RESCALE_X`` placeholders and
+#: ``RESERVED`` padding occupy bytes but take no value (zero-filled).
+_VALUE_COMPONENTS = frozenset({"AXIS_PTS_X", "AXIS_PTS_Y", "AXIS_PTS_Z", "FNC_VALUES"})
+
+
+def _walk_record_layout_components(layout: dict, axis_counts: list[int]) -> Optional[list[dict]]:
+    """
+    Summary:
+        Walk EVERY line of a RECORD_LAYOUT body into ordered per-component
+        entries with accumulated on-disk offsets (R5), or return ``None``
+        (full-span-or-None) if any line, datatype, or needed axis count is
+        unclassifiable. This is the per-component generalization of the former
+        first-line-only read: each entry records the component name, its ASAM
+        position index, datatype, direction (FNC_VALUES only), the aligned
+        start ``offset``, the element ``count``, the element ``size``, and the
+        exclusive ``end`` offset.
+
+    Args:
+        layout (dict): A ``record_layouts_by_name`` entry; ``layout["lines"]``
+            are the raw RECORD_LAYOUT body lines. Per line, token[0] is the
+            component name and token[2] is the datatype — token[1] is the ASAM
+            POSITION INDEX, never a count.
+        axis_counts (list[int]): Ordered axis point-counts ``[n_x, n_y, n_z]``.
+
+    Returns:
+        Optional[list[dict]]: One entry per summable component, in body order,
+        each ``{"component", "position", "datatype", "direction", "offset",
+        "count", "size", "end"}``; the last entry's ``end`` is the record's
+        full byte span. ``None`` on any unclassifiable non-empty line, unknown
+        datatype, truncated component, missing axis count, malformed or
+        non-positive alignment/RESERVED value, or an over-cap total. An empty
+        list means the body carried no summable component.
+
+    Raises:
+        None: every failure mode degrades to ``None``/an empty list (never a
+        wrong-but-non-None structure → no false-green from an under-reported
+        span). ``ALIGNMENT_*`` lines are consumed as padding directives and a
+        loose ``DIRECT`` line (the operator's tool emits it standalone) repeats
+        the FNC_VALUES conversion flag — it carries no bytes and is skipped,
+        NOT forced to ``None`` (R5).
+
+    Data Flow:
+        - First pass: ``_collect_declared_alignments(layout["lines"])`` →
+          ``{directive: N}`` (or ``None`` on a malformed/non-positive value,
+          which propagates full-span-or-None). A packed layout yields ``{}``.
+        - Walk every body line with a running ``offset``: skip empty lines,
+          ``ALIGNMENT_*`` directives, and a standalone ``DIRECT``; classify the
+          rest via the §2.5 taxonomy keyed on ``axis_counts`` (NO_AXIS_PTS /
+          NO_RESCALE → 1; AXIS_PTS_X/Y/Z → the axis count; FNC_VALUES →
+          ``math.prod(axis_counts)`` with ``tokens[3]`` as direction;
+          RESERVED → its declared ``IndexCount``, failing closed when the
+          count is missing, non-int, or < 1); resolve ``tokens[2]`` via
+          ``DATATYPE_SIZES.get``.
+        - Per component: ``offset = align_up(offset, alignment)`` (the declared
+          value for the datatype's R-B class, else 1), then emit the entry and
+          advance ``offset += size × count``. Bail to ``None`` on any
+          unrecognised line, truncated component, unknown datatype, missing
+          axis count, or over-cap total.
+
+    Dependencies:
+        Uses:
+            - ``DATATYPE_SIZES`` / ``MAX_A2L_DECODE_BYTES``
+            - ``_collect_declared_alignments`` / ``_DATATYPE_ALIGNMENT_DIRECTIVE``
+            - ``align_up`` / ``math.prod``
+        Used by:
+            - ``_record_layout_full_span``
+            - ``_resolve_record_layout_components``
+            - ``_encode_curve_record_bytes`` (R5 encode)
+
+    Example:
+        >>> _walk_record_layout_components(
+        ...     {"lines": ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 SBYTE", "FNC_VALUES 3 SWORD ROW_DIR"]},
+        ...     [8],
+        ... )[-1]["end"]
+        25
+    """
+    declared = _collect_declared_alignments(layout.get("lines") or [])
+    if declared is None:
+        return None  # a malformed / non-positive ALIGNMENT_* value → full-span-or-None
+    components: list[dict] = []
+    offset = 0
+    for line in layout.get("lines") or []:
+        tokens = line.split()
+        if not tokens:
+            continue
+        component = tokens[0]
+        if component in _ALIGNMENT_DIRECTIVES:
+            continue  # an alignment directive, already consumed in the first pass
+        if component == "DIRECT" and len(tokens) == 1:
+            continue  # R5: a loose DIRECT repeats the FNC_VALUES conversion flag; no bytes
+        direction = None
+        if component in ("NO_AXIS_PTS_X", "NO_AXIS_PTS_Y", "NO_AXIS_PTS_Z", "NO_RESCALE_X"):
+            element_count = 1
+        elif component == "AXIS_PTS_X":
+            if len(axis_counts) < 1:
+                return None
+            element_count = axis_counts[0]
+        elif component == "AXIS_PTS_Y":
+            if len(axis_counts) < 2:
+                return None
+            element_count = axis_counts[1]
+        elif component == "AXIS_PTS_Z":
+            if len(axis_counts) < 3:
+                return None
+            element_count = axis_counts[2]
+        elif component == "FNC_VALUES":
+            element_count = math.prod(axis_counts)
+            direction = tokens[3] if len(tokens) > 3 else None
+        elif component == "RESERVED":
+            # RESERVED <pos> <datatype> <IndexCount> occupies real bytes; a
+            # missing/garbage count must fail closed (skipping it would
+            # UNDER-REPORT the span), so it is validated, not ignored.
+            if len(tokens) < 4:
+                return None
+            try:
+                element_count = int(tokens[3])
+            except (ValueError, TypeError):
+                return None
+            if element_count < 1:
+                return None
+        else:
+            # A non-empty, non-alignment line that is not a classifiable
+            # component forces full-span-or-None: an unmodeled component or a
+            # standalone comment. Skipping it would UNDER-REPORT the true span
+            # → a false-green.
+            return None
+        if len(tokens) < 3:
+            return None  # recognised component missing its datatype token
+        datatype = tokens[2]
+        size = DATATYPE_SIZES.get(datatype)
+        if size is None:
+            return None
+        try:
+            position = int(tokens[1])
+        except (ValueError, TypeError):
+            position = None  # the position index carries no bytes; a garbage one must not kill the walk
+        # R-B: pad this component's start up to its datatype's declared alignment
+        # (an undeclared class → alignment 1 → no padding). R-C: no trailing pad.
+        alignment = declared.get(_DATATYPE_ALIGNMENT_DIRECTIVE.get(datatype), 1)
+        offset = align_up(offset, alignment)
+        components.append(
+            {
+                "component": component,
+                "position": position,
+                "datatype": datatype,
+                "direction": direction,
+                "offset": offset,
+                "count": element_count,
+                "size": size,
+                "end": offset + size * element_count,
+            }
+        )
+        offset += size * element_count
+        if offset > MAX_A2L_DECODE_BYTES:
+            return None
+    return components
+
+
+def _resolve_record_layout_components(
+    layout_name: Optional[str],
+    record_layouts_by_name: dict[str, dict],
+    axis_counts: list[int],
+) -> Optional[dict]:
+    """
+    Summary:
+        Resolve a named RECORD_LAYOUT into the R5 per-component walk — the
+        additive companion of :func:`_resolve_record_layout` (which keeps its
+        shipped scalar shape untouched). Where the scalar resolver answers
+        "what datatype is the decode unit", this one answers "where does every
+        component live in the record".
+
+    Args:
+        layout_name (Optional[str]): The CHARACTERISTIC's deposit
+            (``tag["record_layout_name"]`` / ``tag["deposit"]``).
+        record_layouts_by_name (dict[str, dict]): The RECORD_LAYOUT side table.
+        axis_counts (list[int]): Ordered axis point-counts for the walk.
+
+    Returns:
+        Optional[dict]: ``{"name", "components", "byte_size",
+        "decode_endian"}`` — ``byte_size`` is the last component's exclusive
+        ``end`` (the full record span, no trailing pad); ``None`` when the name
+        is empty, the layout is absent, or the walk fails full-span-or-None.
+
+    Raises:
+        None: every failure mode degrades to ``None``.
+
+    Data Flow:
+        - Look the layout up by name; ``None`` on a miss.
+        - ``_walk_record_layout_components(layout, axis_counts)``; ``None``/[]
+          on failure or an empty body.
+        - Assemble the additive descriptor.
+
+    Dependencies:
+        Uses:
+            - ``_walk_record_layout_components``
+        Used by:
+            - R5 consumers (curve encode, future curve decode E9)
+
+    Example:
+        >>> _resolve_record_layout_components("RL", {"RL": {"lines": ["FNC_VALUES 1 UWORD ROW_DIR"]}}, [1])["byte_size"]
+        2
+    """
+    if not layout_name:
+        return None
+    layout = record_layouts_by_name.get(layout_name)
+    if not layout:
+        return None
+    components = _walk_record_layout_components(layout, axis_counts)
+    if not components:
+        return None
+    return {
+        "name": layout_name,
+        "components": components,
+        "byte_size": components[-1]["end"],
+        "decode_endian": layout.get("byte_order"),
+    }
+
+
 def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[int]:
     """
     Summary:
@@ -1285,38 +1608,22 @@ def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[i
             consumed as padding directives, not forced to ``None`` (batch-56).
 
     Data Flow:
-        - First pass: ``_collect_declared_alignments(layout["lines"])`` →
-          ``{directive: N}`` (or ``None`` on a malformed/non-positive value, which
-          propagates full-span-or-None). A packed layout yields ``{}`` → every
-          alignment resolves to 1 → the walk is byte-identical to batch-55.
-        - Walk ``layout["lines"]`` with a running ``offset``: skip empty lines and
-          ``ALIGNMENT_*`` directives (consumed in the first pass); every other
-          non-empty line must classify as a summable component or force ``None``
-          (an unmodeled ``AXIS_RESCALE_X`` / ``RESERVED`` / comment must never be
-          silently skipped, or the span under-reports).
-        - Map token[0] to an element count via the §2.5 taxonomy keyed on
-          ``axis_counts`` (NO_AXIS_PTS/NO_RESCALE → 1; AXIS_PTS_X/Y/Z → the axis
-          count; FNC_VALUES → ``math.prod(axis_counts)``); resolve token[2] size
-          via ``DATATYPE_SIZES.get``.
-        - Per component: ``offset = align_up(offset, alignment)`` (alignment =
-          the declared value for the datatype's R-B class, else 1) then
-          ``offset += size × count``. Bail to ``None`` on any unrecognised line,
-          truncated component, unknown datatype, missing axis count, or over-cap
-          total.
-        - Return the final ``offset`` — the last component's end offset, with NO
-          trailing pad-to-max-alignment (R-C reading (i)) — or ``None`` if nothing
-          contributed.
+        - Delegate the whole walk to ``_walk_record_layout_components`` (the R5
+          per-component walker this function now sits on top of) and take the
+          last component's exclusive ``end`` — the record span with NO trailing
+          pad-to-max-alignment (R-C reading (i)).
+        - R5 deltas carried by the walker (this function's contract is otherwise
+          unchanged): a loose ``DIRECT`` line is skipped instead of forcing
+          ``None`` (the operator's tool emits it standalone), and ``RESERVED
+          <pos> <dt> <IndexCount>`` is summed with its declared count instead
+          of forcing ``None``.
 
     Dependencies:
         Uses:
-            - ``DATATYPE_SIZES``
-            - ``MAX_A2L_DECODE_BYTES``
-            - ``_collect_declared_alignments``
-            - ``_DATATYPE_ALIGNMENT_DIRECTIVE``
-            - ``align_up``
-            - ``math.prod``
+            - ``_walk_record_layout_components``
         Used by:
             - ``extract_a2l_tags`` post-axis-walk length pass
+            - the R5 external-axis post-pass in ``extract_a2l_tags``
 
     Example:
         >>> _record_layout_full_span(
@@ -1325,57 +1632,10 @@ def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[i
         ... )
         25
     """
-    declared = _collect_declared_alignments(layout.get("lines") or [])
-    if declared is None:
-        return None  # a malformed / non-positive ALIGNMENT_* value → full-span-or-None
-    offset = 0
-    contributed = False
-    for line in layout.get("lines") or []:
-        tokens = line.split()
-        if not tokens:
-            continue
-        component = tokens[0]
-        if component in _ALIGNMENT_DIRECTIVES:
-            continue  # an alignment directive, already consumed in the first pass
-        if component in ("NO_AXIS_PTS_X", "NO_AXIS_PTS_Y", "NO_AXIS_PTS_Z", "NO_RESCALE_X"):
-            element_count = 1
-        elif component == "AXIS_PTS_X":
-            if len(axis_counts) < 1:
-                return None
-            element_count = axis_counts[0]
-        elif component == "AXIS_PTS_Y":
-            if len(axis_counts) < 2:
-                return None
-            element_count = axis_counts[1]
-        elif component == "AXIS_PTS_Z":
-            if len(axis_counts) < 3:
-                return None
-            element_count = axis_counts[2]
-        elif component == "FNC_VALUES":
-            element_count = math.prod(axis_counts)
-        else:
-            # A non-empty, non-alignment line that is not a summable component
-            # forces full-span-or-None: an unmodeled component (AXIS_RESCALE_X /
-            # RESERVED) or a standalone comment. Skipping it would UNDER-REPORT the
-            # true span → a false-green.
-            return None
-        if len(tokens) < 3:
-            return None  # recognised component missing its datatype token
-        datatype = tokens[2]
-        size = DATATYPE_SIZES.get(datatype)
-        if size is None:
-            return None
-        # R-B: pad this component's start up to its datatype's declared alignment
-        # (an undeclared class → alignment 1 → no padding). R-C: no trailing pad.
-        alignment = declared.get(_DATATYPE_ALIGNMENT_DIRECTIVE.get(datatype), 1)
-        offset = align_up(offset, alignment)
-        offset += size * element_count
-        contributed = True
-        if offset > MAX_A2L_DECODE_BYTES:
-            return None
-    if not contributed:
+    components = _walk_record_layout_components(layout, axis_counts)
+    if not components:
         return None
-    return offset
+    return components[-1]["end"]
 
 
 def _decode_scalar(raw: bytes, decode_type: str, decode_endian: str) -> Any:
@@ -1577,6 +1837,259 @@ def _reverse_table_lookup(
     return None, "value outside interpolation range"
 
 
+def _invert_physical_to_raw(
+    physical: float,
+    method: Optional[dict],
+    compu_tabs_by_name: Optional[dict],
+) -> tuple[Optional[float], Optional[str]]:
+    """
+    Summary:
+        The COMPU_METHOD encode direction (physical → raw) — one inversion per
+        conversion limb, shared by the scalar encoder
+        (:func:`encode_physical_to_raw_bytes`) and the R5 curve-record encoder
+        (:func:`_encode_curve_record_bytes`). Extracted so both encode paths
+        invert byte-identically.
+
+    Args:
+        physical (float): The physical-unit value.
+        method (Optional[dict]): The resolved COMPU_METHOD side-table entry, or
+            ``None`` (the no-COMPU_METHOD limb → identity).
+        compu_tabs_by_name (Optional[dict]): The COMPU_TAB side table (the
+            ``TAB_NOINTP`` / ``TAB_INTP`` inversion input).
+
+    Returns:
+        tuple[Optional[float], Optional[str]]: ``(raw, None)`` on success;
+        ``(None, reason)`` on refusal — the reason names the limb, exactly as
+        the scalar encoder's shipped refusals name them.
+
+    Raises:
+        None: every limb is a returned reason.
+
+    Data Flow:
+        - ``method is None`` → identity (mirrors the decode's
+          ``identity_fallback``); ``IDENTICAL`` → identity.
+        - ``LINEAR`` → ``raw = (physical − b) / a``; ``a == 0`` refuses.
+        - ``RAT_FUNC`` → :func:`_invert_rat_func`; no real root refuses.
+        - ``TAB_NOINTP`` / ``TAB_INTP`` → :func:`_reverse_table_lookup`;
+          missing/empty/non-numeric table refuses.
+        - ``FORM`` / unknown conversion type on a DEFINED method → REFUSE.
+
+    Dependencies:
+        Uses:
+            - ``_invert_rat_func`` / ``_reverse_table_lookup``
+        Used by:
+            - ``encode_physical_to_raw_bytes`` / ``_encode_curve_record_bytes``
+
+    Example:
+        >>> _invert_physical_to_raw(110.0, {"conversion_type": "LINEAR", "coeffs_linear": [2.0, 10.0]}, None)
+        (50.0, None)
+    """
+    if method is None:
+        return physical, None  # the identity limb (no COMPU_METHOD)
+    conversion_type = str(method.get("conversion_type") or "").upper()
+    if conversion_type == "IDENTICAL":
+        return physical, None
+    if conversion_type == "LINEAR":
+        coeffs = method.get("coeffs_linear") or []
+        lin_a = coeffs[0] if len(coeffs) > 0 and coeffs[0] is not None else 1.0
+        lin_b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
+        if math.isclose(lin_a, 0.0):
+            return None, "LINEAR conversion coefficient a is zero"
+        return (physical - lin_b) / lin_a, None
+    if conversion_type == "RAT_FUNC":
+        raw, rat_error = _invert_rat_func(physical, method)
+        if raw is None:
+            return None, rat_error or "RAT_FUNC inversion failed"
+        return raw, None
+    if conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
+        table = (compu_tabs_by_name or {}).get(
+            str(method.get("compu_tab_ref") or "")
+        )
+        if table is None or not table.get("entries"):
+            return None, "lookup table missing or empty"
+        raw, tab_error = _reverse_table_lookup(
+            physical, table, conversion_type == "TAB_INTP"
+        )
+        if raw is None:
+            return None, tab_error or "table inversion failed"
+        return raw, None
+    # FORM (the decode's own unsupported limb) and every unknown conversion
+    # type on a DEFINED method.
+    return None, f"conversion type {conversion_type!r} is not supported"
+
+
+def _encode_curve_record_bytes(
+    tag: dict,
+    values: list[Any],
+    compu_methods_by_name: Optional[dict],
+    compu_tabs_by_name: Optional[dict],
+    record_layouts_by_name: Optional[dict],
+) -> tuple[Optional[tuple[int, ...]], Optional[str], list[str]]:
+    """
+    Summary:
+        R5 array limb of the physical→raw encode: pack a CURVE/MAP physical
+        SEQUENCE into ONE record through the per-component RECORD_LAYOUT walk
+        — axis points and FNC_VALUES land at their accumulated, alignment-padded
+        offsets in the tag's byte order, and non-value components
+        (``NO_AXIS_PTS_*`` / ``RESERVED``) are zero-filled. This is what lets
+        the Patch Editor patch a curve by symbol.
+
+    Args:
+        tag (dict): One CHARACTERISTIC row (CURVE/MAP) of the tag map — needs
+            ``axis_meta`` (inline axes), ``record_layout_name`` /
+            ``deposit``, ``effective_byte_order``, ``length``, and the usual
+            COMPU_METHOD / limit fields.
+        values (list[Any]): The physical sequence — axis points (X, then Y/Z)
+            followed by the FNC_VALUES, in layout component order. For a
+            multi-axis ``COL_DIR`` MAP the caller pre-orders the function
+            values column-major: no reordering is performed (R5 ships CURVE
+            unambiguous; MAP ordering is the caller's contract).
+        compu_methods_by_name (Optional[dict]): The COMPU_METHOD side table.
+        compu_tabs_by_name (Optional[dict]): The COMPU_TAB side table.
+        record_layouts_by_name (Optional[dict]): The RECORD_LAYOUT side table.
+
+    Returns:
+        tuple[Optional[tuple[int, ...]], Optional[str], list[str]]: ``(bytes,
+        None, flags)`` — ``bytes`` spans the full walk (last component's
+        ``end``), padding included. ``(None, reason, [])`` on refusal.
+
+    Raises:
+        None: every limb is a returned reason.
+
+    Data Flow:
+        - The MATRIX_DIM > 1 limb is refused as in the scalar path.
+        - Axis counts come from ``_inline_axis_counts`` and the components from
+          ``_walk_record_layout_components``; ANY resolution failure returns
+          the SHIPPED arrays refusal ("array values are not supported") — the
+          additive encode accepts nothing that refused before R5.
+        - The sequence length must equal Σ counts over the value-bearing
+          components (``AXIS_PTS_*`` / ``FNC_VALUES``); a mismatch refuses
+          naming both numbers.
+        - ``FLOAT16_IEEE`` / code-less datatypes refuse (mirroring the scalar
+          datatype gate); tag ``length`` must equal the record span (the
+          length-drift limb, span-sized).
+        - Per value: ``_invert_physical_to_raw`` (the shared COMPU_METHOD
+          inversion — the tag's ONE method applies to axis points and function
+          values alike; per-axis AXIS_DESCR conversions are an R5-known
+          limit), then the finite / integrality / integer-range limbs per the
+          component's own datatype, then ``struct.pack`` into the buffer at
+          ``offset + index × size``.
+        - Out-of-limits values FLAG and proceed (the scalar path's flag limb).
+
+    Dependencies:
+        Uses:
+            - ``_inline_axis_counts`` / ``_walk_record_layout_components``
+            - ``_VALUE_COMPONENTS`` / ``_invert_physical_to_raw``
+            - ``DATATYPE_SIZES`` / ``DATATYPE_STRUCT_CODES`` / ``_FLOAT_ENCODE_DATATYPES`` / ``_to_float``
+        Used by:
+            - ``encode_physical_to_raw_bytes`` (the R5 dispatch)
+
+    Example:
+        >>> tag = {"axis_meta": [{"header_tokens": ["STD_AXIS"], "max_axis_points": "3", "external": False}],
+        ...        "record_layout_name": "RL", "effective_byte_order": "little", "length": 10}
+        >>> layouts = {"RL": {"lines": ["AXIS_PTS_X 1 UBYTE", "ALIGNMENT_WORD 2", "FNC_VALUES 2 UWORD ROW_DIR"]}}
+        >>> _encode_curve_record_bytes(tag, [10, 20, 30, 100, 200, 300], None, None, layouts)[0]
+        (10, 20, 30, 0, 100, 0, 200, 0, 300, 0)
+    """
+    matrix_dim = tag.get("matrix_dim")
+    if (
+        isinstance(matrix_dim, int)
+        and not isinstance(matrix_dim, bool)
+        and matrix_dim > 1
+    ):
+        return None, "matrix/array-typed tags are not supported", []
+    axis_counts = _inline_axis_counts(tag.get("axis_meta") or [])
+    if axis_counts is None:
+        return None, "array values are not supported", []
+    layout_name = str(tag.get("record_layout_name") or tag.get("deposit") or "")
+    layout = (record_layouts_by_name or {}).get(layout_name)
+    components = _walk_record_layout_components(layout, axis_counts) if layout else None
+    if not components:
+        return None, "array values are not supported", []
+    value_components = [c for c in components if c["component"] in _VALUE_COMPONENTS]
+    expected = sum(c["count"] for c in value_components)
+    if len(values) != expected:
+        return None, (
+            f"the record needs {expected} values (axis points + function "
+            f"values), got {len(values)}"
+        ), []
+    for component in value_components:
+        if component["datatype"] == "FLOAT16_IEEE":
+            return None, "datatype FLOAT16_IEEE is not supported", []
+    method_name = str(tag.get("compu_method_name") or tag.get("conversion") or "")
+    method: Optional[dict] = None
+    if method_name and method_name != "NO_COMPU_METHOD":
+        method = (compu_methods_by_name or {}).get(method_name)
+    span = components[-1]["end"]
+    tag_length = tag.get("length")
+    if (
+        isinstance(tag_length, int)
+        and not isinstance(tag_length, bool)
+        and tag_length != span
+    ):
+        return None, (
+            f"tag length {tag_length} drifts from the record span {span}"
+        ), []
+    endian = str(tag.get("effective_byte_order") or "little")
+    prefix = ">" if endian == "big" else "<"
+    buffer = bytearray(span)
+    flags: list[str] = []
+    lower_limit = _to_float(tag.get("lower_limit"))
+    upper_limit = _to_float(tag.get("upper_limit"))
+    cursor = 0
+    for component in value_components:
+        datatype = component["datatype"]
+        code = DATATYPE_STRUCT_CODES.get(datatype)
+        size = component["size"]
+        if code is None:
+            return None, f"unsupported datatype {datatype!r}", []
+        is_float = datatype in _FLOAT_ENCODE_DATATYPES
+        if not is_float:
+            bits = size * 8
+            signed = code.islower()
+            lo = -(1 << (bits - 1)) if signed else 0
+            hi = (1 << (bits - 1)) - 1 if signed else (1 << bits) - 1
+        for index in range(component["count"]):
+            item = values[cursor]
+            cursor += 1
+            if isinstance(item, bool) or not isinstance(item, (int, float)):
+                return None, "the value is not numeric", []
+            physical = float(item)
+            raw, conversion_error = _invert_physical_to_raw(
+                physical, method, compu_tabs_by_name
+            )
+            if conversion_error is not None:
+                return None, conversion_error, []
+            if not math.isfinite(raw):
+                return None, "the converted raw value is not finite", []
+            if is_float:
+                packed_value: Any = raw
+            else:
+                nearest = round(raw)
+                if not math.isclose(raw, nearest, rel_tol=0.0, abs_tol=1e-6):
+                    return None, f"the converted raw value {raw} is not integral", []
+                if not lo <= nearest <= hi:
+                    return None, (
+                        f"the converted raw value {nearest} is outside the "
+                        f"{datatype} range"
+                    ), []
+                packed_value = nearest
+            try:
+                packed = struct.pack(f"{prefix}{code}", packed_value)
+            except (struct.error, OverflowError) as exc:
+                return None, f"the raw value does not pack as {datatype}: {exc}", []
+            start = component["offset"] + index * size
+            buffer[start : start + size] = packed
+            if (lower_limit is not None and physical < lower_limit) or (
+                upper_limit is not None and physical > upper_limit
+            ):
+                flags.append(
+                    f"the value {physical} is outside the tag's declared "
+                    f"limits [{lower_limit}, {upper_limit}] - the write proceeds"
+                )
+    return tuple(buffer), None, flags
+
+
 def encode_physical_to_raw_bytes(
     tag: dict,
     physical_value: Any,
@@ -1602,7 +2115,10 @@ def encode_physical_to_raw_bytes(
             ``conversion``, and ``lower_limit`` / ``upper_limit``.
         physical_value (Any): The value in physical units — a plain int or
             float (what the picker hands over after parsing the operator's
-            text). Lists/tuples are the arrays limb (refused).
+            text). A list/tuple is the R5 array limb: accepted ONLY for a
+            CURVE/MAP whose RECORD_LAYOUT resolves per-component (packed into
+            one record via :func:`_encode_curve_record_bytes`); refused
+            everywhere else exactly as before.
         compu_methods_by_name (Optional[dict]): The parse payload's
             COMPU_METHOD side table (``a2l.py``'s ``extract_compu_methods``
             shape). ``None`` is the no-COMPU_METHOD limb (identity).
@@ -1635,7 +2151,10 @@ def encode_physical_to_raw_bytes(
           - raw outside the datatype's integer range → REFUSE;
           - length drift (tag ``length`` ≠ datatype size) → REFUSE;
           - arrays (``MATRIX_DIM`` > 1, a non-VALUE ``char_type``, or a
-            list/tuple value) → REFUSE;
+            list/tuple value) → REFUSE — the R5 exception: a list/tuple on a
+            CURVE/MAP with a resolvable per-component layout ENCODES (one
+            packed record); when that layout/axis resolution fails, the
+            shipped "array values are not supported" refusal is kept;
           - unsupported datatype (incl. ``FLOAT16_IEEE``) → REFUSE;
           - value outside the tag's limits → FLAG, proceed.
 
@@ -1645,16 +2164,30 @@ def encode_physical_to_raw_bytes(
 
     Dependencies:
         Uses:
-            - _invert_rat_func / _reverse_table_lookup
+            - _invert_physical_to_raw (the shared COMPU_METHOD inversion)
+            - _encode_curve_record_bytes (the R5 CURVE/MAP array limb)
             - DATATYPE_SIZES / DATATYPE_STRUCT_CODES / _to_float
         Used by:
             - services.change_service.resolve_symbol_entry (the Patch
               Editor picker's backend, LLR-141.2)
     """
     # --- the arrays limb -----------------------------------------------------
-    if isinstance(physical_value, (list, tuple)):
-        return None, "array values are not supported", []
     char_type = str(tag.get("char_type") or "").upper()
+    if isinstance(physical_value, (list, tuple)):
+        # R5: a CURVE/MAP whose RECORD_LAYOUT resolves per-component accepts a
+        # physical SEQUENCE (axis points + FNC_VALUES) and packs ONE record.
+        # Every other case keeps the shipped refusal byte-for-byte — above all
+        # a CURVE/MAP whose layout/axes do NOT resolve still answers "array
+        # values are not supported" (the helper fails closed to it).
+        if char_type in ("CURVE", "MAP"):
+            return _encode_curve_record_bytes(
+                tag,
+                list(physical_value),
+                compu_methods_by_name,
+                compu_tabs_by_name,
+                record_layouts_by_name,
+            )
+        return None, "array values are not supported", []
     if char_type and char_type != "VALUE":
         return None, f"characteristic type {char_type!r} is not a scalar VALUE", []
     matrix_dim = tag.get("matrix_dim")
@@ -1697,40 +2230,11 @@ def encode_physical_to_raw_bytes(
     if method_name and method_name != "NO_COMPU_METHOD":
         method = (compu_methods_by_name or {}).get(method_name)
     physical = float(physical_value)
-    if method is None:
-        raw = physical  # the identity limb (no COMPU_METHOD)
-    else:
-        conversion_type = str(method.get("conversion_type") or "").upper()
-        if conversion_type == "IDENTICAL":
-            raw = physical
-        elif conversion_type == "LINEAR":
-            coeffs = method.get("coeffs_linear") or []
-            lin_a = coeffs[0] if len(coeffs) > 0 and coeffs[0] is not None else 1.0
-            lin_b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
-            if math.isclose(lin_a, 0.0):
-                return None, "LINEAR conversion coefficient a is zero", []
-            raw = (physical - lin_b) / lin_a
-        elif conversion_type == "RAT_FUNC":
-            raw, rat_error = _invert_rat_func(physical, method)
-            if raw is None:
-                return None, rat_error or "RAT_FUNC inversion failed", []
-        elif conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
-            table = (compu_tabs_by_name or {}).get(
-                str(method.get("compu_tab_ref") or "")
-            )
-            if table is None or not table.get("entries"):
-                return None, "lookup table missing or empty", []
-            raw, tab_error = _reverse_table_lookup(
-                physical, table, conversion_type == "TAB_INTP"
-            )
-            if raw is None:
-                return None, tab_error or "table inversion failed", []
-        else:
-            # FORM (the decode's own unsupported limb) and every unknown
-            # conversion type on a DEFINED method.
-            return None, (
-                f"conversion type {conversion_type!r} is not supported"
-            ), []
+    raw, conversion_error = _invert_physical_to_raw(
+        physical, method, compu_tabs_by_name
+    )
+    if conversion_error is not None:
+        return None, conversion_error, []
 
     # --- the finite / integral / range limbs ---------------------------------
     if not math.isfinite(raw):
@@ -1975,6 +2479,26 @@ def extract_a2l_tags(
                 walk(section["children"])
 
     walk(sections)
+    # R5 external-axis post-pass: a CURVE/MAP whose AXIS_DESCR references an
+    # AXIS_PTS record (COM_AXIS / RES_AXIS / CURVE_AXIS) derives its length
+    # from the referenced record's max_axis_points when that reference
+    # resolves BY NAME in the completed tag list. This runs AFTER the walk
+    # because the referenced AXIS_PTS CHARACTERISTIC may be declared after
+    # the referencing tag. Full-span-or-None stands: an unresolvable
+    # reference (dangling name, no axis_meta, non-numeric count) keeps
+    # length=None — never an invented count.
+    for tag in tags:
+        if (
+            tag.get("section") == "CHARACTERISTIC"
+            and tag.get("char_type") in ("CURVE", "MAP")
+            and tag.get("length") is None
+        ):
+            counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags)
+            if counts is None:
+                continue
+            layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
+            if layout:
+                tag["length"] = _record_layout_full_span(layout, counts)
     return tags
 
 
@@ -2118,6 +2642,481 @@ def enrich_a2l_tags_with_values(a2l_data: dict, mem_map: Optional[Dict[int, int]
             }
         )
     return enriched
+
+
+#: Axis component names in walk order — index i belongs to axis i.
+_AXIS_COMPONENT_NAMES = ("AXIS_PTS_X", "AXIS_PTS_Y", "AXIS_PTS_Z")
+
+
+def _decode_component_run(
+    raw_bytes: bytes,
+    component: dict,
+    decode_endian: str,
+) -> tuple[Optional[list[Any]], Optional[str]]:
+    """Decode one walked RECORD_LAYOUT component into a list of raw values.
+
+    Thin slice over :func:`_decode_raw_value` that always returns a LIST
+    (the E9 description pairs element i of every run) and maps a
+    ``FLOAT16_IEEE`` element (the shipped decode refuses it) to an honest
+    ``None`` + reason instead of raising.
+    """
+    size = int(component.get("size") or 0)
+    count = int(component.get("count") or 0)
+    if size <= 0 or count <= 0:
+        return None, "component carries no decodable elements"
+    chunk = raw_bytes[int(component["offset"]) : int(component["end"])]
+    if len(chunk) != size * count:
+        return None, f"record too short for {component['component']}: {len(chunk)} of {size * count} bytes"
+    values: list[Any] = []
+    for index in range(count):
+        start = index * size
+        item = _decode_scalar(chunk[start : start + size], str(component["datatype"]), decode_endian)
+        if item is None:
+            return None, f"datatype {component['datatype']} is not decodable"
+        values.append(item)
+    return values, None
+
+
+def _axis_compu_method(axis: dict, compu_methods_by_name: dict[str, dict]) -> Optional[dict]:
+    """Resolve an axis's own COMPU_METHOD from its AXIS_DESCR header tokens."""
+    header_tokens = axis.get("header_tokens") or []
+    if len(header_tokens) < 3:
+        return None
+    name = header_tokens[2]
+    if not name or name == "NO_COMPU_METHOD":
+        return None
+    return compu_methods_by_name.get(name)
+
+
+def describe_curve_tag(
+    tag: dict,
+    a2l_data: Optional[dict],
+    mem_map: Optional[Dict[int, int]],
+) -> dict:
+    """Build the E9 parameter description for one CHARACTERISTIC (batch-96).
+
+    Summary:
+        Combines the A2L metadata (name, COMPU_METHOD description/unit/
+        conversion type, limits, per-axis type and max points) with the
+        current S19/HEX image bytes: the record is sliced at the R5-walked
+        component offsets and every axis point / function value is decoded
+        and converted to physical units point by point (the shipped
+        :func:`_apply_compu_method` + :func:`_table_lookup`, exactly the
+        decode direction the enrichment uses). For a single-axis CURVE the
+        result pairs into an ``x -> y`` point table.
+
+    Args:
+        tag (dict): One CHARACTERISTIC row — the raw parse tag or an
+            enriched row both work (enrichment keys are read best-effort).
+        a2l_data (Optional[dict]): The parse payload (``compu_methods_by_name``
+            / ``compu_tabs_by_name`` / ``record_layouts_by_name`` / ``tags``).
+        mem_map (Optional[Dict[int, int]]): The loaded image's byte map.
+
+    Returns:
+        dict: The description model. ``status`` is one of ``ok`` /
+            ``not_a_curve`` / ``axes_unresolved`` / ``layout_unresolved`` /
+            ``no_memory`` — an unresolved layout, an external axis without
+            a resolvable count, or missing image bytes NEVER raise and
+            never invent data; the payload carries the honest reason in
+            ``notes`` and whatever partial structure resolved.
+
+    Raises:
+        None: every limb degrades to a status + note.
+    """
+    a2l_data = a2l_data or {}
+    compu_methods_by_name = a2l_data.get("compu_methods_by_name") or {}
+    compu_tabs_by_name = a2l_data.get("compu_tabs_by_name") or {}
+    record_layouts_by_name = a2l_data.get("record_layouts_by_name") or {}
+    tags = a2l_data.get("tags") or []
+
+    char_type = str(tag.get("char_type") or "").upper()
+    method_name = str(tag.get("compu_method_name") or tag.get("conversion") or "")
+    method: Optional[dict] = None
+    if method_name and method_name != "NO_COMPU_METHOD":
+        method = compu_methods_by_name.get(method_name)
+    lower_limit = _to_float(tag.get("lower_limit"))
+    upper_limit = _to_float(tag.get("upper_limit"))
+
+    description: dict = {
+        "name": tag.get("name"),
+        "long_identifier": tag.get("description"),
+        "char_type": char_type or None,
+        "address": tag.get("address"),
+        "byte_size": tag.get("length"),
+        "unit": (method or {}).get("unit") if method else tag.get("unit"),
+        "lower_limit": lower_limit,
+        "upper_limit": upper_limit,
+        "compu_method_name": method_name or None,
+        "compu_description": (method or {}).get("long_identifier"),
+        "conversion_type": (method or {}).get("conversion_type") if method else None,
+        "axes": [],
+        "points": None,
+        "notes": [],
+        "status": "ok",
+    }
+    if method is None and method_name and method_name != "NO_COMPU_METHOD":
+        description["notes"].append(
+            f"compu method {method_name!r} not found - raw values shown"
+        )
+
+    if char_type not in ("CURVE", "MAP"):
+        # E9 is a CURVE/MAP surface; a scalar tag gets an honest header
+        # (never a crash) and its current value when the row is enriched.
+        description["status"] = "not_a_curve"
+        description["scalar_raw"] = tag.get("raw_value")
+        description["scalar_phys"] = tag.get("physical_value")
+        return description
+
+    axis_meta = tag.get("axis_meta") or []
+    axis_counts = _axis_counts_resolving_external(axis_meta, tags)
+    if axis_counts is None:
+        description["status"] = "axes_unresolved"
+        if not axis_meta:
+            description["notes"].append("the characteristic declares no AXIS_DESCR axes")
+        else:
+            description["notes"].append(
+                "axis point counts could not be resolved (external axis "
+                "reference dangling or a non-numeric MaxAxisPoints) - "
+                "the record shape is unknown"
+            )
+        return description
+
+    layout_name = str(tag.get("record_layout_name") or tag.get("deposit") or "")
+    resolved = _resolve_record_layout_components(layout_name, record_layouts_by_name, axis_counts)
+    if resolved is None:
+        description["status"] = "layout_unresolved"
+        description["notes"].append(
+            f"record layout {layout_name!r} does not resolve per-component "
+            "- point decoding is unavailable"
+        )
+        for axis, count in zip(axis_meta, axis_counts):
+            description["axes"].append(
+                {
+                    "kind": (axis.get("header_tokens") or [None])[0],
+                    "max_axis_points": count,
+                    "external": bool(axis.get("external")),
+                }
+            )
+        return description
+
+    byte_size = resolved["byte_size"]
+    description["byte_size"] = byte_size
+    memory = _extract_raw_bytes(mem_map, tag.get("address"), byte_size)
+    if not memory["raw_available"] or memory["raw_bytes"] is None:
+        description["status"] = "no_memory"
+        missing = len(memory["missing_ranges"])
+        description["notes"].append(
+            "the record bytes are not fully present in the loaded image "
+            f"({missing} of {byte_size} bytes missing at "
+            f"0x{(tag.get('address') or 0):X}) - values unavailable"
+        )
+        return description
+
+    raw_bytes = memory["raw_bytes"]
+    decode_endian = str(tag.get("effective_byte_order") or resolved.get("decode_endian") or "little")
+    components = resolved["components"]
+
+    # --- axis limbs -------------------------------------------------------
+    axis_runs: list[Optional[list[Any]]] = []
+    axis_converted: list[Optional[list[Any]]] = []
+    for index, axis in enumerate(axis_meta):
+        component_name = _AXIS_COMPONENT_NAMES[index] if index < len(_AXIS_COMPONENT_NAMES) else None
+        component = next(
+            (c for c in components if c["component"] == component_name),
+            None,
+        )
+        header_tokens = axis.get("header_tokens") or []
+        axis_method = _axis_compu_method(axis, compu_methods_by_name)
+        axis_info: dict = {
+            "kind": header_tokens[0] if header_tokens else None,
+            "max_axis_points": axis_counts[index] if index < len(axis_counts) else None,
+            "external": bool(axis.get("external")),
+            "unit": (axis_method or {}).get("unit"),
+        }
+        run: Optional[list[Any]] = None
+        converted: Optional[list[Any]] = None
+        if component is not None:
+            run, run_error = _decode_component_run(raw_bytes, component, decode_endian)
+            if run is None:
+                description["notes"].append(
+                    f"axis {index + 1}: {run_error}"
+                )
+            else:
+                converted = []
+                for raw_item in run:
+                    phys_item, conv_status, conv_error = _apply_compu_method(
+                        raw_item, axis_method, compu_tabs_by_name
+                    )
+                    if conv_status in ("error", "unsupported", "unknown_method"):
+                        description["notes"].append(
+                            f"axis {index + 1}: point conversion failed: {conv_error}"
+                        )
+                    converted.append(phys_item)
+        elif axis.get("external"):
+            # The axis points live in the referenced AXIS_PTS record; decode
+            # them from ITS address with the same walked-machinery.
+            ref_name = None
+            if "AXIS_PTS_REF" in header_tokens:
+                ref_index = header_tokens.index("AXIS_PTS_REF")
+                if ref_index + 1 < len(header_tokens):
+                    ref_name = header_tokens[ref_index + 1]
+            ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
+            run, converted = _decode_external_axis_points(
+                ref_tag, axis_counts[index], axis_method,
+                compu_tabs_by_name, record_layouts_by_name, mem_map, description,
+            )
+        else:
+            description["notes"].append(
+                f"axis {index + 1}: the layout deposits no axis points "
+                "(NO_AXIS_PTS) - x is shown as the point index"
+            )
+        axis_info["points_raw"] = run
+        axis_info["points_phys"] = converted
+        description["axes"].append(axis_info)
+        axis_runs.append(run)
+        axis_converted.append(converted)
+
+    # --- FNC_VALUES limb --------------------------------------------------
+    fnc_component = next((c for c in components if c["component"] == "FNC_VALUES"), None)
+    values_raw: Optional[list[Any]] = None
+    values_phys: Optional[list[Any]] = None
+    if fnc_component is None:
+        description["notes"].append("the layout carries no FNC_VALUES component")
+        description["status"] = "layout_unresolved"
+        return description
+    values_raw, fnc_error = _decode_component_run(raw_bytes, fnc_component, decode_endian)
+    if values_raw is None:
+        description["notes"].append(f"function values: {fnc_error}")
+        description["status"] = "layout_unresolved"
+        return description
+    values_phys = []
+    for raw_item in values_raw:
+        phys_item, conv_status, conv_error = _apply_compu_method(
+            raw_item, method, compu_tabs_by_name
+        )
+        if conv_status in ("error", "unsupported", "unknown_method"):
+            description["notes"].append(f"value conversion failed: {conv_error}")
+        values_phys.append(phys_item)
+    description["values_raw"] = values_raw
+    description["values_phys"] = values_phys
+
+    # --- point pairing (single-axis CURVE) --------------------------------
+    expected = math.prod(axis_counts)
+    if len(values_raw) != expected:
+        description["notes"].append(
+            f"the layout yields {len(values_raw)} function values for "
+            f"{expected} axis points - the shape is inconsistent"
+        )
+    if len(axis_meta) == 1:
+        x_run = axis_converted[0]
+        points: list[dict] = []
+        for index, phys_item in enumerate(values_phys):
+            if x_run is not None and index < len(x_run):
+                x_value = x_run[index]
+                x_note = None
+            else:
+                x_value = index
+                x_note = "index (axis points unavailable)"
+            phys_number = _to_float(phys_item)
+            points.append(
+                {
+                    "x": x_value,
+                    "y": phys_item,
+                    "x_raw": axis_runs[0][index] if axis_runs[0] is not None and index < len(axis_runs[0]) else None,
+                    "y_raw": values_raw[index],
+                    "x_note": x_note,
+                    "outside_limits": bool(
+                        phys_number is not None
+                        and (
+                            (lower_limit is not None and phys_number < lower_limit)
+                            or (upper_limit is not None and phys_number > upper_limit)
+                        )
+                    ),
+                }
+            )
+        description["points"] = points
+    else:
+        description["notes"].append(
+            "multi-axis MAP: the axes and the flattened value run are "
+            "listed; a 2-D grid view is not part of this description yet"
+        )
+    return description
+
+
+def _decode_external_axis_points(
+    ref_tag: Optional[dict],
+    count: int,
+    axis_method: Optional[dict],
+    compu_tabs_by_name: dict[str, dict],
+    record_layouts_by_name: dict[str, dict],
+    mem_map: Optional[Dict[int, int]],
+    description: dict,
+) -> tuple[Optional[list[Any]], Optional[list[Any]]]:
+    """Decode an external axis's points from the referenced AXIS_PTS record.
+
+    Best-effort honest limb: a missing reference, an unresolvable ref
+    layout, or absent image bytes yields ``(None, None)`` + a note — the
+    caller then falls back to the point index, never invented data.
+    """
+    if not isinstance(ref_tag, dict):
+        description["notes"].append("external axis: the AXIS_PTS reference does not resolve")
+        return None, None
+    ref_counts = _inline_axis_counts(ref_tag.get("axis_meta") or [])
+    if ref_counts is None:
+        ref_counts = [count]
+    ref_layout_name = str(ref_tag.get("record_layout_name") or ref_tag.get("deposit") or "")
+    ref_layout = record_layouts_by_name.get(ref_layout_name)
+    ref_components = (
+        _walk_record_layout_components(ref_layout, ref_counts) if ref_layout else None
+    )
+    ref_component = next(
+        (c for c in (ref_components or []) if c["component"] in _VALUE_COMPONENTS),
+        None,
+    )
+    if ref_component is None:
+        description["notes"].append(
+            f"external axis: the referenced record {ref_tag.get('name')!r} "
+            "has no decodable point component"
+        )
+        return None, None
+    ref_memory = _extract_raw_bytes(mem_map, ref_tag.get("address"), ref_component["end"])
+    if not ref_memory["raw_available"] or ref_memory["raw_bytes"] is None:
+        description["notes"].append(
+            f"external axis: the referenced record {ref_tag.get('name')!r} "
+            "bytes are not present in the image"
+        )
+        return None, None
+    ref_endian = str(ref_tag.get("effective_byte_order") or "little")
+    run, run_error = _decode_component_run(ref_memory["raw_bytes"], ref_component, ref_endian)
+    if run is None:
+        description["notes"].append(f"external axis: {run_error}")
+        return None, None
+    converted = []
+    for raw_item in run:
+        phys_item, _status, _error = _apply_compu_method(raw_item, axis_method, compu_tabs_by_name)
+        converted.append(phys_item)
+    return run, converted
+
+
+def _format_point_number(value: Any) -> str:
+    """Render one table cell: finite numbers tight, anything else n/a."""
+    number = _to_float(value)
+    if number is None:
+        return "n/a"
+    if isinstance(value, float) and not number.is_integer():
+        return f"{number:g}"
+    if isinstance(value, int):
+        return str(value)
+    return f"{number:g}"
+
+
+def render_curve_description(description: dict) -> str:
+    """Render the E9 description model as plain text (markup=False safe).
+
+    The modal's ``Static`` runs with ``markup=False`` (the WindowHelpScreen
+    C-17 voice), so this output is verbatim fixed-width text — no Rich
+    markup, no console metacharacters. Unresolved limbs render as their
+    honest status line instead of a table.
+    """
+    lines: list[str] = []
+    kind = description.get("char_type") or "CHARACTERISTIC"
+    title = f"{kind}  {description.get('name') or '?'}"
+    if description.get("long_identifier"):
+        title += f"  -  {description['long_identifier']}"
+    lines.append(title)
+    address = description.get("address")
+    if isinstance(address, int):
+        tail = f"address 0x{address:08X}"
+        byte_size = description.get("byte_size")
+        if isinstance(byte_size, int):
+            tail += f", {byte_size} bytes"
+        lines.append(tail)
+    unit = description.get("unit")
+    limits = ""
+    if description.get("lower_limit") is not None or description.get("upper_limit") is not None:
+        limits = f" [{description.get('lower_limit')}, {description.get('upper_limit')}]"
+    lines.append(f"Unit: {unit or 'n/a'}{limits}")
+    conversion_bits = []
+    if description.get("conversion_type"):
+        conversion_bits.append(str(description["conversion_type"]))
+    if description.get("compu_method_name"):
+        conversion_bits.append(str(description["compu_method_name"]))
+    if description.get("compu_description"):
+        conversion_bits.append(f'"{description["compu_description"]}"')
+    lines.append(f"Conversion: {' - '.join(conversion_bits) if conversion_bits else 'n/a'}")
+
+    for index, axis in enumerate(description.get("axes") or []):
+        axis_line = (
+            f"Axis {index + 1}: {axis.get('kind') or '?'}"
+            f", max {axis.get('max_axis_points') if axis.get('max_axis_points') is not None else '?'}"
+            f" points"
+        )
+        if axis.get("external"):
+            axis_line += " (external)"
+        if axis.get("unit"):
+            axis_line += f", unit {axis['unit']}"
+        lines.append(axis_line)
+
+    status = description.get("status")
+    if status == "not_a_curve":
+        scalar = description.get("scalar_phys")
+        scalar_text = _format_point_number(scalar) if scalar is not None else "n/a"
+        lines.append("")
+        lines.append(f"Scalar value: {scalar_text} {unit or ''}".rstrip())
+        lines.append("(this characteristic is not a CURVE/MAP - no point table)")
+    elif status != "ok":
+        lines.append("")
+        lines.append(f"Status: {status} - point table unavailable")
+
+    points = description.get("points")
+    if points:
+        lines.append("")
+        x_cells = [_format_point_number(p["x"]) for p in points]
+        y_cells = [
+            _format_point_number(p["y"]) + (" (!)" if p.get("outside_limits") else "")
+            for p in points
+        ]
+        x_width = max([len("x")] + [len(c) for c in x_cells])
+        y_width = max([len("y")] + [len(c) for c in y_cells])
+        lines.append(f"  {'x':>{x_width}}   {'y':>{y_width}}")
+        for p, x_cell, y_cell in zip(points, x_cells, y_cells):
+            note = f"   ({p['x_note']})" if p.get("x_note") else ""
+            lines.append(f"  {x_cell:>{x_width}}   {y_cell:>{y_width}}{note}")
+        y_numbers = [_to_float(p["y"]) for p in points]
+        spark = _sparkline([n for n in y_numbers if n is not None])
+        if spark:
+            lines.append("")
+            lines.append(f"  y shape: {spark}")
+        if any(p.get("outside_limits") for p in points):
+            lines.append("")
+            lines.append("  (!) the value is outside the tag's declared limits")
+
+    if description.get("values_phys") is not None and not points:
+        lines.append("")
+        rendered = ", ".join(_format_point_number(v) for v in description["values_phys"])
+        lines.append(f"  values: {rendered}")
+
+    notes = description.get("notes") or []
+    if notes:
+        lines.append("")
+        for note in notes:
+            lines.append(f"  note: {note}")
+    return "\n".join(lines)
+
+
+def _sparkline(numbers: list[float]) -> str:
+    """One Unicode-block sparkline (optional E9 garnish), empty when flat/short."""
+    if len(numbers) < 2:
+        return ""
+    lo = min(numbers)
+    hi = max(numbers)
+    if not math.isfinite(hi - lo) or hi == lo:
+        return ""
+    blocks = "▁▂▃▄▅▆▇█"
+    return "".join(
+        blocks[min(len(blocks) - 1, int((value - lo) / (hi - lo) * (len(blocks) - 1)))]
+        for value in numbers
+    )
 
 
 def validate_characteristic(tag_name: str, a2l_data: dict, mem_map: Optional[Dict[int, int]]) -> dict:
