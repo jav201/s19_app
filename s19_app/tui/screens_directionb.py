@@ -4585,6 +4585,24 @@ class PatchEditorPanel(ScrollableContainer):
     #: imports nothing from the engine or service layer.
     SAVEBACK_WIDTHS = (32, 16)
 
+    #: P4 fix (RC-3): the panel height at which the JSON editor has real free
+    #: vertical space and the fill regime applies — the growth threshold the
+    #: fix/patch-json-editor-fill-height packet itself measured ("the
+    #: empty-space defect manifests once the JSON window has free vertical
+    #: space, i.e. at ~34+ rows"). Below it (the boxed 120x30 / 80x24
+    #: regimes) the rework's content-height stack rules: AT-063a pins
+    #: ``is_auto_height`` on every window there, and the tcss `min-height: 8`
+    #: floor alone keeps the editor usable. Measured at 120x50, the growth
+    #: arm's size: the panel content is exactly 34 there.
+    _FILL_PANEL_MIN_ROWS = 34
+
+    #: P4 fix (RC-3): the boxed regime's JSON body viewport — the paste
+    #: row's own content height (the 8-row editor floor + the 1-row cap
+    #: gauge). Clipped to it, the editor lands flush on the body bottom
+    #: (AC-1b) with the entry-input band + before/after card riding the
+    #: body's scroll just beneath — exactly where the rework put them.
+    _SHORT_BODY_VIEWPORT_ROWS = 9
+
     # Layout rules for the v2 widget ids live in styles.tcss (folded there
     # at E3b when the retired batch-03/04 ids' rules were removed).
 
@@ -5148,25 +5166,11 @@ class PatchEditorPanel(ScrollableContainer):
                 # content-region at scroll 0 (FOLD-4). #patch_paste_row is kept
                 # for the AT-057a id census; its button row is docked below.
                 Container(
-                    # batch-94: the "Paste change-set (v2 JSON)" in-body label
-                    # is gone — the JSON window's border title/subtitle name
-                    # the surface (batch-48 Amendment D precedent), and the
-                    # boxed budget pays the expanded editor, not a duplicated
-                    # label row. The editor rides FIRST in the paste row (the
-                    # primary edit surface, LLR-003.1) with the batch-48
-                    # paste-cap gauge beneath it. #patch_paste_row is kept for
-                    # the AT-057a id census; its button row is docked below.
-                    # batch-48 (LLR-079.1): a `CappedTextArea` subclass — BOTH
-                    # paste ingresses stay capped + in-place JSON colouring via
-                    # the widget's own `_highlights` map. NO markup path — see
-                    # `json_highlight.py`'s module docstring for the pinned
-                    # `_render_line` verification (C-17 / LLR-079.3).
-                    JsonHighlightTextArea(
-                        DUMMY_CHANGESET_TEXT, id="patch_paste_text"
-                    ),
-                    # batch-48 (LLR-079.4): the paste-cap gauge. The 64 KiB cap
-                    # already truncates SILENTLY (`capped_text_area.py:120`/
-                    # `:157`); this is the missing budget read-out. It renders
+                    # batch-48 (LLR-079.4): the paste-cap gauge rides FIRST,
+                    # ABOVE the editor (the AC-5 order: the editor's growth
+                    # pushes DOWN from the gauge). The 64 KiB cap already
+                    # truncates SILENTLY (`capped_text_area.py:120`/`:157`);
+                    # this is the missing budget read-out. It renders
                     # integers + author-fixed labels only — the buffer's own
                     # text never reaches it (C-17), only its `len`.
                     # `markup=False` is belt-and-braces: it is fed a `Text`.
@@ -5175,6 +5179,18 @@ class PatchEditorPanel(ScrollableContainer):
                         id="patch_paste_gauge",
                         markup=False,
                         classes="patch-field-label",
+                    ),
+                    # batch-48 (LLR-079.1): a `CappedTextArea` subclass — BOTH
+                    # paste ingresses stay capped + in-place JSON colouring via
+                    # the widget's own `_highlights` map. NO markup path — see
+                    # `json_highlight.py`'s module docstring for the pinned
+                    # `_render_line` verification (C-17 / LLR-079.3). The
+                    # editor rides beneath the gauge as the row's `1fr` fill
+                    # (styles.tcss:1651) — its bottom lands on the paste row's
+                    # bottom, which lands on the body bottom (the P4 RC-3
+                    # fill): the editor is the LAST child of the row.
+                    JsonHighlightTextArea(
+                        DUMMY_CHANGESET_TEXT, id="patch_paste_text"
                     ),
                     id="patch_paste_row",
                 ),
@@ -5213,6 +5229,15 @@ class PatchEditorPanel(ScrollableContainer):
                 id="patch_win_json_body",
                 classes="patch-window-body",
             ),
+            # P4 fix (RC-3): the tall regime's layering spacer — an EMPTY 1fr
+            # row riding the window's ``chrome`` layer ABOVE the docked
+            # rows, pushing them to the window's foot (where the body's
+            # bottom padding leaves room for them); in the boxed regime the
+            # window is content-height and the spacer collapses to zero.
+            # The docked rows stay DIRECT children of the window in every
+            # regime (AT-057a's parentage census) — only their ``layer``
+            # assignment flips (see ``_apply_window_geometry``).
+            Container(id="patch_win_json_dock_spacer"),
             Horizontal(
                 Button(
                     "Parse pasted",
@@ -5347,6 +5372,13 @@ class PatchEditorPanel(ScrollableContainer):
         # at 120x30, and every docked row stays a body sibling (the B2 fix
         # holds: no button is a descendant of a scrollable body). The CHECKS
         # window rides at the foot.
+        # P4 fix (RC-3): the JSON/CHECKS windows start content-height; once
+        # the panel is laid out, ``_apply_window_geometry`` upgrades them to
+        # the bounded `height: 100%` fill slots when the panel has real free
+        # vertical space (the AC-1 growth regime) — the short regime keeps
+        # the rework's content-height stack (AT-063a's `is_auto_height` pin,
+        # FOLD-8 panel scroll). The SCRIPT window always stays content-height
+        # (the table band's own size).
         script_window.styles.width = "100%"
         script_window.styles.height = "auto"
         script_window.styles.margin_right = 0
@@ -5361,6 +5393,11 @@ class PatchEditorPanel(ScrollableContainer):
         checks_window.styles.height = "auto"
         checks_window.styles.margin_right = 0
         checks_window.styles.margin_bottom = 1
+        # P4 fix (RC-3): the layer scaffolding is static (set here, pre-mount)
+        # so the regime flip in ``_apply_window_geometry`` touches only the
+        # heights + the docked rows' layer assignment — one reflow, settled
+        # within a single pump of the show.
+        json_window.styles.layers = ("base", "chrome")
         # LLR-075.1: the dolphie-idiom border title + subtitle on each window
         # (the batch-47 `app.py:1651-1656` Workspace-pane precedent). The
         # titles are CONSTANT author strings; the subtitles carry LIVE state
@@ -5448,6 +5485,116 @@ class PatchEditorPanel(ScrollableContainer):
             label_value("Scope", self._SCOPE_LABELS[self._execute_scope])
         )
 
+    def _apply_window_geometry(self, panel_rows: Optional[int] = None) -> None:
+        """Size the JSON/CHECKS windows per the panel's real height (P4 RC-3).
+
+        Args:
+            panel_rows (Optional[int]): the panel's height in rows when known
+                BEFORE this widget is laid out (``None`` reads the painted
+                :attr:`region` — the ``on_resize`` path). The app passes the
+                figure at show time (the workspace is always laid out, and
+                the panel's height is the workspace's minus the screen-title
+                chrome — measured 2 at every shipped size) so the show's
+                relayout lands on the right regime in ONE pass; a class
+                change applied from ``on_resize`` would arrive one reflow
+                too late for single-pump drivers.
+
+        Summary:
+            The rework's content-height stack stays while the panel is
+            boxed (AT-063a's ``is_auto_height`` pin on every window, the
+            FOLD-8 whole-panel scroll). Once the panel has real free
+            vertical space — at or above :attr:`_FILL_PANEL_MIN_ROWS`, the
+            growth threshold the fix/patch-json-editor-fill-height packet
+            measured — the JSON and CHECKS windows claim the bounded
+            ``height: 100%`` fill slots (AC-3's no-leak contrast: both
+            windows tall, only the JSON body stretches) and the JSON body's
+            box spans its whole window (AC-3's ``body >= window - 2``)
+            while its content is inset by the docked rows' measured height,
+            so the paste row / editor land flush on the body's content
+            bottom (AC-1/AC-1b) and grow past the old 8-row cap (AC-1's
+            ``> 8``) directly above the docked rows — which stay in the
+            window's flow at its foot, in the PANEL's scroll (the batch-46
+            FOLD-8 contract, and what AT-068a's real-click helper scrolls;
+            the window itself never gains an internal scroll). The SCRIPT
+            window is untouched (always the table band's own content
+            height); the editor keeps the tcss ``1fr`` + ``min-height: 8``
+            floor in the tall regime and the rework's fixed 8-row band in
+            the boxed one — a bare ``1fr`` there resolves against the
+            unbounded scroll viewport (the C-23 re-measure), growing the
+            body past its content and stealing the scrollbar gutter from
+            the before/after card (the body's scrollbar rides at zero
+            width so TC-080.6's width-pinned budget holds; the wheel and
+            keys still scroll).
+
+        Returns:
+            None
+
+        Dependencies:
+            Used by:
+                - ``on_mount`` / ``on_resize`` (the panel's real height is
+                  known only after layout)
+        """
+        rows = self.region.height if panel_rows is None else panel_rows
+        tall = rows >= self._FILL_PANEL_MIN_ROWS
+        fill = "100%" if tall else "auto"
+        body = self.query_one("#patch_win_json_body")
+        body.styles.layer = "base"
+        docked_ids = (
+            "patch_paste_controls",
+            "patch_history_strip",
+            "patch_history_controls",
+            "patch_execute_row",
+        )
+        if tall:
+            # The body's box spans the whole window (AC-3's
+            # ``body >= window - 2``) while its CONTENT is inset by the
+            # docked rows' measured height, so the paste row / editor land
+            # flush above the docked rows with no overlap. The docked rows
+            # ride the ``chrome`` layer, pushed to the window's foot by the
+            # 1fr spacer — in the PANEL's scroll flow (AT-068a's
+            # real-click helper scrolls the PANEL, never a window; the
+            # window itself never gains an internal scroll). A bare flow
+            # layout would need the body at ``1fr`` (window minus docked
+            # rows) and fail AC-3's tolerance by construction.
+            docked_h = sum(
+                self.query_one(f"#{wid}").region.height for wid in docked_ids
+            )
+            body.styles.height = "100%"
+            body.styles.padding_bottom = docked_h
+            for wid in docked_ids:
+                self.query_one(f"#{wid}").styles.layer = "chrome"
+        else:
+            # Boxed regime: everything flows on the base layer (the
+            # rework's content-height stack — AT-063a's ``is_auto_height``
+            # pin); the body viewport is clipped to the paste row so the
+            # editor lands flush on it (AC-1b), with the entry-input band
+            # and the before/after card riding the body's scroll beneath.
+            body.styles.height = self._SHORT_BODY_VIEWPORT_ROWS
+            body.styles.padding_bottom = 0
+            for wid in docked_ids:
+                self.query_one(f"#{wid}").styles.layer = "base"
+        spacer = self.query_one("#patch_win_json_dock_spacer")
+        spacer.styles.layer = "chrome"
+        # The 1fr push only matters in the tall regime; boxed, the chrome
+        # layer spans the whole window and a 1fr spacer would paint an
+        # invisible sheet over it, eating every click (measured: the scope
+        # button's point resolved to the spacer).
+        spacer.styles.height = "1fr" if tall else 0
+        self.query_one("#patch_win_checks").styles.height = fill
+        self.query_one("#patch_paste_row").styles.height = fill
+        # The editor: `1fr` of the (now definite) paste row in the tall
+        # regime; the fixed 8-row band in the boxed regime — a bare `1fr`
+        # there resolves against the unbounded scroll viewport (the C-23
+        # re-measure the rework's pin recorded), growing the body past its
+        # content and stealing the scrollbar gutter from the card.
+        editor = self.query_one("#patch_paste_text")
+        editor.styles.height = "1fr" if tall else 8
+        editor.styles.min_height = 8
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-apply the window geometry when the panel's height changes."""
+        self._apply_window_geometry()
+
     def on_mount(self) -> None:
         """Initialise the entries table columns, heights and the empty state.
 
@@ -5467,15 +5614,6 @@ class PatchEditorPanel(ScrollableContainer):
         # batch-94 (LLR-003.1): the table is a bounded band (three rows) at
         # the top of the stacked layout — the window body scrolls beneath it.
         table.styles.height = 3
-        # The paste row and editor sit inside the now-content-sized windows:
-        # the editor is a FIXED eight-row band (the tcss `1fr` fill predates
-        # the vertical stack and resolves against the unbounded scroll
-        # viewport once the windows go content-height — the C-23 re-measure).
-        paste_row = self.query_one("#patch_paste_row")
-        paste_row.styles.height = "auto"
-        paste_text = self.query_one("#patch_paste_text", TextArea)
-        paste_text.styles.height = 8
-        paste_text.styles.min_height = 8
         # The docked rows are height-FORCED so the change-file controls keep
         # Load beside the path input (annotation 6) inside the first
         # screenful: the Select compacts to its one-line value row and the
@@ -5507,12 +5645,16 @@ class PatchEditorPanel(ScrollableContainer):
         # two per row, the anti-clip fix); inside the content-height window
         # that is two rows, measured into the stacked budget.
         self.query_one("#patch_doc_controls").styles.height = "auto"
-        # Finding C of the independent review (fixed): the batch-48 JSON-fill
-        # tcss (`#patch_win_json_body { height: 1fr }`, styles.tcss:1590)
-        # starves the body to a one-row viewport inside the rework's
-        # content-height window at 80x24 — the auto override restores the
-        # editor band inside the panel scroll.
-        self.query_one("#patch_win_json_body").styles.height = "auto"
+        # P4 fix (RC-3): the JSON fill cascade (window / body / paste row /
+        # editor) is applied per the panel's real height — see
+        # ``_apply_window_geometry``. The pre-layout call lands on the
+        # boxed-regime branch; ``on_resize`` re-applies after layout. The
+        # body's scrollbar rides at zero width either way: the boxed body
+        # viewport is clipped (below), and an auto-width gutter would
+        # silently narrow the before/after card's measured container
+        # (TC-080.6's budget is width-pinned); the wheel/keys still scroll.
+        self._apply_window_geometry()
+        self.query_one("#patch_win_json_body").styles.scrollbar_size = (0, 0)
         # The panel's vertical padding goes to 0 (the horizontal padding
         # stays) — two more content rows for the stacked windows.
         self.styles.padding_top = 0
@@ -7678,8 +7820,17 @@ class AbDiffPanel(Container):
             super().__init__()
             self.filename = filename
 
-    def __init__(self) -> None:
+    def __init__(self, check_files: Sequence[str] = ()) -> None:
         super().__init__(id="ab_diff_panel")
+        #: The compose-time patches-folder listing (LLR-010.1): non-empty →
+        #: :meth:`compose` mounts ``#diff_check_row``. The listing the OPERATOR
+        #: sees is still the live one ``set_check_files`` installs on every
+        #: diff-screen activation — this copy only decides whether the row
+        #: exists at all (the P4 RC-2 geometry fix: an unconditionally mounted
+        #: row reserved its auto height in EVERY session, including the many
+        #: sessions whose patches folder holds no check spec, and ate the hex
+        #: panes' rows at the B78 sizes).
+        self._compose_check_files: Tuple[str, ...] = tuple(check_files)
         #: The most recent comparison runs (display-capped) the operator can
         #: select between; rendered into ``#diff_range_list``.
         self._runs: List[Tuple[int, int, str]] = []
@@ -7750,15 +7901,25 @@ class AbDiffPanel(Container):
         # the same directory, every check spec's label carrying the green
         # CHECK distinction. Loading a check spec adds its declared fields to
         # the emitted diff report (the C-12 writer→reader→report chain).
-        yield Horizontal(
-            Label("Check spec:", classes="diff-field-label"),
-            Select(
-                [(safe_text("(no check spec)"), "")],
-                id="diff_check_select",
-                allow_blank=False,
-            ),
-            id="diff_check_row",
-        )
+        #
+        # P4 fix (RC-2): mount the row ONLY when the compose-time listing is
+        # non-empty. C-13 arithmetic at the tight regime (120x28 fallback,
+        # the floor tc_b78_54 pins): screen content 26 rows; above-panel
+        # chrome 4; compacted controls (rows A/B + action + status, each
+        # `height: 1` + the 1-row separator, styles.tcss:1286) 8; the
+        # `1fr` `#diff_columns` gets the rest. An unconditionally mounted row
+        # reserves its AUTO height here — measured 8 (wide) / 10 (fallback),
+        # the Textual Select's 12-line dropdown overlay inflating the row
+        # (the `#patch_variant_select_row` precedent, styles.tcss:1259) —
+        # which is exactly 0-5 hex rows at the B78 sizes ((132,44) content
+        # height 5 < the pinned 7; (160,40) painted 0). With an empty listing
+        # the row therefore costs the operator bytes it can never spend, so
+        # it is not composed; when a listing exists (files written before
+        # startup, or appearing mid-session — `set_check_files` mounts the
+        # row then), the 3 control rows + status + the row's own height still
+        # leave the `1fr` columns the majority of the 26-row budget.
+        if self._compose_check_files:
+            yield self._make_check_row()[0]
         yield Horizontal(
             Button("Compare", id="diff_compare_button"),
             Button("Report", id="diff_report_button"),
@@ -8018,22 +8179,29 @@ class AbDiffPanel(Container):
             select.set_options(options)
             select.value = options[0][1]
 
-    def set_check_files(self, names: Sequence[str]) -> None:
-        """Populate the check-spec dropdown, suffix-distinguished (LLR-010.1).
+    @staticmethod
+    def _check_select_options(names: Sequence[str]) -> List[Tuple[Any, str]]:
+        """The dropdown's option list for a patches-folder scan (LLR-010.1).
 
         Summary:
-            Replace ``#diff_check_select``'s options with one entry per file
-            from the patches-folder scan — check specs and patch files listed
-            TOGETHER, check specs labeled with the green ``CHECK`` suffix
-            distinction (patch files get the plain ``PATCH`` label). The
-            leading ``(no check spec)`` blank-value option is always present:
-            it is the dropdown's "no addendum" state. The option labels are
+            One entry per file — check specs and patch files listed TOGETHER,
+            check specs labeled with the green ``CHECK`` suffix distinction
+            (patch files get the plain ``PATCH`` label). The leading
+            ``(no check spec)`` blank-value option is always present: it is
+            the dropdown's "no addendum" state. The option labels are
             FILENAMES read off disk, so they reach the Select as literal
             ``Text`` objects (C-17 — the batch-37 ``set_change_files`` fold).
+            The single construction site, shared by the Select's constructor
+            (a row mounted mid-session) and ``set_check_files`` (the live
+            re-population).
 
         Args:
             names (Sequence[str]): Sorted bare names from the folder scan
                 (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+
+        Returns:
+            List[Tuple[Any, str]]: ``(label, value)`` pairs; the label is a
+                literal ``Text``.
         """
         options: List[Tuple[Any, str]] = [
             (safe_text("(no check spec)"), "")
@@ -8045,8 +8213,82 @@ class AbDiffPanel(Container):
             else:
                 label.append(" PATCH", style=CYAN)
             options.append((label, name))
-        select = self.query_one("#diff_check_select", Select)
-        select.set_options(options)
+        return options
+
+    def _make_check_row(self, names: Sequence[str] = ()) -> Tuple[Horizontal, Select]:
+        """Build the check-spec dropdown row (LLR-010.1).
+
+        Summary:
+            The SINGLE construction site for ``#diff_check_row``, shared by
+            :meth:`compose` (mounts the row when the compose-time listing is
+            non-empty) and :meth:`set_check_files` (mounts it when a listing
+            becomes non-empty mid-session), so the two mount paths cannot
+            drift apart. Returns the row's ``Select`` by reference because a
+            query on a not-yet-mounted subtree sees nothing (constructor
+            children materialize at mount time), and the options are BAKED
+            INTO the constructor: ``Select.set_options`` needs the mounted
+            ``SelectOverlay``, which does not exist before mount.
+
+        Args:
+            names (Sequence[str]): The initial listing; ``()`` keeps only the
+                ``(no check spec)`` blank option (the :meth:`compose` arm —
+                its live options ride the next ``set_check_files`` call).
+
+        Returns:
+            Tuple[Horizontal, Select]: The row carrying
+                ``#diff_check_select``, and that Select itself.
+
+        Dependencies:
+            Used by:
+                - AbDiffPanel.compose / AbDiffPanel.set_check_files
+        """
+        select = Select(
+            self._check_select_options(names),
+            id="diff_check_select",
+            allow_blank=False,
+        )
+        return (
+            Horizontal(
+                Label("Check spec:", classes="diff-field-label"),
+                select,
+                id="diff_check_row",
+            ),
+            select,
+        )
+
+    def set_check_files(self, names: Sequence[str]) -> None:
+        """Populate the check-spec dropdown, suffix-distinguished (LLR-010.1).
+
+        Summary:
+            Replace ``#diff_check_select``'s options with one entry per file
+            from the patches-folder scan (the shared
+            :meth:`_check_select_options` builder).
+
+            P4 fix (RC-2): the row is composed only when a listing exists.
+            When the scan is empty and the row was never composed, this
+            method is a no-op — mounting an empty dropdown would reserve its
+            auto-height rows against the hex panes for nothing. When the
+            scan turns non-empty AFTER compose (the operator wrote a
+            ``.chk.json`` and revisits the diff screen — the AT-B94-12
+            chain), the row is mounted here, in its compose slot ahead of
+            the action row, with this scan's options baked in.
+
+        Args:
+            names (Sequence[str]): Sorted bare names from the folder scan
+                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+        """
+        try:
+            select = self.query_one("#diff_check_select", Select)
+        except Exception:
+            if not names:
+                return  # no row, nothing to list — keep the hex panes' rows
+            # The Select rides the builder's return (a query on the
+            # not-yet-mounted subtree sees nothing) with these names as its
+            # initial options (set_options needs the mounted overlay).
+            row, _select = self._make_check_row(names)
+            self.mount(row, before=self.query_one("#diff_action_row"))
+            return
+        select.set_options(self._check_select_options(names))
         select.value = ""
 
     def on_select_changed(self, event: Select.Changed) -> None:

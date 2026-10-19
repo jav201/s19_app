@@ -523,7 +523,7 @@ def test_at067a_variant_info_button_opens_help_modal(tmp_path: Path) -> None:
 def test_tc336_tc337_help_message_pushes_modal_with_content(
     tmp_path: Path,
 ) -> None:
-    """TC-336/337 (batch-94 form) — a stale help-shaped message is a no-op.
+    """TC-336/TC-337 (batch-94 form) — a stale help-shaped message is a no-op.
 
     Intent (HLR-006 error arm): with the message class retired, a
     same-shaped stale message (a duck-typed local class carrying no payload)

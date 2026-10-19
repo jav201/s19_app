@@ -47,18 +47,26 @@ SERVICES_DIR = PRODUCT_ROOT / "tui" / "services"
 
 #: Declared measured safe_text consumer set (LLR-003.3; module-map §5 F-2 —
 #: the real set also includes screens_directionb's internal call sites, which
-#: become its own import at the new address).
+#: become its own import at the new address). batch-94 (Inc-002, the Flow
+#: Builder/Execution panels in ``flow_screens.py``) imports the NAME at its
+#: module top (the C-17 fold — every file-derived string renders through
+#: ``safe_text``); measured in, per the census's own contract.
 MEASURED_SAFE_TEXT_CONSUMERS = {
     "s19_app.tui.app",
     "s19_app.tui.checks_view",
+    "s19_app.tui.flow_screens",
     "s19_app.tui.issues_view",
     "s19_app.tui.screens_directionb",
 }
 
 #: The 3 measured old-address TEST importers of safe_text (P2 code lens),
-#: repointed to s19_app.utils by Inc-B.
+#: repointed to s19_app.utils by Inc-B. batch-94 (Inc-001, the ce_a Check
+#: Editor) adds ``test_tui_check_editor`` — the new collector's own battery
+#: drives hostile labels through the same escaper (the C-17 fold); measured
+#: in, per the census's own contract.
 MEASURED_SAFE_TEXT_TEST_IMPORTERS = {
     "test_a2l_multiline_headers",
+    "test_tui_check_editor",
     "test_tui_directionb",
     "test_tui_hostile_map",
 }

@@ -102,7 +102,7 @@ from ..changes.model import DISPOSITION_APPLIED
 from ..changes.model import ChangeDocument
 from .flow_model import FlowChangeRecord, FlowRefusal, FlowRunResult
 from ...render.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
-from .markdown_safety import md_safe
+from .markdown_safety import MD_ESCAPE, md_safe
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_TIMESTAMP_FORMAT,
@@ -2052,6 +2052,109 @@ def _html_run_rows(
     return lines
 
 
+def _md_unescape(value: str) -> str:
+    """Reverse :func:`md_safe`'s escape pass for the HTML twin's display.
+
+    Summary:
+        :func:`md_safe` escapes every :data:`MD_ESCAPE` character with a
+        backslash prefix, backslash FIRST so no double-escape is possible.
+        The HTML addendum reuses the Markdown lines as its single content
+        source, then must present the RAW value — the md backslashes are
+        markup mechanics, not content. Reversing the pass in reverse order
+        (backslash LAST) is the exact inverse of the escape pass.
+
+    Args:
+        value (str): One md_safe-escaped line or cell.
+
+    Returns:
+        str: The raw value, ready for ``_esc`` / HTML embedding.
+    """
+    for ch in reversed(MD_ESCAPE):
+        value = value.replace("\\" + ch, ch)
+    return value
+
+
+#: Table-row splitter for :func:`_html_check_addendum`: a pipe is a column
+#: delimiter ONLY when not md-escaped — md_safe escapes every literal ``|`` as
+#: ``\\|``, so a lookbehind-guarded split cannot cut inside a cell value.
+_ROW_CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
+
+
+def _html_check_addendum(
+    check_spec: ChangeDocument,
+    check_spec_name: str,
+    symbol_addresses: Sequence[Tuple[int, str]],
+) -> List[str]:
+    """Build the HTML ``Checks`` addendum (LLR-010.2) — the md/html twin rule.
+
+    Summary:
+        The Markdown :func:`generate_diff_report` and this HTML generator must
+        carry the SAME check addendum with one content source — the md/html
+        pair-consistency rule the other sections follow structurally. This
+        helper therefore renders :func:`_check_addendum_lines`' output
+        line-by-line (header -> ``<h2>``, bullets -> ``<ul>``, the field table
+        -> ``<table>``, the empty arm -> ``<p>``) instead of re-deriving the
+        content, so a future content change lands in BOTH reports at once.
+        md-escaped values are unescaped back to the raw spelling and embedded
+        via ``_esc`` (HTML escaping is the HTML report's own safety control).
+
+    Args:
+        check_spec (ChangeDocument): The loaded check spec (as passed to
+            :func:`generate_diff_report`).
+        check_spec_name (str): The bare spec file name.
+        symbol_addresses (Sequence[Tuple[int, str]]): The shared artifact
+            ``(address, name)`` pairs.
+
+    Returns:
+        List[str]: HTML lines (no trailing blank).
+
+    Dependencies:
+        Uses:
+            - _check_addendum_lines / _md_unescape / _esc
+        Used by:
+            - generate_diff_report_html
+    """
+    md_lines = _check_addendum_lines(
+        check_spec, check_spec_name, symbol_addresses
+    )
+    out: List[str] = []
+    in_list = False
+    in_table = False
+    for line in md_lines:
+        if line == "## Checks":
+            out.append("<h2>Checks</h2>")
+        elif line == "":
+            continue  # md structural blank — the HTML elements carry spacing
+        elif line.startswith("- "):
+            if not in_list:
+                out.append("<ul>")
+                in_list = True
+            out.append(f"<li>{_esc(_md_unescape(line[2:]))}</li>")
+        elif line.startswith("|"):
+            cells = [
+                cell.strip()
+                for cell in _ROW_CELL_SPLIT_RE.split(line.strip("|"))
+            ]
+            if all(set(cell) <= set("-: ") for cell in cells):
+                continue  # the md column-separator row has no HTML twin
+            if not in_table:
+                out.append("<table>")
+                in_table = True
+                tag = "th"
+            else:
+                tag = "td"
+            out.append(
+                f"<tr>{''.join(f'<{tag}>{_esc(_md_unescape(cell))}</{tag}>' for cell in cells)}</tr>"
+            )
+        else:  # "No declared fields." and any future single-line paragraph
+            out.append(f"<p>{_esc(_md_unescape(line))}</p>")
+    if in_list:
+        out.append("</ul>")
+    if in_table:
+        out.append("</table>")
+    return out
+
+
 def _html_flow_change_attribution(
     attribution: FlowChangeAttribution,
     runs: Sequence[DiffRun],
@@ -2334,6 +2437,8 @@ def generate_diff_report_html(
     filename_stem: Optional[str] = None,
     report_filter: Optional["ReportFilterMatcher"] = None,
     flow_changes: Optional["FlowChangeAttribution"] = None,
+    check_spec: Optional[ChangeDocument] = None,
+    check_spec_name: str = "",
 ) -> DiffReportResult:
     """
     Summary:
@@ -2390,6 +2495,14 @@ def generate_diff_report_html(
             ``Flow change attribution`` section renders after the run
             sections (escaped, md/html pair consistent). ``None`` leaves
             the output BYTE-IDENTICAL to the pre-change-5c behavior.
+        check_spec (Optional[ChangeDocument]): batch-94 (LLR-010.2) — same
+            semantics as :func:`generate_diff_report`: the stashed check
+            spec rides the report as the ``Checks`` section (the
+            :func:`_check_addendum_lines` content rendered in HTML form,
+            md/html pair consistent). ``None`` (the default) leaves the
+            output BYTE-IDENTICAL to the pre-batch-94 behavior.
+        check_spec_name (str): The bare spec file name (file-derived —
+            md_safe-scrubbed by the shared addendum builder).
 
     Returns:
         DiffReportResult: ``written=True`` with the ``.html`` path on success,
@@ -2418,6 +2531,7 @@ def generate_diff_report_html(
             - _html_stats / _html_run_rows / _html_hex_windows
             - _apply_report_filter / _html_audit_header /
               _filter_display_name / _zero_match_notice (batch-35)
+            - _html_check_addendum (batch-94)
         Used by:
             - s19_app.tui.app.S19TuiApp (increment I4)
             - s19_app.tui.services.before_after_service
@@ -2513,6 +2627,15 @@ def generate_diff_report_html(
             filtered_runs if filtered_runs is not None else comparison.runs
         )
         lines.extend(_html_flow_change_attribution(flow_changes, census_runs))
+    if check_spec is not None:
+        # batch-94 (LLR-010.2): the check-spec addendum rides the report end
+        # exactly as the md twin's — after the run table / hex windows and the
+        # flow-change attribution, independent of the run scope. The content
+        # source is the SHARED :func:`_check_addendum_lines`; only the
+        # rendering differs (HTML form).
+        lines.extend(
+            _html_check_addendum(check_spec, check_spec_name, symbol_addresses)
+        )
     lines.extend(["</body>", "</html>"])
 
     target = dest_dir / filename

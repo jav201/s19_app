@@ -3633,7 +3633,14 @@ def _b79_app_binding_rows() -> frozenset:
 #: this batch's claim is only that Lane 1 does not disturb it.
 #: The committed App binding set, FULL ROWS. See the assertion in
 #: `test_at_b78_32_...` for why a count plus a key-only projection was not
-#: enough. 38 entries: 31 written as `Binding(...)`, 7 as bare tuples.
+#: enough. 40 entries: 33 written as `Binding(...)`, 7 as bare tuples.
+#: batch-94 (R-1, the PDR-ratified rail keys — `evidence/pdr_rail_key_probe.txt`
+#: in the batch record) extends the committed set with the two NON-footer-
+#: visible (`show=False`) rail navigators `=` → Check Editor and `]` → Flow
+#: Execution; the 11/12-item RAIL drift they accompany is handled by the
+#: canonical-CI snapshot regen (the C-30 path, per the batch-49/58 precedent
+#: below). Sanctioned here; any FUTURE unsanctioned row still trips the
+#: set-equality.
 _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('0', "show_screen('crc_designer')", 'CRC Designer', False),
     ('1', "show_screen('workspace')", 'Workspace', False),
@@ -3654,6 +3661,10 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('ctrl+s', 'save_project', 'Save', True),
     ('ctrl+y', 'patch_redo', 'Redo', False),
     ('ctrl+z', 'patch_undo', 'Undo', False),
+    # batch-94 (R-1, PDR `pdr_rail_key_probe.txt`): `=` mounts the NEW Check
+    # Editor rail screen, `]` the NEW Flow Execution one. Both `show=False`.
+    ('equals_sign', "show_screen('check_editor')", 'Check Editor', False),
+    ('right_square_bracket', "show_screen('flow_execution')", 'Flow Execution', False),
     ('g', 'focus_goto', 'Go-to', True),
     ('j', 'dump_a2l_json', 'Dump A2L JSON', False),
     ('k', 'show_legend', 'Legend', True),
@@ -3675,7 +3686,7 @@ _B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
     ('x', 'operations_view', 'Operations', True),
 })
 
-_B79_COMMITTED_APP_BINDING_COUNT = 38
+_B79_COMMITTED_APP_BINDING_COUNT = 40
 
 
 def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:

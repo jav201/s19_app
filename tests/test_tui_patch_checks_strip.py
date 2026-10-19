@@ -619,12 +619,15 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
 def test_tc078_3_both_sites(tmp_path: Path) -> None:
     """Both app.py call sites pass the aggregates (the writer census).
 
-    Intent (LLR-078.3): the post-run site and the history-refresh site are the
-    only two writers. If either omits the counts the strip and ``check_rows()``
-    read different states — the exact shape of the batch-38 Inc-4 F1 defect.
-    This is a SOURCE-level census (the behavioural arms are AT-078a for the
-    post-run site and AT-078c for the history site); it exists so a THIRD call
-    site added later cannot quietly skip the argument.
+    Intent (LLR-078.3): the post-run site and the history-refresh site are
+    the aggregate-passing writers. If either omits the counts the strip and
+    ``check_rows()`` read different states — the exact shape of the
+    batch-38 Inc-4 F1 defect. batch-94 (LLR-009.2) added a THIRD site —
+    the Check Editor's validate arm — which records NO aggregates by
+    design (a validate is not a run; the comment at the census names it).
+    This is a SOURCE-level census (the behavioural arms are AT-078a for
+    the post-run site and AT-078c for the history site); it exists so a
+    FOURTH call site added later cannot quietly skip the argument.
 
     ⚠ The census walks the AST, NOT ``source.count("…")``. My first draft
     counted substrings and read **3** ``check_aggregates()`` sites against 2
@@ -642,12 +645,26 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
         and node.func.attr == "refresh_check_results"
     ]
 
-    assert len(calls) == 2, (
-        f"the writer census pins TWO refresh_check_results call sites; found "
+    assert len(calls) == 3, (
+        f"the writer census pins THREE refresh_check_results call sites; found "
         f"{len(calls)}. A new site must pass the aggregates and be recorded here."
     )
 
     for call in calls:
+        # batch-94 (LLR-009.2): the Check Editor's validate arm
+        # (``on_check_editor_panel_action_requested``) is the THIRD site —
+        # ``refresh_check_results(rows, "validation complete")`` with NO
+        # aggregates: a validate is not a RUN, so the pass/fail strip keeps
+        # its prior state and the aggregates default is the correct render.
+        # Recorded here per the census's own contract; every OTHER site must
+        # still pass the aggregates (the batch-38 Inc-4 F1 shape below).
+        validate_only = (
+            len(call.args) == 2
+            and isinstance(call.args[1], ast.Constant)
+            and call.args[1].value == "validation complete"
+        )
+        if validate_only:
+            continue
         positional = len(call.args) >= 3
         keyword = any(kw.arg == "aggregates" for kw in call.keywords)
         assert positional or keyword, (

@@ -4837,7 +4837,12 @@ class S19TuiApp(App):
         """
         return Container(
             Label("A2B Diff", classes="db-screen-title"),
-            AbDiffPanel(),
+            # batch-94 P4 fix (RC-2): the compose-time patches-folder listing
+            # decides whether the panel composes its check-spec row at all —
+            # the panel cannot scan for itself, and an empty listing must not
+            # reserve the row's rows against the hex panes. The live listing
+            # still rides ``set_check_files`` on every diff activation.
+            AbDiffPanel(check_files=self._scan_patch_change_files()),
             id="screen_diff",
             classes="db-screen hidden",
         )
@@ -6750,6 +6755,26 @@ class S19TuiApp(App):
             self._prefill_diff_check_files()
         elif screen_key == "patch":
             self._prefill_patch_change_files()
+            # batch-94 P4 fix (RC-3): apply the panel's window geometry NOW,
+            # from the laid-out workspace (the panel's height is the
+            # workspace's minus the 2-row screen-title chrome — measured at
+            # every shipped size), so the show's relayout lands on the right
+            # regime in ONE pass. From the panel's own ``on_resize`` the
+            # same application would arrive one reflow too late for
+            # single-pump drivers (the panel may not read ``self.app``, C-7,
+            # so the app threads the figure in — the ``refresh_entries``
+            # data-in idiom). A not-yet-mounted panel/workspace is tolerated
+            # as a no-op (the ``_prefill_*`` idiom) — ``on_resize`` applies
+            # the geometry once the tree exists.
+            from .screens_directionb import PatchEditorPanel
+
+            try:
+                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+                workspace_rows = self.query_one("#workspace_body").region.height
+            except Exception:
+                pass
+            else:
+                panel._apply_window_geometry(max(0, workspace_rows - 2))
         elif screen_key == "check_editor":
             # batch-94 (LLR-001.2): the collector is populated on entry — the
             # suffix-distinguished spec dropdown from the folder scan, and the
