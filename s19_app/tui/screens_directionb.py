@@ -8286,7 +8286,8 @@ class AbDiffPanel(Container):
             # not-yet-mounted subtree sees nothing) with these names as its
             # initial options (set_options needs the mounted overlay).
             row, _select = self._make_check_row(names)
-            self.mount(row, before=self.query_one("#diff_action_row"))
+            action_row = self.query_one("#diff_action_row")  # name, not Call — the address census (AT-B83-08) pins {literal, name, fstring}
+            self.mount(row, before=action_row)
             return
         select.set_options(self._check_select_options(names))
         select.value = ""
