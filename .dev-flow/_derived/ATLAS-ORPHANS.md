@@ -6,7 +6,7 @@
 - US/HLR/LLR in the batch record, never in the canon: **1104**
 - US/HLR/LLR in the canon, in no batch record: **4** — `LLR-045A`, `LLR-045D`, `LLR-051.1-.8`, `US-77`
 - corpus heading ids never in the canon: **328**
-- registry ids never mentioned by tests/: **543**
+- registry ids never mentioned by tests/: **542**
 
 ## UNPARSED census — what this Atlas failed to read (§5.3)
 

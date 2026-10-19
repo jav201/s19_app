@@ -4492,7 +4492,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-334` | batches, canon, tests |
 | `TC-335` | batches, canon, tests |
 | `TC-336` | batches, canon, tests |
-| `TC-337` | batches, canon |
+| `TC-337` | batches, canon, tests |
 | `TC-338` | batches, canon, tests |
 | `TC-339` | batches, canon, tests |
 | `TC-340` | batches |
