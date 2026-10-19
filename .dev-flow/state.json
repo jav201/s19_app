@@ -30,7 +30,7 @@
    "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
   }
  ],
- "current_station": "P4",
+ "current_station": "P3",
  "phase_status": "not-started",
  "stations_active": [
   "P0",
@@ -48,7 +48,7 @@
   "P0": 0,
   "P1": 0,
   "P2": 0,
-  "P3": 0,
+  "P3": 1,
   "P4": 0,
   "P5": 0,
   "P6": 0,
@@ -158,6 +158,11 @@
    "station": "DDR",
    "date": "2026-10-18",
    "decision": "DDR gate closed under the standing authorization -- every PDR condition discharged by re-reading (C-1..C-3, C-ux-1/2); carried notes: F3 the registry count line reconciles at P4, F4 the owner rulings (Inc-004 F1/F2 workspace-stats + filter chrome, the snapshot regen owner, A4 the operator field check) ride the P4/close review; the P4 gate suite runs in the background; Phase 4 validation is next."
+  },
+  {
+   "station": "P4",
+   "date": "2026-10-18",
+   "decision": "P4 gate run ONE (2026-10-18, 1:07:40, 3025 passed / 20 failed) reconciled by a two-sided probe: 16 of 20 are BATCH-94 regressions (green on pristine origin/main, red here, deterministic) with 5 root causes -- (1) the Inc-001 check_spec kwargs TypeError kills ALL A2B HTML diff reports (app.py forwards to generate_diff_report_html which lacks the params -- a shipped defect), (2) the new diff_check_row eats the diff hex area (0-5 rows at the B78 sizes, C-13 violation), (3) the Inc-001 auto-height overrides defeat the json-window fill tcss (4 fill invariants broken), (4) the two ratified rail bindings trip the B78/81 UNSANCTIONED-bindings censuses, (5) four census/DOM/token reconciliations (strip restructure walk, refresh_check_results census 2->3, the safe_text import census new file, the TC-337 token lost in the variants rewrite); 2 are the documented load-flake family, 2 are batch-95's pre-existing TC-707 missing-file pair. Feedback edge: black-box fails from implementation defects (requirements are right) => ITERATE-TO-FIX to P3. LESSON (postmortem): the per-increment reverse censuses keyed on symbol names, missing the SURFACE families (diff screen, patch strips) -- the P4 probe caught what the increment censuses did not."
   }
  ],
  "obsidian_synced": false,
