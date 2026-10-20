@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08d64bce6ea349c1 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 1ef5ff02d591ae55 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1635 unique id(s)
+## family US/HLR/LLR — 1643 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3028,6 +3028,14 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-131` | batches |
 | `US-132` | batches |
 | `US-133` | batches |
+| `US-134` | batches |
+| `US-134..137` | batches |
+| `US-134..US-139` | batches |
+| `US-135` | batches |
+| `US-136` | batches |
+| `US-137` | batches |
+| `US-138` | batches |
+| `US-139` | batches |
 | `US-77` | canon |
 | `US-77-1` | batches |
 | `US-77-2` | batches, canon |
