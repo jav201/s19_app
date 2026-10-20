@@ -37,7 +37,7 @@
     }
   ],
   "current_station": "P2",
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-gate",
   "stations_active": [
     "P0",
     "ARQ",
@@ -144,6 +144,11 @@
       "station": "P1",
       "date": "2026-10-20",
       "decision": "P1 iteration 2 approved under the standing authorization (Autonomo con excepciones) -- LED-2026-10-19-batch-97.3: every round-2 row routed to P1 resolved; operator decisions written as decided (hue pair #e8ad3d/#c9562b, notices #f6ff8f kept with the operator's reservation; Save/Write primary actions; one Builder chain per variant, LLR-104.6 retired for the Builder; JSON tab live with stamp); orchestrator decisions 5-10 marked revisable at PDR; 65 LLRs, 24 ATs, 65 TCs, 49 premises, 0 assumed flags; evidence moved to 01-requirements-appendix.md (non-normative). P2 round 3 is next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-20",
+      "decision": "P2 round 3 gate: iterate-to-refine forced by blocker Q3-1 (1 blocker, 11 major, 15 minor; security approved, LOW). Returning to P1 would be its third iteration -- the soft cap: STOPPED and surfaced to the operator (root cause named in PLAN.md) before any further amendment. Findings converge 33 -> 17 -> 11 majors, all bounded edits, no operator decision reopened."
     }
   ],
   "obsidian_synced": false,

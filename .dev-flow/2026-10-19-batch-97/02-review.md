@@ -209,3 +209,47 @@ security-reviewer: risk LOW, 0 blockers, 3 majors (S-1 directory check before la
 **security-reviewer** — what/where/why/fix ✓ · severity ✓ · no secrets ✓ · verdict explicit (BLOCK-UNTIL S2-2, LOW) ✓ · opener surface scoped ✓. Executed: junction probes (leaf, project-dir junction, dangling), two NUL `ValueError` reproductions.
 
 **ux-reviewer** — role file ✓ · read-only ✓ · captures inspected ✓ · executed hue math + truncation simulation over the 75 tags ✓ · walkthrough not driven (no implementation) ✗ · ISO 9241-210: expert inspection performed, automated walkthrough owed at P4, user evaluation not performed.
+
+---
+
+## Round 3 — contract at `b8feb8a` (after `LED-2026-10-19-batch-97.3`)
+
+### ✅ Verdict (round 3)
+
+- **Gate:** `iterate-to-refine` → Phase 1 forced by blocker Q3-1. Lenses: architect `iterate-to-refine` (0/3/5), qa `iterate-to-refine` (1/5/3), security **`approve`** (0/0/3, risk LOW, 0 HIGH), ux `iterate-to-refine` (0/3/4).
+- **Round-2 resolution:** every round-2 qa item resolved (Q2-1..Q2-10, most executed); architect 13 resolved · 2 partially (A2-7, A2-15); security S2-2, S2-3, S2-4, Q2-6 resolved, S2-1 partially; ux 11 resolved · 3 partially (U2-3, U2-4, U2-7) · 2 accepted/carried.
+- **New findings:** 1 blocker · 11 major · 15 minor. None reopens an operator decision.
+- **Convergence:** round 1 = 1 blocker / 33 major; round 2 = 1 / 17; round 3 = 1 / 11. Every round-3 finding is a bounded edit to one clause, one TC or one AT row.
+- **Iteration cap:** returning to P1 makes P1's third iteration — the soft cap (`stations/shared-batch.md` §Iteration cap). Stopped and surfaced to the operator before continuing.
+
+### New findings (round 3)
+
+| ID | Reviewer | Severity | Area / Req | What | Recommendation | Status |
+|----|----------|----------|------------|------|----------------|--------|
+| Q3-1 | qa | blocker | AT-B97-23, LLR-148.9 | The "run raises" arm cannot be built through the surface once LLR-146.14 removes the NUL raise (executed: NUL rebind raises at `variant_execution_service.py:273` on HEAD; a `reports` file is swallowed) | Keep the raise arm white-box (TC-B97-58/55); in the AT use NUL pasted into the rebind input → Bind → Run, expecting one English refusal naming `MANIFEST-PATH-ESCAPE`, 0 tracebacks | open → P1 |
+| Q3-2 | qa | major | AT-B97-22, LLR-147.2 | Rebind takes effect only on `#fx_bind_<i>_<j>`, which no LLR places (executed: outputs identical without Bind); RED arm not among the assertions | Place Bind in the SOURCE card + focus chain, press it in the driver; honest RED arm | open → P1 |
+| Q3-3 | qa | major | AT-B97-19 | Passes on `main` (executed keys-only) | Assert what the change adds: a kind chip new on main by `enter`, `flow_scope` absent from the chain, English banner | open → P1 |
+| Q3-4 | qa | major | LLR-148.6 / TC-B97-32 / AT-B97-14 | Help coverage collected from one displayed state; guards fillable by bindings/glyphs | Union over the driven states or composed controls; guards on controls only | open → P1 |
+| Q3-5 | qa | major | LLR-144.12 / TC-B97-60 | Requires non-focusable Statics in the focus chain (same as A3-3) | "each displayed focusable control" | open → P1 |
+| Q3-6 | qa | major | AT-B97-23 / TC-B97-58 | Read-only-dir write succeeds on Windows (executed) | Directory collision at the target or a read-only existing file (`PermissionError`, executed) | open → P1 |
+| Q3-7 | qa | minor | AT-B97-09, LLR-147.3 | Attention observed as a CSS class | Observe painted style | open → P1 |
+| Q3-8 | qa | minor | AT-B97-24, TC-B97-59 | `scroll_to_widget` is not a shipped control | `tab` / `pagedown` / wheel | open → P1 |
+| Q3-9 | qa | minor | LLR-144.12, 145.10 | Control tables hand-listed, no completeness guard (complete today) | Frozen-literal ⊆ table guard | open → P1 |
+| A3-1 | architect | major | HLR-144, LLR-144.6, IFC, TC-B97-06, AT-B97-02 | Stamp refreshes only on document writers; Save (`mark_saved`) and paste-buffer typing change the dirty flag without a document change → stale `saved`/`unsaved` (operator decision 4 unmet) | Trigger on the dirty-flag writers (P-48); Save and typing arms; SOURCE node | open → P1 |
+| A3-2 | architect | major | §1.3, HLR-149, LLR-149.2 vs 147.12 | Overflow predicate counts correctly scrolled cards (executed: unclipped regions inside `HorizontalScroll`) | Measure the clipped region; keep a non-scrolling RED arm | open → P1 |
+| A3-3 | architect | major | LLR-144.12, 145.10, TC-B97-60/61 | Same as Q3-5 for both editors | Restrict to focusable controls; split tables into controls / read-outs | open → P1 |
+| A3-4 | architect | minor | HLR-144, HLR-147, LLR-147.13, 148.10 | Compound EARS residue | One trigger per sentence | open → P1 |
+| A3-5 | architect | minor | HLR-146 vs LLR-146.14 | "refuse" vs "skip" for manifest entries | Align | open → P1 |
+| A3-6 | architect | minor | §3 preamble vs HLR-148 | `SeamSpy` vs "no wrapped service function" | Allow the OS-boundary seam | open → P1 |
+| A3-7 | architect | minor | LLR-148.8, §6.2 item 3 | Node count (11, not 6); guard order after create; create-on-press already shipped | Correct; settle item 3 | open → P1 |
+| A3-8 | architect | minor | whole file | 169,152 bytes | Hygiene | open → P1 (hygiene) |
+| S3-1 | security | minor | LLR-148.8 | Project-junction arm walks an unresolved path the app never holds (`app.py:8200` resolves) | Walk unresolved workarea projects, or declare the resolved dir the trust anchor | open → P1 |
+| S3-2 | security | minor | LLR-146.14 | "Path-bearing field" undefined; `stat()` still catches only `OSError` (`:903-906`, `:1463-1471`) | Enumerate fields; widen to `(OSError, ValueError)` | open → P1 |
+| S3-3 | security | minor | LLR-147.13 | `c` confirms the first waiting lane, not necessarily the one looked at | Name the lane in the status line; scope `c` to a focused lane | open → P1 (overlaps U3-1) |
+| U3-1 | ux | major | LLR-147.13, AT-B97-20, TC-B97-64 | `c` repeated confirms two waiting lanes / a re-wait | `c` only on the attention lane, once per waiting entry, attention moves after paint + minimum time; arms | open → P1 |
+| U3-2 | ux | major | §4 preamble (b), TC-B97-41/45/51/56 | Focus-chain completeness is circular (`focus_chain` is built from the same set) | Reference set by type and id, independent of `can_focus`; mutation on all four screens | open → P1 |
+| U3-3 | ux | major | LLR-147.12, 147.11, TC-B97-63 | Horizontal lane scroll has no keyboard path; `#fx_lanes_scroll` not in the order | Name it in the lanes group; `tab` + `right` arm | open → P1 |
+| U3-4 | ux | minor | LLR-145.3 | Fields name at 24 clips M/C class; full name shown nowhere at 118; not adaptive at 220 | Full-name line for the highlighted row; Fields name adaptive; risk row | open → P1 |
+| U3-5 | ux | minor | LLR-147.3, AT-B97-20 | REQUIRED line names no lane; `c` in a rebind input; scroll hides the focused input; stray `enter` re-runs | Name the chain; assert run count; decide stray-enter behaviour | open → P1 |
+| U3-6 | ux | minor | LLR-147.12, US-137 | Overflowed lane gives no at-a-glance status | Lane-header worst-status mark or overflow mark | open → P1 |
+| U3-7 | ux | minor | §1.3 selection style | Focused vs selected not required distinct | Three distinct states | open → P1 |

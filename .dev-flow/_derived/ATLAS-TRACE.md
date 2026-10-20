@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1720 unique id(s)
+## family US/HLR/LLR — 1721 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3107,6 +3107,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-132` | batches |
 | `US-133` | batches |
 | `US-134` | batches |
+| `US-134..137` | batches |
 | `US-134..US-139` | batches |
 | `US-135` | batches |
 | `US-136` | batches |
