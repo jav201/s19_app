@@ -253,3 +253,27 @@ security-reviewer: risk LOW, 0 blockers, 3 majors (S-1 directory check before la
 | U3-5 | ux | minor | LLR-147.3, AT-B97-20 | REQUIRED line names no lane; `c` in a rebind input; scroll hides the focused input; stray `enter` re-runs | Name the chain; assert run count; decide stray-enter behaviour | open → P1 |
 | U3-6 | ux | minor | LLR-147.12, US-137 | Overflowed lane gives no at-a-glance status | Lane-header worst-status mark or overflow mark | open → P1 |
 | U3-7 | ux | minor | §1.3 selection style | Focused vs selected not required distinct | Three distinct states | open → P1 |
+
+---
+
+## Scoped verification — contract at `217e699` + fold `LED-2026-10-19-batch-97.5` (operator's cap ruling: each lens checks only its own round-3 rows)
+
+### ✅ Verdict (final P2)
+
+- **Gate:** `approve` → PDR. Every blocker and major row of round 3 is closed; all four lenses returned `approve`.
+- **architect** — A3-1, A3-2 (probe re-run: clipped-region predicate scroll 0 / no-scroll 4; HEAD 7/2/1/1), A3-3..A3-7 closed; A3-8 (size, 190,495 bytes) left open as hygiene under the operator's no-restructure ruling.
+- **qa-reviewer** — Q3-1 (executed: `nul_bind` RED on HEAD with `ValueError` at `variant_execution_service.py:273`), Q3-2 (executed: Bind pressed vs not), Q3-3 (executed: three assertions RED on main), Q3-4, Q3-5 (executed column typing), Q3-6 (executed `PermissionError` at the staging path), Q3-7..Q3-9 (executed subset guard) closed.
+- **security-reviewer** — S3-1..S3-3 closed; `permission` scan flag answer adequate; risk LOW, 0 HIGH. S2-2's `stat()` widening is owed RED → GREEN at the Flow Builder increment gate.
+- **ux-reviewer** — U3-2, U3-4..U3-7 closed at `217e699`; U3-1 and U3-3 not closed there (each fix contradicted its own text: the burst arms lacked the dwell wait; "every control by enter/space" covered `#fx_lanes_scroll`, which binds arrows only). The orchestrator folded both sentences as `LED-2026-10-19-batch-97.5` (one-line edits, nothing added) and the same reviewer re-checked: both closed.
+
+### Carried to P3 / PDR (named, with owner)
+
+| ID | What | Owner |
+|----|------|-------|
+| A3-8 | contract size 190,495 bytes vs 54k budget (V26 NOTICE) | P5 lessons (hygiene) |
+| S2-2 / S3-2 | `stat()` handlers widened to `(OSError, ValueError)`; NUL arms RED → GREEN | Flow Builder increment |
+| Q-14 | `tests/test_id_registry.py:124` file count bumped per test-adding increment | each increment |
+| Q-18 | snapshot cells already `xfail(strict=False)` | Patch Editor increment |
+| U2-15 | `Size` label vs `Fmt` column term | Check Editor increment |
+| qa note | LLR-148.6 patch guard breakdown (19+7 vs 20+5+1) | PDR |
+| ux notes | `CONFIRM_DWELL_S` silent swallow feedback; stray-`enter` extra report | PDR |

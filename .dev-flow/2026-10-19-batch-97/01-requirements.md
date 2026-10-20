@@ -427,8 +427,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-144.10 — Patch Editor keyboard order
 - **Traceability:** HLR-144
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The Patch Editor's focus order shall run, with the Inspector tab active, header chips → ledger → tab chips → inspector form → entry chips → file row → document controls; with the JSON tab active, header chips → ledger → tab chips → JSON view → paste area → paste controls → history controls → execute row (→ save-back and before/after rows while offered) → file row → document controls; with the Checks tab active, header chips → ledger → tab chips → checks controls → file row → document controls. Every control in it shall be operable by `enter` or `space`, a focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
+- **Statement:** The Patch Editor's focus order shall run, with the Inspector tab active, header chips → ledger → tab chips → inspector form → entry chips → file row → document controls; with the JSON tab active, header chips → ledger → tab chips → JSON view → paste area → paste controls → history controls → execute row (→ save-back and before/after rows while offered) → file row → document controls; with the Checks tab active, header chips → ledger → tab chips → checks controls → file row → document controls. Every button and chip in it shall be operable by `enter` or `space` and every scroll view in it (the JSON view) by the arrow keys, a focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-41 — `pytest tests/test_b97_patch_editor.py -k tc_b97_41`; procedure: appendix A.4 TC-B97-41.
 - **Numeric pass threshold:** per tab state: 0 group inversions; ≥ 1 member in each group of that state; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group with its effect; 0 chips with two equal states among unfocused · focused · selected.
@@ -538,8 +538,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.8 — Check Editor keyboard order and include by key
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The Check Editor's focus order shall run header chips → parameter filter → parameter ledger → include chip → REPORT FIELDS tab chips → the active tab's controls (Fields: memory inputs and chips; JSON and Addendum: their scroll view) → spec row → docked row, and every control in it shall be operable by `enter` or `space`. When the engineer presses `space` on a highlighted ledger row, the panel shall toggle that parameter's inclusion. A focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
+- **Statement:** The Check Editor's focus order shall run header chips → parameter filter → parameter ledger → include chip → REPORT FIELDS tab chips → the active tab's controls (Fields: memory inputs and chips; JSON and Addendum: their scroll view) → spec row → docked row, and every button and chip in it shall be operable by `enter` or `space` and every scroll view in it by the arrow keys. When the engineer presses `space` on a highlighted ledger row, the panel shall toggle that parameter's inclusion. A focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-45 — `pytest tests/test_b97_check_editor.py -k tc_b97_45`; procedure: appendix A.4 TC-B97-45.
 - **Numeric pass threshold:** per tab state: 0 group inversions, ≥ 1 member per group, reference set (§4 method (b)) ⊆ chain set, one `enter` arm per button group, 0 chips with two equal states among unfocused · focused · selected; `space` → count N+1 then N.
@@ -706,8 +706,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-146.13 — Flow Builder keyboard order
 - **Traceability:** HLR-146
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The Flow Builder's focus order shall run header chips → kind chips → add inputs → Add → copy/paste strip → `Variables (n)` → funnel editor (while open) → foot row; every kind chip shall be focusable and set the kind on `enter` or `space`; every control shall be operable by `enter` or `space`; a focused chip shall paint a style different from its unfocused style, and a kind chip's unfocused, focused and selected styles shall be pairwise distinct.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
+- **Statement:** The Flow Builder's focus order shall run header chips → kind chips → add inputs → Add → copy/paste strip → `Variables (n)` → funnel editor (while open) → foot row; every kind chip shall be focusable and set the kind on `enter` or `space`; every button and chip shall be operable by `enter` or `space` and every scroll view by the arrow keys; a focused chip shall paint a style different from its unfocused style, and a kind chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-51 — `pytest tests/test_b97_flow_builder.py -k tc_b97_51`; procedure: appendix A.4 TC-B97-51.
 - **Numeric pass threshold:** 0 group inversions; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group; 7 of 7 kind chips set their kind by key; 0 chips with two equal states among unfocused · focused · selected.
@@ -835,8 +835,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.11 — Flow Execution keyboard order
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The Flow Execution focus order shall run header chips → `#fx_import` → mode control → `#fx_run` → set row → lanes group (`#fx_lanes_scroll`, then per lane: each rebind input followed by its Bind, then Confirm), every control shall be operable by `enter` or `space`, and a focused chip shall paint a style different from its unfocused style.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
+- **Statement:** The Flow Execution focus order shall run header chips → `#fx_import` → mode control → `#fx_run` → set row → lanes group (`#fx_lanes_scroll`, then per lane: each rebind input followed by its Bind, then Confirm), every button and chip shall be operable by `enter` or `space` and every scroll view (including `#fx_lanes_scroll`) by the arrow keys, and a focused chip shall paint a style different from its unfocused style.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-56 — `pytest tests/test_b97_flow_execution.py -k tc_b97_56`; procedure: appendix A.4 TC-B97-56.
 - **Numeric pass threshold:** 0 group inversions; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group; `fx_lanes_scroll` before `fx_in_0_0`; `fx_bind_1_0` right after `fx_in_1_0`; `fx_confirm_1` after `fx_bind_1_0` and before `fx_in_2_0`; 0 equal focused/unfocused chip styles.
@@ -855,7 +855,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.13 — A scoped key confirms the attention lane once per waiting entry
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
 - **Statement:** When the engineer presses `c` on the Flow Execution screen, the `FlowExecutionPanel` shall confirm the attention lane's (§1.3) current waiting entry exactly as a press of its `#fx_confirm_<i>` does, provided the focus lies outside a text input, that entry has not been confirmed already and it has held the attention for at least `CONFIRM_DWELL_S = 0.5` s (NEW); otherwise the key shall confirm nothing, and in a text input it types `c`. The help entry and the REQUIRED line shall name the key. If `enter` is pressed on `#fx_run` while a lane waits, then the panel shall start one new run of the set (LLR-147.10) and confirm nothing.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-64 — `pytest tests/test_b97_flow_execution.py -k tc_b97_64`; procedure: appendix A.4 TC-B97-64.
