@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3458" height="988" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">confirm-key · low</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M3284,168 C2284,168 2284,242 1285,242" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3271,116 C2278,116 2278,242 1285,242" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M205,104 C638,104 638,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M205,104 C1418,104 1418,104 2630,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3271,116 C2018,116 2018,254 765,254" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3271,116 C2538,116 2538,228 1805,228" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,156 C671,156 671,282 1070,282" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,156 C931,156 931,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1545,104 1545,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="101" fill="#334155" font-size="10">event</text>
+<path d="M980,268 C1285,268 1285,104 1590,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="1285" y="183" fill="#7c3aed" font-size="10">event</text>
+<path d="M980,268 C1025,268 1025,282 1070,282" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="1025" y="272" fill="#7c3aed" font-size="10">event</text>
+<path d="M1500,282 C1805,282 1805,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1805" y="190" fill="#334155" font-size="10">chains</text>
+<path d="M2020,104 C2065,104 2065,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="101" fill="#334155" font-size="10">chains</text>
+<path d="M2540,104 C2585,104 2585,104 2630,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2585" y="101" fill="#7c3aed" font-size="10">record</text>
+<path d="M2540,104 C2585,104 2585,310 2630,310" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2585" y="204" fill="#7c3aed" font-size="10">record</text>
+<path d="M1500,282 C1805,282 1805,296 2110,296" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="1805" y="286" fill="#7c3aed" font-size="10">message</text>
+<path d="M980,104 C1025,104 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="101" fill="#334155" font-size="10">inner</text>
+<path d="M1500,104 C2325,104 2325,156 3150,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2325" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C2325,104 2325,364 3150,364" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2325" y="231" fill="#334155" font-size="10">modify</text>
+<path d="M980,268 C2065,268 2065,312 3150,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2065" y="287" fill="#334155" font-size="10">modify</text>
+<path d="M1500,282 C2065,282 2065,104 2630,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2065" y="190" fill="#334155" font-size="10">inner</text>
+<path d="M2020,104 C2325,104 2325,310 2630,310" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2325" y="204" fill="#334155" font-size="10">inner</text>
+<path d="M2020,104 C2065,104 2065,296 2110,296" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2065" y="197" fill="#334155" font-size="10">inner</text>
+<path d="M2540,104 C2585,104 2585,554 2630,554" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2585" y="326" fill="#334155" font-size="10">inner</text>
+<path d="M2540,104 C2585,104 2585,488 2630,488" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2585" y="293" fill="#334155" font-size="10">inner</text>
+<path d="M3060,104 C3105,104 3105,104 3150,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M3060,104 C3105,104 3105,156 3150,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M3060,104 C3105,104 3105,208 3150,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M3060,104 C3105,104 3105,260 3150,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M3060,104 C3105,104 3105,312 3150,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M3060,310 C3105,310 3105,104 3150,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="204" fill="#334155" font-size="10">modify</text>
+<path d="M3060,310 C3105,310 3105,156 3150,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="230" fill="#334155" font-size="10">modify</text>
+<path d="M3060,310 C3105,310 3105,208 3150,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="256" fill="#334155" font-size="10">modify</text>
+<path d="M3060,310 C3105,310 3105,260 3150,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3105" y="282" fill="#334155" font-size="10">modify</text>
+<path d="M2540,296 C2845,296 2845,260 3150,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2845" y="275" fill="#334155" font-size="10">modify</text>
+<path d="M2540,296 C2845,296 2845,312 3150,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2845" y="301" fill="#334155" font-size="10">modify</text>
+<rect x="550" y="90" width="430" height="138" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="90" x2="553" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="90" x2="977" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="108" font-weight="bold" fill="#0f172a">_FlowExecutionSection.action_confirm_attention</text>
+<text x="560" y="122" font-weight="normal" fill="#0f172a">req: LLR-147.13, HLR-147</text>
+<text x="560" y="136" font-weight="normal" fill="#0f172a">in: _FlowExecutionSection self</text>
+<text x="560" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="164" font-weight="normal" fill="#0f172a">module: app.py</text>
+<text x="560" y="178" font-weight="normal" fill="#0f172a">inner: FlowExecutionPanel.confirm_attention</text>
+<text x="560" y="192" font-weight="normal" fill="#166534">examples: (AT-B97-20, synthetic) `c` with the focus on a</text>
+<text x="560" y="206" font-weight="normal" fill="#0f172a">header chip, lane 1 waiting for 0.6 s → the panel confirms</text>
+<text x="560" y="220" font-weight="normal" fill="#0f172a">lane 1</text>
+<rect x="1070" y="90" width="430" height="152" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="90" x2="1073" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="90" x2="1497" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="108" font-weight="bold" fill="#0f172a">FlowExecutionPanel.confirm_attention</text>
+<text x="1080" y="122" font-weight="normal" fill="#0f172a">req: LLR-147.13, LLR-147.3</text>
+<text x="1080" y="136" font-weight="normal" fill="#0f172a">in: FlowExecutionPanel self</text>
+<text x="1080" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="164" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="1080" y="178" font-weight="normal" fill="#0f172a">modify: [Data: FlowExecutionPanel attention] (append);</text>
+<text x="1080" y="192" font-weight="normal" fill="#0f172a">[Interface: status line] (replace)</text>
+<text x="1080" y="206" font-weight="normal" fill="#166534">examples: (TC-B97-64, synthetic) `press(&quot;c&quot;, &quot;c&quot;)`, two lanes</text>
+<text x="1080" y="220" font-weight="normal" fill="#0f172a">waiting, 0.049 s apart → 1 confirm (lane 0); lane 1 still</text>
+<text x="1080" y="234" font-weight="normal" fill="#0f172a">  waiting</text>
+<rect x="550" y="254" width="430" height="138" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="254" x2="553" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="254" x2="977" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="272" font-weight="bold" fill="#0f172a">FlowExecutionPanel.on_button_pressed</text>
+<text x="560" y="286" font-weight="normal" fill="#0f172a">req: LLR-147.4, LLR-147.10, LLR-147.13</text>
+<text x="560" y="300" font-weight="normal" fill="#0f172a">in: Button.Pressed event</text>
+<text x="560" y="314" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="328" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="560" y="342" font-weight="normal" fill="#0f172a">modify: [Interface: Run button] (replace)</text>
+<text x="560" y="356" font-weight="normal" fill="#166534">examples: (TC-1804, inferred) press `#fx_run` → run request</text>
+<text x="560" y="370" font-weight="normal" fill="#0f172a">{lanes 1 &quot;ext&quot;, mode &quot;sequential&quot;}; press `#fx_confirm_0` →</text>
+<text x="560" y="384" font-weight="normal" fill="#0f172a">confirmation {lane_index 0, block_index 1}</text>
+<rect x="1070" y="268" width="430" height="152" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="268" x2="1073" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="268" x2="1497" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="286" font-weight="bold" fill="#0f172a">S19TuiApp.on_flow_execution_panel_run_requested</text>
+<text x="1080" y="300" font-weight="normal" fill="#0f172a">req: LLR-147.10, LLR-148.9, HLR-147</text>
+<text x="1080" y="314" font-weight="normal" fill="#0f172a">in: FlowExecutionPanel.RunRequested event</text>
+<text x="1080" y="328" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="342" font-weight="normal" fill="#0f172a">module: app.py</text>
+<text x="1080" y="356" font-weight="normal" fill="#0f172a">inner: run_chain_set, FlowExecutionPanel.render_run,</text>
+<text x="1080" y="370" font-weight="normal" fill="#0f172a">  FlowExecutionPanel.render_run_error</text>
+<text x="1080" y="384" font-weight="normal" fill="#166534">examples: (TC-1804) event {lanes 1 {name &quot;ext&quot;, bindings (0,</text>
+<text x="1080" y="398" font-weight="normal" fill="#0f172a">&quot;base.s19&quot;)}, mode &quot;sequential&quot;, set_name &quot;chain-set&quot;} → None;</text>
+<text x="1080" y="412" font-weight="normal" fill="#0f172a">the record goes to render_run</text>
+<rect x="1590" y="90" width="430" height="138" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="90" x2="1593" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="90" x2="2017" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="108" font-weight="bold" fill="#0f172a">S19TuiApp.on_flow_execution_panel_external_step_confirmed</text>
+<text x="1600" y="122" font-weight="normal" fill="#0f172a">req: LLR-147.13</text>
+<text x="1600" y="136" font-weight="normal" fill="#0f172a">in: FlowExecutionPanel.ExternalStepConfirmed event</text>
+<text x="1600" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1600" y="164" font-weight="normal" fill="#0f172a">module: app.py</text>
+<text x="1600" y="178" font-weight="normal" fill="#0f172a">inner: run_chain_set, FlowExecutionPanel.apply_confirmed_run,</text>
+<text x="1600" y="192" font-weight="normal" fill="#0f172a">  FlowExecutionPanel.render_run_error</text>
+<text x="1600" y="206" font-weight="normal" fill="#166534">examples: (PROBE-2EXT) event {lane_index 0, block_index 1} →</text>
+<text x="1600" y="220" font-weight="normal" fill="#0f172a">None; the re-run record of lane 0 waits again, at block 2</text>
+<rect x="2110" y="90" width="430" height="166" fill="#ccfbf1" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="90" x2="2113" y2="256" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="90" x2="2537" y2="256" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="2116" y="138" width="418" height="14" fill="#fcd34d" opacity="0.45"/>
+<rect x="2116" y="152" width="418" height="14" fill="#fcd34d" opacity="0.45"/>
+<text x="2120" y="108" font-weight="normal" fill="#0f172a">run_chain_set</text>
+<text x="2120" y="122" font-weight="normal" fill="#0f172a">req: LLR-147.10, LLR-147.13</text>
+<text x="2120" y="136" font-weight="normal" fill="#0f172a">in: Sequence[ChainSpec] chains; FlowContext ctx; str mode =</text>
+<text x="2120" y="150" font-weight="normal" fill="#0f172a">CHAIN_RUN_SEQUENTIAL; str set_name = &quot;chain-set&quot;; (Callable)</text>
+<text x="2120" y="164" font-weight="normal" fill="#0f172a">(Flow, FlowContext-&gt;FlowRunResult)? run_one = None; (Callable)</text>
+<text x="2120" y="178" font-weight="normal" fill="#0f172a">(-&gt;float)? clock = None</text>
+<text x="2120" y="192" font-weight="normal" fill="#0f172a">out: ChainSetRunRecord record {mode, outcomes, report_path}</text>
+<text x="2120" y="206" font-weight="normal" fill="#0f172a">module: services/flow_execution_service.py</text>
+<text x="2120" y="220" font-weight="normal" fill="#0f172a">inner: run_flow, _chain_inputs</text>
+<text x="2120" y="234" font-weight="normal" fill="#166534">examples: (TC-1804) chains 1 {name &quot;ext&quot;}; mode &quot;sequential&quot; →</text>
+<text x="2120" y="248" font-weight="normal" fill="#0f172a">record {outcomes 1 {status &quot;paused&quot;, block 1 &quot;waiting&quot;}}</text>
+<rect x="2630" y="90" width="430" height="180" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="2633" y1="90" x2="2633" y2="270" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3057" y1="90" x2="3057" y2="270" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2640" y="108" font-weight="bold" fill="#0f172a">FlowExecutionPanel.render_run</text>
+<text x="2640" y="122" font-weight="normal" fill="#0f172a">req: LLR-147.3, LLR-147.10, LLR-147.13</text>
+<text x="2640" y="136" font-weight="normal" fill="#0f172a">in: ChainSetRunRecord record</text>
+<text x="2640" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="2640" y="164" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="2640" y="178" font-weight="normal" fill="#0f172a">modify: [Data: FlowExecutionPanel lanes] (replace); [Data:</text>
+<text x="2640" y="192" font-weight="normal" fill="#0f172a">FlowExecutionPanel attention] (replace); [Interface: lanes]</text>
+<text x="2640" y="206" font-weight="normal" fill="#0f172a">(replace); [Interface: run log] (replace); [Interface: Run</text>
+<text x="2640" y="220" font-weight="normal" fill="#0f172a">button] (replace)</text>
+<text x="2640" y="234" font-weight="normal" fill="#166534">examples: (TC-1804) record {outcomes 1 {status &quot;paused&quot;, block</text>
+<text x="2640" y="248" font-weight="normal" fill="#0f172a">1 &quot;waiting&quot;}} → None; lane 0 paused at block 1; Confirm of</text>
+<text x="2640" y="262" font-weight="normal" fill="#0f172a">lane 0 shown</text>
+<rect x="2630" y="296" width="430" height="152" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="2633" y1="296" x2="2633" y2="448" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3057" y1="296" x2="3057" y2="448" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2640" y="314" font-weight="bold" fill="#0f172a">FlowExecutionPanel.apply_confirmed_run</text>
+<text x="2640" y="328" font-weight="normal" fill="#0f172a">req: LLR-147.13</text>
+<text x="2640" y="342" font-weight="normal" fill="#0f172a">in: int lane_index; ChainSetRunRecord record</text>
+<text x="2640" y="356" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="2640" y="370" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="2640" y="384" font-weight="normal" fill="#0f172a">modify: [Data: FlowExecutionPanel lanes] (replace); [Data:</text>
+<text x="2640" y="398" font-weight="normal" fill="#0f172a">FlowExecutionPanel attention] (replace); [Interface: lanes]</text>
+<text x="2640" y="412" font-weight="normal" fill="#0f172a">(replace); [Interface: run log] (append)</text>
+<text x="2640" y="426" font-weight="normal" fill="#166534">examples: (TC-1804) lane_index 0; record {outcomes 1 {status</text>
+<text x="2640" y="440" font-weight="normal" fill="#0f172a">&quot;ok&quot;}} → None; Confirm of lane 0 hidden</text>
+<rect x="2110" y="282" width="430" height="138" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="282" x2="2113" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="282" x2="2537" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="300" font-weight="bold" fill="#0f172a">FlowExecutionPanel.render_run_error</text>
+<text x="2120" y="314" font-weight="normal" fill="#0f172a">req: LLR-147.10, LLR-148.9</text>
+<text x="2120" y="328" font-weight="normal" fill="#0f172a">in: str message</text>
+<text x="2120" y="342" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="2120" y="356" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="2120" y="370" font-weight="normal" fill="#0f172a">modify: [Interface: run log] (replace); [Interface: Run</text>
+<text x="2120" y="384" font-weight="normal" fill="#0f172a">button] (replace)</text>
+<text x="2120" y="398" font-weight="normal" fill="#166534">examples: (TC-B97-55, synthetic) message &quot;run failed:</text>
+<text x="2120" y="412" font-weight="normal" fill="#0f172a">ValueError&quot; → run log 1 line; `#fx_run` enabled</text>
+<rect x="2630" y="474" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="2640" y="492" font-weight="normal" fill="#0f172a">_chain_inputs</text>
+<text x="2640" y="506" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="2630" y="540" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="2640" y="558" font-weight="normal" fill="#0f172a">run_flow</text>
+<text x="2640" y="572" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="3150" y="90" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="108" font-weight="normal" fill="#0f172a">[Data: FlowExecutionPanel lanes]</text>
+<rect x="3150" y="142" width="267.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="160" font-weight="normal" fill="#0f172a">[Data: FlowExecutionPanel attention]</text>
+<rect x="30" y="90" width="175.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[I/O: monotonic clock]</text>
+<rect x="30" y="142" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="160" font-weight="normal" fill="#0f172a">[Data: S19TuiApp active project]</text>
+<rect x="3150" y="194" width="148.8" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="212" font-weight="normal" fill="#0f172a">[Interface: lanes]</text>
+<rect x="3150" y="246" width="162.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="264" font-weight="normal" fill="#0f172a">[Interface: run log]</text>
+<rect x="3150" y="298" width="181.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="316" font-weight="normal" fill="#0f172a">[Interface: Run button]</text>
+<rect x="3150" y="350" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3160" y="368" font-weight="normal" fill="#0f172a">[Interface: status line]</text>
+<rect x="30" y="650" width="3397.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="666" fill="#b91c1c">H-X1 · FlowExecutionPanel.apply_confirmed_run</text>
+<text x="40" y="680" fill="#b91c1c">what: after a confirmation the re-run can wait again at a second external step, but `apply_confirmed_run` always sets `paused_block = None` and hides Confirm. The lane shows no wait and offers no Confirm</text>
+<text x="40" y="694" fill="#b91c1c">decision: changes I-7 / Inc-6 scope: `apply_confirmed_run` derives `paused_block` from the waiting result, as `render_run` does (`flow_screens.py:2429-2445`), and re-arms the attention</text>
+<rect x="30" y="722" width="3397.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="738" fill="#b91c1c">H-X2 · [Data: FlowExecutionPanel attention]</text>
+<text x="40" y="752" fill="#b91c1c">what: the attention lane, the paint time of its wait and the set of confirmed entries are state that `confirm_attention` reads. No decision names this state, its writers or the post-paint hook that sets the dwell base</text>
+<text x="40" y="766" fill="#b91c1c">decision: adds to I-7: the attention state, its two writers and the `call_after_refresh` hook that stamps the dwell base</text>
+<rect x="30" y="794" width="3397.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="810" fill="#b91c1c">H-X3 · FlowExecutionPanel.apply_confirmed_run</text>
+<text x="40" y="824" fill="#b91c1c">what: the re-run lines of the run log use the absolute monotonic time and the status glyph without its word: &quot;29535:44.249 □ ext2 · done&quot;</text>
+<text x="40" y="838" fill="#b91c1c">decision: no D change. Record it in the Inc-6 scope beside H-X1 (same function)</text>
+<rect x="30" y="896" width="14" height="12" fill="#fce7f3" stroke="#334155"/>
+<text x="50" y="906" fill="#334155">s19_app/tui/app.py</text>
+<rect x="390" y="896" width="14" height="12" fill="#e0e7ff" stroke="#334155"/>
+<text x="410" y="906" fill="#334155">s19_app/tui/flow_screens.py</text>
+<rect x="750" y="896" width="14" height="12" fill="#ccfbf1" stroke="#334155"/>
+<text x="770" y="906" fill="#334155">s19_app/tui/services/flow_execution_service.py</text>
+</svg>

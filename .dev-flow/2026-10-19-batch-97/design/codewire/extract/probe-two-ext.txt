@@ -1,0 +1,5 @@
+S19_APP_FROM C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cw-wt\s19_app\__init__.py
+FIRST_RUN paused_block, confirm_display = (1, True)
+AFTER_CONFIRM paused_block, confirm_display, last_status = (None, False, 'paused')
+RUN_LOG_TAIL ["00:00.002 □ ext2 · ESPERANDO HUMANO — paso externo (block 2/4) · LOG 'run1.log' pendiente", '29535:44.247 ▶ ext2 · re-run tras confirmar paso externo', '29535:44.249 □ ext2 · done · wrote out1.s19']
+1 passed in 6.32s

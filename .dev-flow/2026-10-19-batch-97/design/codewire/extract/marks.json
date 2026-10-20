@@ -1,0 +1,292 @@
+{
+ "placed": [
+  {
+   "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+   "file": "s19_app/tui/app.py",
+   "line": 3090
+  },
+  {
+   "name": "S19TuiApp.action_patch_undo",
+   "file": "s19_app/tui/app.py",
+   "line": 3570
+  },
+  {
+   "name": "S19TuiApp.action_patch_redo",
+   "file": "s19_app/tui/app.py",
+   "line": 3597
+  },
+  {
+   "name": "S19TuiApp._apply_entry_json_edit",
+   "file": "s19_app/tui/app.py",
+   "line": 3793
+  },
+  {
+   "name": "S19TuiApp._refresh_patch_history_view",
+   "file": "s19_app/tui/app.py",
+   "line": 3416
+  },
+  {
+   "name": "S19TuiApp._patch_editor_load",
+   "file": "s19_app/tui/app.py",
+   "line": 5252
+  },
+  {
+   "name": "S19TuiApp._patch_editor_load_tail",
+   "file": "s19_app/tui/app.py",
+   "line": 5274
+  },
+  {
+   "name": "S19TuiApp._apply_prepared_load",
+   "file": "s19_app/tui/app.py",
+   "line": 10661
+  },
+  {
+   "name": "serialize_change_document",
+   "file": "s19_app/tui/changes/io.py",
+   "line": 1392
+  },
+  {
+   "name": "PatchEditorPanel.refresh_entries",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 6112
+  },
+  {
+   "name": "PatchEditorPanel._refresh_dirty_indicator",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5974
+  },
+  {
+   "name": "PatchEditorPanel.mark_saved",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5951
+  },
+  {
+   "name": "PatchEditorPanel.mark_loaded",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5962
+  },
+  {
+   "name": "PatchEditorPanel.request_action",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5748
+  },
+  {
+   "name": "PatchEditorPanel.on_text_area_changed",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5674
+  },
+  {
+   "name": "OpenFolderChip.__init__",
+   "file": "s19_app/tui/open_folder_chip.py",
+   "line": 72
+  },
+  {
+   "name": "OpenFolderChip.refresh_target",
+   "file": "s19_app/tui/open_folder_chip.py",
+   "line": 93
+  },
+  {
+   "name": "OpenFolderChip._open_target",
+   "file": "s19_app/tui/open_folder_chip.py",
+   "line": 141
+  },
+  {
+   "name": "resolve_chip_target",
+   "file": "s19_app/tui/services/folder_open_service.py",
+   "line": 233
+  },
+  {
+   "name": "create_chip_home",
+   "file": "s19_app/tui/services/folder_open_service.py",
+   "line": 281
+  },
+  {
+   "name": "_path_traverses_reparse_point",
+   "file": "s19_app/tui/workspace.py",
+   "line": 184
+  },
+  {
+   "name": "open_folder_in_file_manager",
+   "file": "s19_app/tui/services/folder_open_service.py",
+   "line": 129
+  },
+  {
+   "name": "load_flow_json",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 871
+  },
+  {
+   "name": "dict_to_flow",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 329
+  },
+  {
+   "name": "_parse_a2b_entry",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 650
+  },
+  {
+   "name": "_parse_external_step_entry",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 770
+  },
+  {
+   "name": "load_chain_set",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 1457
+  },
+  {
+   "name": "dict_to_chain_set",
+   "file": "s19_app/tui/services/flow_persistence_service.py",
+   "line": 1191
+  },
+  {
+   "name": "_resolve_manifest_entry",
+   "file": "s19_app/tui/services/variant_execution_service.py",
+   "line": 205
+  },
+  {
+   "name": "read_project_manifest",
+   "file": "s19_app/tui/services/variant_execution_service.py",
+   "line": 365
+  },
+  {
+   "name": "run_flow",
+   "file": "s19_app/tui/services/flow_execution_service.py",
+   "line": 171
+  },
+  {
+   "name": "_chain_inputs",
+   "file": "s19_app/tui/services/flow_execution_service.py",
+   "line": 1421
+  },
+  {
+   "name": "FlowExecutionPanel.on_button_pressed",
+   "file": "s19_app/tui/flow_screens.py",
+   "line": 2609
+  },
+  {
+   "name": "S19TuiApp.on_flow_execution_panel_run_requested",
+   "file": "s19_app/tui/app.py",
+   "line": 2776
+  },
+  {
+   "name": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+   "file": "s19_app/tui/app.py",
+   "line": 2824
+  },
+  {
+   "name": "run_chain_set",
+   "file": "s19_app/tui/services/flow_execution_service.py",
+   "line": 1445
+  },
+  {
+   "name": "FlowExecutionPanel.render_run",
+   "file": "s19_app/tui/flow_screens.py",
+   "line": 2399
+  },
+  {
+   "name": "FlowExecutionPanel.apply_confirmed_run",
+   "file": "s19_app/tui/flow_screens.py",
+   "line": 2502
+  },
+  {
+   "name": "FlowExecutionPanel.render_run_error",
+   "file": "s19_app/tui/flow_screens.py",
+   "line": 2545
+  },
+  {
+   "name": "PatchEditorPanel.on_resize",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 5596
+  },
+  {
+   "name": "PatchEditorPanel._render_before_after_card",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 6279
+  },
+  {
+   "name": "BeforeAfterCard.show_entry",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 4272
+  },
+  {
+   "name": "before_after_card_text",
+   "file": "s19_app/tui/screens_directionb.py",
+   "line": 4119
+  }
+ ],
+ "missing": [
+  {
+   "name": "S19TuiApp._patch_document_view",
+   "modulo": "s19_app/tui/app.py",
+   "why": "no def"
+  },
+  {
+   "name": "_FlowExecutionSection.action_confirm_attention",
+   "modulo": "s19_app/tui/app.py",
+   "why": "no def"
+  },
+  {
+   "name": "json_stamp_text",
+   "modulo": "s19_app/tui/screens_directionb.py",
+   "why": "no def"
+  },
+  {
+   "name": "patch_layout",
+   "modulo": "s19_app/tui/screens_directionb.py",
+   "why": "no def"
+  },
+  {
+   "name": "check_layout",
+   "modulo": "s19_app/tui/screens_directionb.py",
+   "why": "no def"
+  },
+  {
+   "name": "PatchEditorPanel._apply_layout",
+   "modulo": "s19_app/tui/screens_directionb.py",
+   "why": "no def"
+  },
+  {
+   "name": "CheckEditorPanel._apply_layout",
+   "modulo": "s19_app/tui/screens_directionb.py",
+   "why": "no def"
+  },
+  {
+   "name": "no_project_reason",
+   "modulo": "s19_app/tui/services/folder_open_service.py",
+   "why": "no def"
+  },
+  {
+   "name": "is_openable_chip_dir",
+   "modulo": "s19_app/tui/services/folder_open_service.py",
+   "why": "no def"
+  },
+  {
+   "name": "FlowExecutionPanel.confirm_attention",
+   "modulo": "s19_app/tui/flow_screens.py",
+   "why": "no def"
+  },
+  {
+   "name": "pipeline_layout",
+   "modulo": "s19_app/tui/flow_screens.py",
+   "why": "no def"
+  },
+  {
+   "name": "lane_layout",
+   "modulo": "s19_app/tui/flow_screens.py",
+   "why": "no def"
+  },
+  {
+   "name": "FlowBuilderPanel._apply_layout",
+   "modulo": "s19_app/tui/flow_screens.py",
+   "why": "no def"
+  },
+  {
+   "name": "FlowExecutionPanel._apply_layout",
+   "modulo": "s19_app/tui/flow_screens.py",
+   "why": "no def"
+  }
+ ],
+ "conflicts": []
+}

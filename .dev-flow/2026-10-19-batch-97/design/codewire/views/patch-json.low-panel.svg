@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2437" height="1544" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">patch-json · low panel</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M258,104 C404,104 404,840 550,840" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,260 C404,260 404,1038 550,1038" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,260 C404,260 404,906 550,906" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,260 C404,260 404,972 550,972" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M980,840 C1025,840 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="469" fill="#334155" font-size="10">document</text>
+<path d="M980,1038 C1025,1038 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="568" fill="#334155" font-size="10">rows</text>
+<path d="M980,906 C1025,906 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="502" fill="#334155" font-size="10">rows</text>
+<path d="M980,972 C1025,972 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="535" fill="#334155" font-size="10">rows</text>
+<path d="M980,774 C1025,774 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="436" fill="#334155" font-size="10">rows</text>
+<path d="M2227,116 C1756,116 1756,298 1285,298" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2227,116 C1756,116 1756,324 1285,324" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2254,168 C1769,168 1769,324 1285,324" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M139,208 C605,208 605,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1545,104 1545,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="101" fill="#334155" font-size="10">n</text>
+<path d="M1500,338 C1545,338 1545,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="218" fill="#334155" font-size="10">n</text>
+<path d="M2020,104 C2065,104 2065,312 2110,312" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1545,104 1545,240 1590,240" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="169" fill="#334155" font-size="10">inner</text>
+<path d="M1500,104 C1805,104 1805,156 2110,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C1805,104 1805,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C1805,104 1805,260 2110,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C1805,104 1805,312 2110,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M1500,338 C1805,338 1805,312 2110,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="322" fill="#334155" font-size="10">modify</text>
+<path d="M1500,338 C1805,338 1805,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="270" fill="#334155" font-size="10">modify</text>
+<path d="M980,104 C1025,104 1025,338 1070,338" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="218" fill="#334155" font-size="10">inner</text>
+<path d="M980,104 C1545,104 1545,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M980,268 C1025,268 1025,338 1070,338" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="300" fill="#334155" font-size="10">inner</text>
+<path d="M980,268 C1545,268 1545,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="183" fill="#334155" font-size="10">modify</text>
+<path d="M980,432 C1025,432 1025,338 1070,338" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="382" fill="#334155" font-size="10">inner</text>
+<path d="M980,432 C1545,432 1545,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="265" fill="#334155" font-size="10">modify</text>
+<path d="M980,596 C1025,596 1025,338 1070,338" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="464" fill="#334155" font-size="10">inner</text>
+<path d="M980,596 C1545,596 1545,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="347" fill="#334155" font-size="10">modify</text>
+<rect x="1070" y="90" width="430" height="208" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="90" x2="1073" y2="298" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="90" x2="1497" y2="298" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="108" font-weight="bold" fill="#0f172a">PatchEditorPanel.refresh_entries</text>
+<text x="1080" y="122" font-weight="normal" fill="#0f172a">req: LLR-144.5, LLR-144.6, LLR-144.7, LLR-148.9</text>
+<text x="1080" y="136" font-weight="normal" fill="#0f172a">in: Sequence[object] rows; Union[Mapping[int, int], None,</text>
+<text x="1080" y="150" font-weight="normal" fill="#0f172a">_Unset] mem_map = _UNSET; Union[PatchDocumentView, _Unset]</text>
+<text x="1080" y="164" font-weight="normal" fill="#0f172a">document = _UNSET</text>
+<text x="1080" y="178" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="192" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1080" y="206" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel._document_view] (replace);</text>
+<text x="1080" y="220" font-weight="normal" fill="#0f172a">[Interface: patch ledger] (replace); [Interface: patch json</text>
+<text x="1080" y="234" font-weight="normal" fill="#0f172a">view] (replace); [Interface: patch json stamp] (replace)</text>
+<text x="1080" y="248" font-weight="normal" fill="#0f172a">inner: json_stamp_text,</text>
+<text x="1080" y="262" font-weight="normal" fill="#0f172a">  PatchEditorPanel._render_before_after_card</text>
+<text x="1080" y="276" font-weight="normal" fill="#166534">examples: (TC-B94-10) rows 1 of 1 {address_text &quot;0x100&quot;,</text>
+<text x="1080" y="290" font-weight="normal" fill="#0f172a">value_text &quot;DE AD BE EF&quot;}; mem_map None → ledger 1 row</text>
+<rect x="1070" y="324" width="430" height="152" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="324" x2="1073" y2="476" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="324" x2="1497" y2="476" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="342" font-weight="bold" fill="#0f172a">PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="1080" y="356" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="1080" y="370" font-weight="normal" fill="#0f172a">in: PatchEditorPanel self</text>
+<text x="1080" y="384" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="398" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1080" y="412" font-weight="normal" fill="#0f172a">modify: [Interface: patch json stamp] (replace); [Interface:</text>
+<text x="1080" y="426" font-weight="normal" fill="#0f172a">patch ledger] (replace)</text>
+<text x="1080" y="440" font-weight="normal" fill="#0f172a">inner: json_stamp_text</text>
+<text x="1080" y="454" font-weight="normal" fill="#166534">examples: (TC-B94-10, inferred) 6 calls in the thread; the</text>
+<text x="1080" y="468" font-weight="normal" fill="#0f172a">SCRIPT subtitle marker follows the flag</text>
+<rect x="1590" y="90" width="430" height="110" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="90" x2="1593" y2="200" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="90" x2="2017" y2="200" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="108" font-weight="normal" fill="#0f172a">json_stamp_text</text>
+<text x="1600" y="122" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="1600" y="136" font-weight="normal" fill="#0f172a">in: int n; str hhmmss; bool dirty</text>
+<text x="1600" y="150" font-weight="normal" fill="#0f172a">out: str stamp</text>
+<text x="1600" y="164" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1600" y="178" font-weight="normal" fill="#166534">examples: (AT-B97-02, synthetic) n 7; hhmmss &quot;10:02:13&quot;; dirty</text>
+<text x="1600" y="192" font-weight="normal" fill="#0f172a">True → stamp &quot;7 entries · 10:02:13 · unsaved changes&quot;</text>
+<rect x="550" y="90" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="90" x2="553" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="90" x2="977" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="108" font-weight="bold" fill="#0f172a">PatchEditorPanel.mark_saved</text>
+<text x="560" y="122" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="560" y="136" font-weight="normal" fill="#0f172a">in: PatchEditorPanel self</text>
+<text x="560" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="164" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="178" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel._dirty] (clear)</text>
+<text x="560" y="192" font-weight="normal" fill="#0f172a">inner: PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="560" y="206" font-weight="normal" fill="#166534">examples: (TC-B94-10) after Save of the 1-entry document →</text>
+<text x="560" y="220" font-weight="normal" fill="#0f172a">None; the flag reads False</text>
+<rect x="550" y="254" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="254" x2="553" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="254" x2="977" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="272" font-weight="bold" fill="#0f172a">PatchEditorPanel.mark_loaded</text>
+<text x="560" y="286" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="560" y="300" font-weight="normal" fill="#0f172a">in: PatchEditorPanel self</text>
+<text x="560" y="314" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="328" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="342" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel._dirty] (clear)</text>
+<text x="560" y="356" font-weight="normal" fill="#0f172a">inner: PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="560" y="370" font-weight="normal" fill="#166534">examples: (TC-B94-10) after the Load of t.json → None; the</text>
+<text x="560" y="384" font-weight="normal" fill="#0f172a">flag reads False (2 calls in the thread)</text>
+<rect x="550" y="418" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="418" x2="553" y2="556" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="418" x2="977" y2="556" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="436" font-weight="bold" fill="#0f172a">PatchEditorPanel.request_action</text>
+<text x="560" y="450" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="560" y="464" font-weight="normal" fill="#0f172a">in: str action</text>
+<text x="560" y="478" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="492" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="506" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel._dirty] (replace)</text>
+<text x="560" y="520" font-weight="normal" fill="#0f172a">inner: PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="560" y="534" font-weight="normal" fill="#166534">examples: (TC-B94-10) action &quot;add_entry&quot; → None; the flag</text>
+<text x="560" y="548" font-weight="normal" fill="#0f172a">reads True</text>
+<rect x="550" y="582" width="430" height="152" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="582" x2="553" y2="734" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="582" x2="977" y2="734" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="600" font-weight="bold" fill="#0f172a">PatchEditorPanel.on_text_area_changed</text>
+<text x="560" y="614" font-weight="normal" fill="#0f172a">req: LLR-144.6</text>
+<text x="560" y="628" font-weight="normal" fill="#0f172a">in: TextArea.Changed event</text>
+<text x="560" y="642" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="656" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="670" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel._dirty] (replace)</text>
+<text x="560" y="684" font-weight="normal" fill="#0f172a">inner: PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="560" y="698" font-weight="normal" fill="#166534">examples: (TC-B94-10, inferred) one newline typed into</text>
+<text x="560" y="712" font-weight="normal" fill="#0f172a">`#patch_paste_text` → the flag reads True; the stamp is the</text>
+<text x="560" y="726" font-weight="normal" fill="#0f172a">only repaint (P-57)</text>
+<rect x="1590" y="226" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="1600" y="244" font-weight="bold" fill="#0f172a">PatchEditorPanel._render_before_after_card</text>
+<text x="1600" y="258" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="760" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="778" font-weight="bold" fill="#0f172a">S19TuiApp._apply_prepared_load</text>
+<text x="560" y="792" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="826" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="844" font-weight="bold" fill="#0f172a">S19TuiApp._patch_document_view</text>
+<text x="560" y="858" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="892" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="910" font-weight="bold" fill="#0f172a">S19TuiApp._patch_editor_load_tail</text>
+<text x="560" y="924" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="958" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="976" font-weight="bold" fill="#0f172a">S19TuiApp._refresh_patch_history_view</text>
+<text x="560" y="990" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="1024" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="1042" font-weight="bold" fill="#0f172a">S19TuiApp.on_patch_editor_panel_action_requested</text>
+<text x="560" y="1056" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="30" y="90" width="228.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[Data: ChangeService.document]</text>
+<rect x="2110" y="90" width="234.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="108" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel._dirty]</text>
+<rect x="2110" y="142" width="287.4" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="160" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel._document_view]</text>
+<rect x="30" y="142" width="175.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="160" font-weight="normal" fill="#0f172a">[I/O: change-set file]</text>
+<rect x="30" y="194" width="109.19999999999999" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="212" font-weight="normal" fill="#0f172a">[I/O: clock]</text>
+<rect x="30" y="246" width="228.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="264" font-weight="normal" fill="#0f172a">[Data: S19TuiApp.current_file]</text>
+<rect x="2110" y="194" width="195.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="212" font-weight="normal" fill="#0f172a">[Interface: patch ledger]</text>
+<rect x="2110" y="246" width="214.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="264" font-weight="normal" fill="#0f172a">[Interface: patch json view]</text>
+<rect x="2110" y="298" width="221.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="316" font-weight="normal" fill="#0f172a">[Interface: patch json stamp]</text>
+<rect x="30" y="1134" width="2377.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1150" fill="#b91c1c">H-P1 · S19TuiApp.on_patch_editor_panel_action_requested ──▶ PatchEditorPanel.refresh_entries.rows</text>
+<text x="40" y="1164" fill="#b91c1c">what: every Patch Editor action ends at `app.py:3265` with a `refresh_entries` call, Save included. With D1 that call also carries `document=`</text>
+<text x="40" y="1178" fill="#b91c1c">decision: no change to D4. TC-B97-06 names the typing arm as the RED arm of that mutation, or D1 passes `document=` only when the document changed</text>
+<rect x="30" y="1206" width="2377.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1222" fill="#b91c1c">H-P2 · S19TuiApp._patch_document_view ──▶ serialize_change_document.document</text>
+<text x="40" y="1236" fill="#b91c1c">what: the serialiser runs once for each `refresh_entries` call, not once for each document write. That is 11 action kinds, undo, redo, entry JSON edit, every image load, and two times for one Load by button</text>
+<text x="40" y="1250" fill="#b91c1c">decision: changes D1 or §6.2. Build the view only when a document revision changed (the writers mutate in place, so object identity is not a key). Or keep D1 and measure the 100,000-entry cost per action</text>
+<rect x="30" y="1278" width="2377.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1294" fill="#b91c1c">H-P3 · [Data: PatchEditorPanel._document_view] ──▶ PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="40" y="1308" fill="#b91c1c">what: D4 composes the stamp in `_refresh_dirty_indicator` from `n` and `hhmmss`, but no design element keeps them. The graph needs a retained view with its refresh time, and its initial value</text>
+<text x="40" y="1322" fill="#b91c1c">decision: D2/D4 add the retained field and say which time the stamp shows. LLR-148.9 names the fresh-start state of the JSON view</text>
+<rect x="30" y="1350" width="2377.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1366" fill="#b91c1c">H-P4 · serialize_change_document.wire ──▶ S19TuiApp._patch_document_view.view.json_text</text>
+<text x="40" y="1380" fill="#b91c1c">what: the serialiser returns `bytes`. D2 types `json_text` as `str`</text>
+<text x="40" y="1394" fill="#b91c1c">decision: none. Record the decode in D2</text>
+<rect x="30" y="1452" width="14" height="12" fill="#ecfccb" stroke="#334155"/>
+<text x="50" y="1462" fill="#334155">s19_app/tui/screens_directionb.py</text>
+</svg>

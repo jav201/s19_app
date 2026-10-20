@@ -1,0 +1,104 @@
+{
+ "dict_to_flow": [
+  {
+   "test": "tests/test_flow_persistence.py::test_security_battery_dict[traversal]",
+   "depth": 0,
+   "in": {
+    "payload": {
+     "schema_version": 1,
+     "name": "nightly-release",
+     "blocks": [
+      {
+       "kind": "source",
+       "image_ref": "prg.s19",
+       "file_type": "hex"
+      },
+      {
+       "kind": "patch",
+       "change_doc_ref": "calib_patch.json"
+      },
+      {
+       "kind": "check",
+       "check_doc_ref": "post_checks.json",
+       "gating": "block-own-op"
+      },
+      {
+       "kind": "crc",
+       "config_ref": "../../other/secrets.json"
+      },
+      {
+       "kind": "write_out",
+       "output_name": "prg_patched.s19",
+       "fmt": "hex"
+      }
+     ]
+    },
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "MANIFEST-PATH-ESCAPE",
+       "severity": "error",
+       "message": "manifest blocks[3].config_ref entry escapes the project directory - entry skipped: '../../other/secrets.json'",
+       "artifact": "manifest",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ]
+  }
+ ],
+ "_resolve_manifest_entry": [
+  {
+   "test": "tests/test_flow_persistence.py::test_security_battery_dict[traversal]",
+   "depth": 1,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj",
+    "raw_entry": "prg.s19",
+    "context": "blocks[0].image_ref",
+    "issues": []
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj\\prg.s19"
+  },
+  {
+   "test": "tests/test_flow_persistence.py::test_security_battery_dict[traversal]",
+   "depth": 1,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj",
+    "raw_entry": "calib_patch.json",
+    "context": "blocks[1].change_doc_ref",
+    "issues": []
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj\\calib_patch.json"
+  },
+  {
+   "test": "tests/test_flow_persistence.py::test_security_battery_dict[traversal]",
+   "depth": 1,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj",
+    "raw_entry": "post_checks.json",
+    "context": "blocks[2].check_doc_ref",
+    "issues": []
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj\\post_checks.json"
+  },
+  {
+   "test": "tests/test_flow_persistence.py::test_security_battery_dict[traversal]",
+   "depth": 1,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20966\\test_security_battery_dict_tra0\\.s19tool\\workarea\\proj",
+    "raw_entry": "../../other/secrets.json",
+    "context": "blocks[3].config_ref",
+    "issues": []
+   },
+   "out": null
+  }
+ ]
+}

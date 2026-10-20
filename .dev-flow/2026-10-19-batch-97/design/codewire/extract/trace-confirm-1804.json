@@ -1,0 +1,281 @@
+{
+ "S19TuiApp.on_flow_execution_panel_run_requested": [
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 0,
+   "in": {
+    "event": {
+     "RunRequested": {
+      "lanes": [
+       {
+        "FxLaneSpec": {
+         "name": "ext",
+         "template": "ext",
+         "flow": {
+          "Flow": {
+           "name": "ext",
+           "blocks": "[SourceBlock(image_ref='base.s19', file_type='s19', a2l_ref=None, kind='source'), ExternalStepBlock(mode='terminal', instruction='python herramienta.py --release', log_ref='run.log', output_path='C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\",
+           "schema_version": 1,
+           "funnel": "()"
+          }
+         },
+         "bindings": [
+          "(0, 'base.s19')"
+         ],
+         "outputs": []
+        }
+       }
+      ],
+      "mode": "sequential",
+      "set_name": "chain-set"
+     }
+    }
+   },
+   "out": null
+  }
+ ],
+ "run_chain_set": [
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 1,
+   "in": {
+    "chains": [
+     {
+      "ChainSpec": {
+       "name": "ext",
+       "template": "ext",
+       "flow": {
+        "Flow": {
+         "name": "ext",
+         "blocks": [
+          "SourceBlock(image_ref='base.s19', file_type='s19', a2l_ref=None, kind='source')",
+          "ExternalStepBlock(mode='terminal', instruction='python herramienta.py --release', log_ref='run.log', output_path='C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\externo\\\\salida.s19', kind='external_step')",
+          "WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')"
+         ],
+         "schema_version": 1,
+         "funnel": []
+        }
+       },
+       "bindings": {
+        "0x0": "base.s19"
+       }
+      }
+     }
+    ],
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": null
+     }
+    },
+    "mode": "sequential",
+    "set_name": "chain-set"
+   },
+   "out": {
+    "ChainSetRunRecord": {
+     "mode": "sequential",
+     "outcomes": [
+      {
+       "ChainRunOutcome": {
+        "chain": "ext",
+        "template": "ext",
+        "status": "paused",
+        "block_results": [
+         "BlockResult(index=0, kind='source', status='ok', summary='loaded base.s19 (1 ranges)', diagnostics=[], findings=[])",
+         "BlockResult(index=1, kind='external_step', status='waiting', summary=\"paused - esperando humano: comando 'python herramienta.py --release' | LOG 'run.log' + SALIDA 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\externo\\\\salida.s19' pendientes",
+         "BlockResult(index=2, kind='write_out', status='skipped', summary='skipped (waiting on external step)', diagnostics=[], findings=[])"
+        ],
+        "written_paths": [],
+        "inputs": [
+         "('base.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\.s19tool\\\\workarea\\\\proj\\\\base.s19')"
+        ],
+        "started_at": 1772506.2429925,
+        "finished_at": 1772506.2445751,
+        "diagnostics": []
+       }
+      }
+     ],
+     "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\reports\\20261020T165100Z-chain-set-report.md",
+     "diagnostics": []
+    }
+   }
+  },
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 1,
+   "in": {
+    "chains": [
+     {
+      "ChainSpec": {
+       "name": "ext",
+       "template": "ext",
+       "flow": {
+        "Flow": {
+         "name": "ext",
+         "blocks": [
+          "SourceBlock(image_ref='base.s19', file_type='s19', a2l_ref=None, kind='source')",
+          "ExternalStepBlock(mode='terminal', instruction='python herramienta.py --release', log_ref='run.log', output_path='C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\externo\\\\salida.s19', kind='external_step')",
+          "WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')"
+         ],
+         "schema_version": 1,
+         "funnel": []
+        }
+       },
+       "bindings": {
+        "0x0": "base.s19"
+       }
+      }
+     }
+    ],
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": {
+       "0x1": {
+        "ExternalStepConfirmation": {
+         "block_index": 1,
+         "log_ref": "run.log",
+         "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\externo\\salida.s19"
+        }
+       }
+      }
+     }
+    },
+    "mode": "sequential",
+    "set_name": "chain-set"
+   },
+   "out": {
+    "ChainSetRunRecord": {
+     "mode": "sequential",
+     "outcomes": [
+      {
+       "ChainRunOutcome": {
+        "chain": "ext",
+        "template": "ext",
+        "status": "ok",
+        "block_results": [
+         "BlockResult(index=0, kind='source', status='ok', summary='loaded base.s19 (1 ranges)', diagnostics=[], findings=[])",
+         "BlockResult(index=1, kind='external_step', status='ok', summary=\"log 'run.log' recibido · salida copiada a salida.s19 (sesion)\", diagnostics=[], findings=[])",
+         "BlockResult(index=2, kind='write_out', status='ok', summary='wrote out.s19', diagnostics=[], findings=[])"
+        ],
+        "written_paths": [
+         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\salida.s19",
+         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\out.s19"
+        ],
+        "inputs": [
+         "('base.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\.s19tool\\\\workarea\\\\proj\\\\base.s19')"
+        ],
+        "started_at": 1772508.7210507,
+        "finished_at": 1772508.7319772,
+        "diagnostics": []
+       }
+      }
+     ],
+     "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\reports\\20261020T165102Z-chain-set-report.md",
+     "diagnostics": []
+    }
+   }
+  }
+ ],
+ "FlowExecutionPanel.render_run": [
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 1,
+   "in": {
+    "record": {
+     "ChainSetRunRecord": {
+      "mode": "sequential",
+      "outcomes": [
+       {
+        "ChainRunOutcome": {
+         "chain": "ext",
+         "template": "ext",
+         "status": "paused",
+         "block_results": [
+          "BlockResult(index=0, kind='source', status='ok', summary='loaded base.s19 (1 ranges)', diagnostics=[], findings=[])",
+          "BlockResult(index=1, kind='external_step', status='waiting', summary=\"paused - esperando humano: comando 'python herramienta.py --release' | LOG 'run.log' + SALIDA 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\externo\\\\salida.s19' pendientes",
+          "BlockResult(index=2, kind='write_out', status='skipped', summary='skipped (waiting on external step)', diagnostics=[], findings=[])"
+         ],
+         "written_paths": [],
+         "inputs": [
+          "('base.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\.s19tool\\\\workarea\\\\proj\\\\base.s19')"
+         ],
+         "started_at": 1772506.2429925,
+         "finished_at": 1772506.2445751,
+         "diagnostics": []
+        }
+       }
+      ],
+      "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\reports\\20261020T165100Z-chain-set-report.md",
+      "diagnostics": []
+     }
+    }
+   },
+   "out": null
+  }
+ ],
+ "S19TuiApp.on_flow_execution_panel_external_step_confirmed": [
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 0,
+   "in": {
+    "event": {
+     "ExternalStepConfirmed": {
+      "lane_index": 0,
+      "block_index": 1
+     }
+    }
+   },
+   "out": null
+  }
+ ],
+ "FlowExecutionPanel.apply_confirmed_run": [
+  {
+   "test": "tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun",
+   "depth": 1,
+   "in": {
+    "lane_index": 0,
+    "record": {
+     "ChainSetRunRecord": {
+      "mode": "sequential",
+      "outcomes": [
+       {
+        "ChainRunOutcome": {
+         "chain": "ext",
+         "template": "ext",
+         "status": "ok",
+         "block_results": [
+          "BlockResult(index=0, kind='source', status='ok', summary='loaded base.s19 (1 ranges)', diagnostics=[], findings=[])",
+          "BlockResult(index=1, kind='external_step', status='ok', summary=\"log 'run.log' recibido · salida copiada a salida.s19 (sesion)\", diagnostics=[], findings=[])",
+          "BlockResult(index=2, kind='write_out', status='ok', summary='wrote out.s19', diagnostics=[], findings=[])"
+         ],
+         "written_paths": [
+          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\salida.s19",
+          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\out.s19"
+         ],
+         "inputs": [
+          "('base.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-20970\\\\test_tc1804_fx_lane_pause_conf0\\\\.s19tool\\\\workarea\\\\proj\\\\base.s19')"
+         ],
+         "started_at": 1772508.7210507,
+         "finished_at": 1772508.7319772,
+         "diagnostics": []
+        }
+       }
+      ],
+      "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20970\\test_tc1804_fx_lane_pause_conf0\\.s19tool\\workarea\\proj\\reports\\20261020T165102Z-chain-set-report.md",
+      "diagnostics": []
+     }
+    }
+   },
+   "out": null
+  }
+ ]
+}

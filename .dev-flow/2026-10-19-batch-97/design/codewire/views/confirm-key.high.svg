@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2360" height="766" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">confirm-key · high level</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M2195,168 C1515,168 1515,116 835,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2191,116 C1513,116 1513,116 835,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M205,104 C458,104 458,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M205,104 C968,104 968,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2191,116 C1343,116 1343,142 495,142" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2191,116 C1683,116 1683,116 1175,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,156 C491,156 491,156 710,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,156 C661,156 661,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,104 C1005,104 1005,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,156 C835,156 835,104 1050,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M620,156 C665,156 665,156 710,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M960,156 C1175,156 1175,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1300,104 C1345,104 1345,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,104 1730,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M1640,104 C1685,104 1685,156 1730,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M960,156 C1175,156 1175,156 1390,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M620,104 C665,104 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,104 C1515,104 1515,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M960,104 C1515,104 1515,364 2070,364" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="231" fill="#334155" font-size="10">modify</text>
+<path d="M620,156 C1345,156 1345,312 2070,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1345" y="231" fill="#334155" font-size="10">modify</text>
+<path d="M960,156 C1345,156 1345,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1300,104 C1515,104 1515,156 1730,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1300,104 C1345,104 1345,156 1390,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,274 1730,274" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,208 1730,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1980,104 C2025,104 2025,104 2070,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M1980,104 C2025,104 2025,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1980,104 C2025,104 2025,208 2070,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M1980,104 C2025,104 2025,260 2070,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1980,104 C2025,104 2025,312 2070,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M1980,156 C2025,156 2025,104 2070,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1980,156 C2025,156 2025,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M1980,156 C2025,156 2025,208 2070,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1980,156 C2025,156 2025,260 2070,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M1640,156 C1855,156 1855,260 2070,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M1640,156 C1855,156 1855,312 2070,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="231" fill="#334155" font-size="10">modify</text>
+<rect x="370" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="90" x2="373" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="90" x2="617" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="108" font-weight="bold" fill="#0f172a">_FlowExecutionSection.action_confirm_attention</text>
+<rect x="710" y="90" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="90" x2="713" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="90" x2="957" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="108" font-weight="bold" fill="#0f172a">FlowExecutionPanel.confirm_attention</text>
+<rect x="370" y="142" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="142" x2="373" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="142" x2="617" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="160" font-weight="bold" fill="#0f172a">FlowExecutionPanel.on_button_pressed</text>
+<rect x="710" y="142" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="142" x2="713" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="142" x2="957" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="160" font-weight="bold" fill="#0f172a">S19TuiApp.on_flow_execution_panel_run_requested</text>
+<rect x="1050" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="90" x2="1053" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="90" x2="1297" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="108" font-weight="bold" fill="#0f172a">S19TuiApp.on_flow_execution_panel_external_step_confirmed</text>
+<rect x="1390" y="90" width="250" height="26" fill="#ccfbf1" stroke="#334155" stroke-width="1"/>
+<line x1="1393" y1="90" x2="1393" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1637" y1="90" x2="1637" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1400" y="108" font-weight="normal" fill="#0f172a">run_chain_set</text>
+<rect x="1730" y="90" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="90" x2="1733" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="90" x2="1977" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="108" font-weight="bold" fill="#0f172a">FlowExecutionPanel.render_run</text>
+<rect x="1730" y="142" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="142" x2="1733" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="142" x2="1977" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="160" font-weight="bold" fill="#0f172a">FlowExecutionPanel.apply_confirmed_run</text>
+<rect x="1390" y="142" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1393" y1="142" x2="1393" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1637" y1="142" x2="1637" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1400" y="160" font-weight="bold" fill="#0f172a">FlowExecutionPanel.render_run_error</text>
+<rect x="1730" y="194" width="250" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="1740" y="212" font-weight="normal" fill="#0f172a">_chain_inputs</text>
+<text x="1740" y="226" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="1730" y="260" width="250" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="1740" y="278" font-weight="normal" fill="#0f172a">run_flow</text>
+<text x="1740" y="292" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="2070" y="90" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="108" font-weight="normal" fill="#0f172a">[Data: FlowExecutionPanel lanes]</text>
+<rect x="2070" y="142" width="250" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="160" font-weight="normal" fill="#0f172a">[Data: FlowExecutionPanel attention]</text>
+<rect x="30" y="90" width="175.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[I/O: monotonic clock]</text>
+<rect x="30" y="142" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="160" font-weight="normal" fill="#0f172a">[Data: S19TuiApp active project]</text>
+<rect x="2070" y="194" width="148.8" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="212" font-weight="normal" fill="#0f172a">[Interface: lanes]</text>
+<rect x="2070" y="246" width="162.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="264" font-weight="normal" fill="#0f172a">[Interface: run log]</text>
+<rect x="2070" y="298" width="181.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="316" font-weight="normal" fill="#0f172a">[Interface: Run button]</text>
+<rect x="2070" y="350" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2080" y="368" font-weight="normal" fill="#0f172a">[Interface: status line]</text>
+<rect x="30" y="446" width="2300" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="462" fill="#b91c1c">H-X1 · FlowExecutionPanel.apply_confirmed_run</text>
+<text x="40" y="476" fill="#b91c1c">what: after a confirmation the re-run can wait again at a second external step, but `apply_confirmed_run` always sets `paused_block = None` and hides Confirm. The lane shows no wait and offers no Confirm</text>
+<text x="40" y="490" fill="#b91c1c">decision: changes I-7 / Inc-6 scope: `apply_confirmed_run` derives `paused_block` from the waiting result, as `render_run` does (`flow_screens.py:2429-2445`), and re-arms the attention</text>
+<rect x="30" y="518" width="2300" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="534" fill="#b91c1c">H-X2 · [Data: FlowExecutionPanel attention]</text>
+<text x="40" y="548" fill="#b91c1c">what: the attention lane, the paint time of its wait and the set of confirmed entries are state that `confirm_attention` reads. No decision names this state, its writers or the post-paint hook that sets the dwell base</text>
+<text x="40" y="562" fill="#b91c1c">decision: adds to I-7: the attention state, its two writers and the `call_after_refresh` hook that stamps the dwell base</text>
+<rect x="30" y="590" width="2300" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="606" fill="#b91c1c">H-X3 · FlowExecutionPanel.apply_confirmed_run</text>
+<text x="40" y="620" fill="#b91c1c">what: the re-run lines of the run log use the absolute monotonic time and the status glyph without its word: &quot;29535:44.249 □ ext2 · done&quot;</text>
+<text x="40" y="634" fill="#b91c1c">decision: no D change. Record it in the Inc-6 scope beside H-X1 (same function)</text>
+<rect x="30" y="692" width="14" height="12" fill="#fce7f3" stroke="#334155"/>
+<text x="50" y="702" fill="#334155">s19_app/tui/app.py</text>
+<rect x="390" y="692" width="14" height="12" fill="#e0e7ff" stroke="#334155"/>
+<text x="410" y="702" fill="#334155">s19_app/tui/flow_screens.py</text>
+<rect x="750" y="692" width="14" height="12" fill="#ccfbf1" stroke="#334155"/>
+<text x="770" y="702" fill="#334155">s19_app/tui/services/flow_execution_service.py</text>
+</svg>

@@ -37,7 +37,7 @@
     }
   ],
   "current_station": "PDR",
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-gate",
   "stations_active": [
     "P0",
     "ARQ",

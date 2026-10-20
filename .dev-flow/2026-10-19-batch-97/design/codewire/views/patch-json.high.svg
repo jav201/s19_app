@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2700" height="908" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">patch-json · high level</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M205,104 C458,104 458,156 710,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2524,116 C2190,116 2190,116 1855,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,208 C314,208 314,104 370,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,208 C654,208 654,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M258,208 C484,208 484,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1980,104 C2025,104 2025,104 2070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2195,116 C2025,116 2025,116 1855,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1980,104 C2025,104 2025,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,104 C1345,104 1345,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1300,104 C1685,104 1685,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,104 C1515,104 1515,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,312 C1345,312 1345,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2527,168 C2361,168 2361,168 2195,168" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2527,168 C2021,168 2021,116 1515,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2535,220 C2025,220 2025,116 1515,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M139,156 C1105,156 1105,156 2070,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2195,168 C2025,168 2025,168 1855,168" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,156 1730,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1980,156 C2195,156 2195,364 2410,364" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,104 C665,104 665,156 710,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,104 C1175,104 1175,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,104 C665,104 665,208 710,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,104 C835,104 835,156 1050,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,104 C1515,104 1515,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M620,156 C665,156 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,156 C1515,156 1515,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M620,208 C665,208 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,208 C1515,208 1515,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M620,260 C665,260 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,260 C1515,260 1515,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M960,104 C1345,104 1345,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,156 C1005,156 1005,156 1050,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,156 C1005,156 1005,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,156 C1685,156 1685,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1685" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1300,104 C1515,104 1515,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,312 C1175,312 1175,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M2195,168 C2025,168 2025,194 1855,194" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M2320,156 C2365,156 2365,208 2410,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2365" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M2320,156 C2365,156 2365,260 2410,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2365" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M2320,156 C2365,156 2365,312 2410,312" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2365" y="231" fill="#334155" font-size="10">modify</text>
+<path d="M2320,156 C2365,156 2365,364 2410,364" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2365" y="257" fill="#334155" font-size="10">modify</text>
+<path d="M1640,104 C2025,104 2025,364 2410,364" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="231" fill="#334155" font-size="10">modify</text>
+<path d="M1640,104 C2025,104 2025,260 2410,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2025" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M960,208 C1175,208 1175,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,208 C1685,208 1685,156 2410,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1685" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1300,156 C1345,156 1345,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1300,156 C1855,156 1855,156 2410,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M620,364 C1005,364 1005,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,364 C1515,364 1515,156 2410,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="257" fill="#334155" font-size="10">modify</text>
+<path d="M620,416 C1005,416 1005,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,416 C1515,416 1515,156 2410,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1515" y="283" fill="#334155" font-size="10">modify</text>
+<rect x="370" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="90" x2="373" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="90" x2="617" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="108" font-weight="bold" fill="#0f172a">S19TuiApp.on_patch_editor_panel_action_requested</text>
+<rect x="370" y="142" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="142" x2="373" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="142" x2="617" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="160" font-weight="bold" fill="#0f172a">S19TuiApp.action_patch_undo</text>
+<rect x="370" y="194" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="194" x2="373" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="194" x2="617" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="212" font-weight="bold" fill="#0f172a">S19TuiApp.action_patch_redo</text>
+<rect x="370" y="246" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="246" x2="373" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="246" x2="617" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="264" font-weight="bold" fill="#0f172a">S19TuiApp._apply_entry_json_edit</text>
+<rect x="710" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="90" x2="713" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="90" x2="957" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="108" font-weight="bold" fill="#0f172a">S19TuiApp._refresh_patch_history_view</text>
+<rect x="710" y="142" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="142" x2="713" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="142" x2="957" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="160" font-weight="bold" fill="#0f172a">S19TuiApp._patch_editor_load</text>
+<rect x="1050" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="90" x2="1053" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="90" x2="1297" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="108" font-weight="bold" fill="#0f172a">S19TuiApp._patch_editor_load_tail</text>
+<rect x="370" y="298" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="298" x2="373" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="298" x2="617" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="316" font-weight="bold" fill="#0f172a">S19TuiApp._apply_prepared_load</text>
+<rect x="1730" y="90" width="250" height="26" fill="#fce7f3" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="90" x2="1733" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="90" x2="1977" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="108" font-weight="bold" fill="#0f172a">S19TuiApp._patch_document_view</text>
+<rect x="2070" y="90" width="250" height="26" fill="#f1f5f9" stroke="#334155" stroke-width="1"/>
+<line x1="2073" y1="90" x2="2073" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2317" y1="90" x2="2317" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2080" y="108" font-weight="normal" fill="#0f172a">serialize_change_document</text>
+<rect x="2070" y="142" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="2073" y1="142" x2="2073" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2317" y1="142" x2="2317" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2080" y="160" font-weight="bold" fill="#0f172a">PatchEditorPanel.refresh_entries</text>
+<rect x="1390" y="90" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1393" y1="90" x2="1393" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1637" y1="90" x2="1637" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1400" y="108" font-weight="bold" fill="#0f172a">PatchEditorPanel._refresh_dirty_indicator</text>
+<rect x="1730" y="142" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="142" x2="1733" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="142" x2="1977" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="160" font-weight="normal" fill="#0f172a">json_stamp_text</text>
+<rect x="710" y="194" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="194" x2="713" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="194" x2="957" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="212" font-weight="bold" fill="#0f172a">PatchEditorPanel.mark_saved</text>
+<rect x="1050" y="142" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="142" x2="1053" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="142" x2="1297" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="160" font-weight="bold" fill="#0f172a">PatchEditorPanel.mark_loaded</text>
+<rect x="370" y="350" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="350" x2="373" y2="376" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="350" x2="617" y2="376" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="368" font-weight="bold" fill="#0f172a">PatchEditorPanel.request_action</text>
+<rect x="370" y="402" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="402" x2="373" y2="428" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="402" x2="617" y2="428" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="420" font-weight="bold" fill="#0f172a">PatchEditorPanel.on_text_area_changed</text>
+<rect x="1730" y="194" width="250" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="1740" y="212" font-weight="bold" fill="#0f172a">PatchEditorPanel._render_before_after_card</text>
+<text x="1740" y="226" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="2410" y="90" width="228.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="108" font-weight="normal" fill="#0f172a">[Data: ChangeService.document]</text>
+<rect x="2410" y="142" width="234.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="160" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel._dirty]</text>
+<rect x="2410" y="194" width="250" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="212" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel._document_view]</text>
+<rect x="30" y="90" width="175.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[I/O: change-set file]</text>
+<rect x="30" y="142" width="109.19999999999999" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="160" font-weight="normal" fill="#0f172a">[I/O: clock]</text>
+<rect x="30" y="194" width="228.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="212" font-weight="normal" fill="#0f172a">[Data: S19TuiApp.current_file]</text>
+<rect x="2410" y="246" width="195.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="264" font-weight="normal" fill="#0f172a">[Interface: patch ledger]</text>
+<rect x="2410" y="298" width="214.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="316" font-weight="normal" fill="#0f172a">[Interface: patch json view]</text>
+<rect x="2410" y="350" width="221.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="368" font-weight="normal" fill="#0f172a">[Interface: patch json stamp]</text>
+<rect x="30" y="498" width="2640" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="514" fill="#b91c1c">H-P1 · S19TuiApp.on_patch_editor_panel_action_requested ──▶ PatchEditorPanel.refresh_entries.rows</text>
+<text x="40" y="528" fill="#b91c1c">what: every Patch Editor action ends at `app.py:3265` with a `refresh_entries` call, Save included. With D1 that call also carries `document=`</text>
+<text x="40" y="542" fill="#b91c1c">decision: no change to D4. TC-B97-06 names the typing arm as the RED arm of that mutation, or D1 passes `document=` only when the document changed</text>
+<rect x="30" y="570" width="2640" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="586" fill="#b91c1c">H-P2 · S19TuiApp._patch_document_view ──▶ serialize_change_document.document</text>
+<text x="40" y="600" fill="#b91c1c">what: the serialiser runs once for each `refresh_entries` call, not once for each document write. That is 11 action kinds, undo, redo, entry JSON edit, every image load, and two times for one Load by button</text>
+<text x="40" y="614" fill="#b91c1c">decision: changes D1 or §6.2. Build the view only when a document revision changed (the writers mutate in place, so object identity is not a key). Or keep D1 and measure the 100,000-entry cost per action</text>
+<rect x="30" y="642" width="2640" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="658" fill="#b91c1c">H-P3 · [Data: PatchEditorPanel._document_view] ──▶ PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="40" y="672" fill="#b91c1c">what: D4 composes the stamp in `_refresh_dirty_indicator` from `n` and `hhmmss`, but no design element keeps them. The graph needs a retained view with its refresh time, and its initial value</text>
+<text x="40" y="686" fill="#b91c1c">decision: D2/D4 add the retained field and say which time the stamp shows. LLR-148.9 names the fresh-start state of the JSON view</text>
+<rect x="30" y="714" width="2640" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="730" fill="#b91c1c">H-P4 · serialize_change_document.wire ──▶ S19TuiApp._patch_document_view.view.json_text</text>
+<text x="40" y="744" fill="#b91c1c">what: the serialiser returns `bytes`. D2 types `json_text` as `str`</text>
+<text x="40" y="758" fill="#b91c1c">decision: none. Record the decode in D2</text>
+<rect x="30" y="816" width="14" height="12" fill="#fce7f3" stroke="#334155"/>
+<text x="50" y="826" fill="#334155">s19_app/tui/app.py</text>
+<rect x="390" y="816" width="14" height="12" fill="#f1f5f9" stroke="#334155"/>
+<text x="410" y="826" fill="#334155">s19_app/tui/changes/io.py</text>
+<rect x="750" y="816" width="14" height="12" fill="#ecfccb" stroke="#334155"/>
+<text x="770" y="826" fill="#334155">s19_app/tui/screens_directionb.py</text>
+</svg>

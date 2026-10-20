@@ -1,0 +1,16 @@
+== raw codewire_ste.py
+graph-patch-json: 25 errors, 2 warnings
+graph-chip-open: 16 errors, 1 warnings
+graph-nul-refusal: 18 errors, 5 warnings
+graph-confirm-key: 17 errors, 1 warnings
+graph-width: 19 errors, 3 warnings
+== scoped (Language-STE.md §2)
+graph-chip-open.md:204: W1 warning: passive voice? `is computed`
+graph-nul-refusal.md:42: W1 warning: passive voice? `is normalised`
+graph-nul-refusal.md:107: W1 warning: passive voice? `is skipped`
+graph-nul-refusal.md:223: W1 warning: passive voice? `is accepted`
+graph-nul-refusal.md:227: W1 warning: passive voice? `are RED`
+graph-width.md:209: W1 warning: passive voice? `are measured`
+graph-width.md:215: W1 warning: passive voice? `are painted`
+graph-width.md:219: W1 warning: passive voice? `be RED`
+0 errors, 8 warnings

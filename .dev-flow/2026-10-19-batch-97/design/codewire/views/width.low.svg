@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2385" height="1296" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">width · low</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M232,104 C651,104 651,568 1070,568" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C391,104 391,254 550,254" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C391,104 391,418 550,418" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C391,104 391,582 550,582" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,568 C1545,568 1545,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="333" fill="#334155" font-size="10">table_content_w</text>
+<path d="M980,254 C1025,254 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="176" fill="#334155" font-size="10">table_content_w</text>
+<path d="M980,418 C1025,418 1025,268 1070,268" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="340" fill="#334155" font-size="10">avail_w</text>
+<path d="M980,582 C1025,582 1025,418 1070,418" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="497" fill="#334155" font-size="10">viewport_w</text>
+<path d="M2020,104 C2065,104 2065,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1805,104 1805,156 2110,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,268 C1805,268 1805,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,418 C1805,418 1805,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2227,116 C1496,116 1496,732 765,732" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M980,746 C1025,746 1025,746 1070,746" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="743" fill="#334155" font-size="10">max_bytes</text>
+<path d="M1500,746 C1545,746 1545,254 1590,254" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="497" fill="#334155" font-size="10">max_bytes</text>
+<path d="M1500,568 C1805,568 1805,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="333" fill="#334155" font-size="10">modify</text>
+<path d="M1500,568 C1805,568 1805,156 2110,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="359" fill="#334155" font-size="10">modify</text>
+<path d="M980,104 C1025,104 1025,568 1070,568" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1025" y="333" fill="#334155" font-size="10">inner</text>
+<path d="M980,254 C1545,254 1545,156 2110,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="202" fill="#334155" font-size="10">modify</text>
+<path d="M980,418 C1545,418 1545,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="310" fill="#334155" font-size="10">modify</text>
+<path d="M980,582 C1545,582 1545,208 2110,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="392" fill="#334155" font-size="10">modify</text>
+<rect x="1590" y="90" width="430" height="124" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="90" x2="1593" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="90" x2="2017" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="108" font-weight="normal" fill="#0f172a">patch_layout</text>
+<text x="1600" y="122" font-weight="normal" fill="#0f172a">req: LLR-149.1, LLR-144.8</text>
+<text x="1600" y="136" font-weight="normal" fill="#0f172a">in: int table_content_w; int inspector_content_w</text>
+<text x="1600" y="150" font-weight="normal" fill="#0f172a">out: PatchLayout layout {value_col_w, strip_max_bytes}</text>
+<text x="1600" y="164" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1600" y="178" font-weight="normal" fill="#166534">examples: (D21, synthetic) inspector_content_w 44 →</text>
+<text x="1600" y="192" font-weight="normal" fill="#0f172a">strip_max_bytes 12; inspector_content_w 86 → strip_max_bytes</text>
+<text x="1600" y="206" font-weight="normal" fill="#0f172a">  26</text>
+<rect x="1070" y="90" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="90" x2="1073" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="90" x2="1497" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="108" font-weight="normal" fill="#0f172a">check_layout</text>
+<text x="1080" y="122" font-weight="normal" fill="#0f172a">req: LLR-149.1, LLR-145.2, LLR-145.3</text>
+<text x="1080" y="136" font-weight="normal" fill="#0f172a">in: int table_content_w; int card_content_w</text>
+<text x="1080" y="150" font-weight="normal" fill="#0f172a">out: CheckLayout layout {address_w, parameter_w,</text>
+<text x="1080" y="164" font-weight="normal" fill="#0f172a">  fields_name_w}</text>
+<text x="1080" y="178" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1080" y="192" font-weight="normal" fill="#166534">examples: (D21, synthetic) card_content_w 41 → address_w 10;</text>
+<text x="1080" y="206" font-weight="normal" fill="#0f172a">fields_name_w 27; at 118x54 parameter_w 42, at 220x60 about</text>
+<text x="1080" y="220" font-weight="normal" fill="#0f172a">  105</text>
+<rect x="1070" y="254" width="430" height="124" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="254" x2="1073" y2="378" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="254" x2="1497" y2="378" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="272" font-weight="normal" fill="#0f172a">pipeline_layout</text>
+<text x="1080" y="286" font-weight="normal" fill="#0f172a">req: LLR-149.1, LLR-149.5</text>
+<text x="1080" y="300" font-weight="normal" fill="#0f172a">in: int avail_w; int n_cards</text>
+<text x="1080" y="314" font-weight="normal" fill="#0f172a">out: PipelineLayout layout {card_w}</text>
+<text x="1080" y="328" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="1080" y="342" font-weight="normal" fill="#166534">examples: (D21, synthetic) avail_w 108; n_cards 4 → card_w</text>
+<text x="1080" y="356" font-weight="normal" fill="#0f172a">(24, 24, 24, 24); avail_w 208; n_cards 4 → card_w (49, 49, 49,</text>
+<text x="1080" y="370" font-weight="normal" fill="#0f172a">  49)</text>
+<rect x="1070" y="404" width="430" height="124" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="404" x2="1073" y2="528" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="404" x2="1497" y2="528" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="422" font-weight="normal" fill="#0f172a">lane_layout</text>
+<text x="1080" y="436" font-weight="normal" fill="#0f172a">req: LLR-149.1, LLR-147.12</text>
+<text x="1080" y="450" font-weight="normal" fill="#0f172a">in: int viewport_w; int n_cards</text>
+<text x="1080" y="464" font-weight="normal" fill="#0f172a">out: LaneLayout layout {card_w, scrolls}</text>
+<text x="1080" y="478" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="1080" y="492" font-weight="normal" fill="#166534">examples: (D21, synthetic) viewport_w 110; n_cards 6 → card_w</text>
+<text x="1080" y="506" font-weight="normal" fill="#0f172a">21; scrolls True; viewport_w 216; n_cards 4 → card_w 51;</text>
+<text x="1080" y="520" font-weight="normal" fill="#0f172a">scrolls False</text>
+<rect x="1070" y="554" width="430" height="152" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="554" x2="1073" y2="706" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="554" x2="1497" y2="706" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="572" font-weight="bold" fill="#0f172a">PatchEditorPanel._apply_layout</text>
+<text x="1080" y="586" font-weight="normal" fill="#0f172a">req: LLR-149.1</text>
+<text x="1080" y="600" font-weight="normal" fill="#0f172a">in: PatchEditorPanel self</text>
+<text x="1080" y="614" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="628" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1080" y="642" font-weight="normal" fill="#0f172a">modify: [Data: PatchEditorPanel layout] (replace); [Interface:</text>
+<text x="1080" y="656" font-weight="normal" fill="#0f172a">column widths] (replace)</text>
+<text x="1080" y="670" font-weight="normal" fill="#0f172a">inner: patch_layout</text>
+<text x="1080" y="684" font-weight="normal" fill="#166534">examples: (TC-B97-34, synthetic) resize 118x54 → 220x60 →</text>
+<text x="1080" y="698" font-weight="normal" fill="#0f172a">strip_max_bytes 12 → 26; back to 118x54 → 12</text>
+<rect x="550" y="90" width="430" height="124" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="90" x2="553" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="90" x2="977" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="108" font-weight="bold" fill="#0f172a">PatchEditorPanel.on_resize</text>
+<text x="560" y="122" font-weight="normal" fill="#0f172a">req: LLR-149.1</text>
+<text x="560" y="136" font-weight="normal" fill="#0f172a">in: events.Resize event</text>
+<text x="560" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="164" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="178" font-weight="normal" fill="#0f172a">inner: PatchEditorPanel._apply_layout</text>
+<text x="560" y="192" font-weight="normal" fill="#166534">examples: (TC-B97-34, synthetic) four resizes in one session →</text>
+<text x="560" y="206" font-weight="normal" fill="#0f172a">four layouts</text>
+<rect x="550" y="240" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="240" x2="553" y2="378" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="240" x2="977" y2="378" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="258" font-weight="bold" fill="#0f172a">CheckEditorPanel._apply_layout</text>
+<text x="560" y="272" font-weight="normal" fill="#0f172a">req: LLR-149.1</text>
+<text x="560" y="286" font-weight="normal" fill="#0f172a">in: CheckEditorPanel self</text>
+<text x="560" y="300" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="314" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="328" font-weight="normal" fill="#0f172a">modify: [Interface: column widths] (replace)</text>
+<text x="560" y="342" font-weight="normal" fill="#0f172a">inner: check_layout</text>
+<text x="560" y="356" font-weight="normal" fill="#166534">examples: (TC-B97-34, synthetic) 118x54 → 220x60 → parameter_w</text>
+<text x="560" y="370" font-weight="normal" fill="#0f172a">42 → about 105</text>
+<rect x="550" y="404" width="430" height="138" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="404" x2="553" y2="542" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="404" x2="977" y2="542" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="422" font-weight="bold" fill="#0f172a">FlowBuilderPanel._apply_layout</text>
+<text x="560" y="436" font-weight="normal" fill="#0f172a">req: LLR-149.1</text>
+<text x="560" y="450" font-weight="normal" fill="#0f172a">in: FlowBuilderPanel self</text>
+<text x="560" y="464" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="478" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="560" y="492" font-weight="normal" fill="#0f172a">modify: [Interface: card widths] (replace)</text>
+<text x="560" y="506" font-weight="normal" fill="#0f172a">inner: pipeline_layout</text>
+<text x="560" y="520" font-weight="normal" fill="#166534">examples: (AT-B97-16, synthetic) 4 cards at 220x60 → each card</text>
+<text x="560" y="534" font-weight="normal" fill="#0f172a">49 cells; no void over 2 cells</text>
+<rect x="550" y="568" width="430" height="138" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="568" x2="553" y2="706" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="568" x2="977" y2="706" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="586" font-weight="bold" fill="#0f172a">FlowExecutionPanel._apply_layout</text>
+<text x="560" y="600" font-weight="normal" fill="#0f172a">req: LLR-149.1, LLR-147.12</text>
+<text x="560" y="614" font-weight="normal" fill="#0f172a">in: FlowExecutionPanel self</text>
+<text x="560" y="628" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="642" font-weight="normal" fill="#0f172a">module: flow_screens.py</text>
+<text x="560" y="656" font-weight="normal" fill="#0f172a">modify: [Interface: card widths] (replace)</text>
+<text x="560" y="670" font-weight="normal" fill="#0f172a">inner: lane_layout</text>
+<text x="560" y="684" font-weight="normal" fill="#166534">examples: (AT-B97-15, synthetic) 6 cards at 118x54 → cards 21;</text>
+<text x="560" y="698" font-weight="normal" fill="#0f172a">`#fx_lanes_scroll` scrolls; 4 cards at 220x60 fill the width</text>
+<rect x="550" y="732" width="430" height="124" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="732" x2="553" y2="856" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="732" x2="977" y2="856" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="750" font-weight="bold" fill="#0f172a">PatchEditorPanel._render_before_after_card</text>
+<text x="560" y="764" font-weight="normal" fill="#0f172a">req: LLR-144.8</text>
+<text x="560" y="778" font-weight="normal" fill="#0f172a">in: int? index = None</text>
+<text x="560" y="792" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="560" y="806" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="560" y="820" font-weight="normal" fill="#0f172a">inner: BeforeAfterCard.show_entry</text>
+<text x="560" y="834" font-weight="normal" fill="#166534">examples: (TC-B94-10) index 0 → None; the card call that</text>
+<text x="560" y="848" font-weight="normal" fill="#0f172a">follows is the show_entry line of this thread</text>
+<rect x="1070" y="732" width="430" height="138" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="732" x2="1073" y2="870" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="732" x2="1497" y2="870" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="750" font-weight="bold" fill="#0f172a">BeforeAfterCard.show_entry</text>
+<text x="1080" y="764" font-weight="normal" fill="#0f172a">req: LLR-144.8</text>
+<text x="1080" y="778" font-weight="normal" fill="#0f172a">in: int? address; Sequence[int?]? before; Sequence[int] after;</text>
+<text x="1080" y="792" font-weight="normal" fill="#0f172a">int max_bytes = CARD_BYTES_MAX</text>
+<text x="1080" y="806" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="820" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1080" y="834" font-weight="normal" fill="#0f172a">inner: before_after_card_text</text>
+<text x="1080" y="848" font-weight="normal" fill="#166534">examples: (TC-B94-10) address 0x100; before None; after (0xDE,</text>
+<text x="1080" y="862" font-weight="normal" fill="#0f172a">0xAD, 0xBE, 0xEF) → None; the strip shows the no-image line</text>
+<rect x="1590" y="240" width="430" height="124" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="240" x2="1593" y2="364" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="240" x2="2017" y2="364" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="258" font-weight="normal" fill="#0f172a">before_after_card_text</text>
+<text x="1600" y="272" font-weight="normal" fill="#0f172a">req: LLR-144.8</text>
+<text x="1600" y="286" font-weight="normal" fill="#0f172a">in: int? address; Sequence[int?]? before; Sequence[int] after;</text>
+<text x="1600" y="300" font-weight="normal" fill="#0f172a">int max_bytes = CARD_BYTES_MAX</text>
+<text x="1600" y="314" font-weight="normal" fill="#0f172a">out: Text strip</text>
+<text x="1600" y="328" font-weight="normal" fill="#0f172a">module: screens_directionb.py</text>
+<text x="1600" y="342" font-weight="normal" fill="#166534">examples: (TC-B94-10) address 0x100; before None; after (0xDE,</text>
+<text x="1600" y="356" font-weight="normal" fill="#0f172a">0xAD, 0xBE, 0xEF) → strip &quot;No image loaded&quot;</text>
+<rect x="2110" y="90" width="234.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="108" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel layout]</text>
+<rect x="30" y="90" width="201.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[Interface: panel regions]</text>
+<rect x="2110" y="142" width="201.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="160" font-weight="normal" fill="#0f172a">[Interface: column widths]</text>
+<rect x="2110" y="194" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2120" y="212" font-weight="normal" fill="#0f172a">[Interface: card widths]</text>
+<rect x="30" y="940" width="2324.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="956" fill="#b91c1c">H-W1 · lane_layout</text>
+<text x="40" y="970" fill="#b91c1c">what: D21 freezes `&lt;screen&gt;_layout(width) -&gt; NamedTuple`. But the §3 formulas need more inputs. They need the card count (`lane_layout(viewport_w, n)` in §3), the inspector width and the table width</text>
+<text x="40" y="984" fill="#b91c1c">decision: changes D21. Fix the input list of each layout function (this graph proposes one). The inputs are measured content widths, not the terminal width</text>
+<rect x="30" y="1012" width="2324.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1028" fill="#b91c1c">H-W2 · [Data: PatchEditorPanel layout] ──▶ PatchEditorPanel._render_before_after_card</text>
+<text x="40" y="1042" fill="#b91c1c">what: D21 says `_apply_layout` &quot;sets widths only&quot;. The strip byte count, the clipped card text, the Fields name and the full-name line are painted text whose content depends on the width. No step repaints them on resize</text>
+<text x="40" y="1056" fill="#b91c1c">decision: changes D21: `_apply_layout` also re-renders each width-dependent painted widget, or each such widget reads the layout at paint time and `_apply_layout` asks for that paint</text>
+<rect x="30" y="1084" width="2324.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1100" fill="#b91c1c">H-W3 · BeforeAfterCard.show_entry</text>
+<text x="40" y="1114" fill="#b91c1c">what: D5 derives `max_bytes` from the inspector width, but `show_entry` takes no `max_bytes`. Only the pure composer does</text>
+<text x="40" y="1128" fill="#b91c1c">decision: none. List it in the Inc-4 scope</text>
+<rect x="30" y="1186" width="14" height="12" fill="#e0e7ff" stroke="#334155"/>
+<text x="50" y="1196" fill="#334155">s19_app/tui/flow_screens.py</text>
+<rect x="390" y="1186" width="14" height="12" fill="#ecfccb" stroke="#334155"/>
+<text x="410" y="1196" fill="#334155">s19_app/tui/screens_directionb.py</text>
+</svg>

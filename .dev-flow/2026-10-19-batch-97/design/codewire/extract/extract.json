@@ -1,0 +1,5145 @@
+{
+  "marks": [
+    {
+      "name": "S19TuiApp.on_flow_execution_panel_run_requested",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-148.9",
+        "HLR-147"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 2776,
+      "def": {
+        "qualname": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "line": 2777,
+        "params": [
+          {
+            "name": "event",
+            "type": "'FlowExecutionPanel.RunRequested'",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+      "reqs": [
+        "LLR-147.13"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 2824,
+      "def": {
+        "qualname": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "line": 2825,
+        "params": [
+          {
+            "name": "event",
+            "type": "'FlowExecutionPanel.ExternalStepConfirmed'",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "LLR-144.5",
+        "LLR-144.6",
+        "HLR-144"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3090,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "line": 3091,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.ActionRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._refresh_patch_history_view",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3416,
+      "def": {
+        "qualname": "S19TuiApp._refresh_patch_history_view",
+        "line": 3417,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_patch_undo",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3570,
+      "def": {
+        "qualname": "S19TuiApp.action_patch_undo",
+        "line": 3571,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.action_patch_redo",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3597,
+      "def": {
+        "qualname": "S19TuiApp.action_patch_redo",
+        "line": 3598,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._apply_entry_json_edit",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3793,
+      "def": {
+        "qualname": "S19TuiApp._apply_entry_json_edit",
+        "line": 3794,
+        "params": [
+          {
+            "name": "index",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "edited",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load",
+      "reqs": [
+        "LLR-144.5",
+        "HLR-144"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 5252,
+      "def": {
+        "qualname": "S19TuiApp._patch_editor_load",
+        "line": 5253,
+        "params": [
+          {
+            "name": "panel",
+            "type": "PatchEditorPanel",
+            "default": null
+          },
+          {
+            "name": "path_text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load_tail",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 5274,
+      "def": {
+        "qualname": "S19TuiApp._patch_editor_load_tail",
+        "line": 5275,
+        "params": [
+          {
+            "name": "panel",
+            "type": "PatchEditorPanel",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._apply_prepared_load",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10661,
+      "def": {
+        "qualname": "S19TuiApp._apply_prepared_load",
+        "line": 10662,
+        "params": [
+          {
+            "name": "prepared",
+            "type": "PreparedLoad",
+            "default": null
+          },
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "load_started",
+            "type": "float",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "serialize_change_document",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "file": "s19_app/tui/changes/io.py",
+      "line": 1392,
+      "def": {
+        "qualname": "serialize_change_document",
+        "line": 1393,
+        "params": [
+          {
+            "name": "document",
+            "type": "ChangeDocument",
+            "default": null
+          }
+        ],
+        "returns": "bytes"
+      }
+    },
+    {
+      "name": "FlowExecutionPanel.render_run",
+      "reqs": [
+        "LLR-147.3",
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 2399,
+      "def": {
+        "qualname": "FlowExecutionPanel.render_run",
+        "line": 2400,
+        "params": [
+          {
+            "name": "record",
+            "type": null,
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FlowExecutionPanel.apply_confirmed_run",
+      "reqs": [
+        "LLR-147.13"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 2502,
+      "def": {
+        "qualname": "FlowExecutionPanel.apply_confirmed_run",
+        "line": 2503,
+        "params": [
+          {
+            "name": "lane_index",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "record",
+            "type": null,
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FlowExecutionPanel.render_run_error",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-148.9"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 2545,
+      "def": {
+        "qualname": "FlowExecutionPanel.render_run_error",
+        "line": 2546,
+        "params": [
+          {
+            "name": "message",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "FlowExecutionPanel.on_button_pressed",
+      "reqs": [
+        "LLR-147.4",
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "file": "s19_app/tui/flow_screens.py",
+      "line": 2609,
+      "def": {
+        "qualname": "FlowExecutionPanel.on_button_pressed",
+        "line": 2610,
+        "params": [
+          {
+            "name": "event",
+            "type": "Button.Pressed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OpenFolderChip.__init__",
+      "reqs": [
+        "LLR-148.4",
+        "LLR-148.10",
+        "HLR-148"
+      ],
+      "file": "s19_app/tui/open_folder_chip.py",
+      "line": 72,
+      "def": {
+        "qualname": "OpenFolderChip.__init__",
+        "line": 73,
+        "params": [
+          {
+            "name": "family",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OpenFolderChip.refresh_target",
+      "reqs": [
+        "LLR-148.3",
+        "HLR-148"
+      ],
+      "file": "s19_app/tui/open_folder_chip.py",
+      "line": 93,
+      "def": {
+        "qualname": "OpenFolderChip.refresh_target",
+        "line": 94,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "OpenFolderChip._open_target",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "LLR-148.8",
+        "LLR-148.10",
+        "HLR-148"
+      ],
+      "file": "s19_app/tui/open_folder_chip.py",
+      "line": 141,
+      "def": {
+        "qualname": "OpenFolderChip._open_target",
+        "line": 142,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "before_after_card_text",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 4119,
+      "def": {
+        "qualname": "before_after_card_text",
+        "line": 4120,
+        "params": [
+          {
+            "name": "address",
+            "type": "Optional[int]",
+            "default": null
+          },
+          {
+            "name": "before",
+            "type": "Optional[Sequence[Optional[int]]]",
+            "default": null
+          },
+          {
+            "name": "after",
+            "type": "Sequence[int]",
+            "default": null
+          },
+          {
+            "name": "max_bytes",
+            "type": "int",
+            "default": "CARD_BYTES_MAX"
+          }
+        ],
+        "returns": "Text"
+      }
+    },
+    {
+      "name": "BeforeAfterCard.show_entry",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 4272,
+      "def": {
+        "qualname": "BeforeAfterCard.show_entry",
+        "line": 4273,
+        "params": [
+          {
+            "name": "address",
+            "type": "Optional[int]",
+            "default": null
+          },
+          {
+            "name": "before",
+            "type": "Optional[Sequence[Optional[int]]]",
+            "default": null
+          },
+          {
+            "name": "after",
+            "type": "Sequence[int]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.on_resize",
+      "reqs": [
+        "LLR-149.1"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5596,
+      "def": {
+        "qualname": "PatchEditorPanel.on_resize",
+        "line": 5597,
+        "params": [
+          {
+            "name": "event",
+            "type": "events.Resize",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.on_text_area_changed",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5674,
+      "def": {
+        "qualname": "PatchEditorPanel.on_text_area_changed",
+        "line": 5675,
+        "params": [
+          {
+            "name": "event",
+            "type": "TextArea.Changed",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.request_action",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5748,
+      "def": {
+        "qualname": "PatchEditorPanel.request_action",
+        "line": 5749,
+        "params": [
+          {
+            "name": "action",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5951,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_saved",
+        "line": 5952,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.mark_loaded",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5962,
+      "def": {
+        "qualname": "PatchEditorPanel.mark_loaded",
+        "line": 5963,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel._refresh_dirty_indicator",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 5974,
+      "def": {
+        "qualname": "PatchEditorPanel._refresh_dirty_indicator",
+        "line": 5975,
+        "params": [],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel.refresh_entries",
+      "reqs": [
+        "LLR-144.5",
+        "LLR-144.6",
+        "LLR-144.7",
+        "LLR-148.9"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 6112,
+      "def": {
+        "qualname": "PatchEditorPanel.refresh_entries",
+        "line": 6113,
+        "params": [
+          {
+            "name": "rows",
+            "type": "Sequence[object]",
+            "default": null
+          },
+          {
+            "name": "mem_map",
+            "type": "Union[Mapping[int, int], None, _Unset]",
+            "default": "_UNSET"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "PatchEditorPanel._render_before_after_card",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "file": "s19_app/tui/screens_directionb.py",
+      "line": 6279,
+      "def": {
+        "qualname": "PatchEditorPanel._render_before_after_card",
+        "line": 6280,
+        "params": [
+          {
+            "name": "index",
+            "type": "Optional[int]",
+            "default": "None"
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "run_flow",
+      "reqs": [
+        "LLR-146.14",
+        "LLR-148.9"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 171,
+      "def": {
+        "qualname": "run_flow",
+        "line": 172,
+        "params": [
+          {
+            "name": "flow",
+            "type": "Flow",
+            "default": null
+          },
+          {
+            "name": "ctx",
+            "type": "FlowContext",
+            "default": null
+          }
+        ],
+        "returns": "FlowRunResult"
+      }
+    },
+    {
+      "name": "_chain_inputs",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 1421,
+      "def": {
+        "qualname": "_chain_inputs",
+        "line": 1422,
+        "params": [
+          {
+            "name": "ctx",
+            "type": "FlowContext",
+            "default": null
+          },
+          {
+            "name": "blocks",
+            "type": "Sequence[FlowBlock]",
+            "default": null
+          }
+        ],
+        "returns": "List[Tuple[str, str]]"
+      }
+    },
+    {
+      "name": "run_chain_set",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 1445,
+      "def": {
+        "qualname": "run_chain_set",
+        "line": 1446,
+        "params": [
+          {
+            "name": "chains",
+            "type": "Sequence[ChainSpec]",
+            "default": null
+          },
+          {
+            "name": "ctx",
+            "type": "FlowContext",
+            "default": null
+          },
+          {
+            "name": "mode",
+            "type": "str",
+            "default": "CHAIN_RUN_SEQUENTIAL"
+          },
+          {
+            "name": "set_name",
+            "type": "str",
+            "default": "'chain-set'"
+          },
+          {
+            "name": "run_one",
+            "type": "Optional[Callable[[Flow, FlowContext], FlowRunResult]]",
+            "default": "None"
+          },
+          {
+            "name": "clock",
+            "type": "Optional[Callable[[], float]]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChainSetRunRecord"
+      }
+    },
+    {
+      "name": "dict_to_flow",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 329,
+      "def": {
+        "qualname": "dict_to_flow",
+        "line": 330,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Any",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[Flow], List[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "_parse_a2b_entry",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 650,
+      "def": {
+        "qualname": "_parse_a2b_entry",
+        "line": 651,
+        "params": [
+          {
+            "name": "entry",
+            "type": "Dict[str, Any]",
+            "default": null
+          },
+          {
+            "name": "label",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "upstream_blocks",
+            "type": "List[FlowBlock]",
+            "default": null
+          },
+          {
+            "name": "findings",
+            "type": "List[ValidationIssue]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[A2BBlock]"
+      }
+    },
+    {
+      "name": "_parse_external_step_entry",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 770,
+      "def": {
+        "qualname": "_parse_external_step_entry",
+        "line": 771,
+        "params": [
+          {
+            "name": "entry",
+            "type": "Dict[str, Any]",
+            "default": null
+          },
+          {
+            "name": "label",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "findings",
+            "type": "List[ValidationIssue]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[ExternalStepBlock]"
+      }
+    },
+    {
+      "name": "load_flow_json",
+      "reqs": [
+        "LLR-146.14",
+        "HLR-146"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 871,
+      "def": {
+        "qualname": "load_flow_json",
+        "line": 872,
+        "params": [
+          {
+            "name": "flow_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[Flow], List[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "dict_to_chain_set",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 1191,
+      "def": {
+        "qualname": "dict_to_chain_set",
+        "line": 1192,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Any",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[ChainSet], List[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "load_chain_set",
+      "reqs": [
+        "LLR-146.14",
+        "HLR-146"
+      ],
+      "file": "s19_app/tui/services/flow_persistence_service.py",
+      "line": 1457,
+      "def": {
+        "qualname": "load_chain_set",
+        "line": 1458,
+        "params": [
+          {
+            "name": "set_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Tuple[Optional[ChainSet], List[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "open_folder_in_file_manager",
+      "reqs": [
+        "LLR-148.5",
+        "LLR-148.10"
+      ],
+      "file": "s19_app/tui/services/folder_open_service.py",
+      "line": 129,
+      "def": {
+        "qualname": "open_folder_in_file_manager",
+        "line": 130,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "set_status",
+            "type": "Optional[Callable[[str], None]]",
+            "default": "None"
+          },
+          {
+            "name": "label",
+            "type": "str",
+            "default": "'folder'"
+          }
+        ],
+        "returns": "bool"
+      }
+    },
+    {
+      "name": "resolve_chip_target",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "HLR-148"
+      ],
+      "file": "s19_app/tui/services/folder_open_service.py",
+      "line": 233,
+      "def": {
+        "qualname": "resolve_chip_target",
+        "line": 234,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Optional[Path]",
+            "default": null
+          },
+          {
+            "name": "family",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "workarea",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Path]"
+      }
+    },
+    {
+      "name": "create_chip_home",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "HLR-148"
+      ],
+      "file": "s19_app/tui/services/folder_open_service.py",
+      "line": 281,
+      "def": {
+        "qualname": "create_chip_home",
+        "line": 282,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Optional[Path]",
+            "default": null
+          },
+          {
+            "name": "family",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "workarea",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "Path"
+      }
+    },
+    {
+      "name": "_resolve_manifest_entry",
+      "reqs": [
+        "LLR-146.14",
+        "LLR-148.9"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 205,
+      "def": {
+        "qualname": "_resolve_manifest_entry",
+        "line": 206,
+        "params": [
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "raw_entry",
+            "type": "object",
+            "default": null
+          },
+          {
+            "name": "context",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "issues",
+            "type": "list[ValidationIssue]",
+            "default": null
+          }
+        ],
+        "returns": "Optional[Path]"
+      }
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 365,
+      "def": {
+        "qualname": "read_project_manifest",
+        "line": 366,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "size_probe",
+            "type": "Optional[SizeProbe]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[ProjectManifest]"
+      }
+    },
+    {
+      "name": "_path_traverses_reparse_point",
+      "reqs": [
+        "LLR-148.8"
+      ],
+      "file": "s19_app/tui/workspace.py",
+      "line": 184,
+      "def": {
+        "qualname": "_path_traverses_reparse_point",
+        "line": 185,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "stop_at",
+            "type": "Optional[Path]",
+            "default": "None"
+          }
+        ],
+        "returns": "bool"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "LLR-144.5",
+        "LLR-144.6",
+        "HLR-144"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.ActionRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._patch_editor_load",
+        "S19TuiApp._patch_document_view",
+        "PatchEditorPanel.refresh_entries",
+        "PatchEditorPanel.mark_saved",
+        "PatchEditorPanel.mark_loaded"
+      ],
+      "examples": [
+        "(TC-B94-10) event {action \"add_entry\"} → None; the call ends with one refresh_entries call",
+        "(TC-B94-10) event {action \"save_doc\"} → None; the call also ends with one refresh_entries call (H-P1)",
+        "(AT-B97-02, synthetic) event {action \"add_entry\"} on the 6-entry fixture → `refresh_entries` receives document {entry_count 7}"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp.action_patch_undo",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._refresh_patch_history_view"
+      ],
+      "examples": [
+        "(TC-B97-06, inferred) undo after one Add on 6 entries → document 6 entries; view parses to 6"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp.action_patch_redo",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._refresh_patch_history_view"
+      ],
+      "examples": [
+        "(TC-B97-06, inferred) redo after that undo → document 7 entries; view parses to 7"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp._apply_entry_json_edit",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "edited",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._refresh_patch_history_view"
+      ],
+      "examples": [
+        "(TC-B97-06, inferred) index 0; edited with a new value → view shows the new value of entry 1 of 6"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp._refresh_patch_history_view",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._patch_document_view",
+        "PatchEditorPanel.refresh_entries"
+      ],
+      "examples": [
+        "(TC-B97-06, synthetic) after undo → `refresh_entries` receives the document view of the restored document"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load",
+      "reqs": [
+        "LLR-144.5",
+        "HLR-144"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel",
+          "name": "panel",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "path_text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "PatchEditorPanel.mark_loaded",
+        "S19TuiApp._patch_editor_load_tail"
+      ],
+      "examples": [
+        "(TC-B94-10) path_text \".../patches/t.json\" → None; the document now holds the one entry of t.json"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp._patch_editor_load_tail",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel",
+          "name": "panel",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._patch_document_view",
+        "PatchEditorPanel.refresh_entries"
+      ],
+      "examples": [
+        "(TC-B94-10, inferred) after the Load of t.json → `refresh_entries` receives 1 row, address \"0x300\"",
+        "(AT-B97-01, synthetic) after the Load of the 6-entry fixture → the view parses to 6 entries, addresses `0xEB10` to `0xED40`"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._apply_prepared_load",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "PreparedLoad",
+          "name": "prepared",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "float",
+          "name": "load_started",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "S19TuiApp._patch_document_view",
+        "PatchEditorPanel.refresh_entries"
+      ],
+      "examples": [
+        "(TC-B97-06, synthetic) a new image while 6 entries are loaded → view and entry count unchanged; stamp time moves"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._patch_document_view",
+      "reqs": [
+        "LLR-144.5",
+        "LLR-144.7"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PatchDocumentView",
+        "names": [
+          "view"
+        ],
+        "raw": "PatchDocumentView view"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "serialize_change_document"
+      ],
+      "examples": [
+        "(TC-B94-10, synthetic) document 1 entry {address 0x100, bytes DE AD BE EF}; no source path → view {name None, kind \"change\", json_text with `\"address\": \"0x100\"`, entry_count 1}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "serialize_change_document",
+      "reqs": [
+        "LLR-144.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChangeDocument",
+          "name": "document",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bytes",
+        "names": [
+          "wire"
+        ],
+        "raw": "bytes wire"
+      },
+      "modulo_file": "s19_app/tui/changes/io.py",
+      "inner": [],
+      "examples": [
+        "(TC-B94-10) document {kind \"change\", entries 1 of 1 {address 0x100, encoded_bytes (0xDE, 0xAD, 0xBE, 0xEF)}} → wire 232 bytes with `\"address\": \"0x100\"` and `\"bytes\": \"DE AD BE EF\"`"
+      ],
+      "modify": []
+    },
+    {
+      "name": "PatchEditorPanel.refresh_entries",
+      "reqs": [
+        "LLR-144.5",
+        "LLR-144.6",
+        "LLR-144.7",
+        "LLR-148.9"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[object]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Union[Mapping[int, int], None, _Unset]",
+          "name": "mem_map",
+          "default": "_UNSET"
+        },
+        {
+          "kind": "value",
+          "type": "Union[PatchDocumentView, _Unset]",
+          "name": "document",
+          "default": "_UNSET"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "json_stamp_text",
+        "PatchEditorPanel._render_before_after_card"
+      ],
+      "examples": [
+        "(TC-B94-10) rows 1 of 1 {address_text \"0x100\", value_text \"DE AD BE EF\"}; mem_map None → ledger 1 row",
+        "(AT-B97-02, synthetic) rows 7; document {entry_count 7}; dirty True → view parses to 7 entries; stamp \"7 entries · 10:02:13 · unsaved changes\""
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._document_view]",
+        "[Interface: patch ledger]",
+        "[Interface: patch json view]",
+        "[Interface: patch json stamp]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel._refresh_dirty_indicator",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "PatchEditorPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "json_stamp_text"
+      ],
+      "examples": [
+        "(TC-B94-10, inferred) 6 calls in the thread; the SCRIPT subtitle marker follows the flag",
+        "(AT-B97-02, synthetic) after Save, retained {entry_count 7, time \"10:02:13\"}; dirty False → stamp \"7 entries · 10:02:13 · saved\""
+      ],
+      "modify": [
+        "[Interface: patch json stamp]",
+        "[Interface: patch ledger]"
+      ]
+    },
+    {
+      "name": "json_stamp_text",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "n",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "hhmmss",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "dirty",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "stamp"
+        ],
+        "raw": "str stamp"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [],
+      "examples": [
+        "(AT-B97-02, synthetic) n 7; hhmmss \"10:02:13\"; dirty True → stamp \"7 entries · 10:02:13 · unsaved changes\"",
+        "(TC-B97-06, synthetic) n 0; hhmmss \"10:03:00\"; dirty True → stamp \"0 entries · 10:03:00 · unsaved changes\""
+      ],
+      "modify": []
+    },
+    {
+      "name": "PatchEditorPanel.mark_saved",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "PatchEditorPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "PatchEditorPanel._refresh_dirty_indicator"
+      ],
+      "examples": [
+        "(TC-B94-10) after Save of the 1-entry document → None; the flag reads False"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._dirty]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel.mark_loaded",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "PatchEditorPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "PatchEditorPanel._refresh_dirty_indicator"
+      ],
+      "examples": [
+        "(TC-B94-10) after the Load of t.json → None; the flag reads False (2 calls in the thread)"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._dirty]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel.request_action",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "action",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "PatchEditorPanel._refresh_dirty_indicator"
+      ],
+      "examples": [
+        "(TC-B94-10) action \"add_entry\" → None; the flag reads True",
+        "(TC-B94-10) action \"save_doc\" → None; the flag does not change here (Save clears it later, in mark_saved)"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._dirty]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel.on_text_area_changed",
+      "reqs": [
+        "LLR-144.6"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "TextArea.Changed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "PatchEditorPanel._refresh_dirty_indicator"
+      ],
+      "examples": [
+        "(TC-B94-10, inferred) one newline typed into `#patch_paste_text` → the flag reads True; the stamp is the only repaint (P-57)"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel._dirty]"
+      ]
+    },
+    {
+      "name": "OpenFolderChip.__init__",
+      "reqs": [
+        "LLR-148.4",
+        "LLR-148.10",
+        "HLR-148"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "family",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "id_suffix",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "OpenFolderChip",
+        "names": [
+          "chip"
+        ],
+        "raw": "OpenFolderChip chip"
+      },
+      "modulo_file": "s19_app/tui/open_folder_chip.py",
+      "inner": [],
+      "examples": [
+        "(AT-B97-12, synthetic) family \"checks\"; id_suffix \"editor\" → chip {id \"open_folder_checks_editor\", label \"📂 Open checks/\"}",
+        "(AT-B97-12, synthetic) family \"session\"; id_suffix None → chip {id \"open_folder_session\", label \"📂 Open session\"}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "OpenFolderChip.refresh_target",
+      "reqs": [
+        "LLR-148.3",
+        "HLR-148"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "OpenFolderChip",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/open_folder_chip.py",
+      "inner": [
+        "resolve_chip_target",
+        "no_project_reason"
+      ],
+      "examples": [
+        "(AT-B97-13, synthetic) family \"flows\"; no project → chip disabled; status line names the `flows/` folder and not \"Reports\""
+      ],
+      "modify": [
+        "[Interface: chip state]",
+        "[Interface: status line]"
+      ]
+    },
+    {
+      "name": "OpenFolderChip._open_target",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "LLR-148.8",
+        "LLR-148.10",
+        "HLR-148"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "OpenFolderChip",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/open_folder_chip.py",
+      "inner": [
+        "resolve_chip_target",
+        "create_chip_home",
+        "is_openable_chip_dir",
+        "open_folder_in_file_manager",
+        "no_project_reason",
+        "OpenFolderChip.refresh_target"
+      ],
+      "examples": [
+        "(TC-704, inferred) family \"checks\"; project \"proj1\"; `checks/` missing → `create_chip_home` makes \".../proj1/checks\", then the spied seam receives it (the recorder does not see the spy)",
+        "(AT-B97-12, synthetic) family \"flows\"; `flows` is a junction inside the project → 0 seam calls; status line refuses and names `flows/`"
+      ],
+      "modify": [
+        "[I/O: file system]",
+        "[Interface: status line]"
+      ]
+    },
+    {
+      "name": "resolve_chip_target",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "HLR-148"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "family",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "workarea",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Path]",
+        "names": [
+          "target"
+        ],
+        "raw": "Path? target"
+      },
+      "modulo_file": "s19_app/tui/services/folder_open_service.py",
+      "inner": [],
+      "examples": [
+        "(TC-704) family \"checks\"; project_dir \".../proj1\" → target \".../proj1/checks\"",
+        "(TC-703) family \"checks\"; project_dir None → target \".../.s19tool/workarea/patches\"",
+        "(AT-B97-12, synthetic) family \"flows\"; project_dir \".../proj1\" → target \".../proj1/flows\"; family \"session\" → target \".../proj1\""
+      ],
+      "modify": []
+    },
+    {
+      "name": "create_chip_home",
+      "reqs": [
+        "LLR-148.1",
+        "LLR-148.2",
+        "HLR-148"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "family",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "workarea",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "base_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Path",
+        "names": [
+          "home"
+        ],
+        "raw": "Path home"
+      },
+      "modulo_file": "s19_app/tui/services/folder_open_service.py",
+      "inner": [
+        "_path_traverses_reparse_point"
+      ],
+      "examples": [
+        "(TC-704) family \"checks\"; project_dir \".../proj1\" → home \".../proj1/checks\" (created)",
+        "(AT-B97-12, synthetic) family \"flows\"; project_dir \".../proj1\" → home \".../proj1/flows\" (created inside the resolved project)"
+      ],
+      "modify": [
+        "[I/O: file system]"
+      ]
+    },
+    {
+      "name": "no_project_reason",
+      "reqs": [
+        "LLR-148.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "family",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "reason"
+        ],
+        "raw": "str reason"
+      },
+      "modulo_file": "s19_app/tui/services/folder_open_service.py",
+      "inner": [],
+      "examples": [
+        "(AT-B97-13, synthetic) family \"flows\" → reason names `flows/`; family \"reports\" → reason equals `REPORTS_NO_PROJECT_REASON`"
+      ],
+      "modify": []
+    },
+    {
+      "name": "is_openable_chip_dir",
+      "reqs": [
+        "LLR-148.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "target",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "root",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "openable"
+        ],
+        "raw": "bool openable"
+      },
+      "modulo_file": "s19_app/tui/services/folder_open_service.py",
+      "inner": [
+        "_path_traverses_reparse_point"
+      ],
+      "examples": [
+        "(AT-B97-12, synthetic) target \".../proj1/flows\" (a junction); root \".../proj1\" → openable False",
+        "(TC-B97-57, synthetic) target \".../.s19tool/workarea/patches\"; root \".../.s19tool\" (no project) → openable True"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_path_traverses_reparse_point",
+      "reqs": [
+        "LLR-148.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "stop_at",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "traverses"
+        ],
+        "raw": "bool traverses"
+      },
+      "modulo_file": "s19_app/tui/workspace.py",
+      "inner": [],
+      "examples": [
+        "(TC-704) path \".../proj1/checks\"; stop_at \".../.s19tool\" → traverses False (call from the shipped scoped_home containment check)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "open_folder_in_file_manager",
+      "reqs": [
+        "LLR-148.5",
+        "LLR-148.10"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Optional[Callable[[str], None]]",
+          "name": "set_status",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "label",
+          "default": "\"folder\""
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "opened"
+        ],
+        "raw": "bool opened"
+      },
+      "modulo_file": "s19_app/tui/services/folder_open_service.py",
+      "inner": [],
+      "examples": [
+        "(TC-705) path \"/tmp/some dir\"; set_status None → opened True"
+      ],
+      "modify": [
+        "[I/O: file manager]",
+        "[Interface: status line]"
+      ]
+    },
+    {
+      "name": "load_flow_json",
+      "reqs": [
+        "LLR-146.14",
+        "HLR-146"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "flow_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Flow], List[ValidationIssue]]",
+        "names": [
+          "flow",
+          "findings"
+        ],
+        "raw": "tuple(Flow? flow, List[ValidationIssue] findings)"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [
+        "dict_to_flow"
+      ],
+      "examples": [
+        "(TC-B97-62, synthetic) flow_path with a NUL in its name → (flow None, findings 1 of 1, a refusal that names the path)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "dict_to_flow",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Any",
+          "name": "payload",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Flow], List[ValidationIssue]]",
+        "names": [
+          "flow",
+          "findings"
+        ],
+        "raw": "tuple(Flow? flow, List[ValidationIssue] findings)"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [
+        "_parse_a2b_entry",
+        "_parse_external_step_entry",
+        "_resolve_manifest_entry"
+      ],
+      "examples": [
+        "(BAT-traversal) payload blocks[3].config_ref \"../../other/secrets.json\" → (flow None, findings 1 of 1 code \"MANIFEST-PATH-ESCAPE\")",
+        "(BAT-drive-rel) payload blocks[0].image_ref \"C:relative_evil.s19\" → (flow None, findings code \"FLOW-UNSAFE-REF\")",
+        "(BAT-output-name) payload blocks[4].output_name with a traversal to \"escape.s19\" → (flow None, findings code \"FLOW-UNSAFE-OUTPUT-NAME\")",
+        "(TC-B97-62, synthetic) payload blocks[1].change_doc_ref \"calib\\x00.json\" → (flow None, findings 1 of 1 code \"FLOW-UNSAFE-REF\" naming change_doc_ref)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_parse_a2b_entry",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[str, Any]",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "label",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_root",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "List[FlowBlock]",
+          "name": "upstream_blocks",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "List[ValidationIssue]",
+          "name": "findings",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[A2BBlock]",
+        "names": [
+          "block"
+        ],
+        "raw": "A2BBlock? block"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [
+        "_resolve_manifest_entry"
+      ],
+      "examples": [
+        "(TC-B97-62, synthetic) entry image_a {source \"file\", ref \"a\\x00.s19\"} → block None; findings gains 1 refusal naming image_a.ref"
+      ],
+      "modify": [
+        "findings"
+      ]
+    },
+    {
+      "name": "_parse_external_step_entry",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[str, Any]",
+          "name": "entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "label",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "List[ValidationIssue]",
+          "name": "findings",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[ExternalStepBlock]",
+        "names": [
+          "block"
+        ],
+        "raw": "ExternalStepBlock? block"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [],
+      "examples": [
+        "(TC-B97-62, synthetic) entry log_ref \"run\\x00.log\" → block None; findings gains 1 code \"FLOW-UNSAFE-REF\" naming log_ref",
+        "(P-36, inferred) on `main` the same entry loads: `log_ref` is checked for non-empty only (`flow_persistence_service.py:819-825`), so it is accepted, not raised"
+      ],
+      "modify": [
+        "findings"
+      ]
+    },
+    {
+      "name": "load_chain_set",
+      "reqs": [
+        "LLR-146.14",
+        "HLR-146"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "set_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[ChainSet], List[ValidationIssue]]",
+        "names": [
+          "chain_set",
+          "findings"
+        ],
+        "raw": "tuple(ChainSet? chain_set, List[ValidationIssue] findings)"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [
+        "dict_to_chain_set"
+      ],
+      "examples": [
+        "(TC-B94-31) set_path \".../flowsets/escape.json\" → (chain_set None, findings code \"MANIFEST-PATH-ESCAPE\")",
+        "(TC-B97-62, synthetic) set_path with a NUL in its name → (chain_set None, findings 1 of 1); the `stat()` guard catches the `ValueError`"
+      ],
+      "modify": []
+    },
+    {
+      "name": "dict_to_chain_set",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Any",
+          "name": "payload",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[ChainSet], List[ValidationIssue]]",
+        "names": [
+          "chain_set",
+          "findings"
+        ],
+        "raw": "tuple(ChainSet? chain_set, List[ValidationIssue] findings)"
+      },
+      "modulo_file": "s19_app/tui/services/flow_persistence_service.py",
+      "inner": [
+        "_resolve_manifest_entry"
+      ],
+      "examples": [
+        "(TC-B94-31) payload chains[0].inputs [[0, \"../outside.s19\"]] → (chain_set None, findings code \"MANIFEST-PATH-ESCAPE\")",
+        "(TC-B94-31) payload chains[0].template \"../evil\" → (chain_set None, findings code \"CHAIN-SET-UNSAFE-REF\")",
+        "(TC-B97-62, synthetic) payload chains[0].template \"base\\x00\" → (chain_set None, findings 1 of 1 code \"CHAIN-SET-UNSAFE-REF\")"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_resolve_manifest_entry",
+      "reqs": [
+        "LLR-146.14",
+        "LLR-148.9"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_root",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "object",
+          "name": "raw_entry",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "context",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[ValidationIssue]",
+          "name": "issues",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[Path]",
+        "names": [
+          "resolved"
+        ],
+        "raw": "Path? resolved"
+      },
+      "modulo_file": "s19_app/tui/services/variant_execution_service.py",
+      "inner": [
+        "_path_traverses_reparse_point"
+      ],
+      "examples": [
+        "(TC-B94-31) raw_entry \"../outside.s19\"; context \"chains[0].inputs.ref\" → resolved None; issues gains `escapes the project directory`",
+        "(AT-B97-23, synthetic) raw_entry \"base\\x00.s19\"; context \"SourceBlock.image_ref\" → resolved None; issues gains 1 code \"MANIFEST-PATH-ESCAPE\""
+      ],
+      "modify": [
+        "issues"
+      ]
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[SizeProbe]",
+          "name": "size_probe",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[ProjectManifest]",
+        "names": [
+          "manifest"
+        ],
+        "raw": "ProjectManifest? manifest"
+      },
+      "modulo_file": "s19_app/tui/services/variant_execution_service.py",
+      "inner": [
+        "_resolve_manifest_entry"
+      ],
+      "examples": [
+        "(TC-B97-62, inferred) manifest batch entry \"a\\x00.s19\" → that entry skipped, 1 MANIFEST-PATH-ESCAPE finding, the others kept"
+      ],
+      "modify": []
+    },
+    {
+      "name": "run_flow",
+      "reqs": [
+        "LLR-146.14",
+        "LLR-148.9"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Flow",
+          "name": "flow",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "FlowContext",
+          "name": "ctx",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "FlowRunResult",
+        "names": [
+          "result"
+        ],
+        "raw": "FlowRunResult result"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [
+        "_resolve_manifest_entry",
+        "_path_traverses_reparse_point"
+      ],
+      "examples": [
+        "(P-50, inferred) lane 0 bound to \"base\\x00.s19\" → on `main` `ValueError: embedded null character` at `variant_execution_service.py:273`",
+        "(AT-B97-23, inferred) the same binding → result {status \"error\", block 1 \"source unresolved\"}; the run log names MANIFEST-PATH-ESCAPE in 1 English line"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_chain_inputs",
+      "reqs": [
+        "LLR-146.14"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "FlowContext",
+          "name": "ctx",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[FlowBlock]",
+          "name": "blocks",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "List[Tuple[str, str]]",
+        "names": [
+          "inputs"
+        ],
+        "raw": "List[Tuple[str, str]] inputs"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [
+        "_resolve_manifest_entry"
+      ],
+      "examples": [
+        "(AT-B97-23, inferred) a SOURCE bound to \"base\\x00.s19\" → that input left out; no raise"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_FlowExecutionSection.action_confirm_attention",
+      "reqs": [
+        "LLR-147.13",
+        "HLR-147"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "_FlowExecutionSection",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "FlowExecutionPanel.confirm_attention"
+      ],
+      "examples": [
+        "(AT-B97-20, synthetic) `c` with the focus on a header chip, lane 1 waiting for 0.6 s → the panel confirms lane 1"
+      ],
+      "modify": []
+    },
+    {
+      "name": "FlowExecutionPanel.confirm_attention",
+      "reqs": [
+        "LLR-147.13",
+        "LLR-147.3"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FlowExecutionPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(TC-B97-64, synthetic) `press(\"c\", \"c\")`, two lanes waiting, 0.049 s apart → 1 confirm (lane 0); lane 1 still waiting",
+        "(TC-B97-64, synthetic) `c` 0.2 s after the attention paint → 0 confirms; status \"c ignored: the waiting lane just appeared — press c again\""
+      ],
+      "modify": [
+        "[Data: FlowExecutionPanel attention]",
+        "[Interface: status line]"
+      ]
+    },
+    {
+      "name": "FlowExecutionPanel.on_button_pressed",
+      "reqs": [
+        "LLR-147.4",
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Button.Pressed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(TC-1804, inferred) press `#fx_run` → run request {lanes 1 \"ext\", mode \"sequential\"}; press `#fx_confirm_0` → confirmation {lane_index 0, block_index 1}",
+        "(TC-B97-55, synthetic) 3 presses of Run during one run → 1 run request; `#fx_run` disabled until the record is painted"
+      ],
+      "modify": [
+        "[Interface: Run button]"
+      ]
+    },
+    {
+      "name": "S19TuiApp.on_flow_execution_panel_run_requested",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-148.9",
+        "HLR-147"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "FlowExecutionPanel.RunRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "run_chain_set",
+        "FlowExecutionPanel.render_run",
+        "FlowExecutionPanel.render_run_error"
+      ],
+      "examples": [
+        "(TC-1804) event {lanes 1 {name \"ext\", bindings (0, \"base.s19\")}, mode \"sequential\", set_name \"chain-set\"} → None; the record goes to render_run",
+        "(TC-B97-55, synthetic) `run_chain_set` raises → `render_run_error` paints 1 English line; Run enabled again"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+      "reqs": [
+        "LLR-147.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "FlowExecutionPanel.ExternalStepConfirmed",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "run_chain_set",
+        "FlowExecutionPanel.apply_confirmed_run",
+        "FlowExecutionPanel.render_run_error"
+      ],
+      "examples": [
+        "(PROBE-2EXT) event {lane_index 0, block_index 1} → None; the re-run record of lane 0 waits again, at block 2"
+      ],
+      "modify": []
+    },
+    {
+      "name": "run_chain_set",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[ChainSpec]",
+          "name": "chains",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "FlowContext",
+          "name": "ctx",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "mode",
+          "default": "CHAIN_RUN_SEQUENTIAL"
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "set_name",
+          "default": "\"chain-set\""
+        },
+        {
+          "kind": "callable",
+          "type": "Optional[Callable[[Flow, FlowContext], FlowRunResult]]",
+          "name": "run_one",
+          "default": "None"
+        },
+        {
+          "kind": "callable",
+          "type": "Optional[Callable[[], float]]",
+          "name": "clock",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChainSetRunRecord",
+        "names": [
+          "record"
+        ],
+        "raw": "ChainSetRunRecord record"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [
+        "run_flow",
+        "_chain_inputs"
+      ],
+      "examples": [
+        "(TC-1804) chains 1 {name \"ext\"}; mode \"sequential\" → record {outcomes 1 {status \"paused\", block 1 \"waiting\"}}",
+        "(PROBE-2EXT) re-run with block 1 confirmed → record {outcomes 1 {status \"paused\", block 2 \"waiting\", block 3 \"skipped\"}}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "FlowExecutionPanel.render_run",
+      "reqs": [
+        "LLR-147.3",
+        "LLR-147.10",
+        "LLR-147.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChainSetRunRecord",
+          "name": "record",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(TC-1804) record {outcomes 1 {status \"paused\", block 1 \"waiting\"}} → None; lane 0 paused at block 1; Confirm of lane 0 shown",
+        "(AT-B97-20, synthetic) two lanes waiting → attention lane 0; REQUIRED line \"log + output file: REQUIRED for ext · press c to confirm\""
+      ],
+      "modify": [
+        "[Data: FlowExecutionPanel lanes]",
+        "[Data: FlowExecutionPanel attention]",
+        "[Interface: lanes]",
+        "[Interface: run log]",
+        "[Interface: Run button]"
+      ]
+    },
+    {
+      "name": "FlowExecutionPanel.apply_confirmed_run",
+      "reqs": [
+        "LLR-147.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "lane_index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "ChainSetRunRecord",
+          "name": "record",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(TC-1804) lane_index 0; record {outcomes 1 {status \"ok\"}} → None; Confirm of lane 0 hidden",
+        "(PROBE-2EXT) lane_index 0; record {outcomes 1 {status \"paused\", block 2 \"waiting\"}} → None; on main the lane keeps status paused but paused_block None and Confirm of lane 0 hidden; the run log line reads □ ext2 · done, with a monotonic stamp (probe output, H-X3)",
+        "(TC-B97-64, synthetic) the same record → lane 0 waiting at block 2; Confirm shown; one more `c` after the dwell confirms it"
+      ],
+      "modify": [
+        "[Data: FlowExecutionPanel lanes]",
+        "[Data: FlowExecutionPanel attention]",
+        "[Interface: lanes]",
+        "[Interface: run log]"
+      ]
+    },
+    {
+      "name": "FlowExecutionPanel.render_run_error",
+      "reqs": [
+        "LLR-147.10",
+        "LLR-148.9"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "message",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(TC-B97-55, synthetic) message \"run failed: ValueError\" → run log 1 line; `#fx_run` enabled"
+      ],
+      "modify": [
+        "[Interface: run log]",
+        "[Interface: Run button]"
+      ]
+    },
+    {
+      "name": "patch_layout",
+      "reqs": [
+        "LLR-149.1",
+        "LLR-144.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "table_content_w",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "inspector_content_w",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PatchLayout",
+        "names": [
+          "layout"
+        ],
+        "raw": "PatchLayout layout"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [],
+      "examples": [
+        "(D21, synthetic) inspector_content_w 44 → strip_max_bytes 12; inspector_content_w 86 → strip_max_bytes 26"
+      ],
+      "modify": []
+    },
+    {
+      "name": "check_layout",
+      "reqs": [
+        "LLR-149.1",
+        "LLR-145.2",
+        "LLR-145.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "table_content_w",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "card_content_w",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "CheckLayout",
+        "names": [
+          "layout"
+        ],
+        "raw": "CheckLayout layout"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [],
+      "examples": [
+        "(D21, synthetic) card_content_w 41 → address_w 10; fields_name_w 27; at 118x54 parameter_w 42, at 220x60 about 105"
+      ],
+      "modify": []
+    },
+    {
+      "name": "pipeline_layout",
+      "reqs": [
+        "LLR-149.1",
+        "LLR-149.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "avail_w",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "n_cards",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "PipelineLayout",
+        "names": [
+          "layout"
+        ],
+        "raw": "PipelineLayout layout"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(D21, synthetic) avail_w 108; n_cards 4 → card_w (24, 24, 24, 24); avail_w 208; n_cards 4 → card_w (49, 49, 49, 49)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "lane_layout",
+      "reqs": [
+        "LLR-149.1",
+        "LLR-147.12"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "viewport_w",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "n_cards",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LaneLayout",
+        "names": [
+          "layout"
+        ],
+        "raw": "LaneLayout layout"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [],
+      "examples": [
+        "(D21, synthetic) viewport_w 110; n_cards 6 → card_w 21; scrolls True; viewport_w 216; n_cards 4 → card_w 51; scrolls False"
+      ],
+      "modify": []
+    },
+    {
+      "name": "PatchEditorPanel._apply_layout",
+      "reqs": [
+        "LLR-149.1"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "PatchEditorPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "patch_layout"
+      ],
+      "examples": [
+        "(TC-B97-34, synthetic) resize 118x54 → 220x60 → strip_max_bytes 12 → 26; back to 118x54 → 12"
+      ],
+      "modify": [
+        "[Data: PatchEditorPanel layout]",
+        "[Interface: column widths]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel.on_resize",
+      "reqs": [
+        "LLR-149.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "events.Resize",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "PatchEditorPanel._apply_layout"
+      ],
+      "examples": [
+        "(TC-B97-34, synthetic) four resizes in one session → four layouts"
+      ],
+      "modify": []
+    },
+    {
+      "name": "CheckEditorPanel._apply_layout",
+      "reqs": [
+        "LLR-149.1"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "CheckEditorPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "check_layout"
+      ],
+      "examples": [
+        "(TC-B97-34, synthetic) 118x54 → 220x60 → parameter_w 42 → about 105"
+      ],
+      "modify": [
+        "[Interface: column widths]"
+      ]
+    },
+    {
+      "name": "FlowBuilderPanel._apply_layout",
+      "reqs": [
+        "LLR-149.1"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FlowBuilderPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [
+        "pipeline_layout"
+      ],
+      "examples": [
+        "(AT-B97-16, synthetic) 4 cards at 220x60 → each card 49 cells; no void over 2 cells"
+      ],
+      "modify": [
+        "[Interface: card widths]"
+      ]
+    },
+    {
+      "name": "FlowExecutionPanel._apply_layout",
+      "reqs": [
+        "LLR-149.1",
+        "LLR-147.12"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "FlowExecutionPanel",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/flow_screens.py",
+      "inner": [
+        "lane_layout"
+      ],
+      "examples": [
+        "(AT-B97-15, synthetic) 6 cards at 118x54 → cards 21; `#fx_lanes_scroll` scrolls; 4 cards at 220x60 fill the width"
+      ],
+      "modify": [
+        "[Interface: card widths]"
+      ]
+    },
+    {
+      "name": "PatchEditorPanel._render_before_after_card",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "index",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "BeforeAfterCard.show_entry"
+      ],
+      "examples": [
+        "(TC-B94-10) index 0 → None; the card call that follows is the show_entry line of this thread",
+        "(TC-B97-39, synthetic) index 1 at 220x60 → the card receives max_bytes 26 from the retained layout"
+      ],
+      "modify": []
+    },
+    {
+      "name": "BeforeAfterCard.show_entry",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "address",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[int?]]",
+          "name": "before",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[int]",
+          "name": "after",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "max_bytes",
+          "default": "CARD_BYTES_MAX"
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [
+        "before_after_card_text"
+      ],
+      "examples": [
+        "(TC-B94-10) address 0x100; before None; after (0xDE, 0xAD, 0xBE, 0xEF) → None; the strip shows the no-image line",
+        "(TC-B97-39, synthetic) max_bytes 26 at 220x60 → up to 26 byte cells"
+      ],
+      "modify": []
+    },
+    {
+      "name": "before_after_card_text",
+      "reqs": [
+        "LLR-144.8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "address",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[int?]]",
+          "name": "before",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[int]",
+          "name": "after",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "max_bytes",
+          "default": "CARD_BYTES_MAX"
+        }
+      ],
+      "out": {
+        "type": "Text",
+        "names": [
+          "strip"
+        ],
+        "raw": "Text strip"
+      },
+      "modulo_file": "s19_app/tui/screens_directionb.py",
+      "inner": [],
+      "examples": [
+        "(TC-B94-10) address 0x100; before None; after (0xDE, 0xAD, 0xBE, 0xEF) → strip \"No image loaded\"",
+        "(TC-B97-39, synthetic) before (0x01, 0x02); after (0xAA, 0x02) → byte 1 bold and coloured; byte 2 plain"
+      ],
+      "modify": []
+    }
+  ],
+  "edges": [
+    {
+      "src": {
+        "entity": "[I/O: change-set file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._patch_editor_load",
+        "port": "path_text"
+      },
+      "when": null,
+      "raw": "[I/O: change-set file] ──▶ S19TuiApp._patch_editor_load.path_text"
+    },
+    {
+      "src": {
+        "entity": "[Data: ChangeService.document]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._patch_document_view",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: ChangeService.document] ──▶ S19TuiApp._patch_document_view"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp.on_patch_editor_panel_action_requested"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._patch_editor_load_tail",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp._patch_editor_load_tail"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._refresh_patch_history_view",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp._refresh_patch_history_view"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._patch_document_view",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "serialize_change_document",
+        "port": "document"
+      },
+      "when": null,
+      "raw": "S19TuiApp._patch_document_view ──▶ serialize_change_document.document"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "serialize_change_document",
+        "port": "wire"
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._patch_document_view",
+        "port": "view.json_text"
+      },
+      "when": null,
+      "raw": "serialize_change_document.wire ──▶ S19TuiApp._patch_document_view.view.json_text"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._patch_document_view",
+        "port": "view"
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "document"
+      },
+      "when": null,
+      "raw": "S19TuiApp._patch_document_view.view ──▶ PatchEditorPanel.refresh_entries.document"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_patch_editor_panel_action_requested ──▶ PatchEditorPanel.refresh_entries.rows"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._patch_editor_load_tail",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "S19TuiApp._patch_editor_load_tail ──▶ PatchEditorPanel.refresh_entries.rows"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._refresh_patch_history_view",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "S19TuiApp._refresh_patch_history_view ──▶ PatchEditorPanel.refresh_entries.rows"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._apply_prepared_load",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "S19TuiApp._apply_prepared_load ──▶ PatchEditorPanel.refresh_entries.rows"
+    },
+    {
+      "src": {
+        "entity": "[Data: PatchEditorPanel._dirty]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: PatchEditorPanel._dirty] ──▶ PatchEditorPanel.refresh_entries"
+    },
+    {
+      "src": {
+        "entity": "[Data: PatchEditorPanel._dirty]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel._refresh_dirty_indicator",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: PatchEditorPanel._dirty] ──▶ PatchEditorPanel._refresh_dirty_indicator"
+    },
+    {
+      "src": {
+        "entity": "[Data: PatchEditorPanel._document_view]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel._refresh_dirty_indicator",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: PatchEditorPanel._document_view] ──▶ PatchEditorPanel._refresh_dirty_indicator"
+    },
+    {
+      "src": {
+        "entity": "[I/O: clock]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: clock] ──▶ PatchEditorPanel.refresh_entries"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": "document.entry_count"
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "n"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel.refresh_entries.document.entry_count ──▶ json_stamp_text.n"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "hhmmss"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel.refresh_entries ──▶ json_stamp_text.hhmmss"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel.refresh_entries",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "dirty"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel.refresh_entries ──▶ json_stamp_text.dirty"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._refresh_dirty_indicator",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "n"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._refresh_dirty_indicator ──▶ json_stamp_text.n"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._refresh_dirty_indicator",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "hhmmss"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._refresh_dirty_indicator ──▶ json_stamp_text.hhmmss"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._refresh_dirty_indicator",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "dirty"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._refresh_dirty_indicator ──▶ json_stamp_text.dirty"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "json_stamp_text",
+        "port": "stamp"
+      },
+      "dst": {
+        "entity": "[Interface: patch json stamp]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "json_stamp_text.stamp ──▶ [Interface: patch json stamp]"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp active project]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "OpenFolderChip.refresh_target",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp active project] ──▶ OpenFolderChip.refresh_target"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp active project]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp active project] ──▶ OpenFolderChip._open_target"
+    },
+    {
+      "src": {
+        "entity": "[I/O: file system]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: file system] ──▶ OpenFolderChip._open_target"
+    },
+    {
+      "src": {
+        "entity": "[I/O: file system]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "is_openable_chip_dir",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: file system] ──▶ is_openable_chip_dir"
+    },
+    {
+      "src": {
+        "entity": "[I/O: file system]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_path_traverses_reparse_point",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: file system] ──▶ _path_traverses_reparse_point"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip.__init__",
+        "port": "chip"
+      },
+      "dst": {
+        "entity": null,
+        "node": "OpenFolderChip.refresh_target",
+        "port": "self"
+      },
+      "when": null,
+      "raw": "OpenFolderChip.__init__.chip ──▶ OpenFolderChip.refresh_target.self"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip.__init__",
+        "port": "chip"
+      },
+      "dst": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": "self"
+      },
+      "when": null,
+      "raw": "OpenFolderChip.__init__.chip ──▶ OpenFolderChip._open_target.self"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip.refresh_target",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "resolve_chip_target",
+        "port": null
+      },
+      "when": null,
+      "raw": "OpenFolderChip.refresh_target ──▶ resolve_chip_target"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "resolve_chip_target",
+        "port": null
+      },
+      "when": null,
+      "raw": "OpenFolderChip._open_target ──▶ resolve_chip_target"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "create_chip_home",
+        "port": null
+      },
+      "when": "target does not exist and the family is creatable",
+      "raw": "OpenFolderChip._open_target ──▶ create_chip_home"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "resolve_chip_target",
+        "port": "target"
+      },
+      "dst": {
+        "entity": null,
+        "node": "is_openable_chip_dir",
+        "port": "target"
+      },
+      "when": "target exists",
+      "raw": "resolve_chip_target.target ──▶ is_openable_chip_dir.target"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "create_chip_home",
+        "port": "home"
+      },
+      "dst": {
+        "entity": null,
+        "node": "is_openable_chip_dir",
+        "port": "target"
+      },
+      "when": "target was missing and is now created",
+      "raw": "create_chip_home.home ──▶ is_openable_chip_dir.target"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "is_openable_chip_dir",
+        "port": "root"
+      },
+      "when": null,
+      "raw": "OpenFolderChip._open_target ──▶ is_openable_chip_dir.root"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "is_openable_chip_dir",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_path_traverses_reparse_point",
+        "port": null
+      },
+      "when": null,
+      "raw": "is_openable_chip_dir ──▶ _path_traverses_reparse_point"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "resolve_chip_target",
+        "port": "target"
+      },
+      "dst": {
+        "entity": null,
+        "node": "open_folder_in_file_manager",
+        "port": "path"
+      },
+      "when": "openable is True",
+      "raw": "resolve_chip_target.target ──▶ open_folder_in_file_manager.path"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "OpenFolderChip._open_target",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "open_folder_in_file_manager",
+        "port": "set_status"
+      },
+      "when": null,
+      "raw": "OpenFolderChip._open_target ──▶ open_folder_in_file_manager.set_status"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "resolve_chip_target",
+        "port": "target"
+      },
+      "dst": {
+        "entity": null,
+        "node": "no_project_reason",
+        "port": null
+      },
+      "when": "target is None",
+      "raw": "resolve_chip_target.target ──▶ no_project_reason"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "no_project_reason",
+        "port": "reason"
+      },
+      "dst": {
+        "entity": "[Interface: status line]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "no_project_reason.reason ──▶ [Interface: status line]"
+    },
+    {
+      "src": {
+        "entity": "[I/O: flow file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "load_flow_json",
+        "port": "flow_path"
+      },
+      "when": null,
+      "raw": "[I/O: flow file] ──▶ load_flow_json.flow_path"
+    },
+    {
+      "src": {
+        "entity": "[I/O: chain-set file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "load_chain_set",
+        "port": "set_path"
+      },
+      "when": null,
+      "raw": "[I/O: chain-set file] ──▶ load_chain_set.set_path"
+    },
+    {
+      "src": {
+        "entity": "[I/O: manifest file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "read_project_manifest",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: manifest file] ──▶ read_project_manifest"
+    },
+    {
+      "src": {
+        "entity": "[I/O: project tree]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: project tree] ──▶ _resolve_manifest_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "load_flow_json",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "dict_to_flow",
+        "port": "payload"
+      },
+      "when": null,
+      "raw": "load_flow_json ──▶ dict_to_flow.payload"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "load_chain_set",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "dict_to_chain_set",
+        "port": "payload"
+      },
+      "when": null,
+      "raw": "load_chain_set ──▶ dict_to_chain_set.payload"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_flow",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_parse_a2b_entry",
+        "port": "entry"
+      },
+      "when": null,
+      "raw": "dict_to_flow ──▶ _parse_a2b_entry.entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_flow",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_parse_external_step_entry",
+        "port": "entry"
+      },
+      "when": null,
+      "raw": "dict_to_flow ──▶ _parse_external_step_entry.entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_flow",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": "the field is a read ref (image_ref, change_doc_ref, check_doc_ref, config_ref, a2l_ref)",
+      "raw": "dict_to_flow ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "_parse_a2b_entry",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": "the binding source is a file",
+      "raw": "_parse_a2b_entry ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_chain_set",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": null,
+      "raw": "dict_to_chain_set ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "read_project_manifest",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": null,
+      "raw": "read_project_manifest ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_flow",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": null,
+      "raw": "run_flow ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "_chain_inputs",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_resolve_manifest_entry",
+        "port": "raw_entry"
+      },
+      "when": null,
+      "raw": "_chain_inputs ──▶ _resolve_manifest_entry.raw_entry"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_flow",
+        "port": "flow"
+      },
+      "dst": {
+        "entity": null,
+        "node": "load_flow_json",
+        "port": "flow"
+      },
+      "when": null,
+      "raw": "dict_to_flow.flow ──▶ load_flow_json.flow"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "dict_to_chain_set",
+        "port": "chain_set"
+      },
+      "dst": {
+        "entity": null,
+        "node": "load_chain_set",
+        "port": "chain_set"
+      },
+      "when": null,
+      "raw": "dict_to_chain_set.chain_set ──▶ load_chain_set.chain_set"
+    },
+    {
+      "src": {
+        "entity": "[Interface: Flow Execution lanes]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "port": "event"
+      },
+      "when": null,
+      "raw": "[Interface: Flow Execution lanes] ──▶ S19TuiApp.on_flow_execution_panel_run_requested.event"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "flow"
+      },
+      "when": null,
+      "raw": "run_chain_set ──▶ run_flow.flow"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_chain_inputs",
+        "port": "blocks"
+      },
+      "when": null,
+      "raw": "run_chain_set ──▶ _chain_inputs.blocks"
+    },
+    {
+      "src": {
+        "entity": "[Data: FlowExecutionPanel attention]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.confirm_attention",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: FlowExecutionPanel attention] ──▶ FlowExecutionPanel.confirm_attention"
+    },
+    {
+      "src": {
+        "entity": "[Data: FlowExecutionPanel lanes]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.confirm_attention",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: FlowExecutionPanel lanes] ──▶ FlowExecutionPanel.confirm_attention"
+    },
+    {
+      "src": {
+        "entity": "[I/O: monotonic clock]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.confirm_attention",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: monotonic clock] ──▶ FlowExecutionPanel.confirm_attention"
+    },
+    {
+      "src": {
+        "entity": "[I/O: monotonic clock]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.render_run",
+        "port": null
+      },
+      "when": null,
+      "raw": "[I/O: monotonic clock] ──▶ FlowExecutionPanel.render_run"
+    },
+    {
+      "src": {
+        "entity": "[Data: FlowExecutionPanel lanes]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.on_button_pressed",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: FlowExecutionPanel lanes] ──▶ FlowExecutionPanel.on_button_pressed"
+    },
+    {
+      "src": {
+        "entity": "[Data: FlowExecutionPanel lanes]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: FlowExecutionPanel lanes] ──▶ S19TuiApp.on_flow_execution_panel_external_step_confirmed"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp active project]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp active project] ──▶ S19TuiApp.on_flow_execution_panel_run_requested"
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp active project]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp active project] ──▶ S19TuiApp.on_flow_execution_panel_external_step_confirmed"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowExecutionPanel.confirm_attention",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "port": "event"
+      },
+      "when": null,
+      "raw": "FlowExecutionPanel.confirm_attention ──▶ S19TuiApp.on_flow_execution_panel_external_step_confirmed.event"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowExecutionPanel.on_button_pressed",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "port": "event"
+      },
+      "when": "the pressed button is `#fx_confirm_<i>` of a waiting lane",
+      "raw": "FlowExecutionPanel.on_button_pressed ──▶ S19TuiApp.on_flow_execution_panel_external_step_confirmed.event"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowExecutionPanel.on_button_pressed",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "port": "event"
+      },
+      "when": "the pressed button is `#fx_run`",
+      "raw": "FlowExecutionPanel.on_button_pressed ──▶ S19TuiApp.on_flow_execution_panel_run_requested.event"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "chains"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_flow_execution_panel_run_requested ──▶ run_chain_set.chains"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "chains"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_flow_execution_panel_external_step_confirmed ──▶ run_chain_set.chains"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "record"
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.render_run",
+        "port": "record"
+      },
+      "when": "the run was a set run",
+      "raw": "run_chain_set.record ──▶ FlowExecutionPanel.render_run.record"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "record"
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.apply_confirmed_run",
+        "port": "record"
+      },
+      "when": "the run was a confirmation re-run",
+      "raw": "run_chain_set.record ──▶ FlowExecutionPanel.apply_confirmed_run.record"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_flow_execution_panel_run_requested",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel.render_run_error",
+        "port": "message"
+      },
+      "when": "no project, or `run_chain_set` raised",
+      "raw": "S19TuiApp.on_flow_execution_panel_run_requested ──▶ FlowExecutionPanel.render_run_error.message"
+    },
+    {
+      "src": {
+        "entity": "[Interface: panel regions]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel._apply_layout",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Interface: panel regions] ──▶ PatchEditorPanel._apply_layout"
+    },
+    {
+      "src": {
+        "entity": "[Interface: panel regions]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "CheckEditorPanel._apply_layout",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Interface: panel regions] ──▶ CheckEditorPanel._apply_layout"
+    },
+    {
+      "src": {
+        "entity": "[Interface: panel regions]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowBuilderPanel._apply_layout",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Interface: panel regions] ──▶ FlowBuilderPanel._apply_layout"
+    },
+    {
+      "src": {
+        "entity": "[Interface: panel regions]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "FlowExecutionPanel._apply_layout",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Interface: panel regions] ──▶ FlowExecutionPanel._apply_layout"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "patch_layout",
+        "port": "table_content_w"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._apply_layout ──▶ patch_layout.table_content_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "patch_layout",
+        "port": "inspector_content_w"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._apply_layout ──▶ patch_layout.inspector_content_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "CheckEditorPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "check_layout",
+        "port": "table_content_w"
+      },
+      "when": null,
+      "raw": "CheckEditorPanel._apply_layout ──▶ check_layout.table_content_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "CheckEditorPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "check_layout",
+        "port": "card_content_w"
+      },
+      "when": null,
+      "raw": "CheckEditorPanel._apply_layout ──▶ check_layout.card_content_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowBuilderPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "pipeline_layout",
+        "port": "avail_w"
+      },
+      "when": null,
+      "raw": "FlowBuilderPanel._apply_layout ──▶ pipeline_layout.avail_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowBuilderPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "pipeline_layout",
+        "port": "n_cards"
+      },
+      "when": null,
+      "raw": "FlowBuilderPanel._apply_layout ──▶ pipeline_layout.n_cards"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowExecutionPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "lane_layout",
+        "port": "viewport_w"
+      },
+      "when": null,
+      "raw": "FlowExecutionPanel._apply_layout ──▶ lane_layout.viewport_w"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "FlowExecutionPanel._apply_layout",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "lane_layout",
+        "port": "n_cards"
+      },
+      "when": null,
+      "raw": "FlowExecutionPanel._apply_layout ──▶ lane_layout.n_cards"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "patch_layout",
+        "port": "layout"
+      },
+      "dst": {
+        "entity": "[Data: PatchEditorPanel layout]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "patch_layout.layout ──▶ [Data: PatchEditorPanel layout]"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "check_layout",
+        "port": "layout"
+      },
+      "dst": {
+        "entity": "[Interface: column widths]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "check_layout.layout ──▶ [Interface: column widths]"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "pipeline_layout",
+        "port": "layout"
+      },
+      "dst": {
+        "entity": "[Interface: card widths]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "pipeline_layout.layout ──▶ [Interface: card widths]"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "lane_layout",
+        "port": "layout"
+      },
+      "dst": {
+        "entity": "[Interface: card widths]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "lane_layout.layout ──▶ [Interface: card widths]"
+    },
+    {
+      "src": {
+        "entity": "[Data: PatchEditorPanel layout]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "PatchEditorPanel._render_before_after_card",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: PatchEditorPanel layout] ──▶ PatchEditorPanel._render_before_after_card"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "PatchEditorPanel._render_before_after_card",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "BeforeAfterCard.show_entry",
+        "port": "max_bytes"
+      },
+      "when": null,
+      "raw": "PatchEditorPanel._render_before_after_card ──▶ BeforeAfterCard.show_entry.max_bytes"
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "BeforeAfterCard.show_entry",
+        "port": "max_bytes"
+      },
+      "dst": {
+        "entity": null,
+        "node": "before_after_card_text",
+        "port": "max_bytes"
+      },
+      "when": null,
+      "raw": "BeforeAfterCard.show_entry.max_bytes ──▶ before_after_card_text.max_bytes"
+    }
+  ],
+  "c15": [
+    {
+      "caller": "BeforeAfterCard.show_entry",
+      "callee": "before_after_card_text",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:4302"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "OpenFolderChip._open_target",
+      "callee": "OpenFolderChip.refresh_target",
+      "sites": [
+        "s19_app/tui/open_folder_chip.py:185"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "OpenFolderChip._open_target",
+      "callee": "create_chip_home",
+      "sites": [
+        "s19_app/tui/open_folder_chip.py:167"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "OpenFolderChip._open_target",
+      "callee": "open_folder_in_file_manager",
+      "sites": [
+        "s19_app/tui/open_folder_chip.py:177"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "OpenFolderChip._open_target",
+      "callee": "resolve_chip_target",
+      "sites": [
+        "s19_app/tui/open_folder_chip.py:154"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "OpenFolderChip.refresh_target",
+      "callee": "resolve_chip_target",
+      "sites": [
+        "s19_app/tui/open_folder_chip.py:105"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel._render_before_after_card",
+      "callee": "BeforeAfterCard.show_entry",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:6335",
+        "s19_app/tui/screens_directionb.py:6345",
+        "s19_app/tui/screens_directionb.py:6350"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel.mark_loaded",
+      "callee": "PatchEditorPanel._refresh_dirty_indicator",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5972"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel.mark_saved",
+      "callee": "PatchEditorPanel._refresh_dirty_indicator",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5960"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel.on_text_area_changed",
+      "callee": "PatchEditorPanel._refresh_dirty_indicator",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5712"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel.refresh_entries",
+      "callee": "PatchEditorPanel._render_before_after_card",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:6238"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "PatchEditorPanel.request_action",
+      "callee": "PatchEditorPanel._refresh_dirty_indicator",
+      "sites": [
+        "s19_app/tui/screens_directionb.py:5777"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._apply_entry_json_edit",
+      "callee": "S19TuiApp._refresh_patch_history_view",
+      "sites": [
+        "s19_app/tui/app.py:3832"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._apply_prepared_load",
+      "callee": "PatchEditorPanel.refresh_entries",
+      "sites": [
+        "s19_app/tui/app.py:10768"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._patch_editor_load",
+      "callee": "PatchEditorPanel.mark_loaded",
+      "sites": [
+        "s19_app/tui/app.py:5271"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._patch_editor_load",
+      "callee": "S19TuiApp._patch_editor_load_tail",
+      "sites": [
+        "s19_app/tui/app.py:5272"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._patch_editor_load_tail",
+      "callee": "PatchEditorPanel.refresh_entries",
+      "sites": [
+        "s19_app/tui/app.py:5288"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._refresh_patch_history_view",
+      "callee": "PatchEditorPanel.refresh_entries",
+      "sites": [
+        "s19_app/tui/app.py:3455"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.action_patch_redo",
+      "callee": "S19TuiApp._refresh_patch_history_view",
+      "sites": [
+        "s19_app/tui/app.py:3622"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.action_patch_undo",
+      "callee": "S19TuiApp._refresh_patch_history_view",
+      "sites": [
+        "s19_app/tui/app.py:3595"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+      "callee": "FlowExecutionPanel.apply_confirmed_run",
+      "sites": [
+        "s19_app/tui/app.py:2893"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+      "callee": "FlowExecutionPanel.render_run_error",
+      "sites": [
+        "s19_app/tui/app.py:2857"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_external_step_confirmed",
+      "callee": "run_chain_set",
+      "sites": [
+        "s19_app/tui/app.py:2887"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_run_requested",
+      "callee": "FlowExecutionPanel.render_run",
+      "sites": [
+        "s19_app/tui/app.py:2822"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_run_requested",
+      "callee": "FlowExecutionPanel.render_run_error",
+      "sites": [
+        "s19_app/tui/app.py:2803"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_flow_execution_panel_run_requested",
+      "callee": "run_chain_set",
+      "sites": [
+        "s19_app/tui/app.py:2816"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "PatchEditorPanel.mark_loaded",
+      "sites": [
+        "s19_app/tui/app.py:3186"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "PatchEditorPanel.mark_saved",
+      "sites": [
+        "s19_app/tui/app.py:3239"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "PatchEditorPanel.refresh_entries",
+      "sites": [
+        "s19_app/tui/app.py:3268"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "S19TuiApp._patch_editor_load",
+      "sites": [
+        "s19_app/tui/app.py:3177"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "_path_traverses_reparse_point",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:241"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:4171",
+        "s19_app/tui/services/variant_execution_service.py:947"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "_chain_inputs",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:1438"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "_parse_a2b_entry",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:751"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "_resolve_manifest_entry",
+      "callee": "_path_traverses_reparse_point",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:284"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "create_chip_home",
+      "callee": "_path_traverses_reparse_point",
+      "sites": [
+        "s19_app/tui/services/project_gather_service.py:241"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "dict_to_chain_set",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:1378"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "dict_to_flow",
+      "callee": "_parse_a2b_entry",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:498"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "dict_to_flow",
+      "callee": "_parse_external_step_entry",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:508"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "dict_to_flow",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:570",
+        "s19_app/tui/services/flow_persistence_service.py:598"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "load_chain_set",
+      "callee": "dict_to_chain_set",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:1498"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "load_flow_json",
+      "callee": "dict_to_flow",
+      "sites": [
+        "s19_app/tui/services/flow_persistence_service.py:928"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "read_project_manifest",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:498",
+        "s19_app/tui/services/variant_execution_service.py:526"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "_path_traverses_reparse_point",
+      "sites": [
+        "s19_app/tui/workspace.py:338"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "_resolve_manifest_entry",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:299",
+        "s19_app/tui/services/flow_execution_service.py:329",
+        "s19_app/tui/services/flow_execution_service.py:388",
+        "s19_app/tui/services/flow_execution_service.py:409",
+        "s19_app/tui/services/flow_execution_service.py:548",
+        "s19_app/tui/services/flow_execution_service.py:610",
+        "s19_app/tui/services/flow_execution_service.py:707"
+      ],
+      "declared_via": "inner"
+    }
+  ],
+  "top_level_sites": {
+    "S19TuiApp._apply_prepared_load": [
+      "docs/images/capture_readme_media.py:88",
+      "s19_app/tui/app.py:10625"
+    ],
+    "_resolve_manifest_entry": [
+      "prototypes/fb_p1_flow_persistence.prototype.py:289",
+      "s19_app/tui/services/manifest_writer.py:216"
+    ],
+    "OpenFolderChip.__init__": [
+      "s19_app/tui/app.py:2321",
+      "s19_app/tui/app.py:2476",
+      "s19_app/tui/app.py:3050",
+      "s19_app/tui/screens.py:1668"
+    ],
+    "read_project_manifest": [
+      "s19_app/tui/app.py:2606",
+      "s19_app/tui/app.py:4645",
+      "s19_app/tui/app.py:4753",
+      "s19_app/tui/app.py:8172",
+      "s19_app/tui/services/manifest_writer.py:701"
+    ],
+    "run_flow": [
+      "s19_app/tui/app.py:2581"
+    ],
+    "PatchEditorPanel.mark_saved": [
+      "s19_app/tui/app.py:2653",
+      "s19_app/tui/app.py:2939"
+    ],
+    "load_flow_json": [
+      "s19_app/tui/app.py:2690",
+      "s19_app/tui/app.py:2757",
+      "s19_app/tui/app.py:2988"
+    ],
+    "load_chain_set": [
+      "s19_app/tui/app.py:2973"
+    ],
+    "S19TuiApp.action_patch_undo": [
+      "s19_app/tui/app.py:3513"
+    ],
+    "S19TuiApp.action_patch_redo": [
+      "s19_app/tui/app.py:3538"
+    ],
+    "S19TuiApp._apply_entry_json_edit": [
+      "s19_app/tui/app.py:3788"
+    ],
+    "S19TuiApp._patch_editor_load": [
+      "s19_app/tui/app.py:5250",
+      "s19_app/tui/app.py:5330"
+    ],
+    "open_folder_in_file_manager": [
+      "s19_app/tui/app.py:6397"
+    ],
+    "OpenFolderChip.refresh_target": [
+      "s19_app/tui/app.py:12767",
+      "s19_app/tui/open_folder_chip.py:91"
+    ],
+    "serialize_change_document": [
+      "s19_app/tui/changes/io.py:1583",
+      "s19_app/tui/services/change_service.py:1269"
+    ],
+    "dict_to_flow": [
+      "s19_app/tui/flow_screens.py:1352"
+    ],
+    "OpenFolderChip._open_target": [
+      "s19_app/tui/open_folder_chip.py:139"
+    ],
+    "PatchEditorPanel.refresh_entries": [
+      "s19_app/tui/screens_directionb.py:5665"
+    ],
+    "PatchEditorPanel.request_action": [
+      "s19_app/tui/screens_directionb.py:5933",
+      "s19_app/tui/screens_directionb.py:5949"
+    ],
+    "PatchEditorPanel._render_before_after_card": [
+      "s19_app/tui/screens_directionb.py:6277"
+    ],
+    "_chain_inputs": [
+      "s19_app/tui/services/flow_execution_service.py:1514"
+    ],
+    "_path_traverses_reparse_point": [
+      "s19_app/tui/services/manifest_writer.py:407"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app.py",
+      "msg": "`S19TuiApp._patch_document_view`"
+    },
+    {
+      "kind": "input_missing_in_code",
+      "where": "s19_app/tui/screens_directionb.py:6112",
+      "msg": "graph input `document` not a parameter of `PatchEditorPanel.refresh_entries`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/screens_directionb.py",
+      "msg": "`json_stamp_text`"
+    },
+    {
+      "kind": "input_missing_in_code",
+      "where": "s19_app/tui/open_folder_chip.py:72",
+      "msg": "graph input `id_suffix` not a parameter of `OpenFolderChip.__init__`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/folder_open_service.py",
+      "msg": "`no_project_reason`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/folder_open_service.py",
+      "msg": "`is_openable_chip_dir`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/app.py",
+      "msg": "`_FlowExecutionSection.action_confirm_attention`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/flow_screens.py",
+      "msg": "`FlowExecutionPanel.confirm_attention`"
+    },
+    {
+      "kind": "input_untyped_in_code",
+      "where": "s19_app/tui/flow_screens.py:2399",
+      "msg": "`record` has no annotation (graph: `ChainSetRunRecord`)"
+    },
+    {
+      "kind": "input_untyped_in_code",
+      "where": "s19_app/tui/flow_screens.py:2502",
+      "msg": "`record` has no annotation (graph: `ChainSetRunRecord`)"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/screens_directionb.py",
+      "msg": "`patch_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/screens_directionb.py",
+      "msg": "`check_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/flow_screens.py",
+      "msg": "`pipeline_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/flow_screens.py",
+      "msg": "`lane_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/screens_directionb.py",
+      "msg": "`PatchEditorPanel._apply_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/screens_directionb.py",
+      "msg": "`CheckEditorPanel._apply_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/flow_screens.py",
+      "msg": "`FlowBuilderPanel._apply_layout`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/flow_screens.py",
+      "msg": "`FlowExecutionPanel._apply_layout`"
+    },
+    {
+      "kind": "input_missing_in_code",
+      "where": "s19_app/tui/screens_directionb.py:4272",
+      "msg": "graph input `max_bytes` not a parameter of `BeforeAfterCard.show_entry`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/screens_directionb.py:4272",
+      "msg": "`before`: graph `Optional[Sequence[int?]]` vs code `Optional[Sequence[Optional[int]]]`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/screens_directionb.py:4119",
+      "msg": "`before`: graph `Optional[Sequence[int?]]` vs code `Optional[Sequence[Optional[int]]]`"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/project_gather_service.py:241",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `_path_traverses_reparse_point` (sites: s19_app/tui/services/project_gather_service.py:241) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: s19_app/tui/services/manifest_writer.py:407"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:4171",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `read_project_manifest` (sites: s19_app/tui/app.py:4171, s19_app/tui/services/variant_execution_service.py:947) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: s19_app/tui/app.py:2606, s19_app/tui/app.py:4645, s19_app/tui/app.py:4753, s19_app/tui/app.py:8172, s19_app/tui/services/manifest_writer.py:701"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "msg": "`inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` declares `S19TuiApp._patch_document_view`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "S19TuiApp._refresh_patch_history_view",
+      "msg": "`inner:` of `S19TuiApp._refresh_patch_history_view` declares `S19TuiApp._patch_document_view`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "S19TuiApp._patch_editor_load_tail",
+      "msg": "`inner:` of `S19TuiApp._patch_editor_load_tail` declares `S19TuiApp._patch_document_view`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "S19TuiApp._apply_prepared_load",
+      "msg": "`inner:` of `S19TuiApp._apply_prepared_load` declares `S19TuiApp._patch_document_view`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "S19TuiApp._patch_document_view",
+      "msg": "`inner:` of `S19TuiApp._patch_document_view` declares `serialize_change_document`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "PatchEditorPanel.refresh_entries",
+      "msg": "`inner:` of `PatchEditorPanel.refresh_entries` declares `json_stamp_text`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "PatchEditorPanel._refresh_dirty_indicator",
+      "msg": "`inner:` of `PatchEditorPanel._refresh_dirty_indicator` declares `json_stamp_text`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "OpenFolderChip.refresh_target",
+      "msg": "`inner:` of `OpenFolderChip.refresh_target` declares `no_project_reason`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "OpenFolderChip._open_target",
+      "msg": "`inner:` of `OpenFolderChip._open_target` declares `is_openable_chip_dir`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "OpenFolderChip._open_target",
+      "msg": "`inner:` of `OpenFolderChip._open_target` declares `no_project_reason`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "is_openable_chip_dir",
+      "msg": "`inner:` of `is_openable_chip_dir` declares `_path_traverses_reparse_point`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "_FlowExecutionSection.action_confirm_attention",
+      "msg": "`inner:` of `_FlowExecutionSection.action_confirm_attention` declares `FlowExecutionPanel.confirm_attention`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "run_chain_set",
+      "msg": "`inner:` of `run_chain_set` declares `run_flow`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "run_chain_set",
+      "msg": "`inner:` of `run_chain_set` declares `_chain_inputs`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "PatchEditorPanel._apply_layout",
+      "msg": "`inner:` of `PatchEditorPanel._apply_layout` declares `patch_layout`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "PatchEditorPanel.on_resize",
+      "msg": "`inner:` of `PatchEditorPanel.on_resize` declares `PatchEditorPanel._apply_layout`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "CheckEditorPanel._apply_layout",
+      "msg": "`inner:` of `CheckEditorPanel._apply_layout` declares `check_layout`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "FlowBuilderPanel._apply_layout",
+      "msg": "`inner:` of `FlowBuilderPanel._apply_layout` declares `pipeline_layout`, no lifted call found"
+    },
+    {
+      "kind": "info_c15_absence",
+      "where": "FlowExecutionPanel._apply_layout",
+      "msg": "`inner:` of `FlowExecutionPanel._apply_layout` declares `lane_layout`, no lifted call found"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "S19TuiApp._patch_document_view",
+      "msg": "`S19TuiApp._patch_document_view` declared inside `S19TuiApp.on_patch_editor_panel_action_requested`, `S19TuiApp._refresh_patch_history_view`, `S19TuiApp._patch_editor_load_tail`, `S19TuiApp._apply_prepared_load`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "PatchEditorPanel.refresh_entries",
+      "msg": "`PatchEditorPanel.refresh_entries` declared inside `S19TuiApp.on_patch_editor_panel_action_requested`, `S19TuiApp._refresh_patch_history_view`, `S19TuiApp._patch_editor_load_tail`, `S19TuiApp._apply_prepared_load`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "PatchEditorPanel.mark_loaded",
+      "msg": "`PatchEditorPanel.mark_loaded` declared inside `S19TuiApp.on_patch_editor_panel_action_requested`, `S19TuiApp._patch_editor_load`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "S19TuiApp._refresh_patch_history_view",
+      "msg": "`S19TuiApp._refresh_patch_history_view` declared inside `S19TuiApp.action_patch_undo`, `S19TuiApp.action_patch_redo`, `S19TuiApp._apply_entry_json_edit`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "json_stamp_text",
+      "msg": "`json_stamp_text` declared inside `PatchEditorPanel.refresh_entries`, `PatchEditorPanel._refresh_dirty_indicator`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "PatchEditorPanel._refresh_dirty_indicator",
+      "msg": "`PatchEditorPanel._refresh_dirty_indicator` declared inside `PatchEditorPanel.mark_saved`, `PatchEditorPanel.mark_loaded`, `PatchEditorPanel.request_action`, `PatchEditorPanel.on_text_area_changed`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "resolve_chip_target",
+      "msg": "`resolve_chip_target` declared inside `OpenFolderChip.refresh_target`, `OpenFolderChip._open_target`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "no_project_reason",
+      "msg": "`no_project_reason` declared inside `OpenFolderChip.refresh_target`, `OpenFolderChip._open_target`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "_path_traverses_reparse_point",
+      "msg": "`_path_traverses_reparse_point` declared inside `create_chip_home`, `is_openable_chip_dir`, `_resolve_manifest_entry`, `run_flow`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "_resolve_manifest_entry",
+      "msg": "`_resolve_manifest_entry` declared inside `dict_to_flow`, `_parse_a2b_entry`, `dict_to_chain_set`, `read_project_manifest`, `run_flow`, `_chain_inputs`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "run_chain_set",
+      "msg": "`run_chain_set` declared inside `S19TuiApp.on_flow_execution_panel_run_requested`, `S19TuiApp.on_flow_execution_panel_external_step_confirmed`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "FlowExecutionPanel.render_run_error",
+      "msg": "`FlowExecutionPanel.render_run_error` declared inside `S19TuiApp.on_flow_execution_panel_run_requested`, `S19TuiApp.on_flow_execution_panel_external_step_confirmed`: two call sites by design"
+    }
+  ],
+  "parse_failures": []
+}

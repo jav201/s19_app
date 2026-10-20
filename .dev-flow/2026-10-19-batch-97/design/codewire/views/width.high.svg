@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1665" height="750" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">width · high level</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M232,104 C471,104 471,260 710,260" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C301,104 301,156 370,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C301,104 301,208 370,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M232,104 C301,104 301,260 370,260" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,260 C1005,260 1005,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,156 C665,156 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,208 C665,208 665,156 710,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,260 C665,260 665,208 710,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1300,104 C1345,104 1345,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,104 C1175,104 1175,156 1390,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,156 C1175,156 1175,208 1390,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,208 C1175,208 1175,208 1390,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1507,116 C1001,116 1001,298 495,298" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,312 C665,312 665,312 710,312" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,312 C1005,312 1005,156 1050,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,260 C1175,260 1175,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1175" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M960,260 C1175,260 1175,156 1390,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1175" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M620,104 C665,104 665,260 710,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M620,156 C1005,156 1005,156 1390,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1005" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M620,208 C1005,208 1005,208 1390,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1005" y="205" fill="#334155" font-size="10">modify</text>
+<path d="M620,260 C1005,260 1005,208 1390,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1005" y="231" fill="#334155" font-size="10">modify</text>
+<rect x="1050" y="90" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="90" x2="1053" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="90" x2="1297" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="108" font-weight="normal" fill="#0f172a">patch_layout</text>
+<rect x="710" y="90" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="90" x2="713" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="90" x2="957" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="108" font-weight="normal" fill="#0f172a">check_layout</text>
+<rect x="710" y="142" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="142" x2="713" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="142" x2="957" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="160" font-weight="normal" fill="#0f172a">pipeline_layout</text>
+<rect x="710" y="194" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="194" x2="713" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="194" x2="957" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="212" font-weight="normal" fill="#0f172a">lane_layout</text>
+<rect x="710" y="246" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="246" x2="713" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="246" x2="957" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="264" font-weight="bold" fill="#0f172a">PatchEditorPanel._apply_layout</text>
+<rect x="370" y="90" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="90" x2="373" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="90" x2="617" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="108" font-weight="bold" fill="#0f172a">PatchEditorPanel.on_resize</text>
+<rect x="370" y="142" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="142" x2="373" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="142" x2="617" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="160" font-weight="bold" fill="#0f172a">CheckEditorPanel._apply_layout</text>
+<rect x="370" y="194" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="194" x2="373" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="194" x2="617" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="212" font-weight="bold" fill="#0f172a">FlowBuilderPanel._apply_layout</text>
+<rect x="370" y="246" width="250" height="26" fill="#e0e7ff" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="246" x2="373" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="246" x2="617" y2="272" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="264" font-weight="bold" fill="#0f172a">FlowExecutionPanel._apply_layout</text>
+<rect x="370" y="298" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="298" x2="373" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="298" x2="617" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="316" font-weight="bold" fill="#0f172a">PatchEditorPanel._render_before_after_card</text>
+<rect x="710" y="298" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="298" x2="713" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="298" x2="957" y2="324" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="316" font-weight="bold" fill="#0f172a">BeforeAfterCard.show_entry</text>
+<rect x="1050" y="142" width="250" height="26" fill="#ecfccb" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="142" x2="1053" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="142" x2="1297" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="160" font-weight="normal" fill="#0f172a">before_after_card_text</text>
+<rect x="1390" y="90" width="234.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="1400" y="108" font-weight="normal" fill="#0f172a">[Data: PatchEditorPanel layout]</text>
+<rect x="30" y="90" width="201.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[Interface: panel regions]</text>
+<rect x="1390" y="142" width="201.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="1400" y="160" font-weight="normal" fill="#0f172a">[Interface: column widths]</text>
+<rect x="1390" y="194" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="1400" y="212" font-weight="normal" fill="#0f172a">[Interface: card widths]</text>
+<rect x="30" y="394" width="1604.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="410" fill="#b91c1c">H-W1 · lane_layout</text>
+<text x="40" y="424" fill="#b91c1c">what: D21 freezes `&lt;screen&gt;_layout(width) -&gt; NamedTuple`. But the §3 formulas need more inputs. They need the card count (`lane_layout(viewport_w, n)` in §3), the inspector width and the table width</text>
+<text x="40" y="438" fill="#b91c1c">decision: changes D21. Fix the input list of each layout function (this graph proposes one). The inputs are measured content widths, not the terminal width</text>
+<rect x="30" y="466" width="1604.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="482" fill="#b91c1c">H-W2 · [Data: PatchEditorPanel layout] ──▶ PatchEditorPanel._render_before_after_card</text>
+<text x="40" y="496" fill="#b91c1c">what: D21 says `_apply_layout` &quot;sets widths only&quot;. The strip byte count, the clipped card text, the Fields name and the full-name line are painted text whose content depends on the width. No step repaints them on resize</text>
+<text x="40" y="510" fill="#b91c1c">decision: changes D21: `_apply_layout` also re-renders each width-dependent painted widget, or each such widget reads the layout at paint time and `_apply_layout` asks for that paint</text>
+<rect x="30" y="538" width="1604.6" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="554" fill="#b91c1c">H-W3 · BeforeAfterCard.show_entry</text>
+<text x="40" y="568" fill="#b91c1c">what: D5 derives `max_bytes` from the inspector width, but `show_entry` takes no `max_bytes`. Only the pure composer does</text>
+<text x="40" y="582" fill="#b91c1c">decision: none. List it in the Inc-4 scope</text>
+<rect x="30" y="640" width="14" height="12" fill="#e0e7ff" stroke="#334155"/>
+<text x="50" y="650" fill="#334155">s19_app/tui/flow_screens.py</text>
+<rect x="390" y="640" width="14" height="12" fill="#ecfccb" stroke="#334155"/>
+<text x="410" y="650" fill="#334155">s19_app/tui/screens_directionb.py</text>
+</svg>

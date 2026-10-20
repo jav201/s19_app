@@ -1,0 +1,366 @@
+{
+ "load_chain_set": [
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 0,
+   "in": {
+    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json",
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-JSON-PARSE",
+       "severity": "error",
+       "message": "chain-set file is not well-formed JSON - JSONDecodeError",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\bad.json": [
+     "{ not json"
+    ]
+   }
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 0,
+   "in": {
+    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json",
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-SCHEMA-UNSUPPORTED",
+       "severity": "error",
+       "message": "chain-set schema_version 2/kind 'chain-set' is not supported (this build reads version 1 'chain-set' only)",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\wrong.json": [
+     "{\"schema_version\": 2, \"kind\": \"chain-set\", \"name\": \"x\", \"chains\": []}"
+    ]
+   }
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 0,
+   "in": {
+    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json",
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "MANIFEST-PATH-ESCAPE",
+       "severity": "error",
+       "message": "manifest chains[0].inputs.ref entry escapes the project directory - entry skipped: '../outside.s19'",
+       "artifact": "manifest",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\escape.json": [
+     "{\"schema_version\": 1, \"kind\": \"chain-set\", \"name\": \"variants_a_b\", \"chains\": [{\"chain\": \"a\", \"template\": \"base\", \"inputs\": [[0, \"../outside.s19\"]], \"outputs\": [\"out.s19\"]}, {\"chain\": \"b\", \"template\": \"base\", \"inputs\": [[0, \"variant_b.hex\"]], \"outputs\": [\"out.s19\"]}]}"
+    ]
+   }
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 0,
+   "in": {
+    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json",
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-UNSAFE-REF",
+       "severity": "error",
+       "message": "chains[0].template '../evil' must be a plain flows/ file name (no separators, no traversal, not absolute)",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\shape.json": [
+     "{\"schema_version\": 1, \"kind\": \"chain-set\", \"name\": \"variants_a_b\", \"chains\": [{\"chain\": \"a\", \"template\": \"../evil\", \"inputs\": [[0, \"base.s19\"]], \"outputs\": [\"out.s19\"]}, {\"chain\": \"b\", \"template\": \"base\", \"inputs\": [[0, \"variant_b.hex\"]], \"outputs\": [\"out.s19\"]}]}"
+    ]
+   }
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 0,
+   "in": {
+    "set_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\flowsets\\huge.json",
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-SIZE-CAP",
+       "severity": "error",
+       "message": "chain-set file is 1048577 bytes, over the 1048576-byte cap - not loaded",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ]
+  }
+ ],
+ "dict_to_chain_set": [
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 1,
+   "in": {
+    "payload": {
+     "schema_version": 2,
+     "kind": "chain-set",
+     "name": "x",
+     "chains": []
+    },
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-SCHEMA-UNSUPPORTED",
+       "severity": "error",
+       "message": "chain-set schema_version 2/kind 'chain-set' is not supported (this build reads version 1 'chain-set' only)",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ]
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 1,
+   "in": {
+    "payload": {
+     "schema_version": 1,
+     "kind": "chain-set",
+     "name": "variants_a_b",
+     "chains": [
+      {
+       "chain": "a",
+       "template": "base",
+       "inputs": [
+        "[0, '../outside.s19']"
+       ],
+       "outputs": [
+        "out.s19"
+       ]
+      },
+      {
+       "chain": "b",
+       "template": "base",
+       "inputs": [
+        "[0, 'variant_b.hex']"
+       ],
+       "outputs": [
+        "out.s19"
+       ]
+      }
+     ]
+    },
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "MANIFEST-PATH-ESCAPE",
+       "severity": "error",
+       "message": "manifest chains[0].inputs.ref entry escapes the project directory - entry skipped: '../outside.s19'",
+       "artifact": "manifest",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ]
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 1,
+   "in": {
+    "payload": {
+     "schema_version": 1,
+     "kind": "chain-set",
+     "name": "variants_a_b",
+     "chains": [
+      {
+       "chain": "a",
+       "template": "../evil",
+       "inputs": [
+        "[0, 'base.s19']"
+       ],
+       "outputs": [
+        "out.s19"
+       ]
+      },
+      {
+       "chain": "b",
+       "template": "base",
+       "inputs": [
+        "[0, 'variant_b.hex']"
+       ],
+       "outputs": [
+        "out.s19"
+       ]
+      }
+     ]
+    },
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj"
+   },
+   "out": [
+    null,
+    [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-UNSAFE-REF",
+       "severity": "error",
+       "message": "chains[0].template '../evil' must be a plain flows/ file name (no separators, no traversal, not absolute)",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   ]
+  }
+ ],
+ "_resolve_manifest_entry": [
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 2,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "raw_entry": "../outside.s19",
+    "context": "chains[0].inputs.ref",
+    "issues": []
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 2,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "raw_entry": "variant_b.hex",
+    "context": "chains[1].inputs.ref",
+    "issues": [
+     {
+      "ValidationIssue": {
+       "code": "MANIFEST-PATH-ESCAPE",
+       "severity": "error",
+       "message": "manifest chains[0].inputs.ref entry escapes the project directory - entry skipped: '../outside.s19'",
+       "artifact": "manifest",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
+     "S107100001020304DE",
+     "S9030000FC"
+    ]
+   }
+  },
+  {
+   "test": "tests/test_flow_chainset_b94.py::test_tc_b94_31_empty_set_and_hostile_sets_fail_closed",
+   "depth": 2,
+   "in": {
+    "project_root": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj",
+    "raw_entry": "variant_b.hex",
+    "context": "chains[1].inputs.ref",
+    "issues": [
+     {
+      "ValidationIssue": {
+       "code": "CHAIN-SET-UNSAFE-REF",
+       "severity": "error",
+       "message": "chains[0].template '../evil' must be a plain flows/ file name (no separators, no traversal, not absolute)",
+       "artifact": "chain-set",
+       "symbol": null,
+       "address": null,
+       "line_number": null,
+       "related_artifacts": [],
+       "details": {}
+      }
+     }
+    ]
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex",
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20969\\test_tc_b94_31_empty_set_and_h0\\.s19tool\\workarea\\proj\\variant_b.hex": [
+     "S107100001020304DE",
+     "S9030000FC"
+    ]
+   }
+  }
+ ]
+}

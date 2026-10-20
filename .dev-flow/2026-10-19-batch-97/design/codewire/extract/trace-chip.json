@@ -1,0 +1,949 @@
+{
+ "OpenFolderChip.refresh_target": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  }
+ ],
+ "resolve_chip_target": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 2,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 2,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 2,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 2,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\patches"
+  }
+ ],
+ "OpenFolderChip._open_target": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_reports_chip_resolves_project_reports_only",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[patch-#open_folder_patch-patches]",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[checks-#open_folder_checks-checks]",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[templates-#open_folder_templates-templates]",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_common_home_no_project_dimmed_and_recreated",
+   "depth": 0,
+   "in": {},
+   "out": null
+  }
+ ],
+ "create_chip_home": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\proj1",
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\proj1\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_reports_chip_resolves_project_reports_only",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_reports_chip_resolv0\\.s19tool\\workarea\\proj1",
+    "family": "reports",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_reports_chip_resolv0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_reports_chip_resolv0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_reports_chip_resolv0\\.s19tool\\workarea\\proj1\\reports"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[patch-#open_folder_patch-patches]",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0\\.s19tool\\workarea\\proj1",
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0\\.s19tool\\workarea\\proj1\\patches"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[checks-#open_folder_checks-checks]",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1\\.s19tool\\workarea\\proj1",
+    "family": "checks",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1\\.s19tool\\workarea\\proj1\\checks"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[templates-#open_folder_templates-templates]",
+   "depth": 1,
+   "in": {
+    "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2\\.s19tool\\workarea\\proj1",
+    "family": "templates",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2\\.s19tool\\workarea\\proj1\\templates"
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_common_home_no_project_dimmed_and_recreated",
+   "depth": 1,
+   "in": {
+    "project_dir": null,
+    "family": "patch",
+    "workarea": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_common_home0\\.s19tool\\workarea",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_common_home0"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_common_home0\\.s19tool\\workarea\\patches"
+  }
+ ],
+ "_path_traverses_reparse_point": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool\\workarea\\proj1\\patches",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_patch_editor_chip_r0\\.s19tool"
+   },
+   "out": false
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool\\workarea\\proj1\\checks",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_checks_chip_resolve0\\.s19tool"
+   },
+   "out": false
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool\\workarea\\proj1\\templates",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc703_crc_designer_chip_r0\\.s19tool"
+   },
+   "out": false
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[patch-#open_folder_patch-patches]",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0\\.s19tool\\workarea\\proj1\\patches",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol0\\.s19tool"
+   },
+   "out": false
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[checks-#open_folder_checks-checks]",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1\\.s19tool\\workarea\\proj1\\checks",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol1\\.s19tool"
+   },
+   "out": false
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[templates-#open_folder_templates-templates]",
+   "depth": 2,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2\\.s19tool\\workarea\\proj1\\templates",
+    "stop_at": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20964\\test_tc704_missing_project_fol2\\.s19tool"
+   },
+   "out": false
+  }
+ ],
+ "open_folder_in_file_manager": [
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm",
+   "depth": 0,
+   "in": {
+    "path": "\\tmp\\some dir",
+    "set_status": null
+   },
+   "out": true
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm",
+   "depth": 0,
+   "in": {
+    "path": "\\tmp\\some dir",
+    "set_status": null
+   },
+   "out": true
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm",
+   "depth": 0,
+   "in": {
+    "path": "\\tmp\\some dir",
+    "set_status": null
+   },
+   "out": true
+  },
+  {
+   "test": "tests/test_open_folder_chips.py::test_tc705_seam_failure_lands_on_status_line_no_escape",
+   "depth": 0,
+   "in": {
+    "path": "\\tmp\\x",
+    "set_status": "<built-in method append of list object at 0x0000021FE2E189C0>"
+   },
+   "out": false
+  }
+ ]
+}

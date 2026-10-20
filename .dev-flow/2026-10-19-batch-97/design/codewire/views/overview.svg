@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="777" font-family="Consolas, monospace" font-size="11">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">batch-97 · Code-Wire overview of the five flows (review view)</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">one double-framed box per flow · NEW = no def in the code · CHANGED = a synthetic example or a signature drift on a node with code · SHIPPED = neither · read from extract/, not from the graph text</text>
+<rect x="30" y="80" width="520" height="126" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="34" y="84" width="512" height="118" fill="none" stroke="#0f172a"/>
+<text x="42" y="100" fill="#0f172a" font-weight="bold">chip-open  (subsystem)</text>
+<text x="42" y="114" fill="#15803d" font-weight="normal">NEW 2</text>
+<text x="42" y="128" fill="#0f172a" font-weight="normal">  no_project_reason, is_openable_chip_dir</text>
+<text x="42" y="142" fill="#b45309" font-weight="normal">CHANGED 5</text>
+<text x="42" y="156" fill="#0f172a" font-weight="normal">  OpenFolderChip.__init__, OpenFolderChip.refresh_target,</text>
+<text x="42" y="170" fill="#0f172a" font-weight="normal">  OpenFolderChip._open_target, resolve_chip_target, create_chip_home</text>
+<text x="42" y="184" fill="#334155" font-weight="normal">SHIPPED 2</text>
+<text x="42" y="198" fill="#0f172a" font-weight="normal">  _path_traverses_reparse_point, open_folder_in_file_manager</text>
+<rect x="610" y="80" width="520" height="168" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="614" y="84" width="512" height="160" fill="none" stroke="#0f172a"/>
+<text x="622" y="100" fill="#0f172a" font-weight="bold">confirm-key  (subsystem)</text>
+<text x="622" y="114" fill="#15803d" font-weight="normal">NEW 2</text>
+<text x="622" y="128" fill="#0f172a" font-weight="normal">  _FlowExecutionSection.action_confirm_attention,</text>
+<text x="622" y="142" fill="#0f172a" font-weight="normal">    FlowExecutionPanel.confirm_attention</text>
+<text x="622" y="156" fill="#b45309" font-weight="normal">CHANGED 5</text>
+<text x="622" y="170" fill="#0f172a" font-weight="normal">  FlowExecutionPanel.on_button_pressed,</text>
+<text x="622" y="184" fill="#0f172a" font-weight="normal">    S19TuiApp.on_flow_execution_panel_run_requested,</text>
+<text x="622" y="198" fill="#0f172a" font-weight="normal">  FlowExecutionPanel.render_run, FlowExecutionPanel.apply_confirmed_run,</text>
+<text x="622" y="212" fill="#0f172a" font-weight="normal">    FlowExecutionPanel.render_run_error</text>
+<text x="622" y="226" fill="#334155" font-weight="normal">SHIPPED 2</text>
+<text x="622" y="240" fill="#0f172a" font-weight="normal">  S19TuiApp.on_flow_execution_panel_external_step_confirmed, run_chain_set</text>
+<rect x="1190" y="80" width="520" height="126" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="1194" y="84" width="512" height="118" fill="none" stroke="#0f172a"/>
+<text x="1202" y="100" fill="#0f172a" font-weight="bold">nul-refusal  (subsystem)</text>
+<text x="1202" y="114" fill="#15803d" font-weight="normal">NEW 0</text>
+<text x="1202" y="128" fill="#b45309" font-weight="normal">CHANGED 7</text>
+<text x="1202" y="142" fill="#0f172a" font-weight="normal">  load_flow_json, dict_to_flow, _parse_a2b_entry,</text>
+<text x="1202" y="156" fill="#0f172a" font-weight="normal">  _parse_external_step_entry, load_chain_set, dict_to_chain_set,</text>
+<text x="1202" y="170" fill="#0f172a" font-weight="normal">    _resolve_manifest_entry</text>
+<text x="1202" y="184" fill="#334155" font-weight="normal">SHIPPED 3</text>
+<text x="1202" y="198" fill="#0f172a" font-weight="normal">  read_project_manifest, run_flow, _chain_inputs</text>
+<rect x="30" y="288" width="520" height="224" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="34" y="292" width="512" height="216" fill="none" stroke="#0f172a"/>
+<text x="42" y="308" fill="#0f172a" font-weight="bold">patch-json  (subsystem)</text>
+<text x="42" y="322" fill="#15803d" font-weight="normal">NEW 2</text>
+<text x="42" y="336" fill="#0f172a" font-weight="normal">  S19TuiApp._patch_document_view, json_stamp_text</text>
+<text x="42" y="350" fill="#b45309" font-weight="normal">CHANGED 6</text>
+<text x="42" y="364" fill="#0f172a" font-weight="normal">  S19TuiApp.on_patch_editor_panel_action_requested,</text>
+<text x="42" y="378" fill="#0f172a" font-weight="normal">    S19TuiApp._refresh_patch_history_view,</text>
+<text x="42" y="392" fill="#0f172a" font-weight="normal">  S19TuiApp._patch_editor_load_tail, S19TuiApp._apply_prepared_load,</text>
+<text x="42" y="406" fill="#0f172a" font-weight="normal">    PatchEditorPanel.refresh_entries,</text>
+<text x="42" y="420" fill="#0f172a" font-weight="normal">    PatchEditorPanel._refresh_dirty_indicator</text>
+<text x="42" y="434" fill="#334155" font-weight="normal">SHIPPED 9</text>
+<text x="42" y="448" fill="#0f172a" font-weight="normal">  S19TuiApp.action_patch_undo, S19TuiApp.action_patch_redo,</text>
+<text x="42" y="462" fill="#0f172a" font-weight="normal">  S19TuiApp._apply_entry_json_edit, S19TuiApp._patch_editor_load,</text>
+<text x="42" y="476" fill="#0f172a" font-weight="normal">  serialize_change_document, PatchEditorPanel.mark_saved,</text>
+<text x="42" y="490" fill="#0f172a" font-weight="normal">  PatchEditorPanel.mark_loaded, PatchEditorPanel.request_action,</text>
+<text x="42" y="504" fill="#0f172a" font-weight="normal">    PatchEditorPanel.on_text_area_changed</text>
+<rect x="610" y="288" width="520" height="140" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="614" y="292" width="512" height="132" fill="none" stroke="#0f172a"/>
+<text x="622" y="308" fill="#0f172a" font-weight="bold">width  (subsystem)</text>
+<text x="622" y="322" fill="#15803d" font-weight="normal">NEW 8</text>
+<text x="622" y="336" fill="#0f172a" font-weight="normal">  patch_layout, check_layout, pipeline_layout, lane_layout,</text>
+<text x="622" y="350" fill="#0f172a" font-weight="normal">  PatchEditorPanel._apply_layout, CheckEditorPanel._apply_layout,</text>
+<text x="622" y="364" fill="#0f172a" font-weight="normal">  FlowBuilderPanel._apply_layout, FlowExecutionPanel._apply_layout</text>
+<text x="622" y="378" fill="#b45309" font-weight="normal">CHANGED 4</text>
+<text x="622" y="392" fill="#0f172a" font-weight="normal">  PatchEditorPanel.on_resize, PatchEditorPanel._render_before_after_card,</text>
+<text x="622" y="406" fill="#0f172a" font-weight="normal">  BeforeAfterCard.show_entry, before_after_card_text</text>
+<text x="622" y="420" fill="#334155" font-weight="normal">SHIPPED 0</text>
+<text x="30" y="562" font-family="Segoe UI, sans-serif" font-size="13" fill="#0f172a">Cross-flow edges and calls</text>
+<text x="40" y="582" fill="#334155">confirm-key ──▶ nul-refusal : run_chain_set → _chain_inputs</text>
+<text x="40" y="597" fill="#334155">confirm-key ──▶ nul-refusal : run_chain_set → _chain_inputs (inner)</text>
+<text x="40" y="612" fill="#334155">confirm-key ──▶ nul-refusal : run_chain_set → run_flow</text>
+<text x="40" y="627" fill="#334155">confirm-key ──▶ nul-refusal : run_chain_set → run_flow (inner)</text>
+<text x="40" y="642" fill="#334155">nul-refusal ──▶ chip-open : _resolve_manifest_entry → _path_traverses_reparse_point (inner)</text>
+<text x="40" y="657" fill="#334155">nul-refusal ──▶ chip-open : run_flow → _path_traverses_reparse_point (inner)</text>
+<text x="40" y="672" fill="#334155">patch-json ──▶ width : PatchEditorPanel.refresh_entries → PatchEditorPanel._render_before_after_card (inner)</text>
+<text x="30" y="707" font-family="Segoe UI, sans-serif" font-size="13" fill="#0f172a">Entities in more than one flow</text>
+<text x="40" y="727" fill="#334155">[Data: S19TuiApp active project] : chip-open, confirm-key</text>
+<text x="40" y="742" fill="#334155">[Interface: status line] : chip-open, confirm-key</text>
+</svg>

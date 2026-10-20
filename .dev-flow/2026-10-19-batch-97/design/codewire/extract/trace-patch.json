@@ -1,0 +1,3000 @@
+{
+ "PatchEditorPanel.refresh_entries": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "rows": []
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "rows": [
+     {
+      "ChangeEntryRow": {
+       "kind_text": "bytes",
+       "address_text": "0x100",
+       "value_text": "DE AD BE EF",
+       "status_text": "unvalidated-no-image",
+       "linkage_text": "-",
+       "check_glyph": "·",
+       "address": 256,
+       "encoded_bytes": [
+        222,
+        173,
+        190,
+        239
+       ]
+      }
+     }
+    ],
+    "mem_map": null
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "rows": [
+     {
+      "ChangeEntryRow": {
+       "kind_text": "bytes",
+       "address_text": "0x100",
+       "value_text": "DE AD BE EF",
+       "status_text": "unvalidated-no-image",
+       "linkage_text": "-",
+       "check_glyph": "·",
+       "address": 256,
+       "encoded_bytes": [
+        222,
+        173,
+        190,
+        239
+       ]
+      }
+     }
+    ],
+    "mem_map": null
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "rows": [
+     {
+      "ChangeEntryRow": {
+       "kind_text": "bytes",
+       "address_text": "0x100",
+       "value_text": "DE AD BE EF",
+       "status_text": "unvalidated-no-image",
+       "linkage_text": "-",
+       "check_glyph": "·",
+       "address": 256,
+       "encoded_bytes": [
+        222,
+        173,
+        190,
+        239
+       ]
+      }
+     }
+    ],
+    "mem_map": null
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "rows": [
+     {
+      "ChangeEntryRow": {
+       "kind_text": "bytes",
+       "address_text": "0x300",
+       "value_text": "11 22",
+       "status_text": "unvalidated-no-image",
+       "linkage_text": "-",
+       "check_glyph": "·",
+       "address": 768,
+       "encoded_bytes": [
+        17,
+        34
+       ]
+      }
+     }
+    ],
+    "mem_map": null
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "rows": [
+     {
+      "ChangeEntryRow": {
+       "kind_text": "bytes",
+       "address_text": "0x300",
+       "value_text": "11 22",
+       "status_text": "unvalidated-no-image",
+       "linkage_text": "-",
+       "check_glyph": "·",
+       "address": 768,
+       "encoded_bytes": [
+        17,
+        34
+       ]
+      }
+     }
+    ],
+    "mem_map": null
+   },
+   "out": null
+  }
+ ],
+ "PatchEditorPanel._render_before_after_card": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "index": 0
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "index": 0
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "index": 0
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 4,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "index": 0
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "index": 0
+   },
+   "out": null
+  }
+ ],
+ "BeforeAfterCard.show_entry": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": null,
+    "before": null,
+    "after": []
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 5,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": null
+  }
+ ],
+ "before_after_card_text": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "address": null,
+    "before": null,
+    "after": []
+   },
+   "out": "<text 'Select an entry row to preview its bytes.' [Span(0, 41, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 4,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 4,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 256,
+    "before": null,
+    "after": [
+     222,
+     173,
+     190,
+     239
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 6,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 4,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "address": 768,
+    "before": null,
+    "after": [
+     17,
+     34
+    ]
+   },
+   "out": "<text 'No image loaded — before-bytes unavailable.' [Span(0, 43, '#969aad')] ''>"
+  }
+ ],
+ "PatchEditorPanel.request_action": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "action": "add_entry"
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "action": "save_doc"
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "action": "load_doc"
+   },
+   "out": null
+  }
+ ],
+ "PatchEditorPanel._refresh_dirty_indicator": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 3,
+   "in": {},
+   "out": null
+  }
+ ],
+ "S19TuiApp.on_patch_editor_panel_action_requested": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "event": {
+     "ActionRequested": {
+      "action": "add_entry",
+      "address_text": "",
+      "value_text": "",
+      "bytes_text": "",
+      "path_text": "",
+      "scope_text": "active",
+      "paste_text": ""
+     }
+    }
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "event": {
+     "ActionRequested": {
+      "action": "save_doc",
+      "address_text": "",
+      "value_text": "",
+      "bytes_text": "",
+      "path_text": "",
+      "scope_text": "active",
+      "paste_text": ""
+     }
+    }
+   },
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {
+    "event": {
+     "ActionRequested": {
+      "action": "load_doc",
+      "address_text": "",
+      "value_text": "",
+      "bytes_text": "",
+      "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json",
+      "scope_text": "active",
+      "paste_text": ""
+     }
+    }
+   },
+   "out": null
+  }
+ ],
+ "serialize_change_document": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "document": {
+     "ChangeDocument": {
+      "format": "s19app-changeset",
+      "version": "2.0",
+      "kind": "change",
+      "encoding": "utf-8",
+      "value_mode": "text",
+      "entries": [
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 256,
+         "encoded_bytes": [
+          222,
+          173,
+          190,
+          239
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       }
+      ],
+      "issues": [],
+      "source_path": null
+     }
+    }
+   },
+   "out": {
+    "bytes": 232,
+    "text": "{\n  \"format\": \"s19app-changeset\",\n  \"version\": \"2.0\",\n  \"kind\": \"change\",\n  \"encoding\": \"utf-8\",\n  \"value_mode\": \"text\",\n  \"entries\": [\n    {\n      \"type\": \"bytes\",\n      \"address\": \"0x100\",\n      \"bytes\": \"DE AD BE EF\"\n    }\n  ]\n}\n"
+   }
+  }
+ ],
+ "PatchEditorPanel.mark_saved": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {},
+   "out": null
+  }
+ ],
+ "PatchEditorPanel.mark_loaded": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 0,
+   "in": {},
+   "out": null
+  },
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {},
+   "out": null
+  }
+ ],
+ "S19TuiApp._patch_editor_load": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 1,
+   "in": {
+    "panel": {
+     "PatchEditorPanel": {
+      "_render_markup": true,
+      "_size": [
+       96,
+       16
+      ],
+      "_container_size": [
+       92,
+       14
+      ],
+      "_layout_required": false,
+      "_layout_updates": 112,
+      "_repaint_required": false,
+      "_scroll_required": false,
+      "_recompose_required": false,
+      "_refresh_styles_required": false,
+      "_default_layout": {
+       "VerticalLayout": {}
+      },
+      "_animate": null,
+      "sort_order": 116,
+      "highlight_style": null,
+      "_vertical_scrollbar": {
+       "ScrollBar": {
+        "vertical": true,
+        "thickness": 2,
+        "grabbed_position": 0,
+        "_render_markup": true,
+        "_size": [
+         2,
+         14
+        ],
+        "_container_size": [
+         92,
+         14
+        ],
+        "_layout_required": false,
+        "_layout_updates": 1,
+        "_repaint_required": false,
+        "_scroll_required": false,
+        "_recompose_required": false,
+        "_refresh_styles_required": false,
+        "_default_layout": {
+         "VerticalLayout": {}
+        },
+        "_animate": null,
+        "sort_order": 859,
+        "highlight_style": null,
+        "_vertical_scrollbar": null,
+        "_horizontal_scrollbar": null,
+        "_scrollbar_corner": null,
+        "_border_title": null,
+        "_border_subtitle": null,
+        "_layout_cache": {},
+        "_visual_style": {
+         "Style": {
+          "background": [
+           10,
+           14,
+           27,
+           1.0,
+           null,
+           false
+          ],
+          "foreground": [
+           233,
+           233,
+           233,
+           1.0,
+           null,
+           false
+          ],
+          "bold": null,
+          "dim": null,
+          "italic": null,
+          "underline": null,
+          "underline2": null,
+          "reverse": null,
+          "strike": null,
+          "blink": null,
+          "link": null,
+          "_meta": null,
+          "auto_color": false
+         }
+        },
+        "_visual_style_cache_key": 2,
+        "_render_cache": [
+         [
+          2,
+          14
+         ],
+         [
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('▁▁', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)"
+         ]
+        ],
+        "_dirty_regions": [],
+        "_repaint_regions": [],
+        "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+        "_content_width_cache": [
+         null,
+         0
+        ],
+        "_content_height_cache": [
+         null,
+         0
+        ],
+        "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+        "_styles_cache": {
+         "StylesCache": {
+          "_cache": {
+           "0x0": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x1": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x2": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x3": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x4": "Strip([Segment('▁▁', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x5": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x6": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x7": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x8": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x9": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xa": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xb": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xc": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xd": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)"
+          },
+          "_dirty_lines": [],
+          "_width": 2,
+          "_simple_strip": null
+         }
+        },
+        "_rich_style_cache": {},
+        "_visual_style_cache": {},
+        "_tooltip": null,
+        "absolute_offset": null,
+        "_scrollbar_changes": [],
+        "_classes": [
+         "-textual-system"
+        ],
+        "_name": "vertical",
+        "_id": null
+       }
+      },
+      "_horizontal_scrollbar": null,
+      "_scrollbar_corner": null,
+      "_border_title": null,
+      "_border_subtitle": null,
+      "_layout_cache": {},
+      "_visual_style": {
+       "Style": {
+        "background": [
+         10,
+         14,
+         27,
+         1.0,
+         null,
+         false
+        ],
+        "foreground": [
+         233,
+         233,
+         233,
+         1.0,
+         null,
+         false
+        ],
+        "bold": null,
+        "dim": null,
+        "italic": null,
+        "underline": null,
+        "underline2": null,
+        "reverse": null,
+        "strike": null,
+        "blink": null,
+        "link": null,
+        "_meta": null,
+        "auto_color": false
+       }
+      },
+      "_visual_style_cache_key": 27,
+      "_render_cache": [
+       [
+        92,
+        14
+       ],
+       [
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)"
+       ]
+      ],
+      "_dirty_regions": [],
+      "_repaint_regions": [],
+      "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+      "_content_width_cache": [
+       null,
+       0
+      ],
+      "_content_height_cache": [
+       null,
+       0
+      ],
+      "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+      "_styles_cache": {
+       "StylesCache": {
+        "_cache": {
+         "0x0": "Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96)",
+         "0x1": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x2": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x3": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x4": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x5": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x6": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x7": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x8": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x9": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xa": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xb": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xc": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xd": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xe": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xf": "Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96)"
+        },
+        "_dirty_lines": [],
+        "_width": 96,
+        "_simple_strip": null
+       }
+      },
+      "_rich_style_cache": {},
+      "_visual_style_cache": {},
+      "_tooltip": null,
+      "absolute_offset": null,
+      "_scrollbar_changes": [],
+      "_classes": [],
+      "_name": null,
+      "_id": "patch_editor_panel",
+      "_nodes": {
+       "NodeList": {
+        "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+        "_nodes": [
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         }
+        ],
+        "_nodes_set": [
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         }
+        ],
+        "_displayed_nodes": [
+         3,
+         [
+          "Container(id='patch_win_script', classes='patch-window')",
+          "Container(id='patch_win_json', classes='patch-window')",
+          "Container(id='patch_win_checks', classes='patch-window')"
+         ]
+        ],
+        "_displayed_visible_nodes": [
+         -1,
+         []
+        ],
+        "_nodes_by_id": {
+         "patch_win_script": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         "patch_win_json": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         },
+         "patch_win_checks": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         }
+        },
+        "_updates": 87
+       }
+      },
+      "_css_styles": {
+       "Styles": {
+        "node": {
+         "PatchEditorPanel": {
+          "_render_markup": true,
+          "_size": [
+           96,
+           16
+          ],
+          "_container_size": [
+           92,
+           14
+          ],
+          "_layout_required": false,
+          "_layout_updates": 112,
+          "_repaint_required": false,
+          "_scroll_required": false,
+          "_recompose_required": false,
+          "_refresh_styles_required": false,
+          "_default_layout": {
+           "VerticalLayout": {}
+          },
+          "_animate": null,
+          "sort_order": 116,
+          "highlight_style": null,
+          "_vertical_scrollbar": {
+           "ScrollBar": {
+            "vertical": true,
+            "thickness": 2,
+            "grabbed_position": 0,
+            "_render_markup": true,
+            "_size": "Size(width=2, height=14)",
+            "_container_size": "Size(width=92, height=14)",
+            "_layout_required": false,
+            "_layout_updates": 1,
+            "_repaint_required": false,
+            "_scroll_required": false,
+            "_recompose_required": false,
+            "_refresh_styles_required": false,
+            "_default_layout": "<vertical>",
+            "_animate": null,
+            "sort_order": 859,
+            "highlight_style": null,
+            "_vertical_scrollbar": null,
+            "_horizontal_scrollbar": null,
+            "_scrollbar_corner": null,
+            "_border_title": null,
+            "_border_subtitle": null,
+            "_layout_cache": "{}",
+            "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+            "_visual_style_cache_key": 2,
+            "_render_cache": "_RenderCache(size=Size(width=2, height=14), lines=[Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down'",
+            "_dirty_regions": "set()",
+            "_repaint_regions": "set()",
+            "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+            "_content_width_cache": "(None, 0)",
+            "_content_height_cache": "(None, 0)",
+            "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+            "_styles_cache": "<StylesCache width=2>",
+            "_rich_style_cache": "{}",
+            "_visual_style_cache": "{}",
+            "_tooltip": null,
+            "absolute_offset": null,
+            "_scrollbar_changes": "set()",
+            "_classes": "{'-textual-system'}",
+            "_name": "vertical",
+            "_id": null
+           }
+          },
+          "_horizontal_scrollbar": null,
+          "_scrollbar_corner": null,
+          "_border_title": null,
+          "_border_subtitle": null,
+          "_layout_cache": {},
+          "_visual_style": {
+           "Style": {
+            "background": "Color(10, 14, 27)",
+            "foreground": "Color(233, 233, 233)",
+            "bold": null,
+            "dim": null,
+            "italic": null,
+            "underline": null,
+            "underline2": null,
+            "reverse": null,
+            "strike": null,
+            "blink": null,
+            "link": null,
+            "_meta": null,
+            "auto_color": false
+           }
+          },
+          "_visual_style_cache_key": 27,
+          "_render_cache": [
+           "Size(width=92, height=14)",
+           "[Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92), Strip([Segment('                                                              "
+          ],
+          "_dirty_regions": [],
+          "_repaint_regions": [],
+          "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+          "_content_width_cache": [
+           null,
+           0
+          ],
+          "_content_height_cache": [
+           null,
+           0
+          ],
+          "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+          "_styles_cache": {
+           "StylesCache": {
+            "_cache": "{0: Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96), 1: Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECO",
+            "_dirty_lines": "set()",
+            "_width": 96,
+            "_simple_strip": null
+           }
+          },
+          "_rich_style_cache": {},
+          "_visual_style_cache": {},
+          "_tooltip": null,
+          "absolute_offset": null,
+          "_scrollbar_changes": [],
+          "_classes": [],
+          "_name": null,
+          "_id": "patch_editor_panel",
+          "_nodes": {
+           "NodeList": {
+            "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+            "_nodes": "[Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')]",
+            "_nodes_set": "{Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window'), Container(id='patch_win_json', classes='patch-window')}",
+            "_displayed_nodes": "(3, [Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')])",
+            "_displayed_visible_nodes": "(-1, [])",
+            "_nodes_by_id": "{'patch_win_script': Container(id='patch_win_script', classes='patch-window'), 'patch_win_json': Container(id='patch_win_json', classes='patch-window'), 'patch_win_checks': Container(id='patch_win_checks', classes='patch-window')}",
+            "_updates": 87
+           }
+          },
+          "_css_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'scrollbar_background_active': Color(0, 0, 0), 'scrollbar_color_hover': Color(0, 60, 106), 'scrollbar_background_hover': Color(0, 0, 0), 'width': Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), 'overflow_x': 'hidden', 'auto_link_color_hover': True, 'padding': Spacing(top=1,",
+            "_updates": 24,
+            "important": "set()"
+           }
+          },
+          "_inline_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'layout': <vertical>, 'overflow_y': 'auto', 'overflow_x': 'hidden'}",
+            "_updates": 3,
+            "important": "set()"
+           }
+          }
+         }
+        },
+        "_rules": {
+         "scrollbar_background_active": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_color_hover": [
+          0,
+          60,
+          106,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_background_hover": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "width": [
+          100.0,
+          "<Unit.WIDTH: 4>",
+          "<Unit.WIDTH: 4>"
+         ],
+         "overflow_x": "hidden",
+         "auto_link_color_hover": true,
+         "padding": [
+          1,
+          2,
+          1,
+          2
+         ],
+         "scrollbar_color": [
+          0,
+          48,
+          84,
+          1.0,
+          null,
+          false
+         ],
+         "overflow_y": "hidden",
+         "auto_link_color": true,
+         "background": [
+          0,
+          0,
+          0,
+          0,
+          null,
+          false
+         ],
+         "scrollbar_corner_color": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_size_vertical": 2,
+         "height": [
+          1.0,
+          "<Unit.FRACTION: 2>",
+          "<Unit.WIDTH: 4>"
+         ],
+         "layout": {
+          "HorizontalLayout": {}
+         },
+         "scrollbar_size_horizontal": 1,
+         "link_background_hover": [
+          1,
+          120,
+          212,
+          1.0,
+          null,
+          false
+         ],
+         "link_style_hover": "Style(bold=True, underline=False)",
+         "link_background": [
+          0,
+          0,
+          0,
+          0,
+          null,
+          false
+         ],
+         "link_color": [
+          255,
+          255,
+          255,
+          0.87,
+          null,
+          false
+         ],
+         "scrollbar_color_active": [
+          1,
+          120,
+          212,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_background": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "link_style": "Style(underline=True)",
+         "link_color_hover": [
+          255,
+          255,
+          255,
+          0.87,
+          null,
+          false
+         ]
+        },
+        "_updates": 24,
+        "important": []
+       }
+      },
+      "_inline_styles": {
+       "Styles": {
+        "node": {
+         "PatchEditorPanel": {
+          "_render_markup": true,
+          "_size": [
+           96,
+           16
+          ],
+          "_container_size": [
+           92,
+           14
+          ],
+          "_layout_required": false,
+          "_layout_updates": 112,
+          "_repaint_required": false,
+          "_scroll_required": false,
+          "_recompose_required": false,
+          "_refresh_styles_required": false,
+          "_default_layout": {
+           "VerticalLayout": {}
+          },
+          "_animate": null,
+          "sort_order": 116,
+          "highlight_style": null,
+          "_vertical_scrollbar": {
+           "ScrollBar": {
+            "vertical": true,
+            "thickness": 2,
+            "grabbed_position": 0,
+            "_render_markup": true,
+            "_size": "Size(width=2, height=14)",
+            "_container_size": "Size(width=92, height=14)",
+            "_layout_required": false,
+            "_layout_updates": 1,
+            "_repaint_required": false,
+            "_scroll_required": false,
+            "_recompose_required": false,
+            "_refresh_styles_required": false,
+            "_default_layout": "<vertical>",
+            "_animate": null,
+            "sort_order": 859,
+            "highlight_style": null,
+            "_vertical_scrollbar": null,
+            "_horizontal_scrollbar": null,
+            "_scrollbar_corner": null,
+            "_border_title": null,
+            "_border_subtitle": null,
+            "_layout_cache": "{}",
+            "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+            "_visual_style_cache_key": 2,
+            "_render_cache": "_RenderCache(size=Size(width=2, height=14), lines=[Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down'",
+            "_dirty_regions": "set()",
+            "_repaint_regions": "set()",
+            "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+            "_content_width_cache": "(None, 0)",
+            "_content_height_cache": "(None, 0)",
+            "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+            "_styles_cache": "<StylesCache width=2>",
+            "_rich_style_cache": "{}",
+            "_visual_style_cache": "{}",
+            "_tooltip": null,
+            "absolute_offset": null,
+            "_scrollbar_changes": "set()",
+            "_classes": "{'-textual-system'}",
+            "_name": "vertical",
+            "_id": null
+           }
+          },
+          "_horizontal_scrollbar": null,
+          "_scrollbar_corner": null,
+          "_border_title": null,
+          "_border_subtitle": null,
+          "_layout_cache": {},
+          "_visual_style": {
+           "Style": {
+            "background": "Color(10, 14, 27)",
+            "foreground": "Color(233, 233, 233)",
+            "bold": null,
+            "dim": null,
+            "italic": null,
+            "underline": null,
+            "underline2": null,
+            "reverse": null,
+            "strike": null,
+            "blink": null,
+            "link": null,
+            "_meta": null,
+            "auto_color": false
+           }
+          },
+          "_visual_style_cache_key": 27,
+          "_render_cache": [
+           "Size(width=92, height=14)",
+           "[Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92), Strip([Segment('                                                              "
+          ],
+          "_dirty_regions": [],
+          "_repaint_regions": [],
+          "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+          "_content_width_cache": [
+           null,
+           0
+          ],
+          "_content_height_cache": [
+           null,
+           0
+          ],
+          "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+          "_styles_cache": {
+           "StylesCache": {
+            "_cache": "{0: Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96), 1: Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECO",
+            "_dirty_lines": "set()",
+            "_width": 96,
+            "_simple_strip": null
+           }
+          },
+          "_rich_style_cache": {},
+          "_visual_style_cache": {},
+          "_tooltip": null,
+          "absolute_offset": null,
+          "_scrollbar_changes": [],
+          "_classes": [],
+          "_name": null,
+          "_id": "patch_editor_panel",
+          "_nodes": {
+           "NodeList": {
+            "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+            "_nodes": "[Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')]",
+            "_nodes_set": "{Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window'), Container(id='patch_win_json', classes='patch-window')}",
+            "_displayed_nodes": "(3, [Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')])",
+            "_displayed_visible_nodes": "(-1, [])",
+            "_nodes_by_id": "{'patch_win_script': Container(id='patch_win_script', classes='patch-window'), 'patch_win_json': Container(id='patch_win_json', classes='patch-window'), 'patch_win_checks': Container(id='patch_win_checks', classes='patch-window')}",
+            "_updates": 87
+           }
+          },
+          "_css_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'scrollbar_background_active': Color(0, 0, 0), 'scrollbar_color_hover': Color(0, 60, 106), 'scrollbar_background_hover': Color(0, 0, 0), 'width': Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), 'overflow_x': 'hidden', 'auto_link_color_hover': True, 'padding': Spacing(top=1,",
+            "_updates": 24,
+            "important": "set()"
+           }
+          },
+          "_inline_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'layout': <vertical>, 'overflow_y': 'auto', 'overflow_x': 'hidden'}",
+            "_updates": 3,
+            "important": "set()"
+           }
+          }
+         }
+        },
+        "_rules": {
+         "layout": {
+          "VerticalLayout": {}
+         },
+         "overflow_y": "auto",
+         "overflow_x": "hidden"
+        },
+        "_updates": 3,
+        "important": []
+       }
+      }
+     }
+    },
+    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json"
+   },
+   "out": null,
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-20965\\test_tc_b94_10_dirty_flag_tran0\\.s19tool\\workarea\\patches\\t.json": [
+     "{",
+     "  \"format\": \"s19app-changeset\",",
+     "  \"version\": \"2.0\",",
+     "  \"kind\": \"change\",",
+     "  \"encoding\": \"utf-8\",",
+     "  \"value_mode\": \"text\",",
+     "  \"entries\": [",
+     "    {\"type\": \"bytes\", \"address\": \"0x00000300\", \"bytes\": \"11 22\"}",
+     "  ]",
+     "}"
+    ]
+   }
+  }
+ ],
+ "S19TuiApp._patch_editor_load_tail": [
+  {
+   "test": "tests/test_tui_patch_editor_b94.py::test_tc_b94_10_dirty_flag_transitions",
+   "depth": 2,
+   "in": {
+    "panel": {
+     "PatchEditorPanel": {
+      "_render_markup": true,
+      "_size": [
+       96,
+       16
+      ],
+      "_container_size": [
+       92,
+       14
+      ],
+      "_layout_required": false,
+      "_layout_updates": 112,
+      "_repaint_required": false,
+      "_scroll_required": false,
+      "_recompose_required": false,
+      "_refresh_styles_required": false,
+      "_default_layout": {
+       "VerticalLayout": {}
+      },
+      "_animate": null,
+      "sort_order": 116,
+      "highlight_style": null,
+      "_vertical_scrollbar": {
+       "ScrollBar": {
+        "vertical": true,
+        "thickness": 2,
+        "grabbed_position": 0,
+        "_render_markup": true,
+        "_size": [
+         2,
+         14
+        ],
+        "_container_size": [
+         92,
+         14
+        ],
+        "_layout_required": false,
+        "_layout_updates": 1,
+        "_repaint_required": false,
+        "_scroll_required": false,
+        "_recompose_required": false,
+        "_refresh_styles_required": false,
+        "_default_layout": {
+         "VerticalLayout": {}
+        },
+        "_animate": null,
+        "sort_order": 859,
+        "highlight_style": null,
+        "_vertical_scrollbar": null,
+        "_horizontal_scrollbar": null,
+        "_scrollbar_corner": null,
+        "_border_title": null,
+        "_border_subtitle": null,
+        "_layout_cache": {},
+        "_visual_style": {
+         "Style": {
+          "background": [
+           10,
+           14,
+           27,
+           1.0,
+           null,
+           false
+          ],
+          "foreground": [
+           233,
+           233,
+           233,
+           1.0,
+           null,
+           false
+          ],
+          "bold": null,
+          "dim": null,
+          "italic": null,
+          "underline": null,
+          "underline2": null,
+          "reverse": null,
+          "strike": null,
+          "blink": null,
+          "link": null,
+          "_meta": null,
+          "auto_color": false
+         }
+        },
+        "_visual_style_cache_key": 2,
+        "_render_cache": [
+         [
+          2,
+          14
+         ],
+         [
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('▁▁', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+          "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)"
+         ]
+        ],
+        "_dirty_regions": [],
+        "_repaint_regions": [],
+        "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+        "_content_width_cache": [
+         null,
+         0
+        ],
+        "_content_height_cache": [
+         null,
+         0
+        ],
+        "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+        "_styles_cache": {
+         "StylesCache": {
+          "_cache": {
+           "0x0": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x1": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x2": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x3": "Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x4": "Strip([Segment('▁▁', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), reverse=True, meta={'@mouse.down': 'grab'}))], 2)",
+           "0x5": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x6": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x7": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x8": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0x9": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xa": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xb": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xc": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)",
+           "0xd": "Strip([Segment('  ', Style(color=Color('#e9e9e9', ColorType.TRUECOLOR, triplet=ColorTriplet(red=233, green=233, blue=233)), bgcolor=Color('#000000', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=0, blue=0)), meta={'@mouse.down': 'scroll_down'}))], 2)"
+          },
+          "_dirty_lines": [],
+          "_width": 2,
+          "_simple_strip": null
+         }
+        },
+        "_rich_style_cache": {},
+        "_visual_style_cache": {},
+        "_tooltip": null,
+        "absolute_offset": null,
+        "_scrollbar_changes": [],
+        "_classes": [
+         "-textual-system"
+        ],
+        "_name": "vertical",
+        "_id": null
+       }
+      },
+      "_horizontal_scrollbar": null,
+      "_scrollbar_corner": null,
+      "_border_title": null,
+      "_border_subtitle": null,
+      "_layout_cache": {},
+      "_visual_style": {
+       "Style": {
+        "background": [
+         10,
+         14,
+         27,
+         1.0,
+         null,
+         false
+        ],
+        "foreground": [
+         233,
+         233,
+         233,
+         1.0,
+         null,
+         false
+        ],
+        "bold": null,
+        "dim": null,
+        "italic": null,
+        "underline": null,
+        "underline2": null,
+        "reverse": null,
+        "strike": null,
+        "blink": null,
+        "link": null,
+        "_meta": null,
+        "auto_color": false
+       }
+      },
+      "_visual_style_cache_key": 27,
+      "_render_cache": [
+       [
+        92,
+        14
+       ],
+       [
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)",
+        "Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92)"
+       ]
+      ],
+      "_dirty_regions": [],
+      "_repaint_regions": [],
+      "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+      "_content_width_cache": [
+       null,
+       0
+      ],
+      "_content_height_cache": [
+       null,
+       0
+      ],
+      "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+      "_styles_cache": {
+       "StylesCache": {
+        "_cache": {
+         "0x0": "Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96)",
+         "0x1": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x2": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x3": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x4": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x5": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x6": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x7": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x8": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0x9": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xa": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xb": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xc": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xd": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xe": "Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)))), Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriple",
+         "0xf": "Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96)"
+        },
+        "_dirty_lines": [],
+        "_width": 96,
+        "_simple_strip": null
+       }
+      },
+      "_rich_style_cache": {},
+      "_visual_style_cache": {},
+      "_tooltip": null,
+      "absolute_offset": null,
+      "_scrollbar_changes": [],
+      "_classes": [],
+      "_name": null,
+      "_id": "patch_editor_panel",
+      "_nodes": {
+       "NodeList": {
+        "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+        "_nodes": [
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": true,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8, 9} width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         }
+        ],
+        "_nodes_set": [
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": true,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8, 9} width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         }
+        ],
+        "_displayed_nodes": [
+         3,
+         [
+          "Container(id='patch_win_script', classes='patch-window')",
+          "Container(id='patch_win_json', classes='patch-window')",
+          "Container(id='patch_win_checks', classes='patch-window')"
+         ]
+        ],
+        "_displayed_visible_nodes": [
+         -1,
+         []
+        ],
+        "_nodes_by_id": {
+         "patch_win_script": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=12)",
+           "_container_size": "Size(width=87, height=10)",
+           "_layout_required": false,
+           "_layout_updates": 38,
+           "_repaint_required": true,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 232,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('¹PATCH SCRIPT')",
+           "_border_subtitle": "Content('1 entry')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 30,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=10), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=12)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8, 9} width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_script",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_script_body', classes='patch-window-body'), Vertical(id='patch_doc_file_row', classes='patch-docked-row'), Horizontal(id='patch_doc_entry_buttons', classes='patch-chip-entry patch-docked-row'), Horizontal(id='patch_doc_controls', classes='patch-docked-row patc",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=2.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         },
+         "patch_win_json": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=18)",
+           "_container_size": "Size(width=87, height=16)",
+           "_layout_required": false,
+           "_layout_updates": 45,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 281,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('³JSON EDIT')",
+           "_border_subtitle": "Content('v2 schema')",
+           "_layout_cache": "{}",
+           "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+           "_visual_style_cache_key": 31,
+           "_render_cache": "_RenderCache(size=Size(width=87, height=16), lines=[Strip([Segment('                                                                                       ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 87), Strip([Segment('                ",
+           "_dirty_regions": "set()",
+           "_repaint_regions": "set()",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache width=89>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_json",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_json_body', classes='patch-window-body'), Container(id='patch_win_json_dock_spacer'), Horizontal(id='patch_paste_controls', classes='patch-docked-row patch-chip-apply'), Static(id='patch_history_strip', classes='patch-docked-row'), Horizontal(id='patch_history",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>), layers=('base', 'chrome'))"
+          }
+         },
+         "patch_win_checks": {
+          "Container": {
+           "_render_markup": true,
+           "_size": "Size(width=89, height=11)",
+           "_container_size": "Size(width=87, height=9)",
+           "_layout_required": false,
+           "_layout_updates": 24,
+           "_repaint_required": false,
+           "_scroll_required": false,
+           "_recompose_required": false,
+           "_refresh_styles_required": false,
+           "_default_layout": "<vertical>",
+           "_animate": null,
+           "sort_order": 243,
+           "highlight_style": null,
+           "_vertical_scrollbar": null,
+           "_horizontal_scrollbar": null,
+           "_scrollbar_corner": null,
+           "_border_title": "Content('²CHECKS')",
+           "_border_subtitle": "Content('no run yet')",
+           "_layout_cache": "{}",
+           "_visual_style": null,
+           "_visual_style_cache_key": -1,
+           "_render_cache": "_RenderCache(size=Size(width=0, height=0), lines=[])",
+           "_dirty_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_repaint_regions": "{Region(x=0, y=0, width=89, height=11)}",
+           "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=2 misses=5>",
+           "_content_width_cache": "(None, 0)",
+           "_content_height_cache": "(None, 0)",
+           "_arrangement_cache": "<FIFOCache maxsize=4 hits=28 misses=10>",
+           "_styles_cache": "<StylesCache dirty={0, 1, 2, 3, 4, 5, 6, 7, 8}>",
+           "_rich_style_cache": "{}",
+           "_visual_style_cache": "{}",
+           "_tooltip": null,
+           "absolute_offset": null,
+           "_scrollbar_changes": "set()",
+           "_classes": "{'patch-window'}",
+           "_name": null,
+           "_id": "patch_win_checks",
+           "_nodes": "<NodeList [VerticalScroll(id='patch_win_checks_body', classes='patch-window-body'), Label(id='patch_checks_section_label', classes='patch-section-title'), Container(id='patch_checks_controls', classes='patch-docked-group patch-chip-checks')]>",
+           "_css_styles": "Styles(layout=<vertical>, background=Color(0, 0, 0, a=0), margin=Spacing(top=0, right=1, bottom=0, left=0), border_top=('round', Color(27, 35, 58)), border_right=('round', Color(27, 35, 58)), border_bottom=('round', Color(27, 35, 58)), border_left=('round', Color(27, 35, 58)), width=Scalar(value=1.0",
+           "_inline_styles": "Styles(width=Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), height=Scalar(value=1.0, unit=<Unit.AUTO: 8>, percent_unit=<Unit.AUTO: 8>))"
+          }
+         }
+        },
+        "_updates": 87
+       }
+      },
+      "_css_styles": {
+       "Styles": {
+        "node": {
+         "PatchEditorPanel": {
+          "_render_markup": true,
+          "_size": [
+           96,
+           16
+          ],
+          "_container_size": [
+           92,
+           14
+          ],
+          "_layout_required": false,
+          "_layout_updates": 112,
+          "_repaint_required": false,
+          "_scroll_required": false,
+          "_recompose_required": false,
+          "_refresh_styles_required": false,
+          "_default_layout": {
+           "VerticalLayout": {}
+          },
+          "_animate": null,
+          "sort_order": 116,
+          "highlight_style": null,
+          "_vertical_scrollbar": {
+           "ScrollBar": {
+            "vertical": true,
+            "thickness": 2,
+            "grabbed_position": 0,
+            "_render_markup": true,
+            "_size": "Size(width=2, height=14)",
+            "_container_size": "Size(width=92, height=14)",
+            "_layout_required": false,
+            "_layout_updates": 1,
+            "_repaint_required": false,
+            "_scroll_required": false,
+            "_recompose_required": false,
+            "_refresh_styles_required": false,
+            "_default_layout": "<vertical>",
+            "_animate": null,
+            "sort_order": 859,
+            "highlight_style": null,
+            "_vertical_scrollbar": null,
+            "_horizontal_scrollbar": null,
+            "_scrollbar_corner": null,
+            "_border_title": null,
+            "_border_subtitle": null,
+            "_layout_cache": "{}",
+            "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+            "_visual_style_cache_key": 2,
+            "_render_cache": "_RenderCache(size=Size(width=2, height=14), lines=[Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down'",
+            "_dirty_regions": "set()",
+            "_repaint_regions": "set()",
+            "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+            "_content_width_cache": "(None, 0)",
+            "_content_height_cache": "(None, 0)",
+            "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+            "_styles_cache": "<StylesCache width=2>",
+            "_rich_style_cache": "{}",
+            "_visual_style_cache": "{}",
+            "_tooltip": null,
+            "absolute_offset": null,
+            "_scrollbar_changes": "set()",
+            "_classes": "{'-textual-system'}",
+            "_name": "vertical",
+            "_id": null
+           }
+          },
+          "_horizontal_scrollbar": null,
+          "_scrollbar_corner": null,
+          "_border_title": null,
+          "_border_subtitle": null,
+          "_layout_cache": {},
+          "_visual_style": {
+           "Style": {
+            "background": "Color(10, 14, 27)",
+            "foreground": "Color(233, 233, 233)",
+            "bold": null,
+            "dim": null,
+            "italic": null,
+            "underline": null,
+            "underline2": null,
+            "reverse": null,
+            "strike": null,
+            "blink": null,
+            "link": null,
+            "_meta": null,
+            "auto_color": false
+           }
+          },
+          "_visual_style_cache_key": 27,
+          "_render_cache": [
+           "Size(width=92, height=14)",
+           "[Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92), Strip([Segment('                                                              "
+          ],
+          "_dirty_regions": [],
+          "_repaint_regions": [],
+          "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+          "_content_width_cache": [
+           null,
+           0
+          ],
+          "_content_height_cache": [
+           null,
+           0
+          ],
+          "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+          "_styles_cache": {
+           "StylesCache": {
+            "_cache": "{0: Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96), 1: Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECO",
+            "_dirty_lines": "set()",
+            "_width": 96,
+            "_simple_strip": null
+           }
+          },
+          "_rich_style_cache": {},
+          "_visual_style_cache": {},
+          "_tooltip": null,
+          "absolute_offset": null,
+          "_scrollbar_changes": [],
+          "_classes": [],
+          "_name": null,
+          "_id": "patch_editor_panel",
+          "_nodes": {
+           "NodeList": {
+            "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+            "_nodes": "[Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')]",
+            "_nodes_set": "{Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window'), Container(id='patch_win_json', classes='patch-window')}",
+            "_displayed_nodes": "(3, [Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')])",
+            "_displayed_visible_nodes": "(-1, [])",
+            "_nodes_by_id": "{'patch_win_script': Container(id='patch_win_script', classes='patch-window'), 'patch_win_json': Container(id='patch_win_json', classes='patch-window'), 'patch_win_checks': Container(id='patch_win_checks', classes='patch-window')}",
+            "_updates": 87
+           }
+          },
+          "_css_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'scrollbar_background_active': Color(0, 0, 0), 'scrollbar_color_hover': Color(0, 60, 106), 'scrollbar_background_hover': Color(0, 0, 0), 'width': Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), 'overflow_x': 'hidden', 'auto_link_color_hover': True, 'padding': Spacing(top=1,",
+            "_updates": 24,
+            "important": "set()"
+           }
+          },
+          "_inline_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'layout': <vertical>, 'overflow_y': 'auto', 'overflow_x': 'hidden'}",
+            "_updates": 3,
+            "important": "set()"
+           }
+          }
+         }
+        },
+        "_rules": {
+         "scrollbar_background_active": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_color_hover": [
+          0,
+          60,
+          106,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_background_hover": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "width": [
+          100.0,
+          "<Unit.WIDTH: 4>",
+          "<Unit.WIDTH: 4>"
+         ],
+         "overflow_x": "hidden",
+         "auto_link_color_hover": true,
+         "padding": [
+          1,
+          2,
+          1,
+          2
+         ],
+         "scrollbar_color": [
+          0,
+          48,
+          84,
+          1.0,
+          null,
+          false
+         ],
+         "overflow_y": "hidden",
+         "auto_link_color": true,
+         "background": [
+          0,
+          0,
+          0,
+          0,
+          null,
+          false
+         ],
+         "scrollbar_corner_color": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_size_vertical": 2,
+         "height": [
+          1.0,
+          "<Unit.FRACTION: 2>",
+          "<Unit.WIDTH: 4>"
+         ],
+         "layout": {
+          "HorizontalLayout": {}
+         },
+         "scrollbar_size_horizontal": 1,
+         "link_background_hover": [
+          1,
+          120,
+          212,
+          1.0,
+          null,
+          false
+         ],
+         "link_style_hover": "Style(bold=True, underline=False)",
+         "link_background": [
+          0,
+          0,
+          0,
+          0,
+          null,
+          false
+         ],
+         "link_color": [
+          255,
+          255,
+          255,
+          0.87,
+          null,
+          false
+         ],
+         "scrollbar_color_active": [
+          1,
+          120,
+          212,
+          1.0,
+          null,
+          false
+         ],
+         "scrollbar_background": [
+          0,
+          0,
+          0,
+          1.0,
+          null,
+          false
+         ],
+         "link_style": "Style(underline=True)",
+         "link_color_hover": [
+          255,
+          255,
+          255,
+          0.87,
+          null,
+          false
+         ]
+        },
+        "_updates": 24,
+        "important": []
+       }
+      },
+      "_inline_styles": {
+       "Styles": {
+        "node": {
+         "PatchEditorPanel": {
+          "_render_markup": true,
+          "_size": [
+           96,
+           16
+          ],
+          "_container_size": [
+           92,
+           14
+          ],
+          "_layout_required": false,
+          "_layout_updates": 112,
+          "_repaint_required": false,
+          "_scroll_required": false,
+          "_recompose_required": false,
+          "_refresh_styles_required": false,
+          "_default_layout": {
+           "VerticalLayout": {}
+          },
+          "_animate": null,
+          "sort_order": 116,
+          "highlight_style": null,
+          "_vertical_scrollbar": {
+           "ScrollBar": {
+            "vertical": true,
+            "thickness": 2,
+            "grabbed_position": 0,
+            "_render_markup": true,
+            "_size": "Size(width=2, height=14)",
+            "_container_size": "Size(width=92, height=14)",
+            "_layout_required": false,
+            "_layout_updates": 1,
+            "_repaint_required": false,
+            "_scroll_required": false,
+            "_recompose_required": false,
+            "_refresh_styles_required": false,
+            "_default_layout": "<vertical>",
+            "_animate": null,
+            "sort_order": 859,
+            "highlight_style": null,
+            "_vertical_scrollbar": null,
+            "_horizontal_scrollbar": null,
+            "_scrollbar_corner": null,
+            "_border_title": null,
+            "_border_subtitle": null,
+            "_layout_cache": "{}",
+            "_visual_style": "Style(background=Color(10, 14, 27), foreground=Color(233, 233, 233))",
+            "_visual_style_cache_key": 2,
+            "_render_cache": "_RenderCache(size=Size(width=2, height=14), lines=[Strip([Segment('  ', Style(color=Color('#003054', ColorType.TRUECOLOR, triplet=ColorTriplet(red=0, green=48, blue=84)), bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27)), reverse=True, meta={'@mouse.down'",
+            "_dirty_regions": "set()",
+            "_repaint_regions": "set()",
+            "_box_model_cache": "<LRUCache size=0 maxsize=16 hits=0 misses=0>",
+            "_content_width_cache": "(None, 0)",
+            "_content_height_cache": "(None, 0)",
+            "_arrangement_cache": "<FIFOCache maxsize=4 hits=0 misses=0>",
+            "_styles_cache": "<StylesCache width=2>",
+            "_rich_style_cache": "{}",
+            "_visual_style_cache": "{}",
+            "_tooltip": null,
+            "absolute_offset": null,
+            "_scrollbar_changes": "set()",
+            "_classes": "{'-textual-system'}",
+            "_name": "vertical",
+            "_id": null
+           }
+          },
+          "_horizontal_scrollbar": null,
+          "_scrollbar_corner": null,
+          "_border_title": null,
+          "_border_subtitle": null,
+          "_layout_cache": {},
+          "_visual_style": {
+           "Style": {
+            "background": "Color(10, 14, 27)",
+            "foreground": "Color(233, 233, 233)",
+            "bold": null,
+            "dim": null,
+            "italic": null,
+            "underline": null,
+            "underline2": null,
+            "reverse": null,
+            "strike": null,
+            "blink": null,
+            "link": null,
+            "_meta": null,
+            "auto_color": false
+           }
+          },
+          "_visual_style_cache_key": 27,
+          "_render_cache": [
+           "Size(width=92, height=14)",
+           "[Strip([Segment('                                                                                            ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 92), Strip([Segment('                                                              "
+          ],
+          "_dirty_regions": [],
+          "_repaint_regions": [],
+          "_box_model_cache": "<LRUCache size=5 maxsize=16 hits=0 misses=5>",
+          "_content_width_cache": [
+           null,
+           0
+          ],
+          "_content_height_cache": [
+           null,
+           0
+          ],
+          "_arrangement_cache": "<FIFOCache maxsize=4 hits=26 misses=7>",
+          "_styles_cache": {
+           "StylesCache": {
+            "_cache": "{0: Strip([Segment('                                                                                                ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECOLOR, triplet=ColorTriplet(red=10, green=14, blue=27))))], 96), 1: Strip([Segment('  ', Style(bgcolor=Color('#0a0e1b', ColorType.TRUECO",
+            "_dirty_lines": "set()",
+            "_width": 96,
+            "_simple_strip": null
+           }
+          },
+          "_rich_style_cache": {},
+          "_visual_style_cache": {},
+          "_tooltip": null,
+          "absolute_offset": null,
+          "_scrollbar_changes": [],
+          "_classes": [],
+          "_name": null,
+          "_id": "patch_editor_panel",
+          "_nodes": {
+           "NodeList": {
+            "_parent": "<weakref at 0x000001BD83BE5CB0; to 'PatchEditorPanel' at 0x000001BD83BF3450>",
+            "_nodes": "[Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')]",
+            "_nodes_set": "{Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window'), Container(id='patch_win_json', classes='patch-window')}",
+            "_displayed_nodes": "(3, [Container(id='patch_win_script', classes='patch-window'), Container(id='patch_win_json', classes='patch-window'), Container(id='patch_win_checks', classes='patch-window')])",
+            "_displayed_visible_nodes": "(-1, [])",
+            "_nodes_by_id": "{'patch_win_script': Container(id='patch_win_script', classes='patch-window'), 'patch_win_json': Container(id='patch_win_json', classes='patch-window'), 'patch_win_checks': Container(id='patch_win_checks', classes='patch-window')}",
+            "_updates": 87
+           }
+          },
+          "_css_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'scrollbar_background_active': Color(0, 0, 0), 'scrollbar_color_hover': Color(0, 60, 106), 'scrollbar_background_hover': Color(0, 0, 0), 'width': Scalar(value=100.0, unit=<Unit.WIDTH: 4>, percent_unit=<Unit.WIDTH: 4>), 'overflow_x': 'hidden', 'auto_link_color_hover': True, 'padding': Spacing(top=1,",
+            "_updates": 24,
+            "important": "set()"
+           }
+          },
+          "_inline_styles": {
+           "Styles": {
+            "node": "PatchEditorPanel(id='patch_editor_panel')",
+            "_rules": "{'layout': <vertical>, 'overflow_y': 'auto', 'overflow_x': 'hidden'}",
+            "_updates": 3,
+            "important": "set()"
+           }
+          }
+         }
+        },
+        "_rules": {
+         "layout": {
+          "VerticalLayout": {}
+         },
+         "overflow_y": "auto",
+         "overflow_x": "hidden"
+        },
+        "_updates": 3,
+        "important": []
+       }
+      }
+     }
+    }
+   },
+   "out": null
+  }
+ ]
+}

@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3898" height="932" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">chip-open · low</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M271,104 C931,104 931,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,104 C671,104 671,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3744,116 C2515,116 2515,298 1285,298" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3744,116 C3295,116 3295,240 2845,240" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M3744,116 C3555,116 3555,214 3365,214" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M980,104 C1285,104 1285,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1285" y="101" fill="#334155" font-size="10">self</text>
+<path d="M980,104 C1025,104 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="101" fill="#334155" font-size="10">self</text>
+<path d="M2020,104 C2065,104 2065,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1805,104 1805,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1500,104 C1545,104 1545,296 1590,296" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M2540,104 C2585,104 2585,254 2630,254" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2585" y="176" fill="#7c3aed" font-size="10">target</text>
+<path d="M2020,296 C2325,296 2325,254 2630,254" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2325" y="272" fill="#7c3aed" font-size="10">target</text>
+<path d="M1500,104 C2065,104 2065,254 2630,254" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="176" fill="#334155" font-size="10">root</text>
+<path d="M3060,254 C3105,254 3105,104 3150,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2540,104 C2585,104 2585,404 2630,404" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2585" y="251" fill="#7c3aed" font-size="10">path</text>
+<path d="M1500,104 C2065,104 2065,404 2630,404" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="251" fill="#334155" font-size="10">set_status</text>
+<path d="M2540,104 C2585,104 2585,104 2630,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M3060,104 C3365,104 3365,208 3670,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2020,104 C2325,104 2325,104 2630,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2325" y="101" fill="#334155" font-size="10">inner</text>
+<path d="M2020,104 C2845,104 2845,260 3670,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2845" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M2020,104 C2845,104 2845,208 3670,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2845" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C2065,104 2065,104 2630,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2065" y="101" fill="#334155" font-size="10">inner</text>
+<path d="M1500,104 C1545,104 1545,104 1590,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1545" y="101" fill="#334155" font-size="10">inner</text>
+<path d="M1500,104 C2585,104 2585,104 3670,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2585" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M1500,104 C2585,104 2585,208 3670,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2585" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M2020,296 C2585,296 2585,104 3150,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2585" y="197" fill="#334155" font-size="10">inner</text>
+<path d="M2020,296 C2845,296 2845,104 3670,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2845" y="197" fill="#334155" font-size="10">modify</text>
+<path d="M3060,404 C3365,404 3365,156 3670,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3365" y="277" fill="#334155" font-size="10">modify</text>
+<path d="M3060,404 C3365,404 3365,208 3670,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="3365" y="303" fill="#334155" font-size="10">modify</text>
+<rect x="550" y="90" width="430" height="124" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="90" x2="553" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="90" x2="977" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip.__init__</text>
+<text x="560" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.4, LLR-148.10, HLR-148</text>
+<text x="560" y="136" font-weight="normal" fill="#0f172a">in: str family; str? id_suffix = None</text>
+<text x="560" y="150" font-weight="normal" fill="#0f172a">out: OpenFolderChip chip {id, label, family}</text>
+<text x="560" y="164" font-weight="normal" fill="#0f172a">module: open_folder_chip.py</text>
+<text x="560" y="178" font-weight="normal" fill="#166534">examples: (AT-B97-12, synthetic) family &quot;checks&quot;; id_suffix</text>
+<text x="560" y="192" font-weight="normal" fill="#0f172a">&quot;editor&quot; → chip {id &quot;open_folder_checks_editor&quot;, label &quot;📂 Open</text>
+<text x="560" y="206" font-weight="normal" fill="#0f172a">  checks/&quot;}</text>
+<rect x="1590" y="90" width="430" height="166" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="90" x2="1593" y2="256" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="90" x2="2017" y2="256" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip.refresh_target</text>
+<text x="1600" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.3, HLR-148</text>
+<text x="1600" y="136" font-weight="normal" fill="#0f172a">in: OpenFolderChip self</text>
+<text x="1600" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1600" y="164" font-weight="normal" fill="#0f172a">module: open_folder_chip.py</text>
+<text x="1600" y="178" font-weight="normal" fill="#0f172a">modify: [Interface: chip state] (replace); [Interface: status</text>
+<text x="1600" y="192" font-weight="normal" fill="#0f172a">line] (replace)</text>
+<text x="1600" y="206" font-weight="normal" fill="#0f172a">inner: resolve_chip_target, no_project_reason</text>
+<text x="1600" y="220" font-weight="normal" fill="#166534">examples: (AT-B97-13, synthetic) family &quot;flows&quot;; no project →</text>
+<text x="1600" y="234" font-weight="normal" fill="#0f172a">chip disabled; status line names the `flows/` folder and not</text>
+<text x="1600" y="248" font-weight="normal" fill="#0f172a">  &quot;Reports&quot;</text>
+<rect x="1070" y="90" width="430" height="208" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="90" x2="1073" y2="298" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="90" x2="1497" y2="298" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip._open_target</text>
+<text x="1080" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.1, LLR-148.2, LLR-148.8, LLR-148.10, HLR-148</text>
+<text x="1080" y="136" font-weight="normal" fill="#0f172a">in: OpenFolderChip self</text>
+<text x="1080" y="150" font-weight="normal" fill="#0f172a">out: None</text>
+<text x="1080" y="164" font-weight="normal" fill="#0f172a">module: open_folder_chip.py</text>
+<text x="1080" y="178" font-weight="normal" fill="#0f172a">modify: [I/O: file system] (append); [Interface: status line]</text>
+<text x="1080" y="192" font-weight="normal" fill="#0f172a">  (replace)</text>
+<text x="1080" y="206" font-weight="normal" fill="#0f172a">inner: resolve_chip_target, create_chip_home,</text>
+<text x="1080" y="220" font-weight="normal" fill="#0f172a">is_openable_chip_dir, open_folder_in_file_manager,</text>
+<text x="1080" y="234" font-weight="normal" fill="#0f172a">no_project_reason, OpenFolderChip.refresh_target</text>
+<text x="1080" y="248" font-weight="normal" fill="#166534">examples: (TC-704, inferred) family &quot;checks&quot;; project &quot;proj1&quot;;</text>
+<text x="1080" y="262" font-weight="normal" fill="#0f172a">`checks/` missing → `create_chip_home` makes</text>
+<text x="1080" y="276" font-weight="normal" fill="#0f172a">&quot;.../proj1/checks&quot;, then the spied seam receives it (the</text>
+<text x="1080" y="290" font-weight="normal" fill="#0f172a">recorder does not see the spy)</text>
+<rect x="2110" y="90" width="430" height="124" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="90" x2="2113" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="90" x2="2537" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="108" font-weight="normal" fill="#0f172a">resolve_chip_target</text>
+<text x="2120" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.1, LLR-148.2, HLR-148</text>
+<text x="2120" y="136" font-weight="normal" fill="#0f172a">in: Path? project_dir; str family; Path workarea; Path</text>
+<text x="2120" y="150" font-weight="normal" fill="#0f172a">  base_dir</text>
+<text x="2120" y="164" font-weight="normal" fill="#0f172a">out: Path? target</text>
+<text x="2120" y="178" font-weight="normal" fill="#0f172a">module: services/folder_open_service.py</text>
+<text x="2120" y="192" font-weight="normal" fill="#166534">examples: (TC-704) family &quot;checks&quot;; project_dir &quot;.../proj1&quot; →</text>
+<text x="2120" y="206" font-weight="normal" fill="#0f172a">target &quot;.../proj1/checks&quot;</text>
+<rect x="1590" y="282" width="430" height="152" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="282" x2="1593" y2="434" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="282" x2="2017" y2="434" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="300" font-weight="normal" fill="#0f172a">create_chip_home</text>
+<text x="1600" y="314" font-weight="normal" fill="#0f172a">req: LLR-148.1, LLR-148.2, HLR-148</text>
+<text x="1600" y="328" font-weight="normal" fill="#0f172a">in: Path? project_dir; str family; Path workarea; Path</text>
+<text x="1600" y="342" font-weight="normal" fill="#0f172a">  base_dir</text>
+<text x="1600" y="356" font-weight="normal" fill="#0f172a">out: Path home</text>
+<text x="1600" y="370" font-weight="normal" fill="#0f172a">module: services/folder_open_service.py</text>
+<text x="1600" y="384" font-weight="normal" fill="#0f172a">modify: [I/O: file system] (append)</text>
+<text x="1600" y="398" font-weight="normal" fill="#0f172a">inner: _path_traverses_reparse_point</text>
+<text x="1600" y="412" font-weight="normal" fill="#166534">examples: (TC-704) family &quot;checks&quot;; project_dir &quot;.../proj1&quot; →</text>
+<text x="1600" y="426" font-weight="normal" fill="#0f172a">home &quot;.../proj1/checks&quot; (created)</text>
+<rect x="2630" y="90" width="430" height="124" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="2633" y1="90" x2="2633" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3057" y1="90" x2="3057" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2640" y="108" font-weight="normal" fill="#0f172a">no_project_reason</text>
+<text x="2640" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.3</text>
+<text x="2640" y="136" font-weight="normal" fill="#0f172a">in: str family</text>
+<text x="2640" y="150" font-weight="normal" fill="#0f172a">out: str reason</text>
+<text x="2640" y="164" font-weight="normal" fill="#0f172a">module: services/folder_open_service.py</text>
+<text x="2640" y="178" font-weight="normal" fill="#166534">examples: (AT-B97-13, synthetic) family &quot;flows&quot; → reason names</text>
+<text x="2640" y="192" font-weight="normal" fill="#0f172a">`flows/`; family &quot;reports&quot; → reason equals</text>
+<text x="2640" y="206" font-weight="normal" fill="#0f172a">  `REPORTS_NO_PROJECT_REASON`</text>
+<rect x="2630" y="240" width="430" height="124" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="2633" y1="240" x2="2633" y2="364" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3057" y1="240" x2="3057" y2="364" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2640" y="258" font-weight="normal" fill="#0f172a">is_openable_chip_dir</text>
+<text x="2640" y="272" font-weight="normal" fill="#0f172a">req: LLR-148.8</text>
+<text x="2640" y="286" font-weight="normal" fill="#0f172a">in: Path target; Path root</text>
+<text x="2640" y="300" font-weight="normal" fill="#0f172a">out: bool openable</text>
+<text x="2640" y="314" font-weight="normal" fill="#0f172a">module: services/folder_open_service.py</text>
+<text x="2640" y="328" font-weight="normal" fill="#0f172a">inner: _path_traverses_reparse_point</text>
+<text x="2640" y="342" font-weight="normal" fill="#166534">examples: (AT-B97-12, synthetic) target &quot;.../proj1/flows&quot; (a</text>
+<text x="2640" y="356" font-weight="normal" fill="#0f172a">junction); root &quot;.../proj1&quot; → openable False</text>
+<rect x="3150" y="90" width="430" height="124" fill="#fef3c7" stroke="#334155" stroke-width="1"/>
+<line x1="3153" y1="90" x2="3153" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3577" y1="90" x2="3577" y2="214" stroke="#0f172a" stroke-width="1.5"/>
+<text x="3160" y="108" font-weight="normal" fill="#0f172a">_path_traverses_reparse_point</text>
+<text x="3160" y="122" font-weight="normal" fill="#0f172a">req: LLR-148.8</text>
+<text x="3160" y="136" font-weight="normal" fill="#0f172a">in: Path path; Path? stop_at = None</text>
+<text x="3160" y="150" font-weight="normal" fill="#0f172a">out: bool traverses</text>
+<text x="3160" y="164" font-weight="normal" fill="#0f172a">module: workspace.py</text>
+<text x="3160" y="178" font-weight="normal" fill="#166534">examples: (TC-704) path &quot;.../proj1/checks&quot;; stop_at</text>
+<text x="3160" y="192" font-weight="normal" fill="#0f172a">&quot;.../.s19tool&quot; → traverses False (call from the shipped</text>
+<text x="3160" y="206" font-weight="normal" fill="#0f172a">scoped_home containment check)</text>
+<rect x="2630" y="390" width="430" height="152" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="2633" y1="390" x2="2633" y2="542" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="3057" y1="390" x2="3057" y2="542" stroke="#0f172a" stroke-width="1.5"/>
+<rect x="2636" y="424" width="418" height="14" fill="#fcd34d" opacity="0.45"/>
+<text x="2640" y="408" font-weight="normal" fill="#0f172a">open_folder_in_file_manager</text>
+<text x="2640" y="422" font-weight="normal" fill="#0f172a">req: LLR-148.5, LLR-148.10</text>
+<text x="2640" y="436" font-weight="normal" fill="#0f172a">in: Path path; (Callable) (str-&gt;None)? set_status = None; str</text>
+<text x="2640" y="450" font-weight="normal" fill="#0f172a">label = &quot;folder&quot;</text>
+<text x="2640" y="464" font-weight="normal" fill="#0f172a">out: bool opened</text>
+<text x="2640" y="478" font-weight="normal" fill="#0f172a">module: services/folder_open_service.py</text>
+<text x="2640" y="492" font-weight="normal" fill="#0f172a">modify: [I/O: file manager] (append); [Interface: status line]</text>
+<text x="2640" y="506" font-weight="normal" fill="#0f172a">  (replace)</text>
+<text x="2640" y="520" font-weight="normal" fill="#166534">examples: (TC-705) path &quot;/tmp/some dir&quot;; set_status None →</text>
+<text x="2640" y="534" font-weight="normal" fill="#0f172a">opened True</text>
+<rect x="30" y="90" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[Data: S19TuiApp active project]</text>
+<rect x="3670" y="90" width="148.8" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3680" y="108" font-weight="normal" fill="#0f172a">[I/O: file system]</text>
+<rect x="3670" y="142" width="155.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3680" y="160" font-weight="normal" fill="#0f172a">[I/O: file manager]</text>
+<rect x="3670" y="194" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3680" y="212" font-weight="normal" fill="#0f172a">[Interface: status line]</text>
+<rect x="3670" y="246" width="181.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="3680" y="264" font-weight="normal" fill="#0f172a">[Interface: chip state]</text>
+<rect x="30" y="612" width="3838.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="628" fill="#b91c1c">H-C1 · resolve_chip_target.target ──▶ open_folder_in_file_manager.path</text>
+<text x="40" y="642" fill="#b91c1c">what: without a project the `checks` chip resolves to `.s19tool/workarea/patches` (recorded, TC-703), but LLR-148.10 labels it `📂 Open checks/`</text>
+<text x="40" y="656" fill="#b91c1c">decision: changes I-1 (label rule): derive the label from the resolved target name, or keep the family label and amend HLR-148 / LLR-148.10</text>
+<rect x="30" y="684" width="3838.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="700" fill="#b91c1c">H-C2 · OpenFolderChip._open_target ──▶ create_chip_home</text>
+<text x="40" y="714" fill="#b91c1c">what: the press path calls `create_chip_home` for every missing target. Nothing reads `_CREATABLE_FAMILIES`</text>
+<text x="40" y="728" fill="#b91c1c">decision: changes I-1: the `when:` of this edge must be in the code (read `_CREATABLE_FAMILIES` in the press path or in `create_chip_home`)</text>
+<rect x="30" y="756" width="3838.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="772" fill="#b91c1c">H-C3 · OpenFolderChip._open_target ──▶ is_openable_chip_dir.root</text>
+<text x="40" y="786" fill="#b91c1c">what: the family root (the trust anchor) is computed by no named function. I-1 gives `is_openable_chip_dir(target, root)` but no producer of `root`</text>
+<text x="40" y="800" fill="#b91c1c">decision: adds one pure node to I-1, for example `chip_family_root(project_dir, base_dir) -&gt; Path`, or a line in D9 that fixes the root to `base_dir / WORKAREA_DIRNAME`</text>
+<rect x="30" y="858" width="14" height="12" fill="#dbeafe" stroke="#334155"/>
+<text x="50" y="868" fill="#334155">s19_app/tui/open_folder_chip.py</text>
+<rect x="390" y="858" width="14" height="12" fill="#dcfce7" stroke="#334155"/>
+<text x="410" y="868" fill="#334155">s19_app/tui/services/folder_open_service.py</text>
+<rect x="750" y="858" width="14" height="12" fill="#fef3c7" stroke="#334155"/>
+<text x="770" y="868" fill="#334155">s19_app/tui/workspace.py</text>
+</svg>

@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2638" height="644" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">chip-open · high level</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M271,104 C661,104 661,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M271,104 C491,104 491,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2484,116 C1660,116 1660,116 835,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2484,116 C2170,116 2170,142 1855,142" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2484,116 C2340,116 2340,116 2195,116" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,104 C835,104 835,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M620,104 C665,104 665,104 710,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1300,104 C1345,104 1345,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,104 C1175,104 1175,104 1390,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M960,104 C1005,104 1005,156 1050,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M1640,104 C1685,104 1685,156 1730,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M1300,156 C1515,156 1515,156 1730,156" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M960,104 C1345,104 1345,156 1730,156" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1980,156 C2025,156 2025,104 2070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,208 1730,208" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M960,104 C1345,104 1345,208 1730,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1640,104 C1685,104 1685,104 1730,104" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<path d="M1980,104 C2195,104 2195,208 2410,208" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1300,104 C1515,104 1515,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1300,104 C1855,104 1855,260 2410,260" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1300,104 C1855,104 1855,208 2410,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M960,104 C1345,104 1345,104 1730,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,104 C1005,104 1005,104 1050,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M960,104 C1685,104 1685,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1685" y="101" fill="#334155" font-size="10">modify</text>
+<path d="M960,104 C1685,104 1685,208 2410,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1685" y="153" fill="#334155" font-size="10">modify</text>
+<path d="M1300,156 C1685,156 1685,104 2070,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M1300,156 C1855,156 1855,104 2410,104" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1855" y="127" fill="#334155" font-size="10">modify</text>
+<path d="M1980,208 C2195,208 2195,156 2410,156" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2195" y="179" fill="#334155" font-size="10">modify</text>
+<path d="M1980,208 C2195,208 2195,208 2410,208" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2195" y="205" fill="#334155" font-size="10">modify</text>
+<rect x="370" y="90" width="250" height="26" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="373" y1="90" x2="373" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="617" y1="90" x2="617" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="380" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip.__init__</text>
+<rect x="1050" y="90" width="250" height="26" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="90" x2="1053" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="90" x2="1297" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip.refresh_target</text>
+<rect x="710" y="90" width="250" height="26" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+<line x1="713" y1="90" x2="713" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="957" y1="90" x2="957" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="720" y="108" font-weight="bold" fill="#0f172a">OpenFolderChip._open_target</text>
+<rect x="1390" y="90" width="250" height="26" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1393" y1="90" x2="1393" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1637" y1="90" x2="1637" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1400" y="108" font-weight="normal" fill="#0f172a">resolve_chip_target</text>
+<rect x="1050" y="142" width="250" height="26" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1053" y1="142" x2="1053" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1297" y1="142" x2="1297" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1060" y="160" font-weight="normal" fill="#0f172a">create_chip_home</text>
+<rect x="1730" y="90" width="250" height="26" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="90" x2="1733" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="90" x2="1977" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="108" font-weight="normal" fill="#0f172a">no_project_reason</text>
+<rect x="1730" y="142" width="250" height="26" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="142" x2="1733" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="142" x2="1977" y2="168" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="160" font-weight="normal" fill="#0f172a">is_openable_chip_dir</text>
+<rect x="2070" y="90" width="250" height="26" fill="#fef3c7" stroke="#334155" stroke-width="1"/>
+<line x1="2073" y1="90" x2="2073" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2317" y1="90" x2="2317" y2="116" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2080" y="108" font-weight="normal" fill="#0f172a">_path_traverses_reparse_point</text>
+<rect x="1730" y="194" width="250" height="26" fill="#dcfce7" stroke="#334155" stroke-width="1"/>
+<line x1="1733" y1="194" x2="1733" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1977" y1="194" x2="1977" y2="220" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1740" y="212" font-weight="normal" fill="#0f172a">open_folder_in_file_manager</text>
+<rect x="30" y="90" width="241.2" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[Data: S19TuiApp active project]</text>
+<rect x="2410" y="90" width="148.8" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="108" font-weight="normal" fill="#0f172a">[I/O: file system]</text>
+<rect x="2410" y="142" width="155.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="160" font-weight="normal" fill="#0f172a">[I/O: file manager]</text>
+<rect x="2410" y="194" width="188.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="212" font-weight="normal" fill="#0f172a">[Interface: status line]</text>
+<rect x="2410" y="246" width="181.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="2420" y="264" font-weight="normal" fill="#0f172a">[Interface: chip state]</text>
+<rect x="30" y="342" width="2578.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="358" fill="#b91c1c">H-C1 · resolve_chip_target.target ──▶ open_folder_in_file_manager.path</text>
+<text x="40" y="372" fill="#b91c1c">what: without a project the `checks` chip resolves to `.s19tool/workarea/patches` (recorded, TC-703), but LLR-148.10 labels it `📂 Open checks/`</text>
+<text x="40" y="386" fill="#b91c1c">decision: changes I-1 (label rule): derive the label from the resolved target name, or keep the family label and amend HLR-148 / LLR-148.10</text>
+<rect x="30" y="414" width="2578.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="430" fill="#b91c1c">H-C2 · OpenFolderChip._open_target ──▶ create_chip_home</text>
+<text x="40" y="444" fill="#b91c1c">what: the press path calls `create_chip_home` for every missing target. Nothing reads `_CREATABLE_FAMILIES`</text>
+<text x="40" y="458" fill="#b91c1c">decision: changes I-1: the `when:` of this edge must be in the code (read `_CREATABLE_FAMILIES` in the press path or in `create_chip_home`)</text>
+<rect x="30" y="486" width="2578.4" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="502" fill="#b91c1c">H-C3 · OpenFolderChip._open_target ──▶ is_openable_chip_dir.root</text>
+<text x="40" y="516" fill="#b91c1c">what: the family root (the trust anchor) is computed by no named function. I-1 gives `is_openable_chip_dir(target, root)` but no producer of `root`</text>
+<text x="40" y="530" fill="#b91c1c">decision: adds one pure node to I-1, for example `chip_family_root(project_dir, base_dir) -&gt; Path`, or a line in D9 that fixes the root to `base_dir / WORKAREA_DIRNAME`</text>
+<rect x="30" y="588" width="14" height="12" fill="#dbeafe" stroke="#334155"/>
+<text x="50" y="598" fill="#334155">s19_app/tui/open_folder_chip.py</text>
+<rect x="390" y="588" width="14" height="12" fill="#dcfce7" stroke="#334155"/>
+<text x="410" y="598" fill="#334155">s19_app/tui/services/folder_open_service.py</text>
+<rect x="750" y="588" width="14" height="12" fill="#fef3c7" stroke="#334155"/>
+<text x="770" y="598" fill="#334155">s19_app/tui/workspace.py</text>
+</svg>

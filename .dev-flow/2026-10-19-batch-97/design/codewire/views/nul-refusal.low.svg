@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2580" height="1442" font-family="Consolas, monospace" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#334155"/></marker><marker id="p" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#7c3aed"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="32" font-family="Segoe UI, sans-serif" font-size="18" fill="#0f172a">nul-refusal · low</text>
+<text x="30" y="54" font-family="Segoe UI, sans-serif" font-size="12" fill="#475569">colour = file · bold = method · dashed purple = when: · dashed = inner/modify · red dashed = finding · generated from the graph text (C14)</text>
+<path d="M166,104 C1138,104 1138,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1138" y="101" fill="#334155" font-size="10">flow_path</text>
+<path d="M199,156 C1154,156 1154,652 2110,652" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1154" y="401" fill="#334155" font-size="10">set_path</text>
+<path d="M192,208 C371,208 371,104 550,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M185,260 C1148,260 1148,816 2110,816" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M2325,228 C2065,228 2065,242 1805,242" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="232" fill="#334155" font-size="10">payload</text>
+<path d="M2325,776 C2065,776 2065,420 1805,420" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="595" fill="#334155" font-size="10">payload</text>
+<path d="M2020,104 C2065,104 2065,268 2110,268" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="183" fill="#334155" font-size="10">entry</text>
+<path d="M2020,104 C2065,104 2065,474 2110,474" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="286" fill="#334155" font-size="10">entry</text>
+<path d="M2020,104 C2065,104 2065,816 2110,816" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2065" y="457" fill="#7c3aed" font-size="10">raw_entry</text>
+<path d="M2325,434 C2325,434 2325,802 2325,802" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#p)"/>
+<text x="2325" y="615" fill="#7c3aed" font-size="10">raw_entry</text>
+<path d="M2020,282 C2065,282 2065,816 2110,816" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="546" fill="#334155" font-size="10">raw_entry</text>
+<path d="M980,104 C1545,104 1545,816 2110,816" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1545" y="457" fill="#334155" font-size="10">raw_entry</text>
+<path d="M1500,104 C1805,104 1805,816 2110,816" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1805" y="457" fill="#334155" font-size="10">raw_entry</text>
+<path d="M1500,282 C1805,282 1805,816 2110,816" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1805" y="546" fill="#334155" font-size="10">raw_entry</text>
+<path d="M2020,104 C2065,104 2065,104 2110,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="101" fill="#334155" font-size="10">flow</text>
+<path d="M2020,282 C2065,282 2065,652 2110,652" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="2065" y="464" fill="#334155" font-size="10">chain_set</text>
+<path d="M980,268 C1025,268 1025,104 1070,104" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="183" fill="#334155" font-size="10">flow</text>
+<path d="M980,268 C1025,268 1025,282 1070,282" fill="none" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+<text x="1025" y="272" fill="#334155" font-size="10">blocks</text>
+<path d="M2325,968 C2325,968 2325,994 2325,994" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="2325" y="978" fill="#334155" font-size="10">inner</text>
+<path d="M1500,104 C1805,104 1805,1008 2110,1008" fill="none" stroke="#334155" stroke-width="1.2" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<text x="1805" y="553" fill="#334155" font-size="10">inner</text>
+<rect x="2110" y="90" width="430" height="138" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="90" x2="2113" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="90" x2="2537" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="108" font-weight="normal" fill="#0f172a">load_flow_json</text>
+<text x="2120" y="122" font-weight="normal" fill="#0f172a">req: LLR-146.14, HLR-146</text>
+<text x="2120" y="136" font-weight="normal" fill="#0f172a">in: Path flow_path; Path project_dir</text>
+<text x="2120" y="150" font-weight="normal" fill="#0f172a">out: tuple(Flow? flow, List[ValidationIssue] findings)</text>
+<text x="2120" y="164" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="2120" y="178" font-weight="normal" fill="#0f172a">inner: dict_to_flow</text>
+<text x="2120" y="192" font-weight="normal" fill="#166534">examples: (TC-B97-62, synthetic) flow_path with a NUL in its</text>
+<text x="2120" y="206" font-weight="normal" fill="#0f172a">name → (flow None, findings 1 of 1, a refusal that names the</text>
+<text x="2120" y="220" font-weight="normal" fill="#0f172a">  path)</text>
+<rect x="1590" y="90" width="430" height="152" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="90" x2="1593" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="90" x2="2017" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="108" font-weight="normal" fill="#0f172a">dict_to_flow</text>
+<text x="1600" y="122" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="1600" y="136" font-weight="normal" fill="#0f172a">in: Any payload; Path project_dir</text>
+<text x="1600" y="150" font-weight="normal" fill="#0f172a">out: tuple(Flow? flow, List[ValidationIssue] findings)</text>
+<text x="1600" y="164" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="1600" y="178" font-weight="normal" fill="#0f172a">inner: _parse_a2b_entry, _parse_external_step_entry,</text>
+<text x="1600" y="192" font-weight="normal" fill="#0f172a">  _resolve_manifest_entry</text>
+<text x="1600" y="206" font-weight="normal" fill="#166534">examples: (BAT-traversal) payload blocks[3].config_ref</text>
+<text x="1600" y="220" font-weight="normal" fill="#0f172a">&quot;../../other/secrets.json&quot; → (flow None, findings 1 of 1 code</text>
+<text x="1600" y="234" font-weight="normal" fill="#0f172a">  &quot;MANIFEST-PATH-ESCAPE&quot;)</text>
+<rect x="2110" y="254" width="430" height="180" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="254" x2="2113" y2="434" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="254" x2="2537" y2="434" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="272" font-weight="normal" fill="#0f172a">_parse_a2b_entry</text>
+<text x="2120" y="286" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="2120" y="300" font-weight="normal" fill="#0f172a">in: Dict[str, Any] entry; str label; Path project_root;</text>
+<text x="2120" y="314" font-weight="normal" fill="#0f172a">List[FlowBlock] upstream_blocks; List[ValidationIssue]</text>
+<text x="2120" y="328" font-weight="normal" fill="#0f172a">  findings</text>
+<text x="2120" y="342" font-weight="normal" fill="#0f172a">out: A2BBlock? block</text>
+<text x="2120" y="356" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="2120" y="370" font-weight="normal" fill="#0f172a">modify: findings (append)</text>
+<text x="2120" y="384" font-weight="normal" fill="#0f172a">inner: _resolve_manifest_entry</text>
+<text x="2120" y="398" font-weight="normal" fill="#166534">examples: (TC-B97-62, synthetic) entry image_a {source &quot;file&quot;,</text>
+<text x="2120" y="412" font-weight="normal" fill="#0f172a">ref &quot;a\x00.s19&quot;} → block None; findings gains 1 refusal naming</text>
+<text x="2120" y="426" font-weight="normal" fill="#0f172a">  image_a.ref</text>
+<rect x="2110" y="460" width="430" height="152" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="460" x2="2113" y2="612" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="460" x2="2537" y2="612" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="478" font-weight="normal" fill="#0f172a">_parse_external_step_entry</text>
+<text x="2120" y="492" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="2120" y="506" font-weight="normal" fill="#0f172a">in: Dict[str, Any] entry; str label; List[ValidationIssue]</text>
+<text x="2120" y="520" font-weight="normal" fill="#0f172a">  findings</text>
+<text x="2120" y="534" font-weight="normal" fill="#0f172a">out: ExternalStepBlock? block</text>
+<text x="2120" y="548" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="2120" y="562" font-weight="normal" fill="#0f172a">modify: findings (append)</text>
+<text x="2120" y="576" font-weight="normal" fill="#166534">examples: (TC-B97-62, synthetic) entry log_ref &quot;run\x00.log&quot; →</text>
+<text x="2120" y="590" font-weight="normal" fill="#0f172a">block None; findings gains 1 code &quot;FLOW-UNSAFE-REF&quot; naming</text>
+<text x="2120" y="604" font-weight="normal" fill="#0f172a">  log_ref</text>
+<rect x="2110" y="638" width="430" height="138" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="638" x2="2113" y2="776" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="638" x2="2537" y2="776" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="656" font-weight="normal" fill="#0f172a">load_chain_set</text>
+<text x="2120" y="670" font-weight="normal" fill="#0f172a">req: LLR-146.14, HLR-146</text>
+<text x="2120" y="684" font-weight="normal" fill="#0f172a">in: Path set_path; Path project_dir</text>
+<text x="2120" y="698" font-weight="normal" fill="#0f172a">out: tuple(ChainSet? chain_set, List[ValidationIssue]</text>
+<text x="2120" y="712" font-weight="normal" fill="#0f172a">  findings)</text>
+<text x="2120" y="726" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="2120" y="740" font-weight="normal" fill="#0f172a">inner: dict_to_chain_set</text>
+<text x="2120" y="754" font-weight="normal" fill="#166534">examples: (TC-B94-31) set_path &quot;.../flowsets/escape.json&quot; →</text>
+<text x="2120" y="768" font-weight="normal" fill="#0f172a">(chain_set None, findings code &quot;MANIFEST-PATH-ESCAPE&quot;)</text>
+<rect x="1590" y="268" width="430" height="152" fill="#ffedd5" stroke="#334155" stroke-width="1"/>
+<line x1="1593" y1="268" x2="1593" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2017" y1="268" x2="2017" y2="420" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1600" y="286" font-weight="normal" fill="#0f172a">dict_to_chain_set</text>
+<text x="1600" y="300" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="1600" y="314" font-weight="normal" fill="#0f172a">in: Any payload; Path project_dir</text>
+<text x="1600" y="328" font-weight="normal" fill="#0f172a">out: tuple(ChainSet? chain_set, List[ValidationIssue]</text>
+<text x="1600" y="342" font-weight="normal" fill="#0f172a">  findings)</text>
+<text x="1600" y="356" font-weight="normal" fill="#0f172a">module: services/flow_persistence_service.py</text>
+<text x="1600" y="370" font-weight="normal" fill="#0f172a">inner: _resolve_manifest_entry</text>
+<text x="1600" y="384" font-weight="normal" fill="#166534">examples: (TC-B94-31) payload chains[0].inputs [[0,</text>
+<text x="1600" y="398" font-weight="normal" fill="#0f172a">&quot;../outside.s19&quot;]] → (chain_set None, findings code</text>
+<text x="1600" y="412" font-weight="normal" fill="#0f172a">  &quot;MANIFEST-PATH-ESCAPE&quot;)</text>
+<rect x="2110" y="802" width="430" height="166" fill="#ede9fe" stroke="#334155" stroke-width="1"/>
+<line x1="2113" y1="802" x2="2113" y2="968" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="2537" y1="802" x2="2537" y2="968" stroke="#0f172a" stroke-width="1.5"/>
+<text x="2120" y="820" font-weight="normal" fill="#0f172a">_resolve_manifest_entry</text>
+<text x="2120" y="834" font-weight="normal" fill="#0f172a">req: LLR-146.14, LLR-148.9</text>
+<text x="2120" y="848" font-weight="normal" fill="#0f172a">in: Path project_root; object raw_entry; str context;</text>
+<text x="2120" y="862" font-weight="normal" fill="#0f172a">list[ValidationIssue] issues</text>
+<text x="2120" y="876" font-weight="normal" fill="#0f172a">out: Path? resolved</text>
+<text x="2120" y="890" font-weight="normal" fill="#0f172a">module: services/variant_execution_service.py</text>
+<text x="2120" y="904" font-weight="normal" fill="#0f172a">modify: issues (append)</text>
+<text x="2120" y="918" font-weight="normal" fill="#0f172a">inner: _path_traverses_reparse_point</text>
+<text x="2120" y="932" font-weight="normal" fill="#166534">examples: (TC-B94-31) raw_entry &quot;../outside.s19&quot;; context</text>
+<text x="2120" y="946" font-weight="normal" fill="#0f172a">&quot;chains[0].inputs.ref&quot; → resolved None; issues gains `escapes</text>
+<text x="2120" y="960" font-weight="normal" fill="#0f172a">the project directory`</text>
+<rect x="550" y="90" width="430" height="138" fill="#ede9fe" stroke="#334155" stroke-width="1"/>
+<line x1="553" y1="90" x2="553" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="977" y1="90" x2="977" y2="228" stroke="#0f172a" stroke-width="1.5"/>
+<text x="560" y="108" font-weight="normal" fill="#0f172a">read_project_manifest</text>
+<text x="560" y="122" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="560" y="136" font-weight="normal" fill="#0f172a">in: Path project_dir; SizeProbe? size_probe = None</text>
+<text x="560" y="150" font-weight="normal" fill="#0f172a">out: ProjectManifest? manifest</text>
+<text x="560" y="164" font-weight="normal" fill="#0f172a">module: services/variant_execution_service.py</text>
+<text x="560" y="178" font-weight="normal" fill="#0f172a">inner: _resolve_manifest_entry</text>
+<text x="560" y="192" font-weight="normal" fill="#166534">examples: (TC-B97-62, inferred) manifest batch entry</text>
+<text x="560" y="206" font-weight="normal" fill="#0f172a">&quot;a\x00.s19&quot; → that entry skipped, 1 MANIFEST-PATH-ESCAPE</text>
+<text x="560" y="220" font-weight="normal" fill="#0f172a">finding, the others kept</text>
+<rect x="1070" y="90" width="430" height="152" fill="#ccfbf1" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="90" x2="1073" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="90" x2="1497" y2="242" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="108" font-weight="normal" fill="#0f172a">run_flow</text>
+<text x="1080" y="122" font-weight="normal" fill="#0f172a">req: LLR-146.14, LLR-148.9</text>
+<text x="1080" y="136" font-weight="normal" fill="#0f172a">in: Flow flow; FlowContext ctx</text>
+<text x="1080" y="150" font-weight="normal" fill="#0f172a">out: FlowRunResult result {status, block_results,</text>
+<text x="1080" y="164" font-weight="normal" fill="#0f172a">  written_paths}</text>
+<text x="1080" y="178" font-weight="normal" fill="#0f172a">module: services/flow_execution_service.py</text>
+<text x="1080" y="192" font-weight="normal" fill="#0f172a">inner: _resolve_manifest_entry, _path_traverses_reparse_point</text>
+<text x="1080" y="206" font-weight="normal" fill="#166534">examples: (P-50, inferred) lane 0 bound to &quot;base\x00.s19&quot; → on</text>
+<text x="1080" y="220" font-weight="normal" fill="#0f172a">`main` `ValueError: embedded null character` at</text>
+<text x="1080" y="234" font-weight="normal" fill="#0f172a">  `variant_execution_service.py:273`</text>
+<rect x="1070" y="268" width="430" height="124" fill="#ccfbf1" stroke="#334155" stroke-width="1"/>
+<line x1="1073" y1="268" x2="1073" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<line x1="1497" y1="268" x2="1497" y2="392" stroke="#0f172a" stroke-width="1.5"/>
+<text x="1080" y="286" font-weight="normal" fill="#0f172a">_chain_inputs</text>
+<text x="1080" y="300" font-weight="normal" fill="#0f172a">req: LLR-146.14</text>
+<text x="1080" y="314" font-weight="normal" fill="#0f172a">in: FlowContext ctx; Sequence[FlowBlock] blocks</text>
+<text x="1080" y="328" font-weight="normal" fill="#0f172a">out: List[Tuple[str, str]] inputs</text>
+<text x="1080" y="342" font-weight="normal" fill="#0f172a">module: services/flow_execution_service.py</text>
+<text x="1080" y="356" font-weight="normal" fill="#0f172a">inner: _resolve_manifest_entry</text>
+<text x="1080" y="370" font-weight="normal" fill="#166534">examples: (AT-B97-23, inferred) a SOURCE bound to</text>
+<text x="1080" y="384" font-weight="normal" fill="#0f172a">&quot;base\x00.s19&quot; → that input left out; no raise</text>
+<rect x="2110" y="994" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="2120" y="1012" font-weight="normal" fill="#0f172a">_path_traverses_reparse_point</text>
+<text x="2120" y="1026" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="550" y="254" width="430" height="40" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="4,3"/>
+<text x="560" y="272" font-weight="normal" fill="#0f172a">run_chain_set</text>
+<text x="560" y="286" font-weight="normal" fill="#0f172a">(declared in another graph file)</text>
+<rect x="30" y="90" width="135.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="108" font-weight="normal" fill="#0f172a">[I/O: flow file]</text>
+<rect x="30" y="142" width="168.6" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="160" font-weight="normal" fill="#0f172a">[I/O: chain-set file]</text>
+<rect x="30" y="194" width="162.0" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="212" font-weight="normal" fill="#0f172a">[I/O: manifest file]</text>
+<rect x="30" y="246" width="155.39999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="264" font-weight="normal" fill="#0f172a">[I/O: project tree]</text>
+<rect x="30" y="298" width="247.79999999999998" height="26" fill="#f8fafc" stroke="#64748b"/>
+<text x="40" y="316" font-weight="normal" fill="#0f172a">[Interface: Flow Execution lanes]</text>
+<rect x="30" y="1104" width="2520" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1120" fill="#b91c1c">H-N1 · dict_to_flow ──▶ _resolve_manifest_entry.raw_entry</text>
+<text x="40" y="1134" fill="#b91c1c">what: for every unsafe read ref the shipped loaders give the code of the shared guard, MANIFEST-PATH-ESCAPE. LLR-146.14 asks FLOW-UNSAFE-REF (flow) and CHAIN-SET-UNSAFE-REF (set) for a NUL in the same fields</text>
+<text x="40" y="1148" fill="#b91c1c">decision: changes I-6: state the placement and the code for each field family, or amend LLR-146.14 to MANIFEST-PATH-ESCAPE for read refs (the TC-B94-31 rule)</text>
+<rect x="30" y="1176" width="2520" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1192" fill="#b91c1c">H-N2 · dict_to_flow</text>
+<text x="40" y="1206" fill="#b91c1c">what: an unsafe `output_name` has its own shipped code, FLOW-UNSAFE-OUTPUT-NAME. LLR-146.14 asks FLOW-UNSAFE-REF for a NUL in that field</text>
+<text x="40" y="1220" fill="#b91c1c">decision: same decision as H-N1 (one row in I-6)</text>
+<rect x="30" y="1248" width="2520" height="52" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6,4"/>
+<text x="40" y="1264" fill="#b91c1c">H-N3 · _parse_external_step_entry</text>
+<text x="40" y="1278" fill="#b91c1c">what: I-6 names `load_flow_json`, `load_chain_set` and `_resolve_manifest_entry`. The field checks live in four other functions. For `log_ref` and `output_path` today a NUL is accepted, not raised</text>
+<text x="40" y="1292" fill="#b91c1c">decision: no new D. I-6 lists the real owner functions. The NC of LLR-146.14 names the acceptance arms</text>
+<rect x="30" y="1350" width="14" height="12" fill="#ccfbf1" stroke="#334155"/>
+<text x="50" y="1360" fill="#334155">s19_app/tui/services/flow_execution_service.py</text>
+<rect x="390" y="1350" width="14" height="12" fill="#ffedd5" stroke="#334155"/>
+<text x="410" y="1360" fill="#334155">s19_app/tui/services/flow_persistence_service.py</text>
+<rect x="750" y="1350" width="14" height="12" fill="#ede9fe" stroke="#334155"/>
+<text x="770" y="1360" fill="#334155">s19_app/tui/services/variant_execution_service.py</text>
+</svg>
