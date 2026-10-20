@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-19-batch-97 |
 | Objective | b94 polish: port the operator-approved prototype round (prototypes/b94_polish, verdict A on all four screens) into the four batch-94 screens -- Patch Editor = ledger + inspector with a consultable JSON tab (live or explicit Update, Load keeps populating), Check Editor = ledger + inspector, Flow Builder = pipeline rail, Flow Execution = pipeline rail; Run as the second bright element; CRC accent burnt orange (amber only for waiting-human); folder-open chip + window help on every one of the four screens (new chip families flows + session); width-adaptive layouts (118x54 minimum, ~220x60 large reference), no wrapped rows; English UI strings. Input: .dev-flow/design/HANDOFF-b94-polish-2026-10-20.md |
-| Last updated | P2 · 2026-10-20 (iterate-to-refine → P1) |
+| Last updated | P1 iteration 1 · 2026-10-20 (gate closed) |
 | Standing authorization | Asked at the P0 gate, answered by the operator 2026-10-20 (kickoff questions put in Spanish, answers quoted as chosen). **Gates** — "Autónomo con excepciones": the agent self-approves the gates and records each one in this plan and in `state.json`, but STOPS at PDR (design) and on any HIGH finding. **Git** — "Commit y push en cada cierre": the agent commits and pushes to `main` at each close, no PR (as batch-95); a HIGH finding still blocks and returns to the operator. **DoR** — "Las seis": US-134..US-139 proceed. Commission: "Using /dev-flow vamos desde aquí: C:\Users\jjgh8\Github\s19_app\.dev-flow\design\HANDOFF-b94-polish-2026-10-20.md" |
 | First gate | Exit 0 at P0 after the rollover (0 block · 462 notice · 44 n/a). `V7`: "bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared file(s) unmoved, 0 undeclared) at `2026-10-12-rev102`". The pre-rollover run exited 1 (298 block) on the closed batch-94 record — see §Gate notices. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin` run 2026-10-19; `origin/main` tip = `ad10fb5ce6228a2a3823e472fd8e46c09122141d`; merge-base(HEAD, origin/main) = the same commit, so no rebase was owed. Local `main` is one commit ahead (`51ee191`, the docs-only backlog routing of the Code-Wire findings, not yet pushed); `base_ref` = `51ee1914f20d1f031dbced129ce66bda750dbde9`. RC-1 (b): each story's outcome grepped on `origin/main` — 0 hits for the inspector/JSON tab, the report-fields card, the pipeline rails, the `flows`/`session` chip families and the burnt-orange token; the shipped gaps the stories close are present (`patch_win_json` 9 hits, `titled_header("Flow Execution")` with no chip 1, the Check Editor's bare `Label` 1, `_CANVAS_COLS =` 1) — no story is SATISFIED-EXTERNALLY. RC-2: `git ls-remote --exit-code --heads origin` answered (refs served); newest `origin/main` commit 2026-10-19 16:57 -0600. |
@@ -77,7 +77,8 @@ the rest of the app at both 118x54 and ~220x60.
 | ARQ | closed 2026-10-20 | `docs/architecture.md` batch-97 section (I-1..I-4, R13-R17); 4 PDR questions |
 | P1 | closed 2026-10-20 | HLR-144..149 · 38 LLR · AT-B97-01..16 · TC-B97-01..38 · 10 PDR decisions |
 | P2 round 1 | iterate-to-refine 2026-10-20 | 1 blocker (Q-1) · 33 major · 31 minor — `02-review.md` |
-| P1 iteration 1 | in progress | amending the contract against the P2 findings |
+| P1 iteration 1 | closed 2026-10-20 | LED-.2: 59 LLR · AT-B97-01..24 · TC-B97-01..59 · 16 PDR decisions |
+| P2 round 2 | in progress | full four-lens review of the amended contract |
 | PDR · P3 · DDR · P4 · P5 · P6 | not started | PDR is an operator stop |
 
 ## Roadmap + increment plan
@@ -111,6 +112,7 @@ Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
 - Snapshot goldens of the patch screen move (B3) · certain · re-baseline in the increment that moves them, named in its census.
 - 86 test files reach Patch Editor ids (B1) · medium · ids are kept; reverse census per increment.
 - CRC vs waiting-human hue (R-5) · medium · a real capture with both on screen at acceptance.
+- Shipped `main` is red: 10 pre-existing test failures (Test ledger) · certain · each increment diffs its failures against the baseline list; the Patch Editor four are re-examined in that increment, the rest routed to the backlog at the close.
 - Concurrent all-screens review by another agent (Kimi) · medium · the second editor rebases (`COORDINACION-batch92.md` rule); this batch owns only the four screens.
 
 ## Conventions honored
@@ -149,4 +151,4 @@ gates' reviews are independent, not self-executed.
 | Suite / command | Last run | Result |
 |---|---|---|
 | `devflow-validate.py --brief` (P0) | 2026-10-19 | exit 0 — 0 block · 462 notice · 44 n/a |
-| `pytest` (full suite, baseline) | — | owed before increment 1 |
+| `pytest -q -p no:cacheprovider` (full suite, baseline at `51ee191`, code = `ad10fb5`) | 2026-10-20 | **10 failed, 3101 passed, 3 skipped, 32 xfailed in 1:09:58** — transcript `evidence/baseline-pytest-51ee191.txt`. The 10 failures pre-date the batch (found before the batch, on shipped `main`): `test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact`, `test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched`, `test_tui_patch_editor_v2.py::{test_at031b_two_saves_are_distinct_no_clobber, test_at057b_regroup_wiring_and_binding_regression, test_at_batch41_escape_cancels_changeset_json_popup, test_at064c_edit_json_disabled_for_file_backed_document}`, `test_tui_patch_glyphs.py::test_at077c_stale_provenance`, `test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection`, `test_undo_redo_ux.py::test_ac1_checks_panel_clears_after_undo_and_redo`, `test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed`. Four sit on the Patch Editor this batch rebuilds; each increment's run compares against this list, and a failure outside it is a regression. Root cause not investigated here (batch-96 shipped on `main` without a gate). |

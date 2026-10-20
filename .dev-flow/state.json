@@ -36,8 +36,8 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "P1",
-  "phase_status": "iterating",
+  "current_station": "P2",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -129,6 +129,11 @@
       "station": "P2",
       "date": "2026-10-20",
       "decision": "P2 round 1 gate: iterate-to-refine (forced by blocker Q-1; all four lenses -- architect, qa-reviewer, security-reviewer, ux-reviewer -- returned iterate-to-refine; 1 blocker, 33 major, 31 minor in 02-review.md). Under the standing authorization the run chose for the requirement-defect majors: amend P1, then a full second P2 review. Rulings taken for the amendment: Q-5 the 80x24 floor is kept (below 118 the four screens stay reachable under scroll; no supersession); Q-2 the seven Spanish strings in flow_execution_service.py come into scope; A-2/Q-8 the underived story elements are derived, not dropped. Colour (A-4/U-2), primary action per screen (U-9), card growth at 220 (U-5) and the JSON refresh stay operator decisions at PDR. Routed out: A-15, S-6, U-17 to BACKLOG-CODE.md; Q-13 to security at the Flow Builder increment."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-20",
+      "decision": "P1 iteration 1 approved under the standing authorization (Autonomo con excepciones) -- the contract amended against every P2 round-1 finding routed to P1 (ledger LED-2026-10-19-batch-97.2): 59 LLRs (21 new), AT-B97-01..24, TC-B97-01..59, premises P-1..P-35 all TRUE, hostile payload split into a filename-legal subset and file content (Q-1), per-AT fixture table, keyboard-order LLRs, region states, renderer-derived glyph and colour sets; 16 decisions listed for PDR (operator: hue pair, primary action per editor, card growth). Three assumed flags left, each measured in its increment's RED run. P2 round 2 is next."
     }
   ],
   "obsidian_synced": false,

@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 3118fcf2b679eba1 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 5936fcbdd5442d2c -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1692 unique id(s)
+## family US/HLR/LLR — 1714 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2660,19 +2660,31 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-143.1` | batches, canon, tests |
 | `LLR-143.2` | batches, canon, tests |
 | `LLR-144.1` | batches |
+| `LLR-144.10` | batches |
+| `LLR-144.11` | batches |
 | `LLR-144.2` | batches |
 | `LLR-144.3` | batches |
 | `LLR-144.4` | batches |
 | `LLR-144.5` | batches |
 | `LLR-144.6` | batches |
 | `LLR-144.7` | batches |
+| `LLR-144.8` | batches |
+| `LLR-144.9` | batches |
 | `LLR-145` | batches |
 | `LLR-145.1` | batches |
 | `LLR-145.2` | batches |
 | `LLR-145.3` | batches |
 | `LLR-145.4` | batches |
 | `LLR-145.5` | batches |
+| `LLR-145.6` | batches |
+| `LLR-145.7` | batches |
+| `LLR-145.8` | batches |
+| `LLR-145.9` | batches |
 | `LLR-146.1` | batches |
+| `LLR-146.10` | batches |
+| `LLR-146.11` | batches |
+| `LLR-146.12` | batches |
+| `LLR-146.13` | batches |
 | `LLR-146.2` | batches |
 | `LLR-146.3` | batches |
 | `LLR-146.4` | batches |
@@ -2680,12 +2692,18 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-146.6` | batches |
 | `LLR-146.7` | batches |
 | `LLR-146.8` | batches |
+| `LLR-146.9` | batches |
 | `LLR-147.1` | batches |
+| `LLR-147.10` | batches |
+| `LLR-147.11` | batches |
 | `LLR-147.2` | batches |
 | `LLR-147.3` | batches |
 | `LLR-147.4` | batches |
 | `LLR-147.5` | batches |
 | `LLR-147.6` | batches |
+| `LLR-147.7` | batches |
+| `LLR-147.8` | batches |
+| `LLR-147.9` | batches |
 | `LLR-148.1` | batches |
 | `LLR-148.1..148.3` | batches |
 | `LLR-148.2` | batches |
@@ -2694,11 +2712,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-148.5` | batches |
 | `LLR-148.6` | batches |
 | `LLR-148.7` | batches |
+| `LLR-148.8` | batches |
+| `LLR-148.9` | batches |
 | `LLR-149.1` | batches |
+| `LLR-149.1-149.3` | batches |
 | `LLR-149.2` | batches |
 | `LLR-149.3` | batches |
 | `LLR-149.4` | batches |
 | `LLR-149.5` | batches |
+| `LLR-149.6` | batches |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -3394,7 +3416,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1737 unique id(s)
+## family AT/TC — 1766 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4079,6 +4101,14 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B97-14` | batches |
 | `AT-B97-15` | batches |
 | `AT-B97-16` | batches |
+| `AT-B97-17` | batches |
+| `AT-B97-18` | batches |
+| `AT-B97-19` | batches |
+| `AT-B97-20` | batches |
+| `AT-B97-21` | batches |
+| `AT-B97-22` | batches |
+| `AT-B97-23` | batches |
+| `AT-B97-24` | batches |
 | `TC-001` | batches, canon, tests |
 | `TC-001a` | batches, tests |
 | `TC-001b` | batches, tests |
@@ -5135,3 +5165,24 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B97-36` | batches |
 | `TC-B97-37` | batches |
 | `TC-B97-38` | batches |
+| `TC-B97-39` | batches |
+| `TC-B97-40` | batches |
+| `TC-B97-41` | batches |
+| `TC-B97-42` | batches |
+| `TC-B97-43` | batches |
+| `TC-B97-44` | batches |
+| `TC-B97-45` | batches |
+| `TC-B97-46` | batches |
+| `TC-B97-47` | batches |
+| `TC-B97-48` | batches |
+| `TC-B97-49` | batches |
+| `TC-B97-50` | batches |
+| `TC-B97-51` | batches |
+| `TC-B97-52` | batches |
+| `TC-B97-53` | batches |
+| `TC-B97-54` | batches |
+| `TC-B97-55` | batches |
+| `TC-B97-56` | batches |
+| `TC-B97-57` | batches |
+| `TC-B97-58` | batches |
+| `TC-B97-59` | batches |
