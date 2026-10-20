@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08d64bce6ea349c1 -->
 
 # ATLAS-IFC — how is the application addressed?
 
@@ -147,8 +147,10 @@
 - node `symbol resolution (name -> address+length+datatype via the tag map)` — owner LLR-141.1
 - node `physical->raw encode (the COMPU_METHOD composition) + the canonical wire form` — owner LLR-141.1
 - node `the Patch Editor symbol picker + the refusal limb` — owner LLR-141.2
-- node `the flow blocks' A2L reference resolution (project / workspace homes)` — owner LLR-142.1 / LLR-142.2
-- node `report attribution + the A2B diff reference block` — owner LLR-143.1 / LLR-143.2
+- node `the flow blocks' A2L reference resolution -- project home` — owner LLR-142.1
+- node `the flow blocks' A2L reference resolution -- workspace home` — owner LLR-142.2
+- node `report attribution` — owner LLR-143.1
+- node `the A2B diff reference block` — owner LLR-143.2
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -333,7 +335,7 @@
 | `run_log` | `query("#flow-run-log")` | 1 | 0 declared | LLR-020.1 |
 | `chain_set_save_result` | `query("#flow-set-save-result")` | 1 | 0 declared | LLR-021.1 [+ABSORBED] |
 
-### COMPONENT `split_join_engine` — .dev-flow/2026-10-13-batch-95/01-requirements.md:840
+### COMPONENT `split_join_engine` — .dev-flow/2026-10-13-batch-95/01-requirements.md:848
 - gap : str ; pad_byte: int ; fmt: str ; stem: str ; pattern: str ; destination: Path
 - inputs : image: S19File|IntelHexFile ; segments: SegRow[] ; selection: set[int] ; mode: str ;
 - outputs : 
@@ -342,10 +344,10 @@
 
 | output | address | cardinality | consumers | owner |
 |---|---|---|---|---|
-| `output_files` | `s19_app/tui/changes/io.py (the split/join emit entry minted by LLR-137.1-137.3)` | 1..N | 3 declared | LLR-136.5 |
+| `output_files` | `s19_app/tui/changes/io.py (the split/join emit entry minted by LLR-137.1-137.3)` | 1..N | 0 declared | LLR-136.5 |
 | `memory_segment_rows` | `s19_app/tui/a2l.py::extract_memory_segments` | 0..N | 2 declared | LLR-137.4 |
 
-### COMPONENT `change_set_wire` — .dev-flow/2026-10-13-batch-95/01-requirements.md:864
+### COMPONENT `change_set_wire` — .dev-flow/2026-10-13-batch-95/01-requirements.md:871
 - inputs : document: ChangeDocument (address-form and symbol-form entries) ; a2l: the referenced [+ABSORBED]
 - outputs : 
 - parent : SYSTEM
@@ -357,8 +359,7 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:824: FLOW a2l_referenced_patch: node `the flow blocks' A2L reference resolution (project / workspace homes)` names 2 owners (LLR-142.1, LLR-142.2) — a node has exactly one owner; split it into one node per owning requirement
-- [x] V10  .dev-flow/2026-10-13-batch-95/01-requirements.md:828: FLOW a2l_referenced_patch: node `report attribution + the A2B diff reference block` names 2 owners (LLR-143.1, LLR-143.2) — a node has exactly one owner; split it into one node per owning requirement
+- [-] V10  01-requirements.md: 99 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 96 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1131: COMPONENT check_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
@@ -419,7 +420,5 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-10-12-batch-94/01-requirements.md:1158: COMPONENT patch_editor_panel/entries_table_rows: reached by 14 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, s19_app/tui/services/change_service.py, s19_app/tui/styles.tcss, tests/test_tui_checks_screen.py, tests/test_tui_patch_big.py, tests/test_tui_patch_card.py, tests/test_tui_patch_checks_strip.py, tests/test_tui_patch_editor_b94.py, tests/test_tui_patch_editor_v2.py, tests/test_tui_patch_glyphs.py, tests/test_tui_patch_layout.py, tests/test_tui_patch_variant.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  01-requirements.md: 9 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text, split_join_engine/output_files, split_join_engine/memory_segment_rows, change_set_wire/resolved_entries. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `none — the first consumer is the screen's export action and the batch's own` names a file that is not there — the contract points at nothing
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `TCs` names a file that is not there — the contract points at nothing
-- [x] V14  .dev-flow/2026-10-13-batch-95/01-requirements.md:846: COMPONENT split_join_engine/output_files: consumer `no shipped consumer indexes it` names a file that is not there — the contract points at nothing
+- [-] V14  01-requirements.md: 305 declared consumer(s), every one resolved
 - [-] V19  01-requirements.md: 12 COMPONENT id(s), each declared exactly once

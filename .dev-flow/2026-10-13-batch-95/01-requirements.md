@@ -821,14 +821,22 @@ FLOW: a2l_referenced_patch
       owner : LLR-141.2
       in    : the loaded A2L's names ; the operator's entry inputs
       out   : symbol-referenced entries or the named refusal
-    - fn    : the flow blocks' A2L reference resolution (project / workspace homes)
-      owner : LLR-142.1 / LLR-142.2
-      in    : the Load/Patch blocks' a2l_ref ; the project folder ; the workarea containment root
+    - fn    : the flow blocks' A2L reference resolution -- project home
+      owner : LLR-142.1
+      in    : the Load/Patch blocks' a2l_ref ; the project folder
       out   : the run's resolution A2L or the named refusal
-    - fn    : report attribution + the A2B diff reference block
-      owner : LLR-143.1 / LLR-143.2
-      in    : the applied entries ; the flow-produced image B ; the diff runs
-      out   : the change-attribution section + the diff block referencing ALL flow changes
+    - fn    : the flow blocks' A2L reference resolution -- workspace home
+      owner : LLR-142.2
+      in    : the Load/Patch blocks' a2l_ref ; the workarea containment root
+      out   : the run's resolution A2L or the named refusal
+    - fn    : report attribution
+      owner : LLR-143.1
+      in    : the applied entries
+      out   : the change-attribution section
+    - fn    : the A2B diff reference block
+      owner : LLR-143.2
+      in    : the flow-produced image B ; the diff runs
+      out   : the diff block referencing ALL flow changes
   SINK   : the Patch Editor entries table ; the flow's applied image ; the flow report + the
            A2B diff report block
 ```
@@ -848,8 +856,7 @@ COMPONENT: split_join_engine
                     joined file in join; + the .addr sidecar for BIN)
       address     : s19_app/tui/changes/io.py (the split/join emit entry minted by LLR-137.1-137.3)
       cardinality : 1..N
-      consumers   : none — the first consumer is the screen's export action and the batch's own
-                    TCs; no shipped consumer indexes it
+      consumers   : none
       owner       : LLR-136.5
     - id          : memory_segment_rows
       value       : MEMORY_SEGMENT rows (name/usage/kind/base/size/offset)

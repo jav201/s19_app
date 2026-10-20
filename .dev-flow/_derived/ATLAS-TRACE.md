@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08b55e2304e23731 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 73 requirement files | corpus digest: 08d64bce6ea349c1 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
-registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
+registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 
 | id | status | origin | provenance |
 |---|---|---|---|
@@ -1036,6 +1036,21 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-16b` | LIVE | seed |  |
 | `TC-16s` | LIVE | seed |  |
 | `TC-1728` | BURNED | seed | .dev-flow/2026-07-08-batch-29/_qa-acceptance-validation.md:252 — a stray reference, 1119 above its nearest neighbour, already identified as stray by batch-65 (.dev-flow/2026-07-28-batch-65/PLAN.md:90). Marked conforming:false so it is permanently spent WITHOUT dragging the TC high-water mark to 1729. |
+| `TC-1800` | LIVE | batch-96 |  |
+| `TC-1801` | LIVE | batch-96 |  |
+| `TC-1802` | LIVE | batch-96 |  |
+| `TC-1803` | LIVE | batch-96 |  |
+| `TC-1804` | LIVE | batch-96 |  |
+| `TC-1810` | LIVE | batch-96 |  |
+| `TC-1811` | LIVE | batch-96 |  |
+| `TC-1815` | LIVE | batch-96 |  |
+| `TC-1816` | LIVE | batch-96 |  |
+| `TC-1817` | LIVE | batch-96 |  |
+| `TC-1818` | LIVE | batch-96 |  |
+| `TC-1819` | LIVE | batch-96 |  |
+| `TC-1820` | LIVE | batch-96 |  |
+| `TC-1821` | LIVE | batch-96 |  |
+| `TC-1822` | LIVE | batch-96 |  |
 | `TC-201` | LIVE | seed |  |
 | `TC-201-family` | LIVE | seed |  |
 | `TC-201-numbering` | BURNED | seed | .dev-flow/2026-07-09-batch-33/04-validation.md:28 |
@@ -3322,7 +3337,7 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1668 unique id(s)
+## family AT/TC — 1683 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4391,6 +4406,21 @@ registry: 1499 rows — BURNED 422 · LIVE 979 · RESERVED 75 · RETIRED 23
 | `TC-16s` | batches, tests |
 | `TC-1728` | batches, tests |
 | `TC-18` | batches |
+| `TC-1800` | tests |
+| `TC-1801` | tests |
+| `TC-1802` | tests |
+| `TC-1803` | tests |
+| `TC-1804` | tests |
+| `TC-1810` | tests |
+| `TC-1811` | tests |
+| `TC-1815` | tests |
+| `TC-1816` | tests |
+| `TC-1817` | tests |
+| `TC-1818` | tests |
+| `TC-1819` | tests |
+| `TC-1820` | tests |
+| `TC-1821` | tests |
+| `TC-1822` | tests |
 | `TC-19` | batches |
 | `TC-201` | batches, canon, tests |
 | `TC-201.1` | batches, tests |
