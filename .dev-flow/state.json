@@ -36,8 +36,8 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "P1",
-  "phase_status": "iterating",
+  "current_station": "P2",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -139,6 +139,11 @@
       "station": "P2",
       "date": "2026-10-20",
       "decision": "P2 round 2 gate: iterate-to-refine (forced by blocker Q2-1 -- four ATs observe internal symbols; all four lenses returned iterate-to-refine; 1 blocker, 17 major, 27 minor in 02-review.md round 2). Root cause of the second loop, named per the iteration-cap rule: several requirement gaps hinge on design choices still open (hue pair, primary action per editor, card growth, JSON refresh, multi-variant runs, Confirm focus). Those operator choices are asked BEFORE the round-3 amendment so it can be final. S2-2 (NUL crash) ruled into this batch at the Flow Builder increment."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-20",
+      "decision": "P1 iteration 2 approved under the standing authorization (Autonomo con excepciones) -- LED-2026-10-19-batch-97.3: every round-2 row routed to P1 resolved; operator decisions written as decided (hue pair #e8ad3d/#c9562b, notices #f6ff8f kept with the operator's reservation; Save/Write primary actions; one Builder chain per variant, LLR-104.6 retired for the Builder; JSON tab live with stamp); orchestrator decisions 5-10 marked revisable at PDR; 65 LLRs, 24 ATs, 65 TCs, 49 premises, 0 assumed flags; evidence moved to 01-requirements-appendix.md (non-normative). P2 round 3 is next."
     }
   ],
   "obsidian_synced": false,

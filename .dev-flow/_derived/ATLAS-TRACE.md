@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 5936fcbdd5442d2c -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: c60e8131d3448b16 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1714 unique id(s)
+## family US/HLR/LLR — 1720 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1736,6 +1736,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-143.1` | batches |
 | `HLR-143.2` | batches |
 | `HLR-144` | batches |
+| `HLR-144..147` | batches |
 | `HLR-144..148` | batches |
 | `HLR-144..149` | batches |
 | `HLR-144..HLR-149` | batches |
@@ -2662,6 +2663,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-144.1` | batches |
 | `LLR-144.10` | batches |
 | `LLR-144.11` | batches |
+| `LLR-144.12` | batches |
 | `LLR-144.2` | batches |
 | `LLR-144.3` | batches |
 | `LLR-144.4` | batches |
@@ -2672,6 +2674,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-144.9` | batches |
 | `LLR-145` | batches |
 | `LLR-145.1` | batches |
+| `LLR-145.10` | batches |
 | `LLR-145.2` | batches |
 | `LLR-145.3` | batches |
 | `LLR-145.4` | batches |
@@ -2685,6 +2688,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-146.11` | batches |
 | `LLR-146.12` | batches |
 | `LLR-146.13` | batches |
+| `LLR-146.14` | batches |
 | `LLR-146.2` | batches |
 | `LLR-146.3` | batches |
 | `LLR-146.4` | batches |
@@ -2696,6 +2700,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-147.1` | batches |
 | `LLR-147.10` | batches |
 | `LLR-147.11` | batches |
+| `LLR-147.12` | batches |
+| `LLR-147.13` | batches |
 | `LLR-147.2` | batches |
 | `LLR-147.3` | batches |
 | `LLR-147.4` | batches |
@@ -2706,6 +2712,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-147.9` | batches |
 | `LLR-148.1` | batches |
 | `LLR-148.1..148.3` | batches |
+| `LLR-148.10` | batches |
 | `LLR-148.2` | batches |
 | `LLR-148.3` | batches |
 | `LLR-148.4` | batches |
@@ -3100,7 +3107,6 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-132` | batches |
 | `US-133` | batches |
 | `US-134` | batches |
-| `US-134..137` | batches |
 | `US-134..US-139` | batches |
 | `US-135` | batches |
 | `US-136` | batches |
@@ -3416,7 +3422,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1766 unique id(s)
+## family AT/TC — 1772 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -5186,3 +5192,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B97-57` | batches |
 | `TC-B97-58` | batches |
 | `TC-B97-59` | batches |
+| `TC-B97-60` | batches |
+| `TC-B97-61` | batches |
+| `TC-B97-62` | batches |
+| `TC-B97-63` | batches |
+| `TC-B97-64` | batches |
+| `TC-B97-65` | batches |
