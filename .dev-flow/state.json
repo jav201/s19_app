@@ -36,8 +36,8 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "PDR",
-  "phase_status": "awaiting-gate",
+  "current_station": "P3",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -164,6 +164,11 @@
       "station": "P2",
       "date": "2026-10-20",
       "decision": "P2 approved under the standing authorization after the operator's scoped verification -- all four lenses approve: every round-3 blocker/major closed (Q3-1 executed RED on HEAD; A3-2 probe re-run; U3-1/U3-3 closed after the one-line fold LED-2026-10-19-batch-97.5, re-checked by the same ux-reviewer); risk LOW, 0 HIGH. Carried with owners in 02-review.md (A3-8 size, S2-2 stat widening at the Flow Builder increment, Q-14, Q-18, U2-15). PDR is next -- an operator stop."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-10-20",
+      "decision": "asked at the gate — operator PDR verdict 2026-10-20: approved with conditions; decision 1 A (pe_A grid strip), decision 2 A (single meaning of the check mark, frozen c texts), decision 3 A (click selects a word, enter/space toggle), remaining voids at 220x60 accepted. Objection: a two-row bottom key bar (global row + active-screen row) — analysed as app-wide, routed to its own prototype-first batch (backlog U-17 widened) with hedge PC-22 here. Conditions PC-1..PC-22 in the PDR record; P3 opens with PC-12 and PC-20 due before Inc-1."
     }
   ],
   "obsidian_synced": false,

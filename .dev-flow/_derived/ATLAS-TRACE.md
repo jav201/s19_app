@@ -4520,7 +4520,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-1801` | tests |
 | `TC-1802` | tests |
 | `TC-1803` | tests |
-| `TC-1804` | tests |
+| `TC-1804` | batches, tests |
 | `TC-1810` | tests |
 | `TC-1811` | tests |
 | `TC-1815` | tests |
@@ -4954,7 +4954,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-701` | tests |
 | `TC-702` | batches, tests |
 | `TC-703` | batches, tests |
-| `TC-704` | tests |
+| `TC-704` | batches, tests |
 | `TC-705` | batches, tests |
 | `TC-706` | batches, tests |
 | `TC-707` | batches, tests |
