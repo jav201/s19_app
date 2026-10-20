@@ -25,73 +25,345 @@
 
 | Field | Value |
 |---|---|
-| Id | `PDR-<batch_id>` |
-| Requirements covered | `<R-NNN vN · …>` |
-| Modules touched (from `docs/ARCHITECTURE.md`) | `<…>` |
-| Triggers that fired | `<A1 · A3 · D1 …>` |
-| Author / reviewers | `architect` · `qa-reviewer` · `<ux-reviewer if D fired>` |
+| Id | `PDR-2026-10-19-batch-97` (decisions cited as `PDR-2026-10-19-batch-97#D1` … `#D25`, §1.1) |
+| Requirements covered | `01-requirements.md` at `e91631b` (ledger to `LED-2026-10-19-batch-97.5`): HLR-144 to HLR-149 · 65 LLR (LLR-144.1 to LLR-149.6) · AT-B97-01 to AT-B97-24 · TC-B97-01 to TC-B97-65 |
+| Modules touched (from `docs/ARCHITECTURE.md`) | `s19_app/tui/screens_directionb.py` · `s19_app/tui/flow_screens.py` · `s19_app/tui/app.py` · `s19_app/tui/styles.tcss` · `s19_app/tui/window_help.py` · `s19_app/tui/open_folder_chip.py` · `s19_app/tui/insight_style.py` · `s19_app/tui/services/{folder_open_service, flow_persistence_service, variant_execution_service, flow_execution_service}.py` — all CHANGED, none created (`docs/architecture.md:420`, A1 not fired) |
+| Triggers that fired | A2 · A3 · B1 · B3 · C8 · D1 · E1 (`PLAN.md` §Triggers) |
+| Author / reviewers | `architect` (author) · `qa-reviewer` · `ux-reviewer` (D1) · `security-reviewer` (owner of the S2-2 carry, Inc-2 gate) |
 
 ---
 
 ## 1 · Objective and scope
 
-*(What this design must achieve, in the requirement's own terms. And explicitly: what it will NOT do.)*
+**Objective.** Turn the approved contract into seven sequential increments of ≤ 4 SOURCE files each that re-compose the four batch-94 panels at their shipped ids (R13), with every implementation-shape item the contract left open (§6.2 items 1–9) and every P2 carry decided here.
+
+**Will NOT do:** change run semantics, any persisted format (`.chk.json`, change-set v2, flow template, chain-set — batch-94 `#D2` / `#D4` stay frozen), any message type (batch-94 `#D3`), the batch-96 waiting-human doctrine, or any screen other than the four; no worker thread (declared OUT, contract §2.6); nothing imported from `prototypes/`.
+
+### 1.1 Decisions (`#D<n>`) — every §6.2 item and every P2 carry
+
+| # | Decision | One-line reason | Lands in |
+|---|---|---|---|
+| D1 | **I-2/I-3 shape = a `refresh_entries` keyword** `document: PatchDocumentView \| _Unset = _UNSET` (sentinel ⇒ preserve), the payload built by ONE app helper `S19TuiApp._patch_document_view()` and passed at all four sites (`app.py:3265, :3451, :5279, :10758`) | rows, identity and JSON view refresh in the same call, so they cannot disagree; a setter is a second call-site set to keep in step — the MJ-1 defect the code records at `app.py:6273` ("missed a mount-time fourth"); the `mem_map` sentinel idiom is already proven (TC-080.2a) | Inc-4 |
+| D2 | `PatchDocumentView` = frozen dataclass in `screens_directionb.py`: `name: Optional[str]`, `kind: str`, `json_text: str`, `entry_count: int` | the panel keeps importing nothing from the service layer (C-7); the app serialises with `serialize_change_document` (R17) | Inc-4 |
+| D3 | JSON view = `TextArea(read_only=True, soft_wrap=False)` `#patch_json_view`; the cap note is its last line; the stamp is `#patch_json_stamp` (Static) above it | literal by construction (no markup parser, C-17); focusable, arrow keys (LLR-144.10); no raw C0/C1 reaches it — the serialiser calls `json.dumps(payload, indent=2)` with the default `ensure_ascii=True` (`changes/io.py:1419`) | Inc-4 |
+| D4 | The stamp is recomposed by the panel's own `_refresh_dirty_indicator` (the four dirty-flag writers, P-48) and by the D1 document path; text from a pure `json_stamp_text(n, hhmmss, dirty)` | Save and paste typing change the flag, not the document (P-57); one composer, two triggers | Inc-4 |
+| D5 | **Hex strip = REUSE `BeforeAfterCard` `#patch_before_after_card`**, moved from `#patch_win_json_body` into the inspector pane; the changed-byte style becomes `"bold " + VALUE` (attribute = **bold**); `max_bytes` derived from the inspector width | it already follows the highlight with a positional join, a no-image state and an unmapped token (`screens_directionb.py:4119-4216`, `:6270`); its id is in `PE_IDS_9C7BEAF`, so LLR-144.1 keeps it; a new widget would duplicate a tested renderer | Inc-4 |
+| D6 | **`✓` / `▼` (U2-11):** on the two flow screens `✓` means only *check block* and `▼` only *write-out block* (kind glyphs, named in help); `#fx_confirm_<i>` is labelled `Confirm` with no glyph; lane state uses only the cable vocabulary. In the Check Editor `✓` means only *included* (ledger), `☑` / `▪` the included-parameter / memory-row Fields marks (LLR-145.6) | one meaning per glyph per vocabulary (LLR-148.7); the `✓ Confirm` label and the retired lane `✓ clean` were the second meanings | Inc-3, 5, 6 |
+| D7 | Closed vocabularies are `Mapping[str, str]` (glyph → meaning) in their renderer's module: `PATCH_GLYPHS` (strip + ledger verdict glyphs), `CHECK_GLYPHS`, `FLOW_KIND_GLYPHS` + `FLOW_CABLE_GLYPHS` (Builder), `FX_CABLE_GLYPHS` (`▓ ░ ✗ ◇ □`) + `FX_PENDING_GLYPH = "▸"`; each legend is generated from its mapping | a dict key cannot carry two meanings, so "one meaning" holds by construction; help bodies stay hand-authored in `window_help.py` (no `window_help → panels` import edge) and TC-B97-33 couples them | Inc-3..6 |
+| D8 | **Builder variant branch `app.py:2586-2609`: DELETED**; the handler always runs `run_flow`; `RunRequested.scope` stays in the message (frozen `#D3`) and always carries `FLOW_SCOPE_SINGLE`; `_SCOPE_OPTIONS` and `#flow_scope` leave the panel; `render_fused_result` and `run_flow_over_variants` stay untouched (backlog row at close) | an unreachable branch that paints "run over 'This image' instead" names a control that no longer exists; the service and its `test_d4_*` nodes stay (contract §6.3) | Inc-5 |
+| D9 | **Check Editor chip id = suffix:** `OpenFolderChip(family, *, id_suffix=None)` → `open_folder_<family>` or `open_folder_<family>_<suffix>`; the Check Editor mounts `OpenFolderChip("checks", id_suffix="editor")` → `#open_folder_checks_editor` | LLR-148.4 requires an id NO other mounted widget carries; scoping the query would leave two equal ids | Inc-1 (param), Inc-3 (mount) |
+| D10 | **Help keys `check_editor` and `flow_execution`** (the `SCREEN_CONTAINER_IDS` keys, `app.py:6752`, per `window_help.py`'s key convention); **both screens become `WindowSection`**; Flow Execution uses `_FlowExecutionSection(WindowSection)` declared in `app.py` with `Binding("c", "confirm_attention", show=False)` delegating to `FlowExecutionPanel.confirm_attention()` | every other rail screen with help is a `WindowSection` (focused `?`); a screen-level binding makes `c` work with the focus on the header chips too (LLR-147.13 "on the Flow Execution screen"); declaring the subclass in `app.py` adds no import edge; an `Input` consumes `c` itself, so typing still types | Inc-3, Inc-6 |
+| D11 | **Token names** `insight_style.WAITING_HUMAN = "#e8ad3d"`, `insight_style.CRC_FAMILY = "#c9562b"`, mirrored as `$waiting-human` / `$crc-family` in `styles.tcss` with the `/* insight_style.X */` comment (the `$accent-calm` convention, `styles.tcss:26-31`); TC-B97-18 couples the pair | role names, because LLR-147.7 restricts the waiting colour to a role; the TCSS mirror is the project's existing way to reach a token from CSS | Inc-2 (py), Inc-5/6 (tcss) |
+| D12 | **NEW names.** Ids: `#patch_identity_ribbon`, `#patch_main`, `#patch_inspector`, `#patch_tabs`, `#patch_tab_inspector`, `#patch_tab_json`, `#patch_tab_checks`, `#patch_tab_switcher`, `#patch_pane_inspector`, `#patch_json_stamp`, `#patch_json_view`, `#patch_legend`; `#check_full_name_line`, `#check_card_tabs`, `#check_tab_fields`, `#check_tab_json`, `#check_tab_addendum`, `#check_card_switcher`, `#check_pane_fields`, `#check_fields_lines`, `#check_pane_json`, `#check_pane_addendum`, `#check_dock`, `#check_legend`; `#flow_ribbon`, `#flow_pipeline_scroll`, `#flow_pipeline`, `#flow_legend`; `#fx_ribbon`, `#fx_lane_<i>_head`, `#fx_lane_<i>_pending`, `#fx_lane_<i>_row`, `#fx_card_<i>_<j>`, `#fx_cable_<i>_<j>`, `#fx_required`, `#fx_legend`. Classes: `fill-accent`, `chip-selected`, `fx-attention`, `sev-waiting`, `tab-chip`, `kind-chip`, `glyph-legend`, and the no-wrap categories `nowrap-ledger · nowrap-log · nowrap-pipeline · nowrap-ribbon · nowrap-legend · nowrap-heading · nowrap-fields`. Constants: `JSON_TAB_LINE_CAP = 5000` (`screens_directionb.py`), `CONFIRM_DWELL_S = 0.5` (`flow_screens.py`) | contract §6.2 item 5; TC-B97-37 reads the no-wrap set from the DOM by category class, so membership is declared on the widget, not re-listed in the test | per screen increment |
+| D13 | **Mode control:** `#fx_mode` becomes a one-row `Button` toggle labelled `sequential · parallel` (the active word in the selection style, ≤ 23 cells); a `FlowExecutionPanel.mode` property feeds the unchanged `RunRequested.mode` | one focus stop, switches on click or `enter` (LLR-147.4); keeps the shipped id | Inc-6 |
+| D14 | **One run at a time:** the panel disables `#fx_run` before posting `RunRequested`; the app handler wraps `run_chain_set` in `try/except Exception` → `render_run_error(<English line>)`; `render_run` / `render_run_error` re-enable through `call_after_refresh` | input queued during the synchronous run reaches a disabled button (P-44); "ends or raises" is met by the `except` limb (LLR-147.10, 148.9) | Inc-6 |
+| D15 | **`c` dwell feedback (ux carry):** a `c` inside `CONFIRM_DWELL_S` confirms nothing and sets the status line `c ignored: the waiting lane just appeared — press c again`. **Stray `enter` (ux carry):** kept as the contract states — one more run, one more report, 0 confirms | removes the silent swallow without changing the LLR's outcome; the extra report is the contract's own choice (LLR-147.13) | Inc-6 |
+| D16 | **Space keys:** `TabChip(Button)` (`screens_directionb.py`) adds `Binding("space", "press")` for the six editor tab chips; `#check_param_table` becomes `IncludeTable(DataTable)` with `Binding("space", "toggle_include")` | `Button` binds only `enter`, `DataTable` no `space` (P-43); a panel-level `space` would also fire on focused buttons; `query(DataTable)` still matches the subclass (C-38) | Inc-3 |
+| D17 | **Q-18 (snapshots):** the two `patch` cells stay under the live `xfail(strict=False)` envelope (`tests/test_tui_snapshot.py:1150`); Inc-4 writes the C-22 per-cell prediction (both cells drift — the panel is re-composed); Inc-7 triggers the canonical regen (`.github/workflows/snapshot-regen.yml`, textual 8.2.8) after the push and retires the mark in the follow-up commit named in `05-close.md` | a local regen drifts unrelated baselines (`test_tui_snapshot.py:518-520`); the regen is what lets the cells go RED again | Inc-4, Inc-7 |
+| D18 | **Q-14 (registry):** each increment that adds a scanned test module re-measures `EXPECTED_SCANNED_TEST_FILES` (`tests/test_id_registry.py:124`) through `scanned_test_files()` — expected 189 → 190 (Inc-1) → 192 (Inc-2) → 194 (Inc-3) → 195 (Inc-4); measured, never incremented by hand | the file's own convention (`:130`, "MEASURED, not incremented"); whether `b97_*.py` helpers are scanned is measured, not assumed | Inc-1..4 |
+| D19 | **U2-15 (`Size` vs `Fmt`):** one term on screen, the column's (`Fmt`), unless Inc-3 reads that `#check_mem_size_input` accepts byte counts, in which case both say `Size`; ids unchanged | the term follows what the input accepts; that fact is read in the named increment, not guessed here | Inc-3 |
+| D20 | **qa carry (LLR-148.6 patch guard 19+7 vs 20+5+1):** TC-B97-32 derives the control-label guard by widget type over `PE_IDS_9C7BEAF` at test time (`Button`, `Input`, `Select`, `TextArea`) and asserts the total 26, never a hand split | the breakdown is a fact of the frozen id list; a hand split is the disagreement itself | Inc-4 |
+| D21 | **Width derivation (LLR-149.1):** CSS expresses every split it can (`fr`, `%`, `height: 1fr` heroes, one-row docked rows); Python sizes only what CSS cannot — DataTable column widths, painted card widths, the REPORT FIELDS name width, the strip's `max_bytes`, the full-name line — through one pure `<screen>_layout(width) -> NamedTuple` per panel, applied by `_apply_layout()` from `on_mount` (after refresh) and `on_resize`; `_apply_layout` sets widths only, never adds columns or widgets | the E-1 trap (columns added twice) is avoided structurally; the pure functions are layer-0 arms of TC-B97-34 | Inc-3..6 |
+| D22 | **E-1/E-2 removal:** delete `PatchEditorPanel._apply_window_geometry` (`screens_directionb.py:5488-5593`) and its calls (`:5596`, `:5656`), the forced `table.styles.height = 3` and fixed select/path widths in `on_mount` (`:5598-5660`), and the app's show-time block (`app.py:6966-6978`); `#patch_win_json_dock_spacer` stays mounted with `display: none` | LLR-144.3; the spacer id is in the frozen census (LLR-144.1) | Inc-4 |
+| D23 | **E-3 replaced:** delete `#patch_win_script { width: 2fr }` (`styles.tcss:1117-1118`), the six-selector grid block (`:1160-1168`, replaced by `layout: horizontal; height: 1`), the `#patch_doc_controls` grid (`:1536-1538`), `#patch_doc_entries_table { height: 10 }` (`:1581-1584`), and every `#workspace_body.width-narrow` rule that targets a widget of the four panels; each panel gets ONE scoped section (`/* batch-97 <screen> */`) under its panel id | "replaced, not overridden" (LLR-144.4); the four layouts are the same on both sides of 120 (LLR-149.2) | Inc-3..6 |
+| D24 | **Lanes scroll:** ONE scroller, `#fx_lanes_scroll` (`ScrollableContainer`, both axes, focusable); each `#fx_lane_<i>_row` is a plain `Horizontal` with `width: auto` | LLR-147.12 names `#fx_lanes_scroll` as the scroller with its keyboard path (P-53); a per-lane `HorizontalScroll` (fx_A) adds a focus stop per lane | Inc-6 |
+| D25 | **Help bodies:** `check_editor` written in Inc-3, `patch` rewritten in Inc-4, `flow` rewritten in Inc-5, `flow_execution` written in Inc-6 | each body names the labels its increment paints; Inc-2 carries the three flow services + tokens precisely so Inc-5/6 keep a slot for `window_help.py` | Inc-3..6 |
 
 ## 2 · Modules and boundaries
 
 | Module | What it owns here | What it exposes | What it must NOT reach into |
 |---|---|---|---|
+| `tui/screens_directionb.py` | `PatchEditorPanel`, `CheckEditorPanel` compositions; `PatchDocumentView`, `TabChip`, `IncludeTable`, `JSON_TAB_LINE_CAP`, `PATCH_GLYPHS`, `CHECK_GLYPHS`, `patch_layout()`, `check_layout()`, `json_stamp_text()` | `refresh_entries(…, document=)` (I-2/I-3); the shipped ids | the service layer (C-7: payloads arrive as plain data) |
+| `tui/flow_screens.py` | Builder rail, Execution lanes; `FLOW_KIND_GLYPHS`, `FLOW_CABLE_GLYPHS`, `FX_CABLE_GLYPHS`, `FX_PENDING_GLYPH`, `CONFIRM_DWELL_S`, `pipeline_layout()`, `lane_layout()`, `cable_glyph()`, `clip_head()` / `clip_tail()` | `confirm_attention()`, `mode`, `lane_paint_plain()` (kept, re-implemented over the new lane) | app state (the shipped message posture); service writers |
+| `tui/app.py` | headers, `_FlowExecutionSection`, the D1 helper, the run guard's `except` limb; deletes the variant branch and the geometry call | — | panel internals (public methods only) |
+| `tui/styles.tcss` | one scoped section per panel; `$waiting-human`, `$crc-family` | — | rules of other screens |
+| `tui/window_help.py` | `check_editor`, `flow_execution` sections; rewritten `patch`, `flow` | `SHIPPED_WINDOW_KEYS` (I-4) | panel modules (no import) |
+| `tui/open_folder_chip.py` + `services/folder_open_service.py` | `flows` / `session` families, per-family no-project reason, the real-directory guard, labels, `id_suffix` | I-1 | a second `"flows"` literal (R15 imports `FLOWS_SUBDIR`) |
+| `services/flow_persistence_service.py`, `services/variant_execution_service.py` | NUL refusal; `stat()` guards catch `(OSError, ValueError)` | unchanged return shapes | — |
+| `services/flow_execution_service.py` | its 11 painted strings in English | unchanged API | — |
+| `tui/insight_style.py` | `WAITING_HUMAN`, `CRC_FAMILY` | tokens | — |
 
-- Boundaries respected as declared in `docs/ARCHITECTURE.md`: ✓ / ⚠ *(if a boundary must move, that is an ARQ change, not a design decision — go back)*
+- Boundaries respected as declared in `docs/ARCHITECTURE.md`: ✓ — no module created, no file moves; the only new edge is ARQ's `folder_open_service → flow_persistence_service` (`FLOWS_SUBDIR`, `docs/architecture.md` batch-97 §Dependencies). D7 and D10 were chosen so that no second edge appears.
 
 ## 3 · Diagrams
 
-*(Only the viewpoints that apply. IEEE 1016's other eight live here, not in the module map:
-Logical · Information · Patterns · Structure · Interaction · State Dynamics · Algorithm · Resource.)*
+**Structure — Patch Editor widget tree (Inc-4).** Kept ids plain, NEW ids marked.
+
+```mermaid
+graph TD
+  P["#patch_editor_panel"] --> R["#patch_identity_ribbon NEW"]
+  P --> M["#patch_main NEW · Horizontal"]
+  M --> L["#patch_win_script · ledger 3fr"]
+  L --> T["#patch_doc_entries_table · height 1fr"]
+  M --> I["#patch_inspector NEW · 2fr"]
+  I --> C["#patch_tabs NEW · 3 TabChip"]
+  I --> S["#patch_tab_switcher NEW · ContentSwitcher"]
+  S --> PI["#patch_pane_inspector NEW · #patch_before_after_card + entry form + entry chips"]
+  S --> J["#patch_win_json · #patch_json_stamp + #patch_json_view NEW + paste/history/execute/save-back rows"]
+  S --> K["#patch_win_checks · checks controls + issues"]
+  P --> F["#patch_doc_file_row + #patch_doc_controls · one row each"]
+  P --> G["#patch_legend NEW · glyph-legend"]
+```
+
+**Structure — Flow Execution widget tree (Inc-6).** Inside `_FlowExecutionSection` (header: title, `?`, `📂 Open session`).
+
+```mermaid
+graph TD
+  X["#fx_panel"] --> RB["#fx_ribbon NEW · #fx_name_strip, #fx_import, #fx_mode toggle, #fx_run"]
+  X --> SR["#fx_set_row · #fx_set_name, #fx_save, #fx_set_select, #fx_load"]
+  X --> LS["#fx_lanes_scroll · both axes, focusable"]
+  LS --> LN["#fx_lanes · Vertical"]
+  LN --> LA["#fx_lane_i"]
+  LA --> H["#fx_lane_i_head NEW · worst-status mark + chain"]
+  LA --> PD["#fx_lane_i_pending NEW · two ▸ lines"]
+  LA --> RW["#fx_lane_i_row NEW · Horizontal width auto"]
+  RW --> CD["#fx_card_i_j + #fx_cable_i_j · SOURCE card holds #fx_in_i_j + #fx_bind_i_j"]
+  RW --> CF["#fx_confirm_i · fx-attention on the attention lane"]
+  X --> RQ["#fx_required NEW · REQUIRED line"]
+  X --> LG["#fx_log + #fx_legend NEW"]
+```
+
+**Interaction — increment order** (sequential; each arrow names the dependency that forces it).
+
+```mermaid
+graph LR
+  I1["Inc-1 chip families + guard"] --> I2["Inc-2 flow foundations: NUL, EN service, tokens"]
+  I1 -->|"id_suffix, labels"| I3["Inc-3 Check Editor"]
+  I2 --> I3
+  I3 -->|"TabChip, layout helpers, predicates"| I4["Inc-4 Patch Editor"]
+  I2 -->|"tokens, NUL refusal"| I5["Inc-5 Flow Builder"]
+  I4 --> I5
+  I5 -->|"card clip, kind glyphs, CRC css"| I6["Inc-6 Flow Execution + headers close"]
+  I6 -->|"four screens final"| I7["Inc-7 width sweep, captures, regen"]
+```
+
+**Algorithm — width derivation (D21).** Values are **illustrative, non-normative** (C-23): each screen increment re-measures the whole pane budget at 118x54 and 220x60 before fixing them.
+
+| Screen | CSS split | Python-derived (pure fn) | Illustrative, 118 → 220 |
+|---|---|---|---|
+| Check | left `1fr` / card `max(41, 38%)` | Address = 10 (never clipped); Parameter = table content − mark − Address − Fmt·Unit (≥ 42); Fields name = card − 14 (≥ 24) | Parameter 42 → ~105 |
+| Patch | ledger `3fr` / inspector `2fr` | Value/bytes column = table content − the 4 other columns; strip `max_bytes = (inspector_w − 8) // 3` | strip 12 → 26 bytes |
+| Builder | rail `1fr`; EXT inputs `1fr` on two rows | card = `max(21, (avail − 4·(n−1)) // n)`, the remainder one cell each to the first cards (void 0) | 4 cards: 24 → 49 |
+| Execution | lanes take the height left (`1fr`) | card = `lane_layout(viewport_w, n)`, same rule; when `21·n + cables > viewport` cards stay 21 and `#fx_lanes_scroll` scrolls | 6 cards scroll at 118; 4 fill at 220 |
 
 ## 4 · Interfaces that change — and which ones FREEZE
 
 | Interface | Current | After | Consumers | **Frozen for the fork?** |
 |---|---|---|---|---|
+| I-1 chip families (`folder_open_service.py:57-90`, `open_folder_chip.py:59`) | 4 families; `REPORTS_NO_PROJECT_REASON` for any `None`; `OpenFolderChip(family)`; guard = `exists()` | + `CHIP_FAMILY_FLOWS`, `CHIP_FAMILY_SESSION` (`CHIP_FAMILIES` = 6); `no_project_reason(family) -> str` (the Reports constant kept, equal to `no_project_reason("reports")`); `_CREATABLE_FAMILIES` + `flows` (project only), `session` never; `is_openable_chip_dir(target, root) -> bool`; `OpenFolderChip(family, *, id_suffix=None)`; label `📂 Open <folder>/` / `📂 Open session` | `open_folder_chip.py`, `app.py` headers + refresh loop `:12756`, `screens.py:1668`, `tests/test_open_folder_chips.py` | **yes — frozen at PDR**, lands Inc-1; Inc-3/5/6 consume it unchanged |
+| I-2/I-3 `PatchEditorPanel.refresh_entries(rows, mem_map=_UNSET)` (`screens_directionb.py:6104`) | rows + map; no identity, no JSON feed | `refresh_entries(rows, mem_map=_UNSET, document=_UNSET)`; `document: PatchDocumentView` (D1/D2) | `app.py:3265, :3451, :5279, :10758`; the panel's own `:5662`; 27 test calls in 6 files (the keyword default keeps them valid) | **yes — frozen at PDR**, lands Inc-4 |
+| I-4 `window_help.SHIPPED_WINDOW_KEYS` (`:270`) | 8 keys | + `check_editor` (Inc-3), + `flow_execution` (Inc-6) | `tests/test_window_usage_help.py:250`, `_EXPECTED_KEYS` (`:95-107`), `tests/test_changes_file_notation_help.py`, the `WindowHelpChip` sites | **names frozen at PDR**; membership lands per increment |
+| I-5 tokens (`insight_style.py`) | none | `WAITING_HUMAN`, `CRC_FAMILY` + the TCSS mirrors | `flow_screens.py`, `styles.tcss`, TC-B97-18 / 52 | **yes — frozen at PDR**, lands Inc-2 |
+| I-6 NUL refusal in `load_flow_json`, `load_chain_set`, `_resolve_manifest_entry` | raise `ValueError` (P-36, P-50) | the shipped refusal shapes with `FLOW-UNSAFE-REF` / `CHAIN-SET-UNSAFE-REF` / `MANIFEST-PATH-ESCAPE`; `stat()` guards catch `(OSError, ValueError)` | `app.py` load / import / run handlers; the panels' refusal renders | **yes — return shapes unchanged** (batch-94 `#D4` artifacts untouched), lands Inc-2 |
+| I-7 `FlowExecutionPanel` surface | `#fx_mode` is a `Select` | `#fx_mode` is a toggle `Button`; `mode` property; `confirm_attention()`; `lane_paint_plain()` kept over the new lane | `app.py`; `tests/test_tui_flow_execution_b94.py:626, :693` (rewritten Inc-6) | **yes — frozen at PDR**; message types stay frozen by batch-94 `#D3` |
+| I-8 `FlowBuilderPanel.RunRequested` | carries the selector's scope | always `FLOW_SCOPE_SINGLE`; shape unchanged | `app.py:2518` (branch deleted, D8) | **yes — shape frozen** (batch-94 `#D3`) |
+| I-9 the NEW names of D12 (ids, classes, constants, vocabularies) | — | as D12 | the batch's TCs / ATs, the `window_help` bodies | **yes — frozen at PDR**; a rename after PDR is A3 |
 
 **A frozen interface is not touched inside a lane.** If a lane needs to change one, the work returns to
-the trunk — that is trigger **A3**.
+the trunk — that is trigger **A3**. (One lane here; the freeze still binds every later increment.)
 
 ## 5 · Proposed test cases
 
+Layer: **0** pure unit · **A** white-box integration · **B** black-box acceptance · **UX** keyboard / chip-state. Files are `tests/test_b97_<name>.py`. The procedure is A.4 (TC) / A.5 (AT) under the same id, and the RED column points to the row that names the mutation (`NC` = that LLR's *Negative control*) — not restated. A cross-screen TC grows by `parametrize` arms per screen increment and is **closed** at the increment that adds its last arm.
+
 | Id | Layer (0 unit / A white / B black / UX) | What it asserts | **The mutation that would turn it RED** |
 |---|---|---|---|
+| TC-B97-01 | 0 · patch_editor · Inc-4 | LLR-144.1 / A.4 | drop one shipped id (LLR-144.1 NC) |
+| TC-B97-02 | A · patch_editor · Inc-4 | LLR-144.2 | executed on `main`: table height 3 (NC) |
+| TC-B97-03 | A · patch_editor · Inc-4 | LLR-144.3 | re-add the `app.py` geometry call or a second `add_columns` (NC) |
+| TC-B97-04 | 0 · patch_editor · Inc-4 | LLR-144.4 | restore any E-3 pair (NC) |
+| TC-B97-05 | A · patch_editor · Inc-4 | LLR-144.5 | remove the cap; wire Parse to the view (NC) |
+| TC-B97-06 | A · patch_editor · Inc-4 | LLR-144.6 | drop `document=` at the Undo site; stamp fed by document writers only (NC) |
+| TC-B97-07 | A · patch_editor · Inc-4 | LLR-144.7 | `Text.from_markup` on the ribbon (NC) |
+| TC-B97-39 | A · patch_editor · Inc-4 | LLR-144.8 | strip bound to row 0; bold on an unchanged byte (NC) |
+| TC-B97-40 | A · patch_editor · Inc-4 | LLR-144.9 | inputs left in `#patch_doc_entry_inputs` outside the pane (NC) |
+| TC-B97-41 | UX · patch_editor · Inc-4 | LLR-144.10, §4 method | `can_focus = False` on one control (P-54) |
+| TC-B97-42 | A · patch_editor · Inc-4 | LLR-144.11 | a second primary; the active chip given `fill-accent` (NC) |
+| TC-B97-60 | A · patch_editor · Inc-4 | LLR-144.12 | a control under a hidden pane; paste area read-only (NC) |
+| TC-B97-08 | A · check_editor · Inc-3 | LLR-145.1 | executed on `main`: docked ids on y 35 / 38 (NC) |
+| TC-B97-09 | A · check_editor · Inc-3 | LLR-145.2 | executed on `main`: `max_scroll_x 25` (NC) |
+| TC-B97-10 | 0 · check_editor · Inc-3 | LLR-145.3 (+ `check_layout` arms) | head-keeping clip; a 40-cell Parameter column (NC) |
+| TC-B97-11 | A · check_editor · Inc-3 | LLR-145.4 | executed on `main`: height 3 (NC) |
+| TC-B97-12 | A · check_editor · Inc-3 | LLR-145.5 | `Text.from_markup` on one surface (NC) |
+| TC-B97-43 | A · check_editor · Inc-3 | LLR-145.6 | Fields fed from the unfiltered list (NC) |
+| TC-B97-44 | A · check_editor · Inc-3 | LLR-145.7 | executed on `main`: no label widget (NC) |
+| TC-B97-45 | UX · check_editor · Inc-3 | LLR-145.8 | remove `IncludeTable`'s `space` binding (P-43) |
+| TC-B97-46 | A · check_editor · Inc-3 | LLR-145.9 | a second primary (NC) |
+| TC-B97-61 | A · check_editor · Inc-3 | LLR-145.10 | a control under a hidden pane; a shipped control dropped from the table (P-55) |
+| TC-B97-13 | A · flow_builder · Inc-5 | LLR-146.1 | executed on `main`: `#flow_blocks` displayed (NC) |
+| TC-B97-14 | A · flow_builder · Inc-5 | LLR-146.2 | executed on `main`: 4 chips (P-13) |
+| TC-B97-15 | A · flow_builder · Inc-5 | LLR-146.3 | executed on `main`: EXT inputs share y 13 (P-22) |
+| TC-B97-16 | 0 · flow_builder · Inc-5 | LLR-146.4 (`clip_head` / `clip_tail` arms) | tail-keeping instruction clip (NC) |
+| TC-B97-17 | A · flow_builder · Inc-5 | LLR-146.5 | a second primary chip (NC) |
+| TC-B97-18 | 0 · flow_builder · Inc-2 (token + TCSS mirror) → Inc-5 (paint) | LLR-146.6 | `#e8a33d` → 19.5° (P-40); CRC card painted with `WAITING_HUMAN` (NC) |
+| TC-B97-19 | 0 · flow_builder · Inc-5 | LLR-146.7 | leave `'pegado: '` (NC) |
+| TC-B97-20 | A · flow_builder · Inc-5 | LLR-146.8 | `Text.from_markup` on the card IO line (NC) |
+| TC-B97-47 | A · flow_builder · Inc-5 | LLR-146.9 | executed on `main`: `flow_clip_status` overflows (NC) |
+| TC-B97-48 | A · flow_builder · Inc-5 | LLR-146.10 | executed on `main`: `Funnel (1)` (NC) |
+| TC-B97-49 | A · flow_builder · Inc-5 | LLR-146.11 | executed on `main`: `#flow_ext_session` displayed (NC) |
+| TC-B97-50 | A · flow_builder · Inc-5 | LLR-146.12 | re-compose `#flow_scope` (P-47) |
+| TC-B97-51 | UX · flow_builder · Inc-5 | LLR-146.13 | `can_focus = False` on a kind chip (P-54) |
+| TC-B97-62 | 0 · flow_builder · Inc-2 | LLR-146.14 (15 arms) | a `stat()` guard catching `OSError` only (NC) |
+| TC-B97-21 | 0 · flow_execution · Inc-6 | LLR-147.1 (`cable_glyph`, 5 rows) | executed on `main`: progress bar, no `◇` / `□` (NC) |
+| TC-B97-22 | A · flow_execution · Inc-6 | LLR-147.2 | input or Bind re-parented to the lane row (NC, Inc-6 tree) |
+| TC-B97-23 | A · flow_execution · Inc-6 | LLR-147.3 | remove the scroll step; auto-focus Confirm; ignore the focused widget (NC) |
+| TC-B97-24 | A · flow_execution · Inc-6 | LLR-147.4 | executed on `main`: `#fx_mode` 80 wide (P-11) |
+| TC-B97-25 | 0 · flow_execution · Inc-2 (service) → Inc-5 (module `:235`) → Inc-6 (panel) | LLR-147.5 | keep `comando` (NC) |
+| TC-B97-26 | A · flow_execution · Inc-6 | LLR-147.6 | executed on `main`: set-picker spans (P-37) |
+| TC-B97-52 | A · flow_execution · Inc-6 | LLR-147.7 (four screens) | a notices glyph in `WAITING_HUMAN` (NC) |
+| TC-B97-53 | A · flow_execution · Inc-6 | LLR-147.8 | executed on `main`: 3 blank rows (P-32) |
+| TC-B97-54 | A · flow_execution · Inc-6 | LLR-147.9 | a primary Import (NC) |
+| TC-B97-55 | A · flow_execution · Inc-6 | LLR-147.10 | drop the disable (P-44; real-tree RED recorded in Inc-6) |
+| TC-B97-56 | UX · flow_execution · Inc-6 | LLR-147.11 | executed on `main`: no header chip in the chain (P-33) |
+| TC-B97-63 | A · flow_execution · Inc-6 | LLR-147.12 | executed on `main`: panel `max_scroll_x 77` (NC) |
+| TC-B97-64 | UX · flow_execution · Inc-6 | LLR-147.13 (+ the D15 status arm) | remove the dwell → the burst confirms 2 (P-60) |
+| TC-B97-27 | 0 · chips_help · Inc-1 | LLR-148.1 | executed on `main`: `"flows"` not a family (NC) |
+| TC-B97-28 | 0 · chips_help · Inc-1 | LLR-148.2 | executed on `main`: `"session"` not a family (NC) |
+| TC-B97-29 | A · chips_help · Inc-1 | LLR-148.3 | executed on `main`: `(Reports)` on a `flows` chip (NC) |
+| TC-B97-57 | A · chips_help · Inc-1 | LLR-148.8 | guard reduced to `exists()` (P-34) |
+| TC-B97-65 | A · chips_help · Inc-1 (4 instances) → Inc-6 (7) | LLR-148.10 | executed on `main`: `📂 Open folder` (P-46) |
+| TC-B97-30 | A · chips_help · Inc-3 → Inc-6 | LLR-148.4 | mount the Check chip without `id_suffix` (P-19) |
+| TC-B97-31 | A · chips_help · Inc-3 → Inc-6 | LLR-148.5 | executed on `main`: 1 of 4 (NC) |
+| TC-B97-32 | A · chips_help · Inc-3/4/5/6 | LLR-148.6 (D20 guard) | a body without ` — effect`; coverage from one state (NC) |
+| TC-B97-33 | A · chips_help · Inc-3/4/5/6 | LLR-148.7 | a glyph outside its mapping (NC) |
+| TC-B97-58 | A · chips_help · Inc-3/4/5/6 | LLR-148.9 | executed on `main`: no Builder empty line (NC) |
+| TC-B97-34 | 0 + A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.1 (`<screen>_layout` arms) | executed on `main`: EXT inputs 28 at both sizes (P-22) |
+| TC-B97-35 | A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.2 | a non-scrolling ancestor counts 4 (P-52) |
+| TC-B97-36 | A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.3 | executed on `main`: 7 of 10 (P-11) |
+| TC-B97-37 | A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.4 | a 20-cell width on `#fx_log` (NC) |
+| TC-B97-38 | A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.5 | fixed 24-cell cards at 220 (NC) |
+| TC-B97-59 | A · width · Inc-3/4/5/6 → Inc-7 | LLR-149.6 | a panel with `overflow: hidden` (NC) |
+| AT-B97-01 | B · patch_editor · Inc-4 | HLR-144, A.5 row | A.5 RED arm (P-4) |
+| AT-B97-02 | B · patch_editor · Inc-4 | HLR-144 | A.5 RED arm (P-57 mutation) |
+| AT-B97-03 | B · patch_editor · Inc-4 | HLR-144 | A.5 RED arm |
+| AT-B97-17 | B · patch_editor · Inc-4 | HLR-144 | A.5 RED arm (P-33) |
+| AT-B97-04 | B · check_editor · Inc-3 | HLR-145 | A.5 RED arm (P-12) |
+| AT-B97-05 | B · check_editor · Inc-3 | HLR-145 | A.5 RED arm |
+| AT-B97-18 | B · check_editor · Inc-3 | HLR-145 | A.5 RED arm (P-33, P-43) |
+| AT-B97-21 | B · check_editor · Inc-3 | HLR-145 | A.5 RED arm |
+| AT-B97-06 | B · flow_builder · Inc-5 | HLR-146 | A.5 RED arm (P-11) |
+| AT-B97-07 | B · flow_builder · Inc-5 | HLR-146 | A.5 RED arm (P-13) |
+| AT-B97-08 | B · flow_builder · Inc-5 (NUL arm over Inc-2) | HLR-146 | A.5 RED arm (P-36) |
+| AT-B97-19 | B · flow_builder · Inc-5 | HLR-146 | A.5 RED arm (P-56) |
+| AT-B97-09 | B · flow_execution · Inc-6 | HLR-147 | A.5 RED arm (P-17) |
+| AT-B97-10 | B · flow_execution · Inc-6 | HLR-147 | A.5 RED arm (P-11) |
+| AT-B97-11 | B · flow_execution · Inc-6 | HLR-147 | A.5 RED arm (P-36, P-37) |
+| AT-B97-20 | B · flow_execution · Inc-6 | HLR-147 | A.5 RED arms (auto-focus, no dwell, P-43) |
+| AT-B97-22 | B · flow_execution · Inc-6 | HLR-147 | A.5 RED arm (P-11, P-50) |
+| AT-B97-12 | B · chips_help · Inc-6 | HLR-148 | A.5 RED arm |
+| AT-B97-13 | B · chips_help · Inc-6 | HLR-148 | A.5 RED arm (P-18) |
+| AT-B97-14 | B · chips_help · Inc-6 | HLR-148 | A.5 RED arm (P-21) |
+| AT-B97-23 | B · chips_help · Inc-6 | HLR-148 | A.5 RED arm (P-50) |
+| AT-B97-15 | B · width · Inc-7 | HLR-149 | A.5 RED arm (P-10) |
+| AT-B97-16 | B · width · Inc-7 | HLR-149 | A.5 RED arm (P-22, P-32) |
+| AT-B97-24 | B · width · Inc-7 | HLR-149 | A.5 RED arm (P-10) |
 
 **Declared here, at authoring time, not at execution time.** A proposed case whose reddening mutation
 cannot be named is not yet a test case — it is a hope. Layer 0 applies where the unit has cyclomatic
-complexity ≥3 **or** transforms data crossing a declared module boundary.
+complexity ≥3 **or** transforms data crossing a declared module boundary. The new pure functions of D4 / D7 / D21 and I-1 (`json_stamp_text`, `cable_glyph`, `clip_head` / `clip_tail`, `<screen>_layout`, `no_project_reason`, `is_openable_chip_dir`) are tested as layer-0 arms of the TC that owns their LLR — no new test id is minted.
+
+### 5.1 Enablers (Phase 3 and validation)
+
+| Enabler | Where | Built in | Content |
+|---|---|---|---|
+| Frozen literals | `tests/b97_fixtures.py` | Inc-1 | A.2 verbatim: `ES_MARKER`, `ES_48_9C7BEAF`, `HOSTILE_NAME`, `HOSTILE_CONTENT`, `HOSTILE_C1`, `HOSTILE_NUL`, `PE_IDS_9C7BEAF`, `CE_IDS_9C7BEAF`, each with its own `len` guard |
+| Fixture builders | `tests/b97_fixtures.py` | grown per increment: Inc-1 project builder + junction; Inc-2 `nul_flow`, `nul_set`, `nul_bind`; Inc-3 A2L, `hostile.a2l`, `staging_block`; Inc-4 change-sets; Inc-5/6 flows and sets | one function per A.5 row, all under `tmp_path/.s19tool/workarea/<name>`; binaries copied from `examples/case_00_public/`; JSON generated with the current serialisers; the project opened through the app's own load (P-58) |
+| Shared predicates | `tests/b97_probes.py` | Inc-1 (chip helpers), Inc-3 (the rest), extended later | `focus_method(app, panel, groups)` (contract §4 preamble a–d, reference set by type, independent of `can_focus`); `chip_states(widget)` (strip styles unfocused / focused / selected); `clipped_overflow(panel)` (§1.3 clipped region, P-52); `wrapped_rows(widget)` (content height vs logical lines, P-39); `void(widget)` over `content_region` (U2-5); `painted_extent`; `blank_rows(panel, outside=)`; `span_colours(widget)` off `render().spans` (C-37) and `hue_distance()` (`colorsys`, circular); `nowrap_members(panel, category)` (D12 classes) |
+| Seam spy | imported, not copied: `from tests.test_open_folder_chips import SeamSpy` | Inc-1 | the OS-boundary idiom (`tests/test_open_folder_chips.py:101`) |
+| Junction arm | `b97_fixtures.make_junction()` | Inc-1 | `mklink /J` on Windows; on a non-Windows runner the arm uses `os.symlink` and says so (P-34) |
+| Capture harness | `prototypes/b94_polish/run_real.py` gains `--real-tree` (prepend the repo root instead of `appcopy/`, no `--variant`); `capture.ps1` unchanged; new scenario `flow-execution-crc-wait` | Inc-3 (throwaway harness, not product source) | each screen increment writes `png/impl.<scenario>.png` (118x54) and `png/impl.<scenario>.220.png` (`-Cols 220 -Rows 60`); Inc-6 adds `flow-execution-paused` and `-crc-wait`; Inc-7 rebuilds the single review page from them |
+| Baseline list | `PLAN.md` §Test ledger (10 node ids) | every increment | the per-increment diff rule of §6.1 |
 
 ## 6 · Risks and rejected alternatives
 
 > **Rejected alternatives are owed WHERE A REAL DECISION EXISTS**, otherwise `n/a — <the decision already made, and by what>` — an existing pattern, a frozen interface, a prior ADR. **Do not fabricate a second design to fill this section:** two invented options make an arbitrary pick look deliberated, which is worse than one honest constraint. (the same ruling as `agents/architect.md` §Evidence checklist and the PDR row — one obligation, three stations, and closing it at one of them is `C-14`.)
 
+### 6.1 Increment plan (sequential — ARQ verdict; ≤ 4 SOURCE files each, tests uncapped)
+
+| Inc | SOURCE files (count) | LLRs closed | Tests: new · superseded retired / rewritten (contract §6.3) | Depends on |
+|---|---|---|---|---|
+| **Inc-1** chip families + guard + labels | `services/folder_open_service.py`, `open_folder_chip.py` (2) | 148.1, 148.2, 148.3, 148.8; 148.10 (4 shipped instances; 7 at Inc-6); the 148.4 mechanism (`id_suffix`) | NEW `test_b97_chips_help.py`, `b97_fixtures.py`, `b97_probes.py`; Q-14 re-measure (expected 190). Retires none — the 11 nodes of `test_open_folder_chips.py` stay green (P-59). Also copies §4 into `docs/architecture.md` §11 | — |
+| **Inc-2** flow foundations | `services/flow_persistence_service.py`, `services/variant_execution_service.py`, `services/flow_execution_service.py`, `insight_style.py` (4) | 146.14; 147.5 service scope (11 strings); 146.6 token half | NEW `test_b97_flow_builder.py` (TC-B97-62, TC-B97-18 token arm), `test_b97_flow_execution.py` (TC-B97-25 service arm); Q-14 (expected 192). Rewrites the Spanish pins of `test_flow_external_step_b96.py` (`:265, 266, 302, 333, 345, 507-509, 514`) **whose literal is a service string** — split by the Inc-2 reverse census (grep each service value of `ES_48_9C7BEAF` in `tests/`); the rest move with Inc-6. `security-reviewer` at the gate (S2-2 RED → GREEN) | Inc-1 (order only) |
+| **Inc-3** Check Editor | `screens_directionb.py`, `app.py`, `styles.tcss`, `window_help.py` (4) | 145.1–145.10; check arms of 148.4, 148.5, 148.6 (`check_editor` key), 148.7, 148.9, 149.1–149.6 | NEW `test_b97_check_editor.py`, `test_b97_width.py`; Q-14 (expected 194). Retires / rewrites: `test_tui_check_editor.py` button height 3; `test_window_usage_help.py:250` + `_EXPECTED_KEYS :95-107` and `test_changes_file_notation_help.py` `_EXPECTED_KEYS` (check key); `test_open_folder_chips.py:94-98` `_RAIL_CHIPS`; check-file 80x24 layout asserts re-baselined (P-35). D19 decided here; capture harness added | Inc-1 |
+| **Inc-4** Patch Editor | `screens_directionb.py`, `app.py`, `styles.tcss`, `window_help.py` (4) | 144.1–144.12; patch arms of 148.6, 148.7, 148.9, 149.1–149.6 | NEW `test_b97_patch_editor.py`; Q-14 (expected 195). Retires / rewrites: `test_tui_patch_layout.py` (9 tests), `test_tui_patch_chips.py` (E-3 grid); the layout asserts of the 24 patch files that reach the 66 ids; `test_tui_patch_json.py` / `test_tui_patch_history_strip.py` kept green (paste area editable). Q-18 per-cell prediction (D17). The four baseline Patch failures re-examined | Inc-3 |
+| **Inc-5** Flow Builder | `flow_screens.py`, `app.py`, `styles.tcss`, `window_help.py` (4) | 146.1–146.13 (146.6 paint half; the AT-B97-08 NUL arm over Inc-2); 147.5 module scope (`:235`); Builder arms of 148.5 (`📂 Open flows/`), 148.6 (`flow` rewrite), 148.7, 148.9, 149.1–149.6 | Retires / rewrites: `test_flow_funnel_b96.py:330`; `test_tui_flow_builder_b94.py:144-159, 241, 371, 436-454`; `test_flow_external_step_b96.py:404, 387, 425`; `test_flow_multi_image_ui.py:150, 185, 215, 251, 271` retired, `:234` rewritten, `:156` kept; Spanish pins `test_flow_external_step_b96.py:422, 425`, `test_flow_funnel_b96.py:331, 475, 477` | Inc-2, Inc-4 |
+| **Inc-6** Flow Execution + headers close | `flow_screens.py`, `app.py`, `styles.tcss`, `window_help.py` (4) | 147.1–147.13 (147.5 panel scope; 147.7 over the four panels); closes 148.4, 148.5, 148.6 (`flow_execution` key), 148.7, 148.9, 148.10; Execution arms of 149.1–149.6 | Q-14 unchanged (files exist since Inc-2). Retires / rewrites: `test_tui_flow_execution_b94.py:277` (asserts `:345-348`), `:363` (asserts `:451-454`), `:626, :693` (`#fx_mode` read as `Select`); the remaining Spanish pins of LLR-147.5; `test_window_usage_help.py` keys (execution key) | Inc-5 |
+| **Inc-7** width sweep, captures, regen | 0 expected; any fix is ≤ 4 from {`styles.tcss`, `screens_directionb.py`, `flow_screens.py`, `app.py`} and named in its packet | 149.1–149.6 closed over the 24 screen×sample matrix (AT-B97-15, AT-B97-16, AT-B97-24) | the full matrix of `test_b97_width.py`; captures + the single review page; the D17 regen trigger and mark retirement | Inc-6 |
+
+**Gate runs per increment:** the increment's `test_b97_*` files + the superseded files it rewrites + the B1 reverse-census files of its ids + the full guard host `pytest tests/test_tui_directionb.py` (C-34, every render increment: Inc-3..7) + the full suite in the background, compared **node by node** against the 10 baseline failures (`PLAN.md` §Test ledger): a failure outside the list is a regression and blocks; a baseline node that turns green is recorded in the packet, not claimed as a fix; Inc-4 records the outcome of the four `test_tui_patch_editor_v2.py` baseline nodes against the re-composed panel and routes any still-red one to the backlog at close.
+
+### 6.2 Risks
+
+| Risk | Kind | Likelihood · impact | Mitigation / owner |
+|---|---|---|---|
+| Changing a DataTable column width after mount may need a Textual-internal refresh path | operational | medium · medium | Inc-3 opens with a spike: mutate `Column.width` + `refresh(layout=True)` and read `get_render_width`; fallback `clear(columns=True)` and re-add the columns once per layout, cursor row kept (TC-B97-03 still reads 5) |
+| `☑` (an LLR-145.6 literal) renders double-width in Windows Terminal (`NOTES.editors.md` item 7) | UX | medium · low | judged on the Inc-3 capture; a misalignment is a **ledger amendment** of LLR-145.6, never a silent swap |
+| `#fx_run` re-enable timing (D14) is proven only on a model (P-44) | operational | low · medium | TC-B97-55's real-tree RED run is owed in Inc-6 before GREEN |
+| `CONFIRM_DWELL_S` arms depend on pilot timing (0.05 s paint, 0.6 s pause) | test | low · medium | the dwell is measured from the attention paint's `time.monotonic()`; the arms keep A.5's ≥ 0.1 s margins |
+| 86 test files reach Patch ids (B1); layout asserts move | maintenance | certain · medium | ids kept (LLR-144.1); Inc-4's reverse census lists every rewritten node in its packet |
+| Snapshot regen runs in remote CI (D17) | process | certain · low | `strict=False` bound of 2 cells until the regen commit, named in `05-close.md` |
+| A concurrent all-screens review (Kimi) edits `styles.tcss` / `app.py` | process | medium · medium | the rebase rule (`COORDINACION-batch92.md`); this batch's CSS lives in four scoped sections |
+| The junction arm is unavailable off Windows | test | low · low | the labelled symlink fallback (§5.1) |
+| A UI-thread run freezes the UI on large images | UX | low · medium | declared OUT (contract §2.6); backlog row at close |
+| `app.py` is touched by four sequential increments | maintenance | certain · low | sequential by ARQ; each packet lists its `app.py` hunks |
+| Chip guard and NUL refusal are security-relevant | security | low (P2: risk LOW, 0 HIGH) | the Inc-1 and Inc-2 gates run the security lens; trust anchor per LLR-148.8 |
+| Cost / latency | n/a — local TUI, no runtime or API cost; serialisation runs once per document write (706 bytes for the fixture) and the 5000-line cap bounds the paint | — | — |
+
+### 6.3 Rejected alternatives
+
 | Alternative considered | Why it was rejected |
 |---|---|
+| I-2/I-3 as a separate setter called after `refresh_entries` | a second call-site set that must track the first — the MJ-1 shape `app.py:6273` records (D1) |
+| JSON view as a `Static` inside a `VerticalScroll` | a second focus stop and wrapped long lines; a read-only `TextArea` is literal, focusable and unwrapped (D3) |
+| A new hex-strip widget | duplicates `BeforeAfterCard`'s tested positional join and states (D5) |
+| Scoping the Check Editor chip query instead of a suffix | leaves two equal ids, which LLR-148.4 forbids (D9) |
+| Leaving the Builder variant branch unreachable | dead code painting a message about a removed control (D8) |
+| Mode control as a compact `Select` or a `RadioSet` | `Select` needs open + choose, not one press; `RadioSet` is ~28 cells with two focus internals (D13) |
+| Per-lane `HorizontalScroll` (fx_A) | one focus stop per lane; LLR-147.12 names `#fx_lanes_scroll` (D24) |
+| `c` bound on `FlowExecutionPanel` | dead with the focus on the header chips (D10) |
+| Vocabularies in one shared module | a new module is an A1 change, and a `window_help → panels` import adds an edge (D7) |
+| CSS-only widths | Textual CSS cannot size DataTable columns or painted cards (D21) |
+| Overriding the E-3 rules | n/a — decided by LLR-144.4 ("replaced, not overridden") |
+| A shared ledger + inspector module | n/a — rejected at ARQ (R13, `docs/architecture.md` batch-97) |
+| A worker thread for runs | n/a — declared OUT by the operator (contract §2.6, P-42) |
+| Fewer, larger increments | n/a — the ≤ 4-source budget (contract §2.4) forces Inc-2 to carry the three flow services and the tokens, so Inc-5/6 keep a slot for `window_help.py` |
 
 *(Recording the rejection is what stops the same option being re-proposed in three batches.)*
+
+### 6.4 Evidence checklist (architect)
+
+- [x] Constraints stated — 4-source budget, English UI, nothing from `prototypes/`, 118x54 / 220x60 / 80x24 floor, UI-thread runs, Python 3.11 + Textual 8.2.8 (contract §2.4) — `executed`.
+- [x] 2+ alternatives where a real decision exists — §6.3 (D1, D3, D5, D7, D8, D9, D10, D13, D21, D24); the others `n/a — <decided by>` on their rows.
+- [x] Non-applying constraints marked — cost / latency `n/a — local TUI`; fork `n/a — sequential` (§8).
+- [x] Recommendation tied to constraints — each `#D` row carries its reason.
+- [x] Risks listed — §6.2 (operational, security, cost, process, UX).
+- [x] Cost / latency — `n/a` with its reason (§6.2 last row).
+- [x] Diagrams — §3 (two widget trees, increment order, width table).
+- [x] What would change it — a rename after PDR is A3 (I-9); a `☑` misalignment → ledger amendment; a failed Inc-3 width spike → the named fallback, not a new design.
+- [x] Two-layer chains — every LLR → TC and every HLR → AT mapped to a file and an increment (§5, §6.1).
 
 ## 7 · Forward-applicability table — **the section that makes this document honest**
 
 | Output of this PDR | Named consumer downstream | Where the consumer will read it |
 |---|---|---|
-| design characteristics | the Phase-3 increments | `<…>` |
-| enablers (fixtures, data, scaffolding, env) | Phase 3 and validation | `<…>` |
-| proposed test cases | layers 0/A/B and the DDR | `<…>` |
-| design → requirement traceability | the matrix and the DDR | `<…>` |
+| design characteristics | the Phase-3 increments | §1.1 decisions and §3 trees, cited as `PDR-2026-10-19-batch-97#D1` … `#D25` in each `03-increments/increment-00N.md`; the frozen ones copied into `docs/architecture.md` batch-97 section at Inc-1 |
+| enablers (fixtures, data, scaffolding, env) | Phase 3 and validation | §5.1 → `tests/b97_fixtures.py`, `tests/b97_probes.py`, `prototypes/b94_polish/run_real.py --real-tree`; read by every `tests/test_b97_*.py` and by `04-validation.md` for the capture set |
+| proposed test cases | layers 0/A/B and the DDR | §5 table → written by the owning increment in `tests/test_b97_*.py`; `design/DDR-2026-10-19-batch-97.md` checks each row's RED mutation was executed |
+| design → requirement traceability | the matrix and the DDR | §6.1 (LLR → increment) and §5 (TC / AT → file · increment) → the traceability rows of `00-checklists.md` and the DDR's realised-vs-proposed comparison |
+| interfaces that freeze | every later increment (the A3 guard) | §4 → `docs/architecture.md` §11 "Batch-97 interface amendments" (written at Inc-1), read before any increment touches I-1..I-9 |
+| risks and rejected alternatives | the PDR record and the close | §6.2 / §6.3 → the conditions of `design/PDR-2026-10-19-batch-97.md` and the backlog routing in `05-close.md` (D8 fused-result row, UI-thread freeze, baseline failures) |
 
 - ⚠ Any row whose consumer column is empty: **remove the output, or explain why it is being produced.**
 
 ## 8 · Parallelisation plan *(only if the batch forks)*
 
+**Declared empty** — the batch does not fork: ARQ's mechanical verdict is *sequential* (every increment pair shares `styles.tcss`; `docs/architecture.md` batch-97 §Parallelisation verdict), and `01-requirements.md` §2.8 discharges the four fork preconditions as one lane.
+
 | Lane | Modules / layer | Files it owns | Agent |
 |---|---|---|---|
+| trunk (only lane) | all of §2 | all of §6.1 | orchestrator + `software-dev` per increment |
 
-- `modules(lane_i) ∩ modules(lane_j) = { }` — or same domain / different layers with the interface frozen: ✓
-- **File sets are disjoint** (not just modules — two lanes may not edit the same file, not even different regions): ✓
-- Family-B reverse census run **per lane and shared** before forking: ✓
+- `modules(lane_i) ∩ modules(lane_j) = { }` — n/a, one lane
+- **File sets are disjoint** — n/a, one lane
+- Family-B reverse census run per increment inside the trunk: ✓ (§6.1)
 - Trunk-only artifacts (requirements · traceability · backlog · SPEC) are written **only** by the trunk: ✓
