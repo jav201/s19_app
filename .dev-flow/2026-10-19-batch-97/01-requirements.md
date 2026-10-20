@@ -51,11 +51,11 @@ the batch-96 waiting-human doctrine itself; chips and help on any other screen.
 | cable status glyph | the glyph painted on the cable after block *j*: `▓` ok · `░` not run · `✗` error · `◇` notices · `□` into a waiting block (LLR-147.1 truth table) |
 | hero | the screen's growing region, painted as its main object: the Patch Editor ledger, the Check Editor parameter ledger, the Flow Builder pipeline, the Flow Execution lanes |
 | filled element | a displayed `Button` whose `variant == "primary"`, or a widget carrying the filled-accent class (NEW, name fixed at PDR); the hero is filled by definition and is never counted among "the filled elements besides the hero" |
-| selection style | the style of the active tab chip or the selected kind chip (class NEW); its background differs from the filled accent and it is not a fill |
+| selection style | the style of the active tab chip or the selected kind chip (class NEW); its background differs from the filled accent and it is not a fill; a tab or kind chip paints three pairwise distinct styles — unfocused, focused, selected |
 | waiting-human elements | the waiting block's card, the cable into it, the paused lane's status text, `#fx_confirm_<i>` of a waiting lane, the REQUIRED line, and the `□` mark of a waiting line in the run log |
 | waiting colour / CRC colour | `#e8ad3d` (hue 39.3°) / `#c9562b` (hue 16.3°), 23.0° apart (§2.7 P-40), declared as NEW `insight_style` tokens |
 | accent colour | a painted foreground or background colour whose HSV saturation is ≥ 0.15 (greys and whites, whose hue is undefined, are not accents) |
-| horizontal overflow | a displayed descendant of a panel whose painted region extends past the panel's region on the x axis (measured by `widget.region`, C-32) |
+| horizontal overflow | a displayed descendant of a panel whose **clipped region** extends past the panel's region on the x axis; the clipped region is `widget.region` intersected with the `content_region` of every ancestor strictly inside the panel whose `overflow_x` is `auto` or `scroll` (a part scrolled out of such an ancestor is reachable, not overflow); an ancestor that does not scroll clips nothing (C-32; §2.7 P-52) |
 | wrapped row | one logical ledger/log line painted on more than one terminal row, or clipped to fewer rows than its content height |
 | 118x54 / 220x60 | the minimum and the large reference terminal sizes; "the range" = every width ≥ 118 and height ≥ 54; "below the range" = width < 118 or height < 54 |
 | shipped id | a literal `id="…"` a panel's `compose` yields on `main` at `9c7beaf` |
@@ -63,6 +63,8 @@ the batch-96 waiting-human doctrine itself; chips and help on any other screen.
 | painted extent | the rightmost terminal column inside a content region whose painted cell is not blank (read from the compositor's strips, C-32) |
 | no-wrap set | the ledger rows, run-log lines, pipeline rows, identity ribbons, legends, inspector headings and REPORT FIELDS lines of a panel |
 | focus order | the order of `app.screen.focus_chain` restricted to the panel's ids and its header chips |
+| control / read-out | a **control** is a displayed `Button`, `Input`, `Select`, `TextArea`, `DataTable` or tab chip, or a scroll view a focus order names by id (`#fx_lanes_scroll`, the Check Editor's JSON / Addendum scroll views); a **read-out** is a displayed `Static` or `Label` that takes no key (§2.7 P-55) |
+| attention lane | the first waiting lane, in lane order, whose waiting card and `#fx_confirm_<i>` have been painted; its Confirm carries the attention class; after a confirm the attention moves to the next waiting lane once that lane has been painted |
 | family root | the active project directory when a project is active; otherwise the tool root `app.base_dir / WORKAREA_DIRNAME` (`.s19tool`, `workspace.py:16`), which holds every common home |
 
 ### 1.4 References
@@ -200,8 +202,19 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 | P-47 | `#flow_scope` is the only UI path to the variant scopes; 6 nodes of `tests/test_flow_multi_image_ui.py` reach it. | premise | ✅ TRUE | `flow_screens.py:818-823`, `:1485`; `app.py:2586-2609`; nodes `:150, :185, :215, :234, :251, :271` | LLR-146.12; LLR-104.6 retired for the Builder |
 | P-48 | The Patch Editor's dirty flag has four writers. | premise | ✅ TRUE | `screens_directionb.py:4851`; set `:5707`, `:5771`; cleared `:5953`, `:5964` | LLR-144.6 stamp |
 | P-49 | Shipped lane-paint and session-row assertions exist that the new LLRs supersede. | premise | ✅ TRUE | `test_tui_flow_execution_b94.py:345-348`, `:451-454`; `test_flow_external_step_b96.py:387`, `:425` | §6.3 superseded table |
+| P-50 | A NUL ref pasted into `#fx_in_0_0`, bound by `#fx_bind_0_0` and run by `#fx_run` raises an uncaught `ValueError` at `variant_execution_service.py:273`; without the Bind press a typed rebind never reaches the run. | premise | ✅ TRUE | `p2qa3/q_nulbind.py` → `input value 'base\x00.s19'` · `RAISED ValueError stat: embedded null character in path` (`app.py:2815` → `flow_execution_service.py` → `_resolve_manifest_entry` `:273`); `p2qa3/q1_mode.py` → `press_bind=False … outputs identical True` / `press_bind=True … outputs identical False` | LLR-146.14, 147.2; AT-B97-22, -23 |
+| P-51 | The Check Editor's Write stages at `<base>/.s19tool/workarea/temp/<name>` and renames a collision at the target; a read-only target directory, a directory or a read-only file at the target do not refuse on Windows; a directory or a read-only file at the staging path raises `PermissionError`, caught as `MF-WRITE-CONTAINMENT` with no file written. | premise | ✅ TRUE | `p1r4/q6_write.py` → `readonly_dir: path=…\spec.chk.json issues=[]`; `dir_at_target` / `readonly_file: path=…\spec.chk_1.json issues=[]`; `dir_at_staged` / `readonly_file_at_staged: path=None issues=['PermissionError: [Errno 13] Permission denied …']` (`changes/io.py:1590-1597`) | LLR-148.9 write arm |
+| P-52 | On Textual 8.2.8 the region predicate counts cards correctly scrolled inside a `HorizontalScroll` and the clipped-region predicate does not; a non-scrolling `Horizontal` is counted by both; on HEAD both give 1 / 1 / 2 / 7 at 118x54. | premise | ✅ TRUE | `p1r4/a2_overflow.py` → `scroll box.overflow_x=auto max_scroll_x=66 region-pred=4 clipped-pred=0`; `noscroll box.overflow_x=hidden … region-pred=4 clipped-pred=4`; HEAD `flow-execution 7/7`, `flow-builder 2/2`, `patch-editor 1/1`, `check-editor 1/1` | §1.3; LLR-147.12, 149.2 |
+| P-53 | A `ScrollableContainer` is focusable and binds `left` / `right`; `tab` reaches it and `right` brings `scroll_x` to `max_scroll_x`. | premise | ✅ TRUE | `p1r4/u3_lanes_key.py` → `wide=True chain=['run', 'lanes'] focused=lanes rights=66 scroll_x=66 max=66 last_inside=True`; `ScrollableContainer True [… 'left', … 'right', 'up']` | LLR-147.11, 147.12 |
+| P-54 | A reference set built by control type (displayed, enabled) is contained in the focus chain on the four screens at HEAD, and `can_focus = False` on one Button removes it from the chain while the type-built set keeps it. | premise | ✅ TRUE | `p1r4/u2_chain.py` → ref 19 / 14 / 16 / 12, 0 missing; mutation on `patch_checks_run_button`, `check_mem_add_button`, `flow_add`, `fx_bind_0_0` → each `RED`; a chain-built set misses each (`True`) | §4 method (b) |
+| P-55 | Of `PE_IDS_9C7BEAF` / `CE_IDS_9C7BEAF`, 28 / 14 ids are control-typed, every one in the LLR-144.12 / 145.10 controls column; the tables' other shipped ids are 9 / 5 `Static` or `Label` read-outs. | premise | ✅ TRUE | `p1r4/q9_subset.py` → `PE: frozen 66 control-typed 28 missing-from-table []`, `CE: frozen 31 control-typed 14 missing-from-table []`, dropping one → `RED`; `p1r4/q5_types.py` → the 9 / 5 read-outs listed in A.1 | LLR-144.12, 145.10 |
+| P-56 | On `main` the keys-only Builder path completes (2 → 3 blocks, Run pressed), the palette lacks `check`, `source`, `write_out`, `tab` visits `flow_scope`, and the banner after an EXT-STEP run is Spanish. | premise | ✅ TRUE | `p1r4/q3_at19.py` → `palette ids on HEAD ['flow_palette_a2b', 'flow_palette_crc', 'flow_palette_external_step', 'flow_palette_patch']`; `flow_scope visited by tab: True`; `PAUSED - ESPERANDO HUMANO` → `ES_MARKER` matches `['ESPERANDO', 'HUMANO', 'esperando', 'humano', 'SALIDA']` | AT-B97-19 |
+| P-57 | Save and paste-buffer typing change the Patch Editor's dirty flag and write no document field: neither is among the nine writers. | premise | ✅ TRUE | `ChangeService.save` at `change_service.py:1546`, outside the nine writer lines of P-6 (`undo :861`, `redo :893`, `add_entry :1080`, `add_symbol_entry :1154`, `edit_entry :1196`, `remove_entry :1223`, `edit_entry_json :1344`, `load :1404`, `load_text :1465`); `screens_directionb.py:5707` (buffer typing), `:5953` (`mark_saved`), each followed by `_refresh_dirty_indicator` | LLR-144.6 |
+| P-58 | The app holds the active project directory resolved. | premise | ✅ TRUE | `app.py:1861` `return (self.workarea / self.current_project).resolve()`; `app.py:8200` `self.current_project_dir = project_dir.resolve()` | LLR-148.8 trust anchor |
+| P-59 | `tests/test_open_folder_chips.py` holds 11 test nodes; the shipped press path creates a missing target through `create_chip_home` before the open seam. | premise | ✅ TRUE | `grep -c "^def test_\|^async def test_"` → `11`; `open_folder_chip.py:160-172` | LLR-148.1, 148.8 |
+| P-60 | Under the pilot a paint completes between the two keys of `press("c", "c")`, ~0.05 s apart; a chain with two EXT-STEP blocks pauses again at the second after the shipped confirm re-run; a stray `enter` on `#fx_run` while a lane waits starts one more run and confirms nothing. | premise | ✅ TRUE | `p1r4/u1_burst.py` → `[(0.0003, False), (0.0488, True)]`; `p1r4/u1_two_ext.py` → `run 1 paused ['ok', 'ok', 'waiting', 'skipped', 'skipped']`, `confirm re-run paused ['ok', 'ok', 'ok', 'waiting', 'skipped']`; `p1r4/u5_stray_enter.py` → `after enter 1: focused fx_run reports 1 lane ['ok', 'ok', 'waiting', 'skipped']`, `after enter 2: focused fx_run reports 2 lane ['ok', 'ok', 'waiting', 'skipped']` | LLR-147.13; AT-B97-20 |
 
-- **Premise evaluation:** 49 premise(s) · ✅ TRUE 49 / ❌ FALSE 0 / ❓ UNDECIDABLE 0 — executed 2026-10-20 on `9c7beaf` / `bc4fbd3` / `0f21e00` (no `s19_app/` diff between them); P-7, P-13, P-16 record corrected brief claims; P-11, P-17 and P-35 were restated this round (P-17 from 42 to 48 constants).
+- **Premise evaluation:** 60 premise(s) · ✅ TRUE 60 / ❌ FALSE 0 / ❓ UNDECIDABLE 0 — executed 2026-10-20 on `9c7beaf` / `bc4fbd3` / `0f21e00` / `bdd88f3` (no `s19_app/` diff between them); P-7, P-13, P-16 record corrected brief claims; P-11, P-17 and P-35 were restated in round 2; P-50..P-60 are new in round 3.
 
 ### 2.8 Fork preconditions (C-52) — MANDATORY, and the declared empty when the batch does not fork
 
@@ -218,19 +231,19 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ## 3. High-level requirements (HLR)
 
-> Test-file paths, `-k` selectors and node ids in every *Executed verification* line are provisional until Phase 3 (V-5) and reconciled from the real tree at Phase 4. Every acceptance fixture, driver and RED arm is in the per-AT table (appendix A.5). Every acceptance test observes only the shipped surface: painted text and regions, files written on disk (`reports/*`, written images, saved sets and specs), the status line — never an internal attribute, a posted message or a wrapped service function. Every render-increment gate also runs the full guard host `pytest tests/test_tui_directionb.py` (C-34).
+> Test-file paths, `-k` selectors and node ids in every *Executed verification* line are provisional until Phase 3 (V-5) and reconciled from the real tree at Phase 4. Every acceptance fixture, driver and RED arm is in the per-AT table (appendix A.5). Every acceptance test observes only the shipped surface: painted text and regions, files written on disk (`reports/*`, written images, saved sets and specs), the status line — never an internal attribute, a posted message or a wrapped service function — with one exception, the OS boundary: the open seam `folder_open_service.open_folder_in_file_manager` is spied with the `SeamSpy` idiom (`tests/test_open_folder_chips.py:101`), because opening a file manager paints nothing in the terminal (HLR-148). Every render-increment gate also runs the full guard host `pytest tests/test_tui_directionb.py` (C-34).
 
 ### HLR-144 — Patch Editor as a ledger + inspector with a live JSON view
 - **Traceability:** US-134
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While the Patch Editor is displayed, the Patch Editor shall present the document's entries as a full-height ledger beside an inspector carrying Inspector, JSON and Checks tabs, the inspector showing the highlighted entry's before→after hex strip, labelled entry form and entry chips, every shipped control displayed in its home, and Save as its one filled action besides the ledger. When a change-set is loaded or any writer changes the document, the Patch Editor shall show that document in the JSON tab's read-only view at once, under a stamp naming its entry count, time and saved state.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While the Patch Editor is displayed, the Patch Editor shall present the document's entries as a full-height ledger beside an inspector carrying Inspector, JSON and Checks tabs, the inspector showing the highlighted entry's before→after hex strip, labelled entry form and entry chips, every shipped control displayed in its home, and Save as its one filled action besides the ledger. When any writer of the document changes it — a Load is one of them — the Patch Editor shall show that document in the JSON tab's read-only view at once, under a stamp naming its entry count, time and saved state. When the panel's dirty flag changes, the Patch Editor shall recompose that stamp at once.
 - **Rationale (informative):** operator verdict pe_A with the binding JSON condition (brief R-1); the refresh is live with a stamp and no button, and Save is the primary action (operator decisions 2 and 4, LED-…97.3). Today the ledger shows 2 of 6 rows in a 3-row band and the JSON editor keeps the dummy template after Load (§2.7 P-4, P-8).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b97_patch_editor.py -k "at_b97_01 or at_b97_02 or at_b97_03 or at_b97_17"` (Textual pilot, real presses and keys) + the C-34 guard host.
-- **Numeric pass threshold:** after Load of the 6-entry fixture at 118x54: 6 of 6 ledger rows painted without scrolling, and the JSON view's text parses (`json.loads`) to 6 entries whose `address` list equals the list parsed from the fixture FILE (`['0xEB10', '0xEB40', '0xEC00', '0xECA0', '0xED00', '0xED40']`, P-5), stamp `6 entries · HH:MM:SS · saved`; after one Add, with no further press: 7 parsed entries and stamp `7 entries · … · unsaved changes`; the hostile name and content arms of AT-B97-03 render with 0 `MarkupError` and 0 spans originating in the payload.
+- **Numeric pass threshold:** after Load of the 6-entry fixture at 118x54: 6 of 6 ledger rows painted without scrolling, and the JSON view's text parses (`json.loads`) to 6 entries whose `address` list equals the list parsed from the fixture FILE (`['0xEB10', '0xEB40', '0xEC00', '0xECA0', '0xED00', '0xED40']`, P-5), stamp `6 entries · HH:MM:SS · saved`; after one Add, with no further press: 7 parsed entries and stamp `7 entries · … · unsaved changes`; after Save, with no further press: stamp `7 entries · … · saved`; the hostile name and content arms of AT-B97-03 render with 0 `MarkupError` and 0 spans originating in the payload.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
-  - **Observable outcome:** after Load the engineer sees every entry in the left ledger, the highlighted entry's before→after strip in the inspector and, on the JSON tab, the same document as read-only JSON under its stamp; after adding an entry the JSON view shows it at once and the stamp says `unsaved changes`; the paste area stays editable; a markup-laden file name and entry value read literally; the whole first task works from the keyboard.
+  - **Observable outcome:** after Load the engineer sees every entry in the left ledger, the highlighted entry's before→after strip in the inspector and, on the JSON tab, the same document as read-only JSON under its stamp; after adding an entry the JSON view shows it at once and the stamp says `unsaved changes`, and after Save it says `saved`; the paste area stays editable; a markup-laden file name and entry value read literally; the whole first task works from the keyboard.
   - **Shipped surface:** `#screen_patch` → `PatchEditorPanel` (`s19_app/tui/screens_directionb.py:4383`), loaded through `#patch_doc_load_button` → `S19TuiApp._patch_editor_load_tail` (`s19_app/tui/app.py:5266`).
   - **Acceptance test(s):** AT-B97-01, AT-B97-02, AT-B97-03, AT-B97-17
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a 0-entry document shows the empty-state line in the ledger and `"entries": []` in the view (AT-B97-02); boundary: the 118x54 floor (AT-B97-01); invalid: a legacy v1 file loads as the empty document plus its one ERROR finding and the view shows that empty document, not the previous one (AT-B97-02); error: the hostile name and content (AT-B97-03).
@@ -254,8 +267,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-146 — Flow Builder as a pipeline rail with a contextual add form
 - **Traceability:** US-136
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While a flow is loaded in the Flow Builder, the Flow Builder shall present its blocks as one horizontal pipeline of cards joined by cables, CRC cards painted in the CRC colour, shall offer every placeable block kind in its palette with an add form that shows only the chosen kind's inputs, shall carry the copy/paste strip, the `Variables (n)` chip and the session directory on its ribbon, and shall keep Run, its one filled action besides the pipeline, inside the panel viewport without scrolling at any size of at least 118x54, Run requesting the single-image scope with no scope selector. If a flow file, chain-set or manifest ref carries a NUL character, then the system shall refuse it with a finding and raise no exception.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While a flow is loaded in the Flow Builder, the Flow Builder shall present its blocks as one horizontal pipeline of cards joined by cables, CRC cards painted in the CRC colour, shall offer every placeable block kind in its palette with an add form that shows only the chosen kind's inputs, shall carry the copy/paste strip, the `Variables (n)` chip and the session directory on its ribbon, and shall keep Run, its one filled action besides the pipeline, inside the panel viewport without scrolling at any size of at least 118x54, Run requesting the single-image scope with no scope selector. If a flow file, chain-set, manifest or bound lane-input ref carries a NUL character, then the system shall refuse that ref — load nothing from it and resolve no path for it — with a finding, and raise no exception.
 - **Rationale (informative):** operator verdict fb_A (brief R-3, R-5); multi-variant work moves to Flow Execution lanes, one chain per variant (operator decision 3, LLR-104.6 retired for the Builder); the NUL refusal is security's S2-2, fixed at the Flow Builder increment. Today Run sits below the fold at 118x54 (P-11), the palette offers 4 of 7 kinds (P-13), card text overruns its card (P-14), 27 builder strings are Spanish (P-17) and a NUL ref crashes the load (P-36).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b97_flow_builder.py -k "at_b97_06 or at_b97_07 or at_b97_08 or at_b97_19"` + the C-34 guard host.
@@ -270,15 +283,15 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-147 — Flow Execution as one pipeline per lane with cable status
 - **Traceability:** US-137
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** When a flow set runs in Flow Execution, the Flow Execution panel shall paint one pipeline per lane whose cables carry the run status of their blocks from the retained run record, and shall start no second run while one is in flight. While a lane waits for a human, the panel shall bring that lane's waiting card and Confirm into the lanes viewport without moving the focus, offer a scoped key that confirms the first waiting lane, paint the waiting-human elements in the waiting colour that no other element on the four screens paints, and name the wait in English in the run log; Run shall be its one filled action besides the lanes, with each waiting lane's Confirm.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** When a flow set runs in Flow Execution, the Flow Execution panel shall paint one pipeline per lane whose cables carry the run status of their blocks from the retained run record. While a run is in flight, the panel shall start no second run. While a lane waits for a human, the panel shall bring the attention lane's waiting card and Confirm into the lanes viewport without moving the focus, offer a scoped key that confirms the attention lane once per waiting entry, paint the waiting-human elements in the waiting colour that no other element on the four screens paints, and name the wait and its chain in English in the run log and the REQUIRED line. Run shall be its one filled action besides the lanes, with each waiting lane's Confirm.
 - **Rationale (informative):** operator verdict fx_A (brief R-4, R-5); the batch-96 waiting-human doctrine is kept. Per-block status and lane order are already in the record (P-15). Colours: operator decision 1 (`#e8ad3d` / `#c9562b`, 23.0°); Confirm is not auto-focused so that a repeated key cannot attest human work (orchestrator decision 6, U2-3).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b97_flow_execution.py -k "at_b97_09 or at_b97_10 or at_b97_11 or at_b97_20 or at_b97_22"` + the C-34 guard host.
-- **Numeric pass threshold:** importing `patch_chain`, `flash_chain`, `err_chain` through `#fx_import` and pressing `#fx_run` (sequential) at 118x54: lane 0 cables `▓ ▓ ◇`, lane 1 cables `▓ □ ░`, lane 2 cables `▓ ✗ ░`; `#fx_confirm_1` region inside `#fx_lanes_scroll`'s region and carrying the attention class, the focus still on `#fx_run`; `#fx_confirm_0` and `#fx_confirm_2` not displayed; every span painted in the waiting colour belongs to a waiting-human element; 0 `ES_MARKER` matches in the painted log and lanes; `#fx_save` / `#fx_load` inside the panel at scroll 0; Save Set writes the set file and Load Set in a new app on the same `tmp_path` restores its lanes; the chain-set report of a run driven in `parallel` carries `- **Mode:** parallel`; the hostile arms render with 0 `MarkupError` and 0 spans originating in the payload.
+- **Numeric pass threshold:** importing `patch_chain`, `flash_chain`, `err_chain` through `#fx_import` and pressing `#fx_run` (sequential) at 118x54: lane 0 cables `▓ ▓ ◇`, lane 1 cables `▓ □ ░`, lane 2 cables `▓ ✗ ░`; `#fx_confirm_1` region inside `#fx_lanes_scroll`'s region and painted in the attention style (its compositor-strip style ≠ `#fx_run`'s), the focus still on `#fx_run`; the REQUIRED line names `flash_chain`; lane headers carry the worst-status marks `◇`, `□`, `✗`; `press("c", "c")` with two lanes waiting → 1 confirm; a stray `enter` on `#fx_run` while lane 1 waits → 1 more run and 1 more report, 0 confirms; `#fx_confirm_0` and `#fx_confirm_2` not displayed; every span painted in the waiting colour belongs to a waiting-human element; 0 `ES_MARKER` matches in the painted log and lanes; `#fx_save` / `#fx_load` inside the panel at scroll 0 and the mode control ≤ 30 cells wide; each rebind input and its Bind inside its SOURCE card; Save Set writes the set file and Load Set in a new app on the same `tmp_path` restores its lanes; the chain-set report of a run driven in `parallel` carries `- **Mode:** parallel`; the hostile arms render with 0 `MarkupError` and 0 spans originating in the payload.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
-  - **Observable outcome:** after Run the engineer sees lane 0 done with notices, lane 1 paused at its external step with its card and Confirm on screen and highlighted, lane 2 failed, a REQUIRED line naming the confirm key above the log, and the log in English; Save Set and Load Set are on screen and round-trip the set; a CRC card beside the waiting card is painted in a colour distinct from the waiting colour (judged on the capture, §5.1).
+  - **Observable outcome:** after Run the engineer sees lane 0 done with notices, lane 1 paused at its external step with its card and Confirm on screen and highlighted, lane 2 failed, each lane's header mark telling its worst status, a REQUIRED line naming the waiting chain and the confirm key above the log, and the log in English; Save Set and Load Set are on screen and round-trip the set; a CRC card beside the waiting card is painted in a colour distinct from the waiting colour (judged on the capture, §5.1).
   - **Shipped surface:** `#screen_flow_execution` → `FlowExecutionPanel` (`s19_app/tui/flow_screens.py:1874`), lanes added through `#fx_import` → `on_flow_execution_panel_import_requested` (`app.py:2719`), run through `on_flow_execution_panel_run_requested` (`app.py:2776`), which writes `<project>/reports/<ts>-chain-set-report.md` (`flow_execution_service.py:1551`, `:1661`).
   - **Acceptance test(s):** AT-B97-09, AT-B97-10, AT-B97-11, AT-B97-20, AT-B97-22
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: Run with no lanes paints no pipeline and an English no-lanes line (AT-B97-10); boundary: 118x54 header and set row, and the waiting lane third of three with 6 blocks, past the viewport on both axes (AT-B97-10, AT-B97-20); invalid: an imported flow or a loaded set carrying a NUL ref is refused (AT-B97-11); error: `err_chain` (`✗` cable, AT-B97-09) and the hostile arms (AT-B97-11).
@@ -286,28 +299,28 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-148 — Folder chip and help chip on the four screens
 - **Traceability:** US-138
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
 - **Statement:** When the engineer presses an open-folder chip, the system shall open the folder the chip's label names only if it is a real directory reached through no reparse point inside that family's root, and shall otherwise refuse on the status line. When the engineer presses the help chip of the Patch Editor, Check Editor, Flow Builder or Flow Execution screen, the system shall show that screen's help entry naming every control, input, tab, key and glyph on the screen as `label — effect` lines. While no project is active, a project-only family's chip shall be disabled and its status message shall name that family's folder. While a region of the four screens has no content or an error, that region shall show one English line naming the state.
 - **Rationale (informative):** the operator's round-2 answer ("es un problema adivinar y buscarlos, sobre todo para usuarios nuevos") and the verdict note on legends (brief R-6, R-7); chip labels name their folder (orchestrator decision 7). ARQ I-1 / I-4; R14, R15. The real-directory guard and the label change apply to every chip in the app (A2-10).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b97_chips_help.py -k "at_b97_12 or at_b97_13 or at_b97_14 or at_b97_23"` with the open seam spied (the `SeamSpy` idiom of `tests/test_open_folder_chips.py:101`).
-- **Numeric pass threshold:** with a project: 4 presses → 4 seam calls with targets `patch` home, `checks` home, `project_dir / "flows"`, `project_dir`, labels `📂 Open patches/`, `📂 Open checks/`, `📂 Open flows/`, `📂 Open session`, each status line ending with the opened target's full path; a `flows` that is a file or a junction, or a project directory that is a junction → 0 seam calls and a refusal line; without a project: the `flows` and `session` chips are disabled, 0 seam calls, and the status line names the family's folder and not "Reports"; each of the 4 help chips opens a modal whose `label — effect` lines cover 100 % of the screen's coverage set (LLR-148.6); each region state of LLR-148.9 shows its line.
+- **Numeric pass threshold:** with a project: 4 presses → 4 seam calls with targets `patch` home, `checks` home, `project_dir / "flows"`, `project_dir`, labels `📂 Open patches/`, `📂 Open checks/`, `📂 Open flows/`, `📂 Open session`, each status line ending with the opened target's full path; in a project opened through the app's own load (its resolved directory the trust anchor, §2.7 P-58), a `flows` that is a file or a junction → 0 seam calls and a refusal line; a missing `flows` → created inside the project, then guarded, then 1 seam call; without a project: the `flows` and `session` chips are disabled, 0 seam calls, and the status line names the family's folder and not "Reports"; each of the 4 help chips opens a modal whose `label — effect` lines cover 100 % of the screen's coverage set (LLR-148.6); each region state of LLR-148.9 shows its line, including a NUL ref pasted into `#fx_in_0_0`, bound by `#fx_bind_0_0` and run → 1 English line naming `MANIFEST-PATH-ESCAPE`, 0 tracebacks.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
-  - **Observable outcome:** every one of the four screens shows an open-folder chip naming its folder and a `?` chip in its header; with a project the chip opens that folder and the status line shows its full path, without one the flow chips are dimmed and say why, and a folder replaced by a file or reached through a link is refused; `?` explains every control, input, key and mark on that screen; an empty or failed region says so in one line.
+  - **Observable outcome:** every one of the four screens shows an open-folder chip naming its folder and a `?` chip in its header; with a project the chip opens that folder and the status line shows its full path, without one the flow chips are dimmed and say why, and a folder replaced by a file or reached through a link inside the project is refused; `?` explains every control, input, key and mark on that screen; an empty or failed region says so in one line.
   - **Shipped surface:** `OpenFolderChip` / `titled_header` (`s19_app/tui/open_folder_chip.py:59`, `:185`), `folder_open_service.resolve_chip_target` (`s19_app/tui/services/folder_open_service.py:232`), `WindowHelpChip` (`s19_app/tui/window_help.py:401`).
   - **Acceptance test(s):** AT-B97-12, AT-B97-13, AT-B97-14, AT-B97-23
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no project (AT-B97-13); boundary: a project whose `flows/` does not exist yet → the chip is dimmed and the press follows the create decision of PDR within LLR-148.1's containment (AT-B97-12); invalid: `flows` a file or a junction, the project directory a junction → refused, 0 seam calls (AT-B97-12); error: the seam raises → the status line carries the failure, no traceback (AT-B97-12).
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no project (AT-B97-13); boundary: a project whose `flows/` does not exist yet → the chip is dimmed and the press creates it through the shipped create-on-press path inside the project, then guards and opens it (AT-B97-12); invalid: `flows` a file or a junction in a project opened through the app's load → refused, 0 seam calls (AT-B97-12); a NUL ref bound to a lane and run → refused with one line (AT-B97-23); error: the seam raises → the status line carries the failure, no traceback (AT-B97-12).
   - **Negative control:** executed on `main` (§2.7 P-18, P-20, P-21, P-34): `OpenFolderChip("flows")` raises `ValueError` (family not in `CHIP_FAMILIES`), the Check Editor header has no chip, a junction passes the shipped `exists()` check, and the help coverage is 6/19 · 0/6 · 2/13 · 0/4 — all four ATs are RED on today's tree.
 
 ### HLR-149 — Width-adaptive layouts, no wrapped rows
 - **Traceability:** US-139
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
 - **Statement:** While the Patch Editor, Check Editor, Flow Builder or Flow Execution screen is displayed at any terminal size of at least 118 columns by 54 rows, on either side of the 120-column `width-narrow` breakpoint, the system shall derive that screen's column widths, panel splits and region heights from the available size at mount and on every resize, so that no element overflows horizontally, the primary actions stay inside the panel viewport, no row of the no-wrap set wraps and the remaining space goes to the screen's growing region. While such a screen is displayed at a width below 118 or a height below 54, down to 80x24, the system shall keep it reachable under scroll.
 - **Rationale (informative):** the operator's variable-size rule and the 220x60 pass (brief R-8). Every screen overflows today at both sizes (P-10) and the EXT-STEP inputs keep the same width at both sizes (P-22). The 80x24 floor is kept (ruling 1 in LED-…97.2).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b97_width.py -k "at_b97_15 or at_b97_16 or at_b97_24"` (four screens × the samples 118x54, 160x56, 220x60, 260x70; an in-session `pilot.resize_terminal` 118x54 → 220x60 → 260x70 → 118x54; the 119↔120 boundary; 80x24 and 220x40 reachability).
-- **Numeric pass threshold:** per screen and sample: 0 displayed descendants with `region.right > panel.region.right` or `region.x < panel.region.x` (over ≥ 10 displayed descendants); the LLR-149.3 primary actions inside the panel region at scroll 0; 0 wrapped no-wrap rows; at 220x60 and 260x70 the void of LLR-149.5 within its bound; after the resize back to 118x54 the overflow count is 0 again; at 119x54 and 120x54 the same 0 counts; at 80x24 and 220x40 every LLR-149.3 action reachable by scrolling the panel.
+- **Numeric pass threshold:** per screen and sample: 0 displayed descendants whose clipped region (§1.3) has `right > panel.region.right` or `x < panel.region.x` (over ≥ 10 displayed descendants); the LLR-149.3 primary actions inside the panel region at scroll 0; 0 wrapped no-wrap rows; at 220x60 and 260x70 the void of LLR-149.5 within its bound; after the resize back to 118x54 the overflow count is 0 again; at 119x54 and 120x54 the same 0 counts; at 80x24 and 220x40 every LLR-149.3 action reached from the keyboard (`tab` focuses it and scrolls it into view, `pagedown` scrolls the panel) and inside the panel region once reached.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
   - **Observable outcome:** at any size from 118x54 up nothing runs off the right edge and Run / Validate / Save Set / the document controls are on screen; at large sizes the ledgers, inputs and cards grow into the space instead of leaving a void; no table, ledger or log line breaks onto a second line or is cut without an ellipsis; at 80x24 or a short-but-wide window everything is still reachable by scrolling.
@@ -320,7 +333,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ## 4. Low-level requirements (LLR)
 
-> Each LLR decomposes an HLR into a verifiable property at the implementation level. EARS owed (`full`); a statement of several sentences carries one trigger per sentence. ID format: `LLR-<HLR>.<M>`. A symbol marked `NEW` is created in Phase 3; every other symbol carries its `file:line` on `9c7beaf`. Test paths and selectors are provisional (V-5). Every `NEW` widget id or class below is a working name, fixed at PDR (§6.2 item 5). Keyboard TCs share one method, stated once: read `app.screen.focus_chain`, keep the panel's ids and its header chips, and check (a) group order (group membership is the LLR's list, not the DOM), (b) **completeness** — the set of displayed, enabled, focusable widgets inside the panel and its header equals the chain's set (no displayed control left out), (c) one `enter` arm per button group, focusing one member and observing its effect, and (d) focus visibility — each one-row chip's painted style differs between focused and unfocused.
+> Each LLR decomposes an HLR into a verifiable property at the implementation level. EARS owed (`full`); a statement of several sentences carries one trigger per sentence. ID format: `LLR-<HLR>.<M>`. A symbol marked `NEW` is created in Phase 3; every other symbol carries its `file:line` on `9c7beaf`. Test paths and selectors are provisional (V-5). Every `NEW` widget id or class below is a working name, fixed at PDR (§6.2 item 5). Keyboard TCs share one method, stated once: read `app.screen.focus_chain`, keep the panel's ids and its header chips, and check (a) group order (group membership is the LLR's list, not the DOM), (b) **completeness** — a reference set built by widget type and id, independent of `can_focus`: every displayed, enabled control (§1.3) inside the panel and its header; the reference set ⊆ the chain's set (no displayed control left out), and a control given `can_focus = False` (mutation, Phase 3, run on each of the four screens) stays in the reference set and so turns the clause RED (§2.7 P-54), (c) one `enter` arm per button group, focusing one member and observing its effect, and (d) chip states — each one-row chip's painted style differs between unfocused and focused, and a tab or kind chip's three states (unfocused, focused, selected) are pairwise distinct.
 
 ### LLR-144.1 — Patch Editor re-composed at its shipped ids
 - **Traceability:** HLR-144
@@ -374,12 +387,12 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-144.6 — The JSON view follows every writer at once, under its stamp
 - **Traceability:** HLR-144
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** When any of the nine writers of `ChangeService.document` (§2.7 P-6) changes the Patch Editor document, the panel shall refresh `#patch_json_view` at once and shall show above it the stamp `N entries · HH:MM:SS · saved` or `N entries · HH:MM:SS · unsaved changes` (NEW), where N is the document's entry count, HH:MM:SS the refresh time and the last part the panel's dirty flag (`screens_directionb.py:4851`, P-48).
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** When any of the nine writers of `ChangeService.document` (§2.7 P-6) changes the Patch Editor document, the panel shall refresh `#patch_json_view` at once and shall show above it the stamp `N entries · HH:MM:SS · saved` or `N entries · HH:MM:SS · unsaved changes` (NEW), where N is the document's entry count, HH:MM:SS the refresh time and the last part the panel's dirty flag (`screens_directionb.py:4851`, P-48). When the dirty flag changes — paste-buffer typing (`:5707`), an entry Add / Edit / Remove (`:5771`), Save's `mark_saved` (`:5953`) or `mark_loaded` (`:5964`) — the panel shall recompose the stamp at once.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-06 — `pytest tests/test_b97_patch_editor.py -k tc_b97_06`; procedure: appendix A.4 TC-B97-06.
-- **Numeric pass threshold:** 9 of 9 arms: parsed view == `json.loads(serialize_change_document(service.document))`; stamp N == parsed entry count; stamp state == `saved` iff the dirty flag is False; after Load the state reads `saved`, after Add `unsaved changes`.
-- **Negative control:** a feed that skips one writer (mutation: drop the refresh on Undo, Phase 3, C-40) → the Undo arm RED; a stamp counting the pre-change document (mutation) → N ≠ parsed count, RED.
+- **Numeric pass threshold:** 9 of 9 writer arms: parsed view == `json.loads(serialize_change_document(service.document))`; stamp N == parsed entry count; stamp state == `saved` iff the dirty flag is False; after Load the state reads `saved`, after Add `unsaved changes`; 2 of 2 dirty-flag arms with no further press: after Save the stamp reads `saved` with N unchanged, after one character typed into `#patch_paste_text` it reads `unsaved changes` with the view unchanged.
+- **Negative control:** a feed that skips one writer (mutation: drop the refresh on Undo, Phase 3, C-40) → the Undo arm RED; a stamp counting the pre-change document (mutation) → N ≠ parsed count, RED; a stamp recomposed only by the document writers (mutation) → the Save and typing arms keep the stale state, RED (neither writes the document, §2.7 P-57).
 - **Boundary catalog:** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: Remove the last entry → `"entries": []`, stamp `0 entries`; boundary: Undo at the bottom of the stack (no-op) leaves view and N unchanged. Others N/A — entry validation is reused unchanged.
 
 ### LLR-144.7 — Identity ribbon and file-derived fields, markup-safe (E-5, C-17)
@@ -414,12 +427,12 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-144.10 — Patch Editor keyboard order
 - **Traceability:** HLR-144
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The Patch Editor's focus order shall run, with the Inspector tab active, header chips → ledger → tab chips → inspector form → entry chips → file row → document controls; with the JSON tab active, header chips → ledger → tab chips → JSON view → paste area → paste controls → history controls → execute row (→ save-back and before/after rows while offered) → file row → document controls; with the Checks tab active, header chips → ledger → tab chips → checks controls → file row → document controls. Every control in it shall be operable by `enter` or `space`, and a focused chip shall paint a style different from its unfocused style.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The Patch Editor's focus order shall run, with the Inspector tab active, header chips → ledger → tab chips → inspector form → entry chips → file row → document controls; with the JSON tab active, header chips → ledger → tab chips → JSON view → paste area → paste controls → history controls → execute row (→ save-back and before/after rows while offered) → file row → document controls; with the Checks tab active, header chips → ledger → tab chips → checks controls → file row → document controls. Every control in it shall be operable by `enter` or `space`, a focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-41 — `pytest tests/test_b97_patch_editor.py -k tc_b97_41`; procedure: appendix A.4 TC-B97-41.
-- **Numeric pass threshold:** per tab state: 0 group inversions; ≥ 1 member in each group of that state; chain set == displayed focusable set; one `enter` arm per button group with its effect; 0 chips whose focused and unfocused styles are equal.
-- **Negative control:** executed on `main` (§2.7 P-33): no tab chip in the 40-id chain → RED; a displayed control with `can_focus = False` (mutation, Phase 3) → the completeness clause RED.
+- **Numeric pass threshold:** per tab state: 0 group inversions; ≥ 1 member in each group of that state; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group with its effect; 0 chips with two equal states among unfocused · focused · selected.
+- **Negative control:** executed on `main` (§2.7 P-33): no tab chip in the 40-id chain → RED; a displayed control with `can_focus = False` (mutation, Phase 3) → the completeness clause RED (executed on HEAD, §2.7 P-54).
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: each of the 3 tab states; the save-back row offered. Others N/A.
 
 ### LLR-144.11 — Patch Editor filled elements
@@ -434,23 +447,23 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-144.12 — Every shipped Patch Editor control displayed in its home
 - **Traceability:** HLR-144
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** The `PatchEditorPanel` shall display each shipped control of the table below inside its home whenever its condition holds, with `#patch_paste_text` editable, and each displayed control shall be in the panel's focus chain.
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `PatchEditorPanel` shall display each item of the table below inside its home whenever its condition holds, with `#patch_paste_text` editable; each displayed control of the controls column (§1.3) shall be in the panel's focus chain, and the read-outs column is displayed without a focus-chain requirement.
 
-| home | controls | displayed when |
-|---|---|---|
-| ledger column | `#patch_doc_entries_table` (`#patch_doc_empty_state` instead, with no entries) | always |
-| inspector pane | `#patch_entry_address_input`, `#patch_entry_value_input`, `#patch_entry_bytes_input`, `#patch_entry_add_button`, `#patch_entry_edit_button`, `#patch_entry_remove_button`, `#patch_entry_edit_json_button`, the hex strip | Inspector tab active |
-| `#patch_win_json` | the stamp, `#patch_json_view`, `#patch_paste_gauge`, `#patch_paste_text`, `#patch_paste_parse_button`, `#patch_edit_json_button`, `#patch_history_strip`, `#patch_undo_button`, `#patch_redo_button`, `#patch_execute_scope_button`, `#patch_execute_run_button`, `#patch_scope_line` | JSON tab active |
-| `#patch_win_json` | `#patch_saveback_name_input`, `#patch_saveback_width_button`, `#patch_saveback_confirm_button`, `#patch_saveback_decline_button` · `#patch_before_after_button` | JSON tab active and the save-back offer / the before-after report is open (shipped conditions) |
-| `#patch_win_checks` | `#patch_doc_issue_count`, `#patch_doc_issues`, `#patch_checks_status`, `#patch_checks_strip`, `#patch_checks_run_button`, `#patch_checks_help` | Checks tab active |
-| file row | `#patch_doc_file_select`, `#patch_doc_path_input`, `#patch_doc_load_button`, `#patch_doc_refresh_button` | always |
-| document controls | `#patch_doc_validate_button`, `#patch_doc_apply_button`, `#patch_doc_save_button` | always |
+| home | controls | read-outs | displayed when |
+|---|---|---|---|
+| ledger column | `#patch_doc_entries_table` | `#patch_doc_empty_state` (instead of the table, with no entries) | always |
+| inspector pane | `#patch_entry_address_input`, `#patch_entry_value_input`, `#patch_entry_bytes_input`, `#patch_entry_add_button`, `#patch_entry_edit_button`, `#patch_entry_remove_button`, `#patch_entry_edit_json_button` | the hex strip | Inspector tab active |
+| `#patch_win_json` | `#patch_json_view`, `#patch_paste_text`, `#patch_paste_parse_button`, `#patch_edit_json_button`, `#patch_undo_button`, `#patch_redo_button`, `#patch_execute_scope_button`, `#patch_execute_run_button` | the stamp, `#patch_paste_gauge`, `#patch_history_strip`, `#patch_scope_line` | JSON tab active |
+| `#patch_win_json` | `#patch_saveback_name_input`, `#patch_saveback_width_button`, `#patch_saveback_confirm_button`, `#patch_saveback_decline_button` · `#patch_before_after_button` | — | JSON tab active and the save-back offer / the before-after report is open (shipped conditions) |
+| `#patch_win_checks` | `#patch_checks_run_button` | `#patch_doc_issue_count`, `#patch_doc_issues`, `#patch_checks_status`, `#patch_checks_strip`, `#patch_checks_help` | Checks tab active |
+| file row | `#patch_doc_file_select`, `#patch_doc_path_input`, `#patch_doc_load_button`, `#patch_doc_refresh_button` | — | always |
+| document controls | `#patch_doc_validate_button`, `#patch_doc_apply_button`, `#patch_doc_save_button` | — | always |
 
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-60 — `pytest tests/test_b97_patch_editor.py -k tc_b97_60`; procedure: appendix A.4 TC-B97-60.
-- **Numeric pass threshold:** 0 controls missing from their home over the 4 states; guard: ≥ 33 control checks made; `read_only` False; the paste-parse arm changes the entry count.
-- **Negative control:** a control left under a hidden pane (mutation, Phase 3) → RED; `#patch_paste_text` reseeded read-only (mutation) → RED.
+- **Numeric pass threshold:** 0 items missing from their home over the 4 states; 29 of 29 controls in the focus chain where displayed and 11 of 11 read-outs displayed where their condition holds (guard: each item checked in ≥ 1 state); subset guard: every id of `PE_IDS_9C7BEAF` whose widget is a control type lies in the controls column (28 of 28 on HEAD, §2.7 P-55); `read_only` False; the paste-parse arm changes the entry count.
+- **Negative control:** a control left under a hidden pane (mutation, Phase 3) → RED; `#patch_paste_text` reseeded read-only (mutation) → RED; a shipped control dropped from the table (mutation) → the subset guard RED (executed, P-55).
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: the conditional rows (save-back, before/after) and 118x54. Others N/A.
 
 ### LLR-145.1 — Check Editor re-composed: ledger, REPORT FIELDS card, one docked row
@@ -475,11 +488,11 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.3 — Parameter names stay distinguishable when clipped
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The `CheckEditorPanel` shall give the Parameter column a content width of at least 42 cells and each REPORT FIELDS line's name field at least 24 cells at every width from 118 columns upward. If a parameter name is wider than the Parameter column, then the panel shall paint its first dot-separated segment, one ellipsis and the name's tail filling the column. If a parameter name is wider than a REPORT FIELDS name field, then the panel shall paint one ellipsis and the name's tail filling the field. A name that fits shall be painted in full.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `CheckEditorPanel` shall give the Parameter column a content width of at least 42 cells and each REPORT FIELDS line's name field at least 24 cells at every width from 118 columns upward, the name field growing with the card (LLR-149.5). The panel shall show the highlighted ledger row's full parameter name and its address on one full-name line (NEW) under the ledger. If a parameter name is wider than the Parameter column, then the panel shall paint its first dot-separated segment, one ellipsis and the name's tail filling the column. If a parameter name is wider than a REPORT FIELDS name field, then the panel shall paint one ellipsis and the name's tail filling the field. A name that fits shall be painted in full.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B97-10 — `pytest tests/test_b97_check_editor.py -k tc_b97_10`; procedure: appendix A.4 TC-B97-10.
-- **Numeric pass threshold:** Parameter content width W ≥ 42 and Fields name width ≥ 24 at both sizes; per clipped Parameter cell: starts with `first_segment + "…"`, exactly one `…`, ends with the name's last `W − len(first_segment) − 1` characters, cell length == W (guard: ≥ 1 clipped cell at 118x54 — 15 names exceed 42); per clipped Fields name: starts with `…`, ends with the name's last `width − 1` characters; **per cell:** 0 pairs of equal Parameter cells with different names over the 75 rows; 0 pairs of equal Fields lines over the six (they share one address, so only the name separates them); at 220x60 the 47-cell name painted in full.
+- **Numeric pass threshold:** Parameter content width W ≥ 42 and Fields name width ≥ 24 at both sizes; per clipped Parameter cell: starts with `first_segment + "…"`, exactly one `…`, ends with the name's last `W − len(first_segment) − 1` characters, cell length == W (guard: ≥ 1 clipped cell at 118x54 — 15 names exceed 42); per clipped Fields name: starts with `…`, ends with the name's last `width − 1` characters; **per cell:** 0 pairs of equal Parameter cells with different names over the 75 rows; 0 pairs of equal Fields lines over the six (they share one address, so only the name separates them); at 220x60 the 47-cell name painted in full; the full-name line holds the 47-cell name and its address in full when that row is highlighted at 118x54; the Fields name width at 220x60 > its width at 118x54.
 - **Negative control:** measured on the fixture (§2.7 P-38): a head-keeping truncation (mutation, Phase 3) fails the tail clause on every clipped cell and paints 3 of the six Fields names as `ASAM.M.SCALAR.UBYTE.TAB…` at 24 cells → RED; a tail-only Parameter truncation fails the first-segment clause → RED; a 40-cell Parameter column leaves `ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` / `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` equal → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a name exactly W cells (no ellipsis); a name with no dot (`UNKNOWN…`, head + `…` + tail). Others N/A.
 
@@ -525,11 +538,11 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.8 — Check Editor keyboard order and include by key
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The Check Editor's focus order shall run header chips → parameter filter → parameter ledger → include chip → REPORT FIELDS tab chips → the active tab's controls (Fields: memory inputs and chips; JSON and Addendum: their scroll view) → spec row → docked row, and every control in it shall be operable by `enter` or `space`. When the engineer presses `space` on a highlighted ledger row, the panel shall toggle that parameter's inclusion. A focused chip shall paint a style different from its unfocused style.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The Check Editor's focus order shall run header chips → parameter filter → parameter ledger → include chip → REPORT FIELDS tab chips → the active tab's controls (Fields: memory inputs and chips; JSON and Addendum: their scroll view) → spec row → docked row, and every control in it shall be operable by `enter` or `space`. When the engineer presses `space` on a highlighted ledger row, the panel shall toggle that parameter's inclusion. A focused chip shall paint a style different from its unfocused style, and a tab chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-45 — `pytest tests/test_b97_check_editor.py -k tc_b97_45`; procedure: appendix A.4 TC-B97-45.
-- **Numeric pass threshold:** per tab state: 0 group inversions, ≥ 1 member per group, chain set == displayed focusable set, one `enter` arm per button group, 0 equal focused/unfocused chip styles; `space` → count N+1 then N.
+- **Numeric pass threshold:** per tab state: 0 group inversions, ≥ 1 member per group, reference set (§4 method (b)) ⊆ chain set, one `enter` arm per button group, 0 chips with two equal states among unfocused · focused · selected; `space` → count N+1 then N.
 - **Negative control:** executed on `main` (§2.7 P-33): the 27-id chain holds no header chip and no tab chip → RED; `DataTable` binds no `space` today (P-43) → the include-by-key arm RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: no A2L loaded (the ledger still in the chain); each tab state. Others N/A.
 
@@ -545,22 +558,22 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.10 — Every shipped Check Editor control displayed in its home
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** The `CheckEditorPanel` shall display each shipped control of the table below inside its home whenever its condition holds, each displayed control in the panel's focus chain, and shall keep `#check_preview_toggle_button` mounted and not displayed, its function carried by the Addendum tab chip.
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `CheckEditorPanel` shall display each item of the table below inside its home whenever its condition holds, each displayed control of the controls column (§1.3) in the panel's focus chain and the read-outs column displayed without a focus-chain requirement, and shall keep `#check_preview_toggle_button` mounted and not displayed, its function carried by the Addendum tab chip.
 
-| home | controls | displayed when |
-|---|---|---|
-| ledger column | `#check_param_filter`, `#check_param_table`, `#check_param_include_button` | always |
-| Fields pane | the Fields lines, `#check_mem_table`, `#check_mem_address_input`, `#check_mem_label_input`, `#check_mem_size_input`, `#check_mem_add_button`, `#check_mem_remove_button`, `#check_status` | Fields tab active |
-| JSON pane | `#check_preview` | JSON tab active |
-| Addendum pane | `#check_addendum_preview` | Addendum tab active |
-| spec row | `#check_spec_file_select`, `#check_file_name_input` | always |
-| docked row | `#check_validate_button`, `#check_write_button`, `#check_apply_ghost`, `#check_fields_count` | always |
+| home | controls | read-outs | displayed when |
+|---|---|---|---|
+| ledger column | `#check_param_filter`, `#check_param_table`, `#check_param_include_button` | — | always |
+| Fields pane | `#check_mem_table`, `#check_mem_address_input`, `#check_mem_label_input`, `#check_mem_size_input`, `#check_mem_add_button`, `#check_mem_remove_button` | the Fields lines, `#check_status` | Fields tab active |
+| JSON pane | the JSON pane's scroll view (NEW) | `#check_preview` | JSON tab active |
+| Addendum pane | the Addendum pane's scroll view (NEW) | `#check_addendum_preview` | Addendum tab active |
+| spec row | `#check_spec_file_select`, `#check_file_name_input` | — | always |
+| docked row | `#check_validate_button`, `#check_write_button` | `#check_apply_ghost`, `#check_fields_count` | always |
 
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-61 — `pytest tests/test_b97_check_editor.py -k tc_b97_61`; procedure: appendix A.4 TC-B97-61.
-- **Numeric pass threshold:** 0 controls missing over 3 states; guard: ≥ 20 control checks made; the toggle mounted and hidden.
-- **Negative control:** a control left under a hidden pane (mutation, Phase 3) → RED.
+- **Numeric pass threshold:** 0 items missing over 3 states; 15 of 15 controls in the focus chain where displayed and 6 of 6 read-outs displayed (guard: each item checked in ≥ 1 state); subset guard: every control-typed id of `CE_IDS_9C7BEAF` but the hidden toggle lies in the controls column (13 of 13 on HEAD, §2.7 P-55); the toggle mounted and hidden.
+- **Negative control:** a control left under a hidden pane (mutation, Phase 3) → RED; a shipped control dropped from the table (mutation) → the subset guard RED (executed, P-55).
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: each tab state at 118x54. Others N/A.
 
 ### LLR-146.1 — Pipeline of block cards joined by cables
@@ -693,22 +706,22 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-146.13 — Flow Builder keyboard order
 - **Traceability:** HLR-146
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The Flow Builder's focus order shall run header chips → kind chips → add inputs → Add → copy/paste strip → `Variables (n)` → funnel editor (while open) → foot row; every kind chip shall be focusable and set the kind on `enter` or `space`; every control shall be operable by `enter` or `space`; a focused chip shall paint a style different from its unfocused style.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The Flow Builder's focus order shall run header chips → kind chips → add inputs → Add → copy/paste strip → `Variables (n)` → funnel editor (while open) → foot row; every kind chip shall be focusable and set the kind on `enter` or `space`; every control shall be operable by `enter` or `space`; a focused chip shall paint a style different from its unfocused style, and a kind chip's unfocused, focused and selected styles shall be pairwise distinct.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-51 — `pytest tests/test_b97_flow_builder.py -k tc_b97_51`; procedure: appendix A.4 TC-B97-51.
-- **Numeric pass threshold:** 0 group inversions; chain set == displayed focusable set; one `enter` arm per button group; 7 of 7 kind chips set their kind by key; 0 equal focused/unfocused chip styles.
+- **Numeric pass threshold:** 0 group inversions; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group; 7 of 7 kind chips set their kind by key; 0 chips with two equal states among unfocused · focused · selected.
 - **Negative control:** executed on `main` (§2.7 P-33): 4 kind chips in the chain, `flow_scope` between paste and Run → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: the EXT-STEP form and the funnel editor open (most inputs). Others N/A.
 
 ### LLR-146.14 — A NUL character in a ref is refused, never raised
 - **Traceability:** HLR-146
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** If a path-bearing field of a flow file's block carries a NUL character, then `load_flow_json` shall refuse the file with a `FLOW-UNSAFE-REF` finding (`flow_persistence_service.py:114`). If a chain-set's template or input ref carries a NUL character, then `load_chain_set` shall refuse the set with a `CHAIN-SET-UNSAFE-REF` finding (`:1098`). If a manifest entry carries a NUL character, then `_resolve_manifest_entry` (`variant_execution_service.py:205`) shall skip it with a `MANIFEST-PATH-ESCAPE` finding (`:106`). None of the three shall raise.
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** If a path-bearing block field of a flow file — `SourceBlock.image_ref`, `PatchBlock.change_doc_ref`, `WriteOutBlock.output_name`, `CheckBlock.check_doc_ref`, `CrcBlock.config_ref`, the `ref` of each `A2BBlock` binding, `ExternalStepBlock.log_ref` or `ExternalStepBlock.output_path` (`flow_model.py:229, 250, 267, 289, 315, 338, 505, 506`) — carries a NUL character, then `load_flow_json` shall refuse the file with a `FLOW-UNSAFE-REF` finding (`flow_persistence_service.py:114`). If a chain-set's template or input ref carries a NUL character, then `load_chain_set` shall refuse the set with a `CHAIN-SET-UNSAFE-REF` finding (`:1098`). If a manifest entry or a lane input bound through `#fx_bind_<i>_<j>` carries a NUL character, then `_resolve_manifest_entry` (`variant_execution_service.py:205`, the resolve at `:273`, §2.7 P-50) shall refuse that entry — resolve no path for it — with a `MANIFEST-PATH-ESCAPE` finding (`:106`). The `stat()` guards of `load_flow_json` and `load_chain_set` (`flow_persistence_service.py:903-906`, `:1463-1471`) shall catch `ValueError` as well as `OSError`. None of these shall raise.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B97-62 — `pytest tests/test_b97_flow_builder.py -k tc_b97_62`; procedure: appendix A.4 TC-B97-62.
-- **Numeric pass threshold:** 0 exceptions over 5 arms; each refusal arm returns no flow / set / path and exactly one finding of its code naming the field.
-- **Negative control:** executed on `main` (§2.7 P-36): 4 of the 5 arms raise `ValueError` (the template arm loads and raises at its flow load) → RED.
+- **Numeric pass threshold:** 0 exceptions over 15 arms — the 5 of P-36, one per enumerated block field (8), and a NUL in the file path handed to each `stat()` guard (2); each refusal arm returns no flow / set / path and exactly one finding of its code naming the field.
+- **Negative control:** executed on `main` (§2.7 P-36, P-50): 4 of the 5 arms raise `ValueError` (the template arm loads and raises at its flow load), and the bound lane input raises at `:273` → RED; a `stat()` guard catching `OSError` only (as shipped) → the path arms raise `ValueError` (P-36 F), RED.
 - **Boundary catalog:** ☐ empty ☐ boundary ☒ invalid ☒ error — invalid: NUL in each of the four field families; error: the uncaught `ValueError` of P-36. Others N/A.
 
 ### LLR-147.1 — Per-lane pipeline with cable status from the retained record
@@ -730,25 +743,25 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 - **Negative control:** executed on `main`: a progress bar, no `◇` or `□` between blocks → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: no record → every cable `░`; boundary: a 1-block lane (0 cables). Others N/A — the statuses are a closed enum.
 
-### LLR-147.2 — The rebind input sits inside the SOURCE card
+### LLR-147.2 — The rebind input and its Bind sit inside the SOURCE card
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The `FlowExecutionPanel` shall place each `fx_in_<i>_<j>` input (`flow_screens.py:2178`) inside the region of lane *i*'s SOURCE card *j*.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `FlowExecutionPanel` shall place each `fx_in_<i>_<j>` input (`flow_screens.py:2178`) and its `#fx_bind_<i>_<j>` button (`:2181`) — the press that makes a rebind take effect (§2.7 P-50) — inside the region of lane *i*'s SOURCE card *j*, the Bind directly after its input in the focus order.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-22 — `pytest tests/test_b97_flow_execution.py -k tc_b97_22`; procedure: appendix A.4 TC-B97-22.
-- **Numeric pass threshold:** every rebind input contained (0 outside).
-- **Negative control:** the predicate needs the card region the new layout declares, so its RED run is executed on the Flow Execution increment's own tree with the input re-parented to the lane row (mutation, C-40) → RED; it cannot run on `main`, where no card region exists.
+- **Numeric pass threshold:** every rebind input and every Bind contained (0 outside); each `fx_bind_<i>_<j>` immediately after `fx_in_<i>_<j>` in the chain.
+- **Negative control:** the predicate needs the card region the new layout declares, so its RED run is executed on the Flow Execution increment's own tree with the input, or its Bind, re-parented to the lane row (mutation, C-40) → RED; it cannot run on `main`, where no card region exists.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a lane with two SOURCE blocks. Others N/A.
 
 ### LLR-147.3 — The paused lane: waiting style, Confirm in view, focus left alone
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While a lane's record holds a `waiting` block, the `FlowExecutionPanel` shall paint that lane's waiting-human elements in the waiting colour, show two red pending lines (log, output file) under the lane header whose leading glyph is not in the LLR-147.1 cable vocabulary, show `#fx_confirm_<i>` inside lane *i*'s region, and show above the run log the line `log + output file: REQUIRED · press c to confirm` (NEW). When a lane enters the waiting state, the panel shall scroll `#fx_lanes_scroll` on both axes so that the first waiting lane's waiting card and its Confirm lie inside the viewport, shall give that Confirm the attention class (NEW), and shall leave the focus where it was.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While a lane's record holds a `waiting` block, the `FlowExecutionPanel` shall paint that lane's waiting-human elements in the waiting colour, show two red pending lines (log, output file) under the lane header whose leading glyph is not in the LLR-147.1 cable vocabulary, show `#fx_confirm_<i>` inside lane *i*'s region, and show above the run log the line `log + output file: REQUIRED for <chain> · press c to confirm` (NEW), `<chain>` the attention lane's chain name rendered through `safe_text`. When a lane enters the waiting state, the panel shall scroll `#fx_lanes_scroll` on both axes so that the attention lane's (§1.3) waiting card and its Confirm lie inside the viewport, shall give that Confirm the attention class (NEW), whose painted style differs from a waiting Confirm without it and from `#fx_run`'s, and shall leave the focus where it was. If the focus lies inside `#fx_lanes_scroll` when a lane enters the waiting state, then the panel shall keep the focused widget inside the viewport, scrolling only as far as that allows.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-23 — `pytest tests/test_b97_flow_execution.py -k tc_b97_23`; procedure: appendix A.4 TC-B97-23.
-- **Numeric pass threshold:** waiting card and Confirm contained in the viewport on both fixtures; attention class on the first waiting lane's Confirm only; `app.focused.id` == the id focused before Run (`fx_run`); other lanes' Confirm not displayed; 2 pending lines, leading glyph ∉ `{▓, ░, ✗, ◇, □}`; REQUIRED line count 1 while waiting, 0 after confirm.
-- **Negative control:** executed on `main`: no REQUIRED line → RED; the scroll step removed (mutation, Phase 3) → on `wait_third_6` the card outside the viewport, RED; Confirm auto-focused (mutation) → the focus clause RED.
-- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: two lanes waiting at once (one REQUIRED line, two Confirms, the first one scrolled to and highlighted); the waiting lane past the viewport on both axes (`wait_third_6`). Others N/A.
+- **Numeric pass threshold:** waiting card and Confirm contained in the viewport on both fixtures; the attention style on the attention lane's Confirm only, read from the compositor strips (≠ the other waiting Confirm's, ≠ `#fx_run`'s); `app.focused.id` == the id focused before Run (`fx_run`); other lanes' Confirm not displayed; 2 pending lines, leading glyph ∉ `{▓, ░, ✗, ◇, □}`; REQUIRED line count 1 while waiting, naming the attention lane's chain, 0 after confirm; focus-in-lanes arm: the focused `#fx_in_0_0` inside the viewport after the pause.
+- **Negative control:** executed on `main`: no REQUIRED line → RED; the scroll step removed (mutation, Phase 3) → on `wait_third_6` the card outside the viewport, RED; Confirm auto-focused (mutation) → the focus clause RED; a scroll that ignores the focused widget (mutation) → the focus-in-lanes arm RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: two lanes waiting at once (one REQUIRED line naming the attention lane, two Confirms, the attention lane scrolled to and highlighted); the waiting lane past the viewport on both axes (`wait_third_6`); the focus in a rebind input when the wait begins. Others N/A.
 
 ### LLR-147.4 — Two-row header; a two-word mode control
 - **Traceability:** HLR-147
@@ -822,41 +835,41 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.11 — Flow Execution keyboard order
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The Flow Execution focus order shall run header chips → `#fx_import` → mode control → `#fx_run` → set row → lanes (per lane: rebind inputs, then Confirm), every control shall be operable by `enter` or `space`, and a focused chip shall paint a style different from its unfocused style.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The Flow Execution focus order shall run header chips → `#fx_import` → mode control → `#fx_run` → set row → lanes group (`#fx_lanes_scroll`, then per lane: each rebind input followed by its Bind, then Confirm), every control shall be operable by `enter` or `space`, and a focused chip shall paint a style different from its unfocused style.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-56 — `pytest tests/test_b97_flow_execution.py -k tc_b97_56`; procedure: appendix A.4 TC-B97-56.
-- **Numeric pass threshold:** 0 group inversions; chain set == displayed focusable set; one `enter` arm per button group; `fx_confirm_1` after `fx_in_1_0` and before `fx_in_2_0`; 0 equal focused/unfocused chip styles.
+- **Numeric pass threshold:** 0 group inversions; reference set (§4 method (b)) ⊆ chain set; one `enter` arm per button group; `fx_lanes_scroll` before `fx_in_0_0`; `fx_bind_1_0` right after `fx_in_1_0`; `fx_confirm_1` after `fx_bind_1_0` and before `fx_in_2_0`; 0 equal focused/unfocused chip styles.
 - **Negative control:** executed on `main` (§2.7 P-33): no header chip in the chain → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: no lanes. Others N/A.
 
 ### LLR-147.12 — A lane wider than the viewport scrolls inside the lanes area
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** While a lane's painted pipeline is wider than `#fx_lanes_scroll`'s viewport, the `FlowExecutionPanel` shall scroll that pipeline horizontally inside `#fx_lanes_scroll` and shall keep every displayed descendant inside the panel region.
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While a lane's painted pipeline is wider than `#fx_lanes_scroll`'s viewport, the `FlowExecutionPanel` shall scroll that pipeline horizontally inside `#fx_lanes_scroll`, focusable and scrolled by `left` / `right` (§2.7 P-53), and shall keep every displayed descendant's clipped region (§1.3) inside the panel region. The panel shall paint at the head of each lane header one worst-status mark from the LLR-147.1 cable vocabulary — `✗` error, else `□` waiting, else `◇` notices, else `▓` ok, else `░` (nothing run) — so that a lane's state reads at horizontal scroll 0.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-63 — `pytest tests/test_b97_flow_execution.py -k tc_b97_63`; procedure: appendix A.4 TC-B97-63.
-- **Numeric pass threshold:** `max_scroll_x > 0`; 0 panel overflow; after the scroll the 6th card of each lane inside the viewport.
-- **Negative control:** executed on `main` (§2.7 P-11): `#fx_panel max_scroll_x 77` — the overflow lands on the panel, not on the lanes area → RED.
+- **Numeric pass threshold:** `max_scroll_x > 0`; 0 panel overflow over clipped regions; keyboard arm: `tab` to `#fx_lanes_scroll`, `right` until `scroll_x == max_scroll_x` → the 6th card of each lane inside the viewport; header marks at `scroll_x` 0: `◇`, `◇`, `□` on `wait_third_6` and `◇`, `□`, `✗` on the 3-lane run.
+- **Negative control:** executed on `main` (§2.7 P-11): `#fx_panel max_scroll_x 77` — the overflow lands on the panel, not on the lanes area → RED; the region predicate counting a scrolled card (mutation of the predicate) → RED on a correct tree, which is why the clipped region is read (P-52); executed on `main`: no lane-header mark → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 6 blocks at 118 (wider) vs 4 blocks at 220 (no scroll, `max_scroll_x == 0`). Others N/A.
 
-### LLR-147.13 — A scoped key confirms the first waiting lane
+### LLR-147.13 — A scoped key confirms the attention lane once per waiting entry
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** While at least one lane waits and the focus is outside a text input, when the engineer presses `c` on the Flow Execution screen, the `FlowExecutionPanel` shall confirm the first waiting lane exactly as a press of its `#fx_confirm_<i>` does; the help entry and the REQUIRED line shall name the key.
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** When the engineer presses `c` on the Flow Execution screen, the `FlowExecutionPanel` shall confirm the attention lane's (§1.3) current waiting entry exactly as a press of its `#fx_confirm_<i>` does, provided the focus lies outside a text input, that entry has not been confirmed already and it has held the attention for at least `CONFIRM_DWELL_S = 0.5` s (NEW); otherwise the key shall confirm nothing, and in a text input it types `c`. The help entry and the REQUIRED line shall name the key. If `enter` is pressed on `#fx_run` while a lane waits, then the panel shall start one new run of the set (LLR-147.10) and confirm nothing.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-64 — `pytest tests/test_b97_flow_execution.py -k tc_b97_64`; procedure: appendix A.4 TC-B97-64.
-- **Numeric pass threshold:** 1 re-run of lane 1 (its waiting block confirmed) per `c`; REQUIRED line count 0 after; 0 re-runs with the focus in an input or with no waiting lane; `c` named in the help entry and the REQUIRED line.
-- **Negative control:** executed on `main` (§2.7 P-43): `c` is unbound on the screen → 0 re-runs, RED.
-- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: two lanes waiting (the first is confirmed); invalid: `c` with the focus in an input, `c` with no waiting lane. Others N/A.
+- **Numeric pass threshold:** after the dwell, 1 re-run of lane 1 (its waiting block confirmed) per `c`, REQUIRED line count 0 after; `press("c", "c")` with two lanes waiting → 1 confirm, the second lane still waiting; `press("c", "c")` on `flash2_chain` → 1 confirm, the lane waiting at its second EXT-STEP; after `pilot.pause(0.6)` one more `c` confirms the next entry; 0 confirms with the focus in an input (its value gains `c`) or with no waiting lane; a stray `enter` on `#fx_run` while lane 1 waits → 1 more run call, 1 more report, 0 confirms, lane 1 waiting again; `c` named in the help entry and the REQUIRED line.
+- **Negative control:** executed on `main` (§2.7 P-43): `c` is unbound on the screen → 0 re-runs, RED; a paint-only rule without the dwell (mutation) → the burst arms confirm 2, RED — a paint completes between the two keys of `press("c", "c")`, 0.049 s apart (P-60).
+- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: two lanes waiting (only the attention lane confirmed); a chain with two EXT-STEP blocks (one confirm per waiting entry, P-60); invalid: `c` with the focus in an input, `c` with no waiting lane, a stray `enter` on Run. Others N/A.
 
 ### LLR-148.1 — Chip family `flows`
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The `folder_open_service` shall declare a `flows` chip family (NEW `CHIP_FAMILY_FLOWS`) whose target is `project_dir / FLOWS_SUBDIR` (imported from `flow_persistence_service.py:95`, never re-declared) and `None` without a project. If the press path creates a missing `flows` folder, then it shall create it only through `create_chip_home` (`folder_open_service.py:279`) and only at a path whose resolved form lies inside the resolved project directory.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `folder_open_service` shall declare a `flows` chip family (NEW `CHIP_FAMILY_FLOWS`) whose target is `project_dir / FLOWS_SUBDIR` (imported from `flow_persistence_service.py:95`, never re-declared) and `None` without a project. If the `flows` chip is pressed while `flows` is missing, then the shipped press path (`open_folder_chip.py:160-172`, §2.7 P-59) shall create it only through `create_chip_home` (`folder_open_service.py:279`) and only at a path whose resolved form lies inside the resolved project directory.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B97-27 — `pytest tests/test_b97_chips_help.py -k tc_b97_27`; procedure: appendix A.4 TC-B97-27.
-- **Numeric pass threshold:** `== p / "flows"`; `is None`; 1 import, 0 literals; created path inside `p` (create branch only).
+- **Numeric pass threshold:** `== p / "flows"`; `is None`; 1 import, 0 literals; created path inside `p`.
 - **Negative control:** executed on `main`: `"flows" in CHIP_FAMILIES` False → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: no project; boundary: `flows` absent. Others N/A.
 
@@ -902,13 +915,13 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.6 — Help entries name every control, input, tab, key and glyph as `label — effect`
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The `window_help` module shall carry an entry for each of the four screens — `patch` and `flow` rewritten, a Check Editor key and a Flow Execution key added (NEW) to `WINDOW_HELP_SECTIONS` and `SHIPPED_WINDOW_KEYS` (`window_help.py:57`, `:270`) — whose body holds one `label — effect` line, with a non-empty effect, for every button label, input or select label, tab label, key binding and glyph its screen renders, block-kind glyphs included.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** The `window_help` module shall carry an entry for each of the four screens — `patch` and `flow` rewritten, a Check Editor key and a Flow Execution key added (NEW) to `WINDOW_HELP_SECTIONS` and `SHIPPED_WINDOW_KEYS` (`window_help.py:57`, `:270`) — whose body holds one `label — effect` line, with a non-empty effect, for every button label, input or select label, tab label, key binding and glyph its screen renders in any of its states, block-kind glyphs included.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-32 — `pytest tests/test_b97_chips_help.py -k tc_b97_32`; procedure: appendix A.4 TC-B97-32.
-- **Numeric pass threshold:** 100 % coverage on each screen, every matched line with a non-empty effect; guards: coverage-set size ≥ 26 (patch: 19 buttons + 7 inputs of `PE_IDS_9C7BEAF`), ≥ 12 (check: 6 + 6), ≥ 21 (flow: 13 + the 8 add inputs of LLR-146.3), ≥ 6 (execution: 4 + `#fx_set_name`, `#fx_set_select`).
-- **Negative control:** executed on `main` (§2.7 P-21): 6/19 · 0/6 · 2/13 · 0/4 → RED; a body listing labels without ` — effect` (mutation) → RED.
-- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a label carrying a glyph prefix (`⊕ CRC`) matched on its words. Others N/A.
+- **Numeric pass threshold:** 100 % coverage on each screen of the coverage set taken as the union over the states the test drives (Patch: 3 tabs, save-back offered; Check: 3 tabs; Builder: 7 kinds, funnel editor open; Execution: no lanes and the paused 3-lane run), every matched line with a non-empty effect; guards on the **control** subset only (buttons, inputs, selects, tab chips — never bindings or glyphs): ≥ 26 (patch: 19 buttons + 7 inputs of `PE_IDS_9C7BEAF`), ≥ 12 (check: 6 + 6), ≥ 21 (flow: 13 + the 8 add inputs of LLR-146.3), ≥ 6 (execution: 4 + `#fx_set_name`, `#fx_set_select`).
+- **Negative control:** executed on `main` (§2.7 P-21): 6/19 · 0/6 · 2/13 · 0/4 → RED; a body listing labels without ` — effect` (mutation) → RED; a coverage set read from one state only (mutation) → a label shown only on another tab or kind escapes, which the union catches.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a label carrying a glyph prefix (`⊕ CRC`) matched on its words; a control displayed in one state only. Others N/A.
 
 ### LLR-148.7 — Closed glyph vocabularies and a legend on every screen
 - **Traceability:** HLR-148
@@ -922,17 +935,17 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.8 — A chip opens only a real directory inside its family root
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** When any open-folder chip in the app is pressed, the `OpenFolderChip` shall call the open seam only if its target is a directory (`is_dir()`), `_path_traverses_reparse_point(target, stop_at=root.parent)` (`workspace.py:184`) is False and `target.resolve()` lies inside `root.resolve()`, `root` being the chip's family root (§1.3); otherwise it shall set an English refusal status naming the folder and make 0 seam calls.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** When any open-folder chip in the app is pressed, the `OpenFolderChip` shall call the open seam only if its target — after any create-on-press — is a directory (`is_dir()`), `_path_traverses_reparse_point(target, stop_at=root.parent)` (`workspace.py:184`) is False and `target.resolve()` lies inside `root.resolve()`, `root` being the chip's family root (§1.3); otherwise it shall set an English refusal status naming the folder and make 0 seam calls. The trust anchor is the active project directory as the app holds it, resolved at load (`app.py:1861`, `:8200`, §2.7 P-58): the walk starts below it, so a reparse point above or at the project directory itself is not this guard's.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-57 — `pytest tests/test_b97_chips_help.py -k tc_b97_57`; procedure: appendix A.4 TC-B97-57.
-- **Numeric pass threshold:** file → 0 calls + refusal; `flows` junction → 0 + refusal; project junction → 0 + refusal; real dir → 1 call; no-project `patch` → 1 call (root = the tool root); the 6 existing nodes of `tests/test_open_folder_chips.py` stay green.
+- **Numeric pass threshold:** with the project opened through the app's own load: file → 0 calls + refusal; `flows` junction → 0 + refusal; real dir → 1 call; missing `flows` → created, guarded, 1 call; no-project `patch` → 1 call (root = the tool root); the 11 existing nodes of `tests/test_open_folder_chips.py` (P-59) stay green.
 - **Negative control:** executed on `main` (§2.7 P-34, `open_folder_chip.py:118` checks only `exists()`): a junction passes `is_dir()` and `not is_symlink()` → the seam is called, RED.
-- **Boundary catalog:** ☐ empty ☐ boundary ☒ invalid ☒ error — invalid: file, leaf junction, project junction; error: `lstat` raising (target vanished) → refusal, 0 calls. Others N/A.
+- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☒ error — boundary: `flows` missing (created, then guarded); invalid: file, leaf junction; error: `lstat` raising (target vanished) → refusal, 0 calls. Empty: N/A — the no-project chip is LLR-148.3's.
 
 ### LLR-148.9 — Region states in one English line
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
 - **Statement:** While a region of the table below is in a listed state, the panel shall paint in that region one English line naming the state, and no traceback.
 
 | screen | region | states |
@@ -940,7 +953,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 | Patch Editor | ledger · hex strip · JSON view · Checks tab | empty (no document / no image) · error (load refused: its finding) |
 | Check Editor | parameter ledger · REPORT FIELDS card | empty (no A2L / nothing included) · error (write refused) |
 | Flow Builder | pipeline · ribbon | empty (no blocks / no session) · error (load refused, NUL ref included) |
-| Flow Execution | lanes · run log | empty (no lanes) · error (run raised; import or set load refused) |
+| Flow Execution | lanes · run log | empty (no lanes) · error (run raised; import or set load refused; a NUL ref bound to a lane refused at run, `MANIFEST-PATH-ESCAPE`) |
 
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-58 — `pytest tests/test_b97_chips_help.py -k tc_b97_58`; procedure: appendix A.4 TC-B97-58.
@@ -950,8 +963,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.10 — Folder chips are labelled with their folder
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.3
-- **Statement:** Every `OpenFolderChip` in the app shall carry the label `📂 Open <folder>/`, `<folder>` the family's folder-name constant (`patches`, `checks`, `templates`, `reports`, `flows`), or `📂 Open session` for the `session` family, and on a press that opens a folder the status line shall name its full path (`Opened … : <path>`, `folder_open_service.py:182`).
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** Every `OpenFolderChip` in the app shall carry the label `📂 Open <folder>/`, `<folder>` the family's folder-name constant (`patches`, `checks`, `templates`, `reports`, `flows`), or `📂 Open session` for the `session` family. When a chip press opens a folder, the status line shall name its full path (`Opened … : <path>`, `folder_open_service.py:182`).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-65 — `pytest tests/test_b97_chips_help.py -k tc_b97_65`; procedure: appendix A.4 TC-B97-65.
 - **Numeric pass threshold:** 7 of 7 labels equal; 4 of 4 status lines end with `str(target)`.
@@ -970,12 +983,12 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-149.2 — No horizontal overflow over the range
 - **Traceability:** HLR-149
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While displayed at any width of at least 118 columns and height of at least 54 rows, on either side of the 120-column `width-narrow` breakpoint, each of the four panels shall keep every displayed descendant's painted region inside the panel's region on the x axis.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While displayed at any width of at least 118 columns and height of at least 54 rows, on either side of the 120-column `width-narrow` breakpoint, each of the four panels shall keep every displayed descendant's clipped region (§1.3) inside the panel's region on the x axis.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-35 — `pytest tests/test_b97_width.py -k tc_b97_35`; procedure: appendix A.4 TC-B97-35.
 - **Numeric pass threshold:** 0 on 24 of 24 screen×sample cells, each over ≥ 10 displayed descendants (guard); the class flips between 119 and 120.
-- **Negative control:** executed on `main` (§2.7 P-10): 1/1/2/7 at 118x54 and 1/1/1/6 at 220x60 → RED.
+- **Negative control:** executed on `main` (§2.7 P-10, P-52): 1/1/2/7 at 118x54 and 1/1/1/6 at 220x60 → RED, the same 1/1/2/7 under the clipped-region predicate (a non-scrolling ancestor clips nothing); executed on Textual 8.2.8: cards scrolled inside a `HorizontalScroll` count 4 under the region predicate and 0 under the clipped one, and a non-scrolling `Horizontal` counts 4 under both (P-52).
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: 118, the 119↔120 breakpoint, 260; error: the widest real values (60-cell ref, 47-cell name, 40-cell set name).
 
 ### LLR-149.3 — Primary actions inside the viewport over the range
@@ -1000,8 +1013,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-149.5 — The space goes to the growing region: no width or height void
 - **Traceability:** HLR-149
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While displayed at any size of at least 118x54, the four panels shall give their adaptive elements — the Patch Editor ledger, the Check Editor parameter table and its Parameter column, the Flow Builder pipeline cards and EXT-STEP inputs, the Flow Execution lane cards — the width their split assigns, cards growing from a 21-cell minimum, so that the void after each element's painted extent inside its content region is at most 2 cells unless no card line in that band is clipped, and shall give the height the docked rows leave to the screen's growing region, so that no blank row lies outside it.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While displayed at any size of at least 118x54, the four panels shall give their adaptive elements — the Patch Editor ledger, the Check Editor parameter table, its Parameter column and the REPORT FIELDS name field, the Flow Builder pipeline cards and EXT-STEP inputs, the Flow Execution lane cards — the width their split assigns, cards growing from a 21-cell minimum, so that the void after each element's painted extent inside its content region is at most 2 cells unless no card line in that band is clipped, and shall give the height the docked rows leave to the screen's growing region, so that no blank row lies outside it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-38 — `pytest tests/test_b97_width.py -k tc_b97_38`; procedure: appendix A.4 TC-B97-38.
 - **Numeric pass threshold:** every void ≤ 2, or > 2 with 0 clipped card lines in that band; card width ≥ 21; the 47-cell name in full at 220x60; 0 blank rows outside the growing region.
@@ -1010,11 +1023,11 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-149.6 — Below the range the four screens stay reachable under scroll
 - **Traceability:** HLR-149
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** While displayed at a width below 118 or a height below 54, down to the shipped 80x24 floor, each of the four panels shall keep every LLR-149.3 action reachable by scrolling the panel, without overlapping buttons.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Statement:** While displayed at a width below 118 or a height below 54, down to the shipped 80x24 floor, each of the four panels shall keep every LLR-149.3 action reachable from the keyboard — `tab` focuses it and scrolls it into view, `pagedown` scrolls the panel to it — without overlapping buttons.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-59 — `pytest tests/test_b97_width.py -k tc_b97_59`; procedure: appendix A.4 TC-B97-59.
-- **Numeric pass threshold:** 10 of 10 reachable at the three sizes; 0 overlapping button pairs.
+- **Numeric pass threshold:** 10 of 10 reached by `tab` (≤ 200 presses) and inside the panel region once focused, at the three sizes; 10 of 10 inside the panel region after `pagedown` presses on the panel; 0 overlapping button pairs.
 - **Negative control:** a panel with `overflow: hidden` (mutation, Phase 3) → an action unreachable, RED; on `main` (§2.7 P-10) `#fx_load` at x = 134 in a panel whose `max_scroll_x` reads 0 → unreachable, RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 80x24 (the floor, LLR-007.1 / CV-04) and 220x40 (wide but short). Others N/A.
 
@@ -1026,7 +1039,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ```
 FLOW: change_doc_to_json_view
-  SOURCE : a v2 change-set loaded by the Patch Editor's Load, or any of the nine document writers (§2.7 P-6)
+  SOURCE : a v2 change-set loaded by the Patch Editor's Load, any of the nine document writers (§2.7 P-6), or any of the panel's four dirty-flag writers (P-48, P-57)
   NODES  :
     - fn    : the ChangeService writers of the document (change_service.py:861, :893, :1080, :1154, :1196, :1223, :1344, :1404, :1465)
       owner : LLR-144.6
@@ -1040,7 +1053,11 @@ FLOW: change_doc_to_json_view
       owner : LLR-144.5
       in    : canonical v2 JSON text
       out   : the view's text (first 5000 lines + "showing 5000 of M lines" when longer)
-    - fn    : stamp composition — entry count, refresh time, dirty flag (NEW)
+    - fn    : the panel's dirty-flag writers (screens_directionb.py:5707, :5771, :5953, :5964), each followed by _refresh_dirty_indicator
+      owner : LLR-144.6
+      in    : paste-buffer typing, an entry Add / Edit / Remove, Save (mark_saved), Load (mark_loaded)
+      out   : the dirty flag
+    - fn    : stamp composition — entry count, refresh time, dirty flag (NEW), re-run on every document write and every dirty-flag change
       owner : LLR-144.6
       in    : ChangeDocument + the panel's dirty flag
       out   : "N entries · HH:MM:SS · saved|unsaved changes"
@@ -1133,9 +1150,9 @@ FLOW: flow_template_to_pipeline
 
 ```
 FLOW: ref_text_to_load_guard
-  SOURCE : a flow file, a chain-set file or a project manifest read from disk
+  SOURCE : a flow file, a chain-set file or a project manifest read from disk, or a lane input bound through #fx_bind_<i>_<j>
   NODES  :
-    - fn    : NUL test on every path-bearing block field in load_flow_json (flow_persistence_service.py:868), FLOW-UNSAFE-REF
+    - fn    : NUL test on the eight path-bearing block fields in load_flow_json (flow_persistence_service.py:868), FLOW-UNSAFE-REF; its stat() guard catches ValueError and OSError
       owner : LLR-146.14
       in    : block field strings
       out   : the flow, or None + one finding
@@ -1143,9 +1160,9 @@ FLOW: ref_text_to_load_guard
       owner : LLR-146.14
       in    : chain-set entries
       out   : the set, or None + one finding
-    - fn    : NUL test in _resolve_manifest_entry (variant_execution_service.py:205), MANIFEST-PATH-ESCAPE
+    - fn    : NUL test in _resolve_manifest_entry (variant_execution_service.py:205, resolve at :273), MANIFEST-PATH-ESCAPE
       owner : LLR-146.14
-      in    : manifest entry text
+      in    : manifest entry text or bound lane-input text
       out   : the resolved path, or None + one finding
   SINK   : the Builder / Execution region-state line (LLR-148.9) and the run's findings
 ```
@@ -1173,10 +1190,14 @@ FLOW: run_record_to_lane_cables
       owner : LLR-147.1
       in    : record.outcomes[i].block_results
       out   : one glyph per cable per lane
-    - fn    : paused-lane paint, pending lines, REQUIRED line, scroll-into-view on both axes, attention class (focus untouched)
+    - fn    : paused-lane paint, pending lines, REQUIRED line naming the attention lane's chain, scroll-into-view on both axes (a focused widget in the lanes kept in view), attention class (focus untouched)
       owner : LLR-147.3
       in    : waiting block index per lane
-      out   : waiting-styled card + #fx_confirm_<i> in view and highlighted
+      out   : waiting-styled card + the attention lane's #fx_confirm_<i> in view and highlighted
+    - fn    : lane-header worst-status mark from the LLR-147.1 vocabulary (NEW)
+      owner : LLR-147.12
+      in    : record.outcomes[i].block_results statuses
+      out   : one glyph per lane header
     - fn    : waiting-colour assignment restricted to waiting-human elements
       owner : LLR-147.7
       in    : element kind
@@ -1216,18 +1237,18 @@ FLOW: run_press_to_single_run
 
 ```
 FLOW: confirm_key_to_rerun
-  SOURCE : a `c` key press on the Flow Execution screen with the focus outside a text input
+  SOURCE : a `c` key press on the Flow Execution screen
   NODES  :
-    - fn    : first-waiting-lane lookup and the same confirmation a #fx_confirm_<i> press posts (NEW)
+    - fn    : attention-lane lookup; confirm only with the focus outside a text input, once per waiting entry, after CONFIRM_DWELL_S of attention; the same confirmation a #fx_confirm_<i> press posts (NEW)
       owner : LLR-147.13
-      in    : the rendered record's waiting lanes
-      out   : one ExternalStepConfirmed for the first waiting lane, or nothing
+      in    : the attention lane, its waiting entry, its confirm state and attention time
+      out   : one ExternalStepConfirmed for the attention lane, or nothing
   SINK   : on_flow_execution_panel_external_step_confirmed (app.py:2823, the shipped re-run handler)
 ```
 
 ```
 FLOW: project_dir_to_folder_chip
-  SOURCE : S19TuiApp.active_project_dir() (Path or None)
+  SOURCE : S19TuiApp.active_project_dir() (Path or None), resolved at load (app.py:1861, :8200) — the guard's trust anchor
   NODES  :
     - fn    : resolve_chip_target, flows family (folder_open_service.py:232)
       owner : LLR-148.1
@@ -1245,7 +1266,7 @@ FLOW: project_dir_to_folder_chip
       owner : LLR-148.10
       in    : family
       out   : "📂 Open <folder>/" or "📂 Open session"
-    - fn    : real-directory guard — is_dir, no reparse point up to the family root (workspace.py:184), inside the root (NEW)
+    - fn    : real-directory guard, after any create-on-press — is_dir, no reparse point up to the family root (workspace.py:184), inside the root (NEW)
       owner : LLR-148.8
       in    : resolved target + family root
       out   : the target, or a refusal status
@@ -1493,7 +1514,7 @@ COMPONENT: screen_header_chips
 
 > **Two layers** (per the Two-layer validation rule). Every batch declares BOTH:
 > - **Layer A — white-box / functional (`TC-B97-01` … `TC-B97-65`):** one TC per LLR, validating the mechanism. Methods: `test (unit)` / `test (integration)` under `App.run_test` (Textual 8.2.8, pytest — `pyproject.toml:66-73`). A TC may read internal state; an AT may not.
-> - **Layer B — black-box / behavioral acceptance (`AT-B97-01` … `AT-B97-24`):** at least two per story, driving the shipped controls only (`pilot.click` / `pilot.press` on shipped ids, Load / Import / Run / chip presses, `pilot.resize_terminal`, a new `S19TuiApp` on the same `tmp_path` for a restart; never a panel method such as `add_lane`, never a wrapped service) and observing only the shipped surface: painted text, regions and spans (C-32: `region`, `_render_line`, compositor strips, `render().spans`), files on disk (`reports/*-chain-set-report.md` and its `- **Mode:**` line, written images, saved sets and specs), the status line. C-42: parse the emitted JSON / Text / report, never substring-match the readable form.
+> - **Layer B — black-box / behavioral acceptance (`AT-B97-01` … `AT-B97-24`):** at least two per story, driving the shipped controls only (`pilot.click` / `pilot.press` on shipped ids, Load / Import / Run / chip presses, `pilot.resize_terminal`, a new `S19TuiApp` on the same `tmp_path` for a restart; never a panel method such as `add_lane`, never a wrapped service — the OS-boundary open seam spied by `SeamSpy` excepted, §3 preamble) and observing only the shipped surface: painted text, regions and spans (C-32: `region`, `_render_line`, compositor strips, `render().spans`), files on disk (`reports/*-chain-set-report.md` and its `- **Mode:**` line, written images, saved sets and specs), the status line. C-42: parse the emitted JSON / Text / report, never substring-match the readable form.
 
 - **C-10 (one AT per policy branch, a non-default value driven through the real control):** JSON view after Load (AT-B97-01) vs after Add (AT-B97-02); Address at 118 vs 220 and include changing the count (AT-B97-04); Fields / JSON / Addendum tabs (AT-B97-21); palette kinds, one arm per kind (AT-B97-07); `sequential` default vs `parallel` chosen in the mode control and read from the report, and a rebound SOURCE input (AT-B97-22); chip with project (AT-B97-12) vs without (AT-B97-13); 118x54 (AT-B97-15) vs resize to 260x70 (AT-B97-16) vs 119↔120, 80x24 and 220x40 (AT-B97-24); mouse (AT-B97-01..16) vs keyboard only (AT-B97-17..20).
 - **C-12 (a produced artifact consumed):** Save Set writes the set file and Load Set in a new app restores it (AT-B97-10); Write .chk.json parsed and equal to the card (AT-B97-21); the chain-set report parsed for its mode (AT-B97-22); the JSON view consumes the serialiser's output (AT-B97-01).
@@ -1528,12 +1549,12 @@ Decided at ARQ (`docs/architecture.md`, batch-97 section): R13 in-place re-compo
 
 **Decided by the operator (2026-10-20, LED-…97.3), written into the requirements:** the colour pair `#e8ad3d` / `#c9562b` (LLR-146.6, 147.7); the primary actions Save / Write / Run / Run (LLR-144.11, 145.9, 146.5, 147.9); multi-variant runs as one chain per variant in Flow Execution, `#flow_scope` out of the Builder (LLR-146.12); the JSON view live with a stamp, read-only, no button, the paste area editable (LLR-144.5, 144.6, 144.12).
 
-**Decided under the standing authorization, revisable at PDR:** cards grow from 21 cells with the clipped-line void rule (LLR-149.5); Confirm highlighted and scrolled into view, not focused, with the `c` key (LLR-147.3, 147.13); chip labels name their folder (LLR-148.10); `░` after a waiting block (LLR-147.1); runs on the UI thread with the freeze declared OUT (§2.4, §2.6, LLR-147.10); lanes scroll horizontally (LLR-147.12); the grid canvas not displayed (LLR-146.1); `JSON_TAB_LINE_CAP = 5000` (LLR-144.5, 145.6); the Fields line keeps the tail (LLR-145.3, from P-38).
+**Decided under the standing authorization, revisable at PDR:** cards grow from 21 cells with the clipped-line void rule (LLR-149.5); Confirm highlighted and scrolled into view, not focused, with the `c` key (LLR-147.3, 147.13); chip labels name their folder (LLR-148.10); `░` after a waiting block (LLR-147.1); runs on the UI thread with the freeze declared OUT (§2.4, §2.6, LLR-147.10); lanes scroll horizontally (LLR-147.12); the grid canvas not displayed (LLR-146.1); `JSON_TAB_LINE_CAP = 5000` (LLR-144.5, 145.6); the Fields line keeps the tail (LLR-145.3, from P-38); the `c` key confirms the attention lane once per waiting entry after `CONFIRM_DWELL_S = 0.5` s, a stray `enter` on Run re-runs the set and confirms nothing, and a focused widget in the lanes stays in view (LLR-147.3, 147.13, P-60); the lane-header worst-status mark (LLR-147.12); the full-name line under the Check ledger (LLR-145.3); the chip guard's trust anchor is the resolved project directory (LLR-148.8, P-58).
 
 **Deferred to PDR (implementation shape only; every requirement holds for any choice):**
 1. I-2 / I-3 call shape: a `refresh_entries` keyword with the `mem_map` sentinel idiom, or a setter (LLR-144.5, 144.7).
 2. The Check Editor chip id scheme — scoping or a suffix (LLR-148.4; ARQ open question 1).
-3. Create-on-press for `flows`, inside the project only (LLR-148.1); `session` never creates (LLR-148.2).
+3. *Settled in LED-…97.4:* create-on-press for `flows` is the shipped families' path (`open_folder_chip.py:160-172`, `create_chip_home`, P-59), inside the project only (LLR-148.1), the LLR-148.8 guard running after the create; `session` never creates (LLR-148.2).
 4. The two new help keys' names, and whether Flow Execution becomes a `WindowSection` (LLR-148.6).
 5. Final names of every NEW id, class and constant (`#patch_json_view`, the stamp, tab chips, `#flow_pipeline`, legends, the filled / selection / attention classes, the tokens, the vocabulary constants), the no-wrap set's ids per category (LLR-149.4), the hex strip's text attribute (LLR-144.8).
 6. The increment re-cut (02-review A-14): Flow Execution carries `flow_execution_service.py`, R16 adds `insight_style.py` to Inc 3/4, and LLR-146.14 adds `flow_persistence_service.py` and `variant_execution_service.py` to the Flow Builder increment.
@@ -1542,10 +1563,13 @@ Decided at ARQ (`docs/architecture.md`, batch-97 section): R13 in-place re-compo
 9. The app's Builder variant branch (`app.py:2586-2609`): deleted, or left unreachable from the Builder (LLR-146.12 holds either way).
 
 ### 6.3 Open risks
-- **Security pattern scan:** `devflow-scan-spec.py` over this file at each amendment (verdict in the ledger). Standing answers: **`token`** — a design (colour) token in `insight_style.py`, not a credential. **`session`** — the flow session directory (the active project dir), not an auth session; its chip only opens that folder through the existing seam, never creates one (LLR-148.2), and only when it is a real directory reached through no reparse point (LLR-148.8). **`user input`** / **`form`** — the add form and the set-name / rebind inputs keep their shipped validation (batch-94/96: containment of refs, the EXT-STEP log/output refusal, `save_flow_json` → `sanitize_project_name`, `flow_persistence_service.py:970`); this batch adds no write path; every file-derived string they echo is covered by the C-17 LLRs and NUL refs by LLR-146.14. **`escape`** — `MANIFEST-PATH-ESCAPE` is the shipped containment refusal (`variant_execution_service.py:106`) that LLR-146.14 reuses for a NUL manifest entry, which tightens containment rather than opening a path; the other uses are markup escaping under C-17. No escape from the project directory or the work area is added.
+- **Security pattern scan:** `devflow-scan-spec.py` over this file at each amendment (verdict in the ledger). Standing answers: **`token`** — a design (colour) token in `insight_style.py`, not a credential. **`session`** — the flow session directory (the active project dir), not an auth session; its chip only opens that folder through the existing seam, never creates one (LLR-148.2), and only when it is a real directory reached through no reparse point (LLR-148.8). **`user input`** / **`form`** — the add form and the set-name / rebind inputs keep their shipped validation (batch-94/96: containment of refs, the EXT-STEP log/output refusal, `save_flow_json` → `sanitize_project_name`, `flow_persistence_service.py:970`); this batch adds no write path; every file-derived string they echo is covered by the C-17 LLRs and NUL refs by LLR-146.14. **`escape`** — `MANIFEST-PATH-ESCAPE` is the shipped containment refusal (`variant_execution_service.py:106`) that LLR-146.14 reuses for a NUL manifest entry, which tightens containment rather than opening a path; the other uses are markup escaping under C-17. No escape from the project directory or the work area is added. **`permission`** — `PermissionError` is the operating system's refusal that the Check Editor's Write arm provokes at its staging path (a directory or a read-only file there, §2.7 P-51) to exercise the shipped `MF-WRITE-CONTAINMENT` refusal; the batch grants, changes or checks no permission.
 - **C-17:** the control is the per-surface hostile ATs (AT-B97-03, -05, -08, -11), not a source scan: the guard host's scan (`tests/test_tui_directionb.py:8231`) cannot see an implicit sink (a `Static(str)`, a `Button` label, a `DataTable` cell or a `Select` prompt given a `str` — P-37 is one). `safe_text` does not cover bidi / zero-width controls (`BACKLOG-CODE.md:1394`).
+- **Chip trust anchor:** the guard walks from the target up to the active project directory as the app resolved it at load (P-58); a project directory that is itself a reparse point in the work area is resolved — trusted — at load, outside this guard. The hand-built project-junction arm is dropped because the app never holds an unresolved project path; the real-load arm stays (TC-B97-57).
+- **Check Editor Fields name at 24 cells (118 wide):** a tail-kept name loses the leading `ASAM.M.` / `ASAM.C.` class segment, so two Fields lines of the same address can differ only there; the six `0x13A00` names stay distinct (P-38), the full-name line shows the highlighted row's whole name, and the Fields name grows at wider sizes (LLR-145.3, 149.5). Residual: two included M/C twins read alike at 118 until highlighted.
+- **The `c` dwell:** a deliberate second `c` within 0.5 s of the attention landing confirms nothing; the engineer presses again (the REQUIRED line still names the chain).
 - **The `session` chip opens the project directory itself** — a wider folder than any other chip opens; same seam, one call per press, no shell string, real-directory guard.
-- **App-wide chip change:** the reparse-point guard and the folder labels apply to all 7 chip instances (`templates` and `reports` included, P-46); the 6 nodes of `tests/test_open_folder_chips.py` use real directories and stay green.
+- **App-wide chip change:** the reparse-point guard and the folder labels apply to all 7 chip instances (`templates` and `reports` included, P-46); the 11 nodes of `tests/test_open_folder_chips.py` (P-59) use real directories and stay green.
 - **Operator note — the notices yellow `#f6ff8f`:** kept, with the operator's reservation ("Sólo el de aviso no me convence al 100% pero al mismo tiempo dudo que haya un mejor candidato") — re-judged on the implementation captures; a change of value stays ≥ 20° from `#e8ad3d` (LLR-147.7) and is a ledger amendment, not a silent edit.
 - **A palette colour 5.0° from the waiting hue** (`#d9a35b`, P-40) paints on `AbDiffPanel`, the MAC out-of-range labels and `.band-medium` — outside the four panels, so LLR-147.7 holds; it is a finding for the all-screens review.
 - **Multi-variant runs:** the Builder's scope selector is retired with the operator's consent; **LLR-104.6 (batch-70, "the scope is selectable and wired through the ONE run call site") is RETIRED for the Builder**. Multi-variant work runs as one chain per variant in Flow Execution (AT-B97-22); `run_flow_over_variants` and its `test_d4_*` service nodes stay.

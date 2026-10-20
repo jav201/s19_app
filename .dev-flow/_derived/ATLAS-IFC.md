@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: c60e8131d3448b16 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 2819a2950f888f79 -->
 
 # ATLAS-IFC — how is the application addressed?
 
@@ -152,27 +152,28 @@
 - node `report attribution` — owner LLR-143.1
 - node `the A2B diff reference block` — owner LLR-143.2
 
-### FLOW `change_doc_to_json_view` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1028
+### FLOW `change_doc_to_json_view` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1041
 - node `the ChangeService writers of the document (change_service.py:861, :893, :1080, :1154, :1196, :1223, :1344, :1404, :1465)` — owner LLR-144.6
 - node `serialize_change_document (changes/io.py:1392)` — owner LLR-144.5
 - node `app-to-panel feed at the refresh_entries sites (I-3, NEW) into the read-only view, capped at JSON_TAB_LINE_CAP lines + note` — owner LLR-144.5
-- node `stamp composition — entry count, refresh time, dirty flag (NEW)` — owner LLR-144.6
+- node `the panel's dirty-flag writers (screens_directionb.py:5707, :5771, :5953, :5964), each followed by _refresh_dirty_indicator` — owner LLR-144.6
+- node `stamp composition — entry count, refresh time, dirty flag (NEW), re-run on every document write and every dirty-flag change` — owner LLR-144.6
 
-### FLOW `document_identity_to_ribbon` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1051
+### FLOW `document_identity_to_ribbon` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1068
 - node `identity feed through refresh_entries keyword or setter (I-2, NEW)` — owner LLR-144.7
 - node `safe_text render (utils.py:44) of the name, kind and every file-derived entry field` — owner LLR-144.7
 
-### FLOW `highlighted_row_to_hex_strip` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1066
+### FLOW `highlighted_row_to_hex_strip` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1083
 - node `before/after byte read for the highlighted entry, changed bytes marked with a text attribute (NEW)` — owner LLR-144.8
 
-### FLOW `a2l_parameters_to_check_ledger` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1077
+### FLOW `a2l_parameters_to_check_ledger` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1094
 - node `S19TuiApp._prefill_check_editor (app.py:5329) — one row per tag with an integer address` — owner LLR-145.1
 - node `Address column sizing and placement` — owner LLR-145.2
 - node `name clipping — first segment + ellipsis + tail in the ledger, ellipsis + tail on Fields lines` — owner LLR-145.3
 - node `REPORT FIELDS composition — Fields lines, capped JSON spec, Addendum preview (NEW layout over the shipped collector)` — owner LLR-145.6
 - node `safe_text render of names and spec file names` — owner LLR-145.5
 
-### FLOW `flow_template_to_pipeline` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1104
+### FLOW `flow_template_to_pipeline` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1121
 - node `FlowBuilderPanel.set_blocks (flow_screens.py:878) and the pipeline layout (NEW)` — owner LLR-146.1
 - node `card text clipping by element class` — owner LLR-146.4
 - node `CRC card paint with the CRC token #c9562b (NEW)` — owner LLR-146.6
@@ -180,46 +181,47 @@
 - node `funnel count into the Variables (n) label (flow_screens.py:1243)` — owner LLR-146.10
 - node `safe_text render of flow names, refs, EXT-STEP instruction / log_ref / output_path, paths` — owner LLR-146.8
 
-### FLOW `ref_text_to_load_guard` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1135
-- node `NUL test on every path-bearing block field in load_flow_json (flow_persistence_service.py:868), FLOW-UNSAFE-REF` — owner LLR-146.14
+### FLOW `ref_text_to_load_guard` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1152
+- node `NUL test on the eight path-bearing block fields in load_flow_json (flow_persistence_service.py:868), FLOW-UNSAFE-REF; its stat() guard catches ValueError and OSError` — owner LLR-146.14
 - node `NUL test on template and input refs in load_chain_set (:1452) / _is_plain_template_stem (:1147), CHAIN-SET-UNSAFE-REF` — owner LLR-146.14
-- node `NUL test in _resolve_manifest_entry (variant_execution_service.py:205), MANIFEST-PATH-ESCAPE` — owner LLR-146.14
+- node `NUL test in _resolve_manifest_entry (variant_execution_service.py:205, resolve at :273), MANIFEST-PATH-ESCAPE` — owner LLR-146.14
 
-### FLOW `palette_kind_to_add_form` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1154
+### FLOW `palette_kind_to_add_form` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1171
 - node `FlowBuilderPanel.on_button_pressed flow_palette_ prefix (flow_screens.py:1455-1461)` — owner LLR-146.2
 - node `FlowBuilderPanel._sync_kind_dependent_visibility (flow_screens.py:1534)` — owner LLR-146.3
 
-### FLOW `run_record_to_lane_cables` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1169
+### FLOW `run_record_to_lane_cables` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1186
 - node `FlowExecutionPanel.render_run cable glyphs (flow_screens.py:2399)` — owner LLR-147.1
-- node `paused-lane paint, pending lines, REQUIRED line, scroll-into-view on both axes, attention class (focus untouched)` — owner LLR-147.3
+- node `paused-lane paint, pending lines, REQUIRED line naming the attention lane's chain, scroll-into-view on both axes (a focused widget in the lanes kept in view), attention class (focus untouched)` — owner LLR-147.3
+- node `lane-header worst-status mark from the LLR-147.1 vocabulary (NEW)` — owner LLR-147.12
 - node `waiting-colour assignment restricted to waiting-human elements` — owner LLR-147.7
 - node `external-step summaries and diagnostics (flow_execution_service.py:501, :840-:846, :860, :867, :885) and run-log lines in English` — owner LLR-147.5
 - node `safe_text render of chain names, refs, EXT-STEP fields, written paths` — owner LLR-147.6
 
-### FLOW `flowset_listing_to_set_picker` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1196
+### FLOW `flowset_listing_to_set_picker` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1217
 - node `set_available_sets option prompts as safe_text Text (flow_screens.py:2566)` — owner LLR-147.6
 
-### FLOW `run_press_to_single_run` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1207
+### FLOW `run_press_to_single_run` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1228
 - node `in-flight guard — #fx_run disabled for the run's duration, re-enabled when it ends or raises (NEW)` — owner LLR-147.10
 
-### FLOW `confirm_key_to_rerun` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1218
-- node `first-waiting-lane lookup and the same confirmation a #fx_confirm_<i> press posts (NEW)` — owner LLR-147.13
+### FLOW `confirm_key_to_rerun` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1239
+- node `attention-lane lookup; confirm only with the focus outside a text input, once per waiting entry, after CONFIRM_DWELL_S of attention; the same confirmation a #fx_confirm_<i> press posts (NEW)` — owner LLR-147.13
 
-### FLOW `project_dir_to_folder_chip` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1229
+### FLOW `project_dir_to_folder_chip` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1250
 - node `resolve_chip_target, flows family (folder_open_service.py:232)` — owner LLR-148.1
 - node `resolve_chip_target, session family` — owner LLR-148.2
 - node `OpenFolderChip.refresh_target per-family no-project status (open_folder_chip.py:92-127)` — owner LLR-148.3
 - node `chip label from the family's folder-name constant (NEW)` — owner LLR-148.10
-- node `real-directory guard — is_dir, no reparse point up to the family root (workspace.py:184), inside the root (NEW)` — owner LLR-148.8
+- node `real-directory guard, after any create-on-press — is_dir, no reparse point up to the family root (workspace.py:184), inside the root (NEW)` — owner LLR-148.8
 - node `OpenFolderChip._open_target to the open seam (open_folder_chip.py:139)` — owner LLR-148.5
 
-### FLOW `help_chip_to_modal` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1260
+### FLOW `help_chip_to_modal` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1281
 - node `open_window_help + section_body_text (window_help.py:290, :305)` — owner LLR-148.6
 
-### FLOW `renderer_vocabulary_to_legend` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1271
+### FLOW `renderer_vocabulary_to_legend` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1292
 - node `legend composition — status and mark glyphs with one meaning each, at most two rows (NEW)` — owner LLR-148.7
 
-### FLOW `terminal_size_to_layout` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1282
+### FLOW `terminal_size_to_layout` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1303
 - node `per-panel width and height derivation (NEW, on mount and on_resize)` — owner LLR-149.1
 - node `ellipsis clipping by element class` — owner LLR-149.4
 
@@ -428,7 +430,7 @@
 |---|---|---|---|---|
 | `resolved_entries` | `s19_app/tui/changes/io.py (read_change_document — the v2 reader seam)` | 1..N | 3 declared | LLR-141.1 |
 
-### COMPONENT `pe_ledger_inspector` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1299
+### COMPONENT `pe_ledger_inspector` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1320
 - inputs : change_document: ChangeDocument ; document_json: str ; loaded_image: dict
 - outputs : 
 - parent : workspace_shell
@@ -441,7 +443,7 @@
 | `json_view` | `query("#patch_json_view")` | 1 | 0 declared | LLR-144.5 |
 | `identity_ribbon` | `query("#patch_identity_ribbon")` | 1 | 0 declared | LLR-144.7 |
 
-### COMPONENT `ce_ledger_inspector` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1350
+### COMPONENT `ce_ledger_inspector` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1371
 - inputs : a2l_parameters: list ; check_spec_entries: list ; spec_file_listing: list
 - outputs : 
 - parent : workspace_shell
@@ -453,7 +455,7 @@
 | `write_action` | `query("#check_write_button")` | 1 | 3 declared | LLR-145.1 |
 | `fields_count` | `query("#check_fields_count")` | 1 | 1 declared | LLR-145.1 |
 
-### COMPONENT `fb_pipeline_rail` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1379
+### COMPONENT `fb_pipeline_rail` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1400
 - inputs : flow: Flow ; flow_name: str ; session_dir: str
 - outputs : 
 - parent : workspace_shell
@@ -465,7 +467,7 @@
 | `palette` | `query("#flow_palette")` | 7 | 3 declared | LLR-146.2 |
 | `run_action` | `query("#flow_run")` | 1 | 8 declared | LLR-146.5 |
 
-### COMPONENT `fx_pipeline_rail` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1414
+### COMPONENT `fx_pipeline_rail` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1435
 - inputs : run_record: ChainSetRunRecord ; lanes: list ; session_dir: str
 - outputs : 
 - parent : workspace_shell
@@ -478,7 +480,7 @@
 | `run_log` | `query("#fx_log")` | 1 | 3 declared | LLR-147.5 |
 | `set_row` | `query("#fx_set_row")` | 1 | 1 declared | LLR-147.4 |
 
-### COMPONENT `screen_header_chips` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1450
+### COMPONENT `screen_header_chips` — .dev-flow/2026-10-19-batch-97/01-requirements.md:1471
 - inputs : active_project_dir: Path ; family: str ; window_key: str
 - outputs : 
 - parent : workspace_shell
@@ -492,18 +494,18 @@
 
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 140 FLOW node(s), every one owned
+- [-] V10  01-requirements.md: 142 FLOW node(s), every one owned
 - [-] V11  01-requirements.md: 113 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1131: COMPONENT check_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1153: COMPONENT patch_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1182: COMPONENT flow_builder_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1204: COMPONENT flow_execution_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
-- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1299: COMPONENT pe_ledger_inspector: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
-- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1350: COMPONENT ce_ledger_inspector: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
-- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1379: COMPONENT fb_pipeline_rail: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
-- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1414: COMPONENT fx_pipeline_rail: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
-- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1450: COMPONENT screen_header_chips: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1320: COMPONENT pe_ledger_inspector: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1371: COMPONENT ce_ledger_inspector: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1400: COMPONENT fb_pipeline_rail: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1435: COMPONENT fx_pipeline_rail: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-19-batch-97/01-requirements.md:1471: COMPONENT screen_header_chips: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:540: COMPONENT loaded_panel/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -555,8 +557,8 @@
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1161: COMPONENT workspace_body/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-24-batch-87/01-requirements.md:1182: COMPONENT workspace_body/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-10-12-batch-94/01-requirements.md:1158: COMPONENT patch_editor_panel/entries_table_rows: reached by 14 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/screens_directionb.py, s19_app/tui/services/change_service.py, s19_app/tui/styles.tcss, tests/test_tui_checks_screen.py, tests/test_tui_patch_big.py, tests/test_tui_patch_card.py, tests/test_tui_patch_checks_strip.py, tests/test_tui_patch_editor_b94.py, tests/test_tui_patch_editor_v2.py, tests/test_tui_patch_glyphs.py, tests/test_tui_patch_layout.py, tests/test_tui_patch_variant.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-10-19-batch-97/01-requirements.md:1304: COMPONENT pe_ledger_inspector/entries_ledger: reached by 3 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/services/change_service.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
-- [!] V13  .dev-flow/2026-10-19-batch-97/01-requirements.md:1320: COMPONENT pe_ledger_inspector/json_tab: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-18-json-editor-fill-height-spec.md, REQUIREMENTS.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-10-19-batch-97/01-requirements.md:1325: COMPONENT pe_ledger_inspector/entries_ledger: reached by 3 undeclared file(s) — REQUIREMENTS.md, s19_app/tui/screens.py, s19_app/tui/services/change_service.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-10-19-batch-97/01-requirements.md:1341: COMPONENT pe_ledger_inspector/json_tab: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-18-json-editor-fill-height-spec.md, REQUIREMENTS.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  01-requirements.md: 9 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text, split_join_engine/output_files, split_join_engine/memory_segment_rows, change_set_wire/resolved_entries. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
 - [-] V14  01-requirements.md: 364 declared consumer(s), every one resolved
 - [-] V19  01-requirements.md: 17 COMPONENT id(s), each declared exactly once

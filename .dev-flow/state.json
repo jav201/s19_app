@@ -37,7 +37,7 @@
     }
   ],
   "current_station": "P2",
-  "phase_status": "awaiting-gate",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -52,7 +52,7 @@
   ],
   "iterations_per_station": {
     "P0": 0,
-    "P1": 2,
+    "P1": 3,
     "P2": 0,
     "P3": 0,
     "P4": 0,
@@ -149,6 +149,16 @@
       "station": "P2",
       "date": "2026-10-20",
       "decision": "P2 round 3 gate: iterate-to-refine forced by blocker Q3-1 (1 blocker, 11 major, 15 minor; security approved, LOW). Returning to P1 would be its third iteration -- the soft cap: STOPPED and surfaced to the operator (root cause named in PLAN.md) before any further amendment. Findings converge 33 -> 17 -> 11 majors, all bounded edits, no operator decision reopened."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-20",
+      "decision": "Iteration cap asked at the gate -- operator answer 2026-10-20: 'Ultima enmienda + verificacion acotada' -- P1 iteration 3 fixes blocker Q3-1 and the 11 round-3 majors (plus minors where cheap); then each lens verifies ONLY its own round-3 findings, no open-ended new-defect hunt; if closed, P2 approves and the batch moves to PDR."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-20",
+      "decision": "P1 iteration 3 approved under the standing authorization -- LED-2026-10-19-batch-97.4 fixes all 27 round-3 rows (blocker Q3-1 by the nul_bind surface arm; A3-1 stamp on dirty-flag writers; A3-2 clipped-region overflow; U3-1 c on the attention lane once per entry with CONFIRM_DWELL_S 0.5 s; U3-2 type-and-id focus reference; U3-3 lanes scroll by key), executed predicates in P-50..P-60; ids unchanged (65 LLR, 24 AT, 65 TC). New orchestrator calls revisable at PDR listed in 6.2. Scoped P2 verification is next (operator's cap ruling)."
     }
   ],
   "obsidian_synced": false,
