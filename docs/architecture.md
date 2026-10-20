@@ -417,6 +417,48 @@ Rationale (structural decisions):
 
 **ARQ evidence checklist (architect role, self-executed):** constraints stated — the frozen engine list (§7), the ≤5-files-per-increment budget, the rail key space, C-17/C-42 (file-derived text rendered) — all `executed` (this map); alternatives considered — R8/R10 each name the rejected candidates `executed`; risks — R8's guard-host split, R11's key binding, R12's frozen-layer crossing, listed; recommendation rationale tied to the parallelisation rule `executed`; what would re-open each decision — per-row `executed`; two-layer requirements note — the behavioral+functional chains are owed at P1 (this station precedes derivation, per `p1-arq.md`).
 
+### Batch-97 declarations — the b94 polish port (no module created, no boundary moved)
+
+*`2026-10-19-batch-97` (US-134..US-139: port the operator-approved round `prototypes/b94_polish/`, verdict A on all four screens, into the four batch-94 panels; brief `.dev-flow/design/HANDOFF-b94-polish-2026-10-20.md`). Triggers A2 + A3 fired; A1, A4, B2 not fired. **Declared at ARQ, nothing landed** — "Inc" names the handoff §6 increment expected to land each row.*
+
+**A1 not fired — evidence.** Every file the batch touches already exists under `s19_app/**` (product): `git status --short s19_app/` at ARQ is empty and the handoff §6 lists name existing paths only. No panel changes address (B2 not fired), so §10's six-module table and the batch-92/94 sub-module declarations stand unchanged. `prototypes/b94_polish/` is ported by **re-composition, never imported** (the `prototypes/**` boundary).
+
+| Path (all CHANGED) | What the change encapsulates | Inc |
+|---|---|---|
+| `s19_app/tui/screens_directionb.py` | `PatchEditorPanel` (pe_A ledger + inspector + JSON tab, `:4383`) and `CheckEditorPanel` (ce_A, `:6864`) re-composed at their shipped widget ids; the double column/geometry work removed (E-1) | 1, 2 |
+| `s19_app/tui/flow_screens.py` | `FlowBuilderPanel` (fb_A pipeline rail, six-kind palette F-5, IO clipped to the card F-1) and `FlowExecutionPanel` (fx_A per-lane pipeline, cable status, English log — e.g. `:2254` `"(sin proyecto activo)"`) | 4, 5 |
+| `s19_app/tui/app.py` | headers: the bare `Label("Check Editor")` (`:3082`) → `titled_header` + chip + help; Flow Execution (`:2438`) and Flow Builder (`:2404`) gain their chips; the geometry re-apply on show (E-2, now `:6978` — the handoff's `:6848` drifted) deleted or retargeted; the JSON-tab/identity feed at the `refresh_entries` sites (I-2, I-3) | 1, 2, 4, 5 |
+| `s19_app/tui/services/folder_open_service.py` + `s19_app/tui/open_folder_chip.py` | two chip families, `flows` and `session` (I-1) | 3 |
+| `s19_app/tui/window_help.py` | two new window keys + rewritten `patch` / `flow` entries (I-4) | 1, 2, 4, 5 |
+| `s19_app/tui/styles.tcss` | the four screens' rules, the E-3 rules **replaced**, not overridden | all |
+| `s19_app/tui/insight_style.py` | the burnt-orange CRC token (R-5.1) — **not in the handoff's file lists**; see R16 | 3 or 4 |
+
+**Interface deltas (A3) — consumers measured by `grep -rn` over `s19_app/` + `tests/`:**
+
+| # | Surface | Delta | Consumers | Freeze |
+|---|---|---|---|---|
+| I-1 | chip family table (`folder_open_service.py:57-68` `CHIP_FAMILY_*` / `CHIP_FAMILIES`, `resolve_chip_target` `:232`, `create_chip_home` `:279`) | + `flows` → `project_dir / FLOWS_SUBDIR` (`flow_persistence_service.py:95`, the dir `save_flow_json` writes, `:973`); + `session` → `active_project_dir()` itself (the value `_publish_flow_session_dir` pushes to `set_session_dir`, `app.py:8121-8137`). Both project-only. The no-project status `REPORTS_NO_PROJECT_REASON` (`:78`) names *Reports* verbatim and `open_folder_chip.py:115`/`:160` emit it for **any** `None` target — it must become per-family | `open_folder_chip.py:36-43` (the one importer of the table) · `app.py:12756` (refresh loop over every mounted chip — no change) · `app.py:6388` / `screens.py:1668` (seam / Reports chip — unaffected) · `project_gather_service.py:598` (docstring only) · `tests/test_open_folder_chips.py` (`_RAIL_CHIPS` `:94`) | PDR, before Inc 3 |
+| I-2 | `PatchEditorPanel.refresh_entries(rows, mem_map)` (`screens_directionb.py:6104`) | **candidate:** the document identity for the ribbon (E-5) — available today as `ChangeDocument.source_path` / `.kind` (`changes/model.py:197`), no service change | `app.py:3265`, `:3451`, `:5279`, `:10758` + the panel's own `:5662`; tests: 27 calls in 6 files (`test_tui_patch_card.py`, `test_tui_patch_editor_b94.py`, `test_tui_snapshot.py:815`, …) | shape at PDR |
+| I-3 | the JSON-tab feed (E-6) | today the only JSON surface is `#patch_paste_text` (`screens_directionb.py:5192`), an input buffer seeded with `DUMMY_CHANGESET_TEXT`; the app writes it only on the popup write-back (`app.py:3725`). The document lives in `ChangeService.document` (`change_service.py:696`) and has one canonical serialiser, `changes/io.serialize_change_document` (`io.py:1392`, already reused by `entry_seed_json`, `change_service.py:1225`). **Seam: app → panel at the I-2 sites**; the writer is untouched (B4 stays not fired) | the same four `app.py` sites; live vs `Update JSON` decided at PDR (US-134) | PDR, before Inc 2 |
+| I-4 | `window_help.SHIPPED_WINDOW_KEYS` (`:270`) | + a Check Editor key and a Flow Execution key (`checks` is the Checks *result* view, `flow` is the Builder) | `tests/test_window_usage_help.py:250` (equality census) · the `WindowHelpChip(...)` header sites in `app.py` | Inc 1 / Inc 5 |
+| — | `FlowExecutionPanel.render_run(record)` (`flow_screens.py:2399`, sole caller `app.py:2821`) | **read, not changed**: fx_A takes per-block status from the retained record (F-8). If PDR finds the record lacks per-block status or a lane key, the record shape changes → A3 on `services/flow_execution_service`, declared here first | — | — |
+
+**Dependencies.** One new edge, permitted direction: `services/folder_open_service → services/flow_persistence_service` (`FLOWS_SUBDIR`) — a sibling-service import, the posture the seam's own docstring allows (`folder_open_service.py:33`); no cycle (`flow_persistence_service` imports `validation.model`, `flow_model`, `variant_execution_service`, `workspace` only). `session` adds no edge (its input is the `project_dir` `resolve_chip_target` already receives). `flow_screens → insight_style` exists (`flow_screens.py:70`). View → services direction unchanged; no service imports a view.
+
+**Parallelisation verdict (mechanical): sequential.** Inc 1 ∩ Inc 2 = {`screens_directionb.py`, `app.py`, `window_help.py`, `styles.tcss`}; Inc 4 ∩ Inc 5 = {`flow_screens.py`, `app.py`, `window_help.py`, `styles.tcss`}; every pair shares at least `styles.tcss`. Neither exit is taken: a re-cut cannot remove the shared stylesheet / header file, and splitting `styles.tcss` per screen is a boundary move out of proportion for a polish batch. A4 not fired, one worktree.
+
+| # | Decision | Alternative rejected | What would re-open it |
+|---|---|---|---|
+| R13 | The four panels are re-composed **in place**; no module, no shared "ledger + inspector" widget module | extracting pe_A/ce_A's common layout into a new module | a third ledger + inspector screen — then the shared widget earns its module |
+| R14 | `flows` / `session` ride the **project-only limb** of `resolve_chip_target` (the Reports precedent), not `_family_homes` (`:186`, which raises for families without a common home) | inventing a common flows library so they fit `_family_homes` | flows gaining a common (no-project) library |
+| R15 | The flows dir is imported (`FLOWS_SUBDIR`), not re-declared | a second `"flows"` literal in `folder_open_service` | — (two homes for one dir is the defect LLR-139.1 forbids) |
+| R16 | The burnt-orange CRC token lives in `insight_style.py`, the declared token home (`flow_screens.py:1799`) | a literal in `flow_screens.py` | — |
+| R17 | The JSON tab renders `ChangeService.document` through the canonical serialiser | the panel re-serialising its display rows (lossy) or a second writer | — |
+
+**ARQ evidence checklist (architect, self-executed):** constraints — 4 source files per increment, the frozen engine (§7), C-17 for the new file-derived renders (trigger C8) `executed`; alternatives — R13/R14/R17 name the rejected candidates `executed`; where no real decision exists (R15, R16) the row says so instead of inventing one; risks — the Reports-worded status for new project-only families (I-1), the chip id collision (below), line drift in the handoff (E-2), listed; cost/latency `n/a — local TUI, no runtime cost`; diagram `n/a — no new edge beyond one sibling import`; two-layer chains owed at P1.
+
+**Open for PDR:** (1) the Check Editor's chip reuses family `checks`, so its id `open_folder_checks` (`open_folder_chip.py:77`) duplicates the Checks screen's (`app.py:2321`) — `#id` lookups such as `_RAIL_CHIPS` become ambiguous; scope or suffix the id. (2) Is `flows` / `session` offered the create-on-press (`_CREATABLE_FAMILIES`, `:86`)? (3) I-2/I-3 call shape: a keyword with the `mem_map` sentinel idiom vs a separate setter. (4) R-5.1's premise: shipped flow code paints **no** CRC family colour and the wait state uses `YELLOW #f6ff8f` (`_S_PAUSE`, `flow_screens.py:1800`), not amber `#d9a35b` — the "replace" is a prototype-kit fact (`_flows_kit.py:55`); the token is new and the wait colour must be confirmed.
+
 ## 11. Interfaces — the contracts between modules
 
 **Changing one of these is trigger A3** — it fires ARQ, PDR *and* DDR, and it is never done inside a

@@ -36,7 +36,7 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "ARQ",
+  "current_station": "P1",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -114,6 +114,11 @@
       "station": "P0",
       "date": "2026-10-20",
       "decision": "P0 Definition of Ready closed, asked at the gate -- the operator passed all six READY stories (US-134..US-139, answer: Las seis) and answered the kickoff: gates autonomous with stops at PDR and on any HIGH finding (Autonomo con excepciones); Git: commit and push to main at each close, no PR. ARQ is next (A2, A3 fired)."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-10-20",
+      "decision": "ARQ approved under the standing authorization (Autonomo con excepciones, PLAN.md header) -- docs/architecture.md batch-97 section: no module created, no boundary moved (A1 evidence), four interface deltas I-1..I-4 with measured consumers, one new edge folder_open_service -> flow_persistence_service, sequential increments; R13-R17; four questions routed to PDR (Check Editor chip id clash, creatable families, refresh_entries call shape, CRC vs waiting hue). P1 is next."
     }
   ],
   "obsidian_synced": false,
