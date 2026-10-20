@@ -36,7 +36,7 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "P1",
+  "current_station": "P2",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -119,6 +119,11 @@
       "station": "ARQ",
       "date": "2026-10-20",
       "decision": "ARQ approved under the standing authorization (Autonomo con excepciones, PLAN.md header) -- docs/architecture.md batch-97 section: no module created, no boundary moved (A1 evidence), four interface deltas I-1..I-4 with measured consumers, one new edge folder_open_service -> flow_persistence_service, sequential increments; R13-R17; four questions routed to PDR (Check Editor chip id clash, creatable families, refresh_entries call shape, CRC vs waiting hue). P1 is next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-20",
+      "decision": "P1 approved under the standing authorization (Autonomo con excepciones, PLAN.md header) -- 01-requirements.md: 6 stories, HLR-144..149, 38 LLRs, AT-B97-01..16, TC-B97-01..38, IFC 10 flows + 5 components, 26 premises TRUE with executed evidence, fork preconditions declared empty, ledger LED-2026-10-19-batch-97.1; scan security_required true, routed to the P2 security lens; ten design decisions deferred to PDR; handoff corrections recorded (E-1, F-5, R-5.1, CRC fixture, 34 Spanish strings, set-row overflow at 220, R-2.2). The qa-reviewer's P1 validation-method pass is folded into the independent P2 qa lens (declared). P2 is next."
     }
   ],
   "obsidian_synced": false,
