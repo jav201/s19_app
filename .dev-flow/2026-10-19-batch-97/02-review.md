@@ -136,3 +136,76 @@ security-reviewer: risk LOW, 0 blockers, 3 majors (S-1 directory check before la
 **security-reviewer** — what/where/why/fix ✓ · severity ✓ · no secrets ✓ · verdict explicit ✓ · new surface scoped ✓.
 
 **ux-reviewer** — context of use ✓ user/task, ✗ environment (U-16) · observable criteria ✓ · real mechanism ✗ (U-1) · painted result ✗ (U-5, U-12) · error/empty/slow ✗ (U-10) · help and legends ✓ required, ✗ vacuous/incomplete (U-7, U-8) · folder chips ✓ · width at 118 ✓ · voids at 220 ✗ (U-5, U-18) · round-2 rules partial (U-2, U-4) · captures reviewed ✓ · ISO 9241-210 declaration ✓ (expert inspection performed; automated walkthrough owed at P4; new-engineer persona not evaluated with users).
+
+---
+
+## Round 2 — contract at `55899dd` (after `LED-2026-10-19-batch-97.2`)
+
+### ✅ Verdict (round 2)
+
+- **Gate:** `iterate-to-refine` → Phase 1. One blocker (Q2-1) forces it; all four lenses returned `iterate-to-refine`.
+- **Round-1 resolution:** architect 11 resolved · 3 partially (A-4, A-7, A-11) · 1 carried (A-14); qa 17 resolved · 4 partially (Q-2, Q-3, Q-11, Q-12) · 3 carried/routed (Q-13, Q-14, Q-18); security 6 resolved · 2 partially (S-1, S-4); ux 10 resolved · 6 partially (U-1, U-2, U-3, U-5, U-6, U-8; U-10 also partial) · 2 routed to PDR (U-11, U-13).
+- **New findings:** 1 blocker · 17 major · 27 minor (architect 0/4/11 · qa 1/5/4 · security 0/1/3 · ux 0/7/9).
+- **shall/should check:** ✓ clean (architect, 0 modal words in any Statement).
+- **Security:** risk LOW, 0 HIGH. Q-13 ruled: fix in this batch at the Flow Builder increment (S2-2).
+- **Operator decisions put to the operator before the round-3 amendment** (they close several requirement gaps at once, so the amendment can be final): hue pair (U-2/A-4; UX proposal `#e8ad3d` waiting / `#c9562b` CRC, 23.0°), primary action per editor (U-9), card growth at 220 (U-5/U2-5), JSON refresh (PDR 1), multi-variant runs once `#flow_scope` leaves the Builder (A2-4), cable after a waiting block (U-11), chip labels name their folder (U-13), Confirm focus on pause (U2-3).
+
+### New findings (round 2)
+
+| ID | Reviewer | Severity | Area / Req | What | Recommendation | Status |
+|----|----------|----------|------------|------|----------------|--------|
+| Q2-1 | qa | blocker | AT-B97-22, -06, -19, -23 | ATs observe internal symbols (`last_run_record.mode`, posted `RunRequested` count, `run_chain_set` wrapper); a synchronous run cannot be pressed mid-flight through the surface | Observe the chain-set report's `**Mode:**` line (`flow_execution_service.py:1598`) and new `reports/*` files / written output; move AT-B97-23's in-flight arm to TC-B97-55 | open → P1 |
+| Q2-2 | qa | major | `ES_MARKER`, P-17, LLR-146.7/147.5 | Marker misses 6 painted Spanish constants; true census on `9c7beaf` is 48, not 42 | Freeze the 48 constants as a literal; extend the marker; restate P-17 | open → P1 |
+| Q2-3 | qa | major | LLR-149.4 / TC-B97-37 | Neither no-wrap predicate goes RED on a clipped wrapped row (executed) | `get_content_height` vs line count; DataTable content length vs column width + required ellipsis | open → P1 |
+| Q2-4 | qa | major | LLR-145.3, 149.4, TC-B97-10/37 | Tail-only mutation cannot go RED on the fixture (74/75 names share `ASAM`); row vs cell ambiguity; Fields parameters unnamed; distinct cells need W ≥ 42 | Head-keeping as the RED mutation or a new fixture pair; per-cell predicate; name the 6; state the minimum Parameter width | open → P1 |
+| Q2-5 | qa | major | §6.3 superseded table | New LLRs supersede unnamed nodes (`test_tui_flow_execution_b94.py:277, 345-348, 363, 451-452`; `test_flow_external_step_b96.py:387, 425`) | Add rows; re-run C-26 over the 21 new LLRs | open → P1 |
+| Q2-6 | qa | major | LLR-147.6, AT-B97-11 | `#fx_set_select` paints `flowsets/{stem}.json` as raw markup (`flow_screens.py:2566`, executed: spans bold/red/link/@click) | Add the set picker to LLR-147.6 + an AT arm; security re-invoked on the existing surface | open → P1 + security |
+| Q2-7 | qa | minor | §5.3 fixtures | `crc_wait_chain` lacks its CRC config (executed); "restart panel" is not a control; widest-values fixtures missing | `examples/crc_config.example.json`; a new `S19TuiApp` on the same `tmp_path`; fixture rows | open → P1 |
+| Q2-8 | qa | minor | LLR-146.12 / TC-B97-50 | Scope clause passes on `main` (SINGLE is default) | Set the hidden Select to ALL_VARIANTS first | open → P1 |
+| Q2-9 | qa | minor | LLR-147.7, 148.7, 149.2 | Missing non-empty guards on three derived sets | `len >= K` guards | open → P1 |
+| Q2-10 | qa | minor | P-35 | Evidence command does not reproduce as written | Paste the real command (`80, ?24`) | open → P1 |
+| A2-1 | architect | major | HLR-147, LLR-147.1, AT-B97-09 | Expected `✗ ░ ░` contradicts the truth table (`▓ ✗ ░`) | Correct in all three places | open → P1 |
+| A2-2 | architect | major | HLR-144 vs LLR-144.6; HLR-146 vs LLR-149.6 | HLR statements contradict their LLRs (explicit JSON branch; Run without scroll below 118x54) | Qualify both HLR statements | open → P1 |
+| A2-3 | architect | major | LLR-144.1/.2/.9/.10; PDR item 2 | Shipped Patch Editor controls (paste buffer + parse, undo/redo, execute, saveback, Refresh) have no home and may be hidden; the PDR option "reseed `#patch_paste_text` read-only" breaks the `load_text` writer | LLR placing the paste area editable; displayed-and-reachable set for shipped controls (Check Editor too); drop or restate the option | open → P1 |
+| A2-4 | architect | major | LLR-146.12, PDR item 12, §6.3 | Hiding `#flow_scope` retires LLR-104.6 (multi-variant runs) silently | Requirement for where multi-variant runs live, or a ledger-recorded retirement with operator consent | open → P1 + operator |
+| A2-5 | architect | minor | §6.2 items 8, 15 | "Holds for any choice" false for canvas reachability and the cable glyph | Parametrise or decide | open → P1 / PDR |
+| A2-6 | architect | minor | derived LLRs | No parent HLR clause for primary action, one run at a time, CRC hue, scope selector; "hero" undefined | Add clauses; define "hero" | open → P1 |
+| A2-7 | architect | minor | HLR-144, LLR-147.3, 147.10, 148.1 | Compound EARS | One trigger per statement | open → P1 |
+| A2-8 | architect | minor | LLR-147.3 vs §5.3 | Block numbering mixed | 0-based | open → P1 |
+| A2-9 | architect | minor | HLR-149, LLR-149.6 | Mixed sizes (220x40) undefined | "width < 118 or height < 54"; 220x40 sample | open → P1 |
+| A2-10 | architect | minor | LLR-148.8, §1.2 | The real-directory guard changes the shared chip app-wide; "family root" undefined for non-project families | Declare app-wide scope; census other chips; define roots | open → P1 |
+| A2-11 | architect | minor | LLR-144.10 | "≥1 member per group" cannot hold with the JSON tab active | Guard per tab state | open → P1 |
+| A2-12 | architect | minor | LLR-147.4, AT-B97-22, IFC | Mis-citation (P-31); consumer errors | Correct | open → P1 |
+| A2-13 | architect | minor | IFC JSON-tab flows | One node, two owners | One owner | open → P1 |
+| A2-14 | architect | minor | LLR-144.8 | Hex strip vs shipped `#patch_before_after_card`: reuse or replace unstated | Decide | PDR |
+| A2-15 | architect | minor | whole file | 178,620 bytes vs 54k budget; normative text ~12% | Move §2.7 evidence, IFC, executed-verification text, id literals to appendices/companion files (check V26/V42 readers first) | open → P1 (hygiene) |
+| S2-1 | security | minor | LLR-148.8 | Reparse check covers only the leaf (executed: project dir as junction passes) | Reuse `workspace._path_traverses_reparse_point`; keep `is_dir()`; define roots; junction-project TC arm | open → P1 |
+| S2-2 | security | major | `variant_execution_service.py:273`; `flow_persistence_service.py:903-905, 1150-1162` | NUL in a flow ref, chain-set input/template or manifest entry crashes the app (executed) | New LLR under HLR-146: refused with a finding, 0 uncaught exceptions; NUL arms in AT-B97-08/-11 + set load; fix in the Flow Builder increment | open → P1 |
+| S2-3 | security | minor | LLR-146.8/147.6, TC-B97-20/26 | `output_path` never exercised; TC text vs fixture table disagree | Slash-free payload arm; align | open → P1 |
+| S2-4 | security | minor | LLR-145.6; PDR item 2 | Check Editor JSON tab uncapped; capped view must never be a parse source | Cap or state bound; display-only TC | open → P1 |
+| U2-1 | ux | major | LLR-145.3, 149.4 | First-segment + tail cannot distinguish names below ~28 cells; the Fields line has ~17–20 | Geometry clause (≥28 name cells at 118) or another discriminator at PDR | open → P1 |
+| U2-2 | ux | major | LLR-148.7, TC-B97-33 | Renderer glyph harvest unbounded; Execution legend ~130 cells cannot fit one line at 118 | Closed vocabulary constant per renderer; painted ⊆ vocab ⊆ legend; two legend lines or kinds to help | open → P1 |
+| U2-3 | ux | major | LLR-147.3, AT-B97-20 | Auto-focusing Confirm lets a key repeat attest human work | Scroll + highlight, no focus move; scoped confirm key named in the REQUIRED line and help | open → P1 + operator |
+| U2-4 | ux | major | LLR-147.3, 147.1, 149.4 | Lane wider than viewport (6 blocks at 118) has no defined behaviour; Confirm at the right end | State lane overflow; waiting card + Confirm inside the viewport on both axes | open → P1 |
+| U2-5 | ux | major | §1.3, LLR-149.5, TC-B97-38 | Painted extent over a bordered region always reads 0 void | Content region minus border/padding; RED arm with fixed 24-cell cards at 220 | open → P1 |
+| U2-6 | ux | major | §1.3, LLR-147.7 | Waiting-human list omits the REQUIRED line and the run-log `□` (amber in the approved capture) | Add both | open → P1 |
+| U2-7 | ux | major | TC-B97-41/45/51/56 | No completeness check of the focus chain; enter/space only for chips | Every displayed interactive control in the chain; enter arm per button group | open → P1 |
+| U2-8 | ux | minor | LLR-146.5, 144.11 | Selected-kind fill vs primary fill | Separate selection fill; arm | open → P1 / PDR |
+| U2-9 | ux | minor | AT-B97-18, LLR-145.8 | Include by keyboard has no LLR | `space` on a row toggles include | open → P1 |
+| U2-10 | ux | minor | LLR-148.6 | Inputs and selects missing from help coverage | Add | open → P1 |
+| U2-11 | ux | minor | lanes / header | `✓` and `▼` carry two meanings | One meaning per glyph | PDR |
+| U2-12 | ux | minor | LLR-146.4 | EXT-STEP instruction has no truncation class | Head-kept | open → P1 |
+| U2-13 | ux | minor | keyboard LLRs | Focus visibility on one-row chips unstated | Focused spans differ | open → P1 |
+| U2-14 | ux | minor | §2.6, PDR 13 | UI-thread run freeze undeclared | Declare OUT with the measured duration or require a worker | open → P1 |
+| U2-15 | ux | minor | LLR-145.7 | `Size` label vs `Fmt` column | One term | carried → P3 |
+| U2-16 | ux | minor | LLR-147.7 | Grey/white hue undefined in the distance check | Exclude saturation < 0.15 | open → P1 |
+
+### Evidence checklists (round 2)
+
+**architect** — constraints ✓ · alternatives ✓ (3 PDR items are gaps: A2-4, A2-5) · n/a ✓ · recommendation tied ✗ (A2-2, A2-3) · risks ✓ (missing: app-wide chip change A2-10) · cost n/a · diagram n/a · re-open ✓ · two-layer ✗ (A2-6, A2-1) · shall/should ✓ · IFC ✗ (A2-12, A2-13) · 30 new claims spot-verified, 28 match.
+
+**qa-reviewer** — GWT shape ✓ (24/24 rows) · explicit expected ✗ (Q2-4, Q2-7) · edge cases ✓ · regression checklist ✗ (Q2-5) · exit criteria ✓ · no PII ✓ · mode plan ✓ · results planned ✓ · Layer B through surface ✗ (Q2-1) · reachability ✗ (Q2-6) · no unfilled template ✓. 10 thresholds re-measured, 9 match (P-35 command, Q2-10).
+
+**security-reviewer** — what/where/why/fix ✓ · severity ✓ · no secrets ✓ · verdict explicit (BLOCK-UNTIL S2-2, LOW) ✓ · opener surface scoped ✓. Executed: junction probes (leaf, project-dir junction, dangling), two NUL `ValueError` reproductions.
+
+**ux-reviewer** — role file ✓ · read-only ✓ · captures inspected ✓ · executed hue math + truncation simulation over the 75 tags ✓ · walkthrough not driven (no implementation) ✗ · ISO 9241-210: expert inspection performed, automated walkthrough owed at P4, user evaluation not performed.
