@@ -963,8 +963,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.10 — Folder chips are labelled with their folder
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** Every `OpenFolderChip` in the app shall carry the label `📂 Open <folder>/`, `<folder>` the family's folder-name constant (`patches`, `checks`, `templates`, `reports`, `flows`), or `📂 Open session` for the `session` family. When a chip press opens a folder, the status line shall name its full path (`Opened … : <path>`, `folder_open_service.py:182`).
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.6
+- **Statement:** Every `OpenFolderChip` in the app shall carry the label `📂 Open <folder>/`, `<folder>` the name of the folder the chip's target resolves to — the family's folder-name constant (`patches`, `checks`, `templates`, `reports`, `flows`) with a project, and `patches` for the `checks` chip without a project, whose common home is `workarea/patches` — or `📂 Open session` for the `session` family. When a chip press opens a folder, the status line shall name its full path (`Opened … : <path>`, `folder_open_service.py:182`).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-65 — `pytest tests/test_b97_chips_help.py -k tc_b97_65`; procedure: appendix A.4 TC-B97-65.
 - **Numeric pass threshold:** 7 of 7 labels equal; 4 of 4 status lines end with `str(target)`.
