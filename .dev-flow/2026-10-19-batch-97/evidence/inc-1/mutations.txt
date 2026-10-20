@@ -1,0 +1,165 @@
+# Inc-1 mutation battery — HEAD 42655eb + Inc-1 tree; script: .dev-flow/2026-10-19-batch-97/evidence/inc-1/mutate.py
+arms: 18
+M1-label-constant [folder_open_service.py] test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:522: AssertionError: ('patch', '📂 Open folder')
+    | 1 failed in 5.07s
+M1-label-constant [folder_open_service.py] test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:556: AssertionError: assert '📂 Open folder' == '📂 Open patches/'
+    | 1 failed in 2.72s
+M1-label-constant [folder_open_service.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:588: AssertionError: assert '📂 Open folder' == '📂 Open flows/'
+    | 1 failed in 2.59s
+M2-label-not-recomputed [open_folder_chip.py] test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:556: AssertionError: assert '📂 Open checks/' == '📂 Open patches/'
+    | 1 failed in 2.82s
+M3-no-reparse-walk [folder_open_service.py] test_tc_b97_57_guard_unit_arms: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:370: AssertionError: a leaf junction is refused even pointing inside
+    | 1 failed in 0.30s
+M3-no-reparse-walk [folder_open_service.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]: GREEN (SURVIVED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | 1 passed in 2.53s
+M4-no-containment [folder_open_service.py] test_tc_b97_57_guard_unit_arms: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:373: AssertionError: a real directory outside the root is refused
+    | 1 failed in 0.30s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: file: the seam must not be called
+    | 1 failed in 2.60s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: junction: the seam must not be called
+    | 1 failed in 2.55s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: file: the seam must not be called
+    | 1 failed in 3.10s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: junction: the seam must not be called
+    | 1 failed in 3.12s
+M6-chip-reports-reason [open_folder_chip.py] test_tc_b97_29_no_project_chips_disabled_with_their_own_reason: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:266: AssertionError: ('flows', '📂 Open reports/: no active project — load a project first.')
+    | 1 failed in 3.20s
+M6-chip-reports-reason [open_folder_chip.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:591: AssertionError: assert '📂 Open repor...roject first.' == '📂 Open sessi...roject first.'
+    | 1 failed in 2.62s
+M7-service-reports-reason [folder_open_service.py] test_tc_b97_29_no_project_reason_names_each_family_folder: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:220: AssertionError: ('flows', '📂 Open reports/: no active project — load a project first.')
+    | 1 failed in 0.28s
+M8-root-is-workarea [folder_open_service.py] test_tc_b97_57_family_root_is_project_dir_else_tool_root: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:335: AssertionError: assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21012/test_tc_b97_57_family_root_is_0/.s19tool/workarea') == (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21012/test_tc_b97_57_family_root_is_0') / '.s19tool')
+    | 1 failed in 0.27s
+M8-root-is-workarea [folder_open_service.py] test_tc_b97_57_no_project_patch_common_home_opens: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:460: AssertionError: assert [WindowsPath(...rea/patches')] == [WindowsPath(...l/templates')]
+    | 1 failed in 3.35s
+M9-session-creates [open_folder_chip.py] test_tc_b97_28_session_never_creates_a_removed_project_dir: RED (KILLED)
+    restore sha256 e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e == before e509443e4c5823fd1b7a1ad098bfb945cae7021839acec25a3c53d5fbce1ed3e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:194: AssertionError: the session chip never creates a folder
+    | 1 failed in 3.23s
+M10-flows-literal [folder_open_service.py] test_tc_b97_27_flows_folder_name_imported_never_redeclared: RED (KILLED)
+    restore sha256 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94 == before 9eee51c761969a162dc4fe68b0c8d264812d9e93e06aa343599e2103f3fc9a94
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:99: AssertionError: "flows" re-declared at lines [76]
+    | 1 failed in 0.30s
+# exit: 0
+
+# --- gate fold F1/F2 (appended 2026-10-20): python mutate.py M11 M12 M13 ---
+arms: 18
+M1-label-constant [folder_open_service.py] test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:574: AssertionError: ('patch', '📂 Open folder')
+    | 1 failed in 5.37s
+M1-label-constant [folder_open_service.py] test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:608: AssertionError: assert '📂 Open folder' == '📂 Open patches/'
+    | 1 failed in 3.00s
+M1-label-constant [folder_open_service.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:640: AssertionError: assert '📂 Open folder' == '📂 Open flows/'
+    | 1 failed in 2.68s
+M2-label-not-recomputed [open_folder_chip.py] test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:608: AssertionError: assert '📂 Open checks/' == '📂 Open patches/'
+    | 1 failed in 3.03s
+M3-no-reparse-walk [folder_open_service.py] test_tc_b97_57_guard_unit_arms: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:373: AssertionError: a leaf junction is refused even pointing inside
+    | 1 failed in 0.30s
+M3-no-reparse-walk [folder_open_service.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]: GREEN (SURVIVED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | 1 passed in 2.56s
+M4-no-containment [folder_open_service.py] test_tc_b97_57_guard_unit_arms: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:376: AssertionError: a real directory outside the root is refused
+    | 1 failed in 0.31s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:431: AssertionError: file: the seam must not be called
+    | 1 failed in 2.57s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:431: AssertionError: junction: the seam must not be called
+    | 1 failed in 2.64s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:431: AssertionError: file: the seam must not be called
+    | 1 failed in 3.27s
+M5-guard-is-exists [open_folder_chip.py] test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:431: AssertionError: junction: the seam must not be called
+    | 1 failed in 3.17s
+M6-chip-reports-reason [open_folder_chip.py] test_tc_b97_29_no_project_chips_disabled_with_their_own_reason: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:269: AssertionError: ('flows', '📂 Open reports/: no active project — load a project first.')
+    | 1 failed in 3.58s
+M6-chip-reports-reason [open_folder_chip.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:643: AssertionError: assert '📂 Open repor...roject first.' == '📂 Open sessi...roject first.'
+    | 1 failed in 2.65s
+M7-service-reports-reason [folder_open_service.py] test_tc_b97_29_no_project_reason_names_each_family_folder: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:223: AssertionError: ('flows', '📂 Open reports/: no active project — load a project first.')
+    | 1 failed in 0.32s
+M8-root-is-workarea [folder_open_service.py] test_tc_b97_57_family_root_is_project_dir_else_tool_root: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:338: AssertionError: assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21044/test_tc_b97_57_family_root_is_0/.s19tool/workarea') == (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21044/test_tc_b97_57_family_root_is_0') / '.s19tool')
+    | 1 failed in 0.30s
+M8-root-is-workarea [folder_open_service.py] test_tc_b97_57_no_project_patch_common_home_opens: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:463: AssertionError: assert [WindowsPath(...rea/patches')] == [WindowsPath(...l/templates')]
+    | 1 failed in 3.57s
+M9-session-creates [open_folder_chip.py] test_tc_b97_28_session_never_creates_a_removed_project_dir: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:196: AssertionError: None
+    | 1 failed in 3.42s
+M10-flows-literal [folder_open_service.py] test_tc_b97_27_flows_folder_name_imported_never_redeclared: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:99: AssertionError: "flows" re-declared at lines [76]
+    | 1 failed in 0.32s
+# exit: 0
+
+# --- gate fold F1/F2 mutants (appended 2026-10-20): python mutate.py M11 M12 M13 ---
+arms: 3
+M11-stop-at-none [folder_open_service.py] test_tc_b97_57_reparse_point_above_the_root_is_not_the_guards: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:496: AssertionError: Refused to open C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-21047\test_tc_b97_57_reparse_point_a0\linked_base\.s19tool\workarea\patches: not a real folder inside .s19tool/
+    | 1 failed in 2.47s
+M12-stop-at-root [folder_open_service.py] test_tc_b97_57_reparse_point_at_the_root_is_refused: RED (KILLED)
+    restore sha256 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38 == before 5d4e1bd7c65aeb9ad17fbb5c8a83264b5ceb3d48d2e9cce04a596b624527ee38
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:514: AssertionError: a junctioned tool root must not be opened through
+    | 1 failed in 2.50s
+M13-session-tooltip [open_folder_chip.py] test_tc_b97_28_session_never_creates_a_removed_project_dir: RED (KILLED)
+    restore sha256 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 == before 6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:196: AssertionError: folder does not exist yet
+    | 1 failed in 3.20s
+# exit: 0

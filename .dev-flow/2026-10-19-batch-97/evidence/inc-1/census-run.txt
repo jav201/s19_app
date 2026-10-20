@@ -1,0 +1,458 @@
+# Reverse-census run (B1 files of census.txt) — HEAD 42655eb + Inc-1 working tree
+# cmd: python -m pytest tests/test_window_usage_help.py tests/test_segment_split_window.py tests/test_tui_directionb.py tests/test_before_after_report.py tests/test_flow_funnel_b96.py tests/test_tui_report_filter_surface.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py tests/test_tui_snapshot.py -q -rfE -p no:cacheprovider --color=no
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 58%]
+..................................................................FF.... [ 78%]
+.........F......................................xxxxxxxxxxxxxxxxxxxxxxxx [ 97%]
+xxxxx...                                                                 [100%]
+================================== FAILURES ===================================
+____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20985/test_at_061a_persistent_contro0')
+
+    def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back reveals a persistent report control that survives an unrelated
+        action, writes the same report pair on activation, and hides on a new load.
+    
+        Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+        surface. After a successful save-back (the path that today fires only the
+        transient ``notify``), a persistent, queryable control
+        (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+        is shown. Activating it routes to the EXISTING ``action_before_after_report``
+        writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+        produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+        diff heading + the provenance header), not merely "a file was written" (C-10).
+    
+        Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+        a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+        an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+        This proxy asserts widget durability, NOT the notify wall-clock TTL.
+    
+        Activation mechanism: the control is activated through the real button-press
+        dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+        → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+        ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+        ``action_before_after_report``; the message routing is exercised end-to-end.
+    
+        Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+        is re-hidden — a stale "report ready" offer must not persist once the editing
+        context (``last_summary``) has cleared.
+    
+        Counterfactual (RED, C-20): pre-implementation there is no
+        ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+        the transient-only notify cannot satisfy this node.
+        """
+        from textual.css.query import NoMatches
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _drive_apply(app, pilot)
+    
+                # Before the save-back the persistent control must be hidden.
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_before_saveback"] = row.has_class("hidden")
+    
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["revealed_after_saveback"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Persistence proxy: an unrelated action + re-render must NOT drop
+                # the control (a notify Toast would be gone).
+                _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                button = panel.query_one("#patch_before_after_button", Button)
+                outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Activate through the real button-press dispatch (not a proxy call).
+                statuses = _statuses(app)
+                before = _report_names(reports_dir)
+                button.press()
+                await pilot.pause()
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+    
+                # Clear-on-context boundary: a new load re-hides the control.
+                (tmp_path / "changes.json").write_text(
+                    '{"version": 2, "changes": []}', encoding="utf-8"
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    tmp_path / "changes.json"
+                )
+                panel.request_action("load_doc")
+                await pilot.pause()
+                try:
+                    outcomes["hidden_after_new_load"] = panel.query_one(
+                        "#patch_before_after_row"
+                    ).has_class("hidden")
+                except NoMatches:  # pragma: no cover - row must persist as a widget
+                    outcomes["hidden_after_new_load"] = True
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["hidden_before_saveback"], (
+            "AT-061a: the report control must be hidden before any save-back"
+        )
+        assert outcomes["revealed_after_saveback"], (
+            "AT-061a: a successful save-back must reveal the persistent control"
+        )
+        assert outcomes["queryable_after_unrelated_action"], (
+            "AT-061a: the control must survive an unrelated action (persistence "
+            "proxy) — a transient notify would be gone"
+        )
+    
+        new_files = outcomes["new_files"]
+        md_new = [n for n in new_files if n.endswith(".md")]
+        html_new = [n for n in new_files if n.endswith(".html")]
+>       assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+            f"AT-061a: activating the control must write one md + one html pair, "
+            f"got {new_files}; statuses: {outcomes['statuses']}"
+        )
+E       AssertionError: AT-061a: activating the control must write one md + one html pair, got []; statuses: []
+E       assert (0 == 2)
+E        +  where 0 = len([])
+
+tests\test_before_after_report.py:1193: AssertionError
+____________ test_tc330_before_after_row_reveal_hide_state_machine ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20985/test_tc330_before_after_row_re0')
+
+    def test_tc330_before_after_row_reveal_hide_state_machine(
+        tmp_path: Path,
+    ) -> None:
+        """White-box: the ``#patch_before_after_row`` starts hidden, reveals via
+        ``show_before_after_prompt`` and re-hides via ``hide_before_after_prompt``,
+        and its button posts a routed ``BeforeAfterReportRequested`` message.
+    
+        Intent: LLR-061.1 state machine — the control is a persistent
+        ``.hidden``-reveal widget (mirroring ``show_save_prompt`` /
+        ``hide_save_prompt``), and pressing its button routes to
+        ``action_before_after_report`` (asserted by capturing the invocation).
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            (tmp_path / ".s19tool" / "workarea" / "proj").mkdir(
+                parents=True, exist_ok=True
+            )
+            app.current_project = "proj"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_default"] = row.has_class("hidden")
+    
+                panel.show_before_after_prompt()
+                await pilot.pause()
+                outcomes["revealed"] = not row.has_class("hidden")
+    
+                panel.hide_before_after_prompt()
+                await pilot.pause()
+                outcomes["hidden_again"] = row.has_class("hidden")
+    
+                # Button press routes to the single report writer (not duplicated).
+                calls: list[int] = []
+                original = app.action_before_after_report
+                app.action_before_after_report = lambda: (  # type: ignore[method-assign]
+                    calls.append(1),
+                    original(),
+                )[1]
+                panel.show_before_after_prompt()
+                await pilot.pause()
+                panel.query_one("#patch_before_after_button", Button).press()
+                await pilot.pause()
+                outcomes["routed_calls"] = len(calls)
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_before_after_report.py:1282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_before_after_report.py:1251: in _drive
+    async with app.run_test(size=(120, 40)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    @asynccontextmanager
+    async def run_test(
+        self,
+        *,
+        headless: bool = True,
+        size: tuple[int, int] | None = (80, 24),
+        tooltips: bool = False,
+        notifications: bool = False,
+        message_hook: Callable[[Message], None] | None = None,
+    ) -> AsyncGenerator[Pilot[ReturnType], None]:
+        """An asynchronous context manager for testing apps.
+    
+        !!! tip
+    
+            See the guide for [testing](/guide/testing) Textual apps.
+    
+        Use this to run your app in "headless" mode (no output) and drive the app via a [Pilot][textual.pilot.Pilot] object.
+    
+        Example:
+    
+            ```python
+            async with app.run_test() as pilot:
+                await pilot.click("#Button.ok")
+                assert ...
+            ```
+    
+        Args:
+            headless: Run in headless mode (no output or input).
+            size: Force terminal size to `(WIDTH, HEIGHT)`,
+                or None to auto-detect.
+            tooltips: Enable tooltips when testing.
+            notifications: Enable notifications when testing.
+            message_hook: An optional callback that will be called each time any message arrives at any
+                message pump in the app.
+        """
+        from textual.pilot import Pilot
+    
+        app = self
+        app._disable_tooltips = not tooltips
+        app._disable_notifications = not notifications
+        app_ready_event = asyncio.Event()
+    
+        def on_app_ready() -> None:
+            """Called when app is ready to process events."""
+            app_ready_event.set()
+    
+        async def run_app(app: App[ReturnType]) -> None:
+            """Run the apps message loop.
+    
+            Args:
+                app: App to run.
+            """
+    
+            with app._context():
+                try:
+                    if message_hook is not None:
+                        message_hook_context_var.set(message_hook)
+                    app._loop = asyncio.get_running_loop()
+                    app._thread_id = threading.get_ident()
+                    await app._process_messages(
+                        ready_callback=on_app_ready,
+                        headless=headless,
+                        terminal_size=size,
+                    )
+                finally:
+                    app_ready_event.set()
+    
+        # Launch the app in the "background"
+    
+        self._task = app_task = create_task(run_app(app), name=f"run_test {app}")
+    
+        # Wait until the app has performed all startup routines.
+        await app_ready_event.wait()
+        with app._context():
+            # Context manager returns pilot object to manipulate the app
+            try:
+                pilot = Pilot(app)
+                await pilot._wait_for_screen()
+                yield pilot
+            finally:
+                await asyncio.sleep(0)
+                # Shutdown the app cleanly
+                await app._shutdown()
+                await app_task
+                # Re-raise the exception which caused panic so test frameworks are aware
+                if self._exception:
+>                   raise self._exception
+E                   textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#log_line_1' on Screen(id='_default')")
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13239 in set_status         
+│                                                                              
+│   13236 │   │   self.set_status(f"Goto 0x{addr:08X}")                        
+│   13237 │                                                                    
+│   13238 │   def set_status(self, message: str) -> None:                      
+│ ❱ 13239 │   │   self._append_log_line(message)                               
+│   13240 │                                                                    
+│   13241 │   def set_file_status(self, message: str) -> None:                 
+│   13242 │   │   """Update the first status line reserved for file state."""  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ message = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │    self = S19TuiApp(                                                     │ 
+│ │           │   title='Hex Edit Tool',                                     │ 
+│ │           │   classes={'-dark-mode'},                                    │ 
+│ │           │   pseudo_classes={'focus', 'dark'}                           │ 
+│ │           )                                                              │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13258 in _append_log_line   
+│                                                                              
+│   13255 │   │   cap = max(50, getattr(self.size, "width", 0))                
+│   13256 │   │   line = trimmed[:cap]                                         
+│   13257 │   │   self.log_lines.append(line)                                  
+│ ❱ 13258 │   │   self._render_log_lines()                                     
+│   13259 │                                                                    
+│   13260 │   def _render_log_lines(self) -> None:                             
+│   13261 │   │   lines = list(self.log_lines)                                 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │     cap = 120                                                            │ 
+│ │    line = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │ message = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │    self = S19TuiApp(                                                     │ 
+│ │           │   title='Hex Edit Tool',                                     │ 
+│ │           │   classes={'-dark-mode'},                                    │ 
+│ │           │   pseudo_classes={'focus', 'dark'}                           │ 
+│ │           )                                                              │ 
+│ │ trimmed = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13264 in _render_log_lines  
+│                                                                              
+│   13261 │   │   lines = list(self.log_lines)                                 
+│   13262 │   │   while len(lines) < 4:                                        
+│   13263 │   │   │   lines.insert(0, "")                                      
+│ ❱ 13264 │   │   self.query_one("#log_line_1", Label).update(lines[-4])       
+│   13265 │   │   self.query_one("#log_line_2", Label).update(lines[-3])       
+│   13266 │   │   self.query_one("#log_line_3", Label).update(lines[-2])       
+│   13267 │   │   self.query_one("#log_line_4", Label).update(lines[-1])       
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ lines = [                                                                │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   'Before/after report refused: No applied change summary -    │ 
+│ │         apply a change document'+34                                      │ 
+│ │         ]                                                                │ 
+│ │  self = S19TuiApp(                                                       │ 
+│ │         │   title='Hex Edit Tool',                                       │ 
+│ │         │   classes={'-dark-mode'},                                      │ 
+│ │         │   pseudo_classes={'focus', 'dark'}                             │ 
+│ │         )                                                                │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+NoMatches: No nodes match '#log_line_1' on Screen(id='_default')
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-20985/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020B8D09A990>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=15795044;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+3 failed, 336 passed, 29 xfailed in 916.30s (0:15:16)
+# exit: 1

@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 8a8fd7692424f592 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 264509436a32672e -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -5160,7 +5160,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B97-24` | batches |
 | `TC-B97-25` | batches |
 | `TC-B97-26` | batches |
-| `TC-B97-27` | batches |
+| `TC-B97-27` | batches, tests |
 | `TC-B97-28` | batches |
 | `TC-B97-29` | batches |
 | `TC-B97-30` | batches |

@@ -169,6 +169,11 @@
       "station": "PDR",
       "date": "2026-10-20",
       "decision": "asked at the gate — operator PDR verdict 2026-10-20: approved with conditions; decision 1 A (pe_A grid strip), decision 2 A (single meaning of the check mark, frozen c texts), decision 3 A (click selects a word, enter/space toggle), remaining voids at 220x60 accepted. Objection: a two-row bottom key bar (global row + active-screen row) — analysed as app-wide, routed to its own prototype-first batch (backlog U-17 widened) with hedge PC-22 here. Conditions PC-1..PC-22 in the PDR record; P3 opens with PC-12 and PC-20 due before Inc-1."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-20",
+      "decision": "P3 increment 001 (chips: flows/session families, real-directory guard, folder labels) approved under the standing authorization: code-reviewer approve after F1/F2 fold (LED-.7), security LOW 0 HIGH, gate set 50 passed, full suite no regression vs baseline (4 timing flakes re-run green). Inc-2 flow foundations is next."
     }
   ],
   "obsidian_synced": false,

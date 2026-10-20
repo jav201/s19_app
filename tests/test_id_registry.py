@@ -121,7 +121,12 @@ from tools.id_registry import (
 # (the Tk root singleton, TC-1815), ``tests/test_a2l_curve_description.py``
 # (the curve description, TC-1820..1822) and ``tests/test_flow_funnel_b96.py``
 # (the funnel + block copy/paste, TC-1816..1819).
-EXPECTED_SCANNED_TEST_FILES = 189
+# batch-97 Inc-1 (2026-10-20): 189 -> 192, measured with ``scanned_test_files()``
+# (and an independent ``ls tests/*.py tests/**/*.py | wc -l`` agreeing at 192) —
+# the chips increment adds ``tests/test_b97_chips_help.py`` (TC-B97-27..30, 57,
+# 65) and the two batch helpers ``tests/b97_fixtures.py`` and
+# ``tests/b97_probes.py``, which the ``tests/**/*.py`` glob scans too.
+EXPECTED_SCANNED_TEST_FILES = 192
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

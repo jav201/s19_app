@@ -1,0 +1,56 @@
+warning: in the working copy of 's19_app/tui/open_folder_chip.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 's19_app/tui/services/folder_open_service.py', LF will be replaced by CRLF the next time Git touches it
+# GREEN run (final tree, after gate fold F1/F2) — HEAD 42655eb + working tree; changed source: s19_app/tui/open_folder_chip.py s19_app/tui/services/folder_open_service.py 
+# cmd: python -m pytest tests/test_b97_chips_help.py tests/test_open_folder_chips.py tests/test_id_registry.py -rA -p no:cacheprovider --color=no
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_family_targets_project_flows_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_folder_name_imported_never_redeclared
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_missing_flows_created_inside_project_then_opened
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_family_targets_project_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_never_creates_a_removed_project_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_reason_names_each_family_folder
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+PASSED tests/test_b97_chips_help.py::test_tc_b97_30_id_suffix_gives_a_second_checks_chip_its_own_id
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_family_root_is_project_dir_else_tool_root
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_guard_unit_arms
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_no_project_patch_common_home_opens
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_above_the_root_is_not_the_guards
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_at_the_root_is_refused
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+PASSED tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_reports_chip_resolves_project_reports_only
+PASSED tests/test_open_folder_chips.py::test_tc703_chips_render_header_right_with_no_key_bindings
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[patch-#open_folder_patch-patches]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[checks-#open_folder_checks-checks]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[templates-#open_folder_templates-templates]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_common_home_no_project_dimmed_and_recreated
+PASSED tests/test_open_folder_chips.py::test_tc704_reports_without_project_disabled_status_reason_zero_opens
+PASSED tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm
+PASSED tests/test_open_folder_chips.py::test_tc705_seam_failure_lands_on_status_line_no_escape
+PASSED tests/test_open_folder_chips.py::test_tc705_workarea_open_rides_the_same_seam
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+======================= 50 passed in 108.57s (0:01:48) ========================
+# exit: 0

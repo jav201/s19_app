@@ -1,0 +1,56 @@
+## B1 grep -rl '📂 Open folder' tests/ (excluding the new b97 files)
+tests/test_open_folder_chips.py
+tests/test_window_usage_help.py
+
+## B1 grep -rl 'REPORTS_NO_PROJECT_REASON' tests/ (excluding the new b97 files)
+
+## B1 grep -rl '_CREATABLE_FAMILIES' tests/ (excluding the new b97 files)
+
+## B1 grep -rl 'CHIP_FAMILIES' tests/ (excluding the new b97 files)
+
+## B1 grep -rl 'OpenFolderChip' tests/ (excluding the new b97 files)
+tests/test_open_folder_chips.py
+tests/test_segment_split_window.py
+tests/test_tui_directionb.py
+
+## B1 grep -rl 'resolve_chip_target' tests/ (excluding the new b97 files)
+
+## B1 grep -rl 'create_chip_home' tests/ (excluding the new b97 files)
+
+## B1 grep -rl 'no active project' tests/ (excluding the new b97 files)
+tests/test_before_after_report.py
+tests/test_flow_funnel_b96.py
+tests/test_open_folder_chips.py
+tests/test_tui_report_filter_surface.py
+tests/test_tui_report_view.py
+tests/test_tui_variants.py
+tests/test_variant_execution.py
+
+## B1 grep -rl 'Opened folder' tests/ (excluding the new b97 files)
+
+## A3 grep -rn 'REPORTS_NO_PROJECT_REASON' s19_app/ outside the two owning modules
+
+## A3 grep -rn '_CREATABLE_FAMILIES' s19_app/ outside the two owning modules
+
+## A3 grep -rn 'CHIP_FAMILIES' s19_app/ outside the two owning modules
+
+## A3 grep -rn 'OpenFolderChip(' s19_app/ outside the two owning modules
+s19_app/tui/app.py:2321:                OpenFolderChip("checks"),
+s19_app/tui/app.py:2476:                OpenFolderChip("templates"),
+s19_app/tui/app.py:3048:                OpenFolderChip("patch"),
+s19_app/tui/screens.py:1668:                OpenFolderChip("reports"),
+
+## A3 grep -rn '📂 Open folder' s19_app/ outside the two owning modules
+s19_app/tui/app.py:2281:            (title + the ``📂 Open folder`` chip, HLR-139), a
+s19_app/tui/app.py:2458:            (title + the ``📂 Open folder`` chip, HLR-139) and the
+s19_app/tui/app.py:3028:            ``📂 Open folder`` chip, HLR-139) and a ``PatchEditorPanel``.
+s19_app/tui/window_help.py:5:header row, never displacing the ``📂 Open folder`` chip) and a focused-window
+s19_app/tui/window_help.py:410:    control like the ``📂 Open folder`` chip — the focused-window ``?``
+
+## B3 goldens/snapshots naming the chip label
+tests/test_b97_chips_help.py
+tests/test_open_folder_chips.py
+tests/test_window_usage_help.py
+tests/__pycache__/test_open_folder_chips.cpython-311-pytest-8.4.2.pyc
+tests/__pycache__/test_open_folder_chips.cpython-311.pyc
+tests/__pycache__/test_window_usage_help.cpython-311-pytest-8.4.2.pyc

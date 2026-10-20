@@ -139,3 +139,11 @@ above this line is ever edited._
 - **What changed:** `<folder>` in the chip label is the name of the folder the chip's target resolves to. With a project it equals the family constant, as before; without a project the `checks` chip reads `📂 Open patches/`, because its target is the common home `workarea/patches` (`folder_open_service.py:217-218`), which holds both change-sets and check artifacts. TC-B97-65 gains that no-project arm; its 7-of-7 project arm is unchanged.
 - **Why:** Code-Wire H-C1 (PDR annex): the frozen label `📂 Open checks/` would name a folder the no-project press does not open, contradicting HLR-148 ("open the folder the chip's label names"). Re-homing check artifacts to a new common folder would move the Check Editor's save path, which is outside this batch.
 - **Evidence:** `design/codewire/CODEWIRE-PDR.md` H-C1 (recorded TC-703); the operator's PDR verdict 2026-10-20 (`evidence/operator-pdr-verdict-2026-10-20.md`, approved with conditions).
+
+### LED-2026-10-19-batch-97.7 — Inc-1 gate: the reparse walk's boundary stated once
+- **Requirement:** LLR-148.8
+- **Date:** 2026-10-20
+- **What changed:** The Statement's trust-anchor sentence now matches its own formula `stop_at=root.parent`: the walk covers the root itself and every component below it; a reparse point above the root is out of scope; a root that is itself a reparse point (the no-project `.s19tool`) is refused. The earlier prose ("a reparse point … at the project directory itself is not this guard's") contradicted the formula.
+- **Why:** code-reviewer F1 at the Inc-1 gate (mutants `stop_at=None` and `stop_at=root` survived because nothing pinned the boundary); security lens at the same gate ruled the formula the right reading — `.resolve()` follows junctions, so a junctioned `.s19tool` would move every common home outside the tool tree.
+- **Evidence:** `03-increments/increment-001.md` (gate section); `evidence/inc-1/mutations.txt` (the two boundary nodes added at the gate).
+

@@ -1,0 +1,248 @@
+F...                                                                     [100%]
+================================== FAILURES ===================================
+____________ test_tc330_before_after_row_reveal_hide_state_machine ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-21061/test_tc330_before_after_row_re0')
+
+    def test_tc330_before_after_row_reveal_hide_state_machine(
+        tmp_path: Path,
+    ) -> None:
+        """White-box: the ``#patch_before_after_row`` starts hidden, reveals via
+        ``show_before_after_prompt`` and re-hides via ``hide_before_after_prompt``,
+        and its button posts a routed ``BeforeAfterReportRequested`` message.
+    
+        Intent: LLR-061.1 state machine — the control is a persistent
+        ``.hidden``-reveal widget (mirroring ``show_save_prompt`` /
+        ``hide_save_prompt``), and pressing its button routes to
+        ``action_before_after_report`` (asserted by capturing the invocation).
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            (tmp_path / ".s19tool" / "workarea" / "proj").mkdir(
+                parents=True, exist_ok=True
+            )
+            app.current_project = "proj"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_default"] = row.has_class("hidden")
+    
+                panel.show_before_after_prompt()
+                await pilot.pause()
+                outcomes["revealed"] = not row.has_class("hidden")
+    
+                panel.hide_before_after_prompt()
+                await pilot.pause()
+                outcomes["hidden_again"] = row.has_class("hidden")
+    
+                # Button press routes to the single report writer (not duplicated).
+                calls: list[int] = []
+                original = app.action_before_after_report
+                app.action_before_after_report = lambda: (  # type: ignore[method-assign]
+                    calls.append(1),
+                    original(),
+                )[1]
+                panel.show_before_after_prompt()
+                await pilot.pause()
+                panel.query_one("#patch_before_after_button", Button).press()
+                await pilot.pause()
+                outcomes["routed_calls"] = len(calls)
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_before_after_report.py:1282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_before_after_report.py:1251: in _drive
+    async with app.run_test(size=(120, 40)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    @asynccontextmanager
+    async def run_test(
+        self,
+        *,
+        headless: bool = True,
+        size: tuple[int, int] | None = (80, 24),
+        tooltips: bool = False,
+        notifications: bool = False,
+        message_hook: Callable[[Message], None] | None = None,
+    ) -> AsyncGenerator[Pilot[ReturnType], None]:
+        """An asynchronous context manager for testing apps.
+    
+        !!! tip
+    
+            See the guide for [testing](/guide/testing) Textual apps.
+    
+        Use this to run your app in "headless" mode (no output) and drive the app via a [Pilot][textual.pilot.Pilot] object.
+    
+        Example:
+    
+            ```python
+            async with app.run_test() as pilot:
+                await pilot.click("#Button.ok")
+                assert ...
+            ```
+    
+        Args:
+            headless: Run in headless mode (no output or input).
+            size: Force terminal size to `(WIDTH, HEIGHT)`,
+                or None to auto-detect.
+            tooltips: Enable tooltips when testing.
+            notifications: Enable notifications when testing.
+            message_hook: An optional callback that will be called each time any message arrives at any
+                message pump in the app.
+        """
+        from textual.pilot import Pilot
+    
+        app = self
+        app._disable_tooltips = not tooltips
+        app._disable_notifications = not notifications
+        app_ready_event = asyncio.Event()
+    
+        def on_app_ready() -> None:
+            """Called when app is ready to process events."""
+            app_ready_event.set()
+    
+        async def run_app(app: App[ReturnType]) -> None:
+            """Run the apps message loop.
+    
+            Args:
+                app: App to run.
+            """
+    
+            with app._context():
+                try:
+                    if message_hook is not None:
+                        message_hook_context_var.set(message_hook)
+                    app._loop = asyncio.get_running_loop()
+                    app._thread_id = threading.get_ident()
+                    await app._process_messages(
+                        ready_callback=on_app_ready,
+                        headless=headless,
+                        terminal_size=size,
+                    )
+                finally:
+                    app_ready_event.set()
+    
+        # Launch the app in the "background"
+    
+        self._task = app_task = create_task(run_app(app), name=f"run_test {app}")
+    
+        # Wait until the app has performed all startup routines.
+        await app_ready_event.wait()
+        with app._context():
+            # Context manager returns pilot object to manipulate the app
+            try:
+                pilot = Pilot(app)
+                await pilot._wait_for_screen()
+                yield pilot
+            finally:
+                await asyncio.sleep(0)
+                # Shutdown the app cleanly
+                await app._shutdown()
+                await app_task
+                # Re-raise the exception which caused panic so test frameworks are aware
+                if self._exception:
+>                   raise self._exception
+E                   textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#log_line_1' on Screen(id='_default')")
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: WorkerFailed
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13239 in set_status         
+│                                                                              
+│   13236 │   │   self.set_status(f"Goto 0x{addr:08X}")                        
+│   13237 │                                                                    
+│   13238 │   def set_status(self, message: str) -> None:                      
+│ ❱ 13239 │   │   self._append_log_line(message)                               
+│   13240 │                                                                    
+│   13241 │   def set_file_status(self, message: str) -> None:                 
+│   13242 │   │   """Update the first status line reserved for file state."""  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ message = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │    self = S19TuiApp(                                                     │ 
+│ │           │   title='Hex Edit Tool',                                     │ 
+│ │           │   classes={'-dark-mode'},                                    │ 
+│ │           │   pseudo_classes={'focus', 'dark'}                           │ 
+│ │           )                                                              │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13258 in _append_log_line   
+│                                                                              
+│   13255 │   │   cap = max(50, getattr(self.size, "width", 0))                
+│   13256 │   │   line = trimmed[:cap]                                         
+│   13257 │   │   self.log_lines.append(line)                                  
+│ ❱ 13258 │   │   self._render_log_lines()                                     
+│   13259 │                                                                    
+│   13260 │   def _render_log_lines(self) -> None:                             
+│   13261 │   │   lines = list(self.log_lines)                                 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │     cap = 120                                                            │ 
+│ │    line = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │ message = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ │    self = S19TuiApp(                                                     │ 
+│ │           │   title='Hex Edit Tool',                                     │ 
+│ │           │   classes={'-dark-mode'},                                    │ 
+│ │           │   pseudo_classes={'focus', 'dark'}                           │ 
+│ │           )                                                              │ 
+│ │ trimmed = 'Before/after report refused: No applied change summary -      │ 
+│ │           apply a change document'+34                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:13264 in _render_log_lines  
+│                                                                              
+│   13261 │   │   lines = list(self.log_lines)                                 
+│   13262 │   │   while len(lines) < 4:                                        
+│   13263 │   │   │   lines.insert(0, "")                                      
+│ ❱ 13264 │   │   self.query_one("#log_line_1", Label).update(lines[-4])       
+│   13265 │   │   self.query_one("#log_line_2", Label).update(lines[-3])       
+│   13266 │   │   self.query_one("#log_line_3", Label).update(lines[-2])       
+│   13267 │   │   self.query_one("#log_line_4", Label).update(lines[-1])       
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ lines = [                                                                │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   '',                                                          │ 
+│ │         │   'Before/after report refused: No applied change summary -    │ 
+│ │         apply a change document'+34                                      │ 
+│ │         ]                                                                │ 
+│ │  self = S19TuiApp(                                                       │ 
+│ │         │   title='Hex Edit Tool',                                       │ 
+│ │         │   classes={'-dark-mode'},                                      │ 
+│ │         │   pseudo_classes={'focus', 'dark'}                             │ 
+│ │         )                                                                │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+NoMatches: No nodes match '#log_line_1' on Screen(id='_default')
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+1 failed, 3 passed in 10.35s

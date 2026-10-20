@@ -1,0 +1,45 @@
+# RED run — unchanged source at 42655eb; git diff --stat s19_app: []
+# cmd: python -m pytest tests/test_b97_chips_help.py -q -rfE -p no:cacheprovider --color=no --tb=line
+FFFFFFFFFFFFFF.F.F.FFF                                                   [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:70: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:98: AssertionError: FLOWS_SUBDIR must be imported exactly once
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:113: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:149: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:167: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:216: AssertionError: assert 4 >= 6
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:238: AssertionError: assert 4 >= 6
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:289: assert 'id_suffix' in mappingproxy(OrderedDict([('self', <Parameter "self">), ('family', <Parameter "family: 'str'">)]))
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:332: AssertionError: assert False
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:349: AssertionError: assert False
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: file: the seam must not be called
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:428: AssertionError: junction: the seam must not be called
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:398: AssertionError: assert 'flows' in ('patch', 'checks', 'templates', 'reports')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:519: AssertionError: ('patch', '📂 Open folder')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:553: AssertionError: assert '📂 Open folder' == '📂 Open patches/'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:569: AssertionError: assert 'session' in ('patch', 'checks', 'templates', 'reports')
+=========================== short test summary info ===========================
+FAILED tests/test_b97_chips_help.py::test_tc_b97_27_flows_family_targets_project_flows_dir
+FAILED tests/test_b97_chips_help.py::test_tc_b97_27_flows_folder_name_imported_never_redeclared
+FAILED tests/test_b97_chips_help.py::test_tc_b97_27_missing_flows_created_inside_project_then_opened
+FAILED tests/test_b97_chips_help.py::test_tc_b97_28_session_family_targets_project_dir
+FAILED tests/test_b97_chips_help.py::test_tc_b97_28_session_never_creates_a_removed_project_dir
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_reason_names_each_family_folder
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+FAILED tests/test_b97_chips_help.py::test_tc_b97_30_id_suffix_gives_a_second_checks_chip_its_own_id
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_family_root_is_project_dir_else_tool_root
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_guard_unit_arms - Asserti...
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-flows]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-flows]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+19 failed, 3 passed in 27.68s
+# exit: 1

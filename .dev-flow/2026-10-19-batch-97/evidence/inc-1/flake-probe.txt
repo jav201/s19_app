@@ -1,0 +1,11 @@
+# flake probe on the Inc-1 tree: each node 5 runs
+run 1 test_at_061a_persistent_control_survives_then_writes_pair_and_clears: 1 passed in 2.42s
+run 1 test_tc330_before_after_row_reveal_hide_state_machine: 1 passed in 2.17s
+run 2 test_at_061a_persistent_control_survives_then_writes_pair_and_clears: 1 passed in 2.36s
+run 2 test_tc330_before_after_row_reveal_hide_state_machine: 1 passed in 2.00s
+run 3 test_at_061a_persistent_control_survives_then_writes_pair_and_clears: 1 passed in 2.20s
+run 3 test_tc330_before_after_row_reveal_hide_state_machine: 1 passed in 2.10s
+run 4 test_at_061a_persistent_control_survives_then_writes_pair_and_clears: 1 failed in 2.22s
+run 4 test_tc330_before_after_row_reveal_hide_state_machine: 1 passed in 2.04s
+run 5 test_at_061a_persistent_control_survives_then_writes_pair_and_clears: 1 passed in 2.35s
+run 5 test_tc330_before_after_row_reveal_hide_state_machine: 1 passed in 1.92s
