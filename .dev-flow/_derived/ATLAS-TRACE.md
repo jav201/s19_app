@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1690 unique id(s)
+## family US/HLR/LLR — 1692 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1736,6 +1736,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-143.1` | batches |
 | `HLR-143.2` | batches |
 | `HLR-144` | batches |
+| `HLR-144..148` | batches |
 | `HLR-144..149` | batches |
 | `HLR-144..HLR-149` | batches |
 | `HLR-145` | batches |
@@ -2665,6 +2666,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-144.5` | batches |
 | `LLR-144.6` | batches |
 | `LLR-144.7` | batches |
+| `LLR-145` | batches |
 | `LLR-145.1` | batches |
 | `LLR-145.2` | batches |
 | `LLR-145.3` | batches |

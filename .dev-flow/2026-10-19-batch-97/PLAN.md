@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-19-batch-97 |
 | Objective | b94 polish: port the operator-approved prototype round (prototypes/b94_polish, verdict A on all four screens) into the four batch-94 screens -- Patch Editor = ledger + inspector with a consultable JSON tab (live or explicit Update, Load keeps populating), Check Editor = ledger + inspector, Flow Builder = pipeline rail, Flow Execution = pipeline rail; Run as the second bright element; CRC accent burnt orange (amber only for waiting-human); folder-open chip + window help on every one of the four screens (new chip families flows + session); width-adaptive layouts (118x54 minimum, ~220x60 large reference), no wrapped rows; English UI strings. Input: .dev-flow/design/HANDOFF-b94-polish-2026-10-20.md |
-| Last updated | P1 · 2026-10-20 (gate closed) |
+| Last updated | P2 · 2026-10-20 (iterate-to-refine → P1) |
 | Standing authorization | Asked at the P0 gate, answered by the operator 2026-10-20 (kickoff questions put in Spanish, answers quoted as chosen). **Gates** — "Autónomo con excepciones": the agent self-approves the gates and records each one in this plan and in `state.json`, but STOPS at PDR (design) and on any HIGH finding. **Git** — "Commit y push en cada cierre": the agent commits and pushes to `main` at each close, no PR (as batch-95); a HIGH finding still blocks and returns to the operator. **DoR** — "Las seis": US-134..US-139 proceed. Commission: "Using /dev-flow vamos desde aquí: C:\Users\jjgh8\Github\s19_app\.dev-flow\design\HANDOFF-b94-polish-2026-10-20.md" |
 | First gate | Exit 0 at P0 after the rollover (0 block · 462 notice · 44 n/a). `V7`: "bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared file(s) unmoved, 0 undeclared) at `2026-10-12-rev102`". The pre-rollover run exited 1 (298 block) on the closed batch-94 record — see §Gate notices. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin` run 2026-10-19; `origin/main` tip = `ad10fb5ce6228a2a3823e472fd8e46c09122141d`; merge-base(HEAD, origin/main) = the same commit, so no rebase was owed. Local `main` is one commit ahead (`51ee191`, the docs-only backlog routing of the Code-Wire findings, not yet pushed); `base_ref` = `51ee1914f20d1f031dbced129ce66bda750dbde9`. RC-1 (b): each story's outcome grepped on `origin/main` — 0 hits for the inspector/JSON tab, the report-fields card, the pipeline rails, the `flows`/`session` chip families and the burnt-orange token; the shipped gaps the stories close are present (`patch_win_json` 9 hits, `titled_header("Flow Execution")` with no chip 1, the Check Editor's bare `Label` 1, `_CANVAS_COLS =` 1) — no story is SATISFIED-EXTERNALLY. RC-2: `git ls-remote --exit-code --heads origin` answered (refs served); newest `origin/main` commit 2026-10-19 16:57 -0600. |
@@ -76,7 +76,8 @@ the rest of the app at both 118x54 and ~220x60.
 | US-139 Width-adaptive | READY | sweep increment at both sizes |
 | ARQ | closed 2026-10-20 | `docs/architecture.md` batch-97 section (I-1..I-4, R13-R17); 4 PDR questions |
 | P1 | closed 2026-10-20 | HLR-144..149 · 38 LLR · AT-B97-01..16 · TC-B97-01..38 · 10 PDR decisions |
-| P2 | in progress | four-lens cross-review |
+| P2 round 1 | iterate-to-refine 2026-10-20 | 1 blocker (Q-1) · 33 major · 31 minor — `02-review.md` |
+| P1 iteration 1 | in progress | amending the contract against the P2 findings |
 | PDR · P3 · DDR · P4 · P5 · P6 | not started | PDR is an operator stop |
 
 ## Roadmap + increment plan
@@ -100,6 +101,7 @@ Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
 | 2026-10-20 | P0 closed: all six stories READY, ARQ next | the operator's DoR answer "Las seis" (asked at the gate) |
 | 2026-10-20 | ARQ closed: no module or boundary moved; burnt-orange is a NEW token in `insight_style.py` (no CRC colour ships today; waiting uses `#f6ff8f`) | architect's measured map; self-approved under the standing authorization |
 | 2026-10-20 | P1 closed; the qa-reviewer's P1 validation-method pass is folded into the independent P2 qa lens | the architect wrote every requirement's validation method; one independent qa reading at P2 instead of two |
+| 2026-10-20 | P2 round 1 → iterate-to-refine; rulings Q-5 (80x24 floor kept, reachable under scroll), Q-2 (service Spanish strings in scope), A-2/Q-8 (derive, not drop) | blocker Q-1 forces it; the rulings keep shipped behaviour and honour the operator's English rule; colour, primary action, card growth and JSON refresh stay at PDR |
 | 2026-10-19 | Test ids batch-scoped (`AT-B97-NN`, `TC-B97-NN`) | `docs/engineering-rules.md` §AT/TC id allocation prefers batch-scoped ids; no global reservation PR owed |
 
 ## Risks / watch-items
