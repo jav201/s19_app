@@ -1,0 +1,126 @@
+# Inc-3 gate fold mutation run, 2026-10-21T08:10:36-06:00 — M1 M2 M10 (anchors re-written after F8 / L1), M24 (retargeted, F5), M29 M30 (parametrized node ids), M31-M46 (new arms)
+mutants: 22 arms: 31
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:300: AssertionError: ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…
+    | 1 failed in 0.43s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:374: AssertionError: ('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…')
+    | 1 failed in 6.15s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size0]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:318: AssertionError: [('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…'), ('ASAM.M.SCALAR.UBYT...B_INTP_NO_DEFAULT_V…'), ('ASAM.M.SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_NOINTP
+    | 1 failed in 5.77s
+M1-head-keeping-clip [screens_directionb.py] test_at_b97_04_engineer_reads_every_address_and_includes_one[size0]: GREEN (SURVIVED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | 1 passed in 10.27s
+M2-tail-only-clip [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:300: AssertionError: ….M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE
+    | 1 failed in 0.44s
+M2-tail-only-clip [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:374: AssertionError: ('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', '….M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE')
+    | 1 failed in 6.09s
+M10-ledger-no-space [screens_directionb.py] test_tc_b97_45_keyboard_order_enter_space_and_chip_states: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:836: AssertionError: ['2 fields → report', '2 fields → report', '2 fields → report']
+    | 1 failed in 10.17s
+M10-ledger-no-space [screens_directionb.py] test_at_b97_18_first_task_from_the_keyboard: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1124: AssertionError: 0 fields → report
+    | 1 failed in 18.68s
+M24-nowrap-css-removed [styles.tcss] test_tc_b97_37_status_line_stays_one_row_with_a_long_typed_address[size0]: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:345: AssertionError: (['Check Editor: bad memory address     '], 2)
+    | 1 failed in 3.40s
+M29-size-label-fmt [screens_directionb.py] test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size0]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:670: AssertionError: ('check_mem_size_input', ['Fmt'])
+    | 1 failed in 3.48s
+M29-size-label-fmt [screens_directionb.py] test_tc_b97_32_check_editor_help_names_every_label: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:785: AssertionError: labels with no `label — effect` line: ['Fmt']
+    | 1 failed in 3.70s
+M30-buttons-three-rows [styles.tcss] test_tc_b97_11_every_button_is_a_one_row_chip[size0]: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:420: AssertionError: {'check_mem_add_button': 3, 'check_mem_remove_button': 3, 'check_param_include_button': 3, 'check_tab_addendum': 3, ...}
+    | 1 failed in 4.02s
+M31-glyph-back-to-ballot [screens_directionb.py] test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:859: AssertionError: ['☑']
+    | 1 failed in 0.41s
+M31-glyph-back-to-ballot [screens_directionb.py] test_tc_b97_33_check_glyphs_closed_and_in_the_legend: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:830: AssertionError: {'◆'}
+    | 1 failed in 5.01s
+M32-full-name-name-first [screens_directionb.py] test_tc_b97_10_full_name_line_keeps_address_and_name_tail: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1216: AssertionError: ('ASAM.M.SCALAR.UBYTE.LONG_SEGMENT_00_LONG_SEGMENT_01_LONG_SEGMENT_…', '0x00810000', 'u8 hours')
+    | 1 failed in 5.04s
+M32-full-name-name-first [screens_directionb.py] test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size1]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((120, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  …')
+    | 1 failed in 3.75s
+M33-full-name-head-clip [screens_directionb.py] test_tc_b97_10_full_name_line_keeps_address_and_name_tail: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1218: AssertionError: ASAM.M.SCALAR.UBYTE.LONG_SEGMENT_00_LONG_SE…
+    | 1 failed in 4.93s
+M34-full-name-not-recomposed [screens_directionb.py] test_tc_b97_10_full_name_line_keeps_address_and_name_tail: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1221: AssertionError: (66, 118, '0x00810000  u8 hours  ASAM…NG_SEGMENT_07_LONG_SEGMENT_08_TAIL_MARK')
+    | 1 failed in 5.01s
+M35-form-spacers-removed [styles.tcss] test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size0]: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:681: AssertionError: a blank spacer row before MEMORY LOCATIONS and the status line: ['No fields included yet.', 'Add row     Remove row']
+    | 1 failed in 3.63s
+M35-form-spacers-removed [styles.tcss] test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size1]: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:681: AssertionError: a blank spacer row before MEMORY LOCATIONS and the status line: ['No fields included yet.', 'Add row     Remove row']
+    | 1 failed in 3.75s
+M36-label-column-auto [styles.tcss] test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size0]: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:677: AssertionError: ({78}, {6, 8, 13})
+    | 1 failed in 3.47s
+M37-default-label-painted [screens_directionb.py] test_tc_b97_43_memory_lines_name_the_address_once: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:576: AssertionError: ('▪', '0x00000100', 'u32 field @ 0x00000100')
+    | 1 failed in 4.02s
+M38-memory-label-tail-clip [screens_directionb.py] test_tc_b97_43_memory_lines_name_the_address_once: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:578: AssertionError: u16 …XXXXXXXXXXXXXXX_END
+    | 1 failed in 4.17s
+M39-mem-table-default-shown [screens_directionb.py] test_tc_b97_43_memory_lines_name_the_address_once: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:580: AssertionError: ['field @ 0x000001…', 'LABEL_HEAD_XXXXX…']
+    | 1 failed in 4.06s
+M40-ledger-no-enter [screens_directionb.py] test_tc_b97_45_enter_on_the_ledger_toggles_inclusion: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:870: AssertionError: ['0 fields → report', '0 fields → report', '0 fields → report']
+    | 1 failed in 4.31s
+M41-plural-always [screens_directionb.py] test_tc_b97_43_counts_agree_in_number_and_the_hint_reads_whole: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:606: AssertionError: ('1 fields: 1 params · 0 memory rows', '1 fields → report')
+    | 1 failed in 4.90s
+M42-selected-focus-like-focus [styles.tcss] test_tc_b97_45_keyboard_order_enter_space_and_chip_states: RED (KILLED)
+    restore sha256 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 == before 679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:843: AssertionError: [('ColorTriplet(red=150, green=154, blue=173)', 'ColorTriplet(red=15, green=21, blue=37)', False, False, False), ('Col... False), ('ColorTriplet(red=10, green=14, blue=27)', 'ColorTriplet(red=148, green=173, blue=235)'
+    | 1 failed in 13.48s
+M43-tail-counts-code-points [screens_directionb.py] test_tc_b97_10_clips_measure_terminal_cells: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:330: AssertionError: (12, 'ASAM…前名前名前末尾', 19)
+    | 1 failed in 0.55s
+M44-address-cell-blank [screens_directionb.py] test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size1]: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1250: AssertionError: ((120, 54), 69)
+    | 1 failed in 4.21s
+M45-hint-back-to-vs [screens_directionb.py] test_tc_b97_43_counts_agree_in_number_and_the_hint_reads_whole: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:608: AssertionError: Validate checks fields vs the image.
+    | 1 failed in 5.38s
+M46-fmt-unit-off-the-full-name-line [screens_directionb.py] test_tc_b97_10_full_name_line_keeps_address_and_name_tail: RED (KILLED)
+    restore sha256 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec == before 742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1216: AssertionError: ('0x00810000  ASAM…MENT_06_LONG_SEGMENT_07_LONG_SEGMENT_08_TAIL_MARK', '0x00810000', 'u8 hours')
+    | 1 failed in 5.67s
+exit 0

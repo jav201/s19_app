@@ -44,6 +44,7 @@ Memory Map and A2B Diff panels are unchanged.
 from __future__ import annotations
 
 import bisect
+import json
 from dataclasses import dataclass
 from math import ceil
 from typing import (
@@ -52,6 +53,7 @@ from typing import (
     Dict,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Tuple,
@@ -76,6 +78,7 @@ from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import (
     Button,
+    ContentSwitcher,
     DataTable,
     Input,
     Label,
@@ -6861,36 +6864,199 @@ class PatchEditorPanel(ScrollableContainer):
         )
 
 
+#: batch-97 (LLR-145.6 / LLR-144.5): the JSON tab shows at most this many lines
+#: of a serialised document, then one note line naming the full count.
+JSON_TAB_LINE_CAP = 5000
+
+#: batch-97 (LLR-148.7, D6 / D7): the Check Editor's closed glyph vocabulary —
+#: glyph -> its one meaning. ``✓`` marks an included row in the ledger's mark
+#: column; ``◆`` / ``▪`` head the REPORT FIELDS lines. ``#check_legend`` is
+#: generated from this mapping, so the legend cannot name a glyph the panel
+#: does not paint. ``◆`` replaced ``☑``, which Windows Terminal paints two
+#: cells wide (LED-2026-10-19-batch-97.12).
+CHECK_GLYPHS: Mapping[str, str] = {
+    "✓": "included",
+    "◆": "parameter field",
+    "▪": "memory-row field",
+}
+
+
+def cap_json_lines(text: str, cap: int = JSON_TAB_LINE_CAP) -> str:
+    """Cap a JSON tab's text at ``cap`` lines plus one note line (LLR-144.5).
+
+    Example:
+        >>> cap_json_lines("a\\nb\\nc", cap=2)
+        'a\\nb\\nshowing 2 of 3 lines'
+    """
+    lines = text.split("\n")
+    if len(lines) <= cap:
+        return text
+    return "\n".join(lines[:cap] + [f"showing {cap} of {len(lines)} lines"])
+
+
+def _tail_cells(text: str, cap: int) -> str:
+    """The longest tail of ``text`` that fits in ``cap`` terminal cells."""
+    used = 0
+    for index in range(len(text) - 1, -1, -1):
+        used += cell_len(text[index])
+        if used > cap:
+            return text[index + 1:]
+    return text
+
+
+def clip_param(name: str, width: int) -> str:
+    """Clip an A2L parameter name to ``width`` cells, keeping what tells it apart.
+
+    LLR-145.3: a name that fits is painted whole; a longer one keeps its first
+    dot-separated segment, one ``…`` and the name's tail filling the column
+    (A2L names share long prefixes and differ at the end, P-38). A name with
+    no dot keeps a third of the width as its head. Widths are terminal cells
+    (``cell_len``), so a double-width name never paints past the column; a
+    wide character that would straddle the edge is dropped, leaving the clip
+    one cell short.
+
+    Example:
+        >>> clip_param("ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE", 24)
+        'ASAM…RB_NO_DEFAULT_VALUE'
+        >>> clip_param("UNKNOWN_PARAMETER_NAME_TAIL", 12)
+        'UNKN…ME_TAIL'
+    """
+    if cell_len(name) <= width:
+        return name
+    first = name.split(".")[0]
+    if cell_len(first) + 2 > width:
+        first = set_cell_size(first, max(1, width // 3)).rstrip()
+    return first + "…" + _tail_cells(name, width - cell_len(first) - 1)
+
+
+def clip_tail(text: str, width: int) -> str:
+    """Keep the tail of ``text`` behind one ``…`` when it exceeds ``width`` cells."""
+    if cell_len(text) <= width:
+        return text
+    return "…" + _tail_cells(text, width - 1)
+
+
+def _clip_fmt_unit(fmt_unit: str, width: int) -> str:
+    """Clip a ``u<bits> <unit>`` cell: the unit goes first, the width stays.
+
+    When even the ``u<bits>`` token fills the column, the token is painted
+    alone (no room for a ``…``); the full-name line shows the whole text.
+    """
+    text = fmt_unit.rstrip()
+    if cell_len(text) <= width:
+        return text
+    token = text.split(" ")[0]
+    if cell_len(token) >= width:
+        return set_cell_size(token, width)
+    return _clip_to_cells(text, width)
+
+
+def _count(n: int, noun: str) -> str:
+    """``1 field`` / ``2 fields`` — a count with its noun in number (ux-reviewer L3)."""
+    return f"{n} {noun}" if n == 1 else f"{n} {noun}s"
+
+
+class CheckLayout(NamedTuple):
+    """The Check Editor widths Python derives (D21); CSS sizes everything else."""
+
+    param: int
+    fmt: int
+    fmt_label: str
+    fields_name: int
+    mem_label: int
+    full_name: int
+
+
+def check_layout(table_w: int, card_w: int, fmt_longest: int) -> CheckLayout:
+    """Derive the Check Editor's painted widths from its measured content widths.
+
+    Summary:
+        D21 / PC-5. ``table_w`` is ``#check_param_table``'s content width, its
+        1-cell vertical scrollbar gutter always reserved; the fixed cells are
+        the mark (1 + 2 padding), Address (10 + 2) and the two remaining
+        paddings (19 in all). ``Fmt · Unit`` is sized first — the longest unit
+        text, capped at 16, never below ``u128``'s 4 cells and never eating the
+        Parameter floor of 42 — and Parameter takes the rest. ``card_w`` is
+        ``#check_right_column``'s content width: the REPORT FIELDS name field
+        is ``card_w − 14`` (mark 2, address 11, the pane's scrollbar gutter 1)
+        and the memory table's Label column ``card_w − 21``. The full-name line
+        under the ledger is as wide as the table less its 1-cell paddings
+        (``table_w − 2``). Below the range (LLR-149.6) the widths shrink to
+        their floors and the table scrolls.
+
+    Example:
+        >>> tuple(check_layout(68, 38, 11))
+        (42, 6, 'Fmt', 24, 17, 66)
+        >>> tuple(check_layout(120, 70, 11))
+        (89, 11, 'Fmt · Unit', 56, 49, 118)
+    """
+    usable = table_w - 1
+    fmt = max(4, min(fmt_longest, 16, usable - 19 - 42))
+    param = max(8, usable - 19 - fmt)
+    label = "Fmt · Unit" if fmt >= 10 else "Fmt"
+    return CheckLayout(
+        param, fmt, label, max(8, card_w - 14), max(4, card_w - 21), max(8, table_w - 2)
+    )
+
+
+class TabChip(Button):
+    """A one-row tab chip: ``enter`` (Button's own) and ``space`` press it (D16)."""
+
+    BINDINGS = [Binding("space", "press", "Press", show=False)]
+
+
+class IncludeTable(DataTable):
+    """The Check Editor's parameter ledger: ``space`` or ``enter`` toggles the
+    highlighted row's inclusion (LLR-145.8, D16; ``enter`` replaces DataTable's
+    row-select, which the ledger never used). The description ``Include`` is
+    the key bar's label (D27); ``show=False`` keeps the shipped Footer
+    unchanged until Inc-8 replaces it."""
+
+    BINDINGS = [
+        Binding("space", "toggle_include", "Include", show=False),
+        Binding("enter", "toggle_include", "Include", show=False),
+    ]
+
+    class IncludeToggled(Message):
+        """``space`` asked to toggle the highlighted row's inclusion."""
+
+    def action_toggle_include(self) -> None:
+        self.post_message(self.IncludeToggled())
+
+
 class CheckEditorPanel(ScrollableContainer):
-    """The Check Editor rail screen — the ce_a collector (batch-94, US-003).
+    """The Check Editor rail screen — ledger + REPORT FIELDS card (batch-97 ce_A).
 
     Summary:
         The check twin of the Patch Editor: a collector for A2L parameters
-        and memory locations the operator wants in the A2B diff report.
-        Per the ratified graduation call (``editor_bench.NOTES.md``), the
-        panel is the ce_a two-column form — left: the A2L parameter picker
-        (filter + measurement list with address and fmt/unit, ☑ marks the
-        selected); right: the memory-address table (addr / label / fmt) over
-        the spec-file row, the JSON-to-be preview strip, and the footer
-        actions — with ce_b's live addendum folded in as a read-only
-        preview toggle. The product is ONE artifact: a ``.chk.json`` check
-        spec (v2 grammar, ``kind="check"``) that the A2B Diff dropdown lists
-        suffix-distinguished and whose declared fields ride the emitted
-        report.
+        and memory locations the operator wants in the A2B diff report. The
+        batch-97 composition (HLR-145, operator verdict ce_A): the A2L
+        parameter ledger fills the left column at full height (mark ·
+        Parameter · Address · Fmt · Unit, the Address never clipped, names
+        clipped to their discriminating tail), with the highlighted row's full
+        name under it; the right column is the REPORT FIELDS card — Fields /
+        JSON / Addendum tab chips over one ``ContentSwitcher`` (Fields: the
+        included fields one per line, the memory-row table and its labelled
+        inputs, the validate verdicts; JSON: the spec document those fields
+        produce; Addendum: what the A2B diff report gains). Under the two
+        columns: the spec row, one docked action row and the glyph legend.
+        The product is ONE artifact: a ``.chk.json`` check spec (v2 grammar,
+        ``kind="check"``).
 
-        The NO-APPLY doctrine is the design statement and is carried three
-        ways, per the bench notes: the footer shows a struck APPLY ghost
-        (a STATIC — never an actionable control), the preview strip's
-        JSON-to-be carries ``"apply": false``, and the hint row reads
-        ``apply: n/a — check spec``. The panel exposes write and validate
-        actions only.
+        The NO-APPLY doctrine is carried three ways: the docked row shows a
+        struck APPLY ghost (a STATIC — never an actionable control), the JSON
+        tab carries ``"apply": false``, and the hint reads ``apply: n/a —
+        check spec``. The panel exposes write and validate actions only;
+        Write is its one filled element (LLR-145.9).
+
+        Widths: CSS splits the columns (left ``1fr``, card ``38%`` / min 42);
+        :func:`check_layout` derives what CSS cannot — the DataTable column
+        widths, the Fields name field, the memory Label column — and
+        :meth:`_apply_layout` repaints the width-dependent cells through the
+        public ``update_cell`` path (D21, PC-8) on mount, resize and show.
 
         The panel stays **presentational** (C-7): controls post
-        :class:`ActionRequested` messages (sibling family to
-        ``PatchEditorPanel.ActionRequested``) that ``app.py`` routes — the
-        write assembles the ``kind="check"`` document through the change
-        service seam, the validate rides ``run_check_document``, and the
-        shaped verdict rows come back via :meth:`refresh_check_results`.
+        :class:`ActionRequested` messages that ``app.py`` routes.
 
     Example:
         >>> panel = CheckEditorPanel()
@@ -6898,28 +7064,25 @@ class CheckEditorPanel(ScrollableContainer):
         'check_editor_panel'
     """
 
-    #: The no-apply doctrine's three carriers (see the class docstring). The
-    #: struck-APPLY ghost text and the hint row are author constants — never
-    #: file-derived (C-17).
     _APPLY_GHOST_TEXT = "APPLY — not available"
     _APPLY_HINT = "apply: n/a — check spec"
     _PREVIEW_CAP = 6
+    _STATUS_HINT = "Validate compares fields to the image"
+    _EMPTY_LEDGER = "No A2L parameters — load an A2L (^L) to list them."
+    _EMPTY_FIELDS = "No fields included yet."
 
     #: The memory-size -> fmt label vocabulary (closed author set).
     _FMT_LABELS = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}
 
+    #: (tab chip id, label, pane id) — the REPORT FIELDS card's three tabs.
+    _CARD_TABS = (
+        ("check_tab_fields", "Fields", "check_pane_fields"),
+        ("check_tab_json", "JSON", "check_pane_json"),
+        ("check_tab_addendum", "Addendum", "check_pane_addendum"),
+    )
+
     class ActionRequested(Message):
         """A Check Editor write/validate control was triggered (LLR-009).
-
-        Summary:
-            Posted by the Write ``.chk.json`` and Validate controls. Carries
-            the spec file name input's text and the COLLECTED items tuple —
-            one ``{"source", "name", "address", "size"}`` dict per declared
-            field — so ``app.py`` can assemble the ``kind="check"`` document
-            (resolving expected bytes from the loaded image) and either write
-            it (``write_doc``) or run it through ``run_check_document``
-            (``validate_doc``). The panel performs no ``changes``-package
-            work itself.
 
         Args:
             action (str): ``"write_doc"`` or ``"validate_doc"``.
@@ -6945,14 +7108,6 @@ class CheckEditorPanel(ScrollableContainer):
     class SpecFileSelected(Message):
         """The operator picked a spec/patch file from the dropdown (LLR-010.1).
 
-        Summary:
-            Posted when ``#check_spec_file_select`` fires ``Select.Changed``
-            with a concrete filename. Carries the bare name only — ``app.py``
-            re-resolves it under the patches folder, reads it through the
-            shipped reader and, for a valid ``kind="check"`` document, feeds
-            the declared fields back via :meth:`load_spec`. A blank selection
-            (``Select.NULL``) posts nothing.
-
         Args:
             filename (str): The chosen file's bare component.
 
@@ -6967,17 +7122,16 @@ class CheckEditorPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="check_editor_panel")
-        self.styles.layout = "vertical"
         #: The picked A2L parameter rows: {name: (address, size, fmt_unit)}.
         self._param_rows: dict = {}
         #: The picker rows currently mounted (filter-aware), in table order.
         self._visible_params: list = []
-        #: The picked parameter names in picker order (the ☑ set).
+        #: The picked parameter names in inclusion order (the ✓ set).
         self._picked_params: list = []
         #: The declared memory rows: list of (address, label, size).
         self._memory_rows: list = []
-        #: Whether the ce_b addendum preview toggle is open.
-        self._preview_open: bool = False
+        #: The last derived widths; ``None`` until the panel is measured.
+        self._layout: Optional[CheckLayout] = None
 
     # ------------------------------------------------------------------
     # Population seams (app.py is the only caller — the US-026 split)
@@ -6986,20 +7140,8 @@ class CheckEditorPanel(ScrollableContainer):
     def set_spec_files(self, names: Sequence[str]) -> None:
         """Populate the spec dropdown, suffix-distinguished (LLR-010.1).
 
-        Summary:
-            Replace ``#check_spec_file_select``'s options with one entry per
-            file from the patches-folder scan — check specs (``.chk.json``)
-            AND patch files listed together, every check spec's label
-            carrying the green ``CHECK`` distinction and every patch file
-            the ``PATCH`` one (the ce_a idiom: the suffix picks the surface).
-            The option label is a FILENAME read off disk, so it reaches the
-            Select as a literal ``Text`` (C-17 — the same live sink the
-            batch-37 ``set_change_files`` fold documented); the VALUE stays
-            the bare ``str``.
-
-        Args:
-            names (Sequence[str]): Sorted bare names from the folder scan
-                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+        Every option label is a FILENAME read off disk, so it reaches the
+        Select as a literal ``Text`` (C-17); the VALUE stays the bare ``str``.
         """
         options = []
         for name in names:
@@ -7012,24 +7154,15 @@ class CheckEditorPanel(ScrollableContainer):
         self.query_one("#check_spec_file_select", Select).set_options(options)
 
     def set_a2l_parameters(self, rows: Sequence[dict]) -> None:
-        """Populate the A2L parameter picker (LLR-001.1).
+        """Populate the A2L parameter ledger (LLR-001.1, LLR-145.1).
 
-        Summary:
-            Replace the picker's rows with the loaded A2L's measurable
-            parameters — name, address, fmt/unit — clearing any ☑ picks that
-            no longer exist. Called by ``app.py`` when the Check Editor
-            screen activates (and when the A2L reloads). Every cell is a
-            literal ``Text`` (C-17): A2L symbol names are file-derived.
-
-        Args:
-            rows (Sequence[dict]): The enriched A2L tags carrying ``name``,
-                ``address`` (int or None), ``byte_size`` and a unit token.
+        Replaces the ledger's rows with the loaded A2L's parameters carrying an
+        integer address, clears the picks, and re-derives the widths (the
+        longest ``Fmt · Unit`` text is an input of :func:`check_layout`).
+        Every cell is a literal ``Text`` (C-17): A2L names are file-derived.
         """
         self._param_rows = {}
         self._picked_params = []
-        self._visible_params = []
-        table = self.query_one("#check_param_table", DataTable)
-        table.clear()
         for row in rows:
             name = str(row.get("name") or "?")
             address = row.get("address")
@@ -7038,50 +7171,28 @@ class CheckEditorPanel(ScrollableContainer):
             unit = str(row.get("compu_method_unit") or "")
             fmt_unit = f"u{size * 8}" + (f" {unit}" if unit else "")
             self._param_rows[name] = (address, size, fmt_unit)
-            self._visible_params.append(name)
-            table.add_row(
-                Text("·", style=DGRAY),
-                safe_text(name, VALUE),
-                safe_text(
-                    f"0x{address:08X}" if address is not None else "-", CYAN
-                ),
-                safe_text(fmt_unit),
-            )
+        self._visible_params = list(self._param_rows)
+        self._rebuild_ledger()
+        self._layout = None
+        self.call_after_refresh(self._apply_layout)
         self._refresh_preview()
 
     def load_spec(self, items: Sequence[dict], source_name: str) -> None:
         """Populate the collector from a loaded check spec (LLR-009.1 read arm).
 
-        Summary:
-            Replace the collector state with the declared fields of the spec
-            the operator picked from the dropdown: every declared address
-            becomes a memory row (the v2 wire grammar carries no names —
-            fields are named by address). ``app.py`` read the document
-            through the shipped reader; this method only mirrors it into the
-            collector tables.
-
-        Args:
-            items (Sequence[dict]): ``{"address", "size"}`` per declared
-                field (address may be None for an unresolvable field).
-            source_name (str): The spec file name for the name input
-                (already containment-checked by the caller).
+        Every declared address becomes a memory row (the v2 wire grammar
+        carries no names). ``app.py`` read the document; this only mirrors it.
         """
         self._picked_params = []
         self._memory_rows = []
-        table = self.query_one("#check_mem_table", DataTable)
-        table.clear()
         for item in items:
             address = item.get("address")
-            size = int(item.get("size") or 1)
             if address is None:
                 continue
-            label = f"field @ 0x{address:08X}"
-            self._memory_rows.append((int(address), label, size))
-            table.add_row(
-                safe_text(f"0x{int(address):08X}", CYAN),
-                safe_text(label, VALUE),
-                safe_text(self._fmt_label(size)),
-            )
+            size = int(item.get("size") or 1)
+            self._memory_rows.append((int(address), self._default_label(int(address)), size))
+        self._rebuild_memory_table()
+        self._rebuild_ledger()
         base = str(source_name)
         if is_check_spec_name(base):
             base = base[: -len(".chk.json")]
@@ -7100,77 +7211,106 @@ class CheckEditorPanel(ScrollableContainer):
         """Map a declared byte size to the closed fmt vocabulary."""
         return self._FMT_LABELS.get(size, f"{size}B")
 
+    @staticmethod
+    def _default_label(address: int) -> str:
+        """The stored name of a memory row typed with no label (kept in the spec)."""
+        return f"field @ 0x{address:08X}"
+
+    def _widths(self) -> CheckLayout:
+        """The current layout, or the 118-column reading before the first measure."""
+        return self._layout or check_layout(68, 38, self._fmt_longest())
+
+    def _fmt_longest(self) -> int:
+        return max((cell_len(v[2].rstrip()) for v in self._param_rows.values()), default=0)
+
+    def _ledger_cells(self, name: str, layout: CheckLayout) -> tuple:
+        address, _size, fmt_unit = self._param_rows[name]
+        picked = name in self._picked_params
+        plain = safe_text(name).plain
+        return (
+            Text("✓", style=GREEN) if picked else Text(" "),
+            safe_text(clip_param(plain, layout.param), VALUE),
+            safe_text(f"0x{address:08X}" if address is not None else "-", CYAN),
+            safe_text(_clip_fmt_unit(fmt_unit, layout.fmt)),
+        )
+
+    def _rebuild_ledger(self) -> None:
+        """Re-add the visible ledger rows (rows only — never the columns)."""
+        table = self.query_one("#check_param_table", DataTable)
+        layout = self._widths()
+        table.clear()
+        for name in self._visible_params:
+            table.add_row(*self._ledger_cells(name, layout), key=name)
+        self._refresh_full_name()
+
+    def _rebuild_memory_table(self) -> None:
+        table = self.query_one("#check_mem_table", DataTable)
+        layout = self._widths()
+        table.clear()
+        for address, label, size in self._memory_rows:
+            # A row typed with no label shows ``—``: its stored name only
+            # repeats the address of the cell beside it (ux-reviewer M1).
+            shown = (
+                Text("—", style=DGRAY)
+                if label == self._default_label(address)
+                else safe_text(_clip_to_cells(safe_text(label).plain, layout.mem_label), VALUE)
+            )
+            table.add_row(
+                safe_text(f"0x{address:08X}", CYAN),
+                shown,
+                safe_text(self._fmt_label(size)),
+            )
+
     def _collected_items(self) -> tuple:
         """Gather the collector state into the message items tuple.
 
         One ``{"source", "name", "address", "size"}`` dict per declared
-        field, in collector order: the ☑-picked parameters first (model
+        field, in collector order: the included parameters first (inclusion
         order), then the memory rows (table order).
         """
         items = []
         for name in self._picked_params:
             address, size, _fmt = self._param_rows.get(name, (None, 1, ""))
             items.append(
-                {
-                    "source": "param",
-                    "name": name,
-                    "address": address,
-                    "size": size,
-                }
+                {"source": "param", "name": name, "address": address, "size": size}
             )
         for address, label, size in self._memory_rows:
             items.append(
-                {
-                    "source": "memory",
-                    "name": label,
-                    "address": address,
-                    "size": size,
-                }
+                {"source": "memory", "name": label, "address": address, "size": size}
             )
         return tuple(items)
 
     def _preview_text(self) -> Text:
-        """Build the JSON-to-be preview strip (ce_a doctrine, C-17-safe).
+        """The JSON tab: the spec document the collected fields produce.
 
-        A compact rendering of the document the Write control would produce:
-        the v2 envelope with ``"kind": "check"`` and the explicit
-        ``"apply": false`` marker, then up to :attr:`_PREVIEW_CAP` declared
-        fields and the ``← never applied`` tail. Every file-derived string
-        (parameter names, memory labels) is appended LITERALLY — built with
-        ``Text.append``, never f-strung into a markup string.
+        A JSON document (``json.dumps``, ASCII-escaped, so no control byte and
+        no markup reaches the view) carrying the v2 envelope with
+        ``"kind": "check"`` and the explicit ``"apply": false`` marker, one
+        entry per field (address, size, name), capped at
+        :data:`JSON_TAB_LINE_CAP` lines. Built as a plain ``Text`` (C-17).
         """
-        text = Text()
-        text.append("{", style=LABEL)
-        for line in (
-            '  "format": "s19app-changeset",',
-            '  "version": "2.0",',
-            '  "kind": "check",',
-            '  "apply": false,',
-            '  "entries": [',
-        ):
-            text.append("\n")
-            text.append(line, style=LABEL)
-        items = self._collected_items()
-        for index, item in enumerate(items[: self._PREVIEW_CAP]):
-            address = item["address"]
-            addr = f"0x{address:08X}" if address is not None else "unresolved"
-            text.append("\n")
-            text.append(
-                f'    [{index}] {addr} · {item["size"]}B · ', style=LABEL
-            )
-            text.append(safe_text(str(item["name"]), VALUE))
-        if len(items) > self._PREVIEW_CAP:
-            text.append("\n")
-            text.append(f"    … {len(items) - self._PREVIEW_CAP} more", style=DGRAY)
-        text.append("\n")
-        text.append("  ]", style=LABEL)
-        text.append("\n")
-        text.append("}", style=LABEL)
-        text.append("   ← never applied", style=DGRAY)
-        return text
+        document = {
+            "format": "s19app-changeset",
+            "version": "2.0",
+            "kind": "check",
+            "apply": False,
+            "entries": [
+                {
+                    "address": (
+                        f"0x{item['address']:08X}"
+                        if item["address"] is not None
+                        else None
+                    ),
+                    "size": item["size"],
+                    "name": str(item["name"]),
+                }
+                for item in self._collected_items()
+            ],
+        }
+        return Text(cap_json_lines(json.dumps(document, indent=2)), style=LABEL)
 
     def _addendum_preview_text(self) -> Text:
-        """Build the ce_b addendum preview (read-only report-gain frame).
+        """Build the addendum preview (read-only report-gain frame).
 
         Renders what the A2B diff report gains from this spec: the ``## Checks``
         heading, the declared-field count, and the no-apply statement. Field
@@ -7193,228 +7333,387 @@ class CheckEditorPanel(ScrollableContainer):
             text.append(f"  … {len(items) - self._PREVIEW_CAP} more", style=DGRAY)
         return text
 
-    def _refresh_preview(self) -> None:
-        """Repaint the preview strip, the addendum preview and the counts."""
-        previews = self.query("#check_preview")
-        if previews:
-            previews.first(Static).update(self._preview_text())
-        addenda = self.query("#check_addendum_preview")
-        if addenda and self._preview_open:
-            addenda.first(Static).update(self._addendum_preview_text())
-        fields = self.query("#check_fields_count")
-        if fields:
-            fields.first(Static).update(
-                Text(
-                    f"{len(self._collected_items())} fields → report",
-                    style=GREEN,
-                )
+    def _fields_lines_text(self) -> Text:
+        """The Fields tab: a head line, then one line per included field.
+
+        ``◆ <address> <name>`` per included parameter and ``▪ <address> <fmt>
+        <label>`` per memory row, in inclusion order (LLR-145.6). A parameter
+        name wider than the name field keeps its tail behind one ``…``
+        (LLR-145.3); a memory label keeps its head (labels, LLR-149.4), and a
+        row typed with no label reads ``memory row`` instead of repeating its
+        address (ux-reviewer M1). Built with ``Text.append`` — never a markup
+        string (C-17).
+        """
+        items = self._collected_items()
+        params = sum(1 for item in items if item["source"] == "param")
+        memory = len(items) - params
+        text = Text(
+            f"{_count(len(items), 'field')}: {_count(params, 'param')} · "
+            f"{_count(memory, 'memory row')}",
+            style=f"bold {GREEN}",
+        )
+        if not items:
+            text.append("\n")
+            text.append(self._EMPTY_FIELDS, style=DGRAY)
+            return text
+        width = self._widths().fields_name
+        for item in items:
+            param = item["source"] == "param"
+            address = item["address"]
+            text.append("\n")
+            text.append("◆ " if param else "▪ ", style=GREEN if param else CYAN)
+            text.append(
+                f"0x{address:08X} " if address is not None else "unresolved ",
+                style=CYAN,
             )
+            name = safe_text(str(item["name"])).plain
+            if param:
+                text.append(safe_text(clip_tail(name, width), VALUE))
+                continue
+            fmt = self._fmt_label(item["size"])
+            text.append(f"{fmt} ", style=DGRAY)
+            if item["name"] == self._default_label(address):
+                text.append("memory row", style=DGRAY)
+            else:
+                label_w = max(4, width - cell_len(fmt) - 1)
+                text.append(safe_text(_clip_to_cells(name, label_w), VALUE))
+        return text
+
+    def _refresh_preview(self) -> None:
+        """Repaint the Fields lines, the JSON and Addendum tabs and the count."""
+        if not self.is_mounted:
+            return
+        items = self._collected_items()
+        self.query_one("#check_fields_lines", Static).update(self._fields_lines_text())
+        self.query_one("#check_preview", Static).update(self._preview_text())
+        self.query_one("#check_addendum_preview", Static).update(
+            self._addendum_preview_text()
+        )
+        self.query_one("#check_fields_count", Static).update(
+            Text(f"{_count(len(items), 'field')} → report", style=GREEN)
+        )
+        self.query_one("#check_left_column").border_subtitle = (
+            f"{len(self._param_rows)} params · {len(self._picked_params)} picked"
+        )
+
+    def _refresh_full_name(self) -> None:
+        """Paint the highlighted row's address, ``Fmt · Unit`` and name under
+        the ledger (LLR-145.3; code-reviewer F1, ux-reviewer L2).
+
+        The address and the full ``Fmt · Unit`` come first and are never
+        clipped; the name takes the cells left of ``layout.full_name`` and,
+        when wider, is clipped by the ledger's rule (first segment, one ``…``,
+        the tail) — so the line ends with the part that tells twins apart. The
+        text depends on the derived width, so ``_apply_layout`` repaints it
+        (D21 (4), PC-19).
+        """
+        line = self.query_one("#check_full_name_line", Static)
+        table = self.query_one("#check_param_table", DataTable)
+        if not self._visible_params:
+            empty = self._EMPTY_LEDGER if not self._param_rows else "No parameter matches the filter."
+            line.update(Text(empty, style=DGRAY))
+            return
+        row = table.cursor_row
+        if not 0 <= row < len(self._visible_params):
+            row = 0
+        name = self._visible_params[row]
+        address, _size, fmt_unit = self._param_rows[name]
+        head = f"0x{address:08X}" if address is not None else "-"
+        fmt_unit = fmt_unit.rstrip()
+        text = Text(head, style=CYAN)
+        text.append(f"  {fmt_unit}  ", style=DGRAY)
+        room = max(8, self._widths().full_name - cell_len(text.plain))
+        text.append(safe_text(clip_param(safe_text(name).plain, room), VALUE))
+        line.update(text)
+
+    # ------------------------------------------------------------------
+    # Width derivation (D21: mount, resize, show)
+    # ------------------------------------------------------------------
+
+    def _apply_layout(self) -> None:
+        """Re-derive the widths and repaint every width-dependent text.
+
+        Reads the measured content widths of ``#check_param_table`` and
+        ``#check_right_column`` (never the terminal width). An unchanged
+        layout repaints nothing. Otherwise it sets each column's width and
+        rewrites the Parameter and ``Fmt · Unit`` cells with ``update_cell``,
+        the first call with ``update_width=True`` (the public repaint path
+        the PC-8 spike measured); it never adds a column. The Fields lines
+        and the memory Label cells are rebuilt by their own painters.
+        """
+        table = self.query_one("#check_param_table", DataTable)
+        card = self.query_one("#check_right_column")
+        if table.content_region.width == 0 or card.content_region.width == 0:
+            return
+        layout = check_layout(
+            table.content_region.width, card.content_region.width, self._fmt_longest()
+        )
+        if layout == self._layout:
+            return
+        self._layout = layout
+        columns = table.ordered_columns
+        for column, width in zip(columns, (1, layout.param, 10, layout.fmt)):
+            column.width = width
+            column.auto_width = False
+        columns[3].label = Text(layout.fmt_label)
+        keys = [column.key for column in columns]
+        if not self._visible_params:
+            # D21 (5): with no rows the pass is ``clear()`` (rows only) — it
+            # drops the table's cached render so the new column widths repaint
+            # the header; there is no cell for ``update_cell`` to go through.
+            table.clear()
+        for index, name in enumerate(self._visible_params):
+            cells = self._ledger_cells(name, layout)
+            table.update_cell(name, keys[1], cells[1], update_width=(index == 0))
+            table.update_cell(name, keys[3], cells[3])
+        mem = self.query_one("#check_mem_table", DataTable)
+        for column, width in zip(mem.ordered_columns, (10, layout.mem_label, 3)):
+            column.width = width
+            column.auto_width = False
+        self._rebuild_memory_table()
+        self._refresh_full_name()
+        self._refresh_preview()
+
+    def on_resize(self, event: events.Resize) -> None:
+        self.call_after_refresh(self._apply_layout)
+
+    def on_show(self, event: events.Show) -> None:
+        self.call_after_refresh(self._apply_layout)
 
     # ------------------------------------------------------------------
     # Composition
     # ------------------------------------------------------------------
 
     def compose(self) -> ComposeResult:
-        """Lay out the ce_a two-column collector (LLR-001.1).
+        """Lay out the ledger + REPORT FIELDS card (HLR-145, the ce_A tree).
 
-        Summary:
-            Left column: the A2L parameter picker — filter input, the
-            measurement table (☑ / Parameter / Address / Fmt · Unit) and its
-            include control. Right column: the spec-file row (the
-            suffix-distinguished dropdown tops it, per ce_a), the memory
-            table with its add/remove inputs, the JSON-to-be preview strip,
-            the ce_b addendum preview (revealed by its toggle), the footer
-            actions (Validate · Write ``.chk.json`` · the struck APPLY ghost ·
-            the field count) and the no-apply hint row. The window geometry
-            is inline (the panel's SOURCE-file budget excludes styles.tcss).
-
-        Returns:
-            ComposeResult: The Check Editor widget tree.
+        Every row below the two columns is one terminal row; the ledger is
+        the panel's growing region (design §3, Check Editor tree). The shipped
+        ids are all kept (LLR-145.1); ``#check_preview_toggle_button`` stays
+        mounted and hidden, its function carried by the Addendum tab chip.
         """
-        left = Vertical(
-            Label("A2L parameters", classes="patch-field-label"),
-            OsClipboardInput(
-                placeholder="filter parameters",
-                id="check_param_filter",
-            ),
-            DataTable(
-                id="check_param_table",
-                zebra_stripes=True,
-                cursor_type="row",
-            ),
-            Horizontal(
-                Button(
-                    "Include parameter",
-                    id="check_param_include_button",
-                    classes="patch-chip",
-                ),
-                id="check_param_controls",
-                classes="patch-docked-row patch-chip-entry",
-            ),
-            id="check_left_column",
-        )
-        right = Vertical(
-            Horizontal(
-                Select(
-                    [],
-                    id="check_spec_file_select",
-                    prompt="Check specs in patches/",
-                    allow_blank=True,
-                ),
-                OsClipboardInput(
-                    placeholder="spec file name",
-                    id="check_file_name_input",
-                ),
-                id="check_spec_file_row",
-                classes="patch-docked-row",
-            ),
-            Label("Memory locations", classes="patch-field-label"),
-            DataTable(
-                id="check_mem_table",
-                zebra_stripes=True,
-                cursor_type="row",
-            ),
-            Horizontal(
-                OsClipboardInput(
-                    placeholder="0x100",
-                    id="check_mem_address_input",
-                ),
-                OsClipboardInput(
-                    placeholder="label",
-                    id="check_mem_label_input",
-                ),
-                OsClipboardInput(
-                    placeholder="size",
-                    id="check_mem_size_input",
-                ),
-                id="check_mem_inputs",
-                classes="patch-docked-row",
-            ),
-            Horizontal(
-                Button(
-                    "Add memory row",
-                    id="check_mem_add_button",
-                    classes="patch-chip",
-                ),
-                Button(
-                    "Remove memory row",
-                    id="check_mem_remove_button",
-                    classes="patch-chip",
-                ),
-                id="check_mem_controls",
-                classes="patch-docked-row patch-chip-entry",
-            ),
-            Static("", id="check_preview", markup=False),
-            Static(
-                "",
-                id="check_addendum_preview",
-                markup=False,
-                classes="hidden",
-            ),
-            Horizontal(
-                Button(
-                    "Validate",
-                    id="check_validate_button",
-                    classes="patch-chip",
-                ),
-                Button(
-                    "Write .chk.json",
-                    id="check_write_button",
-                    classes="patch-chip",
-                ),
-                # The struck-APPLY ghost — a STATIC, not a Button. The
-                # no-apply doctrine made visible (C-ux-2: the apply-action
-                # census counts ACTIONABLE controls only; this ghost posts
-                # nothing and can be pressed nowhere).
-                Static(
-                    Text(self._APPLY_GHOST_TEXT, style="strike dim"),
-                    id="check_apply_ghost",
-                ),
+        with Horizontal(id="check_columns"):
+            with Vertical(id="check_left_column") as left:
+                left.border_title = "A2L PARAMETERS"
+                with Horizontal(classes="ce-row"):
+                    yield Label("Filter", classes="ce-label")
+                    yield OsClipboardInput(
+                        placeholder="filter parameters",
+                        id="check_param_filter",
+                        compact=True,
+                    )
+                yield IncludeTable(
+                    id="check_param_table",
+                    zebra_stripes=True,
+                    cursor_type="row",
+                    classes="nowrap-ledger",
+                )
+                yield Static("", id="check_full_name_line", classes="nowrap-heading")
+                with Horizontal(
+                    id="check_param_controls",
+                    classes="patch-docked-row patch-chip-entry",
+                ):
+                    yield Button(
+                        "Include parameter",
+                        id="check_param_include_button",
+                        classes="patch-chip",
+                    )
+                    yield Static(
+                        "space also toggles ✓ on the highlighted row",
+                        classes="ce-hint",
+                    )
+            with Vertical(id="check_right_column") as right:
+                right.border_title = "REPORT FIELDS"
+                with Horizontal(id="check_card_tabs"):
+                    for chip_id, label, _pane in self._CARD_TABS:
+                        yield TabChip(
+                            label,
+                            id=chip_id,
+                            classes="tab-chip chip-selected"
+                            if chip_id == "check_tab_fields"
+                            else "tab-chip",
+                        )
+                with ContentSwitcher(initial="check_pane_fields", id="check_card_switcher"):
+                    with VerticalScroll(id="check_pane_fields") as fields_pane:
+                        fields_pane.can_focus = False
+                        yield Static(
+                            "", id="check_fields_lines", classes="nowrap-fields"
+                        )
+                        yield Static("MEMORY LOCATIONS", classes="ce-title")
+                        yield DataTable(
+                            id="check_mem_table",
+                            zebra_stripes=True,
+                            cursor_type="row",
+                        )
+                        # One row per field, labels in one fixed column
+                        # (operator decision at the Inc-3 gate, LED-…97.14).
+                        with Vertical(id="check_mem_inputs", classes="patch-docked-row"):
+                            with Horizontal(classes="ce-row"):
+                                yield Label("Address", classes="ce-label")
+                                yield OsClipboardInput(
+                                    placeholder="0x100",
+                                    id="check_mem_address_input",
+                                    compact=True,
+                                )
+                            with Horizontal(classes="ce-row"):
+                                yield Label("Label", classes="ce-label")
+                                yield OsClipboardInput(
+                                    placeholder="label",
+                                    id="check_mem_label_input",
+                                    compact=True,
+                                )
+                            with Horizontal(classes="ce-row"):
+                                yield Label("Size (bytes)", classes="ce-label")
+                                yield OsClipboardInput(
+                                    placeholder="1",
+                                    id="check_mem_size_input",
+                                    compact=True,
+                                )
+                        with Horizontal(
+                            id="check_mem_controls",
+                            classes="patch-docked-row patch-chip-entry",
+                        ):
+                            yield Button(
+                                "Add row",
+                                id="check_mem_add_button",
+                                classes="patch-chip",
+                            )
+                            yield Button(
+                                "Remove row",
+                                id="check_mem_remove_button",
+                                classes="patch-chip",
+                            )
+                        yield Label(
+                            self._STATUS_HINT,
+                            id="check_status",
+                            classes="patch-field-label",
+                            markup=False,
+                        )
+                        yield Container(id="check_results")
+                    with ScrollableContainer(id="check_pane_json"):
+                        yield Static("", id="check_preview", markup=False)
+                    with ScrollableContainer(id="check_pane_addendum"):
+                        yield Static("", id="check_addendum_preview", markup=False)
+        with Horizontal(id="check_spec_file_row", classes="patch-docked-row"):
+            yield Label("Spec", classes="ce-label")
+            yield Select(
+                [],
+                id="check_spec_file_select",
+                prompt="Check specs in patches/",
+                allow_blank=True,
+                compact=True,
+            )
+            yield Label("Write as", classes="ce-label")
+            yield OsClipboardInput(
+                placeholder="spec file name",
+                id="check_file_name_input",
+                compact=True,
+            )
+        with Horizontal(id="check_dock"):
+            with Horizontal(
                 id="check_actions_row",
                 classes="patch-docked-row patch-chip-apply",
-            ),
-            Horizontal(
-                Static("", id="check_fields_count", markup=False),
-                Button(
+            ):
+                yield Button(
+                    "Validate", id="check_validate_button", classes="patch-chip"
+                )
+                yield Button(
+                    "Write .chk.json",
+                    id="check_write_button",
+                    classes="patch-chip fill-accent",
+                )
+                # The struck-APPLY ghost — a STATIC, not a Button: the
+                # no-apply doctrine made visible (C-ux-2).
+                yield Static(
+                    Text(self._APPLY_GHOST_TEXT, style="strike dim"),
+                    id="check_apply_ghost",
+                )
+            with Horizontal(id="check_actions_row2", classes="patch-docked-row"):
+                yield Static("", id="check_fields_count", markup=False)
+                toggle = Button(
                     "Addendum preview",
                     id="check_preview_toggle_button",
                     classes="patch-chip",
-                ),
-                id="check_actions_row2",
-                classes="patch-docked-row",
-            ),
-            Static(
+                )
+                toggle.display = False
+                yield toggle
+            yield Static(
                 Text(self._APPLY_HINT, style=DGRAY),
                 id="check_apply_hint",
                 markup=False,
-            ),
-            Container(id="check_results"),
-            Label(
-                "",
-                id="check_status",
-                classes="patch-field-label",
-                markup=False,
-            ),
-            id="check_right_column",
+            )
+        yield Static(
+            "   ".join(f"{glyph} {meaning}" for glyph, meaning in CHECK_GLYPHS.items()),
+            id="check_legend",
+            classes="glyph-legend nowrap-legend",
+            markup=False,
         )
-        row = Horizontal(left, right, id="check_columns")
-        yield row
 
     def on_mount(self) -> None:
-        """Initialise the collector tables' columns and column widths."""
-        self.query_one("#check_param_table", DataTable).add_columns(
-            "✓", "Parameter", "Address", "Fmt · Unit"
-        )
-        self.query_one("#check_mem_table", DataTable).add_columns(
-            "Address", "Label", "Fmt"
-        )
+        """Add the two tables' columns once, at the 118-column widths."""
+        layout = self._widths()
+        table = self.query_one("#check_param_table", DataTable)
+        table.add_column("✓", width=1, key="mark")
+        table.add_column("Parameter", width=layout.param, key="param")
+        table.add_column("Address", width=10, key="address")
+        table.add_column(layout.fmt_label, width=layout.fmt, key="fmt")
+        mem = self.query_one("#check_mem_table", DataTable)
+        mem.add_column("Address", width=10)
+        mem.add_column("Label", width=layout.mem_label)
+        mem.add_column("Fmt", width=3)
         self.query_one("#check_file_name_input", Input).value = "spec.chk.json"
-        # The ce_a two-column split: each column takes half the boxed
-        # workspace, and the compact input widths keep every docked row inside
-        # its column at the 120x30 primary regime (measured — the C-13
-        # budget arithmetic, applied inline because styles.tcss is outside
-        # this increment's SOURCE-file budget).
-        self.query_one("#check_left_column").styles.width = "1fr"
-        self.query_one("#check_right_column").styles.width = "1fr"
-        # Static defaults to 1fr — the count read-out must size to its text or
-        # it pushes the addendum toggle off the row at 120 cols.
-        self.query_one("#check_fields_count").styles.width = "auto"
-        for input_id, width in (
-            ("#check_mem_address_input", 12),
-            ("#check_mem_label_input", 14),
-            ("#check_mem_size_input", 8),
-            ("#check_file_name_input", 16),
-        ):
-            self.query_one(input_id, Input).styles.width = width
+        self._refresh_full_name()
         self._refresh_preview()
+        self.call_after_refresh(self._apply_layout)
 
     # ------------------------------------------------------------------
     # Events
     # ------------------------------------------------------------------
 
+    def _show_tab(self, chip_id: str) -> None:
+        """Switch the card to ``chip_id``'s pane and mark that chip selected."""
+        for tab_id, _label, pane in self._CARD_TABS:
+            selected = tab_id == chip_id
+            self.query_one(f"#{tab_id}").set_class(selected, "chip-selected")
+            if selected:
+                self.query_one("#check_card_switcher", ContentSwitcher).current = pane
+
+    def _toggle_highlighted(self) -> None:
+        """Include or exclude the highlighted ledger row (button and ``space``)."""
+        if not self._visible_params:
+            return
+        table = self.query_one("#check_param_table", DataTable)
+        cursor = table.cursor_row
+        if not 0 <= cursor < len(self._visible_params):
+            return
+        name = self._visible_params[cursor]
+        if name in self._picked_params:
+            self._picked_params.remove(name)
+        else:
+            self._picked_params.append(name)
+        table.update_cell_at(
+            Coordinate(cursor, 0), self._ledger_cells(name, self._widths())[0]
+        )
+        self._refresh_preview()
+
+    def on_include_table_include_toggled(self, event: IncludeTable.IncludeToggled) -> None:
+        event.stop()
+        self._toggle_highlighted()
+
+    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
+        if event.data_table.id == "check_param_table":
+            self._refresh_full_name()
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Translate the collector controls into messages (LLR-001.1/.2)."""
         button_id = event.button.id or ""
+        if any(button_id == tab_id for tab_id, _l, _p in self._CARD_TABS):
+            event.stop()
+            self._show_tab(button_id)
+            return
         if button_id == "check_param_include_button":
             event.stop()
-            if not self._visible_params:
-                return
-            table = self.query_one("#check_param_table", DataTable)
-            cursor = table.cursor_row
-            if not 0 <= cursor < len(self._visible_params):
-                return
-            name = self._visible_params[cursor]
-            if name in self._picked_params:
-                self._picked_params.remove(name)
-            else:
-                self._picked_params.append(name)
-            new_marker = (
-                Text("✓", style=GREEN)
-                if name in self._picked_params
-                else Text("·", style=DGRAY)
-            )
-            table.update_cell_at(Coordinate(cursor, 0), new_marker)
-            self._refresh_preview()
+            self._toggle_highlighted()
             return
         if button_id == "check_mem_add_button":
             event.stop()
@@ -7429,18 +7728,12 @@ class CheckEditorPanel(ScrollableContainer):
             if not 0 <= cursor < len(self._memory_rows):
                 return
             self._memory_rows.pop(cursor)
-            table.remove_row(cursor)
+            self._rebuild_memory_table()
             self._refresh_preview()
             return
         if button_id == "check_preview_toggle_button":
             event.stop()
-            self._preview_open = not self._preview_open
-            preview = self.query_one("#check_addendum_preview", Static)
-            if self._preview_open:
-                preview.update(self._addendum_preview_text())
-                preview.remove_class("hidden")
-            else:
-                preview.add_class("hidden")
+            self._show_tab("check_tab_addendum")
             return
         actions = {
             "check_write_button": "write_doc",
@@ -7490,39 +7783,20 @@ class CheckEditorPanel(ScrollableContainer):
             )
             return
         if not label:
-            label = f"field @ 0x{address:08X}"
+            label = self._default_label(address)
         self._memory_rows.append((address, label, size))
-        self.query_one("#check_mem_table", DataTable).add_row(
-            safe_text(f"0x{address:08X}", CYAN),
-            safe_text(label, VALUE),
-            safe_text(self._fmt_label(size)),
-        )
+        self._rebuild_memory_table()
         self._refresh_preview()
 
     def on_input_changed(self, event: Input.Changed) -> None:
-        """Filter the parameter picker as the operator types (ce_a picker)."""
+        """Filter the parameter ledger as the operator types."""
         if event.input.id != "check_param_filter":
             return
         needle = event.value.strip().lower()
-        table = self.query_one("#check_param_table", DataTable)
-        names = list(self._param_rows)
         self._visible_params = [
-            name
-            for name in names
-            if not needle or needle in name.lower()
+            name for name in self._param_rows if not needle or needle in name.lower()
         ]
-        table.clear()
-        for name in self._visible_params:
-            address, size, fmt_unit = self._param_rows[name]
-            picked = name in self._picked_params
-            table.add_row(
-                Text("✓", style=GREEN) if picked else Text("·", style=DGRAY),
-                safe_text(name, VALUE),
-                safe_text(
-                    f"0x{address:08X}" if address is not None else "-", CYAN
-                ),
-                safe_text(fmt_unit),
-            )
+        self._rebuild_ledger()
 
     def on_select_changed(self, event: Select.Changed) -> None:
         """Forward a spec-file dropdown pick to ``app.py`` (LLR-010.1)."""
@@ -7533,17 +7807,27 @@ class CheckEditorPanel(ScrollableContainer):
         event.stop()
         self.post_message(self.SpecFileSelected(str(event.value)))
 
+    def show_status_line(self, line: str) -> None:
+        """Paint one English state line in the REPORT FIELDS card (LLR-148.9).
+
+        Used for a refused Write: the line replaces the verdict rows under the
+        memory form, and the card shows its Fields tab.
+        """
+        self.refresh_check_results([], line)
+
     def refresh_check_results(
         self,
         rows: Sequence[tuple],
         status_line: str,
     ) -> None:
-        """Render the validate verdicts (LLR-009.2) — one row per entry.
+        """Render the validate verdicts (LLR-009.2) under the memory form, on
+        the Fields tab.
 
         Args:
             rows (Sequence[tuple]): ``(text, css_class)`` per entry verdict.
-            status_line (str): The aggregate status sentence.
+            status_line (str): The status sentence (one line).
         """
+        self._show_tab("check_tab_fields")
         self.query_one("#check_status", Label).update(status_line)
         container = self.query_one("#check_results", Container)
         container.remove_children()

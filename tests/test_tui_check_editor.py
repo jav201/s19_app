@@ -472,9 +472,10 @@ def test_at_b94_13_hostile_symbol_and_file_name(tmp_path: Path) -> None:
                 (label.plain if hasattr(label, "plain") else str(label))
                 for label, _v in select._options
             ]
-            return cell_text, cell_spans, option_labels
+            full_name = str(app.query_one("#check_full_name_line").render())
+            return cell_text, cell_spans, option_labels, full_name
 
-    cell_text, cell_spans, option_labels = asyncio.run(_drive())
+    cell_text, cell_spans, option_labels, full_name = asyncio.run(_drive())
     # The collector cell: sentinel visible, brackets literal, no style span.
     # The cell MUST be a Text (a bare str cell is the live from_markup sink —
     # C-17/batch-37), so an empty-spans read cannot be vacuous (C-32).
@@ -482,10 +483,24 @@ def test_at_b94_13_hostile_symbol_and_file_name(tmp_path: Path) -> None:
         "the collector cell must be a Text — a bare str cell is markup-parsed "
         "by default_cell_formatter (the live sink)"
     )
-    assert "b77hostilemark" in cell_text, (
-        f"the sentinel must be visible in the collector cell, got {cell_text!r}"
+    # Named supersession (batch-97 Inc-3, LLR-145.3): the ledger cell now
+    # clips a name wider than the Parameter column to head + `…` + tail, so
+    # the sentinel clause moves to the full-name line under the ledger. The
+    # cell keeps the literal-rendering clauses (Text, 0 spans, 0 control
+    # bytes, `[red]`).
+    # Second named supersession (Inc-3 gate fold, LED-2026-10-19-batch-97.15,
+    # code-reviewer F1 / ux-reviewer L2): the full-name line paints the
+    # address and `Fmt · Unit` first and clips the name to the cells left by
+    # the same LLR-145.3 rule. At 120x30 (inside the 120..133 band) the
+    # 34-cell payload gets 33 cells, so the line holds the head
+    # `b77hostilem`, one `…` and the literal tail `_evil[red]…`; the WHOLE
+    # sentinel stays asserted on the addendum emission below.
+    assert full_name.startswith("0x00000100"), full_name
+    assert "b77hostilem" in full_name and "_evil[red]" in full_name, (
+        f"the sentinel's head and literal tail must be on the full-name line, got {full_name!r}"
     )
-    assert "[red]" in cell_text and "_evil" in cell_text, (
+    assert full_name.count("…") <= 1, full_name
+    assert "[red]" in cell_text, (
         "the hostile markup must render as its own characters"
     )
     control_bytes = [ch for ch in cell_text if ord(ch) < 0x20 and ch not in "\n\t"]

@@ -1,0 +1,164 @@
+mutants: 30 arms: 43
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:298: AssertionError: ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…
+    | 1 failed in 0.39s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:351: AssertionError: ('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…')
+    | 1 failed in 5.60s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size0]: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 5.48s
+M1-head-keeping-clip [screens_directionb.py] test_at_b97_04_engineer_reads_every_address_and_includes_one[size0]: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 9.59s
+M2-tail-only-clip [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:298: AssertionError: ….M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE
+    | 1 failed in 0.38s
+M2-tail-only-clip [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:351: AssertionError: ('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', '….M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE')
+    | 1 failed in 5.63s
+M3-param-floor-40 [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:284: AssertionError: assert (40, 8, 'Fmt', 24, 17) == (42, 6, 'Fmt', 24, 17)
+    | 1 failed in 0.39s
+M3-param-floor-40 [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 failed in 5.60s
+M4-vacuous-repaint [screens_directionb.py] test_tc_b97_34_painted_widths_follow_four_resizes: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:127: AssertionError: ((220, 60), 'ASAM…LAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE')
+    | 1 failed in 10.73s
+M4-vacuous-repaint [screens_directionb.py] test_tc_b97_34_resize_while_hidden_rederives_on_show: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 7.61s
+M5-no-show-trigger [screens_directionb.py] test_tc_b97_34_resize_while_hidden_rederives_on_show: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 7.40s
+M6-card-from-unfiltered [screens_directionb.py] test_tc_b97_43_fields_hold_exactly_the_included: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:500: AssertionError: empty arm: nothing included -> entries []
+    | 1 failed in 4.88s
+M7-ledger-from-markup [screens_directionb.py] test_tc_b97_12_hostile_names_render_literally: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:448: AssertionError: ('ledger', 'b97xyzq')
+    | 1 failed in 4.63s
+M7-ledger-from-markup [screens_directionb.py] test_at_b97_05_hostile_parameter_reads_literally: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:941: AssertionError: ('ledger', ' ✓  b97xyzq                                     0x00810000  u8 ho…  ')
+    | 1 failed in 9.55s
+M8-second-primary [screens_directionb.py] test_tc_b97_46_one_filled_element: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:757: AssertionError: ('check_tab_fields', ['check_validate_button', 'check_write_button'])
+    | 1 failed in 4.62s
+M9-tabchip-no-space [screens_directionb.py] test_tc_b97_08_tab_chips_nine_activations: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:220: AssertionError: ('check_tab_fields', 'space', 'check_pane_json', ['check_pane_json'])
+    | 1 failed in 8.71s
+M10-ledger-no-space [screens_directionb.py] test_tc_b97_45_keyboard_order_enter_space_and_chip_states: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:718: AssertionError: ['2 fields → report', '2 fields → report', '2 fields → report']
+    | 1 failed in 9.65s
+M10-ledger-no-space [screens_directionb.py] test_at_b97_18_first_task_from_the_keyboard: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:975: AssertionError: 0 fields → report
+    | 1 failed in 18.08s
+M11-tabchip-cannot-focus [screens_directionb.py] test_tc_b97_45_keyboard_order_enter_space_and_chip_states: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:709: AssertionError: ('check_tab_fields', [2, 1, 1, 1, 0, 6, ...])
+    | 1 failed in 8.77s
+M12-toggle-displayed [screens_directionb.py] test_tc_b97_61_every_control_displayed_in_its_home[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:832: AssertionError: the addendum toggle is mounted, not displayed
+    | 1 failed in 3.56s
+M13-test-control-dropped-from-table [test_b97_check_editor.py] test_tc_b97_61_every_control_displayed_in_its_home[size0]: RED (KILLED)
+    restore sha256 439638a721e217afb0e78b26dd1378b4283049e0e4007baaf10f1629a44b04f4 == before 439638a721e217afb0e78b26dd1378b4283049e0e4007baaf10f1629a44b04f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:834: AssertionError: (14, 6)
+    | 1 failed in 3.86s
+M14-chip-without-suffix [app.py] test_tc_b97_30_check_editor_chip_unique_and_opens_checks_home: RED (KILLED)
+    restore sha256 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126 == before 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:326: AssertionError: the Check Editor chip is mounted once: Counter({'open_folder_checks': 2, 'open_folder_patch': 1, 'open_folder_templates': 1})
+    | 1 failed in 3.14s
+M15-help-without-effect [window_help.py] test_tc_b97_32_check_editor_help_names_every_label: RED (KILLED)
+    restore sha256 85975fda11f2e5c8be6c8f5a535477472b169ebc7e1d4ca00cc939c6853932c1 == before 85975fda11f2e5c8be6c8f5a535477472b169ebc7e1d4ca00cc939c6853932c1
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:785: AssertionError: labels with no `label — effect` line: ['Filter']
+    | 1 failed in 3.62s
+M16-glyph-outside-vocabulary [screens_directionb.py] test_tc_b97_33_check_glyphs_closed_and_in_the_legend: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:830: AssertionError: {'✔'}
+    | 1 failed in 4.82s
+M17-write-refusal-not-painted [app.py] test_tc_b97_58_check_editor_region_states[write_dir]: RED (KILLED)
+    restore sha256 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126 == before 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:882: AssertionError: Validate checks fields vs the image.
+    | 1 failed in 3.60s
+M17-write-refusal-not-painted [app.py] test_tc_b97_58_check_editor_region_states[write_readonly]: RED (KILLED)
+    restore sha256 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126 == before 25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:882: AssertionError: Validate checks fields vs the image.
+    | 1 failed in 3.73s
+M18-no-ledger-empty-line [screens_directionb.py] test_tc_b97_58_check_editor_region_states[no_a2l]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:878: AssertionError: ('no_a2l', [])
+    | 1 failed in 2.81s
+M18-no-ledger-empty-line [screens_directionb.py] test_at_b97_04_empty_ledger_line_and_dock_inside[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:906: AssertionError: ['╭─ A2L PARAMETERS ───────────────────────────────────────────────────╮', '│Filter filter parameters                 ...                                     │', '│                                                      
+    | 1 failed in 2.80s
+M19-no-fields-empty-line [screens_directionb.py] test_tc_b97_58_check_editor_region_states[nothing_included]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:878: AssertionError: ('nothing_included', [])
+    | 1 failed in 3.17s
+M20-spec-row-margin [styles.tcss] test_tc_b97_38_no_blank_row_outside_the_ledger[size0]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | 1 failed in 3.25s
+M20-spec-row-margin [styles.tcss] test_tc_b97_38_no_blank_row_outside_the_ledger[size1]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | 1 failed in 3.37s
+M21-columns-fixed-past-panel [styles.tcss] test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size0]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:234: AssertionError: ((118, 54), 'check_validate_button', Region(x=5, y=65, width=12, height=1), Region(x=5, y=4, width=112, height=40))
+    | 1 failed in 3.68s
+M21-columns-fixed-past-panel [styles.tcss] test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size1]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:234: AssertionError: ((118, 53), 'check_validate_button', Region(x=5, y=65, width=12, height=1), Region(x=5, y=4, width=112, height=39))
+    | 1 failed in 3.52s
+M22-panel-overflow-hidden [styles.tcss] test_tc_b97_59_below_the_range_actions_reachable[size0]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:401: AssertionError: ((80, 24), 'check_validate_button', 14)
+    | 1 failed in 16.24s
+M23-fields-name-too-wide [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:366: AssertionError: ASAM.M.SCALAR.UBYTE.IDE…
+    | 1 failed in 5.60s
+M24-nowrap-css-removed [styles.tcss] test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size0]: GREEN (SURVIVED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | 1 passed in 5.78s
+M25-predicate-region-not-clipped [b97_probes.py] test_tc_b97_35_predicate_self_check: RED (KILLED)
+    restore sha256 f05272c19fe35df9f60dd6498860184c9d2931a4f9e3d2d018a6ebbf4c12976f == before f05272c19fe35df9f60dd6498860184c9d2931a4f9e3d2d018a6ebbf4c12976f
+    | 1 failed in 0.52s
+M26-address-pushed-out [screens_directionb.py] test_tc_b97_09_address_column_never_truncated[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:249: AssertionError: the table scrolls horizontally: max_scroll_x 25
+    | 1 failed in 3.75s
+M27-json-cap-removed [screens_directionb.py] test_tc_b97_43_empty_state_and_json_cap: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:523: AssertionError: assert 'line 5000' == 'showing 5000 of 5001 lines'
+    | 1 failed in 0.39s
+M28-dock-two-rows [styles.tcss] test_tc_b97_08_census_rows_and_one_docked_row[size0]: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:184: AssertionError: {'check_apply_ghost': 40, 'check_fields_count': 41, 'check_validate_button': 40, 'check_write_button': 40}
+    | 1 failed in 3.22s
+M29-size-label-fmt [screens_directionb.py] test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:565: AssertionError: ('check_mem_size_input', ['Label', 'Fmt'])
+    | 1 failed in 3.17s
+M29-size-label-fmt [screens_directionb.py] test_tc_b97_32_check_editor_help_names_every_label: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:785: AssertionError: labels with no `label — effect` line: ['Fmt']
+    | 1 failed in 3.47s
+M30-buttons-three-rows [styles.tcss] test_tc_b97_11_every_button_is_a_one_row_chip: RED (KILLED)
+    restore sha256 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 == before 5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:395: AssertionError: {'check_mem_add_button': 3, 'check_mem_remove_button': 3, 'check_param_include_button': 3, 'check_tab_addendum': 3, ...}
+    | 1 failed in 3.60s

@@ -1,0 +1,10 @@
+# TC-081.1 isolation re-run x3 after the gate-set failure, 2026-10-21T08:35:22-06:00
+.                                                                        [100%]
+1 passed in 7.84s
+.                                                                        [100%]
+1 passed in 8.15s
+.                                                                        [100%]
+1 passed in 8.24s
+# whole file, no concurrent load, 2026-10-21T08:35:57-06:00
+........                                                                 [100%]
+8 passed in 23.69s

@@ -1,0 +1,27 @@
+mutants: 3 arms: 7
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_layout_and_clip_units: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:298: AssertionError: ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…
+    | 1 failed in 0.40s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:351: AssertionError: ('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…')
+    | 1 failed in 5.56s
+M1-head-keeping-clip [screens_directionb.py] test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size0]: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:302: AssertionError: [('ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_V…'), ('ASAM.M.SCALAR.UBYT...B_INTP_NO_DEFAULT_V…'), ('ASAM.M.SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE', 'ASAM.M.SCALAR.UBYTE.TAB_NOINTP
+    | 1 failed in 5.37s
+M1-head-keeping-clip [screens_directionb.py] test_at_b97_04_engineer_reads_every_address_and_includes_one[size0]: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 9.52s
+M4-vacuous-repaint [screens_directionb.py] test_tc_b97_34_painted_widths_follow_four_resizes: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:127: AssertionError: ((220, 60), 'ASAM…LAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE')
+    | 1 failed in 10.60s
+M4-vacuous-repaint [screens_directionb.py] test_tc_b97_34_resize_while_hidden_rederives_on_show: RED (KILLED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:157: AssertionError:  ✓  Parameter                                                                                  Address     Fmt · Unit
+    | 1 failed in 7.75s
+M5-no-show-trigger [screens_directionb.py] test_tc_b97_34_resize_while_hidden_rederives_on_show: GREEN (SURVIVED)
+    restore sha256 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 == before 3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4
+    | 1 passed in 7.42s

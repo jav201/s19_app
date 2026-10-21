@@ -4,7 +4,9 @@ The literals are committed verbatim from ``01-requirements-appendix.md`` A.2,
 each with its own length guard, so a drifted copy fails at import rather than
 silently weakening every test that reads it. The builders grow per increment
 (design-proposal §5.1); Inc-1 adds the project builder, the app's own project
-load and the junction arm.
+load and the junction arm; Inc-2 the NUL flow and set; Inc-3 the demo A2L,
+``hostile.a2l``, an image covering the A2L, the staging block and the Check
+Editor opener.
 """
 from __future__ import annotations
 
@@ -247,3 +249,135 @@ def nul_set(project_dir: Path) -> Path:
     payload = chain_set_to_dict(ChainSet(name="nul_set", chains=(entry,)))
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path
+
+
+# --------------------------------------------------------------------------- #
+# A.5 builders — Inc-3: the A2L, hostile.a2l, an image under the A2L, the
+# staging block (P-24, P-28, P-51)
+# --------------------------------------------------------------------------- #
+
+DEMO_A2L = EXAMPLES_DIR / "ASAP2_Demo_V161.a2l"
+
+#: The six parameters that share ``0x00013A00`` (A.1 P-38): only the name tells
+#: their REPORT FIELDS lines apart.
+SIX_13A00: tuple[str, ...] = (
+    "ASAM.M.SCALAR.UBYTE.IDENTICAL",
+    "ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE",
+    "ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE",
+    "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE",
+    "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE",
+    "ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE",
+)
+
+#: One of the demo's 47-cell names, the widest real parameter name.
+LONGEST_NAME = "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE"
+assert len(LONGEST_NAME) == 47
+
+
+#: Inc-3 gate fold (code-reviewer F1 / F2): a dotted name far wider than any
+#: Parameter column of the range (165 cells; the 260x70 column is narrower), so
+#: the ledger clip, the full-name line clip and the Fields tail clip all fire at
+#: every LLR-149.2 size. Its tail ``_TAIL_MARK`` is what the clips must keep.
+LONG_NAME = (
+    "ASAM.M.SCALAR.UBYTE."
+    + "_".join(f"LONG_SEGMENT_{i:02d}" for i in range(9))
+    + "_TAIL_MARK"
+)
+assert len(LONG_NAME) > 160
+
+
+def _renamed_a2l(dest_dir: Path, new_name: str, file_name: str) -> Path:
+    """The demo A2L with its first CHARACTERISTIC renamed ``new_name``. Only the
+    ``/begin`` line is rewritten."""
+    lines = DEMO_A2L.read_text(encoding="utf-8").splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if line.strip().startswith("/begin CHARACTERISTIC "):
+            old = line.split()[2]
+            lines[index] = line.replace(old, new_name, 1)
+            break
+    else:  # pragma: no cover - the demo file always holds one
+        raise AssertionError("no CHARACTERISTIC in the demo A2L")
+    path = dest_dir / file_name
+    path.write_text("".join(lines), encoding="utf-8")
+    return path
+
+
+def hostile_a2l(dest_dir: Path) -> Path:
+    """Write ``hostile.a2l``: the demo A2L with its first CHARACTERISTIC renamed
+    ``HOSTILE_CONTENT`` (A.5, P-28)."""
+    return _renamed_a2l(dest_dir, HOSTILE_CONTENT, "hostile.a2l")
+
+
+def long_name_a2l(dest_dir: Path) -> Path:
+    """Write ``long_name.a2l``: the demo A2L with its first CHARACTERISTIC
+    renamed :data:`LONG_NAME` (Inc-3 gate fold, F1 / F2)."""
+    return _renamed_a2l(dest_dir, LONG_NAME, "long_name.a2l")
+
+
+def write_cover_s19(path: Path, tags) -> Path:
+    """Write an S19 image holding one byte pattern under every A2L field.
+
+    Measured 2026-10-20: ``prg.s19`` covers 0 of the demo A2L's 75 addresses,
+    so a written ``.chk.json`` over included parameters would hold no entry
+    (the writer skips a field outside the loaded image). This image puts
+    ``byte_size`` bytes under each tag's address, S2 records, so a write
+    declares every included field.
+    """
+    mem = {}
+    for tag in tags:
+        address = tag.get("address")
+        if not isinstance(address, int):
+            continue
+        for offset in range(int(tag.get("byte_size") or 1)):
+            mem[address + offset] = (address + offset) & 0xFF
+    lines = ["S0030000FC"]
+    for address in sorted(mem):
+        payload = [3 + 1 + 1] + list((address).to_bytes(3, "big")) + [mem[address]]
+        count = payload[0]
+        body = payload[1:]
+        checksum = (~(count + sum(body))) & 0xFF
+        lines.append("S2" + f"{count:02X}" + "".join(f"{b:02X}" for b in body) + f"{checksum:02X}")
+    lines.append("S804000000FB")
+    path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    return path
+
+
+def staging_block(base_dir: Path, spec_name: str, kind: str) -> Path:
+    """Block the Write's staging path ``<base>/.s19tool/workarea/temp/<name>``
+    with a directory (``kind="dir"``) or a read-only file (``"readonly"``) (P-51)."""
+    from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
+
+    temp = base_dir / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "temp"
+    temp.mkdir(parents=True, exist_ok=True)
+    target = temp / spec_name
+    if kind == "dir":
+        target.mkdir()
+    else:
+        target.write_text("{}", encoding="utf-8")
+        os.chmod(target, 0o444)
+    return target
+
+
+async def open_check_editor(app, pilot, *, a2l=DEMO_A2L, cover_image: bool = False) -> object:
+    """Load ``a2l`` (and an image covering it) through the app's own loaders,
+    then show the Check Editor through ``action_show_screen`` (the rail path
+    that prefills the panel). Returns the panel."""
+    from tests.b97_probes import settle
+
+    await settle(pilot)
+    if a2l is not None:
+        app.load_a2l_from_path(Path(a2l))
+        await settle(pilot)
+        tags = app._compute_a2l_enriched_tags()
+        assert tags, f"the A2L did not load: {list(app.log_lines)[-3:]}"
+        if cover_image:
+            image = write_cover_s19(app.base_dir / "a2l_cover.s19", tags)
+            app.load_from_path(image)
+            for _ in range(100):
+                if app.current_file is not None:
+                    break
+                await pilot.pause(0.05)
+            assert app.current_file is not None, "the cover image did not load"
+    app.action_show_screen("check_editor")
+    await settle(pilot, 6)
+    return app.query_one("#check_editor_panel")

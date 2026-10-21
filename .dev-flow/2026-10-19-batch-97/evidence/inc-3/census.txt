@@ -1,0 +1,175 @@
+# Inc-3 reverse census (family B + A3), run 2026-10-20 on the working tree (HEAD f93dadc + Inc-3)
+
+## B1a — tests that reach a Check Editor id, class or the screen container
+tests/test_open_folder_chips.py:100:    ("checks", "#open_folder_checks_editor", "screen_check_editor"),
+tests/test_tui_check_chain_b94.py:114:            app.query_one("#check_file_name_input", Input).value = (
+tests/test_tui_check_chain_b94.py:117:            app.query_one("#check_mem_address_input", Input).value = "0x00000000"
+tests/test_tui_check_chain_b94.py:118:            app.query_one("#check_mem_label_input", Input).value = "blk0"
+tests/test_tui_check_chain_b94.py:119:            app.query_one("#check_mem_size_input", Input).value = "4"
+tests/test_tui_check_chain_b94.py:120:            app.query_one("#check_mem_add_button").focus()
+tests/test_tui_check_chain_b94.py:123:            app.query_one("#check_write_button").focus()
+tests/test_tui_check_editor.py:21:  selection mounts exactly 1 ``CheckEditorPanel``; its write message reaches
+tests/test_tui_check_editor.py:46:    CheckEditorPanel,
+tests/test_tui_check_editor.py:95:# TC-B94-06 — CheckEditorPanel composition census (LLR-001.1)
+tests/test_tui_check_editor.py:119:            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+tests/test_tui_check_editor.py:122:                b for b in buttons if b.id == "check_write_button"
+tests/test_tui_check_editor.py:125:                b for b in buttons if b.id == "check_validate_button"
+tests/test_tui_check_editor.py:132:            ghost = panel.query_one("#check_apply_ghost", Static)
+tests/test_tui_check_editor.py:134:                "param_tables": len(panel.query("#check_param_table")),
+tests/test_tui_check_editor.py:135:                "mem_tables": len(panel.query("#check_mem_table")),
+tests/test_tui_check_editor.py:142:                    "#check_param_table", DataTable
+tests/test_tui_check_editor.py:162:    """Selecting the entry mounts exactly 1 CheckEditorPanel; the write
+tests/test_tui_check_editor.py:188:                for sid in ("screen_check_editor", "screen_patch")
+tests/test_tui_check_editor.py:192:            panels = list(app.query(CheckEditorPanel))
+tests/test_tui_check_editor.py:202:            app.query_one("#check_mem_address_input", Input).value = "0x100"
+tests/test_tui_check_editor.py:203:            app.query_one("#check_mem_label_input", Input).value = "x"
+tests/test_tui_check_editor.py:204:            app.query_one("#check_mem_size_input", Input).value = "1"
+tests/test_tui_check_editor.py:205:            app.query_one("#check_mem_add_button").focus()
+tests/test_tui_check_editor.py:210:                app.query_one("#check_write_button").focus()
+tests/test_tui_check_editor.py:226:    assert visible == ["screen_check_editor"], (
+tests/test_tui_check_editor.py:232:    assert mounted == 1, f"exactly 1 CheckEditorPanel mounts, got {mounted}"
+tests/test_tui_check_editor.py:320:                for sid in ("screen_check_editor", "screen_patch")
+tests/test_tui_check_editor.py:323:            check_panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+tests/test_tui_check_editor.py:332:                for sid in ("screen_check_editor", "screen_patch")
+tests/test_tui_check_editor.py:338:    assert check_visible == ["screen_check_editor"], (
+tests/test_tui_check_editor.py:341:    assert "check_write_button" in buttons, "a write action is exposed"
+tests/test_tui_check_editor.py:342:    assert "check_validate_button" in buttons, "a validate action is exposed"
+tests/test_tui_check_editor.py:375:            app.query_one("#check_file_name_input", Input).value = (
+tests/test_tui_check_editor.py:378:            app.query_one("#check_mem_address_input", Input).value = "0x100"
+tests/test_tui_check_editor.py:379:            app.query_one("#check_mem_label_input", Input).value = "block0"
+tests/test_tui_check_editor.py:380:            app.query_one("#check_mem_size_input", Input).value = "4"
+tests/test_tui_check_editor.py:381:            app.query_one("#check_mem_add_button").focus()
+tests/test_tui_check_editor.py:384:            app.query_one("#check_write_button").focus()
+tests/test_tui_check_editor.py:391:            app.query_one("#check_validate_button").focus()
+tests/test_tui_check_editor.py:395:            result_rows = list(app.query("#check_results Static"))
+tests/test_tui_check_editor.py:398:                for b in app.query("#check_editor_panel Button")
+tests/test_tui_check_editor.py:402:                app.query_one("#check_status").render()
+tests/test_tui_check_editor.py:458:            panel = app.query_one("#check_editor_panel", CheckEditorPanel)
+tests/test_tui_check_editor.py:464:            picker = app.query_one("#check_param_table", DataTable)
+tests/test_tui_check_editor.py:470:            select = app.query_one("#check_spec_file_select", Select)
+tests/test_tui_check_editor.py:475:            full_name = str(app.query_one("#check_full_name_line").render())
+tests/test_tui_directionb.py:149:    "screen_check_editor",
+tests/test_tui_directionb.py:800:    assert after_equals == ["screen_check_editor"], (
+tests/test_tui_patch_chips.py:91:# NO ``#check_editor_panel`` rules in styles.tcss (measured). Its subtree is
+tests/test_tui_patch_chips.py:94:_CHECK_PANEL_ID = "check_editor_panel"
+tests/test_tui_patch_chips.py:153:    """True when ``node`` is `#check_editor_panel` or one of its descendants."""
+tests/test_tui_patch_chips.py:248:    (no `#check_editor_panel` rules exist — the family cannot match them, so
+
+## B1b — changed labels / attributes (old strings) anywhere in tests/ and s19_app/
+### 'Add memory row'
+### 'Remove memory row'
+### 'Addendum preview'
+s19_app/tui/screens_directionb.py:7562:                    "Addendum preview",
+### '_preview_open'
+### 'Memory locations'
+### 'A2L parameters'
+s19_app/tui/screens_directionb.py:6999:        The check twin of the Patch Editor: a collector for A2L parameters
+s19_app/tui/screens_directionb.py:7039:    _EMPTY_LEDGER = "No A2L parameters — load an A2L (^L) to list them."
+s19_app/tui/window_help.py:230:            "Collect A2L parameters and memory rows into a check spec "
+### 'Fmt · Unit'
+s19_app/tui/screens_directionb.py:6953:        paddings (19 in all). ``Fmt · Unit`` is sized first — the longest unit
+s19_app/tui/screens_directionb.py:6965:        (89, 11, 'Fmt · Unit', 56, 49)
+s19_app/tui/screens_directionb.py:6970:    label = "Fmt · Unit" if fmt >= 10 else "Fmt"
+s19_app/tui/screens_directionb.py:7003:        Parameter · Address · Fmt · Unit, the Address never clipped, names
+s19_app/tui/screens_directionb.py:7129:        longest ``Fmt · Unit`` text is an input of :func:`check_layout`).
+s19_app/tui/screens_directionb.py:7374:        rewrites the Parameter and ``Fmt · Unit`` cells with ``update_cell``,
+### 'never applied'
+s19_app/tui/changes/io.py:149:#: validatable, never applied (the ``kind != "change"`` gate is the no-apply
+s19_app/tui/window_help.py:232:            "spec is never applied.",
+tests/test_tui_patch_editor_b94.py:786:    # The kind gate: a check spec is never applied (LLR-009.3's seam).
+### 'Include parameter'
+s19_app/tui/screens_directionb.py:7448:                        "Include parameter",
+s19_app/tui/window_help.py:235:            "Include parameter — adds the highlighted ledger row to the "
+s19_app/tui/window_help.py:239:            "like Include parameter; on a tab chip, opens its tab.",
+### '_PREVIEW_CAP'
+s19_app/tui/screens_directionb.py:7037:    _PREVIEW_CAP = 6
+s19_app/tui/screens_directionb.py:7285:        for item in items[: self._PREVIEW_CAP]:
+s19_app/tui/screens_directionb.py:7291:        if len(items) > self._PREVIEW_CAP:
+s19_app/tui/screens_directionb.py:7292:            text.append(f"  … {len(items) - self._PREVIEW_CAP} more", style=DGRAY)
+### '_FMT_LABELS'
+s19_app/tui/screens_directionb.py:7043:    _FMT_LABELS = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}
+s19_app/tui/screens_directionb.py:7180:        return self._FMT_LABELS.get(size, f"{size}B")
+### 'refresh_check_results'
+s19_app/tui/app.py:3146:                  / ``refresh_check_results`` / ``show_save_prompt``
+s19_app/tui/app.py:3256:                panel.refresh_check_results(
+s19_app/tui/app.py:3438:              (``refresh_check_results`` — ``undo``/``redo`` reset
+s19_app/tui/app.py:3452:                  / ``refresh_check_results`` / ``set_edit_json_enabled``
+s19_app/tui/app.py:3475:        panel.refresh_check_results(
+s19_app/tui/app.py:5463:                panel.refresh_check_results(
+s19_app/tui/app.py:5524:            panel.refresh_check_results(rows, "validation complete")
+s19_app/tui/screens_directionb.py:4432:          :meth:`refresh_issues` (and :meth:`refresh_check_results` after a
+s19_app/tui/screens_directionb.py:5408:        # marker) and refresh_check_results (CHECKS: run state). The JSON
+s19_app/tui/screens_directionb.py:5446:                - ``PatchEditorPanel.refresh_check_results`` (CHECKS run state)
+s19_app/tui/screens_directionb.py:6770:                - :meth:`refresh_check_results`
+s19_app/tui/screens_directionb.py:6803:    def refresh_check_results(
+s19_app/tui/screens_directionb.py:7738:    def refresh_check_results(
+s19_app/tui/services/change_service.py:597:            - PatchEditorPanel.refresh_check_results (the screen widget)
+s19_app/tui/services/change_service.py:1882:                  ``PatchEditorPanel.refresh_check_results`` at BOTH call
+s19_app/tui/services/change_service.py:1921:                - PatchEditorPanel.refresh_check_results (via app.py)
+tests/test_tui_patch_checks_strip.py:73:    M-3  history call site drops the aggregates argument (`refresh_check_results
+tests/test_tui_patch_checks_strip.py:85:    M-3b `_refresh_patch_history_view` drops the refresh_check_results call
+tests/test_tui_patch_checks_strip.py:543:    signature = inspect.signature(PatchEditorPanel.refresh_check_results)
+tests/test_tui_patch_checks_strip.py:547:        "refresh_check_results must take an `aggregates` parameter; its "
+tests/test_tui_patch_checks_strip.py:615:# TC-078.3 — BOTH refresh_check_results call sites push the aggregates
+tests/test_tui_patch_checks_strip.py:645:        and node.func.attr == "refresh_check_results"
+tests/test_tui_patch_checks_strip.py:649:        f"the writer census pins THREE refresh_check_results call sites; found "
+tests/test_tui_patch_checks_strip.py:656:        # ``refresh_check_results(rows, "validation complete")`` with NO
+tests/test_tui_patch_checks_strip.py:671:            f"the refresh_check_results call at line {call.lineno} does not "
+tests/test_tui_patch_checks_strip.py:737:            panel.refresh_check_results(
+tests/test_undo_redo_ux.py:9:  ``refresh_check_results`` seam.
+### 'set_a2l_parameters'
+s19_app/tui/app.py:5358:        panel.set_a2l_parameters(measurable)
+s19_app/tui/screens_directionb.py:7124:    def set_a2l_parameters(self, rows: Sequence[dict]) -> None:
+tests/test_tui_check_editor.py:459:            panel.set_a2l_parameters(
+### 'load_spec('
+s19_app/tui/app.py:5572:        panel.load_spec(items, event.filename)
+s19_app/tui/screens_directionb.py:7148:    def load_spec(self, items: Sequence[dict], source_name: str) -> None:
+### 'SHIPPED_WINDOW_KEYS'
+s19_app/tui/window_help.py:318:SHIPPED_WINDOW_KEYS: Tuple[str, ...] = (
+tests/test_window_usage_help.py:76:    SHIPPED_WINDOW_KEYS,
+tests/test_window_usage_help.py:258:    assert frozenset(SHIPPED_WINDOW_KEYS) == (
+### 'window_help_check_editor'
+tests/test_window_usage_help.py:120:    ("check_editor", "#window_help_check_editor", "check_editor"),
+### 'open_folder_checks_editor'
+s19_app/tui/app.py:3066:            suffixed id ``#open_folder_checks_editor`` — the Checks screen
+tests/test_b97_chips_help.py:286:    ``#open_folder_checks_editor`` (D9) beside the Checks screen's
+tests/test_b97_chips_help.py:313:            for screen, chip_id in (("checks", "open_folder_checks"), ("check_editor", "open_folder_checks_editor")):
+tests/test_b97_chips_help.py:324:    assert ids["open_folder_checks_editor"] == 1, f"the Check Editor chip is mounted once: {ids}"
+tests/test_open_folder_chips.py:100:    ("checks", "#open_folder_checks_editor", "screen_check_editor"),
+tests/test_open_folder_chips.py:335:        "#open_folder_checks_editor",
+tests/test_window_usage_help.py:464:        "check_editor": "open_folder_checks_editor",
+
+## B1c — colour-literal sweep (test_tc079_5c): new hex literals in s19_app/
+warning: in the working copy of 's19_app/tui/styles.tcss', LF will be replaced by CRLF the next time Git touches it
+      3 #54efae
+     10 #969aad
+
+## B1d — TC-081.4 guard: 'Binding(' on added/removed lines of app.py
+0
+
+## B1e — chip-family selectors (TC-076.1 / AT-076b): '.patch-chip' in added CSS
+warning: in the working copy of 's19_app/tui/styles.tcss', LF will be replaced by CRLF the next time Git touches it
+1
+
+## B2 — files moved: none
+ M s19_app/tui/app.py
+ M s19_app/tui/screens_directionb.py
+ M s19_app/tui/styles.tcss
+ M s19_app/tui/window_help.py
+ M tests/b97_fixtures.py
+ M tests/b97_probes.py
+ M tests/test_b97_chips_help.py
+ M tests/test_changes_file_notation_help.py
+ M tests/test_id_registry.py
+ M tests/test_open_folder_chips.py
+ M tests/test_tui_check_editor.py
+ M tests/test_window_usage_help.py
+?? tests/test_b97_check_editor.py
+?? tests/test_b97_width.py
+
+## B3 — golden captures: Check Editor screen painted in any snapshot baseline?
+0
+positive control: 'Check Editor' (the rail label) in baselines:
+19
+
+## A3 — source consumers of the panel outside screens_directionb.py

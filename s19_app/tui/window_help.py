@@ -219,6 +219,56 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "join writes one `‹stem›_joined.‹ext›`.",
         ),
     },
+    #: batch-97 Inc-3 (D10 / D25, LLR-148.6): CODE-authored like the tenth
+    #: section below — not an md port, so outside TC-707's md census. One
+    #: ``label — effect`` line per label, key and glyph the Check Editor
+    #: paints (TC-B97-32 parses this body). The key lines are hand-typed until
+    #: Inc-8's generated keys block replaces them (D27).
+    "check_editor": {
+        "title": "Check Editor",
+        "steps": (
+            "Collect A2L parameters and memory rows into a check spec "
+            "(`.chk.json`) whose fields ride the A2B diff report; a check "
+            "spec is never applied.",
+            "Filter — narrows the A2L PARAMETERS ledger to the names that "
+            "contain the typed text.",
+            "Include parameter — adds the highlighted ledger row to the "
+            "REPORT FIELDS, or removes it when it is already included; the "
+            "line under the ledger shows that row's full name and address.",
+            "space — on the ledger, includes or excludes the highlighted row, "
+            "like Include parameter; on a tab chip, opens its tab.",
+            "enter — on the ledger, includes or excludes the highlighted "
+            "row, like space; on a chip or button, presses it.",
+            "Fields — shows the included fields, one line each, then the "
+            "memory-row form and the Validate verdicts.",
+            "JSON — shows the check spec document the fields produce "
+            "(read-only).",
+            "Addendum — shows what the A2B diff report gains from this spec.",
+            "Address — the memory row's start address, `0x…` hex or decimal.",
+            "Label — the memory row's name in the report (optional).",
+            "Size (bytes) — 1 to 8; the Fmt column shows it as u8 / u16 / "
+            "u32 / u64.",
+            "Add row — appends the memory row typed above.",
+            "Remove row — removes the highlighted memory row.",
+            "Spec — loads a check spec from the patches folder into the "
+            "collector.",
+            "Write as — the file name Write .chk.json saves under.",
+            "Validate — checks the fields against the loaded image; the "
+            "verdicts show under the memory form.",
+            "Write .chk.json — writes the check spec; nothing is applied to "
+            "the image.",
+            "Open checks/ — opens the project's checks folder, where check "
+            "specs are kept.",
+            "Open patches/ — without a project, opens the common patches "
+            "folder, where check specs are kept.",
+            "? — opens this help.",
+            "✓ — the ledger row is included in the REPORT FIELDS.",
+            "◆ — a REPORT FIELDS line for an included parameter.",
+            "▪ — a REPORT FIELDS line for a memory row: its address, its "
+            "width (u8 … u64) and its label, or `memory row` when none was "
+            "typed.",
+        ),
+    },
     #: Tenth section (batch-96, TC-1802 — the 2026-10-18 PDF-bug request):
     #: CODE-authored (NOT ported from help_sections.md, so TC-707's md
     #: fidelity census stays scoped to the nine sections above). Documents
@@ -265,8 +315,9 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     },
 }
 
-#: The eight shipped surfaces that seat an affordance (the ninth section,
-#: ``split_join_export``, ships copy-only — inc-004 mounts its window).
+#: The shipped surfaces that seat an affordance (the ninth section,
+#: ``split_join_export``, ships copy-only — inc-004 mounts its window);
+#: batch-97 adds ``check_editor`` (Inc-3) and ``flow_execution`` (Inc-6).
 SHIPPED_WINDOW_KEYS: Tuple[str, ...] = (
     "patch",
     "checks",
@@ -276,6 +327,7 @@ SHIPPED_WINDOW_KEYS: Tuple[str, ...] = (
     "flow",
     "a2l",
     "workspace",
+    "check_editor",
 )
 
 

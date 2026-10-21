@@ -148,11 +148,15 @@ def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
     every one of the nine is still a verbatim port of
     ``help_sections.md`` (title + every step string), so the batch-96
     addition disturbed nothing the batch-95 contract froze."""
+    # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
+    # section (LLR-148.6) joins the data home; it is not an md port either.
     assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
-        SECTION_KEY
+        SECTION_KEY,
+        "check_editor",
     }, (
         "the data home must hold exactly the nine md-authored sections "
-        "plus the batch-96 changes_file_notation section"
+        "plus the batch-96 changes_file_notation and batch-97 check_editor "
+        "sections"
     )
     md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
     normalized_md = re.sub(r"\s+", " ", md_text)

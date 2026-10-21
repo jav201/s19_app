@@ -95,6 +95,9 @@ _RAIL_CHIPS: Tuple[Tuple[str, str, str], ...] = (
     ("patch", "#open_folder_patch", "screen_patch"),
     ("checks", "#open_folder_checks", "screen_checks"),
     ("templates", "#open_folder_templates", "screen_crc_designer"),
+    # batch-97 Inc-3 (D9, LLR-148.5): the Check Editor header carries the
+    # second ``checks`` chip under its suffixed id.
+    ("checks", "#open_folder_checks_editor", "screen_check_editor"),
 )
 
 
@@ -329,6 +332,7 @@ def test_tc703_chips_render_header_right_with_no_key_bindings(
         "#open_folder_checks",
         "#open_folder_templates",
         "#open_folder_reports",
+        "#open_folder_checks_editor",
     ):
         is_row, has_class, title_is_label, rightmost_id = observed[chip_id]
         assert is_row and has_class, f"{chip_id}: the header row must carry .db-screen-header"

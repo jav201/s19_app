@@ -1,0 +1,306 @@
+# Inc-3 gate fold — GREEN gate set, 2026-10-21T08:14:20-06:00, HEAD f93dadc
+742023836bd51ff9c8088db28a1a10f8319928516717925139e4f1797bcd0fec *s19_app/tui/screens_directionb.py
+25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126 *s19_app/tui/app.py
+679048f825bdfa5aaf085291e0fb5f06ee076c4d77fc765249dea482af262d65 *s19_app/tui/styles.tcss
+8773ae3aba325c1188dbe804a3ecffaad2d1528b270664997d9b904f15f2e075 *s19_app/tui/window_help.py
+........................................................................ [ 32%]
+........................................................................ [ 64%]
+.........................................F.....xxxxxxxxxxxxxxxxxxxxxxxxx [ 96%]
+xxxx...                                                                  [100%]
+================================== FAILURES ===================================
+____________________________ test_tc081_1_derived _____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23029/test_tc081_1_derived0')
+
+    def test_tc081_1_derived(tmp_path: Path) -> None:
+        """Depths are derived from the two stacks, across every branch quadrant.
+    
+        Intent (LLR-081.1): no history cursor exists, so the position must be
+        computed from ``len(_undo_stack)`` / ``len(_redo_stack)``. This test owns
+        the off-by-one risk that a cursor would otherwise hide.
+    
+        ⚠ **The input set is guarded, not asserted in prose.** The first assertion
+        below computes the quadrant of every fixture and requires all four cells of
+        the ``(undo no-ops?, redo no-ops?)`` partition to be present. Drop a
+        fixture and the test fails. This is the Inc-5b HIGH-1 lesson applied
+        up-front: a universal ("the derivation holds across every branch") is only
+        as true as the set it quantifies over, and code mutation cannot test a set.
+    
+        The fixtures are deliberately ASYMMETRIC (3/0, 0/2, 2/1) — a back<->forward
+        swap is invisible at AT-081a's prescribed (1, 1) palindrome (M-2), and
+        ``back`` vs ``back + forward`` collapse at any (N, 0) state (M-3). Both
+        mutations die here.
+        """
+        covered = {
+            _quadrant(back, forward)
+            for _, _, back, forward in _QUADRANT_FIXTURES.values()
+        }
+        assert covered == {(False, False), (True, False), (False, True), (True, True)}, (
+            "the fixture table must cover all FOUR cells of the (undo no-ops?, "
+            f"redo no-ops?) partition — the code's own branch structure. Covered: "
+            f"{sorted(covered)}. A quadrant missing here is a branch this test "
+            "silently certifies without ever entering."
+        )
+    
+        async def _drive(adds: int, undos: int) -> tuple[str, dict[str, int], int, int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _drive_history(app, pilot, adds=adds, undos=undos)
+                service = app._change_service
+                return (
+                    _strip(app).plain,
+                    service.history_depths(),
+                    len(service._undo_stack),
+                    len(service._redo_stack),
+                )
+    
+        for label, (adds, undos, back, forward) in _QUADRANT_FIXTURES.items():
+            painted, depths, undo_len, redo_len = asyncio.run(_drive(adds, undos))
+    
+            # literal <-> live stacks: the branch built what it claims.
+>           assert (undo_len, redo_len) == (back, forward), (
+                f"{label}: {adds} adds then {undos} undos must leave stacks "
+                f"({back}, {forward}); got ({undo_len}, {redo_len})"
+            )
+E           AssertionError: newest_end: 3 adds then 0 undos must leave stacks (3, 0); got (2, 0)
+E           assert (2, 0) == (3, 0)
+E             
+E             At index 0 diff: 2 != 3
+E             Use -v to get more diff
+
+tests\test_tui_patch_history_strip.py:427: AssertionError
+=================================== PASSES ====================================
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=12717069;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+PASSED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_08_tab_chips_nine_activations
+PASSED tests/test_b97_check_editor.py::test_tc_b97_09_address_column_never_truncated[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_09_address_column_never_truncated[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_layout_and_clip_units
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_clips_measure_terminal_cells
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_painted_names_distinct_and_full_name_line[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_11_every_button_is_a_one_row_chip[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_11_every_button_is_a_one_row_chip[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_12_hostile_names_render_literally
+PASSED tests/test_b97_check_editor.py::test_tc_b97_43_fields_hold_exactly_the_included
+PASSED tests/test_b97_check_editor.py::test_tc_b97_43_empty_state_and_json_cap
+PASSED tests/test_b97_check_editor.py::test_tc_b97_43_memory_lines_name_the_address_once
+PASSED tests/test_b97_check_editor.py::test_tc_b97_43_counts_agree_in_number_and_the_hint_reads_whole
+PASSED tests/test_b97_check_editor.py::test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_45_keyboard_order_enter_space_and_chip_states
+PASSED tests/test_b97_check_editor.py::test_tc_b97_45_enter_on_the_ledger_toggles_inclusion
+PASSED tests/test_b97_check_editor.py::test_tc_b97_46_one_filled_element
+PASSED tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home[size1]
+PASSED tests/test_b97_check_editor.py::test_at_b97_04_engineer_reads_every_address_and_includes_one[size0]
+PASSED tests/test_b97_check_editor.py::test_at_b97_04_engineer_reads_every_address_and_includes_one[size1]
+PASSED tests/test_b97_check_editor.py::test_at_b97_04_empty_ledger_line_and_dock_inside[size0]
+PASSED tests/test_b97_check_editor.py::test_at_b97_04_empty_ledger_line_and_dock_inside[size1]
+PASSED tests/test_b97_check_editor.py::test_at_b97_05_hostile_parameter_reads_literally
+PASSED tests/test_b97_check_editor.py::test_at_b97_18_first_task_from_the_keyboard
+PASSED tests/test_b97_check_editor.py::test_at_b97_21_six_shared_address_fields_and_the_written_file
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_full_name_line_keeps_address_and_name_tail
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size0]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size1]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size2]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size3]
+PASSED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size4]
+PASSED tests/test_b97_width.py::test_tc_b97_34_check_layout_monotonic_in_its_inputs
+PASSED tests/test_b97_width.py::test_tc_b97_34_painted_widths_follow_four_resizes
+PASSED tests/test_b97_width.py::test_tc_b97_34_resize_while_hidden_rederives_on_show
+PASSED tests/test_b97_width.py::test_tc_b97_35_predicate_self_check
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size2]
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size3]
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size4]
+PASSED tests/test_b97_width.py::test_tc_b97_35_no_horizontal_overflow[size5]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size2]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size3]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size4]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size5]
+PASSED tests/test_b97_width.py::test_tc_b97_36_validate_and_write_inside_at_scroll_zero[size6]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size2]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size3]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size4]
+PASSED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size5]
+PASSED tests/test_b97_width.py::test_tc_b97_37_status_line_stays_one_row_with_a_long_typed_address[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_37_status_line_stays_one_row_with_a_long_typed_address[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_38_ledger_takes_the_width_its_split_assigns[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_38_ledger_takes_the_width_its_split_assigns[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_38_ledger_takes_the_width_its_split_assigns[size2]
+PASSED tests/test_b97_width.py::test_tc_b97_38_no_blank_row_outside_the_ledger[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_38_no_blank_row_outside_the_ledger[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_38_no_blank_row_outside_the_ledger[size2]
+PASSED tests/test_b97_width.py::test_tc_b97_59_below_the_range_actions_reachable[size0]
+PASSED tests/test_b97_width.py::test_tc_b97_59_below_the_range_actions_reachable[size1]
+PASSED tests/test_b97_width.py::test_tc_b97_59_below_the_range_actions_reachable[size2]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_family_targets_project_flows_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_folder_name_imported_never_redeclared
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_missing_flows_created_inside_project_then_opened
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_family_targets_project_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_never_creates_a_removed_project_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_reason_names_each_family_folder
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+PASSED tests/test_b97_chips_help.py::test_tc_b97_30_check_editor_chip_unique_and_opens_checks_home
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_family_root_is_project_dir_else_tool_root
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_guard_unit_arms
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-checks]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-flows]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_no_project_patch_common_home_opens
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_above_the_root_is_not_the_guards
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_at_the_root_is_refused
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+PASSED tests/test_b97_chips_help.py::test_tc_b97_31_check_editor_header_carries_both_chips
+PASSED tests/test_b97_chips_help.py::test_tc_b97_32_check_editor_help_names_every_label
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_check_glyphs_closed_and_in_the_legend
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[no_a2l]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[nothing_included]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[write_dir]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[write_readonly]
+PASSED tests/test_tui_check_editor.py::test_tc_b94_06_composition_census
+PASSED tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+PASSED tests/test_tui_check_editor.py::test_tc_b94_07b_help_panel_lists_check_editor_binding
+PASSED tests/test_tui_check_editor.py::test_at_b94_01_rail_selects_check_editor_mounts_twin
+PASSED tests/test_tui_check_editor.py::test_at_b94_11_write_validate_chk_json_no_apply
+PASSED tests/test_tui_check_editor.py::test_at_b94_13_hostile_symbol_and_file_name
+PASSED tests/test_tui_check_editor.py::test_tc_b94_17_safe_text_hostile_payload
+PASSED tests/test_window_usage_help.py::test_tc707_section_census_nine_sections_min_three_steps
+PASSED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+PASSED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+PASSED tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[patch-#window_help_patch-patch]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[checks-#window_help_checks-checks]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[crc_designer-#window_help_crc_designer-crc_designer]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[map-#window_help_map-map]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[flow-#window_help_flow-flow]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[a2l-#window_help_a2l-a2l]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[workspace-#window_help_workspace-workspace]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[reports-#window_help_reports-reports]
+PASSED tests/test_window_usage_help.py::test_tc706_affordance_opens_window_section_modal[check_editor-#window_help_check_editor-check_editor]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[patch-#window_help_patch-patch]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[checks-#window_help_checks-checks]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[crc_designer-#window_help_crc_designer-crc_designer]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[map-#window_help_map-map]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[flow-#window_help_flow-flow]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[a2l-#window_help_a2l-a2l]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[workspace-#window_help_workspace-workspace]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[reports-#window_help_reports-reports]
+PASSED tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss[check_editor-#window_help_check_editor-check_editor]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[patch-#window_help_patch-patch]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[checks-#window_help_checks-checks]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[crc_designer-#window_help_crc_designer-crc_designer]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[map-#window_help_map-map]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[flow-#window_help_flow-flow]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[a2l-#window_help_a2l-a2l]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[workspace-#window_help_workspace-workspace]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[reports-#window_help_reports-reports]
+PASSED tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal[check_editor-#window_help_check_editor-check_editor]
+PASSED tests/test_window_usage_help.py::test_tc706_stock_help_panel_untouched
+PASSED tests/test_window_usage_help.py::test_tc706_seat_census_header_row_and_window_section
+PASSED tests/test_changes_file_notation_help.py::test_tc1802_changes_file_notation_section_ships
+PASSED tests/test_changes_file_notation_help.py::test_tc1802_notation_documents_the_wire_fields
+PASSED tests/test_changes_file_notation_help.py::test_tc1802_minimal_example_parses_with_the_shipped_reader
+PASSED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+PASSED tests/test_open_folder_chips.py::test_tc703_patch_editor_chip_resolves_change_set_home_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_checks_chip_resolves_check_artifact_home_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_crc_designer_chip_resolves_template_library_both_modes
+PASSED tests/test_open_folder_chips.py::test_tc703_reports_chip_resolves_project_reports_only
+PASSED tests/test_open_folder_chips.py::test_tc703_chips_render_header_right_with_no_key_bindings
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[patch-#open_folder_patch-patches]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[checks-#open_folder_checks-checks]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_project_folder_dimmed_create_offer_opens[templates-#open_folder_templates-templates]
+PASSED tests/test_open_folder_chips.py::test_tc704_missing_common_home_no_project_dimmed_and_recreated
+PASSED tests/test_open_folder_chips.py::test_tc704_reports_without_project_disabled_status_reason_zero_opens
+PASSED tests/test_open_folder_chips.py::test_tc705_seam_popen_argv_list_per_platform_arm
+PASSED tests/test_open_folder_chips.py::test_tc705_seam_failure_lands_on_status_line_no_escape
+PASSED tests/test_open_folder_chips.py::test_tc705_workarea_open_rides_the_same_seam
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_tui_patch_checks_strip.py::test_at078a_counts
+PASSED tests/test_tui_patch_checks_strip.py::test_at078b_zero_total
+PASSED tests/test_tui_patch_checks_strip.py::test_at078c_cleared
+PASSED tests/test_tui_patch_checks_strip.py::test_tc078_1_strip_mounted
+PASSED tests/test_tui_patch_checks_strip.py::test_tc078_2_aggregates_param
+PASSED tests/test_tui_patch_checks_strip.py::test_tc078_3_both_sites
+PASSED tests/test_tui_patch_checks_strip.py::test_tc078_5_strip_geometry_painted
+PASSED tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips
+PASSED tests/test_tui_patch_chips.py::test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch
+PASSED tests/test_tui_patch_chips.py::test_tc076_1_every_chip_selector_is_panel_rooted
+PASSED tests/test_tui_patch_chips.py::test_tc076_2_group_assignment_on_docked_containers
+PASSED tests/test_tui_patch_history_strip.py::test_at081a_position
+PASSED tests/test_tui_patch_history_strip.py::test_at081b_bounds
+PASSED tests/test_tui_patch_history_strip.py::test_tc081_2_strip
+PASSED tests/test_tui_patch_history_strip.py::test_tc081_3_sites
+PASSED tests/test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff
+PASSED tests/test_tui_patch_history_strip.py::test_tc081_5_strip_geometry_painted
+PASSED tests/test_tui_patch_history_strip.py::test_tc081_6_builder_returns_text
+PASSED tests/test_tui_snapshot.py::test_tc016s_snapshot_setup_loads_only_public_fixtures
+PASSED tests/test_tui_snapshot.py::test_cv04_breakpoint_boundary_119_proportional_120_fixed
+PASSED tests/test_tui_snapshot.py::test_cv04_breakpoint_boundary_on_live_resize
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-compact-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[workspace-comfortable-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-compact-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[mac-comfortable-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-compact-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[issues-comfortable-160x40] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome; batch-94 Inc-001: the Patch Editor pe_b rework (vertical stack — entries-table band + expanded JSON editor + Load/Refresh beside the path input)
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome; batch-94 Inc-001: the Patch Editor pe_b rework (vertical stack — entries-table band + expanded JSON editor + Load/Refresh beside the path input)
+XFAIL tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30] - batch-94 Inc-001: rail census 10->11 — the Check Editor entry (after Patch Editor) renders in every cell's rail chrome; batch-94 Inc-003: rail census 11->12 — the Flow Execution entry (after Flow Builder, `]`) renders in every cell's rail chrome; batch-94 Inc-001: the A2B Diff check-spec dropdown row (LLR-010.1)
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_1_derived - Assertio...
+1 failed, 193 passed, 29 xfailed in 822.58s (0:13:42)

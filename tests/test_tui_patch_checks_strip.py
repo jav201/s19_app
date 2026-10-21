@@ -645,6 +645,9 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
         and node.func.attr == "refresh_check_results"
     ]
 
+    # batch-97 Inc-3: the Check Editor's refused Write paints its line through
+    # ``CheckEditorPanel.show_status_line`` (it wraps ``refresh_check_results``
+    # inside the panel), so app.py gains no fourth site and the census stays 3.
     assert len(calls) == 3, (
         f"the writer census pins THREE refresh_check_results call sites; found "
         f"{len(calls)}. A new site must pass the aggregates and be recorded here."

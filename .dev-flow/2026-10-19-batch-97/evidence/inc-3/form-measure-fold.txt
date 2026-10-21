@@ -1,0 +1,55 @@
+== (118, 54) ce_A: panel H 40, switcher 34, empty rows under the status line 14, full-width blank panel rows []
+   full-name line: '0x00013A00  u8  ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE'  (content width 66, layout 66)
+   status: 'Validate compares fields to the image' width 37
+   |6 fields: 2 params · 4 memory rows    
+   |◆ 0x00013A00 ….TAB_VERB_DEFAULT_VALUE 
+   |◆ 0x00013A00 …_RANGE_NO_DEFAULT_VALUE 
+   |▪ 0x0000EB10 u32 memory row           
+   |▪ 0x0000EB40 u32 memory row           
+   |▪ 0x0000ED00 u16 memory row           
+   |▪ 0x0000FCB0 u16 memory row           
+   |                                      
+   |MEMORY LOCATIONS                      
+   | Address     Label              Fmt   
+   | 0x0000EB10  —                  u32   
+   | 0x0000EB40  —                  u32   
+   | 0x0000ED00  —                  u16   
+   | 0x0000FCB0  —                  u16   
+   | Address      0x100                   
+   | Label        label                   
+   | Size (bytes) 1                       
+   |  Add row     Remove row              
+   |                                      
+   |Validate compares fields to the image 
+== (118, 54) empty: panel H 40, switcher 34, empty rows under the status line 23, full-width blank panel rows []
+   full-name line: '0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL'  (content width 66, layout 66)
+   status: 'Validate compares fields to the image' width 37
+   |0 fields: 0 params · 0 memory rows    
+   |No fields included yet.               
+   |                                      
+   |MEMORY LOCATIONS                      
+   | Address     Label              Fmt   
+   | Address      0x100                   
+   | Label        label                   
+   | Size (bytes) 1                       
+   |  Add row     Remove row              
+   |                                      
+   |Validate compares fields to the image 
+== (118, 53) ce_A: panel H 39, switcher 33, empty rows under the status line 13, full-width blank panel rows []
+   full-name line: '0x00013A00  u8  ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE'  (content width 66, layout 66)
+   status: 'Validate compares fields to the image' width 37
+== (118, 53) empty: panel H 39, switcher 33, empty rows under the status line 22, full-width blank panel rows []
+   full-name line: '0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL'  (content width 66, layout 66)
+   status: 'Validate compares fields to the image' width 37
+== (220, 60) ce_A: panel H 46, switcher 40, empty rows under the status line 20, full-width blank panel rows []
+   full-name line: '0x00013A00  u8  ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE'  (content width 118, layout 118)
+   status: 'Validate compares fields to the image' width 69
+== (220, 60) empty: panel H 46, switcher 40, empty rows under the status line 29, full-width blank panel rows []
+   full-name line: '0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL'  (content width 118, layout 118)
+   status: 'Validate compares fields to the image' width 69
+== (220, 59) ce_A: panel H 45, switcher 39, empty rows under the status line 19, full-width blank panel rows []
+   full-name line: '0x00013A00  u8  ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE'  (content width 118, layout 118)
+   status: 'Validate compares fields to the image' width 69
+== (220, 59) empty: panel H 45, switcher 39, empty rows under the status line 28, full-width blank panel rows []
+   full-name line: '0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL'  (content width 118, layout 118)
+   status: 'Validate compares fields to the image' width 69

@@ -117,7 +117,13 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
     ("a2l", "#window_help_a2l", "a2l"),
     ("workspace", "#window_help_workspace", "workspace"),
     ("reports", "#window_help_reports", "reports"),
+    ("check_editor", "#window_help_check_editor", "check_editor"),
 )
+
+#: Code-authored shipped sections (not md ports, so outside TC-707's md
+#: fidelity census): batch-97 Inc-3 adds ``check_editor`` (D10 / D25,
+#: LLR-148.6); Inc-6 adds ``flow_execution``.
+_CODE_AUTHORED_SHIPPED = frozenset({"check_editor"})
 
 
 async def _pilot_pause(pilot) -> None:
@@ -247,9 +253,14 @@ def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
     unknown key, the opener pushes nothing for one (never a blank modal),
     and the shipped seats are exactly the nine keys minus the inc-004
     ``split_join_export``."""
-    assert frozenset(SHIPPED_WINDOW_KEYS) == _EXPECTED_KEYS - {
-        "split_join_export"
-    }, "the eighth shipped seats are the nine sections minus split_join_export"
+    # Named supersession (batch-97 Inc-3, I-4): the shipped seats grow by the
+    # code-authored ``check_editor`` key; the md-authored nine are unchanged.
+    assert frozenset(SHIPPED_WINDOW_KEYS) == (
+        _EXPECTED_KEYS - {"split_join_export"}
+    ) | _CODE_AUTHORED_SHIPPED, (
+        "the shipped seats are the nine md sections minus split_join_export, "
+        "plus the code-authored check_editor section"
+    )
     for key in WINDOW_HELP_SECTIONS:
         body = section_body_text(key)
         assert body.startswith("1. ") and len(body) > 0, (
@@ -445,7 +456,13 @@ def test_tc706_seat_census_header_row_and_window_section(tmp_path: Path) -> None
     (the chip windows keep the folder chip rightmost — TC-703's placement
     assertion is unchanged), and no seat exists for ``split_join_export``."""
     rail_seats = [seat for seat in _SEATS if seat[2] != "reports"]
-    folder_chip_windows = {"patch", "checks", "crc_designer"}
+    # batch-97 Inc-3 (D9): the Check Editor seat carries its suffixed chip.
+    folder_chip_windows = {
+        "patch": "open_folder_patch",
+        "checks": "open_folder_checks",
+        "crc_designer": "open_folder_templates",
+        "check_editor": "open_folder_checks_editor",
+    }
 
     async def _drive() -> dict:
         app = S19TuiApp(base_dir=tmp_path)
@@ -492,7 +509,7 @@ def test_tc706_seat_census_header_row_and_window_section(tmp_path: Path) -> None
             expected_folder_chip = (
                 "open_folder_reports"
                 if window_key == "reports"
-                else f"open_folder_{'templates' if window_key == 'crc_designer' else window_key}"
+                else folder_chip_windows[window_key]
             )
             assert seat["child_ids"] == [
                 None,

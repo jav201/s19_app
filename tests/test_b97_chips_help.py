@@ -3,8 +3,10 @@
 Inc-1 arms only: the ``flows`` / ``session`` families (LLR-148.1, 148.2), the
 per-family no-project message (LLR-148.3), the ``id_suffix`` mechanism of
 LLR-148.4, the real-directory guard (LLR-148.8) and the folder labels over the
-four shipped chip instances plus the no-project arm (LLR-148.10). The help-chip
-arms (LLR-148.5..148.7, 148.9) and AT-B97-12/13/14/23 land with Inc-3..6.
+four shipped chip instances plus the no-project arm (LLR-148.10). Inc-3 adds the
+Check Editor arms of LLR-148.4 (the mounted ``open_folder_checks_editor``),
+148.5, 148.6, 148.7 and 148.9; the other screens' arms and AT-B97-12/13/14/23
+land with Inc-4..6.
 
 Every test opens with a clause that is observable on ``main`` (a family
 membership, a signature, an attribute) so a run on the base tree fails at a
@@ -274,21 +276,30 @@ def test_tc_b97_29_no_project_chips_disabled_with_their_own_reason(
 
 
 # --------------------------------------------------------------------------- #
-# TC-B97-30 (Inc-1 arm) — LLR-148.4, the id_suffix mechanism
+# TC-B97-30 — LLR-148.4, chip ids unique; the Check Editor chip mounted (Inc-3)
 # --------------------------------------------------------------------------- #
 
 
-def test_tc_b97_30_id_suffix_gives_a_second_checks_chip_its_own_id(
+def test_tc_b97_30_check_editor_chip_unique_and_opens_checks_home(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """TC-B97-30 (LLR-148.4, Inc-1 mechanism arm): ``OpenFolderChip(family,
-    id_suffix=...)`` carries ``open_folder_<family>_<suffix>``, so a second
-    ``checks`` chip (the Check Editor's, mounted at Inc-3) and the Checks
-    screen's chip each hold a unique id and resolve the same ``checks`` home.
+    """TC-B97-30 (LLR-148.4): every mounted open-folder chip carries an id no
+    other widget carries — the Check Editor header mounts its ``checks`` chip as
+    ``#open_folder_checks_editor`` (D9) beside the Checks screen's
+    ``#open_folder_checks`` — and both resolve the same ``checks`` home.
 
-    RED on main: no ``id_suffix`` parameter (P-19). Mutation: ignore the
-    suffix (two ``open_folder_checks`` ids).
+    Named supersession (Inc-3): the Inc-1 arm
+    ``test_tc_b97_30_id_suffix_gives_a_second_checks_chip_its_own_id`` mounted a
+    stand-in ``id_suffix="editor"`` chip because no screen carried one; with the
+    real chip mounted that stand-in would be the duplicate, so the arm now
+    reads the mounted chip. The ``id_suffix`` signature clause is kept.
+
+    RED on main (P-19): no Check Editor chip. Mutation: the Check Editor
+    mounts ``OpenFolderChip("checks")`` without ``id_suffix`` (two
+    ``open_folder_checks``).
     """
+    import collections
+
     assert "id_suffix" in inspect.signature(OpenFolderChip.__init__).parameters
     spy = SeamSpy(monkeypatch)
 
@@ -299,22 +310,22 @@ def test_tc_b97_30_id_suffix_gives_a_second_checks_chip_its_own_id(
             await settle(pilot)
             project_dir = load_project(app)
             (project_dir / PROJECT_CHECKS_DIR).mkdir()
-            app.action_show_screen("checks")
-            await settle(pilot)
-            editor_chip = await mount_chip(app, pilot, "checks", id_suffix="editor")
-            counts = (
-                len(app.query("#open_folder_checks")),
-                len(app.query("#open_folder_checks_editor")),
-            )
-            app.query_one("#open_folder_checks", OpenFolderChip).press()
-            await settle(pilot)
-            editor_chip.press()
-            await settle(pilot)
-            return project_dir, counts, list(spy.calls)
+            ids = collections.Counter(w.id for w in app.query(OpenFolderChip))
+            presses = []
+            for screen, chip_id in (("checks", "open_folder_checks"), ("check_editor", "open_folder_checks_editor")):
+                app.action_show_screen(screen)
+                await settle(pilot)
+                chips = list(app.query(f"#{chip_id}"))
+                if len(chips) == 1:
+                    chips[0].press()
+                    await settle(pilot)
+                presses.append(len(chips))
+            return project_dir, ids, presses, list(spy.calls)
 
-    project_dir, counts, calls = asyncio.run(_drive())
-    assert OpenFolderChip("checks").id == "open_folder_checks"
-    assert counts == (1, 1), f"each chip id must be unique in the app: {counts}"
+    project_dir, ids, presses, calls = asyncio.run(_drive())
+    assert ids["open_folder_checks_editor"] == 1, f"the Check Editor chip is mounted once: {ids}"
+    assert all(count == 1 for count in ids.values()), f"each chip id unique in the app: {ids}"
+    assert presses == [1, 1]
     home = project_dir / PROJECT_CHECKS_DIR
     assert [path for path, _ in calls] == [home, home], "both chips open the checks home"
 
@@ -642,3 +653,256 @@ def test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason(
     assert disabled
     assert status == "📂 Open session: no active project — load a project first."
     assert spy.calls == []
+
+
+# --------------------------------------------------------------------------- #
+# Inc-3 — the Check Editor arms of LLR-148.5, 148.6, 148.7, 148.9
+# --------------------------------------------------------------------------- #
+
+CHECK_TABS = ("check_tab_fields", "check_tab_json", "check_tab_addendum")
+
+
+def test_tc_b97_31_check_editor_header_carries_both_chips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-31 (LLR-148.5, Check arm): the Check Editor header is a
+    ``titled_header`` row holding one ``OpenFolderChip`` and one
+    ``WindowHelpChip``; with a project, a click and an ``enter`` on the folder
+    chip each make exactly one seam call with ``resolve_chip_target``'s target.
+
+    RED on main (P-20): the header is a bare ``Label`` — 0 chips.
+    """
+    from s19_app.tui.window_help import WindowHelpChip
+
+    spy = SeamSpy(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            project_dir = load_project(app)
+            (project_dir / PROJECT_CHECKS_DIR).mkdir()
+            app.action_show_screen("check_editor")
+            await settle(pilot)
+            screen = app.query_one("#screen_check_editor")
+            headers = list(screen.query(".db-screen-header"))
+            counts = (
+                sum(len(h.query(OpenFolderChip)) for h in headers),
+                sum(len(h.query(WindowHelpChip)) for h in headers),
+            )
+            if counts[0] == 1:
+                chip = headers[0].query_one(OpenFolderChip)
+                await pilot.click(f"#{chip.id}")
+                await settle(pilot)
+                chip.focus()
+                await pilot.press("enter")
+                await settle(pilot)
+            target = fos.resolve_chip_target(
+                project_dir, family="checks", workarea=app.workarea, base_dir=tmp_path
+            )
+            return counts, target, list(spy.calls)
+
+    counts, target, calls = asyncio.run(_drive())
+    assert counts == (1, 1), f"one folder chip and one help chip in the header: {counts}"
+    assert [path for path, _ in calls] == [target, target]
+
+
+def _check_help_lines() -> dict:
+    from s19_app.tui.window_help import section_body_text
+
+    lines = {}
+    for raw in section_body_text("check_editor").split("\n"):
+        text = raw.strip()
+        text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
+        if " — " in text:
+            label, effect = text.split(" — ", 1)
+            lines[label.strip()] = effect.strip()
+    return lines
+
+
+def _strip_glyph(label: str) -> str:
+    """A button label without its leading glyph prefix (``📂 Open checks/``)."""
+    text = label.strip()
+    while text and not (text[0].isalnum() or text[0] in "?."):
+        text = text[1:].lstrip()
+    return text
+
+
+def test_tc_b97_32_check_editor_help_names_every_label(tmp_path: Path) -> None:
+    """TC-B97-32 (LLR-148.6, Check arm): the ``check_editor`` help body holds one
+    ``label — effect`` line, effect non-empty, for every button, tab chip, input
+    and select label the screen renders over its three tab states, every key it
+    binds (``space``, ``enter``, ``?``) and every glyph of ``CHECK_GLYPHS``; the
+    control subset counts >= 12.
+
+    RED on main (P-21): no ``check_editor`` section (0 of 6 buttons named).
+    Mutation: a body listing labels without `` — effect``; coverage read from
+    the Fields tab only.
+    """
+    from textual.widgets import Button, Input as _Input, Label as _Label, Select as _Select
+
+    from s19_app.tui import screens_directionb as sdb
+    from s19_app.tui.window_help import WINDOW_HELP_SECTIONS
+
+    assert "check_editor" in WINDOW_HELP_SECTIONS, "a check_editor help section exists"
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            app.action_show_screen("check_editor")
+            await settle(pilot)
+            screen = app.query_one("#screen_check_editor")
+            controls, keys = set(), set()
+            for tab in CHECK_TABS:
+                app.query_one(f"#{tab}").press()
+                await settle(pilot)
+                for widget in screen.query("*"):
+                    if not widget.display or widget.region.width == 0:
+                        continue
+                    if isinstance(widget, Button):
+                        controls.add(_strip_glyph(str(widget.label)))
+                    elif isinstance(widget, (_Input, _Select)):
+                        row = [
+                            str(lab.render()).strip()
+                            for lab in screen.query(_Label)
+                            if lab.display and lab.region.y == widget.region.y and lab.region.right <= widget.region.x
+                        ]
+                        controls.add(row[-1] if row else getattr(widget, "placeholder", ""))
+                    for binding in getattr(type(widget), "BINDINGS", []):
+                        key = binding.key if hasattr(binding, "key") else binding[0]
+                        keys.add({"question_mark": "?"}.get(key, key))
+            return controls, keys
+
+    controls, keys = asyncio.run(_drive())
+    keys &= {"space", "enter", "?"}
+    keys.add("enter")
+    glyphs = set(sdb.CHECK_GLYPHS)
+    lines = _check_help_lines()
+    assert len(controls) >= 12, sorted(controls)
+    missing = sorted((controls | keys | glyphs) - set(lines))
+    assert missing == [], f"labels with no `label — effect` line: {missing}"
+    assert all(lines[label] for label in controls | keys | glyphs)
+
+
+def test_tc_b97_33_check_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None:
+    """TC-B97-33 (LLR-148.7, Check arm): the glyphs painted in the ledger's mark
+    column and at the head of each REPORT FIELDS line belong to
+    ``CHECK_GLYPHS`` (>= 2 painted), every vocabulary glyph is named in the
+    one-row ``#check_legend``, and no painted text says ``issues``.
+
+    RED on main: no ``CHECK_GLYPHS``. Mutation: a renderer painting a glyph
+    outside the vocabulary.
+    """
+    from s19_app.tui import screens_directionb as sdb
+    from tests.b97_fixtures import DEMO_A2L, open_check_editor
+    from tests.b97_probes import painted_rows
+
+    vocabulary = getattr(sdb, "CHECK_GLYPHS", None)
+    assert vocabulary, "the Check Editor's closed glyph vocabulary exists"
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            panel = await open_check_editor(app, pilot, a2l=DEMO_A2L)
+            table = panel.query_one("#check_param_table")
+            for row in (0, 2):
+                table.move_cursor(row=row)
+                await settle(pilot)
+                panel.query_one("#check_param_include_button").press()
+                await settle(pilot)
+            panel.query_one("#check_mem_address_input").value = "0x100"
+            panel.query_one("#check_mem_size_input").value = "1"
+            panel.query_one("#check_mem_add_button").press()
+            await settle(pilot)
+            cols = table.ordered_columns
+            x0 = table.cell_padding
+            marks = [row[x0:x0 + cols[0].width] for row in painted_rows(app, table)[1:]]
+            fields = [row[:1] for row in painted_rows(app, panel.query_one("#check_fields_lines"))[1:] if row.strip()]
+            legend = panel.query_one("#check_legend")
+            legend_rows = [r for r in painted_rows(app, legend) if r.strip()]
+            panel_text = "\n".join(painted_rows(app, panel))
+            return marks, fields, legend_rows, legend.region.height, panel_text
+
+    marks, fields, legend_rows, legend_h, panel_text = asyncio.run(_drive())
+    painted = {c for text in marks + fields for c in text if not c.isalnum() and not c.isspace()}
+    assert painted <= set(vocabulary), painted - set(vocabulary)
+    assert len(painted) >= 2, painted
+    assert legend_h <= 2 and 1 <= len(legend_rows) <= 2
+    assert all(glyph in "".join(legend_rows) for glyph in vocabulary), legend_rows
+    assert "issues" not in panel_text
+
+
+#: Glyphs seen painted ONE cell wide in a real Windows Terminal capture (the
+#: headless compositor counts every one of them as 1 cell, so only a real
+#: terminal can tell). Source: ``.dev-flow/2026-10-19-batch-97/evidence/inc-3/
+#: png/impl.check-editor.png`` (Inc-3 gate fold, 2026-10-21), read at the
+#: Fields lines — ``◆ 0x…`` and ``▪ 0x…`` start their addresses in the same
+#: column — and the legend row; the SHA-256 is in the Inc-3 packet §4. ``☑`` is
+#: deliberately absent: the first Inc-3 capture painted it two cells wide,
+#: glued to the address (LED-2026-10-19-batch-97.12).
+WT_NARROW_GLYPHS = ("✓", "◆", "▪")
+
+
+def test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal() -> None:
+    """TC-B97-33 (LLR-148.7 / LLR-145.6, WT width arm): every Check Editor
+    glyph is one the real-terminal capture showed one cell wide, so no mark
+    glues itself to the address after it.
+
+    Why: the headless tests cannot see a double-width glyph; the operator saw
+    ``☑0x00013A00`` in Windows Terminal. RED on the pre-fold tree (``☑`` in
+    the vocabulary); mutation: the vocabulary back to ``☑``.
+    """
+    from s19_app.tui import screens_directionb as sdb
+
+    assert set(sdb.CHECK_GLYPHS) <= set(WT_NARROW_GLYPHS), sorted(set(sdb.CHECK_GLYPHS) - set(WT_NARROW_GLYPHS))
+    assert sdb.CHECK_GLYPHS.get("◆") == "parameter field"
+
+
+@pytest.mark.parametrize("arm", ["no_a2l", "nothing_included", "write_dir", "write_readonly"])
+def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
+    """TC-B97-58 (LLR-148.9, Check arms): the parameter ledger with no A2L, the
+    REPORT FIELDS card with nothing included, and a Write refused at the
+    staging path (a directory, then a read-only file, P-51) each paint exactly
+    one English line in their region, and no traceback.
+
+    RED on main: no ledger empty line; a refused Write paints nothing in the
+    card (the refusal only reaches the app status line).
+    """
+    import os
+
+    from tests.b97_fixtures import DEMO_A2L, ES_MARKER_RE, open_check_editor, staging_block
+    from tests.b97_probes import painted_rows
+
+    blocker = None
+    if arm.startswith("write_"):
+        blocker = staging_block(tmp_path, "spec.chk.json", "dir" if arm == "write_dir" else "readonly")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            panel = await open_check_editor(app, pilot, a2l=None if arm == "no_a2l" else DEMO_A2L)
+            if arm == "no_a2l":
+                holder = panel.query("#check_full_name_line")
+                rows = painted_rows(app, holder.first()) if holder else []
+                return [r.strip() for r in rows if r.strip()]
+            if arm == "nothing_included":
+                holder = panel.query("#check_fields_lines")
+                rows = painted_rows(app, holder.first()) if holder else []
+                return [r.strip() for r in rows[1:] if r.strip()]
+            panel.query_one("#check_write_button").press()
+            await settle(pilot, 6)
+            status = panel.query_one("#check_status")
+            return [r.strip() for r in painted_rows(app, status) if r.strip()]
+
+    try:
+        lines = asyncio.run(_drive())
+    finally:
+        if blocker is not None and blocker.is_file():
+            os.chmod(blocker, 0o666)
+    assert len(lines) == 1, (arm, lines)
+    assert not ES_MARKER_RE.search(lines[0]), lines[0]
+    assert "Traceback" not in lines[0]
+    if arm.startswith("write_"):
+        assert "refused" in lines[0].lower() and "MF-WRITE-CONTAINMENT" in lines[0], lines[0]

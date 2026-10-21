@@ -2278,7 +2278,7 @@ class S19TuiApp(App):
 
         Returns:
             Container: ``#screen_checks`` holding the ``Checks`` header row
-            (title + the ``📂 Open folder`` chip, HLR-139), a
+            (title + the ``📂 Open checks/`` chip, HLR-139 / LLR-148.10), a
             ``#checks_content`` container (the ``#checks_aggregate_strip``
             ``Static`` above a ``#checks_columns`` horizontal split whose left
             ``GroupedChecksPanel`` (``#checks_grouped``) sits beside the hex
@@ -3053,13 +3053,18 @@ class S19TuiApp(App):
             classes="db-screen hidden",
         )
 
-    def _compose_screen_check_editor(self) -> Container:
+    def _compose_screen_check_editor(self) -> WindowSection:
         """Build the Check Editor rail screen (``#screen_check_editor``).
 
         Summary:
             The batch-94 (US-003, HLR-001) check twin of the Patch Editor —
-            one ``CheckEditorPanel`` (the ce_a collector) mounted as its own
-            rail surface between Patch Editor and A2B Diff (the R-1 order).
+            one ``CheckEditorPanel`` (batch-97: the ledger + REPORT FIELDS
+            card, HLR-145) mounted as its own rail surface between Patch
+            Editor and A2B Diff (the R-1 order). Batch-97 (LLR-148.5, D9 /
+            D10): a ``WindowSection`` whose ``titled_header`` carries the
+            ``?`` help chip and the ``📂 Open checks/`` chip under the
+            suffixed id ``#open_folder_checks_editor`` — the Checks screen
+            already mounts ``#open_folder_checks`` (LLR-148.4).
             The panel is presentational: its controls emit
             ``CheckEditorPanel.ActionRequested`` messages that
             ``on_check_editor_panel_action_requested`` routes — the write
@@ -3069,8 +3074,9 @@ class S19TuiApp(App):
             built here (C-7).
 
         Returns:
-            Container: ``#screen_check_editor`` holding a title label and a
-            ``CheckEditorPanel``. Hidden at startup.
+            WindowSection: ``#screen_check_editor`` holding the header row
+            (title, ``?``, ``📂 Open checks/``) and a ``CheckEditorPanel``.
+            Hidden at startup.
 
         Dependencies:
             Uses:
@@ -3078,8 +3084,13 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
-        return Container(
-            Label("Check Editor", classes="db-screen-title"),
+        return WindowSection(
+            "check_editor",
+            titled_header(
+                "Check Editor",
+                OpenFolderChip("checks", id_suffix="editor"),
+                help_button=WindowHelpChip("check_editor"),
+            ),
             CheckEditorPanel(),
             id="screen_check_editor",
             classes="db-screen hidden",
@@ -5446,6 +5457,12 @@ class S19TuiApp(App):
                 )
             if path is None:
                 self.set_status("Check Editor: spec NOT written.")
+                # LLR-148.9: the refusal also paints one English line in the
+                # REPORT FIELDS card, naming the finding codes.
+                codes = ", ".join(sorted({issue.code for issue in issues}))
+                panel.show_status_line(
+                    f"Write refused: {codes or 'not written'}."
+                )
             else:
                 self.set_status(
                     f"Check Editor: wrote {path.name} "

@@ -130,7 +130,12 @@ from tools.id_registry import (
 # (and ``ls tests/*.py tests/**/*.py | sort -u | wc -l`` agreeing at 194) — the
 # flow foundations add ``tests/test_b97_flow_builder.py`` (TC-B97-62, TC-B97-18
 # token arm) and ``tests/test_b97_flow_execution.py`` (TC-B97-25 service arm).
-EXPECTED_SCANNED_TEST_FILES = 194
+# batch-97 Inc-3 (2026-10-20): 194 -> 196, measured with ``scanned_test_files()``
+# (and ``ls tests/*.py tests/**/*.py | sort -u | wc -l`` agreeing at 196) — the
+# Check Editor increment adds ``tests/test_b97_check_editor.py`` (TC-B97-08..12,
+# 43..46, 61; AT-B97-04/05/18/21) and ``tests/test_b97_width.py`` (TC-B97-34..38,
+# 59, Check arms).
+EXPECTED_SCANNED_TEST_FILES = 196
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

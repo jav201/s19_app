@@ -1,0 +1,34 @@
+26c26
+< ===== workspace-compact-120x30 sha256 15438592da0bc2d63fca25dde8fccfb8843642abc4fb41e8b25a26a0b803c9b2
+---
+> ===== workspace-compact-120x30 sha256 93c0b6ed27695647bde9b906fe00ad66821cefd02850e8f36f5046e0fec0e289
+35,38c35,38
+<  ▏ ✎  Patch Editor    │ S19   snap.s19  1.0 KiB · 5 rng                                                           [u]   
+<  ▏ ✔  Check Editor    │ MAC   snap.mac  24 records                                                                [u]   
+<  ▏ ⏚  A2B Diff        │ A2L   snap.a2l  32 tags                                                                   [u]   
+<  ▏ ✦  Flow Builder    │                                                                               unload all  [U]   
+---
+>  ▏ ✎  Patch Editor    │ S19   (none)                                                                                    
+>  ▏ ✔  Check Editor    │ MAC   (none)                                                                                    
+>  ▏ ⏚  A2B Diff        │ A2L   (none)                                                                                    
+>  ▏ ✦  Flow Builder    │                                                                                    unload all   
+48c48
+<   Ready.                                                                                           (none)  |  snap.a2l  
+---
+>   Ready.                                                                                             (none)  |  (none)  
+317c317
+< ===== a2l-comfortable-120x30 sha256 6f2d065cebf9c0900c3a671cc66ba63e7af67b73c8913969ad9e2e5e39d5a6d7
+---
+> ===== a2l-comfortable-120x30 sha256 6756a7450ba3b372c6f3266a4fe95c28001cb99d5e4b061be6ce9c35255d45dd
+339c339
+<   Ready.                                                                                             (none)  |  (none)  
+---
+>   Ready.                                                                                           (none)  |  snap.a2l  
+639c639
+< ===== issues-compact-160x40 sha256 7cb196ee389bbe7238c5fb37c45702c7888b23663cb93364a2884b16a7d2d632
+---
+> ===== issues-compact-160x40 sha256 7fa25df98e8b23323add0982293ab062dcc8f0e9c938ab2c8226a3f65234c293
+671c671
+<   Ready.                                                                                                                                     (none)  |  (none)  
+---
+>   Ready.                                                                                                                                   (none)  |  snap.a2l  

@@ -52,7 +52,7 @@ the batch-96 waiting-human doctrine itself; chips and help on any other screen.
 | inspector | the right-hand column that shows the highlighted ledger row and the tab chips |
 | pipeline rail | one horizontal row of block cards joined by cable glyphs (fb_A / fx_A) |
 | cable status glyph | the glyph painted on the cable after block *j*: `▓` ok · `░` not run · `✗` error · `◇` notices · `□` into a waiting block (LLR-147.1 truth table) |
-| hero | the screen's growing region, painted as its main object: the Patch Editor ledger, the Check Editor parameter ledger, the Flow Builder pipeline, the Flow Execution lanes |
+| hero | the screen's main object and, except on the Flow Builder, its growing region: the Patch Editor ledger, the Check Editor parameter ledger, the Flow Builder pipeline, the Flow Execution lanes. The Flow Builder's growing region is the result area under Run (`#flow_result`); its pipeline frame fits its cards (LLR-149.5, LED-2026-10-19-batch-97.11) |
 | filled element | a displayed `Button` whose `variant == "primary"`, or a widget carrying the filled-accent class (NEW, name fixed at PDR); the hero is filled by definition and is never counted among "the filled elements besides the hero" |
 | selection style | the style of the active tab chip or the selected kind chip (class NEW); its background differs from the filled accent and it is not a fill; a tab or kind chip paints three pairwise distinct styles — unfocused, focused, selected |
 | waiting-human elements | the waiting block's card, the cable into it, the paused lane's status text, `#fx_confirm_<i>` of a waiting lane, the REQUIRED line, and the `□` mark of a waiting line in the run log |
@@ -522,11 +522,11 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.3 — Parameter names stay distinguishable when clipped
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The `CheckEditorPanel` shall give the Parameter column a content width of at least 42 cells and each REPORT FIELDS line's name field at least 24 cells at every width from 118 columns upward, the name field growing with the card (LLR-149.5). The panel shall show the highlighted ledger row's full parameter name and its address on one full-name line (NEW) under the ledger. If a parameter name is wider than the Parameter column, then the panel shall paint its first dot-separated segment, one ellipsis and the name's tail filling the column. If a parameter name is wider than a REPORT FIELDS name field, then the panel shall paint one ellipsis and the name's tail filling the field. A name that fits shall be painted in full.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.13, LED-2026-10-19-batch-97.15
+- **Statement:** The `CheckEditorPanel` shall give the Parameter column a content width of at least 42 cells at 118 and 119 columns and from 134 columns upward, and at least 28 cells from 120 to 133 columns (the degraded band where the shell's wide-regime rail takes 16 more cells, LED-2026-10-19-batch-97.13), and each REPORT FIELDS line's name field at least 24 cells at every width from 118 columns upward, the name field growing with the card (LLR-149.5). The panel shall show, on one full-name line (NEW) under the ledger, the highlighted ledger row's address, its full `Fmt · Unit` and its parameter name, in that order; the address and `Fmt · Unit` are never clipped, and a name wider than the cells left is clipped by the Parameter rule below, recomputed when the derived width changes (LED-2026-10-19-batch-97.15). If a parameter name is wider than the Parameter column, then the panel shall paint its first dot-separated segment, one ellipsis and the name's tail filling the column. If a parameter name is wider than a REPORT FIELDS name field, then the panel shall paint one ellipsis and the name's tail filling the field. A name that fits shall be painted in full. Widths are terminal cells.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B97-10 — `pytest tests/test_b97_check_editor.py -k tc_b97_10`; procedure: appendix A.4 TC-B97-10.
-- **Numeric pass threshold:** Parameter content width W ≥ 42 and Fields name width ≥ 24 at both sizes; per clipped Parameter cell: starts with `first_segment + "…"`, exactly one `…`, ends with the name's last `W − len(first_segment) − 1` characters, cell length == W (guard: ≥ 1 clipped cell at 118x54 — 15 names exceed 42); per clipped Fields name: starts with `…`, ends with the name's last `width − 1` characters; **per cell:** 0 pairs of equal Parameter cells with different names over the 75 rows; 0 pairs of equal Fields lines over the six (they share one address, so only the name separates them); at 220x60 the 47-cell name painted in full; the full-name line holds the 47-cell name and its address in full when that row is highlighted at 118x54; the Fields name width at 220x60 > its width at 118x54.
+- **Numeric pass threshold:** Parameter content width W ≥ 42 and Fields name width ≥ 24 at both sizes; per clipped Parameter cell: starts with `first_segment + "…"`, exactly one `…`, ends with the name's last `W − len(first_segment) − 1` characters, cell length == W (guard: ≥ 1 clipped cell at 118x54 — 15 names exceed 42); per clipped Fields name: starts with `…`, ends with the name's last `width − 1` characters; **per cell:** 0 pairs of equal Parameter cells with different names over the 75 rows; 0 pairs of equal Fields lines over the six (they share one address, so only the name separates them); at 220x60 the 47-cell name painted in full; the full-name line holds the 47-cell name and its address in full when that row is highlighted at 118x54; the Fields name width at 220x60 > its width at 118x54. **Amended band (LED-…97.13):** at 119 and 134 columns W ≥ 42; at 120, 126 and 133 columns W ≥ 28, the 75 painted ledger rows pairwise distinct, and the full-name line of the highlighted 47-cell row starts with its address and ends with its tail. **Full-name line (LED-…97.15):** with the 173-cell `LONG_NAME` highlighted at 118x54 and after a resize to 220x60 the line starts with `address  Fmt · Unit  `, its name part starts with `ASAM…` and holds exactly one `…`, it ends with the name's tail, and its painted length equals the line's content width (wider at 220x60).
 - **Negative control:** measured on the fixture (§2.7 P-38): a head-keeping truncation (mutation, Phase 3) fails the tail clause on every clipped cell and paints 3 of the six Fields names as `ASAM.M.SCALAR.UBYTE.TAB…` at 24 cells → RED; a tail-only Parameter truncation fails the first-segment clause → RED; a 40-cell Parameter column leaves `ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` / `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` equal → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a name exactly W cells (no ellipsis); a name with no dot (`UNKNOWN…`, head + `…` + tail). Others N/A.
 
@@ -552,21 +552,21 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-145.6 — The REPORT FIELDS card holds exactly the included fields
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** The REPORT FIELDS card's Fields tab shall list one line per included parameter (`☑`, name, address) and one per memory row (`▪`, label, address), in inclusion order; its JSON tab (`#check_preview`) shall show the spec document those fields produce, capped at `JSON_TAB_LINE_CAP` lines with the LLR-144.5 note line; and its Addendum tab shall show `#check_addendum_preview`.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.12, LED-2026-10-19-batch-97.15
+- **Statement:** The REPORT FIELDS card's Fields tab shall list one line per included parameter (`◆`, address, name) and one per memory row (`▪`, address, its width `u8`…`u64`, and its label, or `memory row` when none was typed), in inclusion order; its JSON tab (`#check_preview`) shall show the spec document those fields produce, capped at `JSON_TAB_LINE_CAP` lines with the LLR-144.5 note line; and its Addendum tab shall show `#check_addendum_preview`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-43 — `pytest tests/test_b97_check_editor.py -k tc_b97_43`; procedure: appendix A.4 TC-B97-43.
-- **Numeric pass threshold:** parsed Fields set == `{("☑", a1), ("☑", a2), ("▪", m1)}`; JSON tab addresses == `[a1, a2, m1]`; `#check_fields_count` reads 3; Addendum shows `#check_addendum_preview`; at 5001 lines: 5000 + 1 note line.
+- **Numeric pass threshold:** parsed Fields set == `{("◆", a1), ("◆", a2), ("▪", m1)}`; a memory row typed with no label paints `u32 memory row` after its address, its table Label cell `—`, and its JSON entry keeps the name `field @ 0x…`; JSON tab addresses == `[a1, a2, m1]`; `#check_fields_count` reads 3; Addendum shows `#check_addendum_preview`; at 5001 lines: 5000 + 1 note line.
 - **Negative control:** a card fed from the unfiltered parameter list (mutation, Phase 3) → 75 lines, RED; executed on `main`: no Fields tab → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: nothing included → one empty-state line, `"entries": []`; boundary: include then exclude the same parameter → the line disappears; 5000/5001 lines. Others N/A.
 
 ### LLR-145.7 — Memory-row table with labelled inputs
 - **Traceability:** HLR-145
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.14
 - **Statement:** The REPORT FIELDS card's Fields tab shall carry `#check_mem_table` (columns Address, Label, Fmt) above `#check_mem_address_input`, `#check_mem_label_input` and `#check_mem_size_input`, each beside a visible label naming its field, with `#check_mem_add_button` and `#check_mem_remove_button`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-44 — `pytest tests/test_b97_check_editor.py -k tc_b97_44`; procedure: appendix A.4 TC-B97-44.
-- **Numeric pass threshold:** 6 of 6 contained; 3 of 3 labelled.
+- **Numeric pass threshold:** 6 of 6 contained; 3 of 3 labelled. Form arm (LED-…97.14), at 118x54 and 118x53: the three inputs on 3 consecutive rows; one label column (equal x and width ≥ 12); Address and Label inputs equally wide and wider than Size (≥ 3); one blank card row before `MEMORY LOCATIONS` and one before the status line.
 - **Negative control:** executed on `main`: the memory inputs carry placeholders only, no label widget → RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 118x54. Others N/A (input validation is batch-94's).
 
@@ -959,7 +959,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.7 — Closed glyph vocabularies and a legend on every screen
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.12
 - **Statement:** Each renderer of the four panels — the Patch Editor hex strip, the Check Editor marks, the Builder cards and cables, the Execution lanes and pending lines — shall draw its glyphs from a closed vocabulary constant (NEW, one per renderer, each glyph with one meaning). Each panel shall paint a legend of at most two rows (id NEW) naming every status and mark glyph of its vocabularies, the block-kind glyphs being named in the help entry (LLR-148.6), and shall use the word `notices` for every non-blocking finding.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-33 — `pytest tests/test_b97_chips_help.py -k tc_b97_33`; procedure: appendix A.4 TC-B97-33.
@@ -1047,11 +1047,11 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-149.5 — The space goes to the growing region: no width or height void
 - **Traceability:** HLR-149
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** While displayed at any size of at least 118x54, the four panels shall give their adaptive elements — the Patch Editor ledger, the Check Editor parameter table, its Parameter column and the REPORT FIELDS name field, the Flow Builder pipeline cards and EXT-STEP inputs, the Flow Execution lane cards — the width their split assigns, cards growing from a 21-cell minimum, so that the void after each element's painted extent inside its content region is at most 2 cells unless no card line in that band is clipped, and shall give the height the docked rows leave to the screen's growing region, so that no blank row lies outside it.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.11
+- **Statement:** While displayed at any size of at least 118x54, the four panels shall give their adaptive elements — the Patch Editor ledger, the Check Editor parameter table, its Parameter column and the REPORT FIELDS name field, the Flow Builder pipeline cards and EXT-STEP inputs, the Flow Execution lane cards — the width their split assigns, cards growing from a 21-cell minimum, so that the void after each element's painted extent inside its content region is at most 2 cells unless no card line in that band is clipped, and shall give the height the docked rows leave to the screen's growing region, so that no blank row lies outside it. The Flow Builder's pipeline frame (`#flow_pipeline_scroll`) shall be exactly as tall as its cards plus its border, plus the horizontal scrollbar row when the cards overflow its width, and the Builder's growing region shall be its result area (`#flow_result`), which shows one empty-state line before a run and the run's verdict lines without scrolling up to its own height.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-38 — `pytest tests/test_b97_width.py -k tc_b97_38`; procedure: appendix A.4 TC-B97-38.
-- **Numeric pass threshold:** every void ≤ 2, or > 2 with 0 clipped card lines in that band; card width ≥ 21; the 47-cell name in full at 220x60; 0 blank rows outside the growing region.
+- **Numeric pass threshold:** every void ≤ 2, or > 2 with 0 clipped card lines in that band; card width ≥ 21; the 47-cell name in full at 220x60; 0 blank rows outside the growing region; Flow Builder: 0 blank rows inside `#flow_pipeline_scroll` (its height == card height + 2, + 1 when it scrolls horizontally) and `#flow_result.region.bottom == #flow_legend.region.y`.
 - **Negative control:** fixed 24-cell cards with a 60-cell ref at 220x60 (mutation, Phase 3) → a void > 2 beside a clipped line, RED; measuring over `region` instead of `content_region` reads 0 void on any bordered band (U2-5) — the predicate reads the content region; executed on `main` (§2.7 P-22, P-32): EXT-STEP inputs equal at both sizes, Patch 3 / 2 blank rows outside the ledger → RED. Check 0 / 0 is a regression **pin**; the Builder's base count is recorded by the Flow Builder increment's RED run.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 160x56 (off-grid), 260x70 (above the reference). Others N/A.
 
@@ -1213,7 +1213,7 @@ FLOW: a2l_parameters_to_check_ledger
     - fn    : REPORT FIELDS composition — Fields lines, capped JSON spec, Addendum preview (NEW layout over the shipped collector)
       owner : LLR-145.6
       in    : included parameters + memory rows
-      out   : ☑/▪ lines, spec JSON, addendum
+      out   : ◆/▪ lines, spec JSON, addendum
     - fn    : safe_text render of names and spec file names
       owner : LLR-145.5
       in    : file-derived names

@@ -1,0 +1,118 @@
+....F                                                                    [100%]
+================================== FAILURES ===================================
+____________________________ test_save_back_prompt ____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23082/test_save_back_prompt0')
+
+    def test_save_back_prompt(tmp_path: Path) -> None:
+        """The post-apply prompt offers an editable suggestion; decline writes
+        nothing; adversarial typed names are contained or refused.
+    
+        Intent: LLR-002.7 UI half (F-Q-10) — after an apply with ≥1 applied
+        entry on an S19 image the prompt appears pre-filled with
+        ``<variant_id>-patched.s19``; declining leaves ``saved_path`` ``None``
+        and writes no file; the operator-typed name passes the F-S-01
+        sanitizer — a traversal name and an absolute path are neutralised into
+        the work area, a reserved device name is refused (3 adversarial cases —
+        the v2 replacement for the retired batch-04 containment tests).
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            workarea = tmp_path / ".s19tool" / "workarea"
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                async def _apply() -> None:
+                    panel.request_action("apply_doc")
+                    await pilot.pause()
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+    
+                # Stage 1 — prompt appears with the pre-filled suggestion.
+                await _apply()
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["suggestion"] = name_input.value
+    
+                # Stage 2 — decline: nothing written, saved_path stays None.
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await pilot.pause()
+                outcomes["prompt_hidden_after_decline"] = prompt.has_class(
+                    "hidden"
+                )
+                outcomes["declined_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["s19_after_decline"] = sorted(
+                    p.name for p in workarea.rglob("*.s19")
+                )
+    
+                # Stage 3 — the suggestion is editable; adversarial names.
+                async def _confirm_with(name: str) -> None:
+                    await _apply()
+                    name_input.value = name
+                    app.query_one(
+                        "#patch_saveback_confirm_button", Button
+                    ).press()
+                    await pilot.pause()
+    
+                await _confirm_with("..\\escape.s19")
+                outcomes["traversal_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["traversal_escaped"] = (
+                    (tmp_path / "escape.s19").exists()
+                    or (tmp_path.parent / "escape.s19").exists()
+                )
+    
+                await _confirm_with("C:\\evil\\abs.s19")
+                outcomes["absolute_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+    
+                await _confirm_with("CON.s19")
+                outcomes["reserved_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["reserved_files"] = sorted(
+                    p.name for p in workarea.rglob("CON*")
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        assert outcomes["prompt_shown"] is True
+        assert outcomes["suggestion"] == "img-patched.s19"
+        assert outcomes["prompt_hidden_after_decline"] is True
+        assert outcomes["declined_saved_path"] is None
+        assert outcomes["s19_after_decline"] == [], (
+            "declining the prompt must write no patched image"
+        )
+    
+        traversal_path = outcomes["traversal_saved_path"]
+>       assert traversal_path is not None
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:630: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+1 failed, 4 passed in 11.87s
+
+# test_save_back_prompt repeated 3x on the Inc-3 tree: passed, failed, passed
+# test_save_back_prompt repeated 3x on a clean worktree at HEAD f93dadc (no Inc-3 source): failed, failed, passed
+# -> intermittent on HEAD itself (assert traversal_saved_path is not None, test_tui_patch_editor_v2.py:630); not an Inc-3 regression

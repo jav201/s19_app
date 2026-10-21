@@ -1,0 +1,53 @@
+# Inc-3 gate fold — RED run of the new/changed arms on the PRE-FOLD source (tests edited, s19_app/ untouched since the Inc-3 packet)
+# date: 2026-10-21T07:49:29-06:00
+# HEAD f93dadc; source sha256 (pre-fold):
+3b15dd65bace9c438b009da6710d444ea4942361c7dc0013d99ab3d8a79422f4 *s19_app/tui/screens_directionb.py
+25e8477984f2fdadaaebf614444bfb57dcecdb819319cc96c53610a577f38126 *s19_app/tui/app.py
+5ad3a1f2a703e12fcf479abc35f166e9f38c19cd2dcc54f36913b5a8cf1c0153 *s19_app/tui/styles.tcss
+85975fda11f2e5c8be6c8f5a535477472b169ebc7e1d4ca00cc939c6853932c1 *s19_app/tui/window_help.py
+FFFFFFFFFFF..FFFFFFFFF..F.....                                           [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:859: AssertionError: ['☑']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:286: AssertionError: assert (42, 6, 'Fmt', 24, 17) == (42, 6, 'Fmt', 24, 17, 66)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:330: AssertionError: (12, 'ASAM…前名前名前末尾', 19)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:387: AssertionError: ('☑', '0x00013A00')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:387: AssertionError: ('☑', '0x00013A00')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1216: AssertionError: ('ASAM.M.SCALAR.UBYTE.LONG_SEGMENT_00_LONG_SEGMENT_01_LONG_SEGMENT_…', '0x00810000', 'u8 hours')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((119, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x00013A00')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((120, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  …')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((126, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x0001…')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((133, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x00013A00')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1251: AssertionError: ((134, 54), 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x00013A00')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:528: AssertionError: assert [('☑', '0x000...'0x00000100')] == [('◆', '0x000...'0x00000100')]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:576: AssertionError: ('▪', '0x00000100', 'field @ 0x00000100')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:606: AssertionError: ('1 fields: 1 params · 0 memory rows', '1 fields → report')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:674: AssertionError: one row per field: [10, 11, 11]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:674: AssertionError: one row per field: [10, 11, 11]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:830: AssertionError: {'add': 1, 'help': 'WindowHelpScreen', 'include': '1 fields → report', 'tab': 'check_pane_json', ...}
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:870: AssertionError: ['0 fields → report', '0 fields → report', '0 fields → report']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1124: AssertionError: 1 fields → report
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:1169: AssertionError: assert ['☑', '☑', '☑...'☑', '☑', ...] == ['◆', '◆', '◆...'◆', '◆', ...]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:310: AssertionError: [('u128 hours', 'u128')]
+=========================== short test summary info ===========================
+FAILED tests/test_b97_chips_help.py::test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_layout_and_clip_units
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_clips_measure_terminal_cells
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_painted_names_distinct_and_full_name_line[size0]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_painted_names_distinct_and_full_name_line[size1]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_full_name_line_keeps_address_and_name_tail
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size0]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size1]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size2]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size3]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_10_parameter_floor_at_the_wide_breakpoint[size4]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_43_fields_hold_exactly_the_included
+FAILED tests/test_b97_check_editor.py::test_tc_b97_43_memory_lines_name_the_address_once
+FAILED tests/test_b97_check_editor.py::test_tc_b97_43_counts_agree_in_number_and_the_hint_reads_whole
+FAILED tests/test_b97_check_editor.py::test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size0]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_44_memory_inputs_labelled_inside_the_fields_tab[size1]
+FAILED tests/test_b97_check_editor.py::test_tc_b97_45_keyboard_order_enter_space_and_chip_states
+FAILED tests/test_b97_check_editor.py::test_tc_b97_45_enter_on_the_ledger_toggles_inclusion
+FAILED tests/test_b97_check_editor.py::test_at_b97_18_first_task_from_the_keyboard
+FAILED tests/test_b97_check_editor.py::test_at_b97_21_six_shared_address_fields_and_the_written_file
+FAILED tests/test_b97_width.py::test_tc_b97_37_no_wrapped_row_and_tail_kept_clips[size2]
+21 failed, 9 passed in 166.27s (0:02:46)
