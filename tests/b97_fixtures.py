@@ -183,3 +183,67 @@ def make_junction(link: Path, target: Path) -> str:
         return "junction"
     os.symlink(target, link, target_is_directory=True)
     return "symlink (non-Windows stand-in for a junction)"
+
+
+# --------------------------------------------------------------------------- #
+# A.5 builders — Inc-2: the NUL flow and the NUL set (P-36)
+# --------------------------------------------------------------------------- #
+
+
+def patch_chain_blocks(change_doc_ref: str = "calib_hotfix.json") -> list:
+    """The ``patch_chain`` demo block list: source, patch, check, write_out."""
+    from s19_app.tui.services.flow_model import (
+        CheckBlock,
+        PatchBlock,
+        SourceBlock,
+        WriteOutBlock,
+    )
+
+    return [
+        SourceBlock("prg.s19"),
+        PatchBlock(change_doc_ref),
+        CheckBlock("baseline.chk.json"),
+        WriteOutBlock("out.s19"),
+    ]
+
+
+def nul_flow(project_dir: Path) -> Path:
+    """Write ``flows/nul_flow.json``: ``patch_chain`` with ``change_doc_ref =
+    HOSTILE_NUL``, serialised by the shipped ``flow_to_dict``."""
+    import json
+
+    from s19_app.tui.services.flow_model import Flow
+    from s19_app.tui.services.flow_persistence_service import (
+        FLOWS_SUBDIR,
+        flow_to_dict,
+    )
+
+    flows_dir = project_dir / FLOWS_SUBDIR
+    flows_dir.mkdir(parents=True, exist_ok=True)
+    path = flows_dir / "nul_flow.json"
+    payload = flow_to_dict(Flow(name="nul_flow", blocks=patch_chain_blocks(HOSTILE_NUL)))
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def nul_set(project_dir: Path) -> Path:
+    """Write ``flowsets/nul_set.json``: one chain whose template is
+    ``patch\x00chain``, serialised by the shipped ``chain_set_to_dict``."""
+    import json
+
+    from s19_app.tui.services.flow_persistence_service import (
+        FLOWSETS_SUBDIR,
+        ChainSet,
+        ChainSetEntry,
+        chain_set_to_dict,
+    )
+
+    sets_dir = project_dir / FLOWSETS_SUBDIR
+    sets_dir.mkdir(parents=True, exist_ok=True)
+    path = sets_dir / "nul_set.json"
+    entry = ChainSetEntry(
+        chain="lane0", template="patch\x00chain", inputs=((0, "prg.s19"),)
+    )
+    payload = chain_set_to_dict(ChainSet(name="nul_set", chains=(entry,)))
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path

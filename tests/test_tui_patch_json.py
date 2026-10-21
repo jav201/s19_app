@@ -800,6 +800,11 @@ _CLAIMED_HUES = {
     # band's hue+glyph encoding, so an analyst CAN read it as a chromatic cue
     # — it claims, like every other live foreground hue.
     "SJE band ctx tint (segment_split_view.py:91 foreground '·' cue)": "#46557a",
+    # batch-97 Inc-2 (LLR-146.6): the two flow-screen role tokens. Declared in
+    # insight_style now, painted on the flow cards from Inc-5; foreground cues,
+    # so they claim. Both sit inside the RED..YELLOW flank, far from MAGENTA.
+    "insight_style.WAITING_HUMAN (flow waiting-human elements)": "#e8ad3d",
+    "insight_style.CRC_FAMILY (flow CRC card)": "#c9562b",
     # Rich NAMED styles: not hex, so the source sweep cannot see them. RESOLVED
     # through rich rather than transcribed — transcribing is how Inc-5 recorded
     # orange3 as #d75f00 (darkorange3) and measured a hue the app never paints.

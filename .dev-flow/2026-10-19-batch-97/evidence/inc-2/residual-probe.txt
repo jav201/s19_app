@@ -1,0 +1,2 @@
+write_out output_name -> error [('ok', 'loaded prg.s19 (11 ranges)', []), ('error', 'error', ['ValueError: unlink: embedded null character in path'])]
+external_step confirm log_ref -> error [('ok', 'loaded prg.s19 (11 ranges)', []), ('error', 'external step refused', ["log 'r\x00.log' does not exist - the log is mandatory evidence, never optional"])]

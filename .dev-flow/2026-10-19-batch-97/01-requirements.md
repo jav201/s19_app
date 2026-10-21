@@ -22,7 +22,8 @@
 The live requirements contract for batch-97: it ports the operator-approved prototype round
 `prototypes/b94_polish/` (verdict **A on all four screens**) into the four batch-94 panels
 (Patch Editor, Check Editor, Flow Builder, Flow Execution). It derives HLR-144..HLR-149 from
-the six READY stories US-134..US-139 and their LLRs, and declares the acceptance tests
+the six READY stories US-134..US-139 and their LLRs, plus HLR-150 (the two-row key bar, US-140) that
+the operator routed into the batch after the key-bar prototype round (LED-…97.9), and declares the acceptance tests
 (`AT-B97-NN`), the white-box tests (`TC-B97-NN`) and the Information Flow Contract. The full
 probe transcripts, the frozen literals and the P0 refinement log live in the companion
 `01-requirements-appendix.md` (A.1 premise transcripts, A.2 literals, A.3 refinement log, A.4 TC procedures,
@@ -38,7 +39,9 @@ four screens, including the eleven `flow_execution_service.py` strings that pain
 screens (§2.7 P-17); keyboard reachability, a scoped confirm key and region states on the four
 screens; width-adaptive layouts at any size from 118x54 up with no wrapped rows, the shipped 80x24
 floor kept reachable under scroll; markup safety (C-17) for every render of file-derived text on
-the four screens; the refusal of NUL characters in flow, chain-set and manifest refs.
+the four screens; the refusal of NUL characters in flow, chain-set and manifest refs; the two-row
+bottom key bar on every window of the app — the global keys on row 1, the active window's keys on
+row 2 — that replaces the one-row `Footer` (HLR-150, LED-…97.9, the one app-wide change besides the chips).
 **Out:** the items listed under "Not taken in" in §2.6; run semantics, persistence formats and
 the batch-96 waiting-human doctrine itself; chips and help on any other screen.
 
@@ -66,6 +69,11 @@ the batch-96 waiting-human doctrine itself; chips and help on any other screen.
 | control / read-out | a **control** is a displayed `Button`, `Input`, `Select`, `TextArea`, `DataTable` or tab chip, or a scroll view a focus order names by id (`#fx_lanes_scroll`, the Check Editor's JSON / Addendum scroll views); a **read-out** is a displayed `Static` or `Label` that takes no key (§2.7 P-55) |
 | attention lane | the first waiting lane, in lane order, whose waiting card and `#fx_confirm_<i>` have been painted; its Confirm carries the attention class; after a confirm the attention moves to the next waiting lane once that lane has been painted |
 | family root | the active project directory when a project is active; otherwise the tool root `app.base_dir / WORKAREA_DIRNAME` (`.s19tool`, `workspace.py:16`), which holds every common home |
+| window | one surface the app can make active: a key of `SCREEN_CONTAINER_IDS` (`app.py:6752`, 12) or `split_join` (the Split / Join / Export window, `app.py:7036`) — 13 in all |
+| key bar | the two-row bar docked at the bottom of the app (NEW, I-11), replacing the shipped `Footer`: row 1 the global tokens, row 2 the active window's tag, its window tokens and its go tokens |
+| token | one painted key glyph + description pair (`^s Save`); a token is painted whole or not at all |
+| window key / go key | an entry of the window-key table (NEW, I-10) for one window: a key that window handles / a key that takes the engineer from that window to one of its workflow neighbours — a rail jump (`6`, `9`, `=`, `]`, …) or the reports view (`t`) — an editorial choice recorded in the table, reviewable there |
+| dimmed token | the token of a key a window handles that cannot act in the current state (a condition of the table is false), painted with the `dim` attribute and not clickable |
 
 ### 1.4 References
 - Brief: `.dev-flow/design/HANDOFF-b94-polish-2026-10-20.md` (§1 verdict, §3 R-1..R-9, §4, §5).
@@ -141,11 +149,12 @@ evaluability, one block per story) is appendix A.3.
 | US-137 | As the engineer running flow sets, I want Flow Execution as one pipeline per lane with each cable carrying its block's run status, the rebind input inside the source card, the batch-96 waiting-human doctrine kept, and an English run log, so that I read a whole set's state at a glance and know exactly which lane waits for me. | verdict fx_A (handoff R-4, R-5) | READY |
 | US-138 | As an engineer new to the tool, I want every one of the four screens to carry a visible open-folder chip for the folder its files live in and a help chip whose entry names every control and glyph on that screen, so that I never guess where files are or what a mark means. | operator round-2 answer: "es un problema adivinar y buscarlos, sobre todo para usuarios nuevos"; verdict note: "No olvides las leyendas y ayudas en cada ventana" (handoff R-6, R-7) | READY |
 | US-139 | As an engineer who scales the terminal to taste (≈220x60, variable), I want the four screens to use the width they get — no horizontal overflow at 118x54, no half-screen voids from fixed widths at 220x60, and no row ever wrapping onto a second line — so that information density follows the window. | operator round-2 answer + the 220x60 pass (handoff R-8) | READY |
+| US-140 | As an engineer moving between the app's windows, I want two rows of keys at the bottom — the global keys always in the same place on the first row, and on the second the keys that act on the window I am in and the windows it leads to — so that I find the keys that matter here without guessing and never read a key that does nothing on this window. | the operator's PDR objection 2026-10-20 (PC-22, `evidence/operator-pdr-verdict-2026-10-20.md`) and the key-bar prototype round `prototypes/keybar/` — verdict **A · Two rows** accepted and preferred, no per-screen objection (`evidence/operator-keybar-verdict-2026-10-20.json`); the operator's instruction in chat 2026-10-20 "Mete el cambio al incremento" routes it into this batch (LED-…97.9) | READY |
 
 **Ledger pairing:** stories live in this table (the batch-91 shape); the ledger entries name the
 HLR/LLR they trace to.
 
-**Not taken in (OUT, with where it lives):** the `Fmt · Unit` column of ce_C as a layout choice and the matrix density mode (fx_C) — offered, not chosen (ce_A's own `Fmt · Unit` column stays, LLR-149.4); the hex-viewer no-wrap rule outside these four screens — `.dev-flow/BACKLOG-CODE.md:1393` (P2, origin A-15); bidi/zero-width controls through `safe_text` — `BACKLOG-CODE.md:1394` (S-6); the footer key bar — `BACKLOG-CODE.md:1395` (U-17); a loading state on the two editors — Load, Validate and Write run synchronously on the UI thread, so no region shows a partial load; **a running state and a worker for Flow Execution** — runs stay on the UI thread (orchestrator decision 9, revisable at PDR), the measured demo freeze is 0.021 s (P-42), and a large image may freeze the UI for longer (§6.3); **a variant-scope selector in the Flow Builder** — retired with the operator's consent (LLR-104.6 retired for the Builder, §6.3): multi-variant work runs as one chain per variant, each set up through its funnel block and run as a lane in Flow Execution (AT-B97-22 drives two lanes over two source images); the eight Code-Wire pilot findings — already in `BACKLOG-CODE.md` (`51ee191`); the batch-96 follow-ups — untouched.
+**Not taken in (OUT, with where it lives):** the `Fmt · Unit` column of ce_C as a layout choice and the matrix density mode (fx_C) — offered, not chosen (ce_A's own `Fmt · Unit` column stays, LLR-149.4); the hex-viewer no-wrap rule outside these four screens — `.dev-flow/BACKLOG-CODE.md:1393` (P2, origin A-15); bidi/zero-width controls through `safe_text` — `BACKLOG-CODE.md:1394` (S-6); go keys for the eight windows the key-bar prototype round did not render (A2L, MAC, Map, Issues, Diff, Checks, CRC Designer, Split / Join / Export) — a later edit of the window-key table, not this batch; a loading state on the two editors — Load, Validate and Write run synchronously on the UI thread, so no region shows a partial load; **a running state and a worker for Flow Execution** — runs stay on the UI thread (orchestrator decision 9, revisable at PDR), the measured demo freeze is 0.021 s (P-42), and a large image may freeze the UI for longer (§6.3); **a variant-scope selector in the Flow Builder** — retired with the operator's consent (LLR-104.6 retired for the Builder, §6.3): multi-variant work runs as one chain per variant, each set up through its funnel block and run as a lane in Flow Execution (AT-B97-22 drives two lanes over two source images); the eight Code-Wire pilot findings — already in `BACKLOG-CODE.md` (`51ee191`); the batch-96 follow-ups — untouched.
 
 ### 2.7 Premise evaluation (C-43) — MANDATORY, one row per premise
 
@@ -213,8 +222,17 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 | P-58 | The app holds the active project directory resolved. | premise | ✅ TRUE | `app.py:1861` `return (self.workarea / self.current_project).resolve()`; `app.py:8200` `self.current_project_dir = project_dir.resolve()` | LLR-148.8 trust anchor |
 | P-59 | `tests/test_open_folder_chips.py` holds 11 test nodes; the shipped press path creates a missing target through `create_chip_home` before the open seam. | premise | ✅ TRUE | `grep -c "^def test_\|^async def test_"` → `11`; `open_folder_chip.py:160-172` | LLR-148.1, 148.8 |
 | P-60 | Under the pilot a paint completes between the two keys of `press("c", "c")`, ~0.05 s apart; a chain with two EXT-STEP blocks pauses again at the second after the shipped confirm re-run; a stray `enter` on `#fx_run` while a lane waits starts one more run and confirms nothing. | premise | ✅ TRUE | `p1r4/u1_burst.py` → `[(0.0003, False), (0.0488, True)]`; `p1r4/u1_two_ext.py` → `run 1 paused ['ok', 'ok', 'waiting', 'skipped', 'skipped']`, `confirm re-run paused ['ok', 'ok', 'ok', 'waiting', 'skipped']`; `p1r4/u5_stray_enter.py` → `after enter 1: focused fx_run reports 1 lane ['ok', 'ok', 'waiting', 'skipped']`, `after enter 2: focused fx_run reports 2 lane ['ok', 'ok', 'waiting', 'skipped']` | LLR-147.13; AT-B97-20 |
+| P-61 | `WindowSection` binds `?` with `show=False` (`window_help.py:449`); while a window holds the focus that binding shadows the app's `? Help` (`app.py:1414`), so the shipped Footer paints no `? Help`. | premise | ✅ TRUE | probe → `WindowSection ? : [('question_mark', False)]`; the 118x54 capture of the prototype round's baseline row holds no `? Help` (`prototypes/keybar/keybar.html` "Painted rows") | LLR-150.2 |
+| P-62 | `window_help` holds no key table — `SHIPPED_WINDOW_KEYS` is its only key-named constant — and its sections have no `check_editor` or `flow_execution` key. | premise | ✅ TRUE | probe → `has key table attr: ['SHIPPED_WINDOW_KEYS']`; `help sections: ['a2l', 'changes_file_notation', 'checks', 'crc_designer', 'flow', 'map', 'patch', 'reports', 'split_join_export', 'workspace']` | LLR-150.1 |
+| P-63 | `+` / `-` act only on A2L and MAC; `,` / `.` act on any window whose view is `"main"` — every window but A2L and MAC — so on the Patch, Check, Flow and Flow Execution windows they page the hidden Workspace hex view. | premise | ✅ TRUE | `app.py:1832-1836` (`"alt"` / `"mac"` / else `"main"`); `app.py:7562-7566` (`page_next_context` routes only `alt` / `mac`); `app.py:7678-7679` (`hex_page_next` returns only when the view is not `"main"`) | LLR-150.4 |
+| P-64 | `S19TuiApp` overrides no `check_action`. | premise | ✅ TRUE | probe → `check_action in S19TuiApp.__dict__: False` | LLR-150.4 (I-11) |
+| P-65 | The `period` binding carries no `key_display`, and Textual displays it as the word `period`. | premise | ✅ TRUE | probe → `period key_display: None`; `display period: period` (`App.get_key_display`) | LLR-150.5 |
+| P-66 | A click on a shipped Footer key runs `app.simulate_key(key)` (a bell when disabled); a binding whose `check_action` answers `False` is left out of `active_bindings`. | premise | ✅ TRUE | `textual/widgets/_footer.py:133-137`; `textual/screen.py:473-481` (Textual 8.2.8) | LLR-150.7, LLR-150.4 |
+| P-67 | At 118x54 the shipped Footer row reads `^k Palette ^d Density ^l Load ^s Save / Find q Quit x Operations + Page+ - Page- , Hex- perio▏^p palette` on the Workspace with the focus in a window. | premise | ✅ TRUE | real Windows Terminal capture, text from its SVG export (`prototypes/keybar/keybar.html` "Painted rows, hex viewer") | LLR-150.2, LLR-150.5 |
+| P-68 | With a two-row bar each window container loses exactly one row: 42 → 41 at 118x54 on the Workspace, Patch, Check, Flow and Flow Execution windows. | premise | ✅ TRUE | `prototypes/keybar/measure.txt` → `container_rows=42` baseline, `container_rows=41` variant A on all five; `hex_scroll 32 → 31`, `patch_editor_panel 40 → 39`, `check_param_table 40 → 39`, `flow_panel 40 → 39` | LLR-150.6 |
+| P-69 | The app's `show=True` bindings are the 14 keys AT-B78-28 pins by set-equality (`tests/test_tui_diff_screen.py:3590-3606`). | premise | ✅ TRUE | probe → `shown bindings: ['ctrl+k', 'ctrl+d', 'ctrl+l', 'ctrl+s', 'slash', 'g', 'q', 'x', 'k', 'question_mark', 'plus', 'minus', 'comma', 'period']` (14) | §6.3 superseded table |
 
-- **Premise evaluation:** 60 premise(s) · ✅ TRUE 60 / ❌ FALSE 0 / ❓ UNDECIDABLE 0 — executed 2026-10-20 on `9c7beaf` / `bc4fbd3` / `0f21e00` / `bdd88f3` (no `s19_app/` diff between them); P-7, P-13, P-16 record corrected brief claims; P-11, P-17 and P-35 were restated in round 2; P-50..P-60 are new in round 3.
+- **Premise evaluation:** 69 premise(s) · ✅ TRUE 69 / ❌ FALSE 0 / ❓ UNDECIDABLE 0 — executed 2026-10-20 on `9c7beaf` / `bc4fbd3` / `0f21e00` / `bdd88f3` (no `s19_app/` diff between them) and, for P-61..P-69, on `d5d0ff9` (`app.py` and `window_help.py` unchanged since `9c7beaf`); P-7, P-13, P-16 record corrected brief claims; P-11, P-17 and P-35 were restated in round 2; P-50..P-60 are new in round 3; P-61..P-69 are new in the key-bar fold (LED-…97.9, transcript `evidence/keybar-premises-2026-10-20.txt`).
 
 ### 2.8 Fork preconditions (C-52) — MANDATORY, and the declared empty when the batch does not fork
 
@@ -328,6 +346,22 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
   - **Acceptance test(s):** AT-B97-15, AT-B97-16, AT-B97-24
   - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — empty: N/A — geometry is asserted on the loaded scenarios, the empty states are covered by each screen's own AT; boundary: 118x54, 119x54↔120x54, 220x40, the in-session resize (AT-B97-16, AT-B97-24); invalid: N/A — below the range only reachability is promised (LLR-149.6); error: a 60-cell ref and the 47-cell parameter name, the widest real values, clip with an ellipsis instead of overflowing (AT-B97-15).
   - **Negative control:** executed on `main` (§2.7 P-10, P-11, P-22): overflow counts 1/1/2/7 at 118x54 and 1/1/1/6 at 220x60; EXT-STEP inputs 28/26/28 at both sizes — the ATs are RED on today's tree.
+
+### HLR-150 — Two-row key bar scoped to the active window
+- **Traceability:** US-140
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** While any window of the app is displayed, the system shall paint a two-row key bar at the bottom of the terminal: the first row the global keys, the same on every window and always including `? Help`; the second row the active window's name tag, then that window's own keys, then its go keys. The key bar shall paint no key the active window does not handle, shall dim a key the window handles that cannot act in the current state, and shall paint whole tokens only, ending an overflowing row with `? more`. When the engineer clicks an enabled token, the system shall run that token's binding action in the binding's own namespace, whatever widget holds the focus.
+- **Rationale (informative):** the operator's PDR objection (PC-22: "necesitamos dos líneas en el fondo de la pantalla … las teclas de interés para la pantalla") and the key-bar prototype round, verdict **A · Two rows** accepted and preferred with no per-screen objection (`evidence/operator-keybar-verdict-2026-10-20.json`), including the operator's colour amendment (the window tag in the `.db-screen-title` pair). Today the one-row `Footer` lists 14 app bindings on every window (P-69), clips at 118 columns (`perio▏`, P-65, P-67), shows `Page±` / `Hex±` where they do nothing and `,` / `.` page a hidden view there (P-63), and drops `? Help` whenever a window holds the focus (P-61). Routed into the batch as Inc-8 (LED-…97.9); backlog U-17. Row 1 is the rendered and accepted one (Find / Go-to are window keys, not global: they own an input only on Workspace, A2L and MAC, `app.py:6794`).
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b97_key_bar.py -k "at_b97_25 or at_b97_26"` (Textual pilot, real clicks and keys) + the C-34 guard host.
+- **Numeric pass threshold:** on each of the 13 windows at 118x54 and at 220x60 (26 cells): row 1 paints exactly the 8 global tokens in order (`^k Palette`, `^d Density`, `^l Load`, `^s Save`, `x Operations`, `? Help`, `q Quit`, `^p palette`) and never `? more`, whatever holds the focus; row 2 starts with the window's tag; 0 painted tokens outside the window's allowed set (the globals ∪ its window keys ∪ its go keys ∪ `? more`); 0 partially painted tokens and 0 `perio`; 0 `? more` at 220x60, and the Workspace row 2 ends with `? more` at 118x54; every window's container is exactly 1 row shorter than on `main` (41 at 118x54, P-68); a click on `9 Checks` on the Patch Editor with a text `Input` focused shows the Checks window and types nothing, a click on a dimmed token changes nothing; `.` pressed on the Patch Editor with an image loaded leaves the Workspace hex view's first painted address unchanged.
+- **Priority:** medium
+- **Acceptance (black-box) — the user-verified outcome (the WHAT):**
+  - **Observable outcome:** on every window the engineer reads the same global keys on the bottom row, `? Help` included, and above them the window's name in the title colours followed by the keys that act on that window and the windows it leads to; a key that exists but cannot act right now is dimmed; nothing is cut in half and a row that is too long ends with `? more`; clicking a key runs that key's action even while a text field has the focus, without typing into it; `Page±` / `Hex±` no longer show where they did nothing, and pressing them there no longer pages a hidden view.
+  - **Shipped surface:** the bottom bar of `S19TuiApp` — today `Footer()` (`s19_app/tui/app.py:2077`) over `S19TuiApp.BINDINGS` (`app.py:1384`); after Inc-8 the key bar (I-11) fed from the window-key table (I-10) in `s19_app/tui/window_help.py`, reached through the rail keys and `action_show_screen` (`app.py:6895`).
+  - **Acceptance test(s):** AT-B97-25, AT-B97-26
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☒ error — empty: a window whose row holds no window key and no go key paints its tag alone on row 2 — Split / Join / Export unless the PC-26 derivation gives it an entry, in which case the arm is recorded `n/a — no empty window` (AT-B97-25); boundary: 118x54, where the Workspace row 2 overflows, 220x60, where every row fits, and 80x24, where row 1 drops `^p palette` whole (AT-B97-25); invalid: N/A — the key bar takes no typed input; error: a key pressed on a window that does not handle it (`.` on the Patch Editor) does nothing (AT-B97-26).
+  - **Negative control:** executed on `main` (§2.7 P-61, P-63, P-67): the Footer at 118x54 ends `perio▏`, paints no `? Help` with the focus in a window and paints `+ Page+ - Page- , Hex-` on the Patch Editor, and `.` there advances the hidden hex view — AT-B97-25 and AT-B97-26 are RED on today's tree.
 
 ---
 
@@ -716,12 +750,12 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-146.14 — A NUL character in a ref is refused, never raised
 - **Traceability:** HLR-146
-- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.8
 - **Statement:** If a path-bearing block field of a flow file — `SourceBlock.image_ref`, `PatchBlock.change_doc_ref`, `WriteOutBlock.output_name`, `CheckBlock.check_doc_ref`, `CrcBlock.config_ref`, the `ref` of each `A2BBlock` binding, `ExternalStepBlock.log_ref` or `ExternalStepBlock.output_path` (`flow_model.py:229, 250, 267, 289, 315, 338, 505, 506`) — carries a NUL character, then `load_flow_json` shall refuse the file with a `FLOW-UNSAFE-REF` finding (`flow_persistence_service.py:114`). If a chain-set's template or input ref carries a NUL character, then `load_chain_set` shall refuse the set with a `CHAIN-SET-UNSAFE-REF` finding (`:1098`). If a manifest entry or a lane input bound through `#fx_bind_<i>_<j>` carries a NUL character, then `_resolve_manifest_entry` (`variant_execution_service.py:205`, the resolve at `:273`, §2.7 P-50) shall refuse that entry — resolve no path for it — with a `MANIFEST-PATH-ESCAPE` finding (`:106`). The `stat()` guards of `load_flow_json` and `load_chain_set` (`flow_persistence_service.py:903-906`, `:1463-1471`) shall catch `ValueError` as well as `OSError`. None of these shall raise.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B97-62 — `pytest tests/test_b97_flow_builder.py -k tc_b97_62`; procedure: appendix A.4 TC-B97-62.
 - **Numeric pass threshold:** 0 exceptions over 15 arms — the 5 of P-36, one per enumerated block field (8), and a NUL in the file path handed to each `stat()` guard (2); each refusal arm returns no flow / set / path and exactly one finding of its code naming the field.
-- **Negative control:** executed on `main` (§2.7 P-36, P-50): 4 of the 5 arms raise `ValueError` (the template arm loads and raises at its flow load), and the bound lane input raises at `:273` → RED; a `stat()` guard catching `OSError` only (as shipped) → the path arms raise `ValueError` (P-36 F), RED.
+- **Negative control:** executed on `main` at the Inc-2 RED run (`evidence/inc-2/red.txt`, LED-.8): the loader arms of P-36 raise `ValueError`, the chain-set template arm loads, `run_flow` records a block error carrying the raw `ValueError` text instead of a finding, the `output_name` / `log_ref` / `output_path` arms are accepted, and the bound lane input yields that raw block error → RED on every arm (by raise, by raw text, or by acceptance); a `stat()` guard catching `OSError` only (as shipped) → the path arms raise `ValueError` (P-36 F), RED.
 - **Boundary catalog:** ☐ empty ☐ boundary ☒ invalid ☒ error — invalid: NUL in each of the four field families; error: the uncaught `ValueError` of P-36. Others N/A.
 
 ### LLR-147.1 — Per-lane pipeline with cable status from the retained record
@@ -915,8 +949,8 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.6 — Help entries name every control, input, tab, key and glyph as `label — effect`
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
-- **Statement:** The `window_help` module shall carry an entry for each of the four screens — `patch` and `flow` rewritten, a Check Editor key and a Flow Execution key added (NEW) to `WINDOW_HELP_SECTIONS` and `SHIPPED_WINDOW_KEYS` (`window_help.py:57`, `:270`) — whose body holds one `label — effect` line, with a non-empty effect, for every button label, input or select label, tab label, key binding and glyph its screen renders in any of its states, block-kind glyphs included.
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.9
+- **Statement:** The `window_help` module shall carry an entry for each of the four screens — `patch` and `flow` rewritten, a Check Editor key and a Flow Execution key added (NEW) to `WINDOW_HELP_SECTIONS` and `SHIPPED_WINDOW_KEYS` (`window_help.py:57`, `:270`) — whose body holds one `label — effect` line, with a non-empty effect, for every button label, input or select label, tab label, key binding and glyph its screen renders in any of its states, block-kind glyphs included. From Inc-8 on, the key-binding lines of a window are its generated keys block (LLR-150.1), shown in the same help modal beneath the steps, and no key is described twice.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-32 — `pytest tests/test_b97_chips_help.py -k tc_b97_32`; procedure: appendix A.4 TC-B97-32.
 - **Numeric pass threshold:** 100 % coverage on each screen of the coverage set taken as the union over the states the test drives (Patch: 3 tabs, save-back offered; Check: 3 tabs; Builder: 7 kinds, funnel editor open; Execution: no lanes and the paused 3-lane run), every matched line with a non-empty effect; guards on the **control** subset only (buttons, inputs, selects, tab chips — never bindings or glyphs): ≥ 26 (patch: 19 buttons + 7 inputs of `PE_IDS_9C7BEAF`), ≥ 12 (check: 6 + 6), ≥ 21 (flow: 13 + the 8 add inputs of LLR-146.3), ≥ 6 (execution: 4 + `#fx_set_name`, `#fx_set_select`).
@@ -1030,6 +1064,76 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 - **Numeric pass threshold:** 10 of 10 reached by `tab` (≤ 200 presses) and inside the panel region once focused, at the three sizes; 10 of 10 inside the panel region after `pagedown` presses on the panel; 0 overlapping button pairs.
 - **Negative control:** a panel with `overflow: hidden` (mutation, Phase 3) → an action unreachable, RED; on `main` (§2.7 P-10) `#fx_load` at x = 134 in a panel whose `max_scroll_x` reads 0 → unreachable, RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 80x24 (the floor, LLR-007.1 / CV-04) and 220x40 (wide but short). Others N/A.
+
+### LLR-150.1 — One window-key table feeds row 2 and the help
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** The `window_help` module shall hold the window-key table (NEW, I-10): for each of the 13 windows (§1.3) an ordered tuple of window-key entries and an ordered tuple of go keys, each entry naming a key bound either in `S19TuiApp.BINDINGS` or on a widget the entry names inside that window, with an optional state condition. Every token label shall be the description of the binding it names, resolved when the key bar mounts and never typed a second time, with exactly two painter literals named here: `more` (the `?` binding relabelled as the row-2 overflow tail) and `palette` (Textual's command-palette binding); an entry whose key resolves to no binding, or to a binding whose description is empty, shall raise at mount. Help sections map to windows by the help-key → window table (NEW, I-10): every help key equal to a window key maps to that window, `split_join_export` maps to `split_join`, and `reports` and `changes_file_notation` map to no window (`SHIPPED_WINDOW_KEYS`, `window_help.py:270-279`, holds `reports`, which is a modal, not a window). The help modal of every help section mapped to a window shall show, beneath its steps, a keys block (NEW) listing that window's entries as `key — description` lines generated from the same table; a section mapped to no window shows no keys block; `section_body_text` stays the steps alone.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-66 — `pytest tests/test_b97_key_bar.py -k tc_b97_66`; procedure: appendix A.4 TC-B97-66.
+- **Numeric pass threshold:** the table's window set == `set(SCREEN_CONTAINER_IDS) | {"split_join"}` (13); 100 % of entries and go keys resolve to a binding, guard ≥ 15 entries and ≥ 9 go keys over the five windows the prototype round rendered (I-10 rows); for each help section mapped to a window (the mapping above), the keys block's `key — description` lines == the lines the table yields for that window, set-equal, and 0 of them repeated as a hand-typed step line; the Reports and the Split / Join / Export help modals open with 0 exceptions, Reports with no keys block and Split / Join / Export with `split_join`'s block; `section_body_text(key)` unchanged by the block (TC-707's numbered-steps census stays green); 0 label strings in the table and exactly the two painter literals `more` and `palette`; 0 resolved bindings with an empty description.
+- **Negative control:** executed on `main` (§2.7 P-62): `window_help` holds no key table and no `check_editor` / `flow_execution` section → RED; an entry naming an unbound key, or a binding with an empty description (mutations) → the mount raises; a keys block typed by hand with a different label (mutation) → the set comparison RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: entries bound on a widget inside the window (`space` on `#check_param_table`, `c` on the Flow Execution section) and `split_join`, which has no rail key; invalid: an unbound key, an empty description (the mount raises); `reports` and `changes_file_notation`, help sections that map to no window. Others N/A.
+
+### LLR-150.2 — Row 1: the global keys, fixed, with Help always painted
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** The key bar's first row shall paint, on every window and whatever widget holds the focus, the global tokens in this order — `^k Palette`, `^d Density`, `^l Load`, `^s Save`, `x Operations`, `? Help`, `q Quit`, `^p palette` (Textual's command palette, `S19TuiApp.COMMAND_PALETTE_BINDING`) — in the shipped footer colours (the theme variables `footer-key-foreground`, `footer-description-foreground`, `footer-background`); when the row is narrower than its tokens it shall drop whole tokens by the LLR-150.5 rule and never `? Help`; row 1 never paints `? more`, since `? Help` is always on it.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-67 — `pytest tests/test_b97_key_bar.py -k tc_b97_67`; procedure: appendix A.4 TC-B97-67.
+- **Numeric pass threshold:** 13 windows × the focus {on the rail, on the window's first control, in a text `Input`} × {118x54, 220x60}: the row-1 tokens == exactly the 8 in order and 0 `? more`; at 80x24 exactly the first 7 in order, `^p palette` absent and 0 `? more`; every key-glyph cell's foreground == `footer-key-foreground` (`#ffa62b` on the shipped theme, guard).
+- **Negative control:** executed on `main` (§2.7 P-61, P-67): with the focus inside a `WindowSection` the Footer paints no `? Help` → RED; at 118x54 its row ends `perio▏` → RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 80x24 (the 84-cell row is wider than 80); the focus in an `Input` and inside a `WindowSection`. Others N/A.
+
+### LLR-150.3 — Row 2: the window tag, the window's keys, then its go keys
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** The key bar's second row shall paint the active window's title as a tag in the window-title pair of `.db-screen-title` (`styles.tcss:130-138`: foreground `$bg-base` `#0a0e1b` on background `$accent-calm` `#91abec`), in bold, then the window's entries in table order, then the go separator — ` · go` after window keys, ` go` when the window has none (the prototype's rule) — and the window's go keys, with key glyphs in the row-1 key colour, descriptions in `$accent-calm` `#91abec` and the row background the row-1 background (`footer-background`). Every colour shall come from component classes of the key-bar rows styled in `styles.tcss` through its `$` variables and read with `get_component_rich_style` (I-11); no hex value shall be written in Python. The tag text shall be the description of the window's rail binding (`Patch Editor`, `Check Editor`, …), and `Split / Join / Export` for `split_join`. When the active window changes, the second row shall show the new window's tag and tokens once the switch has settled, and after a modal screen (a help modal) is dismissed it shall show the window it showed before the modal opened.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-68 — `pytest tests/test_b97_key_bar.py -k tc_b97_68`; procedure: appendix A.4 TC-B97-68.
+- **Numeric pass threshold:** 13 of 13 tags == the window's rail description; tag cells foreground `#0a0e1b` on background `#91abec`, every enabled description cell foreground `#91abec`, every key-glyph cell foreground == the row-1 key colour (read from the compositor strips, PC-7); the tag cells bold; the separator ` · go` on Patch / Check / Flow Execution and ` go` on Flow Builder; row-2 background == `footer-background`; 0 cells in `#e8ad3d`, `#c9562b` or `#f6ff8f` anywhere in the key bar; 0 hex literals in the key-bar code (AST scan for `#rrggbb` strings in `window_help.py`); after each rail key and one `pilot.pause()`, the new window's tag; after opening and dismissing the Patch Editor help modal, row 2 == its reading before the modal.
+- **Negative control:** executed on `main`: no second row exists (one `Footer`, height 1) → RED; the tag painted in the description pair (mutation) → the foreground / background clause RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: the switch to Split / Join / Export (no rail key) and back; a window whose row 2 holds go keys only (Flow Builder). Others N/A.
+
+### LLR-150.4 — A key the window does not handle is neither painted nor live; a key that cannot act now is dimmed
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** The key bar shall paint no token whose action has no effect on the active window. The `S19TuiApp` shall answer `check_action` (NEW override) `False` for `page_next_context` / `page_prev_context` (`+` / `-`) on every window but A2L and MAC, and for `hex_page_prev` / `hex_page_next` (`,` / `.`) on every window but Workspace, so that those keys do nothing there instead of paging the hidden hex view (§2.7 P-63). A window entry whose condition is false — Undo / Redo on a file-backed change-set (`_patch_history_action_allowed`, `app.py:3536`), Select variant with no variant set, Hex± and Unload all with no image loaded — shall be painted dimmed.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-69 — `pytest tests/test_b97_key_bar.py -k tc_b97_69`; procedure: appendix A.4 TC-B97-69.
+- **Numeric pass threshold:** per window, the painted keys ⊆ its allowed set — a pin on the table, not the proof; the proof is behavioural: with an image and an A2L loaded, each of `,` `.` `+` `-` pressed on every window where it is disabled (11 windows for `, .`, 11 for `+ -`) leaves the Workspace hex window start, the A2L tag page and the MAC record page unchanged (0 of 44 presses change one), while `.` on Workspace advances the hex window by one page and `+` on A2L advances the tag page; each derived row of PC-26 carries the `file:line` of the guard it was read from inside the test's data, and the test asserts that line still holds the guard (a moved guard fails loud); dim arms: a file-backed document → `^z` / `^y` dimmed, a paste-authored one → lit; no variant set → `v` dimmed; no image → `,` `.` `U` dimmed; each flip painted after one `pilot.pause()` with no timer wait (PC-23).
+- **Negative control:** executed on `main` (§2.7 P-63, P-64): `S19TuiApp` overrides no `check_action` and `action_hex_page_next` returns only off the `"main"` view, which the Patch Editor is, so `.` there advances the hidden view → RED; the Footer paints `+ Page+ - Page- , Hex-` on the four batch-97 screens → RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: Workspace with and without an image; the Patch Editor with a file-backed and a paste-authored document; invalid: `+` and `.` pressed where they are not handled. Others N/A.
+
+### LLR-150.5 — Whole tokens only; an overflowing row ends with `? more`
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** Each row of the key bar shall paint whole tokens: when its tokens are wider than the row, the row shall first reserve the width of its mandatory parts — `? Help` on row 1; the tag and the `? more` tail on row 2 — and then keep the longest display-order prefix of the other tokens that fits in what is left (a prefix, never a greedy skip: no token shows while an earlier one is hidden), mandatory tokens keeping their display position; the second row then ends with `? more`, the `?` binding labelled `more`; no token shall be cut. The `.` key shall display as `.` (`key_display="."` on the `period` binding, NEW), never as `period`.
+- **Validation:** `test (unit)` + `test (integration)`
+- **Executed verification:** TC-B97-70 — `pytest tests/test_b97_key_bar.py -k tc_b97_70`; procedure: appendix A.4 TC-B97-70.
+- **Numeric pass threshold:** every painted row of the 13 windows at 118x54, 220x60 and 80x24 parses into a sequence of known tokens with no remainder but padding; 0 occurrences of `perio`; Workspace at 118x54: row 2 ends `? more` and holds no `U Unload all`; 0 `? more` at 220x60; layer 0, `pack_key_row` over widths 20..240: painted cell length ≤ width, every kept token whole, the kept non-mandatory tokens a display-order prefix (0 gaps) and the mandatory ones present at every width ≥ their own width.
+- **Negative control:** executed on `main` (§2.7 P-65, P-67): Textual displays the key as `period` and the Footer row at 118x54 ends `perio▏` → RED; a packer that crops at the width instead of dropping (mutation) → a partial token, RED; a greedy packer that skips a long token and keeps a later short one (mutation, the prototype's `pack`) → a gap, RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: a row exactly as wide as its tokens; 80x24. Others N/A.
+
+### LLR-150.6 — The key bar replaces the Footer and costs exactly one row
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** The `S19TuiApp` shall mount the key bar (NEW, I-11) docked at the bottom with a height of 2 rows in place of the shipped `Footer` (`app.py:2077`), so that each window's container is exactly one row shorter than on `main` and nothing else in the shell moves; the four batch-97 screens shall keep LLR-149.3, LLR-149.5 and LLR-149.6 with the key bar mounted.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-71 — `pytest tests/test_b97_key_bar.py -k tc_b97_71`; procedure: appendix A.4 TC-B97-71.
+- **Numeric pass threshold:** `app.query(Footer)` empty; the key bar's region height 2 and `y` == terminal height − 2; each of the 13 windows' container rows == its `main` reading − 1 at 118x54 and 220x60 (`main` 42 at 118x54, P-68); LLR-149.3 10 of 10, LLR-149.5's blank-row clause and LLR-149.6 at 80x24 hold with the key bar (re-run in the Inc-7 sweep).
+- **Negative control:** executed on `main` (§2.7 P-68): one `Footer` of height 1 and container rows 42 at 118x54 → the height and row clauses RED; a key bar of height 3 (mutation) → container rows `main` − 2, RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☐ error — boundary: 80x24 (the floor); 220x60. Others N/A.
+
+### LLR-150.7 — A click on a token runs its key
+- **Traceability:** HLR-150
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10
+- **Statement:** When the engineer clicks an enabled token of either row, the key bar shall run that token's binding action in the binding's own namespace, never by simulating the key: for an entry with no `owner`, `app.run_action(action)` in the app's namespace, which honours `S19TuiApp.check_action` (`textual/app.py:4223-4248`); for an entry with an `owner` selector, the action run on the widget that selector resolves inside the active window (`widget.run_action(action)`). Whatever holds the focus — a text input, a tab chip, a button — shall neither receive the key nor change. A click on `? Help` (or `? more`) shall run the app binding `show_help_panel`, the stock help panel listing every binding, whatever the focus; pressing `?` keeps its focus-dependent meaning (inside a `WindowSection`, that window's help, `window_help.py:449`). A click on a dimmed token shall ring the bell and run nothing, and a click on the tag, a separator or the padding shall run nothing.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B97-72 — `pytest tests/test_b97_key_bar.py -k tc_b97_72`; procedure: appendix A.4 TC-B97-72.
+- **Numeric pass threshold:** a click on `space Include` on the Check Editor with the focus on a card tab chip → the active card tab unchanged and the highlighted parameter's include toggled (count ±1); a click on `c Confirm` on Flow Execution with the focus in `#fx_bind_<i>_<j>` → that input's value unchanged and the attention lane confirmed (1 re-run); a click on `q` and on `9` with a text `Input` focused → the action runs (the quit request is observed through a spy on `action_quit`; the Checks window shown) and the input's value unchanged (0 characters typed); a click on `? Help` with the focus inside the Patch Editor's section → the stock help panel, not the window-help modal; on the dimmed `^z Undo` (file-backed document) → the document and the active window unchanged and one bell; on the tag → the active window unchanged; per token, its hit range == its painted cells.
+- **Negative control:** a click implemented as `app.simulate_key(key)` (mutation, the prototype's and the Footer's path, P-66) → `space` reaches the focused tab chip and presses it, `c` and `q` type into the focused input → RED; hit ranges offset by the tag's width (mutation) → the click on `9 Checks` runs the neighbouring token → RED; dimmed tokens clickable (mutation) → the Undo arm RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: the last cell of one token beside the first cell of the next; a click with the focus in a text input, on a tab chip and inside a `WindowSection`; an `owner` entry (`space`, `c`) vs an app entry (`q`, `9`, `?`); invalid: a dimmed token, the tag. Others N/A.
 
 ### Information Flow Contract (IFC) — C-54
 
@@ -1314,6 +1418,37 @@ FLOW: terminal_size_to_layout
   SINK   : the painted layout of the four panels
 ```
 
+```
+FLOW: active_window_to_key_bar
+  SOURCE : the active window key (`_active_screen_key`, `app.py:1505`), the focus, and the state conditions of the window-key table
+  NODES  :
+    - fn    : window-key table lookup and binding resolution at mount; labels are the bindings' descriptions (NEW, I-10)
+      owner : LLR-150.1
+      in    : window key + S19TuiApp.BINDINGS + the bindings of the widget an entry names
+      out   : the window's ordered window tokens and go tokens
+    - fn    : global row composition in the theme's footer colours (NEW)
+      owner : LLR-150.2
+      in    : GLOBAL_KEYS + COMMAND_PALETTE_BINDING
+      out   : row-1 tokens
+    - fn    : window row composition: tag in the .db-screen-title pair, window tokens, go tokens (NEW)
+      owner : LLR-150.3
+      in    : window tokens + go tokens + the rail binding's description
+      out   : row-2 tokens
+    - fn    : handled-key filter and state dimming; S19TuiApp.check_action (NEW)
+      owner : LLR-150.4
+      in    : action + active window + table conditions
+      out   : each token painted, dimmed or absent; the key live or inert
+    - fn    : whole-token packing with "? more" (NEW, pack_key_row)
+      owner : LLR-150.5
+      in    : tokens + row width
+      out   : painted row text + one hit range per kept token
+    - fn    : click hit-test to app.simulate_key (NEW)
+      owner : LLR-150.7
+      in    : click x + hit ranges
+      out   : one simulated key, or a bell
+  SINK   : the key bar's two painted rows and the action the key runs
+```
+
 - **Part B — boundary decomposition:** yes — the TUI panels are components a consumer addresses on their own. Parent: `workspace_shell` (`docs/architecture.md` §11), not itself a COMPONENT anywhere in the corpus, so `V12` reports *could not be tested* (the batch-87/94 precedent, a NOTICE). Addresses marked COMPUTED are built at runtime (`f"#fx_confirm_{i}"`, `f"open_folder_{family}"`, `f"window_help_{key}"`); their consumers were measured with `grep -rl` over `s19_app/` and `tests/` (2026-10-20).
 
 ```
@@ -1504,6 +1639,20 @@ COMPONENT: screen_header_chips
       owner       : LLR-148.7
 ```
 
+```
+COMPONENT: bottom_key_bar
+  PARENT : workspace_shell
+  SURFACE: the bottom two rows of every window (replaces the shipped Footer, app.py:2077)
+  INPUTS : active_window: str ; focus: Widget ; window_key_table: Mapping[str, WindowKeys]
+  OUTPUTS:
+    - id          : key_bar
+      value       : the two-row key bar docked at the bottom, height 2
+      address     : query("#key_bar")
+      cardinality : exactly 1
+      consumers   : none
+      owner       : LLR-150.6
+```
+
 > `consumers : none` is written where no file reaches the address today because the address is NEW (`#patch_json_view`, `#patch_identity_ribbon`, `#flow_pipeline`, `.glyph-legend` — working names fixed at PDR). The defining modules are declared as consumers (they query or build their own ids and break if the address moves); a docstring that names an id is a mention, not a dependant (`screens.py:331` and `change_service.py:1237` name `#patch_doc_entries_table` in prose only); `REQUIREMENTS.md` and `.fast-dev-flow/archive/…` reach addresses as prose mentions; `prototypes/**` is never imported (the ARQ boundary) and is not declared. The batch's ATs/TCs become consumers in Phase 3 and the Phase-4 record re-runs `V13`/`V14`.
 
 ---
@@ -1513,10 +1662,10 @@ COMPONENT: screen_header_chips
 ### 5.1 Methods
 
 > **Two layers** (per the Two-layer validation rule). Every batch declares BOTH:
-> - **Layer A — white-box / functional (`TC-B97-01` … `TC-B97-65`):** one TC per LLR, validating the mechanism. Methods: `test (unit)` / `test (integration)` under `App.run_test` (Textual 8.2.8, pytest — `pyproject.toml:66-73`). A TC may read internal state; an AT may not.
-> - **Layer B — black-box / behavioral acceptance (`AT-B97-01` … `AT-B97-24`):** at least two per story, driving the shipped controls only (`pilot.click` / `pilot.press` on shipped ids, Load / Import / Run / chip presses, `pilot.resize_terminal`, a new `S19TuiApp` on the same `tmp_path` for a restart; never a panel method such as `add_lane`, never a wrapped service — the OS-boundary open seam spied by `SeamSpy` excepted, §3 preamble) and observing only the shipped surface: painted text, regions and spans (C-32: `region`, `_render_line`, compositor strips, `render().spans`), files on disk (`reports/*-chain-set-report.md` and its `- **Mode:**` line, written images, saved sets and specs), the status line. C-42: parse the emitted JSON / Text / report, never substring-match the readable form.
+> - **Layer A — white-box / functional (`TC-B97-01` … `TC-B97-72`):** one TC per LLR, validating the mechanism. Methods: `test (unit)` / `test (integration)` under `App.run_test` (Textual 8.2.8, pytest — `pyproject.toml:66-73`). A TC may read internal state; an AT may not.
+> - **Layer B — black-box / behavioral acceptance (`AT-B97-01` … `AT-B97-26`):** at least two per story, driving the shipped controls only (`pilot.click` / `pilot.press` on shipped ids, Load / Import / Run / chip presses, `pilot.resize_terminal`, a new `S19TuiApp` on the same `tmp_path` for a restart; never a panel method such as `add_lane`, never a wrapped service — the OS-boundary open seam spied by `SeamSpy` excepted, §3 preamble) and observing only the shipped surface: painted text, regions and spans (C-32: `region`, `_render_line`, compositor strips, `render().spans`), files on disk (`reports/*-chain-set-report.md` and its `- **Mode:**` line, written images, saved sets and specs), the status line. C-42: parse the emitted JSON / Text / report, never substring-match the readable form.
 
-- **C-10 (one AT per policy branch, a non-default value driven through the real control):** JSON view after Load (AT-B97-01) vs after Add (AT-B97-02); Address at 118 vs 220 and include changing the count (AT-B97-04); Fields / JSON / Addendum tabs (AT-B97-21); palette kinds, one arm per kind (AT-B97-07); `sequential` default vs `parallel` chosen in the mode control and read from the report, and a rebound SOURCE input (AT-B97-22); chip with project (AT-B97-12) vs without (AT-B97-13); 118x54 (AT-B97-15) vs resize to 260x70 (AT-B97-16) vs 119↔120, 80x24 and 220x40 (AT-B97-24); mouse (AT-B97-01..16) vs keyboard only (AT-B97-17..20).
+- **C-10 (one AT per policy branch, a non-default value driven through the real control):** JSON view after Load (AT-B97-01) vs after Add (AT-B97-02); Address at 118 vs 220 and include changing the count (AT-B97-04); Fields / JSON / Addendum tabs (AT-B97-21); palette kinds, one arm per kind (AT-B97-07); `sequential` default vs `parallel` chosen in the mode control and read from the report, and a rebound SOURCE input (AT-B97-22); chip with project (AT-B97-12) vs without (AT-B97-13); 118x54 (AT-B97-15) vs resize to 260x70 (AT-B97-16) vs 119↔120, 80x24 and 220x40 (AT-B97-24); mouse (AT-B97-01..16) vs keyboard only (AT-B97-17..20); the key bar at 118x54 vs 220x60 vs 80x24, a file-backed vs a paste-authored change-set (dimmed vs lit Undo), a click (AT-B97-25) vs a key press on a window that does not handle the key (AT-B97-26).
 - **C-12 (a produced artifact consumed):** Save Set writes the set file and Load Set in a new app restores it (AT-B97-10); Write .chk.json parsed and equal to the card (AT-B97-21); the chain-set report parsed for its mode (AT-B97-22); the JSON view consumes the serialiser's output (AT-B97-01).
 - **C-16:** n/a — the prototypes are Textual monkeypatches over the shipped app, the target's technology (brief §2), and trigger D2 did not fire; the ATs drive the real mechanism, keyboard included.
 - **C-17:** LLR-144.7, 145.5, 146.8, 147.6 with AT-B97-03, -05, -08, -11; the payload is split by what the surface can carry (A.2): `HOSTILE_NAME` through real file names and the EXT-STEP `output_path`, `HOSTILE_CONTENT` (+ `HOSTILE_C1` where admitted) through file content; NUL through LLR-146.14's refusal arms.
@@ -1526,7 +1675,7 @@ COMPONENT: screen_header_chips
 - **Captures:** each increment re-captures its screen at 118x54 and 220x60 into `prototypes/b94_polish/png/impl.*` for the operator's side-by-side judgement (brief §4.7) — a `demo`, auxiliary to the ATs; the notices yellow is re-judged there (§6.3).
 
 ### 5.2 Batch acceptance criteria
-- 100 % of the 65 LLRs covered by their TC with a pass result; 24 of 24 ATs pass; every story has ≥ 2 ATs with boundary and negative evidence.
+- 100 % of the 72 LLRs covered by their TC with a pass result; 26 of 26 ATs pass; every story has ≥ 2 ATs with boundary and negative evidence.
 - 0 blocker fails at Phase 4; the full guard host `tests/test_tui_directionb.py` green at every render increment (C-34).
 - Every superseded shipped node of §6.3 retired or rewritten through the ledger in its owning increment; the 14 Spanish pin lines (P-17) rewritten to English, not deleted.
 - No requirement without a validation method; the operator judges the captures on the review page before the batch closes.
@@ -1597,6 +1746,13 @@ Decided at ARQ (`docs/architecture.md`, batch-97 section): R13 in-place re-compo
 | Spanish pins `test_flow_external_step_b96.py:265, 266, 302, 333, 345, 507, 508, 509, 514` | LLR-147.5 | Flow Execution |
 | 80x24 runs in 17 patch/check/flow test files (P-35) | not superseded — LLR-149.6 keeps them reachable; layout-asserting ones re-baselined with their screen | each screen's increment |
 | LLR-146.14, 147.12, 147.13, 148.10 | 0 shipped nodes (NUL: no test feeds a NUL ref; `c`: unbound; the label: pinned by no assertion, P-46) | — |
+| `tests/test_tui_diff_screen.py:3692` AT-B78-28 clause 3 — the 14 shown keys `_B79_COMMITTED_SHOWN_KEYS` (`:3590-3606`) by set-equality on the diff window (P-69) | LLR-150.4 (`+ - , .` leave the diff window's live set), LLR-150.6 (the painted bar replaces the Footer's set); clauses 1-2 (the run-list keys in the help panel) kept | Inc-8 |
+| `tests/test_tui_directionb.py:6910` `test_tc030_global_footer_set_present_on_every_screen`, `:6940` `test_tc030_per_screen_paging_bindings_in_footer` (`_PAGING_FOOTER_KEYS` on `issues`, `:6887-6893`), `:6972` `test_tc030_footer_updates_and_reflects_active_screen` (a `Footer` mounted), `:7011` `test_tc030_operations_binding_shown_in_footer` — rewritten to read the painted key bar | LLR-150.2, 150.4, 150.6 | Inc-8 |
+| `tests/test_tui_diff_screen.py:3806` AT-B78-32 — the App `BINDINGS` block pinned row by row (a baseline failure, `PLAN.md` §Test ledger); the `period` row gains `key_display="."` | LLR-150.5 | Inc-8 (re-pinned, the row named in the ledger) |
+| `tests/test_tui_snapshot.py` — the bottom rows of all 29 cells (every window paints the key bar) | LLR-150.6 | Inc-8 per-cell prediction (PC-10), Inc-7 regen (D17) |
+| `tests/test_discoverability.py:33` (the Help binding `show=True`) | not superseded — the `show` flags stay as shipped; the key bar does not read them | — |
+| `tests/test_tui_patch_history_strip.py:667` TC-081.4 — diffs `app.py` against `main` and fails on any `Binding(` line not carrying a marker of `_SANCTIONED_BINDING_MARKERS` (`:739-745`) | Inc-6: the `Binding("c", "confirm_attention", "Confirm", show=False)` line of `_FlowExecutionSection` (declared in `app.py`, D10) → marker `confirm_attention` added in Inc-6; Inc-8: the `Binding("period", "hex_page_next", "Hex+", key_display=".")` line (LLR-150.5) → marker `key_display="."` added in Inc-8; each with its comment in the shipped style | Inc-6, Inc-8 (named supersession, the list extended, never relaxed) |
+| batch-02 LLR-013.2 "the footer shows the active screen's `show=True` bindings" (`.dev-flow/2026-05-20-batch-02/01-requirements.md:583`) and `keymap-proposal.md` §2 (the always-shown set) / §3 (per-screen paging on Workspace, A2L, MAC, Issues) (`.dev-flow/2026-05-20-batch-02/03-increments/keymap-proposal.md`), as encoded at `tests/test_tui_directionb.py:6881-6893` | HLR-150: row 1 = the 8 global tokens of LLR-150.2 (no `/`, `g` — window keys); per window: `, .` on Workspace only, `+ -` on A2L and MAC only, Issues none of the four (its paging rides `pageup` / `pagedown`, `app.py:1441-1442`); the rest per I-10 | Inc-8 (LED-…97.10) |
 
 ### 6.4 Phase-1 reconciliation log — moved to the ledger (§7)
 

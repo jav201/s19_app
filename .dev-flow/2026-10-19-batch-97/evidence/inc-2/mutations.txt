@@ -1,0 +1,96 @@
+arms: 24
+M1-flow-ref-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[change_doc_ref]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest blocks[1].change_doc_ref entry carries a NUL character - not a path; entry skipped: 'arm\\x00.bin'")
+    | 1 failed in 0.31s
+M1-flow-ref-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_name]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in output_name was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='run.log', output_path='ext_out.s19', kind='external_step'), WriteOutBlock(output_name='arm\x00.bin', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+    | 1 failed in 0.30s
+M1-flow-ref-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[image_ref]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest blocks[0].image_ref entry carries a NUL character - not a path; entry skipped: 'arm\\x00.bin'")
+    | 1 failed in 0.32s
+M1-flow-ref-nul-off [flow_persistence_service.py] test_tc_b97_62_p36_nul_flow_file_refused: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest blocks[1].change_doc_ref entry carries a NUL character - not a path; entry skipped: 'calib\\x00hotfix.json'")
+    | 1 failed in 0.30s
+M2-a2b-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[a2b_binding_ref]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest blocks[4].image_a.ref entry carries a NUL character - not a path; entry skipped: 'arm\\x00.bin'")
+    | 1 failed in 0.34s
+M3-log-ref-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[log_ref]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in log_ref was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='arm\x00.bin', output_path='ext_out.s19', kind='external_step'), WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+    | 1 failed in 0.30s
+M4-output-path-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_path]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in output_path was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='run.log', output_path='arm\x00.bin', kind='external_step'), WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+    | 1 failed in 0.31s
+M5-a2l-nul-off [flow_persistence_service.py] test_tc_b97_62_nul_a2l_ref_refuses_the_flow: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest blocks[0].a2l_ref entry carries a NUL character - not a path; entry skipped: 'demo\\x00.a2l'")
+    | 1 failed in 0.31s
+M6-flow-stat-oserror-only [flow_persistence_service.py] test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_flow_json]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:332: AssertionError: raised ValueError: stat: embedded null character in path
+    | 1 failed in 0.29s
+M7-set-stat-oserror-only [flow_persistence_service.py] test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_chain_set]: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:332: AssertionError: raised ValueError: stat: embedded null character in path
+    | 1 failed in 0.33s
+M8-template-nul-term-off [flow_persistence_service.py] test_tc_b97_62_p36_nul_template_refuses_the_set: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in template was accepted: ChainSet(name='nul_set', chains=(ChainSetEntry(chain='lane0', template='patch\x00chain', inputs=((0, 'prg.s19'),), outputs=()),))
+    | 1 failed in 0.31s
+M9-set-input-nul-off [flow_persistence_service.py] test_tc_b97_62_p36_nul_input_ref_refuses_the_set: RED (KILLED)
+    restore sha256 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c == before 4cc0f65af2e899775682be2613b70698cba2a2175dcbf887891131f8ac095e8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:89: AssertionError: ('MANIFEST-PATH-ESCAPE', "manifest chains[0].inputs.ref entry carries a NUL character - not a path; entry skipped: 'base\\x00.s19'")
+    | 1 failed in 0.34s
+M10-guard-nul-off [variant_execution_service.py] test_tc_b97_62_p36_p50_manifest_guard_refuses_nul_entry: RED (KILLED)
+    restore sha256 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b == before 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:272: AssertionError: raised ValueError: stat: embedded null character in path
+    | 1 failed in 0.29s
+M10-guard-nul-off [variant_execution_service.py] test_tc_b97_62_p36_run_flow_over_nul_ref_is_a_block_error: RED (KILLED)
+    restore sha256 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b == before 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:225: AssertionError: ['ValueError: stat: embedded null character in path']
+    | 1 failed in 0.33s
+M10-guard-nul-off [variant_execution_service.py] test_tc_b97_62_p50_bound_lane_input_is_a_block_error: RED (KILLED)
+    restore sha256 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b == before 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:295: AssertionError: raised ValueError: stat: embedded null character in path
+    | 1 failed in 0.31s
+M10-guard-nul-off [variant_execution_service.py] test_tc_b97_62_manifest_nul_entry_skipped_others_kept: RED (KILLED)
+    restore sha256 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b == before 86d1b4ec7188437cfc05625bf01df784507ea519373127ef16035ad57887047b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:311: AssertionError: raised ValueError: stat: embedded null character in path
+    | 1 failed in 0.33s
+M11-noun-instruccion [flow_execution_service.py] test_tc_b97_25_service_constants_carry_no_spanish: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:112: AssertionError: ['instruccion']
+    | 1 failed in 0.32s
+M11-noun-instruccion [flow_execution_service.py] test_tc_b97_25_pause_summary_in_english[manual-instruction]: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:130: AssertionError: paused - waiting for a human: instruccion 'python flash.py --release' | LOG 'run.log' + OUTPUT 'C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-21097\test_tc_b97_25_pause_summary_i0\ext\flashed.s19' pending
+    | 1 failed in 0.33s
+M12-missing-output-es [flow_execution_service.py] test_tc_b97_25_service_constants_carry_no_spanish: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:113: AssertionError: ["' does not exist - correr el paso externo antes de confirmar"]
+    | 1 failed in 0.32s
+M12-missing-output-es [flow_execution_service.py] test_tc_b97_25_confirm_and_refusal_lines_in_english: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | 1 failed in 0.32s
+M13-waiting-prototype-amber [insight_style.py] test_tc_b97_18_waiting_and_crc_tokens_declared_apart: RED (KILLED)
+    restore sha256 08f7bb6d002257872f3d22cf77eb1308922ffe1f1005e34598660f19b2298069 == before 08f7bb6d002257872f3d22cf77eb1308922ffe1f1005e34598660f19b2298069
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:371: AssertionError: assert '#e8a33d' == '#e8ad3d'
+    | 1 failed in 0.31s
+M14-crc-is-waiting [insight_style.py] test_tc_b97_18_waiting_and_crc_tokens_declared_apart: RED (KILLED)
+    restore sha256 08f7bb6d002257872f3d22cf77eb1308922ffe1f1005e34598660f19b2298069 == before 08f7bb6d002257872f3d22cf77eb1308922ffe1f1005e34598660f19b2298069
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:372: AssertionError: assert '#e8ad3d' == '#c9562b'
+    | 1 failed in 0.29s
+M15-funnel-notice-es [flow_execution_service.py] test_tc_b97_25_funnel_notice_in_english: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:185: AssertionError: ['funnel: ${MISSING} is not declared in the flow — el placeholder queda intacto']
+    | 1 failed in 0.32s
+M15-funnel-notice-es [flow_execution_service.py] test_tc_b97_25_service_constants_carry_no_spanish: RED (KILLED)
+    restore sha256 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4 == before 3129749817a7613d6a22f48657b6274091f4db7ca75f692799c758cde96d56d4
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:113: AssertionError: ['} is not declared in the flow — el placeholder queda intacto']
+    | 1 failed in 0.32s

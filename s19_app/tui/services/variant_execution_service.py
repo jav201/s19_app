@@ -230,6 +230,9 @@ def _resolve_manifest_entry(
 
     Data Flow:
         - Non-string entry → one ``MANIFEST-BAD-STRUCTURE``.
+        - An entry carrying a NUL character → one ``MANIFEST-PATH-ESCAPE``,
+          before any ``resolve()`` (which would raise ``ValueError``;
+          batch-97 LLR-146.14).
         - Absolute under EITHER separator convention (``PureWindowsPath`` /
           ``PurePosixPath``) → one ``MANIFEST-PATH-ESCAPE`` — checked before
           any filesystem touch so a drive-qualified path is refused on every
@@ -260,6 +263,15 @@ def _resolve_manifest_entry(
         )
         return None
     text = raw_entry.strip()
+    if "\x00" in text:
+        issues.append(
+            _manifest_issue(
+                MANIFEST_PATH_ESCAPE,
+                f"manifest {context} entry carries a NUL character - not a "
+                f"path; entry skipped: {text!r}",
+            )
+        )
+        return None
     if PureWindowsPath(text).is_absolute() or PurePosixPath(text).is_absolute():
         issues.append(
             _manifest_issue(

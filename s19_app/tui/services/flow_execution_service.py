@@ -498,8 +498,8 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     patch_result.findings.extend(
                         Finding(
                             FINDING_WARN,
-                            f"funnel: ${{{name}}} no declarada en el flow — "
-                            "el placeholder queda intacto",
+                            f"funnel: ${{{name}}} is not declared in the flow — "
+                            "the placeholder stays intact",
                         )
                         for name in funnel_missing
                     )
@@ -837,15 +837,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 confirmation = confirmations.get(index)
                 if confirmation is None:
                     noun = (
-                        "comando" if block.mode == EXTERNAL_MODE_TERMINAL
-                        else "instruccion"
+                        "command" if block.mode == EXTERNAL_MODE_TERMINAL
+                        else "instruction"
                     )
                     result.block_results.append(
                         BlockResult(
                             index, kind, BLOCK_STATUS_WAITING,
-                            f"paused - esperando humano: {noun} "
+                            f"paused - waiting for a human: {noun} "
                             f"'{block.instruction}' | LOG '{block.log_ref}' "
-                            f"+ SALIDA '{block.output_path}' pendientes",
+                            f"+ OUTPUT '{block.output_path}' pending",
                         )
                     )
                     paused = True
@@ -857,15 +857,15 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 if not log_path.is_file():
                     aborted = _record_error(
                         result, index, kind, "external step refused", [],
-                        f"log '{confirmation.log_ref}' no existe - la "
-                        "constancia es obligatoria, nunca opcional",
+                        f"log '{confirmation.log_ref}' does not exist - the "
+                        "log is mandatory evidence, never optional",
                     )
                     continue
                 if not source_path.is_file():
                     aborted = _record_error(
                         result, index, kind, "external step refused", [],
-                        f"salida '{confirmation.source_path}' no existe - "
-                        "correr el paso externo antes de confirmar",
+                        f"output '{confirmation.source_path}' does not exist - "
+                        "run the external step before confirming",
                     )
                     continue
                 try:
@@ -882,8 +882,8 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 result.block_results.append(
                     BlockResult(
                         index, kind, BLOCK_STATUS_OK,
-                        f"log '{log_path.name}' recibido · salida copiada a "
-                        f"{copied.name} (sesion)",
+                        f"log '{log_path.name}' received · output copied to "
+                        f"{copied.name} (session)",
                     )
                 )
 

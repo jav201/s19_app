@@ -1,0 +1,7 @@
+# Inc-2 census run — files reached by the census greps (census.txt) on the Inc-2 tree
+# files: tests/test_flow_persistence.py tests/test_flow_chainset_b94.py tests/test_flow_a2b_b94.py tests/test_changes_symbol_entries.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_variant_execution.py tests/test_flow_multi_image.py tests/test_flow_execution_service.py tests/test_flow_funnel_b96.py tests/test_tui_patch_json.py tests/test_import_census.py tests/test_tui_insight_style.py tests/test_flow_builder_render.py tests/test_tui_flow_builder_b94.py tests/test_tui_flow_execution_b94.py
+........................................................................ [ 31%]
+........................................................................ [ 63%]
+........................................................................ [ 94%]
+............                                                             [100%]
+228 passed in 155.26s (0:02:35)

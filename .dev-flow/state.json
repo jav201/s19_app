@@ -174,6 +174,11 @@
       "station": "P3",
       "date": "2026-10-20",
       "decision": "P3 increment 001 (chips: flows/session families, real-directory guard, folder labels) approved under the standing authorization: code-reviewer approve after F1/F2 fold (LED-.7), security LOW 0 HIGH, gate set 50 passed, full suite no regression vs baseline (4 timing flakes re-run green). Inc-2 flow foundations is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-20",
+      "decision": "P3 increment 002 approved under the standing authorization (autonomous gates, stop at PDR and on HIGH): code-reviewer approve (F1-F3 LOW folded), security-reviewer LOW 0 HIGH, full suite node by node vs baseline: no regression (3 non-baseline nodes pass in isolation). Operator verdict 2026-10-20 on the key bar: variant A, folded as Inc-8 executed after Inc-6 and before Inc-7; QA review of that delta found H-1 (click routes the key to the focused widget), operator chose: a click runs the binding's action in its namespace."
     }
   ],
   "obsidian_synced": false,

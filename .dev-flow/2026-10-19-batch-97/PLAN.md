@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-19-batch-97 |
 | Objective | b94 polish: port the operator-approved prototype round (prototypes/b94_polish, verdict A on all four screens) into the four batch-94 screens -- Patch Editor = ledger + inspector with a consultable JSON tab (live or explicit Update, Load keeps populating), Check Editor = ledger + inspector, Flow Builder = pipeline rail, Flow Execution = pipeline rail; Run as the second bright element; CRC accent burnt orange (amber only for waiting-human); folder-open chip + window help on every one of the four screens (new chip families flows + session); width-adaptive layouts (118x54 minimum, ~220x60 large reference), no wrapped rows; English UI strings. Input: .dev-flow/design/HANDOFF-b94-polish-2026-10-20.md |
-| Last updated | PDR · 2026-10-20 (awaiting the operator's PDR decision) |
+| Last updated | P3 · 2026-10-20 (Inc-1 closed `d5d0ff9`, Inc-2 in progress; the operator's key-bar scope addition folded as Inc-8, LED-…97.9) |
 | Standing authorization | Asked at the P0 gate, answered by the operator 2026-10-20 (kickoff questions put in Spanish, answers quoted as chosen). **Gates** — "Autónomo con excepciones": the agent self-approves the gates and records each one in this plan and in `state.json`, but STOPS at PDR (design) and on any HIGH finding. **Git** — "Commit y push en cada cierre": the agent commits and pushes to `main` at each close, no PR (as batch-95); a HIGH finding still blocks and returns to the operator. **DoR** — "Las seis": US-134..US-139 proceed. Commission: "Using /dev-flow vamos desde aquí: C:\Users\jjgh8\Github\s19_app\.dev-flow\design\HANDOFF-b94-polish-2026-10-20.md" |
 | First gate | Exit 0 at P0 after the rollover (0 block · 462 notice · 44 n/a). `V7`: "bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared file(s) unmoved, 0 undeclared) at `2026-10-12-rev102`". The pre-rollover run exited 1 (298 block) on the closed batch-94 record — see §Gate notices. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin` run 2026-10-19; `origin/main` tip = `ad10fb5ce6228a2a3823e472fd8e46c09122141d`; merge-base(HEAD, origin/main) = the same commit, so no rebase was owed. Local `main` is one commit ahead (`51ee191`, the docs-only backlog routing of the Code-Wire findings, not yet pushed); `base_ref` = `51ee1914f20d1f031dbced129ce66bda750dbde9`. RC-1 (b): each story's outcome grepped on `origin/main` — 0 hits for the inspector/JSON tab, the report-fields card, the pipeline rails, the `flows`/`session` chip families and the burnt-orange token; the shipped gaps the stories close are present (`patch_win_json` 9 hits, `titled_header("Flow Execution")` with no chip 1, the Check Editor's bare `Label` 1, `_CANVAS_COLS =` 1) — no story is SATISFIED-EXTERNALLY. RC-2: `git ls-remote --exit-code --heads origin` answered (refs served); newest `origin/main` commit 2026-10-19 16:57 -0600. |
@@ -74,6 +74,7 @@ the rest of the app at both 118x54 and ~220x60.
 | US-137 Flow Execution | READY | outcome↔lane mapping confirmed at PDR |
 | US-138 Chips + help | READY | two new chip families |
 | US-139 Width-adaptive | READY | sweep increment at both sizes |
+| US-140 Two-row key bar | READY (added 2026-10-20) | operator verdict A on the key-bar round; Inc-8, before Inc-7 (LED-…97.9) |
 | ARQ | closed 2026-10-20 | `docs/architecture.md` batch-97 section (I-1..I-4, R13-R17); 4 PDR questions |
 | P1 | closed 2026-10-20 | HLR-144..149 · 38 LLR · AT-B97-01..16 · TC-B97-01..38 · 10 PDR decisions |
 | P2 round 1 | iterate-to-refine 2026-10-20 | 1 blocker (Q-1) · 33 major · 31 minor — `02-review.md` |
@@ -84,18 +85,23 @@ the rest of the app at both 118x54 and ~220x60.
 | P1 iteration 3 | closed 2026-10-20 | LED-.4: 27 round-3 rows fixed, P-50..P-60 executed |
 | P2 verification (scoped) | approve 2026-10-20 | all four lenses; fold LED-.5 for two one-line contradictions |
 | PDR | awaiting the operator | proposal `7d823a7`; 3 reviewers approved with conditions (0 blockers); Code-Wire annex (4 majors); 21 conditions PC-1..PC-21; review page `prototypes/b94_polish/pdr-review.html` |
-| PDR · P3 · DDR · P4 · P5 · P6 | not started | PDR is an operator stop |
+| PDR | approved with conditions 2026-10-20 (`070429f`) | PC-1..PC-22; delta 2026-10-20 on the key bar: PC-22 re-routed into the batch, PC-23..PC-26 |
+| P3 | in progress | Inc-1 closed (`d5d0ff9`); Inc-2 in progress; then Inc-3 → 4 → 5 → 6 → 8 → 7 |
+| DDR · P4 · P5 · P6 | not started | — |
 
 ## Roadmap + increment plan
 
-Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
+Proposed from handoff §6; fixed at PDR (`design/design-proposal.md` §6.1); Inc-8 added by the PDR delta of 2026-10-20. ≤4 source files each, tests uncapped.
+**Execution order: Inc-1 → 2 → 3 → 4 → 5 → 6 → 8 → 7** (labels kept, so no PDR condition is renumbered).
 
-1. Check Editor → ce_A + chip + help (US-135, US-138 part).
-2. Patch Editor → pe_A + JSON tab + geometry cleanup (US-134).
-3. Chip families `flows` + `session`; CRC burnt-orange token (US-138 part, R-5).
-4. Flow Builder → fb_A (US-136).
-5. Flow Execution → fx_A (US-137).
-6. Width sweep 118 + 220, real captures, review-page rebuild (US-139).
+1. Inc-1 — chip families `flows` + `session`, the real-directory guard, folder labels (US-138 part) — closed `d5d0ff9`.
+2. Inc-2 — flow foundations: NUL refusal, English service strings, the two role tokens (US-136/137 part).
+3. Inc-3 — Check Editor → ce_A + chip + help (US-135).
+4. Inc-4 — Patch Editor → pe_A + JSON tab + geometry cleanup (US-134).
+5. Inc-5 — Flow Builder → fb_A (US-136).
+6. Inc-6 — Flow Execution → fx_A + headers close (US-137, US-138).
+7. **Inc-8** — the two-row key bar on every window: `window_help.py`, `app.py`, `styles.tcss` (US-140). Runs before Inc-7 so the sweep and the snapshot regen see the final bottom rows.
+8. Inc-7 — width sweep 118 + 220 on the two-row layout, real captures, review-page rebuild, snapshot regen (US-139).
 
 ## Key decisions
 
@@ -111,6 +117,8 @@ Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
 | 2026-10-20 | Operator design decisions before the round-3 amendment (asked in chat): hue pair waiting `#e8ad3d` / CRC `#c9562b` (option A, 23.0°), notices yellow `#f6ff8f` kept with the operator's reservation to re-judge on the captures; primary action Patch = Save, Check = Write; multi-variant runs = one Builder chain per variant set up with the funnel block, run as lanes in Flow Execution (`#flow_scope` leaves the Builder, LLR-104.6 retired for the Builder); JSON tab live with a stamp, read-only, no button | operator answers 2026-10-20; colours judged on `prototypes/b94_polish/colores-espera-crc.html` |
 | 2026-10-20 | Orchestrator decisions (revisable at PDR): cards grow at wide sizes; Confirm not auto-focused, scoped confirm key; chip labels name their folder; `░` after a waiting block; runs stay on the UI thread (freeze declared OUT); lanes scroll horizontally with the waiting card brought into view | UX recommendations, minor design items under the standing authorization |
 | 2026-10-19 | Test ids batch-scoped (`AT-B97-NN`, `TC-B97-NN`) | `docs/engineering-rules.md` §AT/TC id allocation prefers batch-scoped ids; no global reservation PR owed |
+| 2026-10-20 | Key bar folded into the batch as Inc-8 (US-140 / HLR-150, LED-…97.9), executed after Inc-6 and before Inc-7 | operator verdict on the key-bar round: A · Two rows accepted and preferred, no per-window objection (`evidence/operator-keybar-verdict-2026-10-20.json`), and the instruction "Mete el cambio al incremento"; design D26–D29, I-10, I-11; PDR PC-22 re-routed, PC-23..PC-26 |
+| 2026-10-20 | Key-bar QA folded (approve with conditions); a click on a token runs the binding's action in its own namespace, never `simulate_key` (H-1) | the operator's chat decision, option (a); LED-…97.10; D10 / D16 gain the descriptions `Confirm` / `Include` (must land with Inc-6 / Inc-3); PC-24 widened to every vertical arm at 118x53 |
 
 ## Risks / watch-items
 
@@ -120,7 +128,8 @@ Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
 - 86 test files reach Patch Editor ids (B1) · medium · ids are kept; reverse census per increment.
 - CRC vs waiting-human hue (R-5) · medium · a real capture with both on screen at acceptance.
 - Shipped `main` is red: 10 pre-existing test failures (Test ledger) · certain · each increment diffs its failures against the baseline list; the Patch Editor four are re-examined in that increment, the rest routed to the backlog at the close.
-- Concurrent all-screens review by another agent (Kimi) · medium · the second editor rebases (`COORDINACION-batch92.md` rule); this batch owns only the four screens.
+- Concurrent all-screens review by another agent (Kimi) · medium · the second editor rebases (`COORDINACION-batch92.md` rule); this batch owns only the four screens and, from Inc-8, the app-wide key bar.
+- The key bar takes one row from every window (HLR-150) · certain · Inc-3..6 also check their vertical budget at 118x53 (PC-24); Inc-8 re-checks at 118x54 with the bar; the footer tests are rewritten by named supersession (PC-25).
 
 ## Conventions honored
 
@@ -132,6 +141,7 @@ Proposed from handoff §6; fixed at PDR. ≤4 source files each, tests uncapped.
 
 - `Fmt · Unit` column (ce_C) and the matrix density mode (fx_C) — offered, not chosen.
 - Hex-viewer no-wrap rule on A2L viewer / Hex View — backlog item for the all-screens review.
+- Go keys on row 2 of the eight windows the key-bar round did not render — a later edit of the window-key table (PC-26).
 - The eight Code-Wire pilot findings — `BACKLOG-CODE.md` (`51ee191`).
 - Batch-96 follow-ups — untouched.
 

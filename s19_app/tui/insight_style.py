@@ -118,6 +118,18 @@ PURPLE = "#b565f3"
 #: and YELLOW), and it is asserted as a computed predicate rather than prose.
 MAGENTA = "#f586da"
 
+#: Waiting-human role (batch-97 LLR-146.6 / 147.7, operator decision 1): the
+#: flow screens paint this ONLY on elements that wait for a human (an
+#: external step's card, its pending lines, its Confirm). Every other accent
+#: on those panels lies >= 20° from this hue (P-40). Mirrored in
+#: ``styles.tcss`` as ``$waiting-human``.
+WAITING_HUMAN = "#e8ad3d"
+#: CRC family role (batch-97 LLR-146.6): the CRC block card. 23.0° from
+#: WAITING_HUMAN, so a CRC card never reads as a waiting one (the prototype's
+#: amber sat 19.5° away and was rejected). Mirrored in ``styles.tcss``
+#: as ``$crc-family``.
+CRC_FAMILY = "#c9562b"
+
 #: Navy "depth stack" — four steps from app background to panel border.
 DEPTH_BG = "#0a0e1b"
 DEPTH_PANEL = "#0f1525"

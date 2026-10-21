@@ -5,7 +5,7 @@ human-gated block carries, in BOTH modes, the instruction/command, a
 MANDATORY log ref and an output file (absolute path preferred); persistence
 is strict (unknown keys / empty instruction / empty log / shaped output all
 refuse the block); execution WITHOUT a confirmation PAUSES the run
-("esperando humano") and skips every downstream block, WITH one it validates
+("paused - waiting for a human") and skips every downstream block, WITH one it validates
 the log + output evidence, COPIES the output into the session artifact
 folder (``copy_into_workarea`` — the copied path rides ``written_paths``)
 and the chain goes on; the builder exposes the kind on the palette + the
@@ -250,7 +250,7 @@ def test_tc1804_parser_output_path_shape(tmp_path: Path) -> None:
 def test_tc1804_unconfirmed_run_pauses_and_skips_downstream(tmp_path: Path) -> None:
     """TC-1804 (execution, the pause): a run with NO confirmation PAUSES at
     the external step — the block result is ``waiting`` naming the pending
-    LOG + SALIDA ("esperando humano"), the flow status is ``paused`` (NOT
+    LOG + OUTPUT ("waiting for a human"), the flow status is ``paused`` (NOT
     ``error`` — the image is intact), and the downstream WRITE-OUT skips
     with the waiting reason and writes nothing."""
     project = _make_project(tmp_path, {"base.s19": _S19})
@@ -262,8 +262,9 @@ def test_tc1804_unconfirmed_run_pauses_and_skips_downstream(tmp_path: Path) -> N
     assert outcome.status == FLOW_STATUS_PAUSED
     ext_result, write_result = outcome.block_results[1], outcome.block_results[2]
     assert ext_result.status == BLOCK_STATUS_WAITING
-    assert "esperando humano" in ext_result.summary
-    assert ext_result.summary.count("pendientes") == 1
+    # batch-97 Inc-2 (LLR-147.5): the service strings are English.
+    assert "waiting for a human" in ext_result.summary
+    assert ext_result.summary.count("pending") == 1
     assert write_result.status == BLOCK_STATUS_SKIPPED
     assert "waiting on external step" in write_result.summary
     # The image is intact: the SOURCE block ran clean…
@@ -299,7 +300,7 @@ def test_tc1804_confirmed_run_copies_output_into_session(tmp_path: Path) -> None
     assert outcome.status == FLOW_STATUS_OK
     ext_result = outcome.block_results[1]
     assert ext_result.status == BLOCK_STATUS_OK
-    assert "salida copiada" in ext_result.summary
+    assert "output copied" in ext_result.summary
     # The copied file lives in the session artifact folder, byte-faithful to
     # the source the human produced (write_text may newline-translate — the
     # pin is source-vs-copy, not a literal).
@@ -317,7 +318,7 @@ def test_tc1804_confirmed_run_copies_output_into_session(tmp_path: Path) -> None
 
 def test_tc1804_confirmed_run_refuses_missing_evidence(tmp_path: Path) -> None:
     """TC-1804 (execution, the refusal): a confirmation whose MANDATORY log
-    does not exist refuses the step (``error`` — the named constancia
+    does not exist refuses the step (``error`` — the named mandatory-evidence
     message), as does a confirmation whose output file was never produced;
     the downstream WRITE-OUT stays skipped."""
     project = _make_project(tmp_path, {"base.s19": _S19})
@@ -330,7 +331,9 @@ def test_tc1804_confirmed_run_refuses_missing_evidence(tmp_path: Path) -> None:
     record = run_chain_set([_ext_chain("ext", block)], ctx, set_name="s")
     outcome = record.outcomes[0]
     assert outcome.status == FLOW_STATUS_ERROR
-    assert any("constancia" in line for line in outcome.block_results[1].diagnostics)
+    assert any(
+        "mandatory evidence" in line for line in outcome.block_results[1].diagnostics
+    )
 
     ext_dir = Path(block.output_path).parent
     (ext_dir / "run.log").write_text("flashed OK\n", encoding="utf-8")
@@ -342,7 +345,7 @@ def test_tc1804_confirmed_run_refuses_missing_evidence(tmp_path: Path) -> None:
     outcome2 = record2.outcomes[0]
     assert outcome2.status == FLOW_STATUS_ERROR
     assert any(
-        "correr el paso externo" in line
+        "run the external step" in line
         for line in outcome2.block_results[1].diagnostics
     )
     assert outcome2.block_results[2].status == BLOCK_STATUS_SKIPPED

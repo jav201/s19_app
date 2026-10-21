@@ -1,0 +1,57 @@
+# Inc-2 GREEN run — gate set on the Inc-2 tree (HEAD d5d0ff9 + working changes)
+ s19_app/tui/insight_style.py                      | 12 ++++
+ s19_app/tui/services/flow_execution_service.py    | 24 ++++----
+ s19_app/tui/services/flow_persistence_service.py  | 68 +++++++++++++++++++++--
+ s19_app/tui/services/variant_execution_service.py | 12 ++++
+ 4 files changed, 100 insertions(+), 16 deletions(-)
+...............................................                          [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_clean_arms_flow_loads
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[image_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[change_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_name]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[check_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[config_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[a2b_binding_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[log_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_path]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_a2l_ref_refuses_the_flow
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_flow_file_refused
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_run_flow_over_nul_ref_is_a_block_error
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_template_refuses_the_set
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_input_ref_refuses_the_set
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_p50_manifest_guard_refuses_nul_entry
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p50_bound_lane_input_is_a_block_error
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_manifest_nul_entry_skipped_others_kept
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_flow_json]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_chain_set]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_18_waiting_and_crc_tokens_declared_apart
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_service_reach_guard_on_9c7beaf
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_service_constants_carry_no_spanish
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_pause_summary_in_english[terminal-command]
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_pause_summary_in_english[manual-instruction]
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_confirm_and_refusal_lines_in_english
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_funnel_notice_in_english
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_persistence_roundtrip_field_by_field
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_parser_refuses_missing_mandatory_fields
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_parser_output_path_shape
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_unconfirmed_run_pauses_and_skips_downstream
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_confirmed_run_copies_output_into_session
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_confirmed_run_refuses_missing_evidence
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc603_g4_requirements_citations_are_live
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+47 passed in 13.37s

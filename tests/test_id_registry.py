@@ -126,7 +126,11 @@ from tools.id_registry import (
 # the chips increment adds ``tests/test_b97_chips_help.py`` (TC-B97-27..30, 57,
 # 65) and the two batch helpers ``tests/b97_fixtures.py`` and
 # ``tests/b97_probes.py``, which the ``tests/**/*.py`` glob scans too.
-EXPECTED_SCANNED_TEST_FILES = 192
+# batch-97 Inc-2 (2026-10-20): 192 -> 194, measured with ``scanned_test_files()``
+# (and ``ls tests/*.py tests/**/*.py | sort -u | wc -l`` agreeing at 194) — the
+# flow foundations add ``tests/test_b97_flow_builder.py`` (TC-B97-62, TC-B97-18
+# token arm) and ``tests/test_b97_flow_execution.py`` (TC-B97-25 service arm).
+EXPECTED_SCANNED_TEST_FILES = 194
 """Test modules scanned, including this one.
 
 batch-91 Inc-3: 158 -> 159. This increment adds

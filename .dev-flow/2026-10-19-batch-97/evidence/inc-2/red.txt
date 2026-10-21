@@ -1,0 +1,53 @@
+# Inc-2 RED run — unchanged source at HEAD d5d0ff9; git diff -- s19_app empty: yes
+.FFFFFFFFFFFFFFFFFFF.FFFFF                                               [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in output_name was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='run.log', output_path='ext_out.s19', kind='external_step'), WriteOutBlock(output_name='arm\x00.bin', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in log_ref was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='arm\x00.bin', output_path='ext_out.s19', kind='external_step'), WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in output_path was accepted: Flow(name='nul_arms', blocks=[SourceBlock(image_ref='prg.s19', file_type='s19', a2l_ref=None, kind='source'), PatchBlock(change_doc_ref='calib_hotfix.json', a2l_ref=None, kind='patch'), CheckBlock(check_doc_ref='baseline.chk.json', gating='advisory', kind='check'), CrcBlock(config_ref='crc.json', kind='crc'), A2BBlock(image_a=A2BInputBinding(source='file', ref='other.s19'), image_b=A2BInputBinding(source='flow', ref='0'), kind='a2b'), ExternalStepBlock(mode='terminal', instruction='python flash.py', log_ref='run.log', output_path='arm\x00.bin', kind='external_step'), WriteOutBlock(output_name='out.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:225: AssertionError: ['ValueError: stat: embedded null character in path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:87: AssertionError: a NUL in template was accepted: ChainSet(name='nul_set', chains=(ChainSetEntry(chain='lane0', template='patch\x00chain', inputs=((0, 'prg.s19'),), outputs=()),))
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:85: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:272: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:295: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:311: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:332: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:332: AssertionError: raised ValueError: stat: embedded null character in path
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:369: AssertionError: no WAITING_HUMAN token
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:112: AssertionError: ['} no declarada en el flow — el placeholder queda intacto', 'comando', 'instruccion', "' + SALIDA '", "' pendientes", 'paused - esperando humano: ', ...]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:130: AssertionError: paused - esperando humano: comando 'python flash.py --release' | LOG 'run.log' + SALIDA 'C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-21074\test_tc_b97_25_pause_summary_i0\ext\flashed.s19' pendientes
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:130: AssertionError: paused - esperando humano: instruccion 'python flash.py --release' | LOG 'run.log' + SALIDA 'C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-21074\test_tc_b97_25_pause_summary_i1\ext\flashed.s19' pendientes
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:156: assert False
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:185: AssertionError: ['funnel: ${MISSING} no declarada en el flow — el placeholder queda intacto']
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[a2b_binding_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[log_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_path]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_a2l_ref_refuses_the_flow
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_flow_file_refused
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_run_flow_over_nul_ref_is_a_block_error
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_template_refuses_the_set
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_input_ref_refuses_the_set
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_p50_manifest_guard_refuses_nul_entry
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_p50_bound_lane_input_is_a_block_error
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_manifest_nul_entry_skipped_others_kept
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_flow_json]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_chain_set]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_18_waiting_and_crc_tokens_declared_apart
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_service_constants_carry_no_spanish
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_pause_summary_in_english[terminal-command]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_pause_summary_in_english[manual-instruction]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_confirm_and_refusal_lines_in_english
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_funnel_notice_in_english
+24 failed, 2 passed in 0.69s

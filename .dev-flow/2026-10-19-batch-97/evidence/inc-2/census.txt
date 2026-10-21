@@ -1,0 +1,83 @@
+# Inc-2 reverse census — 2026-10-20 — tree: HEAD d5d0ff9 + Inc-2 working changes
+
+## B1a — the 11 Spanish service values (ES_48_9C7BEAF scope flow_execution_service), reverse grep over tests/ BEFORE the pin rewrite (recorded from the base tree via git show)
+--- esperando humano
+tests/test_flow_external_step_b96.py:8:("esperando humano") and skips every downstream block, WITH one it validates
+tests/test_flow_external_step_b96.py:253:    LOG + SALIDA ("esperando humano"), the flow status is ``paused`` (NOT
+tests/test_flow_external_step_b96.py:265:    assert "esperando humano" in ext_result.summary
+tests/test_flow_external_step_b96.py:509:    assert "esperando humano" in log_text.lower() or "ESPERANDO HUMANO" in log_text
+--- pendientes
+tests/test_flow_external_step_b96.py:266:    assert ext_result.summary.count("pendientes") == 1
+--- salida copiada
+tests/test_flow_external_step_b96.py:302:    assert "salida copiada" in ext_result.summary
+--- constancia
+tests/test_flow_external_step_b96.py:108:            log_ref="constancia.txt",
+tests/test_flow_external_step_b96.py:320:    does not exist refuses the step (``error`` — the named constancia
+tests/test_flow_external_step_b96.py:333:    assert any("constancia" in line for line in outcome.block_results[1].diagnostics)
+tests/test_flow_external_step_b96.py:397:            app.query_one("#flow_ext_log", Input).value = "constancia.txt"
+tests/test_flow_funnel_b96.py:350:                log_ref="constancia.txt",
+--- correr el paso externo
+tests/test_flow_external_step_b96.py:345:        "correr el paso externo" in line
+--- no declarada
+--- placeholder queda
+--- comando
+--- instruccion
+--- SALIDA
+tests/test_flow_external_step_b96.py:253:    LOG + SALIDA ("esperando humano"), the flow status is ``paused`` (NOT
+--- (sesion)
+--- recibido
+
+## B1a' — same greps on the Inc-2 working tree (after the rewrite)
+--- esperando humano
+tests/test_flow_external_step_b96.py:8:("esperando humano") and skips every downstream block, WITH one it validates
+tests/test_flow_external_step_b96.py:512:    assert "esperando humano" in log_text.lower() or "ESPERANDO HUMANO" in log_text
+--- pendientes
+--- salida copiada
+--- constancia
+tests/test_flow_external_step_b96.py:108:            log_ref="constancia.txt",
+tests/test_flow_external_step_b96.py:400:            app.query_one("#flow_ext_log", Input).value = "constancia.txt"
+tests/test_flow_funnel_b96.py:350:                log_ref="constancia.txt",
+--- correr el paso externo
+tests/test_b97_flow_execution.py:140:    ``"salida '…' no existe - correr el paso externo antes de confirmar"`` → RED.
+--- no declarada
+tests/test_b97_flow_execution.py:176:    Reddening mutation: the notice reverted to ``"… no declarada en el flow —
+--- recibido
+
+## B1b — symbols whose behaviour changed (NUL arms, stat guards, codes, tokens) asserted elsewhere in tests/
+--- FLOW-UNSAFE-REF: tests/test_b97_flow_builder.py 
+--- FLOW_UNSAFE_REF: tests/test_b97_flow_builder.py tests/test_changes_symbol_entries.py tests/test_flow_a2b_b94.py tests/test_flow_persistence.py 
+--- CHAIN-SET-UNSAFE-REF: tests/test_b97_flow_builder.py 
+--- CHAIN_SET_UNSAFE_REF: tests/test_b97_flow_builder.py tests/test_flow_chainset_b94.py 
+--- MANIFEST-PATH-ESCAPE: tests/test_b97_flow_builder.py tests/test_changes_symbol_entries.py tests/test_flow_a2b_b94.py tests/test_flow_chainset_b94.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_variant_execution.py 
+--- MANIFEST_PATH_ESCAPE: tests/test_b97_flow_builder.py tests/test_changes_symbol_entries.py tests/test_flow_multi_image.py tests/test_flow_persistence.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_variant_execution.py 
+--- _is_plain_template_stem: tests/test_b97_flow_builder.py 
+--- _resolve_manifest_entry: tests/test_b97_flow_builder.py tests/test_manifest_writer.py 
+--- file unreadable: 
+--- x00: tests/b97_fixtures.py tests/conftest.py tests/test_a2l_enriched.py tests/test_a2l_record_layout_length.py tests/test_a2l_record_layout_walker.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_changes_linkage.py tests/test_changes_schema.py tests/test_changes_symbol_entries.py tests/test_checks_engine.py tests/test_compare_engine.py tests/test_compare_service.py tests/test_crc_config.py tests/test_crc_designer_model.py tests/test_crc_designer_view.py tests/test_crc_engine.py tests/test_crc_job_upconvert.py tests/test_crc_kernel.py tests/test_crc_operation.py tests/test_crc_template_loader.py tests/test_crc_word_codec.py tests/test_diff_report_service.py tests/test_entropy_service.py tests/test_flow_a2b_b94.py tests/test_flow_builder_render.py tests/test_hex_emit.py tests/test_hexfile.py tests/test_linkage_soundness.py tests/test_memory_changelist.py tests/test_memory_display.py tests/test_operations.py tests/test_report_addendum_bound.py tests/test_report_filter.py tests/test_report_markup_safety.py tests/test_report_service.py tests/test_report_symbol_escape.py tests/test_segment_ops.py tests/test_segment_split_window.py tests/test_tui_a2l.py tests/test_tui_a2l_detail.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_app.py tests/test_tui_check_chain_b94.py tests/test_tui_check_editor.py tests/test_tui_checks_screen.py tests/test_tui_checks_view.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_goto_marker.py tests/test_tui_helpers.py tests/test_tui_hexview.py tests/test_tui_hexview_classed.py tests/test_tui_hostile_map.py tests/test_tui_map_big.py tests/test_tui_map_wrap.py tests/test_tui_operations_view.py tests/test_tui_patch_big.py tests/test_tui_patch_card.py tests/test_tui_patch_checks_strip.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_glyphs.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_search_pagination.py tests/test_tui_workspace.py tests/test_tui_workspace_insight.py tests/test_validation_service_supplemental.py 
+--- WAITING_HUMAN: tests/test_b97_flow_builder.py tests/test_tui_patch_json.py 
+--- CRC_FAMILY: tests/test_b97_flow_builder.py tests/test_tui_patch_json.py 
+--- e8ad3d: tests/test_b97_flow_builder.py tests/test_tui_patch_json.py 
+--- c9562b: tests/test_b97_flow_builder.py tests/test_tui_patch_json.py 
+
+## B3 — golden captures holding a service string
+--- esperando: 0 files
+--- pendientes: 0 files
+--- copiada: 0 files
+--- sesion: 0 files
+--- positive control: grep -rl 'ESPERANDO' tests/__snapshots__ → 0 files
+
+## A3 — source consumers of the changed service strings / guard outside the owning modules
+s19_app/tui/flow_screens.py:223:    BLOCK_STATUS_WAITING: "□",   # □ waiting (esperando humano)
+s19_app/tui/flow_screens.py:740:            placeholder="LOG — obligatorio (texto de constancia)",
+s19_app/tui/flow_screens.py:1431:                "constancia, nunca opcional)."
+s19_app/tui/flow_screens.py:2280:                "⚠ SALIDA sin confirmar - esperando humano"[: _FX_LANE_W - 4],
+s19_app/tui/flow_screens.py:2389:            if block_result.summary.endswith("unresolved"):
+s19_app/tui/services/flow_model.py:65:#: (absolute path preferred). The run PAUSES ("esperando humano") until the
+s19_app/tui/services/flow_model.py:107:#: ("esperando humano") and every downstream block is skipped.
+s19_app/tui/services/flow_model.py:484:    definition). The execution PAUSES here ("esperando humano") until the
+s19_app/tui/services/flow_model.py:593:            a confirmation PAUSES the run ("esperando humano"); WITH one the
+
+## hex sweep guard (test_tui_patch_json.py tc079_5c): literals added to s19_app/
+s19_app/tui/insight_style.py:126:WAITING_HUMAN = "#e8ad3d"
+s19_app/tui/insight_style.py:131:CRC_FAMILY = "#c9562b"
+--- positive control (probe reads the captures): grep -rl 'S19' tests/__snapshots__ → 10 files

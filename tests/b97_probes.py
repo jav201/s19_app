@@ -49,3 +49,34 @@ def last_status(app) -> str:
 def chip_label(chip: OpenFolderChip) -> str:
     """The chip's painted label as plain text."""
     return str(chip.label)
+
+
+def string_constants(source: str, scope: Optional[str] = None) -> list:
+    """The string constants of ``source`` — docstrings excluded.
+
+    ``scope`` limits the walk to one top-level ``ClassDef`` by name (keyed on
+    the node, never on line spans); ``None`` walks the whole module. f-string
+    literal parts are constants too (``JoinedStr`` children), so a Spanish
+    fragment inside an f-string is counted.
+    """
+    import ast
+
+    tree = ast.parse(source)
+    root = tree
+    if scope is not None:
+        matches = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == scope]
+        assert len(matches) == 1, f"scope {scope!r} found {len(matches)} times"
+        root = matches[0]
+    docstrings = set()
+    for node in ast.walk(root):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            body = node.body
+            if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant):
+                docstrings.add(id(body[0].value))
+    return [
+        node.value
+        for node in ast.walk(root)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and id(node) not in docstrings
+    ]

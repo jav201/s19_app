@@ -1,0 +1,33 @@
+# Key-bar fold (LED-2026-10-19-batch-97.9) -- premise probes P-61..P-68
+# Executed 2026-10-20 on HEAD d5d0ff9 (s19_app/tui/app.py and window_help.py unmodified in the working tree),
+# Python 3.11 (s19env), Textual 8.2.8. Static reads + one class-level probe; no app run, no pytest.
+
+## P-61 / P-62 / P-64 / P-65 -- class-level probe (stdin script)
+#   from s19_app.tui.app import S19TuiApp; from s19_app.tui.window_help import WindowSection, WINDOW_HELP_SECTIONS
+period key_display: None
+check_action in S19TuiApp.__dict__: False
+WindowSection ? : [('question_mark', False)]
+help sections: ['a2l', 'changes_file_notation', 'checks', 'crc_designer', 'flow', 'map', 'patch', 'reports', 'split_join_export', 'workspace']
+has key table attr: ['SHIPPED_WINDOW_KEYS']
+shown bindings: ['ctrl+k', 'ctrl+d', 'ctrl+l', 'ctrl+s', 'slash', 'g', 'q', 'x', 'k', 'question_mark', 'plus', 'minus', 'comma', 'period']
+display period: period          # textual App.get_key_display(Binding("period", ...))
+COMMAND_PALETTE_BINDING ctrl+p True
+
+## P-63 -- the paging guards (source reads)
+app.py:1832-1836  _active_view_name: "alt" if #screen_a2l visible, "mac" if #screen_mac visible, else "main"
+app.py:7562-7566  action_page_next_context: acts only when active == "alt" or "mac"  (page_prev_context mirrors it)
+app.py:7678-7679  action_hex_page_next: `if self._active_view_name() != "main": return` -- so on Patch / Check / Flow / Execution
+                  (all "main") it advances _hex_window_start of the HIDDEN workspace hex view (hex_page_prev mirrors it)
+
+## P-66 -- Textual Footer internals (site-packages/textual, 8.2.8)
+widgets/_footer.py:133-137  FooterKey.on_mouse_down: bell if disabled, else self.app.simulate_key(self.key)
+screen.py:473-481           active_bindings: action_state False -> binding omitted (not shown); None -> shown disabled
+
+## P-67 -- painted footer at 118x54 (prototype round, real Windows Terminal capture, text from the SVG export)
+prototypes/keybar/keybar.html "Painted rows, hex viewer":
+baseline  ^k Palette ^d Density ^l Load ^s Save / Find q Quit x Operations + Page+ - Page- , Hex- perio▏^p palette
+          (no `? Help`, no `g Go-to`, no `k Legend`; the focus sits inside a WindowSection)
+
+## P-68 -- vertical cost (prototype round, headless measure)
+prototypes/keybar/measure.txt: container_rows 42 (baseline) -> 41 (variant A) on workspace, patch, check_editor, flow,
+flow_execution at 118x54; hex_scroll 32 -> 31, patch_editor_panel 40 -> 39, check_param_table 40 -> 39, flow_panel 40 -> 39

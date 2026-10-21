@@ -1,0 +1,42 @@
+{
+  "round": "keybar (U-17)",
+  "date": "2026-10-21T02:22:33.359Z",
+  "variants": {
+    "A": {
+      "choice": "accept",
+      "notes": ""
+    },
+    "B": {
+      "choice": "no opinion",
+      "notes": ""
+    },
+    "C": {
+      "choice": "no opinion",
+      "notes": ""
+    }
+  },
+  "per_screen": {
+    "hex-viewer": {
+      "screen": "Workspace · hex viewer",
+      "objection": ""
+    },
+    "patch-editor": {
+      "screen": "Patch Editor",
+      "objection": ""
+    },
+    "check-editor": {
+      "screen": "Check Editor",
+      "objection": ""
+    },
+    "flow-builder": {
+      "screen": "Flow Builder",
+      "objection": ""
+    },
+    "flow-execution": {
+      "screen": "Flow Execution",
+      "objection": ""
+    }
+  },
+  "preferred": "A · Two rows",
+  "general_notes": "Las pantallas de check, patch y flow builder están horribles. Aún no están implementadas los nuevos prototipos? siguen en progreso?"
+}

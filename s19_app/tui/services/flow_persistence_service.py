@@ -30,7 +30,11 @@ Finding taxonomy (OQ-1, §6.2 — mixed and honest):
   project on a different drive escapes the work area; a backslash traversal
   reads as one in-project literal on a POSIX host, so the guard's
   ``resolve()`` containment arm misses it. Both rejected loader-side
-  WITHOUT forking the guard (AMD-11/F4).
+  WITHOUT forking the guard (AMD-11/F4). A NUL character in any path-bearing
+  block field is the same kind of shape reject (batch-97 LLR-146.14): it is
+  refused here with ``FLOW-UNSAFE-REF`` before the guard (whose ``resolve()``
+  would raise) and before the output-name shape check; a chain-set template
+  or input ref carrying one gets ``CHAIN-SET-UNSAFE-REF``.
 """
 
 from __future__ import annotations
@@ -537,6 +541,15 @@ def dict_to_flow(
                     )
                 )
                 continue
+            if "\x00" in ref:
+                findings.append(
+                    _finding(
+                        FLOW_UNSAFE_REF,
+                        f"{label} ({kind}) {ref_field} {ref!r} carries a NUL "
+                        "character - not a path",
+                    )
+                )
+                continue
 
         enum_ok = True
         for field_name, allowed in enum_fields.items():
@@ -581,6 +594,15 @@ def dict_to_flow(
                         FLOW_BAD_FIELD,
                         f"{label} ({kind}) field 'a2l_ref' is not a non-empty "
                         "string",
+                    )
+                )
+                continue
+            if "\x00" in a2l_ref:
+                findings.append(
+                    _finding(
+                        FLOW_UNSAFE_REF,
+                        f"{label} ({kind}) a2l_ref {a2l_ref!r} carries a NUL "
+                        "character - not a path",
                     )
                 )
                 continue
@@ -724,6 +746,15 @@ def _parse_a2b_entry(
             )
             return None
         ref = ref.strip()
+        if "\x00" in ref:
+            findings.append(
+                _finding(
+                    FLOW_UNSAFE_REF,
+                    f"{label} (a2b) {field}.ref {ref!r} carries a NUL "
+                    "character - not a path",
+                )
+            )
+            return None
         if source == A2B_INPUT_FILE:
             # The binding ref is WIRE text and the operator file grammar is
             # Windows-shaped, so normalize its separators to '/' BEFORE the
@@ -826,6 +857,15 @@ def _parse_external_step_entry(
             )
         )
         return None
+    if "\x00" in log_ref:
+        findings.append(
+            _finding(
+                FLOW_UNSAFE_REF,
+                f"{label} (external_step) log_ref {log_ref!r} carries a NUL "
+                "character - not a path",
+            )
+        )
+        return None
     output_path = entry.get("output_path")
     if not isinstance(output_path, str) or not output_path.strip():
         findings.append(
@@ -837,6 +877,15 @@ def _parse_external_step_entry(
         )
         return None
     output_path = output_path.strip()
+    if "\x00" in output_path:
+        findings.append(
+            _finding(
+                FLOW_UNSAFE_REF,
+                f"{label} (external_step) output_path {output_path!r} carries "
+                "a NUL character - not a path",
+            )
+        )
+        return None
     if not Path(output_path).is_absolute():
         # Relative output paths are accepted but must be plain names — the
         # same WRITE-target shape pre-check as V7 (no traversal, not
@@ -902,7 +951,7 @@ def load_flow_json(
     findings: List[ValidationIssue] = []
     try:
         size = flow_path.stat().st_size
-    except OSError as exc:
+    except (OSError, ValueError) as exc:
         findings.append(_finding(FLOW_JSON_PARSE, f"flow file unreadable: {type(exc).__name__}"))
         return None, findings
     if size > FLOW_SIZE_CAP_BYTES:
@@ -1149,11 +1198,12 @@ def _is_plain_template_stem(ref: str) -> bool:
 
     A template ref names a file inside ``flows/`` — the same WRITE-target
     shape pre-check as the flow loader's V7 (no separators, no traversal, not
-    absolute, not drive-relative, not hidden) so a set can never point its
+    absolute, not drive-relative, not hidden, no NUL) so a set can never point its
     chains at a template outside the work area.
     """
     return not (
-        "/" in ref
+        "\x00" in ref
+        or "/" in ref
         or "\\" in ref
         or ".." in ref
         or Path(ref).is_absolute()
@@ -1320,7 +1370,7 @@ def dict_to_chain_set(
                 _chain_set_finding(
                     CHAIN_SET_UNSAFE_REF,
                     f"{label}.template {template!r} must be a plain flows/ file name "
-                    "(no separators, no traversal, not absolute)",
+                    "(no separators, no traversal, not absolute, no NUL)",
                 )
             )
             continue
@@ -1360,6 +1410,16 @@ def dict_to_chain_set(
                 input_ok = False
                 break
             ref = pair[1].strip()
+            if "\x00" in ref:
+                findings.append(
+                    _chain_set_finding(
+                        CHAIN_SET_UNSAFE_REF,
+                        f"{label}.inputs ref {ref!r} carries a NUL character "
+                        "- not a path",
+                    )
+                )
+                input_ok = False
+                break
             if _is_drive_relative(ref):
                 findings.append(
                     _chain_set_finding(
@@ -1462,7 +1522,7 @@ def load_chain_set(
     findings: List[ValidationIssue] = []
     try:
         size = set_path.stat().st_size
-    except OSError as exc:
+    except (OSError, ValueError) as exc:
         findings.append(
             _chain_set_finding(
                 CHAIN_SET_JSON_PARSE, f"chain-set file unreadable: {type(exc).__name__}"
