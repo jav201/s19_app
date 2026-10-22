@@ -1,0 +1,29 @@
+# GATE set on the Inc-5 tree
+d66ad15479f566586141e0fd4863f5277798614a37b4f0ffdd18a4dd011f065b *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa *s19_app/tui/styles.tcss
+5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd *s19_app/tui/window_help.py
+........................................................................ [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+........................................................................ [ 69%]
+..........F............................................................. [ 83%]
+................................F..........xxxxxxxxxxxxxxxxxxxxxxxxxxxxx [ 97%]
+...............                                                          [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_legend.py:276: AssertionError: issues_legend_button clipped at 80 cols: right=0, screen=80
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:736: AssertionError: got '40.0K /'
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=4947437;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_legend.py::test_at023e_c13_geometry_at_80_cols - Assert...
+FAILED tests/test_tui_patch_json.py::test_at079a_gauge_tracks_buffer - Assert...
+2 failed, 488 passed, 29 xfailed in 1698.66s (0:28:18)
+exit=1

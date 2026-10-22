@@ -1,0 +1,19 @@
+== run 1
+...                                                                      [100%]
+3 passed in 7.01s
+== run 2
+...                                                                      [100%]
+3 passed in 6.84s
+== run 3
+NoMatches: No nodes match '#log_line_1' on Screen(id='_default')
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+1 failed, 2 passed in 8.37s
+== run 4
+...                                                                      [100%]
+3 passed in 7.23s
+== run 5
+tests\test_tui_patch_editor_v2.py:638: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+1 failed, 2 passed in 6.75s

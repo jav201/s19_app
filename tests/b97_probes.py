@@ -2,7 +2,7 @@
 
 Inc-1 adds the open-folder chip helpers; Inc-3 adds the painted-surface
 predicates (``painted_rows``, ``chip_style``, ``clipped_overflow``,
-``blank_panel_rows``); ``span_colours`` arrives with Inc-5 (PC-7).
+``blank_panel_rows``); Inc-5 adds ``span_colours`` (PC-7) and ``settled``.
 Every probe reads the shipped surface: the chip widget itself and the app's
 status line (``S19TuiApp.log_lines``, the buffer ``#status_log`` paints).
 """
@@ -45,6 +45,25 @@ async def mount_chip(
 def last_status(app) -> str:
     """The newest status line the app painted."""
     return app.log_lines[-1] if app.log_lines else ""
+
+
+def record_statuses(monkeypatch) -> list:
+    """Record every status line any ``S19TuiApp`` writes, in order.
+
+    ``app.log_lines`` is a ``deque(maxlen=4)``, so a count or slice over it
+    loses lines; this wraps ``S19TuiApp.set_status`` for the test's duration.
+    """
+    from s19_app.tui.app import S19TuiApp
+
+    seen: list = []
+    original = S19TuiApp.set_status
+
+    def recording(self, message: str) -> None:
+        seen.append(message)
+        original(self, message)
+
+    monkeypatch.setattr(S19TuiApp, "set_status", recording)
+    return seen
 
 
 def chip_label(chip: OpenFolderChip) -> str:
@@ -190,3 +209,115 @@ def string_constants(source: str, scope: Optional[str] = None) -> list:
         and isinstance(node.value, str)
         and id(node) not in docstrings
     ]
+
+
+# --------------------------------------------------------------------------- #
+# Inc-5: span_colours (PC-7, LED-2026-10-19-batch-97.22) — a colour claim is
+# asserted on what the terminal paints (the compositor strips), never on hex
+# equality and never on ``render().spans`` alone: a CSS rule, a TCSS variable
+# and a ``text-opacity`` blend reach the strips with 0 spans, and Textual 8's
+# ``Static.render()`` returns ``textual.content.Content``, not ``rich.Text``.
+# --------------------------------------------------------------------------- #
+
+from dataclasses import dataclass as _dataclass
+
+#: Two hues closer than this (degrees) are the same colour claim. The CRC and
+#: waiting tokens lie 23.0 degrees apart, so the window keeps them disjoint.
+HUE_TOLERANCE = 4.0
+#: Below this HSV saturation a hue is noise (greys such as DGRAY), never a match.
+MIN_SATURATION = 0.30
+
+
+@_dataclass(frozen=True)
+class ColourRun:
+    """One coloured run: ``source`` is ``"strip"`` (painted cells, ``x``/``y``
+    the screen column and row) or ``"span"`` (a span of ``widget.render()``,
+    ``x`` its character offset, ``y`` -1); colours are ``#rrggbb`` or ``None``."""
+
+    source: str
+    text: str
+    fg: Optional[str]
+    bg: Optional[str]
+    bold: bool
+    x: int = -1
+    y: int = -1
+
+
+def _colour_hex(color) -> Optional[str]:
+    if color is None:
+        return None
+    triplet = color.get_truecolor() if hasattr(color, "get_truecolor") else None
+    return triplet.hex if triplet is not None else None
+
+
+def _hsv(hex_color: str):
+    import colorsys
+
+    r, g, b = (int(hex_color[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    return colorsys.rgb_to_hsv(r, g, b)
+
+
+def hue_distance(a: str, b: str) -> float:
+    """Circular hue distance in degrees between two ``#rrggbb`` colours."""
+    d = abs(_hsv(a)[0] - _hsv(b)[0]) * 360.0 % 360.0
+    return min(d, 360.0 - d)
+
+
+def hue_matches(hex_color: Optional[str], target: str, tol: float = HUE_TOLERANCE) -> bool:
+    """``hex_color`` is saturated enough to carry a hue and lies within ``tol``."""
+    return bool(hex_color) and _hsv(hex_color)[1] >= MIN_SATURATION and hue_distance(hex_color, target) <= tol
+
+
+def span_colours(app, widget, region=None) -> list:
+    """Every coloured run painted over ``widget`` (design-proposal §5.1).
+
+    (1) one ``"strip"`` run per non-blank segment of the compositor strips
+    cropped to the widget region — the colour the terminal paints, CSS rules,
+    TCSS variables and opacity blends included; then (2) one ``"span"`` run per
+    span of ``widget.render()`` when that is a ``Content`` or a ``rich.Text``
+    (a ``str`` style parsed with ``rich.style.Style.parse``, a Textual
+    ``Style`` through ``.rich_style``). Colour claims read the strip runs; the
+    span runs serve the C-37 origin checks.
+    """
+    from rich.style import Style as RichStyle
+    from rich.text import Text
+    from textual.content import Content
+
+    runs = []
+    strips = app.screen._compositor.render_strips()
+    region = widget.region if region is None else region
+    for y in range(region.y, min(region.y + region.height, len(strips))):
+        x = region.x
+        for segment in strips[y].crop(region.x, region.x + region.width):
+            if segment.text and segment.text.strip() and segment.style is not None:
+                runs.append(ColourRun(
+                    "strip", segment.text, _colour_hex(segment.style.color),
+                    _colour_hex(segment.style.bgcolor), bool(segment.style.bold), x, y,
+                ))
+            x += segment.cell_length
+    rendered = widget.render()
+    if isinstance(rendered, (Text, Content)):
+        plain = rendered.plain
+        for span in rendered.spans:
+            style = span.style
+            if isinstance(style, str):
+                style = RichStyle.parse(style)
+            elif not isinstance(style, RichStyle):
+                style = getattr(style, "rich_style", None) or RichStyle()
+            runs.append(ColourRun(
+                "span", plain[span.start:span.end], _colour_hex(style.color),
+                _colour_hex(style.bgcolor), bool(style.bold), span.start,
+            ))
+    return runs
+
+
+async def settled(pilot, predicate, description: str, attempts: int = 60) -> None:
+    """Bounded pump-until (the ``_settled`` idiom of
+    ``tests/test_tui_patch_editor_v2.py``): ``pilot.pause()`` until
+    ``predicate()`` holds, then fail loudly with ``description``. Never one
+    fixed pause before an assertion that waits for a render."""
+    for _ in range(attempts):
+        await pilot.pause()
+        if predicate():
+            return
+    raise AssertionError(f"did not settle: {description}")

@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 24897a50957146ed -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: c3c14b8c994dbaba -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1733 unique id(s)
+## family US/HLR/LLR — 1734 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2661,17 +2661,18 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-142.2` | batches, canon, tests |
 | `LLR-143.1` | batches, canon, tests |
 | `LLR-143.2` | batches, canon, tests |
-| `LLR-144.1` | batches |
+| `LLR-144.1` | batches, tests |
+| `LLR-144.1..144.12` | tests |
 | `LLR-144.10` | batches, tests |
-| `LLR-144.11` | batches |
-| `LLR-144.12` | batches |
-| `LLR-144.2` | batches |
-| `LLR-144.3` | batches |
-| `LLR-144.4` | batches |
-| `LLR-144.5` | batches |
-| `LLR-144.6` | batches |
-| `LLR-144.7` | batches |
-| `LLR-144.8` | batches |
+| `LLR-144.11` | batches, tests |
+| `LLR-144.12` | batches, tests |
+| `LLR-144.2` | batches, tests |
+| `LLR-144.3` | batches, tests |
+| `LLR-144.4` | batches, tests |
+| `LLR-144.5` | batches, tests |
+| `LLR-144.6` | batches, tests |
+| `LLR-144.7` | batches, tests |
+| `LLR-144.8` | batches, tests |
 | `LLR-144.9` | batches, tests |
 | `LLR-145` | batches |
 | `LLR-145.1` | batches, tests |
@@ -2685,20 +2686,20 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-145.7` | batches, tests |
 | `LLR-145.8` | batches, tests |
 | `LLR-145.9` | batches, tests |
-| `LLR-146.1` | batches |
-| `LLR-146.10` | batches |
-| `LLR-146.11` | batches |
-| `LLR-146.12` | batches |
-| `LLR-146.13` | batches |
+| `LLR-146.1` | batches, tests |
+| `LLR-146.10` | batches, tests |
+| `LLR-146.11` | batches, tests |
+| `LLR-146.12` | batches, tests |
+| `LLR-146.13` | batches, tests |
 | `LLR-146.14` | batches, tests |
-| `LLR-146.2` | batches |
-| `LLR-146.3` | batches |
-| `LLR-146.4` | batches |
-| `LLR-146.5` | batches |
+| `LLR-146.2` | batches, tests |
+| `LLR-146.3` | batches, tests |
+| `LLR-146.4` | batches, tests |
+| `LLR-146.5` | batches, tests |
 | `LLR-146.6` | batches, tests |
-| `LLR-146.7` | batches |
-| `LLR-146.8` | batches |
-| `LLR-146.9` | batches |
+| `LLR-146.7` | batches, tests |
+| `LLR-146.8` | batches, tests |
+| `LLR-146.9` | batches, tests |
 | `LLR-147.1` | batches |
 | `LLR-147.10` | batches |
 | `LLR-147.11` | batches |
@@ -4105,14 +4106,14 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B94-22` | batches, tests |
 | `AT-B94-23` | batches, tests |
 | `AT-B94-24` | batches, tests |
-| `AT-B97-01` | batches |
-| `AT-B97-02` | batches |
-| `AT-B97-03` | batches |
+| `AT-B97-01` | batches, tests |
+| `AT-B97-02` | batches, tests |
+| `AT-B97-03` | batches, tests |
 | `AT-B97-04` | batches, tests |
 | `AT-B97-05` | batches, tests |
-| `AT-B97-06` | batches |
-| `AT-B97-07` | batches |
-| `AT-B97-08` | batches |
+| `AT-B97-06` | batches, tests |
+| `AT-B97-07` | batches, tests |
+| `AT-B97-08` | batches, tests |
 | `AT-B97-09` | batches |
 | `AT-B97-10` | batches |
 | `AT-B97-11` | batches |
@@ -4121,9 +4122,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B97-14` | batches |
 | `AT-B97-15` | batches |
 | `AT-B97-16` | batches |
-| `AT-B97-17` | batches |
+| `AT-B97-17` | batches, tests |
 | `AT-B97-18` | batches, tests |
-| `AT-B97-19` | batches |
+| `AT-B97-19` | batches, tests |
 | `AT-B97-20` | batches |
 | `AT-B97-21` | batches, tests |
 | `AT-B97-22` | batches |
@@ -5149,26 +5150,26 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B94-29` | batches, tests |
 | `TC-B94-30` | batches, tests |
 | `TC-B94-31` | batches, tests |
-| `TC-B97-01` | batches |
-| `TC-B97-02` | batches |
-| `TC-B97-03` | batches |
+| `TC-B97-01` | batches, tests |
+| `TC-B97-02` | batches, tests |
+| `TC-B97-03` | batches, tests |
 | `TC-B97-04` | batches, tests |
-| `TC-B97-05` | batches |
-| `TC-B97-06` | batches |
-| `TC-B97-07` | batches |
+| `TC-B97-05` | batches, tests |
+| `TC-B97-06` | batches, tests |
+| `TC-B97-07` | batches, tests |
 | `TC-B97-08` | batches, tests |
 | `TC-B97-09` | batches, tests |
 | `TC-B97-10` | batches, tests |
 | `TC-B97-11` | batches, tests |
 | `TC-B97-12` | batches, tests |
-| `TC-B97-13` | batches |
-| `TC-B97-14` | batches |
-| `TC-B97-15` | batches |
-| `TC-B97-16` | batches |
-| `TC-B97-17` | batches |
+| `TC-B97-13` | batches, tests |
+| `TC-B97-14` | batches, tests |
+| `TC-B97-15` | batches, tests |
+| `TC-B97-16` | batches, tests |
+| `TC-B97-17` | batches, tests |
 | `TC-B97-18` | batches, tests |
-| `TC-B97-19` | batches |
-| `TC-B97-20` | batches |
+| `TC-B97-19` | batches, tests |
+| `TC-B97-20` | batches, tests |
 | `TC-B97-21` | batches, tests |
 | `TC-B97-22` | batches |
 | `TC-B97-23` | batches |
@@ -5187,19 +5188,19 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B97-36` | batches, tests |
 | `TC-B97-37` | batches, tests |
 | `TC-B97-38` | batches, tests |
-| `TC-B97-39` | batches |
-| `TC-B97-40` | batches |
-| `TC-B97-41` | batches |
-| `TC-B97-42` | batches |
+| `TC-B97-39` | batches, tests |
+| `TC-B97-40` | batches, tests |
+| `TC-B97-41` | batches, tests |
+| `TC-B97-42` | batches, tests |
 | `TC-B97-43` | batches, tests |
 | `TC-B97-44` | batches, tests |
 | `TC-B97-45` | batches, tests |
 | `TC-B97-46` | batches, tests |
-| `TC-B97-47` | batches |
-| `TC-B97-48` | batches |
-| `TC-B97-49` | batches |
-| `TC-B97-50` | batches |
-| `TC-B97-51` | batches |
+| `TC-B97-47` | batches, tests |
+| `TC-B97-48` | batches, tests |
+| `TC-B97-49` | batches, tests |
+| `TC-B97-50` | batches, tests |
+| `TC-B97-51` | batches, tests |
 | `TC-B97-52` | batches |
 | `TC-B97-53` | batches |
 | `TC-B97-54` | batches |
@@ -5208,7 +5209,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B97-57` | batches, tests |
 | `TC-B97-58` | batches, tests |
 | `TC-B97-59` | batches, tests |
-| `TC-B97-60` | batches |
+| `TC-B97-60` | batches, tests |
 | `TC-B97-61` | batches, tests |
 | `TC-B97-62` | batches, tests |
 | `TC-B97-63` | batches |

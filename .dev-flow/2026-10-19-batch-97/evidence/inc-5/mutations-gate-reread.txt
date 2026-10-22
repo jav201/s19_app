@@ -1,0 +1,9 @@
+# Inc-5 gate re-read (2026-10-22), orchestrator: ux L-a clear calls in FlowBuilderPanel.on_button_pressed
+# restore proven: flow_screens.py sha256 0e1f00310bee5f68513585892d49fd862e4f91ade350b248b94a5cf7af51b390 before and after
+== mutant M54 palette branch clear -> pass
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[kind change]
+1 failed, 1 passed, 66 deselected in 7.59s
+== mutant M55 run branch clear -> pass
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[Run]
+1 failed, 1 passed, 66 deselected in 12.20s
+# GREEN on the final source: tests/test_b97_flow_builder.py -k tc_b97_58 -> 5 passed; tests/test_b97_width.py -k spare_cells (card_w==21 no longer skipped, code L1) -> 5 passed

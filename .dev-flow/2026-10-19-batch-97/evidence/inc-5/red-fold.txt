@@ -1,0 +1,123 @@
+# RED-fold: the gate-fold test edits on the PRE-FOLD source (unchanged since the Inc-5 packet)
+7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa *s19_app/tui/styles.tcss
+5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd *s19_app/tui/window_help.py
+6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 *s19_app/tui/open_folder_chip.py
+.FFFFF.F.F.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFF.                  [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:842: AttributeError: 'PipelineLayout' object has no attribute 'spare'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((163, 56), 3, 1)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((223, 60), 3, 1)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'before_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'before_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'before_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'after_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 53), 'after_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((220, 60), 'after_run', [], [17, 19, 20])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:270: TypeError: sequence index must be integer, not 'slice'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:321: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:695: TypeError: sequence index must be integer, not 'slice'
+C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:490: TypeError: sequence index must be integer, not 'slice'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1033: AssertionError: Flow: demo  ✓  LOAD → PATCH                                                               session C:/w/proj1
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1068: AssertionError:  Flow: patch_chain  ✓  LOAD → PATCH → CHECK → WRITE-OUT            session …n_paints_s0\.s19tool\workarea\proj1
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] source image_ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] patch change_doc_ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] check check_doc_ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] crc config_ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_a.ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] a2b image_b.ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step log_ref carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1394: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] external_step output_path carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1537: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output_name carries a NUL character - not a path']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1162: AssertionError:   ISSUES
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError:   ISSUES
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:145: AssertionError: assert ('· saved' in 'Flow: flow  ✓                              session (no active project)')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:321: AssertionError: assert '· unsaved' in 'Flow: flow  ●  LOAD                        session (no active project)'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:423: AssertionError: assert ('· saved' in 'Flow: other  ✓  LOAD                       session (no active project)')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:319: AssertionError: assert ('chain1' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)' and '· saved' in 'Flow: chain1  ✓  LOAD → PATCH                                      session (no active project)')
+C:\Users\jjgh8\Github\s19_app\tests\test_flow_builder_render.py:287: AssertionError: assert 'ISSUES' == 'NOTICES'
+=========================== short test summary info ===========================
+FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[3]
+FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[4]
+FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[5]
+FAILED tests/test_b97_width.py::test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[6]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size2]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_status_line_at_startup_without_a_project
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+FAILED tests/test_open_folder_chips.py::test_tc704_reports_without_project_disabled_status_reason_zero_opens
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_saved_state_is_a_word
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[source-image file]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[check-check doc]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[write_out-output file]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[source.image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[patch.change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[check.check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[crc.config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[write_out.output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[a2b.image_a.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[a2b.image_b.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[external_step.log_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[external_step.output_path]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_50_run_requests_the_single_image_scope
+FAILED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x54]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x53]
+FAILED tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved
+FAILED tests/test_tui_flow_persistence_ui.py::test_at006_quarantine_card_painted_and_flow_unchanged
+FAILED tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+FAILED tests/test_flow_builder_render.py::test_at085a_notices_load_shows_warning_gutter
+49 failed, 6 passed in 209.79s (0:03:29)
+
+# RED-fold re-run: the 4 chip nodes after the status recorder (app.log_lines is a deque(maxlen=4); slicing it raised TypeError above) — same pre-fold source digests
+6ceb4f9bb2525e44ebe4ac2eb8ef0ba0f4389a5d67b3fe5f61689eb98cdfb558 *s19_app/tui/open_folder_chip.py
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:290: AssertionError: ('reports', ['📂 Open reports/: no active project — load a project first.'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:326: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:717: AssertionError: ['📂 Open session: no active project — load a project first.']
+C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:506: AssertionError: no status line at mount (LED-…97.24)
+=========================== short test summary info ===========================
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_no_status_line_at_startup_without_a_project
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+FAILED tests/test_open_folder_chips.py::test_tc704_reports_without_project_disabled_status_reason_zero_opens
+4 failed in 17.89s

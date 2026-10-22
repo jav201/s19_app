@@ -102,9 +102,11 @@ _EXPECTED_KEYS = frozenset(
         # and ``reports`` either — their step 6 names its folder in code
         # (F3/F4) while the draft keeps the operator's wording; both are
         # code-authored now.
+        # batch-97 Inc-5 (named supersession, D25 / LLR-148.6): ``flow`` is
+        # rewritten as a code-authored ``label — effect`` body and leaves the
+        # md-fidelity census too.
         "checks",
         "map",
-        "flow",
         "a2l",
         "workspace",
         "split_join_export",
@@ -129,8 +131,8 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
 #: fidelity census): batch-97 Inc-3 adds ``check_editor`` (D10 / D25,
 #: LLR-148.6); Inc-4 adds ``patch``, and at its gate ``crc_designer`` and
 #: ``reports`` (their step 6 names the folder; the draft is not versioned);
-#: Inc-6 adds ``flow_execution``.
-_CODE_AUTHORED_SHIPPED = frozenset({"check_editor", "patch", "crc_designer", "reports"})
+#: Inc-5 adds ``flow``; Inc-6 adds ``flow_execution``.
+_CODE_AUTHORED_SHIPPED = frozenset({"check_editor", "patch", "crc_designer", "reports", "flow"})
 
 
 async def _pilot_pause(pilot) -> None:
@@ -469,6 +471,9 @@ def test_tc706_seat_census_header_row_and_window_section(tmp_path: Path) -> None
         "checks": "open_folder_checks",
         "crc_designer": "open_folder_templates",
         "check_editor": "open_folder_checks_editor",
+        # batch-97 Inc-5 (LLR-148.5, named supersession): the Flow Builder
+        # header gains the `📂 Open flows/` chip, rightmost like the others.
+        "flow": "open_folder_flows",
     }
 
     async def _drive() -> dict:

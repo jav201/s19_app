@@ -281,7 +281,10 @@ def test_at085a_notices_load_shows_warning_gutter(tmp_path: Path) -> None:
     assert warn_gutter, "the notices LOAD node must carry sev-warning"
     assert n_findings >= 1
     assert "line" in finding_text  # the WARN message names the numeric line
-    assert banner_text == "ISSUES"  # AT-087a observation surface
+    # batch-97 named supersession (LED-2026-10-19-batch-97.27, LLR-088.5): a
+    # finished run whose blocks carry notices only reads NOTICES; ISSUES stays
+    # for a finished run with a block in error (AT-088a above).
+    assert banner_text == "NOTICES"  # AT-087a observation surface
 
 
 # ===========================================================================
@@ -363,7 +366,10 @@ def test_at088b_every_render_sink_renders_hostile_literally(tmp_path: Path) -> N
         "summary": _HOSTILE_SCRUBBED,
         "finding": _HOSTILE_SCRUBBED,
         "diagnostic": _HOSTILE_SCRUBBED,
-        "written-path": _scrub(str(hostile_path)),
+        # batch-97 named supersession (LED-2026-10-19-batch-97.25, ux M1): the
+        # written-path line reads ``wrote <path>`` on one row (tail kept when
+        # it is wider than the result area; this payload fits).
+        "written-path": "wrote " + _scrub(str(hostile_path)),
         "flow-diagnostic": _HOSTILE_SCRUBBED,
     }
     # The expectation must not be able to degenerate to "" — an empty expected

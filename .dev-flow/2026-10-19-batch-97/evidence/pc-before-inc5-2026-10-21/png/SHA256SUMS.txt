@@ -1,0 +1,2 @@
+198f4b2156a5440b0870d4ac7a9dd4cf86ac75182eb8f5519bf3dc4b0d62ec82 *glyph-ruler-wt-2.png
+c8cdf7fb823b3ab26cfaa8dc9de25f5ac3c4f96bcf305e6ae9222ef198cdbe0a *glyph-ruler-wt.png

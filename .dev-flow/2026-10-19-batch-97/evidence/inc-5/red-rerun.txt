@@ -1,0 +1,56 @@
+# RED re-run after the PC-11 reorders, source unchanged (git diff --stat -- s19_app: 0 lines)
+e028a0934ed843682febc64c0d7f331dcb953e457fb5c46b7c2c699b331cc4ea *s19_app/tui/flow_screens.py
+6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e *s19_app/tui/app.py
+478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b *s19_app/tui/styles.tcss
+cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/window_help.py
+FFFFFFFFFFFFFFFFFFFFFF.F.                                                [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL image_ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL change_doc_ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL check_doc_ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL config_ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL output_name was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL image_a.ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL image_b.ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL log_ref was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1240: AssertionError: a NUL output_path was added (1 -> 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: Run at Region(x=51, y=44, width=16, height=3) outside Region(x=5, y=4, width=112, height=40)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: Run at Region(x=51, y=44, width=16, height=3) outside Region(x=5, y=4, width=112, height=39)
+C:\Users\jjgh8\Github\s19_app\tests\b97_probes.py:304: AssertionError: did not settle: flows/patch_chain.json loaded or refused
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:861: AssertionError: no pipeline
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:946: AssertionError: [80, 26]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:946: AssertionError: [142, 88]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:946: AssertionError: [182, 128]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((118, 54), 'before_run', [5])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((118, 53), 'before_run', [5])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((220, 60), 'before_run', [5, 41])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((118, 54), 'after_run', [5])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((118, 53), 'after_run', [5])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:982: AssertionError: ((220, 60), 'after_run', [5, 41])
+C:\Users\jjgh8\Github\s19_app\tests\b97_probes.py:304: AssertionError: did not settle: flows/patch_chain.json loaded or refused
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x54]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x53]
+FAILED tests/test_b97_width.py::test_tc_b97_34_builder_painted_widths_follow_four_resizes
+FAILED tests/test_b97_width.py::test_tc_b97_34_builder_resize_while_hidden_rederives_on_show
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[before_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_59_builder_below_the_range_run_reachable[size1]
+23 failed, 2 passed, 134 deselected in 109.46s (0:01:49)
+exit=1

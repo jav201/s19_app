@@ -1,0 +1,12 @@
+# Glyph ruler — real Windows Terminal capture, Textual-painted (truecolor, NO_COLOR unset)
+# HEAD 09e44de · Textual 8.2.8 · 2026-10-21 · scripts: glyph_ruler.py / glyph_ruler2.py, captured by cap.ps1 (PrintWindow)
+# Each row: the glyph at a fixed column, then "|0123|", then the glyph x3, then "|end".
+# A glyph WT paints two cells wide covers the "|" after it (Textual counts it 1 cell).
+# Reading (by eye, at 2x zoom), png/glyph-ruler-wt.png and png/glyph-ruler-wt-2.png:
+ONE CELL (the "|" after the glyph intact, the x3 run three cells):
+  a ◉ ▣ ✓ ⊕ ▼ ⏚ » ≡ ▶ ▸ ► → ← ─ ╭ ╮ ╰ ╯ │ … · — ● ◈ ✗ ○ □ █ ░ ▓ ‥ ◆ ▪ ◇ ⊘
+TWO CELLS, coloured emoji, covering the next cell:
+  ✖ U+2716 (purple) · ⚠ U+26A0 (yellow) · ✔ U+2714 (purple) · ☑ U+2611 (purple, the Inc-3 finding) · ⏸ U+23F8 (blue)
+TWO CELLS and counted two by Textual (cell_len 2), so aligned:
+  📂 U+1F4C2
+Builder use (design-proposal D7): every glyph the Builder paints is in the ONE CELL list once ✖ -> ✗.

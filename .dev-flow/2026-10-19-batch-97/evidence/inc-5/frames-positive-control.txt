@@ -1,0 +1,10 @@
+# positive control: .flow-name-strip margin-bottom 1 -> 0 (styles.tcss), frames diffed against frames-09e44de.txt
+189d188
+<                                                                                                                 
+226a226
+>                                                                                                                 
+232d231
+<                                                                                                                                                                                                     
+241a241
+>                                                                                                                                                                                                     
+restore 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa

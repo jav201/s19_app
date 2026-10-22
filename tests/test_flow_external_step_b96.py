@@ -418,14 +418,16 @@ def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> No
     session_text = canvas_pack.rsplit("|", 1)[1]
     canvas, gates = canvas_pack.rsplit("|", 2)[0], canvas_pack.rsplit("|", 2)[1]
 
-    assert sorted(palette_kinds) == sorted(
-        [BLOCK_PATCH, BLOCK_CRC, BLOCK_A2B, BLOCK_EXTERNAL_STEP]
-    )
+    # batch-97 Inc-5 (named supersession): the palette offers every kind of
+    # ``_KIND_OPTIONS`` (LLR-146.2); the refusal is English (LLR-146.7); the
+    # session path rides the ribbon and ``#flow_ext_session`` stays mounted,
+    # hidden, in English (LLR-146.11).
+    assert palette_kinds == kind_values
     assert BLOCK_EXTERNAL_STEP in kind_values
-    assert "LOG" in notice and "rechazado" in notice
+    assert "log file is required" in notice and "refused" in notice
     assert counts == 1  # 0 kept after the refusal, 1 after the accept
     assert gates == "1"  # config row shown, plain ref hidden
-    assert "sesión:" in session_text  # the session strip is always visible
+    assert session_text.startswith("session: ")
     assert "EXT-STEP" in canvas and "TERMINAL" in canvas
 
 

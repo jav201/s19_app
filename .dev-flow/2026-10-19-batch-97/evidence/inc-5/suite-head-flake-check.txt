@@ -1,0 +1,4 @@
+# Inc-5 PC-12: non-baseline failures re-run on a clean worktree at HEAD 09e44de (scratchpad, removed afterwards), 2026-10-22
+test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine  HEAD 10 runs: 8 passed, 2 failed
+test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key                    HEAD 10 runs: 7 passed, 3 failed
+test_tui_patch_editor_v2.py::test_save_back_prompt                                  already recorded as intermittent on HEAD at Inc-4

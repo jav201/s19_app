@@ -185,3 +185,47 @@ def test_tc_b97_25_funnel_notice_in_english(tmp_path: Path) -> None:
     assert messages == [
         "funnel: ${MISSING} is not declared in the flow — the placeholder stays intact"
     ], messages
+
+
+# --------------------------------------------------------------------------- #
+# Inc-5 — TC-B97-25 module scope: the constant at flow_screens.py:235
+# --------------------------------------------------------------------------- #
+
+FLOW_SCREENS = "s19_app/tui/flow_screens.py"
+FROZEN_MODULE = [value for scope, value in ES_48_9C7BEAF if scope == "module:235"]
+
+
+def _module_level_constants(source: str) -> List[str]:
+    """String constants outside every class of ``source`` (docstrings
+    excluded): the module scope of LLR-147.5, keyed on the AST, never on line
+    numbers."""
+    import ast
+
+    tree = ast.parse(source)
+    module_only = ast.Module(
+        body=[node for node in tree.body if not isinstance(node, ast.ClassDef)], type_ignores=[]
+    )
+    return string_constants(ast.unparse(module_only))
+
+
+def test_tc_b97_25_module_constant_in_english() -> None:
+    """TC-B97-25 (LLR-147.5, module scope, Inc-5): the frozen
+    ``'PAUSED - ESPERANDO HUMANO'`` banner (``flow_screens.py:235`` on
+    ``9c7beaf``) is gone, and no module-level constant of ``flow_screens.py``
+    matches ``ES_MARKER``; the reach guard finds the frozen value on
+    ``9c7beaf`` with the same census.
+
+    RED on HEAD ``09e44de``: the banner is still Spanish. Mutation: the banner
+    reverted.
+    """
+    assert FROZEN_MODULE == ["PAUSED - ESPERANDO HUMANO"]
+    constants = _module_level_constants((REPO_ROOT / FLOW_SCREENS).read_text(encoding="utf-8"))
+    assert [v for v in FROZEN_MODULE if v in constants] == []
+    assert _spanish(constants) == [], _spanish(constants)
+    try:
+        old = subprocess.run(
+            ["git", "show", f"9c7beaf:{FLOW_SCREENS}"], cwd=REPO_ROOT, capture_output=True, check=True,
+        ).stdout.decode("utf-8")
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        pytest.skip(f"git or commit 9c7beaf unavailable — reach guard cannot run: {exc}")
+    assert _spanish(_module_level_constants(old)) == FROZEN_MODULE

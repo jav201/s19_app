@@ -6,8 +6,10 @@ render idiom), asserting on PAINTED widget state read back through
 ``render().plain`` / ``.spans`` / ``.region`` (C-32 painted-result, C-17
 markup-safety):
 
-- AT-002 / TC-011 — name-strip dirty ``●`` → saved ``✓`` glyph (glyph-primary,
-  C-10), read off the painted strip line, through the real Save button + modal.
+- AT-002 / TC-011 — name-strip dirty → saved state (word-primary since
+  batch-97: ``· unsaved`` / ``· saved``, the ``●`` / ``✓`` glyphs superseded by
+  name, LED-2026-10-19-batch-97.26; C-10), read off the painted strip line,
+  through the real Save button + modal.
 - AT-003 / TC-012/013 — SaveFlowScreen overwrite notice; LoadFlowScreen lists
   the saved flow stems.
 - AT-004 (list arm) — a flow copied into ``flows/`` appears in the Load list
@@ -96,7 +98,8 @@ async def _wait_list_items(app: S19TuiApp, pilot, minimum: int = 1) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# AT-002 / TC-011 — name strip glyph dirty ● → saved ✓ (painted, C-32/C-10)
+# AT-002 / TC-011 — name strip dirty → saved (painted, C-32/C-10); batch-97
+# LED-2026-10-19-batch-97.26: the state is the word ``· unsaved`` / ``· saved``
 # --------------------------------------------------------------------------- #
 
 def test_at002_name_strip_glyph_dirty_then_saved(tmp_path: Path) -> None:
@@ -138,14 +141,14 @@ def test_at002_name_strip_glyph_dirty_then_saved(tmp_path: Path) -> None:
 
     states, saved_exists = asyncio.run(_drive())
     initial, dirty, saved = states
-    # (i) saved on entry, glyph is the primary cue and the strip is painted.
-    assert "✓" in initial[0] and initial[1] > 0
+    # (i) saved on entry, the word is the primary cue and the strip is painted.
+    assert "· saved" in initial[0] and "unsaved" not in initial[0] and initial[1] > 0
     assert "sev-neutral" in initial[2]
-    # (ii) dirty after add — glyph flips ●, colour is the secondary cue.
-    assert "●" in dirty[0]
+    # (ii) dirty after add — the word flips to unsaved, colour is the secondary cue.
+    assert "· unsaved" in dirty[0]
     assert "sev-warning" in dirty[2]
-    # (iii) saved after Save — glyph back to ✓, name adopted, file written.
-    assert "✓" in saved[0]
+    # (iii) saved after Save — the word back to saved, name adopted, file written.
+    assert "· saved" in saved[0] and "unsaved" not in saved[0]
     assert "nightly" in saved[0]
     assert "sev-neutral" in saved[2]
     assert saved_exists
@@ -315,7 +318,7 @@ def test_at006_quarantine_card_painted_and_flow_unchanged(tmp_path: Path) -> Non
     # (iv) the current flow is UNTOUCHED (blocks + name strip preserved).
     assert r["blocks_after"] == r["blocks_before"]
     assert "keep.s19" in r["blocks_after"]
-    assert "●" in r["strip"]  # still dirty (unchanged), never flipped by the reject
+    assert "· unsaved" in r["strip"]  # still dirty (unchanged), never flipped by the reject (LED-2026-10-19-batch-97.26: word, was ●)
 
 
 # --------------------------------------------------------------------------- #
@@ -414,9 +417,9 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
     assert r["modal_on_cancel"]
     assert "keep.s19" in r["blocks_after_cancel"]
     assert "other.s19" not in r["blocks_after_cancel"]
-    # (b) Discard replaced the blocks and cleared dirty (✓).
+    # (b) Discard replaced the blocks and cleared dirty (`· saved`, LED-2026-10-19-batch-97.26; was ✓).
     assert "other.s19" in r["blocks_after_discard"]
     assert "keep.s19" not in r["blocks_after_discard"]
-    assert "✓" in r["strip_after_discard"]
+    assert "· saved" in r["strip_after_discard"] and "unsaved" not in r["strip_after_discard"]
     # (c) a clean load shows no confirm modal.
     assert not r["modal_on_clean"]

@@ -1,0 +1,125 @@
+# Inc-5 gate-fold mutation battery: M29 (re-run, single trigger) + M29b (both triggers, two edits) + M40..M53. Source digests before:
+eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c *s19_app/tui/flow_screens.py
+362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 *s19_app/tui/styles.tcss
+5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea *s19_app/tui/open_folder_chip.py
+mutants: 16 arms: 29
+M29-show-trigger-removed [flow_screens.py] test_tc_b97_34_builder_resize_while_hidden_rederives_on_show: GREEN (SURVIVED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | 1 passed in 7.66s
+M29b-both-layout-triggers-removed [flow_screens.py] test_tc_b97_34_builder_resize_while_hidden_rederives_on_show: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:908: AssertionError: (21, 192)
+    | 1 failed in 12.90s
+M40-chip-announces-at-mount [open_folder_chip.py] test_tc_b97_29_no_status_line_at_startup_without_a_project: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:326: AssertionError: (['📂 Open flows/: no active project — load a project first.'], ['📂 Open flows/: no active project — load a project first.'])
+    | 1 failed in 2.12s
+M40-chip-announces-at-mount [open_folder_chip.py] test_tc_b97_29_no_project_chips_disabled_with_their_own_reason: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:290: AssertionError: ('reports', ['📂 Open reports/: no active project — load a project first.'])
+    | 1 failed in 9.17s
+M40-chip-announces-at-mount [open_folder_chip.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:717: AssertionError: ['📂 Open session: no active project — load a project first.']
+    | 1 failed in 3.96s
+M40-chip-announces-at-mount [open_folder_chip.py] test_tc704_reports_without_project_disabled_status_reason_zero_opens: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:509: AssertionError: no status line at mount (LED-…97.24)
+    | 1 failed in 2.39s
+M41-chip-never-announces [open_folder_chip.py] test_tc_b97_29_no_project_chips_disabled_with_their_own_reason: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:291: AssertionError: ('reports', [])
+    | 1 failed in 8.94s
+M41-chip-never-announces [open_folder_chip.py] test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:718: AssertionError: []
+    | 1 failed in 3.92s
+M41-chip-never-announces [open_folder_chip.py] test_tc704_reports_without_project_disabled_status_reason_zero_opens: RED (KILLED)
+    restore sha256 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea == before 5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea
+    | C:\Users\jjgh8\Github\s19_app\tests\test_open_folder_chips.py:511: AssertionError: the transition names the reason on the status line
+    | 1 failed in 2.34s
+M42-spare-cells-dropped [flow_screens.py] test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[4]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:844: AssertionError: (101, 4, PipelineLayout(card_w=22, spare=0), {100})
+    | 1 failed in 0.33s
+M42-spare-cells-dropped [flow_screens.py] test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size1]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((163, 56), 3, 1)
+    | 1 failed in 2.92s
+M42-spare-cells-dropped [flow_screens.py] test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size3]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((223, 60), 3, 1)
+    | 1 failed in 3.08s
+M43-spare-on-the-cards-not-drawn [flow_screens.py] test_tc_b97_38_pipeline_spare_cells_go_to_the_cables[4]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:844: AssertionError: (101, 4, PipelineLayout(card_w=22, spare=1), {100})
+    | 1 failed in 0.33s
+M43-spare-on-the-cards-not-drawn [flow_screens.py] test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size3]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1011: AssertionError: ((223, 60), 3, 1)
+    | 1 failed in 2.99s
+M44-add-empty-says-nothing [flow_screens.py] test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[source-image file]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1117: AssertionError: []
+    | 1 failed in 7.57s
+M45-unsaved-word-grey [flow_screens.py] test_tc_b97_49_ribbon_saved_state_is_a_word: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1038: AssertionError: ('· unsaved', {'#969aad'})
+    | 1 failed in 0.39s
+M45-unsaved-word-grey [flow_screens.py] test_tc_b97_49_ribbon_paints_saved_then_unsaved: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1074: AssertionError: [ColourRun(source='strip', text='· unsaved', fg='#969aad', bg='#0a0e1b', bold=False, x=25, y=4)]
+    | 1 failed in 3.80s
+M46-ribbon-glyphs-back [flow_screens.py] test_tc_b97_49_ribbon_saved_state_is_a_word: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1033: AssertionError: Flow: demo  ✓  LOAD → PATCH                                                               session C:/w/proj1
+    | 1 failed in 0.37s
+M46-ribbon-glyphs-back [flow_screens.py] test_at002_name_strip_glyph_dirty_then_saved: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_persistence_ui.py:145: AssertionError: assert ('· saved' in 'Flow: flow  ✓                              session (no active project)')
+    | 1 failed in 2.57s
+M47-notices-banner-reverted [flow_screens.py] test_tc_b97_38_builder_height_goes_to_the_result[after_run-size0]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1081: AssertionError: ['ISSUES', '● source    ok']
+    | 1 failed in 3.75s
+M47-notices-banner-reverted [flow_screens.py] test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x54]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1436: AssertionError: ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    | 1 failed in 7.71s
+M47-notices-banner-reverted [flow_screens.py] test_at085a_notices_load_shows_warning_gutter: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_flow_builder_render.py:287: AssertionError: assert 'ISSUES' == 'NOTICES'
+    | 1 failed in 2.27s
+M48-notices-even-with-an-error [flow_screens.py] test_at088a_pipeline_ledger_structure_all_three_banners: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_flow_builder_render.py:230: AssertionError: completed-with-issues
+    | 1 failed in 4.30s
+M49-separator-rows-removed [styles.tcss] test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]: RED (KILLED)
+    restore sha256 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 == before 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1073: AssertionError: ((118, 54), 'before_run', [], [17, 19, 20])
+    | 1 failed in 3.19s
+M50-result-rule-row-removed [styles.tcss] test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]: RED (KILLED)
+    restore sha256 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 == before 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1075: AssertionError: the result area opens with its rule row: 'No run yet — Run executes this chain against the loaded image; the block verdicts land here.'
+    | 1 failed in 3.25s
+M51-banner-blank-row-back [styles.tcss] test_tc_b97_38_builder_height_goes_to_the_result[after_run-size1]: RED (KILLED)
+    restore sha256 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 == before 362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1080: AssertionError: ((118, 53), 1, ['NOTICES', '● source    ok', 'loaded prg.s19 (11 ranges)', '──────────────────────────────────────────────────────────────────────────────────────────────────────────', '● patch     ok', 'applied 6 entries', 
+    | 1 failed in 3.55s
+M52-wrote-path-not-tail-clipped [flow_screens.py] test_tc_b97_38_builder_height_goes_to_the_result[after_run-size0]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1085: AssertionError: [[' wrote C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-23919\\test_tc_b97_38_builder_height_0\\.s19too…']]
+    | 1 failed in 3.46s
+M53-nul-line-names-the-block-field [flow_screens.py] test_tc_b97_62_nul_refusal_helper_names_kind_and_field[write_out.output_name]: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1340: AssertionError: assert 'Add refused:... - not a path' == 'Add refused:... - not a path'
+    | 1 failed in 0.37s
+M53-nul-line-names-the-block-field [flow_screens.py] test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject: RED (KILLED)
+    restore sha256 eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c == before eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1537: AssertionError: ['Add refused: [FLOW-UNSAFE-REF] write_out output file holds a NUL character - not a path']
+    | 1 failed in 5.50s
+exit 0
+# Source digests after:
+eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c *s19_app/tui/flow_screens.py
+362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 *s19_app/tui/styles.tcss
+5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea *s19_app/tui/open_folder_chip.py

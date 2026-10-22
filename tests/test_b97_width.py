@@ -1,4 +1,4 @@
-"""Batch-97 width and height derivation (HLR-149) — the Check Editor (Inc-3) and Patch Editor (Inc-4) arms.
+"""Batch-97 width and height derivation (HLR-149) — the Check Editor (Inc-3), Patch Editor (Inc-4) and Flow Builder (Inc-5) arms.
 
 TC-B97-34..38 and TC-B97-59 over the Check Editor; the Patch, Builder and
 Execution arms join at Inc-4..6 and the full sweep at Inc-7. Every reading
@@ -724,4 +724,403 @@ def test_tc_b97_59_patch_below_the_range_actions_reachable(tmp_path: Path, size)
     for wid, (presses, inside_tab, pages, inside_page) in out.items():
         assert presses < 200 and inside_tab, (size, wid, presses)
         assert pages < 20 and inside_page, (size, wid, pages)
+    assert overlaps == [], overlaps
+
+
+
+# =========================================================================== #
+# Inc-5 — the Flow Builder arms of TC-B97-34..38 and TC-B97-59
+# =========================================================================== #
+
+from textual.widgets import Input  # noqa: E402
+
+from s19_app.tui import flow_screens as fs  # noqa: E402
+from tests.b97_fixtures import patch_chain_demo  # noqa: E402
+from tests.b97_fixtures import flow_project, load_flow, open_flow_builder  # noqa: E402
+
+FLOW_CATEGORIES = ("nowrap-pipeline", "nowrap-ribbon", "nowrap-legend")
+
+
+async def _poll(pilot, predicate, attempts: int = 60) -> bool:
+    for _ in range(attempts):
+        await pilot.pause()
+        if predicate():
+            return True
+    return False
+
+
+def _laid_out(panel) -> bool:
+    """The Builder's layout pass ran for the size now shown (D21 inputs)."""
+    scroll = panel.query("#flow_pipeline_scroll")
+    if not scroll:
+        return True
+    return getattr(panel, "_layout_key", None) is not None and panel._layout_key[0] == scroll.first().scrollable_content_region.width
+
+
+#: A 60-cell change-doc ref (the widest real values, A.5): wider than a card
+#: at every size of the range, so a card band always holds a clipped line.
+WIDE_REF = "calibration_hotfix_release_candidate_" + "w" * 13 + "_TAIL.json"
+assert len(WIDE_REF) == 60
+
+
+def run_flow_builder(tmp_path: Path, size, body, *, ext: bool = True, wide: bool = False):
+    """Open the Flow Builder at ``size`` with ``patch_chain`` loaded — its
+    change doc a 60-cell ref when ``wide`` — (and the EXT-STEP form open when
+    ``ext``) and return ``await body(app, pilot, panel)``."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await settle(pilot)
+            project_dir = flow_project(app)
+            stem = "patch_chain"
+            if wide:
+                from tests.b97_fixtures import patch_chain_demo, write_flow
+
+                blocks = patch_chain_demo()
+                blocks[1] = type(blocks[1])(WIDE_REF)
+                stem = "wide_chain"
+                write_flow(project_dir, stem, blocks)
+            panel = await open_flow_builder(app, pilot)
+            await load_flow(app, pilot, stem)
+            if ext:
+                panel.query_one("#flow_palette_external_step").press()
+                await _poll(pilot, lambda: is_displayed(panel.query_one("#flow_ext_log")))
+            await _poll(pilot, lambda: _laid_out(panel))
+            await settle(pilot, 2)
+            return await body(app, pilot, panel)
+
+    return asyncio.run(_drive())
+
+
+def _card_width(app, panel):
+    """The painted width of the first card, or ``None`` with no pipeline."""
+    holder = panel.query("#flow_pipeline")
+    if not holder:
+        return None
+    top = next(r for r in painted_rows(app, holder.first()) if "╭" in r)
+    return top.index("╮") - top.index("╭") + 1
+
+
+def test_tc_b97_34_pipeline_layout_monotonic_in_its_inputs() -> None:
+    """TC-B97-34 (LLR-149.1, Builder arm, layer 0): ``pipeline_layout``'s card
+    width is non-decreasing as the rail's measured width grows, never below
+    the 21-cell minimum, strictly greater at the 220x60 reading (192 cells)
+    than at 118x54 (108) for the 4-block demo, and four cards at 108 fill the
+    rail (4·24 + 3·4 = 108).
+
+    RED: no ``pipeline_layout`` on main (fixed 24-cell blocks on an 88-cell
+    canvas). Mutation: the card width fixed at 24.
+    """
+    layout = getattr(fs, "pipeline_layout", None)
+    assert layout is not None
+    widths = [layout(w, 4).card_w for w in (60, 108, 140, 192, 252)]
+    assert widths == sorted(widths) and min(widths) >= 21, widths
+    assert layout(192, 4).card_w > layout(108, 4).card_w
+    assert layout(108, 4).card_w == 24 and 4 * 24 + 3 * fs.CABLE_W == 108
+    assert layout(108, 5).card_w == 21  # the rail scrolls from the 5th card at 118
+
+
+@pytest.mark.parametrize("n_cards", [2, 3, 4, 5, 6])
+def test_tc_b97_38_pipeline_spare_cells_go_to_the_cables(n_cards) -> None:
+    """TC-B97-38 (LLR-149.5, Builder width clause, layer 0; gate fold F2):
+    whenever the cards are wider than the 21-cell minimum, the painted chain
+    is exactly as wide as the rail — ``card_w·n + CABLE_W·(n−1) + spare``
+    with ``0 ≤ spare ≤ n − 1`` cells, one more cell on each of the first
+    ``spare`` cables — so no void is left right of the last card at any
+    width, the off-grid ones included.
+
+    RED on the pre-fold tree: ``PipelineLayout`` has no ``spare`` (integer
+    division left up to n − 1 void cells). Mutation: the spare cells dropped.
+    """
+    blocks = list(patch_chain_demo()) + list(patch_chain_demo())
+    blocks = blocks[:n_cards]
+    for avail in range(60, 261):
+        layout = fs.pipeline_layout(avail, n_cards)
+        # Skip only where the minimum binds (the rail scrolls); a chain at
+        # exactly 21 cells with spare cells still owes the full width.
+        if (avail - fs.CABLE_W * (n_cards - 1)) // n_cards < fs.CARD_MIN_W:
+            continue
+        assert 0 <= layout.spare <= n_cards - 1, (avail, layout)
+        lines = fs.pipeline_text(blocks, layout.card_w, layout.spare).plain.split("\n")
+        assert {len(line) for line in lines} == {avail}, (avail, n_cards, layout, {len(line) for line in lines})
+
+
+def test_tc_b97_34_builder_painted_widths_follow_four_resizes(tmp_path: Path) -> None:
+    """TC-B97-34 (LLR-149.1, Builder painted arm): in one session 118x54 →
+    160x56 → 220x60 → 260x70 → 118x54, the painted card width and the
+    EXT-STEP command input's width are non-decreasing, strictly greater at 220
+    than at 118, and back at 118x54 the painted pipeline equals the first
+    reading.
+
+    RED on main (P-22): ``#flow_ext_instruction`` 28 cells at both sizes.
+    Mutation: the resize trigger removed (cards keep their 118 width).
+    """
+
+    async def body(app, pilot, panel):
+        out = []
+        for size in ((118, 54), (160, 56), (220, 60), (260, 70), (118, 54)):
+            await pilot.resize_terminal(*size)
+            await _poll(pilot, lambda: app.size == size and _laid_out(panel))
+            await settle(pilot, 2)
+            instruction = panel.query_one("#flow_ext_instruction").region.width
+            pipeline = panel.query("#flow_pipeline")
+            out.append((size, instruction, _card_width(app, panel), painted_rows(app, pipeline.first()) if pipeline else None))
+        return out
+
+    readings = run_flow_builder(tmp_path, (118, 54), body)
+    instructions = [r[1] for r in readings[:4]]
+    cards = [r[2] for r in readings[:4]]
+    assert instructions == sorted(instructions) and instructions[2] > instructions[0], instructions
+    assert None not in cards, "no pipeline"
+    assert cards == sorted(cards) and cards[2] > cards[0], cards
+    assert readings[0][3] == readings[-1][3], "back at 118x54 the pipeline paints as at first"
+
+
+def test_tc_b97_34_builder_resize_while_hidden_rederives_on_show(tmp_path: Path) -> None:
+    """TC-B97-34 (LLR-149.1, Builder hidden arm): resizing to 220x60 while the
+    workspace is shown, then showing the Flow Builder, paints the card width
+    ``pipeline_layout`` derives from the rail's measured width — wider than
+    the 21-cell minimum — and the same width as a session that starts at
+    220x60.
+
+    The path-independent clause (gate fold, code-reviewer F1): with both the
+    ``on_resize`` and ``on_show`` triggers removed no layout pass ever runs,
+    both sessions paint the 21-cell default and the equality alone stays
+    GREEN; the derived-width clause goes RED. ``on_show`` alone removed is an
+    equivalent mutant on this app's show path (M29: showing a ``display:
+    none`` screen delivers a Resize to the panel).
+    """
+
+    async def body(app, pilot, panel):
+        app.action_show_screen("workspace")
+        await settle(pilot, 2)
+        await pilot.resize_terminal(220, 60)
+        await _poll(pilot, lambda: app.size == (220, 60))
+        app.action_show_screen("flow")
+        await _poll(pilot, lambda: _laid_out(panel))
+        await settle(pilot, 2)
+        return _card_width(app, panel), panel.query_one("#flow_pipeline_scroll").scrollable_content_region.width
+
+    async def direct(app, pilot, panel):
+        return _card_width(app, panel)
+
+    hidden, rail_w = run_flow_builder(tmp_path / "a", (118, 54), body, ext=False)
+    assert hidden is not None, "no pipeline"
+    assert hidden == fs.pipeline_layout(rail_w, 4).card_w and hidden > fs.CARD_MIN_W, (hidden, rail_w)
+    assert hidden == run_flow_builder(tmp_path / "b", (220, 60), direct, ext=False)
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+def test_tc_b97_35_builder_no_horizontal_overflow(tmp_path: Path, size) -> None:
+    """TC-B97-35 (LLR-149.2, Builder arm): with ``patch_chain`` and the
+    EXT-STEP form open, 0 displayed descendants of ``#flow_panel`` leave it on
+    x (clipped-region predicate, P-52), over >= 10 descendants, on both sides
+    of the 120-column breakpoint.
+
+    RED on main (P-10): 2 overflowing descendants at 118x54.
+    """
+
+    async def body(app, pilot, panel):
+        return [w.id or type(w).__name__ for w in clipped_overflow(panel)], len(displayed_descendants(panel))
+
+    offenders, population = run_flow_builder(tmp_path, size, body)
+    assert offenders == [], (size, offenders)
+    assert population >= 10
+
+
+@pytest.mark.parametrize("size", RANGE_SAMPLES)
+def test_tc_b97_36_builder_run_inside_at_scroll_zero(tmp_path: Path, size) -> None:
+    """TC-B97-36 (LLR-149.3, Builder arm; PC-24 at 118x53): with
+    ``patch_chain`` and the EXT-STEP form open, ``#flow_run`` lies inside the
+    panel region with the panel at its top.
+
+    RED on main (P-11): ``#flow_run (51, 48, 16, 3)`` past the panel bottom 44.
+    """
+
+    async def body(app, pilot, panel):
+        panel.scroll_home(animate=False)
+        await _poll(pilot, lambda: panel.scroll_y == 0)
+        return panel.query_one("#flow_run").region, panel.region
+
+    region, panel_region = run_flow_builder(tmp_path, size, body)
+    assert panel_region.contains_region(region), (size, region, panel_region)
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+def test_tc_b97_37_builder_no_wrapped_row_and_tail_kept_ribbon(tmp_path: Path, size) -> None:
+    """TC-B97-37 (LLR-149.4, Builder arm): every member of the Builder's
+    no-wrap set (pipeline, ribbon, legend — read from the DOM by category)
+    paints one terminal row per logical line, and the ribbon keeps the session
+    path's tail: its painted line ends with the project folder's name.
+
+    RED on main: no member carries a no-wrap category class (the guard).
+    """
+
+    async def body(app, pilot, panel):
+        members = {cat: [w for w in panel.query(f".{cat}") if is_displayed(w)] for cat in FLOW_CATEGORIES}
+        wraps = []
+        for widgets in members.values():
+            for w in widgets:
+                lines = str(w.render()).split("\n")
+                height = w.get_content_height(w.content_region.size, app.size, w.content_region.width)
+                if height != len(lines) or w.region.height < len(lines):
+                    wraps.append((w.id, height, len(lines), w.region.height))
+        ribbon = [r.rstrip() for r in painted_rows(app, panel.query_one("#flow_name_strip")) if r.strip()]
+        return {c: len(m) for c, m in members.items()}, wraps, ribbon, app.active_project_dir().name
+
+    counts, wraps, ribbon, project = run_flow_builder(tmp_path, size, body)
+    assert all(n >= 1 for n in counts.values()), counts
+    assert wraps == [], wraps
+    assert len(ribbon) == 1 and ribbon[0].endswith(project), ribbon
+
+
+@pytest.mark.parametrize("size", [(160, 56), (163, 56), (220, 60), (223, 60), (260, 70)])
+def test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width(tmp_path: Path, size) -> None:
+    """TC-B97-38 (LLR-149.5, Builder width clause): with a 60-cell change-doc
+    ref (clipped at every size, the guard) the pipeline leaves at most 2 void
+    cells after its painted extent inside the rail's content region; every
+    card is at least 21 cells; each EXT-STEP input row ends within 2 cells of
+    its row.
+
+    163x56 and 223x60 are off-grid widths (gate fold, code-reviewer F2): the
+    rail's width minus the cables is not a multiple of 4 there, so integer
+    card widths alone left 3 void cells; the spare cells now widen the first
+    cables. RED on the pre-fold tree at both sizes (void 3).
+
+    RED by mutation: cards fixed at 24 cells (the void beside the clipped ref
+    line at 220x60, the NC — M27; the first battery ran this arm on the short
+    demo refs and the mutant survived, so the arm now carries the wide ref).
+    """
+
+    async def body(app, pilot, panel):
+        row_voids = []
+        for row_id in ("flow_ext_instruction", "flow_ext_output"):
+            widget = panel.query_one(f"#{row_id}")
+            row = widget.parent
+            row_voids.append(row.content_region.right - widget.region.right)
+        assert all(v <= 2 for v in row_voids), row_voids
+        scroll = panel.query_one("#flow_pipeline_scroll")
+        content = scroll.scrollable_content_region
+        rows = painted_rows(app, panel.query_one("#flow_pipeline"))
+        extent = max(len(r.rstrip()) for r in rows)
+        void = content.width - extent
+        clipped = sum(r.count("…") for r in rows)
+        return void, clipped, _card_width(app, panel), row_voids
+
+    void, clipped, card_w, row_voids = run_flow_builder(tmp_path, size, body, wide=True)
+    assert clipped >= 1, "guard: the 60-cell ref clips in its card"
+    assert void <= 2 or clipped == 0, (size, void, clipped)
+    assert card_w >= 21
+    assert all(v <= 2 for v in row_voids), row_voids
+
+
+#: The Builder's named separator rows (gate fold, operator decision 2,
+#: fb_A's air): one blank row above each of these, outside the growing region.
+BUILDER_SEPARATED = ("#flow_palette", "#flow_clip_row", "#flow_run_row")
+
+
+@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+@pytest.mark.parametrize("phase", ["before_run", "after_run"])
+def test_tc_b97_38_builder_height_goes_to_the_result(tmp_path: Path, size, phase) -> None:
+    """TC-B97-38 (LLR-149.5, Builder height clause, decision B / LED-…97.11;
+    PC-24 at 118x53): outside ``#flow_result`` the only blank panel rows are
+    the k = 3 named separator rows, one directly above ``#flow_palette``,
+    ``#flow_clip_row`` and ``#flow_run_row`` (gate fold, operator decision 2);
+    the pipeline frame is exactly as tall as its cards plus the border (plus
+    the horizontal scrollbar row when it scrolls), so no blank row lies inside
+    it; ``#flow_result`` opens with its painted rule row, ends on the legend's
+    row, paints one empty-state line before a run and, after the run of the
+    4-block chain, every verdict from the ``NOTICES`` banner to the one-row
+    ``wrote …`` line without scrolling, at 118x53 too.
+
+    RED by mutation: ``#flow_pipeline_scroll { height: 1fr }`` (the A
+    placement) — blank rows inside the frame; a separator margin removed —
+    the named rows differ. RED on the pre-fold tree: no separator rows, no
+    rule row, the ``ISSUES`` banner.
+    """
+
+    async def body(app, pilot, panel):
+        if phase == "after_run":
+            panel.query_one("#flow_run").press()
+            await _poll(pilot, lambda: bool(panel.query("#flow_result .flow-banner")))
+            await settle(pilot, 2)
+        result = panel.query_one("#flow_result")
+        blank = blank_panel_rows(app, panel, outside=result)
+        separators = sorted(panel.query_one(wid).region.y - 1 for wid in BUILDER_SEPARATED)
+        scroll = panel.query_one("#flow_pipeline_scroll")
+        pipeline = panel.query_one("#flow_pipeline")
+        legend = panel.query_one("#flow_legend")
+        inner_blank = [r for r in painted_rows(app, scroll, scroll.scrollable_content_region) if not r.strip()]
+        expected = pipeline.region.height + 2 + (1 if scroll.max_scroll_x > 0 else 0)
+        rule = painted_rows(app, result)[0].strip()
+        result_lines = [r.strip() for r in painted_rows(app, result, result.content_region) if r.strip()]
+        wrote = [painted_rows(app, w) for w in panel.query("#flow_result .flow-wrote")]
+        return (
+            result_lines,
+            blank,
+            separators,
+            scroll.region.height,
+            expected,
+            inner_blank,
+            rule,
+            result.region.bottom,
+            legend.region.y,
+            result.max_scroll_y,
+            wrote,
+        )
+
+    (result_lines, blank, separators, frame_h, expected_h, inner_blank, rule,
+     result_bottom, legend_y, max_scroll, wrote) = run_flow_builder(tmp_path, size, body, ext=False)
+    assert blank == separators and len(blank) == len(BUILDER_SEPARATED), (size, phase, blank, separators)
+    assert frame_h == expected_h and inner_blank == [], (frame_h, expected_h, inner_blank)
+    assert rule and set(rule) == {"─"}, f"the result area opens with its rule row: {rule!r}"
+    assert result_bottom == legend_y, (result_bottom, legend_y)
+    if phase == "before_run":
+        assert len(result_lines) == 1 and result_lines[0].startswith("No run yet"), result_lines
+    if phase == "after_run":
+        assert max_scroll == 0, (size, max_scroll, result_lines)
+        assert result_lines and result_lines[0] == "NOTICES", result_lines[:2]
+        heads = [line.split()[1] for line in result_lines if line[:1] in "●◈✗○□"]
+        assert heads == ["source", "patch", "check", "write_out"], heads
+        assert len(wrote) == 1 and len(wrote[0]) == 1, wrote
+        assert wrote[0][0].strip().startswith("wrote ") and wrote[0][0].rstrip().endswith("fw_app_patched.s19"), wrote
+
+
+@pytest.mark.parametrize("size", [(80, 24), (100, 40), (220, 40)])
+def test_tc_b97_59_builder_below_the_range_run_reachable(tmp_path: Path, size) -> None:
+    """TC-B97-59 (LLR-149.6, Builder arm): below the range ``tab`` from the
+    panel top reaches ``#flow_run`` (<= 200 presses) and it lies inside the
+    panel once focused; ``pagedown`` from scroll 0 brings it inside (<= 20);
+    no two displayed buttons overlap.
+
+    RED by mutation: ``overflow: hidden`` on the panel.
+    """
+
+    async def body(app, pilot, panel):
+        panel.scroll_home(animate=False)
+        app.query_one("#window_help_flow").focus()
+        await settle(pilot, 2)
+        presses = 0
+        while (app.focused is None or app.focused.id != "flow_run") and presses < 200:
+            await pilot.press("tab")
+            presses += 1
+        await _poll(pilot, lambda: panel.region.contains_region(panel.query_one("#flow_run").region))
+        inside_tab = panel.region.contains_region(panel.query_one("#flow_run").region)
+        panel.scroll_home(animate=False)
+        panel.focus()
+        await _poll(pilot, lambda: panel.scroll_y == 0)
+        pages = 0
+        while not panel.region.contains_region(panel.query_one("#flow_run").region) and pages < 20:
+            await pilot.press("pagedown")
+            await settle(pilot, 1)
+            pages += 1
+        inside_page = panel.region.contains_region(panel.query_one("#flow_run").region)
+        buttons = [b.region for b in panel.query(Button) if is_displayed(b) and b.region.width]
+        overlaps = [(a, b) for i, a in enumerate(buttons) for b in buttons[:i] if a.overlaps(b)]
+        return presses, inside_tab, pages, inside_page, overlaps
+
+    presses, inside_tab, pages, inside_page, overlaps = run_flow_builder(tmp_path, size, body)
+    assert presses < 200 and inside_tab, (size, presses)
+    assert pages < 20 and inside_page, (size, pages)
     assert overlaps == [], overlaps

@@ -1,0 +1,8 @@
+patch_chain  ext_form=False 118x54: {'H': 40, 'ribbon': 1, 'palette': 1, 'add': 1, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 13, 'cards': 11, 'scrolls': False, 'result': 21, 'run_inside': True}
+patch_chain  ext_form=False 118x53: {'H': 39, 'ribbon': 1, 'palette': 1, 'add': 1, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 13, 'cards': 11, 'scrolls': False, 'result': 20, 'run_inside': True}
+patch_chain  ext_form=False 220x60: {'H': 46, 'ribbon': 1, 'palette': 1, 'add': 1, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 13, 'cards': 11, 'scrolls': False, 'result': 27, 'run_inside': True}
+patch_chain  ext_form=False 220x59: {'H': 45, 'ribbon': 1, 'palette': 1, 'add': 1, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 13, 'cards': 11, 'scrolls': False, 'result': 26, 'run_inside': True}
+flash_chain  ext_form=True  118x54: {'H': 40, 'ribbon': 1, 'palette': 1, 'add': 2, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 15, 'cards': 13, 'scrolls': False, 'result': 18, 'run_inside': True}
+flash_chain  ext_form=True  118x53: {'H': 39, 'ribbon': 1, 'palette': 1, 'add': 2, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 15, 'cards': 13, 'scrolls': False, 'result': 17, 'run_inside': True}
+flash_chain  ext_form=True  220x60: {'H': 46, 'ribbon': 1, 'palette': 1, 'add': 2, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 15, 'cards': 13, 'scrolls': False, 'result': 24, 'run_inside': True}
+flash_chain  ext_form=True  220x59: {'H': 45, 'ribbon': 1, 'palette': 1, 'add': 2, 'clip': 1, 'run': 1, 'legend': 1, 'frame': 15, 'cards': 13, 'scrolls': False, 'result': 23, 'run_inside': True}

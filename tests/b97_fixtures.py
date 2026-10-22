@@ -170,6 +170,20 @@ def load_project(app, name: str = "proj1") -> Path:
     return held
 
 
+def unload_project(app) -> None:
+    """Drop the active project and run the app's one project-refresh seam.
+
+    The app has no unload action; this clears the two fields
+    ``_active_project_dir`` reads and calls ``update_project_labels`` — the
+    seam every project-context change goes through (it re-resolves every
+    mounted chip), so a chip sees the transition a user-caused change makes.
+    """
+    app.current_project = None
+    app.current_project_dir = None
+    app.update_project_labels()
+    assert app.active_project_dir() is None
+
+
 def make_junction(link: Path, target: Path) -> str:
     """Make ``link`` a directory junction to ``target`` (P-34).
 
@@ -507,3 +521,159 @@ async def load_change_file(app, pilot, panel, path: Path) -> None:
     panel.query_one("#patch_doc_path_input", Input).value = str(path)
     panel.query_one("#patch_doc_load_button", Button).press()
     await settle(pilot, 6)
+
+
+# --------------------------------------------------------------------------- #
+# A.5 builders — Inc-5: the Flow Builder chains (P-31, P-41, P-45, P-36)
+# --------------------------------------------------------------------------- #
+
+#: ``baseline.chk.json`` (A.5): a check document over 4 fields. Three hold the
+#: bytes ``calib_hotfix.json`` writes; the fourth (``0xFCB0``) does not, so the
+#: advisory check block of ``patch_chain`` ends with notices (``ok ok notices
+#: ok``, P-31) and the run banner reads ``NOTICES`` (``ISSUES`` before the Inc-5 gate fold).
+CHECK_ENTRIES: tuple[tuple[int, tuple[int, ...]], ...] = (
+    (0xEB10, (0xDE, 0xAD, 0xBE, 0xEF)),
+    (0xEB40, (0x00, 0x00, 0x00, 0x01)),
+    (0xED00, (0x7F, 0xFF)),
+    (0xFCB0, (0x00, 0x00)),
+)
+
+PATCHED_OUTPUT = "fw_app_patched.s19"
+
+
+def baseline_check(dest_dir: Path) -> Path:
+    """``baseline.chk.json``: the shipped serialiser over :data:`CHECK_ENTRIES`
+    with ``kind = check``."""
+    from dataclasses import replace
+
+    from s19_app.tui.changes.io import serialize_change_document
+
+    path = dest_dir / "baseline.chk.json"
+    document = replace(_document([_bytes_entry(a, r) for a, r in CHECK_ENTRIES]), kind="check")
+    path.write_bytes(serialize_change_document(document))
+    return path
+
+
+def write_flow(project_dir: Path, name: str, blocks) -> Path:
+    """Write ``flows/<name>.json`` with the shipped ``save``-side serialiser."""
+    import json
+
+    from s19_app.tui.services.flow_model import Flow
+    from s19_app.tui.services.flow_persistence_service import FLOWS_SUBDIR, flow_to_dict
+
+    flows_dir = project_dir / FLOWS_SUBDIR
+    flows_dir.mkdir(parents=True, exist_ok=True)
+    path = flows_dir / f"{name}.json"
+    path.write_text(json.dumps(flow_to_dict(Flow(name=name, blocks=list(blocks)))), encoding="utf-8")
+    return path
+
+
+def patch_chain_demo() -> list:
+    """``patch_chain`` (A.5): load ``prg.s19`` → patch ``calib_hotfix.json`` →
+    advisory check ``baseline.chk.json`` → write ``fw_app_patched.s19``."""
+    from s19_app.tui.services.flow_model import WriteOutBlock
+
+    return patch_chain_blocks()[:3] + [WriteOutBlock(PATCHED_OUTPUT)]
+
+
+def flash_chain_demo(project_dir: Path) -> list:
+    """``flash_chain`` (A.5): load → patch → EXT-STEP (terminal) → write-out;
+    the step's log and output paths lie inside the project (P-31: ``ok ok
+    waiting skipped``)."""
+    from s19_app.tui.services.flow_model import (
+        EXTERNAL_MODE_TERMINAL,
+        ExternalStepBlock,
+        WriteOutBlock,
+    )
+
+    return patch_chain_blocks()[:2] + [
+        ExternalStepBlock(
+            mode=EXTERNAL_MODE_TERMINAL,
+            instruction="./flash.sh fw_app_patched.s19",
+            log_ref="flash_log.txt",
+            output_path=str(project_dir / "fw_app_flashed.s19"),
+        ),
+        WriteOutBlock("fw_app_flashed_copy.s19"),
+    ]
+
+
+def crc_chain_demo() -> list:
+    """A Builder chain holding a CRC card (TC-B97-18 paint arm): load → patch
+    → CRC ``crc.json`` → write-out."""
+    from s19_app.tui.services.flow_model import CrcBlock, WriteOutBlock
+
+    return patch_chain_blocks()[:2] + [CrcBlock("crc.json"), WriteOutBlock(PATCHED_OUTPUT)]
+
+
+def hostile_flow_demo(project_dir: Path) -> list:
+    """``hostile_flow`` (A.5, P-30, P-45): ``flash_chain`` with
+    ``change_doc_ref``, ``instruction`` and ``log_ref`` = ``HOSTILE_CONTENT +
+    HOSTILE_C1`` and ``output_path`` = ``HOSTILE_NAME`` (slash-free)."""
+    from dataclasses import replace
+
+    blocks = flash_chain_demo(project_dir)
+    payload = HOSTILE_CONTENT + HOSTILE_C1
+    blocks[1] = replace(blocks[1], change_doc_ref=payload)
+    blocks[2] = replace(blocks[2], instruction=payload, log_ref=payload, output_path=HOSTILE_NAME)
+    return blocks
+
+
+def flow_project(app, name: str = "proj1") -> Path:
+    """A project opened through the app's own load (P-58) holding ``prg.s19``,
+    ``calib_hotfix.json``, ``baseline.chk.json``, ``crc.json`` and the saved
+    flows ``patch_chain``, ``flash_chain`` and ``crc_chain``."""
+    make_project(app, name)
+    project_dir = load_project(app, name)
+    calib_hotfix(project_dir)
+    baseline_check(project_dir)
+    shutil.copyfile(REPO_ROOT / "examples" / "crc_config.example.json", project_dir / "crc.json")
+    write_flow(project_dir, "patch_chain", patch_chain_demo())
+    write_flow(project_dir, "flash_chain", flash_chain_demo(project_dir))
+    write_flow(project_dir, "crc_chain", crc_chain_demo())
+    return project_dir
+
+
+async def open_flow_builder(app, pilot) -> object:
+    """Show the Flow Builder through ``action_show_screen`` and return the panel."""
+    from tests.b97_probes import settled
+
+    app.action_show_screen("flow")
+    panel = app.query_one("#flow_panel")
+    await settled(pilot, lambda: panel.region.height > 0, "the Flow Builder panel is laid out")
+    return panel
+
+
+async def load_flow(app, pilot, stem: str) -> None:
+    """Load ``flows/<stem>.json`` through ``#flow_load`` and the picker (the
+    shipped controls), then wait until the panel shows it or a refusal."""
+    from textual.widgets import Button, ListView
+
+    from tests.b97_probes import settled
+
+    panel = app.query_one("#flow_panel")
+    panel.query_one("#flow_load", Button).press()
+    await settled(
+        pilot,
+        lambda: stem in [item.name for item in app.screen.query("#flow_list ListItem")],
+        f"the flow picker lists {stem}",
+    )
+    names = [item.name for item in app.screen.query("#flow_list ListItem")]
+    listing = app.screen.query_one("#flow_list", ListView)
+    target = names.index(stem)
+
+    def highlighted() -> bool:
+        # Load reads the HIGHLIGHTED item, which follows ``index`` a tick
+        # later; an index set while the list still mounts is re-applied.
+        child = listing.highlighted_child
+        if child is not None and child.name == stem:
+            return True
+        listing.index = target
+        return False
+
+    await settled(pilot, highlighted, f"{stem} highlighted in the flow picker")
+    app.screen.query_one("#flow_load_ok", Button).press()
+    await settled(
+        pilot,
+        lambda: panel._flow_name == stem or bool(panel.query("#flow_result .flow-quarantine")),
+        f"flows/{stem}.json loaded or refused",
+    )

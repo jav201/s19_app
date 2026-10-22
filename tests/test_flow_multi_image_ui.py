@@ -18,16 +18,14 @@ import asyncio
 import json
 from pathlib import Path
 
-from textual.widgets import Button, Select
+from textual.widgets import Button
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.models import VariantDescriptor
 from s19_app.tui.flow_screens import FlowBuilderPanel
 from s19_app.tui.services.flow_execution_service import run_flow, run_flow_over_variants
 from s19_app.tui.services.flow_model import (
-    FLOW_SCOPE_ALL_VARIANTS,
     FLOW_SCOPE_SINGLE,
-    FLOW_SCOPES,
     FLOW_STATUS_ERROR,
     FLOW_STATUS_OK,
     WRITE_FMT_S19,
@@ -147,10 +145,15 @@ def test_d4_an_unscoped_run_still_writes_its_own_report(tmp_path: Path) -> None:
 # LLR-104.6 — the scope selector
 # ---------------------------------------------------------------------------
 
-def test_llr1046_scope_options_cover_every_declared_scope() -> None:
-    values = [value for _label, value in FlowBuilderPanel._SCOPE_OPTIONS]
-    assert values == list(FLOW_SCOPES)
-    assert values[0] == FLOW_SCOPE_SINGLE, "the default must be today's behaviour"
+# batch-97 Inc-5 (D8, LLR-146.12, named supersession): the Builder composes no
+# scope selector and Run always requests FLOW_SCOPE_SINGLE — multi-variant runs
+# live in Flow Execution, one chain per variant. Retired here:
+# ``test_llr1046_scope_options_cover_every_declared_scope`` (``_SCOPE_OPTIONS``
+# left the panel), ``test_llr1046_selecting_all_variants_runs_the_fused_path``
+# and ``test_llr1046_a_variant_scope_without_variants_degrades_to_an_error_card``
+# (both picked a variant scope on ``#flow_scope``); their successor is
+# TC-B97-50 (``tests/test_b97_flow_builder.py``). The service tests (D-4, the
+# assignments plan) and the retained ``render_fused_result`` test stay.
 
 
 def test_llr1046_run_requested_defaults_to_the_single_image_scope() -> None:
@@ -159,10 +162,11 @@ def test_llr1046_run_requested_defaults_to_the_single_image_scope() -> None:
     assert message.scope == FLOW_SCOPE_SINGLE
 
 
-async def _run_scoped(app: S19TuiApp, pilot, project: Path, blocks, scope: str) -> str:
-    """Compose ``blocks``, pick ``scope``, press the REAL Run button, read the pane.
+async def _run_scoped(app: S19TuiApp, pilot, project: Path, blocks) -> str:
+    """Compose ``blocks`` in a project that declares variants, press the REAL
+    Run button, read the pane.
 
-    Drives the shipped surface end to end — panel Select → ``RunRequested`` →
+    Drives the shipped surface end to end — Run → ``RunRequested`` →
     ``S19TuiApp.on_flow_builder_panel_run_requested`` → engine → repaint — so
     what is observed is the wiring, not a hand-built message.
     """
@@ -173,7 +177,6 @@ async def _run_scoped(app: S19TuiApp, pilot, project: Path, blocks, scope: str) 
     await pilot.pause()
     panel = app.query_one("#flow_panel", FlowBuilderPanel)
     panel._blocks = list(blocks)
-    app.query_one("#flow_scope", Select).value = scope
     app.query_one("#flow_run", Button).press()  # the real Run button
     await pilot.pause()
     await pilot.pause()
@@ -212,60 +215,22 @@ def test_llr1046_the_assignments_scope_narrows_the_planned_set(tmp_path: Path) -
     assert len(variant_set.variants) == 3, "while three are declared"
 
 
-def test_llr1046_selecting_all_variants_runs_the_fused_path(tmp_path: Path) -> None:
-    """Picking "All variants" and pressing Run executes over every declared image."""
-    project = _project(tmp_path, "a", "b", "c")
-    blocks = [SourceBlock("x.s19", file_type=WRITE_FMT_S19)]
-
-    async def _drive() -> str:
-        app = S19TuiApp()
-        async with app.run_test() as pilot:
-            return await _run_scoped(
-                app, pilot, project, blocks, FLOW_SCOPE_ALL_VARIANTS
-            )
-
-    rendered = asyncio.run(_drive())
-
-    assert "3 variant(s): 3 ok / 0 issues / 0 error" in rendered
-    for variant_id in ("a", "b", "c"):
-        assert f"{variant_id}  —  ok" in rendered
-
-
 def test_llr1046_this_image_still_takes_the_single_image_path(tmp_path: Path) -> None:
-    """The default scope must not route through the fused renderer (AC-6)."""
+    """Run takes the single-image path, never the fused renderer (AC-6;
+    batch-97 LLR-146.12 rewrote it without the retired scope select)."""
     project = _project(tmp_path, "a")
     blocks = [SourceBlock("a.s19", file_type=WRITE_FMT_S19)]
 
     async def _drive() -> str:
         app = S19TuiApp()
         async with app.run_test() as pilot:
-            return await _run_scoped(app, pilot, project, blocks, FLOW_SCOPE_SINGLE)
+            return await _run_scoped(app, pilot, project, blocks)
 
     rendered = asyncio.run(_drive())
 
     assert "CLEAN" in rendered
     assert "variant(s):" not in rendered, "the single-image pane gains no fused line"
     assert "loaded a.s19" in rendered
-
-
-def test_llr1046_a_variant_scope_without_variants_degrades_to_an_error_card(
-    tmp_path: Path,
-) -> None:
-    """"It ran, over something you did not ask for" is the worse failure."""
-    project = tmp_path / ".s19tool" / "workarea" / "empty"
-    project.mkdir(parents=True)
-    blocks = [SourceBlock("x.s19", file_type=WRITE_FMT_S19)]
-
-    async def _drive() -> str:
-        app = S19TuiApp()
-        async with app.run_test() as pilot:
-            return await _run_scoped(
-                app, pilot, project, blocks, FLOW_SCOPE_ALL_VARIANTS
-            )
-
-    rendered = asyncio.run(_drive())
-
-    assert "no variants declared in this project" in rendered
 
 
 def test_llr1046_fused_result_renders_every_variant_and_the_inverted_counts(

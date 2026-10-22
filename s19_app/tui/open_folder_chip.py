@@ -18,8 +18,9 @@ there (LLR-139.1/.3); this module owns only the rendering states
   ``folder does not exist yet``); pressing it creates exactly the offered
   folder and then opens it;
 - no target (Reports, flows, session without a project) — the chip is
-  genuinely ``disabled`` (dimmed + tooltip) and the disabling refresh names
-  that family's folder on the status line (LLR-148.3); zero opens are
+  genuinely ``disabled`` (dimmed + tooltip); a transition to disabled after
+  mount names that family's folder on the status line, the first refresh at
+  mount writes nothing (LLR-148.3, batch-97 LED-…97.24); zero opens are
   possible.
 
 Dimmed-but-enabled uses an explicit CSS class rather than ``disabled`` on
@@ -91,6 +92,9 @@ class OpenFolderChip(Button):
         )
         #: The artifact family this chip opens (one of ``CHIP_FAMILIES``).
         self.family = family
+        #: Set by the first ``refresh_target`` (the one ``on_mount`` runs):
+        #: a chip that mounts with no project announces nothing (LED-…97.24).
+        self._resolved_once = False
 
     # ------------------------------------------------------------------ #
     # Rendering state
@@ -105,11 +109,15 @@ class OpenFolderChip(Button):
 
         A ``None`` target (a project-only family without a project) is the
         genuinely disabled limb: the chip is ``disabled`` (Textual swallows
-        its press — the 0-open contract) and the disabling transition names
-        that family's folder on the status line. Every other missing target
-        stays pressable: dimmed + tooltip, and the press is the create-offer
-        (never for ``session``).
+        its press — the 0-open contract) and a transition to disabled after
+        mount names that family's folder on the status line; the first
+        refresh (at mount) is silent, so an app started with no project
+        prints no reason for a chip nobody touched. Every other missing
+        target stays pressable: dimmed + tooltip, and the press is the
+        create-offer (never for ``session``).
         """
+        announce = self._resolved_once
+        self._resolved_once = True
         app = self.app
         project_dir = app.active_project_dir()
         target = resolve_chip_target(
@@ -120,7 +128,7 @@ class OpenFolderChip(Button):
         )
         self.label = chip_label(self.family, target)
         if target is None:
-            newly_disabled = not self.disabled
+            newly_disabled = announce and not self.disabled
             self.disabled = True
             self.set_class(True, DIMMED_CLASS)
             self.tooltip = TOOLTIP_NO_PROJECT

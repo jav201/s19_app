@@ -5,8 +5,10 @@ per-family no-project message (LLR-148.3), the ``id_suffix`` mechanism of
 LLR-148.4, the real-directory guard (LLR-148.8) and the folder labels over the
 four shipped chip instances plus the no-project arm (LLR-148.10). Inc-3 adds the
 Check Editor arms of LLR-148.4 (the mounted ``open_folder_checks_editor``),
-148.5, 148.6, 148.7 and 148.9; the other screens' arms and AT-B97-12/13/14/23
-land with Inc-4..6.
+148.5, 148.6, 148.7 and 148.9; Inc-4 the Patch Editor arms; Inc-5 the Flow
+Builder arms (the ``flows`` header chip, the ``flow`` help body, the Builder
+vocabularies and their WT widths, the region states); the Execution arms and
+AT-B97-12/13/14/23 land with Inc-6.
 
 Every test opens with a clause that is observable on ``main`` (a family
 membership, a signature, an attribute) so a run on the base tree fails at a
@@ -44,8 +46,8 @@ from s19_app.tui.workspace import (
     WORKAREA_SUBDIR,
     WORKAREA_TEMPLATES,
 )
-from tests.b97_fixtures import load_project, make_junction, make_project
-from tests.b97_probes import CHIP_TEST_SIZE, chip_label, last_status, mount_chip, settle
+from tests.b97_fixtures import load_project, make_junction, make_project, unload_project
+from tests.b97_probes import CHIP_TEST_SIZE, chip_label, last_status, mount_chip, record_statuses, settle
 from tests.test_open_folder_chips import SeamSpy
 
 NO_PROJECT_TAIL = ": no active project — load a project first."
@@ -232,13 +234,17 @@ def test_tc_b97_29_no_project_chips_disabled_with_their_own_reason(
 ) -> None:
     """TC-B97-29 (LLR-148.3, integration): with no project, every family
     whose target is ``None`` (read from ``CHIP_FAMILIES`` at test time) mounts
-    disabled, paints a status naming its own folder and never Reports, and a
-    press opens nothing.
+    disabled and writes no status line at mount (gate fold, operator decision
+    1, LED-…97.24); after a project is loaded and then dropped — a
+    transition to disabled after mount — the chip's status line names its own
+    folder and never Reports; a press of the disabled chip opens nothing.
 
     Why: a dimmed Flow chip that says "(Reports)" sends the user to the wrong
-    screen. RED on main: ``len(CHIP_FAMILIES) == 4``; the shipped chip sets
-    ``REPORTS_NO_PROJECT_REASON`` for any ``None`` target (P-18). Mutation:
-    restore that single reason.
+    screen, and a reason printed at startup for a chip nobody touched reads
+    as an error. RED on main: ``len(CHIP_FAMILIES) == 4``; the shipped chip
+    sets ``REPORTS_NO_PROJECT_REASON`` for any ``None`` target (P-18). RED on
+    the pre-fold Inc-5 tree: the reason is written at mount. Mutation:
+    restore that single reason; announce on the first refresh.
     """
     assert len(fos.CHIP_FAMILIES) >= 6
     spy = SeamSpy(monkeypatch)
@@ -251,28 +257,73 @@ def test_tc_b97_29_no_project_chips_disabled_with_their_own_reason(
         is None
     ]
     assert set(none_families) == set(_NO_PROJECT_FOLDER), none_families
+    statuses = record_statuses(monkeypatch)
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
         observed = {}
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
             for family in none_families:
+                seen = len(statuses)
                 chip = await mount_chip(app, pilot, family, id_suffix="tc29")
-                observed[family] = (chip.disabled, last_status(app))
+                at_mount = [line for line in statuses[seen:] if NO_PROJECT_TAIL in line]
+                disabled = chip.disabled
                 chip.press()
+                await settle(pilot)
+                load_project(app)
+                await settle(pilot)
+                seen = len(statuses)
+                unload_project(app)
+                await settle(pilot)
+                after = [line for line in statuses[seen:] if NO_PROJECT_TAIL in line]
+                observed[family] = (disabled, at_mount, after, chip.disabled)
+                await chip.remove()
                 await settle(pilot)
         return observed
 
     observed = asyncio.run(_drive())
     assert len(observed) >= 3
-    for family, (disabled, status) in observed.items():
-        assert disabled, f"{family}: a None target disables the chip"
-        assert _NO_PROJECT_FOLDER[family] in status, (family, status)
-        assert status.endswith(NO_PROJECT_TAIL), (family, status)
+    for family, (disabled, at_mount, after, disabled_again) in observed.items():
+        assert disabled and disabled_again, f"{family}: a None target disables the chip"
+        assert at_mount == [], (family, at_mount)
+        assert fos.no_project_reason(family) in after, (family, after)
+        assert _NO_PROJECT_FOLDER[family] in fos.no_project_reason(family)
         if family != "reports":
-            assert "reports" not in status.lower(), (family, status)
+            assert all("reports" not in line.lower() for line in after), (family, after)
     assert spy.calls == [], "a disabled chip opens nothing"
+
+
+def test_tc_b97_29_no_status_line_at_startup_without_a_project(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-29 (LLR-148.3 as amended by LED-…97.24, startup arm): an app
+    started with no project writes no chip status line while the header chips
+    mount — on the workspace and after the Flow Builder (its ``📂 Open
+    flows/`` chip) is shown.
+
+    RED on the pre-fold Inc-5 tree: ``📂 Open flows/: no active project —
+    load a project first.`` on the status log at startup (PC-10, 29 of 29
+    snapshot cells). Mutation: announce on the first refresh.
+    """
+
+    statuses = record_statuses(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            at_start = [line for line in statuses if NO_PROJECT_TAIL in line]
+            app.action_show_screen("flow")
+            await settle(pilot)
+            chip = app.query_one("#open_folder_flows", OpenFolderChip)
+            shown = [line for line in statuses if NO_PROJECT_TAIL in line]
+            return at_start, shown, chip.disabled
+
+    at_start, shown, disabled = asyncio.run(_drive())
+    assert disabled, "the no-project flows chip is disabled"
+    assert at_start == [] and shown == [], (at_start, shown)
 
 
 # --------------------------------------------------------------------------- #
@@ -624,34 +675,47 @@ def test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens(
 def test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """TC-B97-65 (LLR-148.10, no-project arm, LED-.6): the ``session`` chip
-    reads ``📂 Open session``, is disabled with no project, and the status
-    reads ``📂 Open session: no active project — load a project first.``;
-    the ``flows`` chip reads ``📂 Open flows/``.
+    """TC-B97-65 (LLR-148.10, no-project arm, LED-.6; LLR-148.3 as amended by
+    LED-…97.24): the ``session`` chip reads ``📂 Open session``, is disabled
+    with no project and writes no status line at mount; after a project is
+    loaded and dropped, the status reads ``📂 Open session: no active project
+    — load a project first.``; the ``flows`` chip reads ``📂 Open flows/``.
 
-    RED on main: ``"session" not in CHIP_FAMILIES``. Mutation: ``📂 Open
+    RED on main: ``"session" not in CHIP_FAMILIES``. RED on the pre-fold
+    Inc-5 tree: the reason is written at mount. Mutation: ``📂 Open
     session/`` (the folder-suffix rule applied to ``session``).
     """
     assert "session" in fos.CHIP_FAMILIES
     spy = SeamSpy(monkeypatch)
+    statuses = record_statuses(monkeypatch)
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
         async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
             await settle(pilot)
             flows = await mount_chip(app, pilot, "flows")
             flows_label = chip_label(flows)
+            seen = len(statuses)
             session = await mount_chip(app, pilot, "session")
-            state = (chip_label(session), session.disabled, last_status(app))
+            at_mount = list(statuses[seen:])
+            state = (chip_label(session), session.disabled)
             session.press()
             await settle(pilot)
-            return flows_label, state
+            load_project(app)
+            await settle(pilot)
+            seen = len(statuses)
+            unload_project(app)
+            await settle(pilot)
+            after = list(statuses[seen:])
+            return flows_label, state, at_mount, after, session.disabled
 
-    flows_label, (label, disabled, status) = asyncio.run(_drive())
+    flows_label, (label, disabled), at_mount, after, disabled_again = asyncio.run(_drive())
     assert flows_label == f"📂 Open {FLOWS_SUBDIR}/"
     assert label == "📂 Open session"
-    assert disabled
-    assert status == "📂 Open session: no active project — load a project first."
+    assert disabled and disabled_again
+    assert [line for line in at_mount if NO_PROJECT_TAIL in line] == [], at_mount
+    assert "📂 Open session: no active project — load a project first." in after, after
     assert spy.calls == []
 
 
@@ -842,7 +906,16 @@ def test_tc_b97_33_check_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None
 #: column — and the legend row; the SHA-256 is in the Inc-3 packet §4. ``☑`` is
 #: deliberately absent: the first Inc-3 capture painted it two cells wide,
 #: glued to the address (LED-2026-10-19-batch-97.12).
-WT_NARROW_GLYPHS = ("✓", "◆", "▪")
+#: Inc-5 extension (design D7, PDR delta 2026-10-21 (b)): the Flow Builder
+#: glyphs seen ONE cell wide in the real Windows Terminal ruler capture
+#: ``evidence/pc-before-inc5-2026-10-21/png/glyph-ruler-wt*.png`` (SHA-256 in
+#: its ``png/SHA256SUMS.txt``), re-confirmed on Inc-5's own captures
+#: ``evidence/inc-5/png/impl.flow-builder*.png``. ``✖`` ``⚠`` ``✔`` ``☑``
+#: ``⏸`` painted two cells in that capture and are absent on purpose.
+WT_NARROW_GLYPHS = (
+    "✓", "◆", "▪",
+    "◉", "▣", "⊕", "▼", "⏚", "»", "≡", "─", "▶", "●", "◈", "○", "□", "✗",
+)
 
 
 def test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal() -> None:
@@ -1138,3 +1211,298 @@ def test_tc_b97_58_patch_editor_region_states(tmp_path: Path, arm: str) -> None:
         assert lines[0] == "No entries yet: Add one, paste a change-set or Load a file.", lines[0]
     if arm == "json_no_document":
         assert lines[0] == "No document yet: Load, paste or Add.", lines[0]
+
+
+
+# --------------------------------------------------------------------------- #
+# Inc-5 — the Flow Builder arms of LLR-148.5, 148.6, 148.7, 148.9
+# --------------------------------------------------------------------------- #
+
+import re as _re  # noqa: E402
+import string as _string  # noqa: E402
+
+FLOW_KINDS = ("source", "patch", "check", "crc", "write_out", "a2b", "external_step")
+
+
+async def _poll(pilot, predicate, attempts: int = 60) -> bool:
+    for _ in range(attempts):
+        await pilot.pause()
+        if predicate():
+            return True
+    return False
+
+
+def test_tc_b97_31_flow_builder_header_carries_both_chips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-31 (LLR-148.5, Builder arm): the Flow Builder header holds one
+    ``OpenFolderChip`` (family ``flows``, ``📂 Open flows/``) and one
+    ``WindowHelpChip``; with a project, a click and an ``enter`` on the folder
+    chip each make exactly one seam call with ``resolve_chip_target``'s target.
+
+    RED on HEAD: the header carries the help chip only (0 folder chips).
+    """
+    from s19_app.tui.window_help import WindowHelpChip
+    from tests.b97_fixtures import flow_project
+
+    spy = SeamSpy(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            project_dir = flow_project(app)
+            app.action_show_screen("flow")
+            await _poll(pilot, lambda: app.query_one("#flow_panel").region.height > 0)
+            screen = app.query_one("#screen_flow")
+            headers = list(screen.query(".db-screen-header"))
+            counts = (
+                sum(len(h.query(OpenFolderChip)) for h in headers),
+                sum(len(h.query(WindowHelpChip)) for h in headers),
+            )
+            label = None
+            if counts[0] == 1:
+                chip = headers[0].query_one(OpenFolderChip)
+                # The chip refreshes to the loaded project a tick after the
+                # load: click once it is laid out and enabled.
+                await _poll(pilot, lambda: chip.region.width > 0 and not chip.disabled)
+                label = chip_label(chip)
+                await pilot.click(f"#{chip.id}")
+                await _poll(pilot, lambda: len(spy.calls) == 1)
+                chip.focus()
+                # Button ignores a key press during its 0.2 s click effect.
+                await _poll(pilot, lambda: app.focused is chip and not chip.has_class("-active"), 120)
+                await pilot.press("enter")
+                await _poll(pilot, lambda: len(spy.calls) == 2)
+            target = fos.resolve_chip_target(
+                project_dir, family="flows", workarea=app.workarea, base_dir=tmp_path
+            )
+            return counts, label, target, list(spy.calls)
+
+    counts, label, target, calls = asyncio.run(_drive())
+    assert counts == (1, 1), f"one folder chip and one help chip in the header: {counts}"
+    assert label == f"📂 Open {FLOWS_SUBDIR}/"
+    assert [path for path, _ in calls] == [target, target]
+
+
+def _flow_label(screen, widget) -> str:
+    """A button label without its glyph prefix or its trailing count; an input
+    or select by the ``Label`` on its own row to its left, else its
+    placeholder."""
+    from textual.widgets import Button, Label as _Label
+
+    if isinstance(widget, Button):
+        return _re.sub(r"\s*\(\d+\)$", "", _strip_glyph(str(widget.label)))
+    row = [
+        str(lab.render()).strip()
+        for lab in screen.query(_Label)
+        if lab.display and lab.region.width and lab.region.y == widget.region.y
+        and lab.region.right <= widget.region.x
+    ]
+    return (row[-1] if row else getattr(widget, "placeholder", "")).rstrip(":").strip()
+
+
+def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
+    """TC-B97-32 (LLR-148.6, Builder arm): the ``flow`` help body holds one
+    ``label — effect`` line, effect non-empty, for every button, chip, input
+    and select label the screen renders over the driven states (each of the 7
+    kinds, both EXT-STEP modes, the funnel editor open), every key it binds
+    (``space``, ``enter``, ``?``) and every glyph of ``FLOW_KIND_GLYPHS``,
+    ``FLOW_CABLE_GLYPHS`` and the result's status glyphs; the control subset
+    counts >= 21 (13 + the 8 add inputs of LLR-146.3).
+
+    RED on HEAD (P-21): 2 of 13 labels named. Mutation: a body line without
+    `` — effect``; coverage read from one kind only.
+    """
+    from textual.widgets import Button, Input as _Input, Select as _Select
+
+    from s19_app.tui import flow_screens as fs
+    from tests.b97_fixtures import flow_project
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            flow_project(app)
+            app.action_show_screen("flow")
+            panel = app.query_one("#flow_panel")
+            await _poll(pilot, lambda: panel.region.height > 0)
+            screen = app.query_one("#screen_flow")
+            controls, keys = set(), set()
+
+            def harvest():
+                for widget in screen.query("*"):
+                    if not widget.display or widget.region.width == 0:
+                        continue
+                    if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                        continue
+                    if isinstance(widget, (Button, _Input, _Select)):
+                        controls.add(_flow_label(screen, widget))
+                    for binding in getattr(type(widget), "BINDINGS", []):
+                        key = binding.key if hasattr(binding, "key") else binding[0]
+                        keys.add({"question_mark": "?"}.get(key, key))
+
+            panel.query_one("#flow_funnel_toggle").press()
+            await _poll(pilot, lambda: panel.query_one("#flow_funnel_editor").display)
+            for kind in FLOW_KINDS:
+                if panel.query(f"#flow_palette_{kind}"):
+                    panel.query_one(f"#flow_palette_{kind}").press()
+                    await _poll(pilot, lambda: str(panel.query_one("#flow_kind").value) == kind)
+                    await settle(pilot, 2)
+                harvest()
+            mode = panel.query_one("#flow_ext_mode", _Select)
+            mode.value = "manual"
+            await _poll(pilot, lambda: str(mode.value) == "manual")
+            await settle(pilot, 2)
+            harvest()
+            return controls, keys
+
+    controls, keys = asyncio.run(_drive())
+    keys &= {"space", "enter", "?"}
+    keys.add("enter")
+    glyphs = set(getattr(fs, "FLOW_KIND_GLYPHS", {}) or {"(no FLOW_KIND_GLYPHS)"})
+    glyphs |= set(getattr(fs, "FLOW_CABLE_GLYPHS", {}))
+    glyphs |= set(fs._BLOCK_STATUS_GLYPH.values())
+    lines = _help_lines("flow")
+    assert len(controls) >= 21, sorted(controls)
+    missing = sorted((controls | keys | glyphs) - set(lines))
+    assert missing == [], f"labels with no `label — effect` line: {missing}"
+    assert all(lines[label] for label in controls | keys | glyphs)
+
+
+#: Characters the Builder paints as card frame and text structure, outside the
+#: three vocabularies (design D7: frame ``╭ ╮ ╰ ╯ │``, ``←`` input from block
+#: #n, ``…``, ``·``, plus ASCII punctuation of file names and ``#n``).
+_FLOW_STRUCTURE = set("╭╮╰╯│←…·—→") | set(_string.punctuation)
+
+
+def _vocabulary_glyphs(text: str) -> set:
+    return {c for c in text if not c.isalnum() and not c.isspace() and c not in _FLOW_STRUCTURE}
+
+
+@pytest.mark.parametrize("arm", ["patch_chain", "report_block"])
+def test_tc_b97_33_flow_glyphs_closed_and_in_the_legend(tmp_path: Path, arm: str) -> None:
+    """TC-B97-33 (LLR-148.7, Builder arm): the glyphs painted in the pipeline
+    and the legend before a run, and at the head of each ``#flow_result``
+    block line after the run, belong to ``FLOW_KIND_GLYPHS`` ∪
+    ``FLOW_CABLE_GLYPHS`` ∪ the status glyphs; the three sets are pairwise
+    disjoint; the one-row legend is generated from the first two (``≡``
+    only when the chain carries a report block — at 220x60, where the
+    10-pair legend fits); no painted text says ``issues``.
+
+    RED on HEAD: no ``FLOW_KIND_GLYPHS``. Mutation: a card painting a glyph
+    outside its vocabulary.
+    """
+    from s19_app.tui import flow_screens as fs
+    from s19_app.tui.services.flow_model import ReportBlock
+    from tests.b97_fixtures import flow_project, load_flow, patch_chain_demo, write_flow
+    from tests.b97_probes import painted_rows
+
+    kinds = getattr(fs, "FLOW_KIND_GLYPHS", None)
+    cables = getattr(fs, "FLOW_CABLE_GLYPHS", None)
+    assert kinds and cables, "the Builder's closed glyph vocabularies exist"
+    statuses = set(fs._BLOCK_STATUS_GLYPH.values())
+    size = (118, 54) if arm == "patch_chain" else (220, 60)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await settle(pilot)
+            project_dir = flow_project(app)
+            stem = "patch_chain"
+            if arm == "report_block":
+                stem = "with_report"
+                write_flow(project_dir, stem, patch_chain_demo() + [ReportBlock()])
+            app.action_show_screen("flow")
+            panel = app.query_one("#flow_panel")
+            await _poll(pilot, lambda: panel.region.height > 0)
+            await load_flow(app, pilot, stem)
+            await settle(pilot, 2)
+            pipeline = "\n".join(painted_rows(app, panel.query_one("#flow_pipeline")))
+            legend = panel.query_one("#flow_legend")
+            legend_rows = [r for r in painted_rows(app, legend) if r.strip()]
+            panel.query_one("#flow_run").press()
+            await _poll(pilot, lambda: bool(panel.query("#flow_result .flow-node-head")))
+            await settle(pilot, 2)
+            heads = [
+                r.strip()[:1] for h in panel.query("#flow_result .flow-node-head") for r in painted_rows(app, h) if r.strip()
+            ]
+            text = "\n".join(painted_rows(app, panel))
+            return pipeline, legend_rows, legend.region.height, heads, text
+
+    pipeline, legend_rows, legend_h, heads, text = asyncio.run(_drive())
+    union = set(kinds) | set(cables) | statuses
+    assert set(kinds).isdisjoint(cables) and set(kinds).isdisjoint(statuses) and set(cables).isdisjoint(statuses)
+    painted = _vocabulary_glyphs(pipeline) | _vocabulary_glyphs("".join(legend_rows)) | set(heads)
+    assert painted <= union, painted - union
+    assert set(heads) <= statuses and heads, heads
+    assert legend_h == 1 and len(legend_rows) == 1, legend_rows
+    expected = (set(kinds) - ({"≡"} if arm == "patch_chain" else set())) | set(cables)
+    assert _vocabulary_glyphs(legend_rows[0]) == expected, (legend_rows, expected)
+    assert "issues" not in text
+
+
+def test_tc_b97_33_flow_glyphs_are_narrow_in_windows_terminal() -> None:
+    """TC-B97-33 (LLR-148.7, Builder WT width arm): every glyph of the three
+    Builder vocabularies is one the real-terminal capture showed one cell
+    wide, so no card or result line glues a glyph to the next cell.
+
+    Why: the headless compositor counts ``✖`` as one cell; Windows Terminal
+    paints it as a two-cell emoji over the next cell. RED on HEAD: the result
+    error mark is ``✖``. Mutation: ``_BLOCK_STATUS_GLYPH`` error back to ``✖``.
+    """
+    from s19_app.tui import flow_screens as fs
+
+    union = set(getattr(fs, "FLOW_KIND_GLYPHS", {})) | set(getattr(fs, "FLOW_CABLE_GLYPHS", {}))
+    union |= set(fs._BLOCK_STATUS_GLYPH.values())
+    assert union - set(WT_NARROW_GLYPHS) == set(), sorted(union - set(WT_NARROW_GLYPHS))
+    assert len(union) == 15, sorted(union)
+
+
+@pytest.mark.parametrize("arm", ["pipeline_empty", "ribbon_no_session", "load_refused"])
+def test_tc_b97_58_flow_builder_region_states(tmp_path: Path, arm: str) -> None:
+    """TC-B97-58 (LLR-148.9, Builder arms): the pipeline with no blocks, the
+    ribbon with no session and the pipeline after a refused load (a NUL ref,
+    ``nul_flow``) each paint exactly one English line naming the state in
+    their region — the refused load on the frame's bottom border row, the
+    chain kept — and no traceback.
+
+    RED on main: no pipeline exists, so the Builder has no empty line.
+    """
+    from tests.b97_fixtures import ES_MARKER_RE, flow_project, load_flow, nul_flow
+    from tests.b97_probes import painted_rows
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = flow_project(app) if arm != "ribbon_no_session" else None
+            app.action_show_screen("flow")
+            panel = app.query_one("#flow_panel")
+            await _poll(pilot, lambda: panel.region.height > 0)
+            if arm == "ribbon_no_session":
+                holder = panel.query("#flow_ribbon")
+                rows = painted_rows(app, holder.first()) if holder else []
+                return [r.strip() for r in rows if r.strip()]
+            holder = panel.query("#flow_pipeline_scroll")
+            if not holder:
+                return []
+            scroll = holder.first()
+            if arm == "pipeline_empty":
+                rows = painted_rows(app, scroll, scroll.scrollable_content_region)
+                return [r.strip() for r in rows if r.strip()]
+            nul_flow(project_dir)
+            await load_flow(app, pilot, "nul_flow")
+            await _poll(pilot, lambda: "refused" in "".join(painted_rows(app, scroll)))
+            return [r.strip() for r in painted_rows(app, scroll) if "refused" in r]
+
+    lines = asyncio.run(_drive())
+    assert len(lines) == 1, (arm, lines)
+    assert not ES_MARKER_RE.search(lines[0]), lines[0]
+    assert "Traceback" not in lines[0]
+    if arm == "pipeline_empty":
+        assert lines[0].startswith("No blocks yet"), lines[0]
+    if arm == "ribbon_no_session":
+        assert lines[0].endswith("(no active project)"), lines[0]
+    if arm == "load_refused":
+        assert "nul_flow" in lines[0] and "kept" in lines[0], lines[0]

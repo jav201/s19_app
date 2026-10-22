@@ -1,0 +1,17 @@
+118x54 rail=108 card_w=24 max_scroll_x=0 scrolls=False
+119x54 rail=109 card_w=24 max_scroll_x=0 scrolls=False
+120x54 rail=92 card_w=21 max_scroll_x=4 scrolls=True
+121x54 rail=93 card_w=21 max_scroll_x=3 scrolls=True
+122x54 rail=94 card_w=21 max_scroll_x=2 scrolls=True
+123x54 rail=95 card_w=21 max_scroll_x=1 scrolls=True
+124x54 rail=96 card_w=21 max_scroll_x=0 scrolls=False
+125x54 rail=97 card_w=21 max_scroll_x=0 scrolls=False
+126x54 rail=98 card_w=21 max_scroll_x=0 scrolls=False
+127x54 rail=99 card_w=21 max_scroll_x=0 scrolls=False
+128x54 rail=100 card_w=22 max_scroll_x=0 scrolls=False
+129x54 rail=101 card_w=22 max_scroll_x=0 scrolls=False
+130x54 rail=102 card_w=22 max_scroll_x=0 scrolls=False
+131x54 rail=103 card_w=22 max_scroll_x=0 scrolls=False
+132x54 rail=104 card_w=23 max_scroll_x=0 scrolls=False
+133x54 rail=105 card_w=23 max_scroll_x=0 scrolls=False
+134x54 rail=106 card_w=23 max_scroll_x=0 scrolls=False

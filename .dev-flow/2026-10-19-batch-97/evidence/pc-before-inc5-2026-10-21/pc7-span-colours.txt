@@ -1,0 +1,9 @@
+# HEAD 09e44de · Textual 8.2.8 · 2026-10-21T19:52:15-06:00
+# pc7_span_colours.py — compositor strips vs render().spans
+A  #by_var   : strip runs 1 fg ['#c9562b'] match 1 | render().spans 0 match 0 | hue distance of painted fg to #c9562b: #c9562b 0.00°
+A  #by_class : strip runs 1 fg ['#c9562b'] match 1 | render().spans 0 match 0 | hue distance of painted fg to #c9562b: #c9562b 0.00°
+A  #by_span  : strip runs 1 fg ['#c9562b'] match 1 | render().spans 1 match 1 | hue distance of painted fg to #c9562b: #c9562b 0.00°
+A  #by_blend : strip runs 1 fg ['#914229'] match 1 | render().spans 0 match 0 | hue distance of painted fg to #c9562b: #914229 1.91°
+A  control: #by_var runs matching WAITING #e8ad3d within 4.0°: 0
+B  notice text: 'A2B wiring refused: empty or malformed binding — use a file name or #<' classes ['sev-warning']
+B  #flow_wiring_notice vs .sev-warning #f6ff8f: strip runs 1 fg ['#f6ff8f'] match 1 | render().spans 0 match 0 | hue distance of painted fg to #f6ff8f: #f6ff8f 0.00°

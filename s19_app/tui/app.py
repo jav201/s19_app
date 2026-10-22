@@ -2388,7 +2388,8 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_flow`` holding a title label and the
+            Container: ``#screen_flow`` holding the header (title, ``?`` and
+            the ``📂 Open flows/`` chip, batch-97 LLR-148.5) and the
             ``FlowBuilderPanel``. Hidden at startup.
 
         Data Flow:
@@ -2397,13 +2398,17 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``FlowBuilderPanel``
+                - ``FlowBuilderPanel`` / ``OpenFolderChip``
             Used by:
                 - ``compose``
         """
         return WindowSection(
             "flow",
-            titled_header("Flow Builder", help_button=WindowHelpChip("flow")),
+            titled_header(
+                "Flow Builder",
+                OpenFolderChip("flows"),
+                help_button=WindowHelpChip("flow"),
+            ),
             FlowBuilderPanel(),
             id="screen_flow",
             classes="db-screen hidden",
@@ -2531,38 +2536,29 @@ class S19TuiApp(App):
             running. Runs synchronously — acceptable for the tracer's small
             images; a worker is deferred to polish.
 
-            batch-70 FB-P2 adds the scope (LLR-104.6). ``FLOW_SCOPE_SINGLE`` —
-            the default — takes the UNCHANGED single-image path; a variant scope
-            dispatches to ``run_flow_over_variants`` and paints the fused
-            result. A variant scope with no declared variant set degrades to an
-            error card rather than silently running one image, because
-            "it ran, over what you did not ask for" is the worse failure.
+            batch-97 (D8, LLR-146.12): the Builder runs the single image only;
+            the batch-70 variant branch is deleted — multi-variant runs live in
+            Flow Execution, one chain per variant. ``RunRequested.scope`` stays
+            in the frozen message shape and always carries
+            ``FLOW_SCOPE_SINGLE``.
 
         Args:
-            event (FlowBuilderPanel.RunRequested): Carries the composed flow and
-                the requested scope.
+            event (FlowBuilderPanel.RunRequested): Carries the composed flow.
 
         Returns:
             None
 
         Dependencies:
             Uses:
-                - ``_active_project_dir`` / ``run_flow`` / ``run_flow_over_variants``
-                - ``read_project_manifest`` (the manifest half of the plan)
+                - ``_active_project_dir`` / ``run_flow``
             Used by:
                 - ``FlowBuilderPanel`` Run button (message dispatch)
         """
-        from .services.flow_execution_service import run_flow, run_flow_over_variants
+        from .services.flow_execution_service import run_flow
         from .services.flow_model import (
-            FLOW_SCOPE_ASSIGNMENTS,
-            FLOW_SCOPE_SINGLE,
             FLOW_STATUS_ERROR,
             FlowContext,
             FlowRunResult,
-        )
-        from .services.variant_execution_service import (
-            SCOPE_ALL,
-            SCOPE_ASSIGNMENTS,
         )
 
         panel = self.query_one("#flow_panel", FlowBuilderPanel)
@@ -2575,40 +2571,13 @@ class S19TuiApp(App):
                 )
             )
             return
-        scope = getattr(event, "scope", FLOW_SCOPE_SINGLE)
-        if scope == FLOW_SCOPE_SINGLE:
-            # batch-95 inc-004b (LLR-143.2): retain the run result so the A2B
-            # diff report can later attribute an image B this flow produced —
-            # the provenance seat mirrors the retained _diff_last_result.
-            self._last_flow_run = run_flow(
-                event.flow, FlowContext(project_dir=project_dir)
-            )
-            panel.render_result(self._last_flow_run)
-            return
-        if self._variant_set is None or not self._variant_set.variants:
-            panel.render_result(
-                FlowRunResult(
-                    status=FLOW_STATUS_ERROR,
-                    diagnostics=[
-                        "no variants declared in this project - "
-                        "run over 'This image' instead"
-                    ],
-                )
-            )
-            return
-        # The flow-layer scope and the execution-layer scope share their string
-        # values; map them EXPLICITLY so the coupling survives a rename of either.
-        service_scope = (
-            SCOPE_ASSIGNMENTS if scope == FLOW_SCOPE_ASSIGNMENTS else SCOPE_ALL
+        # batch-95 inc-004b (LLR-143.2): retain the run result so the A2B
+        # diff report can later attribute an image B this flow produced —
+        # the provenance seat mirrors the retained _diff_last_result.
+        self._last_flow_run = run_flow(
+            event.flow, FlowContext(project_dir=project_dir)
         )
-        fused = run_flow_over_variants(
-            event.flow,
-            FlowContext(project_dir=project_dir),
-            self._variant_set,
-            read_project_manifest(project_dir),
-            service_scope,
-        )
-        panel.render_fused_result(fused)
+        panel.render_result(self._last_flow_run)
 
     def _flow_no_project_error(self, panel: "FlowBuilderPanel") -> None:
         """Render the no-project error card on the flow panel (mirrors Run)."""

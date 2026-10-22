@@ -1,0 +1,10 @@
+# M27 re-run after the TC-38 width arm gained the 60-cell ref (the first run's survivor)
+mutants: 1 arms: 2
+M27-cards-fixed-at-24 [flow_screens.py] test_tc_b97_34_pipeline_layout_monotonic_in_its_inputs: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 failed in 0.36s
+M27-cards-fixed-at-24 [flow_screens.py] test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size1]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:974: AssertionError: ((220, 60), 84, 1)
+    | 1 failed in 2.84s
+exit=0

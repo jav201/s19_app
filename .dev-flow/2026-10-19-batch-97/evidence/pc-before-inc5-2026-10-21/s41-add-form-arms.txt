@@ -1,0 +1,11 @@
+# HEAD 09e44de · Textual 8.2.8 · 2026-10-21T19:52:15-06:00
+# s41_arms.py — a NUL pasted (events.Paste) into each Builder add input, Add, then Run
+source.image_ref             pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest SourceBlock.image_ref entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+patch.change_doc_ref         pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest PatchBlock.change_doc_ref entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+check.check_doc_ref          pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest CheckBlock.check_doc_ref entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+crc.config_ref               pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest CrcBlock.config_ref entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+write_out.output_name        pasted_nul=True added=True notice='' raised=None raw=['ValueError: unlink: embedded null character in path'] codes=[]
+a2b.image_a.ref              pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest A2BBlock.image_a entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+a2b.image_b.ref              pasted_nul=True added=True notice='' raised=None raw=[] codes=["[MANIFEST-PATH-ESCAPE] manifest A2BBlock.image_b entry carries a NUL character - not a path; entry skipped: 'x\\x00y.s19'"]
+external_step.log_ref        pasted_nul=True added=True notice='' raised=None raw=[] codes=[]
+external_step.output_path    pasted_nul=True added=True notice='' raised=None raw=[] codes=[]

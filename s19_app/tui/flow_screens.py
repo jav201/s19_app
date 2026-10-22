@@ -46,10 +46,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import (
     Container,
     Horizontal,
@@ -68,10 +69,14 @@ from textual.widgets import (
 )
 
 from .insight_style import (
+    CRC_FAMILY,
     CYAN,
     DGRAY,
+    GREEN,
+    HILITE,
     LABEL,
     LBLUE,
+    PURPLE,
     RED,
     VALUE,
     DEPTH_BORDER,
@@ -88,6 +93,7 @@ from .services.flow_model import (
     BLOCK_CRC,
     BLOCK_EXTERNAL_STEP,
     BLOCK_PATCH,
+    BLOCK_REPORT,
     BLOCK_SOURCE,
     BLOCK_STATUS_ERROR,
     BLOCK_STATUS_NOTICES,
@@ -99,8 +105,6 @@ from .services.flow_model import (
     CHECK_GATING_BLOCK_OWN,
     EXTERNAL_MODE_MANUAL,
     EXTERNAL_MODE_TERMINAL,
-    FLOW_SCOPE_ALL_VARIANTS,
-    FLOW_SCOPE_ASSIGNMENTS,
     FLOW_SCOPE_SINGLE,
     FLOW_STATUS_ERROR,
     FLOW_STATUS_ISSUES,
@@ -211,16 +215,19 @@ _BLOCK_STATUS_SEV_CLASS = {
     BLOCK_STATUS_WAITING: "sev-warning",
 }
 
-#: A per-status gutter glyph (enum-derived, never file-derived).
+#: A per-status gutter glyph (enum-derived, never file-derived). batch-97
+#: Inc-5 (D7): every glyph here paints one cell in Windows Terminal; the
+#: error mark is ``✗`` (U+2717) — ``✖`` (U+2716) painted as a two-cell emoji
+#: over the next cell, and ``✗`` already means error in the Execution cables.
 _BLOCK_STATUS_GLYPH = {
     BLOCK_STATUS_OK: "●",        # ● ok
     BLOCK_STATUS_NOTICES: "◈",   # ◈ notices
-    BLOCK_STATUS_ERROR: "✖",     # ✖ error
+    BLOCK_STATUS_ERROR: "✗",     # ✗ error
     BLOCK_STATUS_SKIPPED: "○",   # ○ skipped
     # prototype v3: □ — a queued chain cell (the fx_a ▓/□ doctrine): a
     # waiting external step is the chain waiting for the human. (⏸ U+23F8
     # falls to a blue emoji in Windows Terminal even with VS15 — measured.)
-    BLOCK_STATUS_WAITING: "□",   # □ waiting (esperando humano)
+    BLOCK_STATUS_WAITING: "□",   # □ waiting for a human
 }
 
 #: Flow-status → (banner text, ``sev-*`` class) (LLR-088.5). The banner text is
@@ -230,18 +237,27 @@ _FLOW_STATUS_BANNER = {
     FLOW_STATUS_OK: ("CLEAN", "sev-ok"),
     FLOW_STATUS_ISSUES: ("ISSUES", "sev-warning"),
     FLOW_STATUS_ERROR: ("FAILED", "sev-error"),
-    # prototype v3 (spec "paso externo"): the paused banner — the run waits
-    # for the human at an external step.
-    FLOW_STATUS_PAUSED: ("PAUSED - ESPERANDO HUMANO", "sev-warning"),
+    # prototype v3 (the external step): the paused banner — the run waits
+    # for the human at an external step (English since batch-97 LLR-147.5).
+    FLOW_STATUS_PAUSED: ("PAUSED - WAITING FOR A HUMAN", "sev-warning"),
 }
+
+#: The Builder's banner for a finished run whose blocks carry notices only
+#: (no block in error): ``ISSUES`` read as a failure (batch-97 operator
+#: decision 4, LED-…97.27, superseding LLR-088.5's word for that case);
+#: ``ISSUES`` stays for a finished run with a block in error.
+_NOTICES_BANNER = ("NOTICES", "sev-warning")
 
 #: The memory ribbon's fixed cell budget. A FIXED strip sized to clear the
 #: tightest supported regime's measured content width — so it fits the 80×24
 #: floor AND every wider regime with no horizontal overflow (LLR-088.4,
 #: C-13/C-23/C-29). MEASURED in the mounted ``#flow_result`` via
 #: ``App.run_test`` — NOT inherited from the HTML prototype's ~82/150-col
-#: budget (C-16). Measured content widths (both axes, over a real
-#: LOAD→WRITE-OUT run):
+#: budget (C-16). The table is batch-51's, when ``#flow_result`` had a full
+#: border and padding; since batch-97 Inc-5 it has only a top rule row and
+#: ``padding: 0 1``, so every content width is wider than listed and 48 cells
+#: still clear the floor. Measured content widths (both axes, over a real
+#: LOAD→WRITE-OUT run, batch-51):
 #:
 #: ===========  ==============================  ====================
 #: regime       ``#flow_result`` content width  region (border+pad)
@@ -499,16 +515,455 @@ def _wire_drop(
     g.put(col_in, y_dest, "┬", _S_WIRE)
 
 
-class FlowBuilderPanel(ScrollableContainer):
-    """Rail-8 Flow Builder — the fb_a block-diagram composer (batch-94 Inc-002).
+# ---------------------------------------------------------------------------
+# batch-97 Inc-5 — the pipeline rail (fb_A, HLR-146): vocabularies and the
+# pure painters. The rail replaces the grid canvas and the numbered list on
+# screen (both stay mounted and repainted, not displayed — LLR-146.1).
+# ---------------------------------------------------------------------------
+
+#: Block-kind glyphs (D7, one meaning each; the help entry names them). ``≡``
+#: paints only when a loaded flow carries a report block — the palette offers
+#: the other seven. Every glyph paints one cell in Windows Terminal (the
+#: 2026-10-21 ruler capture).
+FLOW_KIND_GLYPHS: Mapping[str, str] = {
+    "◉": "load",
+    "▣": "patch",
+    "✓": "check",
+    "⊕": "CRC",
+    "▼": "write-out",
+    "⏚": "A2B diff",
+    "»": "external step",
+    "≡": "report",
+}
+#: The cable between two cards (D7): ``─`` run, ``▶`` into the next card.
+FLOW_CABLE_GLYPHS: Mapping[str, str] = {"─": "cable", "▶": "feeds the next block"}
+
+#: The PATCH family teal (``screens_directionb.PATCH_TEAL``, in the hue
+#: census); ``flow_screens`` imports nothing from ``screens_directionb``.
+_PATCH_TEAL = "#56e0d6"
+
+#: kind -> (glyph, chip and card label, family colour, what the block does).
+#: CRC paints in ``CRC_FAMILY``, never in the waiting colour (LLR-146.6).
+_KIND_LOOK: Mapping[str, Tuple[str, str, str, str]] = {
+    BLOCK_SOURCE: ("◉", "LOAD", HILITE, "reads an image"),
+    BLOCK_PATCH: ("▣", "PATCH", _PATCH_TEAL, "applies a change doc"),
+    BLOCK_CHECK: ("✓", "CHECK", GREEN, "verifies addresses"),
+    BLOCK_CRC: ("⊕", "CRC", CRC_FAMILY, "stamps a CRC"),
+    BLOCK_WRITE_OUT: ("▼", "WRITE-OUT", GREEN, "writes the image"),
+    BLOCK_A2B: ("⏚", "A2B-DIFF", PURPLE, "diffs two images"),
+    BLOCK_EXTERNAL_STEP: ("»", "EXT-STEP", LBLUE, "human: log + file"),
+    BLOCK_REPORT: ("≡", "REPORT", DGRAY, "report marker"),
+}
+
+#: The single-ref input's field label and placeholder, per kind (fb_A: the
+#: contextual add form names what the kind needs).
+_REF_FIELD: Mapping[str, Tuple[str, str]] = {
+    BLOCK_SOURCE: ("image file", "e.g. prg.s19"),
+    BLOCK_PATCH: ("change doc", "e.g. calib_hotfix.json"),
+    BLOCK_CHECK: ("check doc", "e.g. baseline.chk.json"),
+    BLOCK_CRC: ("CRC template", "e.g. crc.json"),
+    BLOCK_WRITE_OUT: ("output file", "e.g. fw_app_patched.s19"),
+}
+
+#: The path-bearing add inputs of each kind (LLR-146.3 order) and the label
+#: the form shows beside each — the NUL refusal of the add form (S4-1, I-6)
+#: names the field by that label (gate fold ux L1, LED-…97.28).
+_ADD_PATH_INPUTS: Mapping[str, Tuple[Tuple[str, str], ...]] = {
+    BLOCK_SOURCE: (("#flow_ref", _REF_FIELD[BLOCK_SOURCE][0]),),
+    BLOCK_PATCH: (("#flow_ref", _REF_FIELD[BLOCK_PATCH][0]),),
+    BLOCK_CHECK: (("#flow_ref", _REF_FIELD[BLOCK_CHECK][0]),),
+    BLOCK_CRC: (("#flow_ref", _REF_FIELD[BLOCK_CRC][0]),),
+    BLOCK_WRITE_OUT: (("#flow_ref", _REF_FIELD[BLOCK_WRITE_OUT][0]),),
+    BLOCK_A2B: (("#flow_ref_a", "image A"), ("#flow_ref_b", "image B")),
+    BLOCK_EXTERNAL_STEP: (("#flow_ext_log", "log"), ("#flow_ext_output", "output file")),
+}
+
+
+def nul_add_refusal(kind: str, values: Mapping[str, str]) -> Optional[str]:
+    """The add form's NUL refusal line, or ``None`` (LLR-146.14, S4-1).
 
     Summary:
-        The reworked builder (HLR-013): a block PALETTE rail (patch / CRC /
-        A2B-diff — the three fb_a placeable types), a framed CANVAS with grid
-        dots painting the composed flow as box-drawn blocks with typed
-        ``in``/``out`` stubs and ``─│└┐`` cable runs (SOURCE blocks render as
-        file chips dropping onto the next block's image row), and the fb_c
-        audit strip (``#flow_blocks``). The A2B diff block (HLR-014) binds each
+        Checks the chosen kind's path-bearing inputs, in form order, for a
+        NUL character — the one character no path may hold.
+
+    Args:
+        kind (str): The chosen block kind.
+        values (Mapping[str, str]): Input id (``#flow_ref`` …) → typed text.
+
+    Returns:
+        Optional[str]: For the first path-bearing input of ``kind`` holding a
+        NUL character, one English line naming the loader's code for that
+        field (``FLOW-UNSAFE-REF``) and the kind and field as the form labels
+        them, e.g. ``Add refused: [FLOW-UNSAFE-REF] WRITE-OUT output file
+        holds a NUL character - not a path`` (the value is never echoed);
+        ``None`` when every path-bearing input is clean.
+
+    Data Flow:
+        - ``_ADD_PATH_INPUTS[kind]`` → (input id, field label) pairs → the
+          first id whose text holds a NUL → the refusal line.
+
+    Dependencies:
+        Uses:
+            - ``_ADD_PATH_INPUTS`` / ``_KIND_LOOK`` (labels),
+              ``flow_persistence_service.FLOW_UNSAFE_REF`` (the loader's code)
+        Used by:
+            - ``FlowBuilderPanel.on_button_pressed`` (the ``flow_add`` branch,
+              before any block is built)
+    """
+    for input_id, field_label in _ADD_PATH_INPUTS.get(kind, ()):
+        if "\x00" in values.get(input_id, ""):
+            kind_label = _KIND_LOOK.get(kind, ("", kind.upper(), "", ""))[1]
+            return (
+                f"Add refused: [{fps.FLOW_UNSAFE_REF}] {kind_label} {field_label} "
+                "holds a NUL character - not a path"
+            )
+    return None
+
+
+def clip_head(text: str, width: int) -> str:
+    """Keep the head: labels, titles and commands (LLR-146.4).
+
+    Args:
+        text (str): The plain text to fit.
+        width (int): The cells available.
+
+    Returns:
+        str: ``text`` when it fits, else its first ``width − 1`` characters
+        and one ``…``.
+
+    Data Flow:
+        - ``len(text)`` vs ``width`` → unchanged, or head + ``…``.
+
+    Dependencies:
+        Used by:
+            - ``_card_lines`` (titles, notes, commands), ``ribbon_text`` (name,
+              kind summary)
+    """
+    if len(text) <= width:
+        return text
+    return text[: max(0, width - 1)] + "…"
+
+
+def clip_tail(text: str, width: int) -> str:
+    """Keep the tail: file names and paths (LLR-146.4).
+
+    Args:
+        text (str): The plain text to fit.
+        width (int): The cells available.
+
+    Returns:
+        str: ``text`` when it fits, else one ``…`` and its last ``width − 1``
+        characters.
+
+    Data Flow:
+        - ``len(text)`` vs ``width`` → unchanged, or ``…`` + tail.
+
+    Dependencies:
+        Used by:
+            - ``_card_lines`` (refs, logs, outputs), ``ribbon_text`` (session
+              path), ``FlowBuilderPanel._wrote_line`` (written paths)
+    """
+    if len(text) <= width:
+        return text
+    return "…" + text[len(text) - max(0, width - 1):]
+
+
+#: The narrowest card (LLR-149.5) and the cable between two cards (``───▶``).
+CARD_MIN_W = 21
+CABLE_W = 4
+
+
+class PipelineLayout(NamedTuple):
+    """The Builder's derived widths (D21): one card width for the whole chain,
+    and the spare cells integer card widths leave, one on each of the first
+    ``spare`` cables."""
+
+    card_w: int
+    spare: int = 0
+
+
+def pipeline_layout(avail_w: int, n_cards: int) -> PipelineLayout:
+    """Cards share the rail's measured width, never below ``CARD_MIN_W``.
+
+    Args:
+        avail_w (int): ``#flow_pipeline_scroll``'s scrollable content width.
+        n_cards (int): The chain's block count.
+
+    Returns:
+        PipelineLayout: Four cards fill a 108-cell rail at 24 cells each; from
+        the 5th card at 118 columns the cards keep 21 cells and the rail
+        scrolls sideways inside its own frame. When the cards are wider than
+        the minimum, ``spare`` (0 … ``n_cards − 1``) is what the integer
+        division left, so the chain paints exactly ``avail_w`` cells and no
+        void lies right of the last card (LLR-149.5; gate fold F2).
+
+    Data Flow:
+        - ``avail_w − CABLE_W·(n − 1)`` → ``card_w = ⌊…/n⌋`` (≥ 21) → the
+          remainder → ``spare`` (0 when the minimum binds: the rail scrolls).
+
+    Dependencies:
+        Used by:
+            - ``FlowBuilderPanel._refresh_blocks`` (the D21 layout pass) →
+              ``pipeline_text``
+    """
+    if n_cards <= 0:
+        return PipelineLayout(CARD_MIN_W)
+    room = avail_w - CABLE_W * (n_cards - 1)
+    card_w = room // n_cards
+    if card_w < CARD_MIN_W:
+        return PipelineLayout(CARD_MIN_W)
+    return PipelineLayout(card_w, room - card_w * n_cards)
+
+
+_S_CABLE = "bold " + HILITE
+
+
+def _card_rows(blocks: Sequence[FlowBlock], index: int) -> Tuple[List[Tuple[str, str]], Tuple[str, str], str]:
+    """(inputs as (label, painted value), (output label, value), note) of one
+    card. Values are clipped by kind of text: a command keeps its head, every
+    ref and path its tail (LLR-146.4); file-derived text is scrubbed (C-17)."""
+    block = blocks[index]
+    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard
+    prev = ("image", f"← #{index}" if index > 0 else "—")
+    if isinstance(block, SourceBlock):
+        return [("file", scrub(block.image_ref)), ("fmt", block.file_type)], ("out", "image"), ""
+    if isinstance(block, PatchBlock):
+        return [prev, ("doc", scrub(block.change_doc_ref))], ("out", "image"), ""
+    if isinstance(block, CheckBlock):
+        return [prev, ("doc", scrub(block.check_doc_ref))], ("out", "image"), f"gating {block.gating}"
+    if isinstance(block, CrcBlock):
+        return [prev, ("tpl", scrub(block.config_ref))], ("out", "image"), ""
+    if isinstance(block, WriteOutBlock):
+        return [prev], ("out · file", scrub(block.output_name)), f"fmt {block.fmt}"
+    if isinstance(block, ExternalStepBlock):
+        noun = "cmd" if block.mode == EXTERNAL_MODE_TERMINAL else "instr"
+        return (
+            [prev, (noun, scrub(block.instruction)), ("log", scrub(block.log_ref))],
+            ("out · file", scrub(block.output_path)),
+            "",
+        )
+    if isinstance(block, A2BBlock):
+        return (
+            [("A", scrub(_binding_label(block.image_a))), ("B", scrub(_binding_label(block.image_b)))],
+            ("out", "report"),
+            "",
+        )
+    return [], ("out", "report marker"), ""
+
+
+def _card_lines(blocks: Sequence[FlowBlock], index: int, card_w: int, rows_in: int) -> List[Text]:
+    """One card as ``7 + 2·rows_in`` lines, each exactly ``card_w`` cells."""
+    block = blocks[index]
+    glyph, label, colour, does = _KIND_LOOK.get(block.kind, ("·", block.kind.upper(), DGRAY, ""))
+    ins, (out_label, out_value), note = _card_rows(blocks, index)
+    inner = card_w - 4
+    ext = isinstance(block, ExternalStepBlock)
+
+    def row(text: str = "", style: str = VALUE) -> Text:
+        line = Text("│ ", style=_S_RULE)
+        line.append(text, style=style)
+        line.append(" " * (inner - len(text)) + " │", style=_S_RULE)
+        return line
+
+    number = str(index + 1)
+    head = Text("╭─ ", style=_S_RULE)
+    head.append(number, style=_S_DIM)
+    head.append(" " + "─" * (card_w - 5 - len(number)) + "╮", style=_S_RULE)
+    sub = f"{block.mode} · human" if ext else does
+    lines = [head, row(clip_head(f"{glyph} {label}", inner), "bold " + colour), row(clip_head(sub, inner), _S_DIM)]
+    for slot in range(rows_in):
+        if slot < len(ins):
+            name, value = ins[slot]
+            keep = clip_head if ext and name in ("cmd", "instr") else clip_tail
+            lines.append(row(clip_head(f"in · {name}", inner), _S_DIM))
+            lines.append(row(keep(value, inner)))
+        else:
+            lines.extend([row(), row()])
+    lines.append(row(clip_head(note, inner), _S_DIM))
+    lines.append(row(clip_head(out_label, inner), _S_DIM))
+    lines.append(row(clip_tail(out_value, inner), _S_OUT))
+    lines.append(Text("╰" + "─" * (card_w - 2) + "╯", style=_S_RULE))
+    return lines
+
+
+def pipeline_text(blocks: Sequence[FlowBlock], card_w: int, spare: int = 0) -> Text:
+    """The chain as one row of equal-height cards joined by cables (fb_A).
+
+    Args:
+        blocks (Sequence[FlowBlock]): The chain, in order.
+        card_w (int): Every card's width (``pipeline_layout``).
+        spare (int): How many cables, the first ones, take one more cell
+            (``pipeline_layout``), so the chain fills the rail.
+
+    Returns:
+        Text: Every card ``card_w`` cells and ``7 + 2·m`` rows, ``m`` the most
+        inputs any card shows (2, or 3 with an EXT-STEP); the cable ``───▶``
+        (``────▶`` when widened) on the output row between consecutive cards;
+        with no blocks, the one empty-state line.
+
+    Data Flow:
+        - ``blocks`` → ``_card_rows`` / ``_card_lines`` per card → rows joined
+          left to right with the cables. Pure projection of ``blocks``; every
+          file-derived string goes through ``safe_text`` in ``_card_rows``.
+
+    Dependencies:
+        Uses:
+            - ``_card_lines``, ``clip_head`` / ``clip_tail``, ``_KIND_LOOK``
+        Used by:
+            - ``FlowBuilderPanel.compose`` / ``_refresh_blocks``
+    """
+    if not blocks:
+        text = Text()
+        text.append("No blocks yet", style="bold " + VALUE)
+        text.append(" — a chain starts with ", style=_S_DIM)
+        text.append("◉ LOAD", style="bold " + HILITE)
+        text.append(": pick it below, type the image file, press ", style=_S_DIM)
+        text.append("Add", style="bold " + HILITE)
+        text.append(".", style=_S_DIM)
+        return text
+    rows_in = max(len(_card_rows(blocks, i)[0]) for i in range(len(blocks)))
+    cards = [_card_lines(blocks, i, card_w, rows_in) for i in range(len(blocks))]
+    height = len(cards[0])
+    out_row = height - 2
+    lines: List[Text] = []
+    for y in range(height):
+        line = Text()
+        for i, card in enumerate(cards):
+            line.append_text(card[y])
+            if i < len(cards) - 1:
+                cable_w = CABLE_W + (1 if i < spare else 0)
+                if y == out_row:
+                    line.append("─" * (cable_w - 1) + "▶", style=_S_CABLE)
+                else:
+                    line.append(" " * cable_w)
+        lines.append(line)
+    return _join_lines(lines)
+
+
+#: The ribbon's no-session state (LLR-146.11 empty arm, LLR-148.9).
+RIBBON_NO_SESSION = "(no active project)"
+
+
+def ribbon_text(name: str, dirty: bool, kinds: Sequence[str], session: str, width: int) -> Text:
+    """The identity ribbon, ``width`` cells (LLR-146.11).
+
+    Args:
+        name (str): The flow's display name.
+        dirty (bool): Unsaved edits exist.
+        kinds (Sequence[str]): The chain's block kinds, in order.
+        session (str): The session directory, ``""`` with no project.
+        width (int): The ribbon's measured content width.
+
+    Returns:
+        Text: ``Flow: <name>  · saved|· unsaved  LOAD → PATCH …`` and,
+        right-aligned, ``session <path tail>``. The saved state is a word
+        (gate fold, operator decision 3, LED-…97.26; batch-53's ``✓`` / ``●``
+        also meant check block / ok on this screen): ``· saved`` in
+        ``DGRAY``, ``· unsaved`` in ``YELLOW`` — the attention colour the
+        dirty strip already carried (``.sev-warning``); the amber
+        ``WAITING_HUMAN`` stays reserved for what waits for a human. The name
+        keeps its head, the kind summary its head (clipped first), the
+        session path its tail.
+
+    Data Flow:
+        - name / state / kinds / session → one line; every file-derived
+          string is scrubbed by ``safe_text`` (C-17).
+
+    Dependencies:
+        Uses:
+            - ``clip_head`` / ``clip_tail``, ``_KIND_LOOK``, ``safe_text``
+        Used by:
+            - ``FlowBuilderPanel._name_strip_text``
+    """
+    state, state_style = ("· unsaved", YELLOW) if dirty else ("· saved", DGRAY)
+    path = safe_text(session).plain if session else ""
+    right_full = ("session " + path) if path else ("session " + RIBBON_NO_SESSION)
+    right_w = min(len(right_full), max(len("session ") + 12, width * 2 // 5))
+    right = Text("session ", style=_S_DIM)
+    if path:
+        right.append(clip_tail(path, right_w - len("session ")), style=_S_OUT)
+    else:
+        right.append(clip_tail(RIBBON_NO_SESSION, right_w - len("session ")), style=_S_DIM)
+    left = Text("Flow: ")
+    room = max(4, width - right.cell_len - 2 - 6 - 2 - len(state))
+    left.append(clip_head(safe_text(name).plain, room), style="bold " + VALUE)
+    left.append("  ")
+    left.append(state, style=state_style)
+    summary = " → ".join(_KIND_LOOK.get(k, ("", k.upper(), "", ""))[1] for k in kinds)
+    gap = width - left.cell_len - right.cell_len
+    if summary and gap > 6:
+        left.append("  ")
+        left.append(clip_head(summary, gap - 4), style=_S_DIM)
+    left.append(" " * max(1, width - left.cell_len - right.cell_len))
+    left.append_text(right)
+    return left
+
+
+def flow_legend_text(with_report: bool) -> Text:
+    """The one-row legend, generated from the two Builder vocabularies.
+
+    Args:
+        with_report (bool): The chain carries a report block.
+
+    Returns:
+        Text: ``glyph meaning`` pairs of ``FLOW_KIND_GLYPHS`` then
+        ``FLOW_CABLE_GLYPHS``; ``≡ report`` only while ``with_report`` (all
+        ten pairs, 116 cells, do not fit the 112-cell panel at 118 columns —
+        D7, the legend from the mapping).
+
+    Data Flow:
+        - the two mappings → filtered pairs → one styled line.
+
+    Dependencies:
+        Uses:
+            - ``FLOW_KIND_GLYPHS``, ``FLOW_CABLE_GLYPHS``
+        Used by:
+            - ``FlowBuilderPanel.compose`` / ``_refresh_blocks``
+    """
+    pairs = [(g, m) for g, m in FLOW_KIND_GLYPHS.items() if with_report or g != "≡"]
+    pairs += list(FLOW_CABLE_GLYPHS.items())
+    text = Text()
+    for i, (glyph, meaning) in enumerate(pairs):
+        if i:
+            text.append("  ")
+        text.append(glyph, style=VALUE)
+        text.append(f" {meaning}", style=_S_DIM)
+    return text
+
+
+class KindChip(Button):
+    """A one-row block-kind chip: ``enter`` (Button's own) and ``space`` set
+    the kind (LLR-146.13). Declared here, not reused from
+    ``screens_directionb.TabChip``, so ``flow_screens`` gains no import edge.
+
+    Data Flow:
+        - ``enter`` / ``space`` / click → ``Button.Pressed`` →
+          ``FlowBuilderPanel.on_button_pressed`` (``flow_palette_<kind>``) →
+          ``#flow_kind`` set → the add form shows that kind's inputs.
+
+    Dependencies:
+        Uses:
+            - ``textual.widgets.Button`` (``action_press``)
+        Used by:
+            - ``FlowBuilderPanel.compose`` (one per ``_KIND_OPTIONS`` kind)
+    """
+
+    BINDINGS = [Binding("space", "press", "Press", show=False)]
+
+
+class FlowBuilderPanel(ScrollableContainer):
+    """Rail-8 Flow Builder — the pipeline rail (batch-97 Inc-5, fb_A).
+
+    Summary:
+        batch-97 (HLR-146): an identity ribbon (name, saved glyph, kind
+        summary, session path tail), the chain as ONE row of cards joined by
+        cables in a frame exactly as tall as the cards, a kind-chip palette
+        with an add form showing only the chosen kind's inputs, the copy /
+        paste strip with ``Variables (n)``, the foot row with Run as the one
+        filled action, and the result area under Run as the growing region.
+        The batch-94 grid canvas and numbered list (``#flow_canvas``,
+        ``#flow_blocks``) stay mounted and painted, not displayed. The A2B
+        diff block (HLR-014) binds each
         image input to a flow output (``#<n>``) or a file, refused at wiring
         time when both inputs are external / the reference is downstream / the
         target produces no image — a refused binding never enters the flow, so
@@ -519,10 +974,10 @@ class FlowBuilderPanel(ScrollableContainer):
         via ``safe_text`` (C-17).
 
     Data Flow:
-        - Palette button / Add → block appended to ``self._blocks`` → canvas
-          + ledger repaint.
-        - Run → ``RunRequested(Flow(blocks=self._blocks), scope)`` → app →
-          ``run_flow`` → :meth:`render_result`.
+        - Kind chip / Add → block appended to ``self._blocks`` → pipeline,
+          ribbon and legend repaint (the hidden canvas and list too).
+        - Run → ``RunRequested(Flow(blocks=self._blocks), FLOW_SCOPE_SINGLE)``
+          → app → ``run_flow`` → :meth:`render_result`.
 
     Dependencies:
         Uses:
@@ -552,22 +1007,12 @@ class FlowBuilderPanel(ScrollableContainer):
 
     #: The external-step mode options (label, mode value) — TERMINAL runs an
     #: exact command outside the app; MANUAL shows the instruction. Both
-    #: ALWAYS carry the mandatory log + the output file (spec v3).
+    #: ALWAYS carry the mandatory log + the output file (spec v3). Labels fit
+    #: the one-row mode select (batch-97 Inc-5).
     _EXT_MODE_OPTIONS = [
-        ("Terminal (exact command)", EXTERNAL_MODE_TERMINAL),
-        ("Manual (instruction)", EXTERNAL_MODE_MANUAL),
+        ("Terminal", EXTERNAL_MODE_TERMINAL),
+        ("Manual", EXTERNAL_MODE_MANUAL),
     ]
-
-    #: The fb_a palette rail — the three placeable block types the contract
-    #: pins (TC-B94-20 census): patch / CRC / A2B-diff. Each button selects
-    #: the matching ``#flow_kind`` entry (the chain kinds stay on the select).
-    #: prototype v3 adds the external-step type to the same rail idiom.
-    _PALETTE_TYPES = (
-        ("▣", "PATCH", BLOCK_PATCH),
-        ("⊕", "CRC", BLOCK_CRC),
-        ("⏚", "A2B-DIFF", BLOCK_A2B),
-        ("»", "EXT-STEP", BLOCK_EXTERNAL_STEP),
-    )
 
     #: The CHECK per-block gating options (label, gating value) — the minimal
     #: user-visible setter (LLR-086.1, the OPEN gating-UI flag). Read by Add
@@ -577,22 +1022,15 @@ class FlowBuilderPanel(ScrollableContainer):
         ("block-own-op", CHECK_GATING_BLOCK_OWN),
     ]
 
-    #: Run-scope options (batch-70 FB-P2, LLR-104.6). "This image" is the
-    #: DEFAULT and is today's single-image run, so the new dimension is opt-in
-    #: and an operator who never touches this control sees no change (AC-6).
-    _SCOPE_OPTIONS = [
-        ("This image", FLOW_SCOPE_SINGLE),
-        ("All variants", FLOW_SCOPE_ALL_VARIANTS),
-        ("Assigned variants", FLOW_SCOPE_ASSIGNMENTS),
-    ]
-
     class RunRequested(Message):
         """The operator pressed Run — carries the composed flow to the app.
 
         Args:
             flow (Flow): The ordered typed-block flow to execute.
-            scope (str): One of ``FLOW_SCOPES`` — which images to run over
-                (batch-70 FB-P2). Defaults to the single-image run.
+            scope (str): One of ``FLOW_SCOPES``. The Builder always sends
+                ``FLOW_SCOPE_SINGLE`` (batch-97 LLR-146.12: multi-variant runs
+                live in Flow Execution, one chain per variant); the field stays
+                for the frozen message shape (batch-94 ``#D3``).
         """
 
         def __init__(self, flow: Flow, scope: str = FLOW_SCOPE_SINGLE) -> None:
@@ -628,9 +1066,8 @@ class FlowBuilderPanel(ScrollableContainer):
         self._flow_name: str = "flow"
         #: Unsaved-edits flag — glyph ``●`` (dirty) / ``✓`` (saved), C-10 primary.
         self._dirty: bool = False
-        #: The session artifact dir (the active project work area) — ALWAYS
-        #: shown under the add row (spec v3); set by the app via
-        #: :meth:`set_session_dir`.
+        #: The session artifact dir (the active project work area), shown on
+        #: the ribbon (LLR-146.11); set by the app via :meth:`set_session_dir`.
         self._session_dir: Optional[str] = None
         #: The flow-level FUNNEL table (batch-96 B1) — ordered (name, value)
         #: pairs declared beside the canvas; rides ``current_flow`` into
@@ -640,216 +1077,150 @@ class FlowBuilderPanel(ScrollableContainer):
         #: ONE block (the ``flow_to_dict`` projection), never a live
         #: instance, so a paste always builds a fresh block object.
         self._clipboard: Optional[dict] = None
+        #: D21 layout state: the measured (rail width, ribbon width) of the
+        #: last layout pass, and the card width it derived for the chain.
+        self._layout_key: Optional[Tuple[int, int]] = None
+        self._card_w: int = CARD_MIN_W
+        self._spare: int = 0
+        #: The last run's written paths, re-clipped by the layout pass.
+        self._wrote_paths: List[str] = []
 
     def set_session_dir(self, path: str) -> None:
-        """Publish the session artifact dir (spec v3: ALWAYS on screen)."""
-        self._session_dir = path
-        try:
-            strip = self.query_one("#flow_ext_session", Static)
-        except Exception:
-            return  # not mounted yet — the compose default paints instead
-        strip.update(
-            safe_text(
-                f"sesión: {path} — al confirmar, la SALIDA se copia aquí"
-            )
+        """Publish the session artifact dir; it rides the ribbon (LLR-146.11)."""
+        self._session_dir = path or None
+        if not self.is_mounted:
+            return
+        self.query_one("#flow_ext_session", Static).update(
+            safe_text(f"session: {path} — on confirm, the output file is copied here")
+            if path
+            else safe_text(f"session: {RIBBON_NO_SESSION}")
         )
+        self._refresh_name_strip()
 
     def compose(self) -> ComposeResult:
-        yield Static(
-            self._name_strip_text(),
-            id="flow_name_strip",
-            markup=False,
-            classes=self._name_strip_class(),
-        )
+        with Horizontal(id="flow_ribbon"):
+            yield Static(
+                self._name_strip_text(),
+                id="flow_name_strip",
+                markup=False,
+                classes=self._name_strip_class(),
+            )
         yield Label(
-            "Flow Builder (fb_a): pick a block kind, enter its ref(s), Add; "
-            "wire A2B inputs as a file name or #<n> (a flow output).",
+            "Flow Builder: pick a block kind, enter its refs, Add; wire A2B "
+            "inputs as a file name or #<n> (a flow output).",
             id="flow_help",
             markup=False,
         )
-        palette_row = Horizontal(
-            *(
-                Button(f"{glyph} {name}", id=f"flow_palette_{kind}")
-                for glyph, name, kind in self._PALETTE_TYPES
-            ),
-            id="flow_palette",
-        )
-        palette_row.styles.height = 3
-        yield palette_row
-        kind_select = Select(
-            self._KIND_OPTIONS,
-            value=BLOCK_SOURCE,
-            allow_blank=False,
-            id="flow_kind",
-        )
-        kind_select.styles.width = 28
-        gating_select = Select(
-            self._GATING_OPTIONS,
-            value=CHECK_GATING_ADVISORY,
-            allow_blank=False,
-            id="flow_gating",
-        )
-        gating_select.styles.width = 18
-        ref_input = OsClipboardInput(
-            placeholder="ref (image / change-doc / output name)",
-            id="flow_ref",
-        )
-        ref_input.styles.width = 50
-        ref_a_input = OsClipboardInput(
-            placeholder="image A — file or #n",
-            id="flow_ref_a",
-        )
-        ref_a_input.styles.width = 22
-        ref_b_input = OsClipboardInput(
-            placeholder="image B — file or #n",
-            id="flow_ref_b",
-        )
-        ref_b_input.styles.width = 22
-        add_button = Button("Add", id="flow_add")
-        add_button.styles.width = 8
-        add_row = Horizontal(
-            kind_select,
-            gating_select,
-            ref_input,
-            ref_a_input,
-            ref_b_input,
-            add_button,
-            id="flow_add_row",
-        )
-        #: Altura explícita: los hijos (Select/Input/Button) miden 3 filas y
-        #: un Horizontal de altura 1 solapa al hermano siguiente (artefacto
-        #: de rasterización con overflow del panel).
-        add_row.styles.height = 3
-        yield add_row
-        # prototype v3 (spec "paso externo"): the external-step config row —
-        # mode, instruction/command, MANDATORY log ref, output path. Visible
-        # only when the kind select is on External step (the F3 idiom).
-        ext_mode_select = Select(
-            self._EXT_MODE_OPTIONS,
-            value=EXTERNAL_MODE_TERMINAL,
-            allow_blank=False,
-            id="flow_ext_mode",
-        )
-        ext_mode_select.styles.width = 26
-        ext_instruction_input = OsClipboardInput(
-            placeholder="comando exacto (terminal) / instrucción (manual)",
-            id="flow_ext_instruction",
-        )
-        ext_instruction_input.styles.width = 28
-        ext_log_input = OsClipboardInput(
-            placeholder="LOG — obligatorio (texto de constancia)",
-            id="flow_ext_log",
-        )
-        ext_log_input.styles.width = 26
-        ext_output_input = OsClipboardInput(
-            placeholder="SALIDA — path absoluto preferido",
-            id="flow_ext_output",
-        )
-        ext_output_input.styles.width = 28
-        ext_row = Horizontal(
-            ext_mode_select,
-            ext_instruction_input,
-            ext_log_input,
-            ext_output_input,
-            id="flow_ext_row",
-        )
-        ext_row.styles.height = 3
-        yield ext_row
-        #: The session directory is ALWAYS on screen (spec v3): on confirm the
-        #: flow copies the external step's output file INTO this folder and
-        #: downstream blocks reference that copy.
-        yield Static(
-            "sesión: (sin proyecto activo — el directorio de sesión se "
-            "muestra al cargar un proyecto)",
-            id="flow_ext_session",
-            markup=False,
-            classes="flow-node-summary sev-neutral",
-        )
-        # batch-96 B1: the FUNNEL editor — a collapsible flow-level table of
-        # ${NAME} → value declarations (one per flow), applied to PATCH
-        # change-doc texts at run time.
-        yield Button("Funnel (0)", id="flow_funnel_toggle")
-        funnel_name_input = OsClipboardInput(
-            placeholder="VARIABLE ([A-Z0-9_])",
-            id="flow_funnel_name",
-        )
-        funnel_name_input.styles.width = 24
-        funnel_value_input = OsClipboardInput(
-            placeholder="valor a sustituir",
-            id="flow_funnel_value",
-        )
-        funnel_value_input.styles.width = 30
-        funnel_add = Button("Añadir var", id="flow_funnel_add")
-        funnel_add.styles.width = 14
-        funnel_editor = Horizontal(
-            funnel_name_input,
-            funnel_value_input,
-            funnel_add,
-            id="flow_funnel_editor",
-        )
-        funnel_editor.styles.height = 3
-        yield funnel_editor
-        yield Static("", id="flow_funnel_list", markup=False)
-        # batch-96 B2: block COPY/PASTE — the canvas has no block selection,
-        # so the ledger number (1-based, empty = last) picks the block.
-        pick_input = OsClipboardInput(
-            placeholder="nº",
-            id="flow_pick",
-        )
-        pick_input.styles.width = 6
-        copy_button = Button("Copiar", id="flow_copy")
-        copy_button.styles.width = 10
-        paste_button = Button("Pegar", id="flow_paste")
-        paste_button.styles.width = 10
-        clip_status = Static("", id="flow_clip_status", markup=False)
-        clip_row = Horizontal(
-            pick_input,
-            copy_button,
-            paste_button,
-            clip_status,
-            id="flow_clip_row",
-        )
-        clip_row.styles.height = 3
-        yield clip_row
+        with ScrollableContainer(id="flow_pipeline_scroll"):
+            yield Static(
+                pipeline_text(self._blocks, self._card_w),
+                id="flow_pipeline",
+                classes="nowrap-pipeline",
+            )
         yield Static(self._canvas_text(), id="flow_canvas", markup=False)
-        yield Static("", id="flow_wiring_notice", markup=False)
         yield Static(self._blocks_text(), id="flow_blocks", markup=False)
-        run_row = Horizontal(
-            Select(
-                self._SCOPE_OPTIONS,
-                value=FLOW_SCOPE_SINGLE,
-                allow_blank=False,
-                id="flow_scope",
-            ),
-            Button("Run", id="flow_run", variant="primary"),
-            Button("Clear", id="flow_clear"),
-            Button("Save…", id="flow_save"),
-            Button("Load…", id="flow_load"),
-            id="flow_run_row",
-        )
-        run_row.styles.height = 3
-        yield run_row
+        with Horizontal(id="flow_palette"):
+            yield Label("add block", classes="flow-field-label")
+            for _label, kind in self._KIND_OPTIONS:
+                glyph, name, _colour, _does = _KIND_LOOK[kind]
+                yield KindChip(f"{glyph} {name}", id=f"flow_palette_{kind}", classes="kind-chip")
+        with Horizontal(id="flow_add_row"):
+            yield Select(self._KIND_OPTIONS, value=BLOCK_SOURCE, allow_blank=False, id="flow_kind")
+            yield Static("", classes="flow-kind-tag")
+            with Vertical(classes="flow-add-fields"):
+                with Horizontal(classes="flow-add-line"):
+                    yield Label("", classes="flow-field-label flow-ref-label")
+                    yield OsClipboardInput(placeholder="", id="flow_ref", compact=True)
+                    yield Label("gating", classes="flow-field-label flow-gating-label")
+                    yield Select(
+                        self._GATING_OPTIONS,
+                        value=CHECK_GATING_ADVISORY,
+                        allow_blank=False,
+                        id="flow_gating",
+                        compact=True,
+                    )
+                    yield Label("image A", classes="flow-field-label flow-a2b-label")
+                    yield OsClipboardInput(placeholder="file or #n", id="flow_ref_a", compact=True)
+                    yield Label("image B", classes="flow-field-label flow-a2b-label")
+                    yield OsClipboardInput(placeholder="file or #n", id="flow_ref_b", compact=True)
+                    yield Label("mode", classes="flow-field-label flow-ext-label")
+                    yield Select(
+                        self._EXT_MODE_OPTIONS,
+                        value=EXTERNAL_MODE_TERMINAL,
+                        allow_blank=False,
+                        id="flow_ext_mode",
+                        compact=True,
+                    )
+                    yield Label("command", classes="flow-field-label flow-ext-label flow-instruction-label")
+                    yield OsClipboardInput(
+                        placeholder="the exact command run outside the app",
+                        id="flow_ext_instruction",
+                        compact=True,
+                    )
+                # The EXT-STEP second row (LLR-146.3: two rows). It sits inside
+                # the add fields, so the focus chain reaches the log and the
+                # output before Add (LLR-146.13).
+                with Horizontal(id="flow_ext_row"):
+                    yield Label("log", classes="flow-field-label")
+                    yield OsClipboardInput(placeholder="log file (required)", id="flow_ext_log", compact=True)
+                    yield Label("output file", classes="flow-field-label")
+                    yield OsClipboardInput(
+                        placeholder="the file the step leaves, absolute path preferred",
+                        id="flow_ext_output",
+                        compact=True,
+                    )
+            yield Button("+ Add", id="flow_add")
+        with Horizontal(id="flow_clip_row"):
+            yield Label("copy block #", classes="flow-field-label")
+            yield OsClipboardInput(placeholder="last", id="flow_pick", compact=True)
+            yield Button("Copy", id="flow_copy")
+            yield Button("Paste", id="flow_paste")
+            yield Static("", id="flow_clip_status", markup=False)
+            yield Button("Variables (0)", id="flow_funnel_toggle")
+        with Horizontal(id="flow_funnel_editor"):
+            yield Label("variable", classes="flow-field-label")
+            yield OsClipboardInput(placeholder="NAME [A-Z0-9_]", id="flow_funnel_name", compact=True)
+            yield Label("value", classes="flow-field-label")
+            yield OsClipboardInput(placeholder="the value to substitute", id="flow_funnel_value", compact=True)
+            yield Button("+ Add var", id="flow_funnel_add")
+        yield Static("", id="flow_funnel_list", markup=False)
+        yield Static("", id="flow_wiring_notice", markup=False)
+        #: Kept mounted, never displayed: the session rides the ribbon now.
+        yield Static(f"session: {RIBBON_NO_SESSION}", id="flow_ext_session", markup=False)
+        with Horizontal(id="flow_run_row"):
+            yield Button("Run", id="flow_run", classes="fill-accent")
+            yield Button("Clear", id="flow_clear")
+            yield Button("Save…", id="flow_save")
+            yield Button("Load…", id="flow_load")
         yield VerticalScroll(id="flow_result")
+        yield Static(
+            flow_legend_text(False),
+            id="flow_legend",
+            classes="glyph-legend nowrap-legend",
+        )
 
-    # -- name strip (unchanged tracer contract) ------------------------------
+    # -- the identity ribbon (the tracer's name strip, widened) --------------
 
     def _name_strip_text(self) -> Text:
-        """The name-strip line: ``Flow: <name>  <glyph>`` (glyph-primary, C-10).
+        """The ribbon line: ``Flow: <name>  <glyph>``, the kind summary and the
+        session path's tail (LLR-146.11), at the ribbon's measured width.
 
-        The name is rendered markup-safe (a loaded/imported name can be hostile);
-        the glyph ``●`` (dirty) / ``✓`` (saved) is the PRIMARY state cue, colour
-        the secondary one.
+        The glyph ``●`` (dirty) / ``✓`` (saved) stays the PRIMARY state cue
+        (C-10), colour the secondary one; every file-derived string is
+        scrubbed (C-17).
         """
-        glyph = "●" if self._dirty else "✓"
-        text = Text()
-        text.append("Flow: ")
-        text.append(safe_text(self._flow_name))
-        text.append(f"  {glyph}")
-        return text
+        width = self._layout_key[1] if self._layout_key else 108
+        return ribbon_text(
+            self._flow_name,
+            self._dirty,
+            [block.kind for block in self._blocks],
+            self._session_dir or "",
+            width,
+        )
 
     def _name_strip_class(self) -> str:
         """``sev-warning`` when dirty, ``sev-neutral`` when saved (secondary cue)."""
-        return "flow-name-strip " + ("sev-warning" if self._dirty else "sev-neutral")
+        return "flow-name-strip nowrap-ribbon " + ("sev-warning" if self._dirty else "sev-neutral")
 
     def _refresh_name_strip(self) -> None:
         strip = self.query_one("#flow_name_strip", Static)
@@ -857,8 +1228,10 @@ class FlowBuilderPanel(ScrollableContainer):
         strip.set_classes(self._name_strip_class())
 
     def _mark_dirty(self) -> None:
-        """Flag unsaved edits and repaint the name strip."""
+        """Flag unsaved edits and repaint the name strip; a chain edit also
+        retires the frame's load-refusal line."""
         self._dirty = True
+        self.query_one("#flow_pipeline_scroll").border_subtitle = None
         self._refresh_name_strip()
 
     @property
@@ -894,10 +1267,11 @@ class FlowBuilderPanel(ScrollableContainer):
         #: batch-96 B1: a loaded flow's funnel table replaces the canvas one.
         self._funnel = list(flow.funnel)
         self._dirty = False
+        self.query_one("#flow_pipeline_scroll").border_subtitle = None
         self._refresh_blocks()
         self._refresh_funnel_list()
         self._refresh_name_strip()
-        self.query_one("#flow_result", VerticalScroll).remove_children()
+        self._show_result_empty()
 
     def mark_saved(self, stem: str) -> None:
         """Record a successful save: identity = ``stem``, clear dirty, confirm.
@@ -931,10 +1305,17 @@ class FlowBuilderPanel(ScrollableContainer):
             Every file-derived string (the picked name, each finding message) is
             rendered ``safe_text`` + ``markup=False`` (C-17).
 
+        batch-97 (LLR-148.9): the pipeline frame names the refusal on its
+        bottom border row — one English line, the chain kept — while the card
+        under Run holds the findings.
+
         Args:
             flow_name (str): The rejected file's stem (untrusted — markup-safe).
             findings (List[ValidationIssue]): The loader's fail-closed findings.
         """
+        self.query_one("#flow_pipeline_scroll").border_subtitle = safe_text(
+            f"load refused: flows/{flow_name}.json — this chain is kept"
+        )
         container = self.query_one("#flow_result", VerticalScroll)
         container.remove_children()
         children: List[Static] = [
@@ -950,7 +1331,8 @@ class FlowBuilderPanel(ScrollableContainer):
         for finding in findings:
             children.append(
                 Static(
-                    safe_text(finding.message),  # SINK: file-derived finding text
+                    # batch-97 (HLR-146): the line names its finding code.
+                    safe_text(f"[{finding.code}] {finding.message}"),  # SINK: file-derived finding text
                     markup=False,
                     classes="flow-quarantine-line",
                 )
@@ -1218,8 +1600,50 @@ class FlowBuilderPanel(ScrollableContainer):
         return text
 
     def _refresh_blocks(self) -> None:
+        """Repaint the pipeline, its frame title, the legend and the ribbon;
+        the hidden canvas and list are repainted too (their readers stay)."""
         self.query_one("#flow_blocks", Static).update(self._blocks_text())
         self.query_one("#flow_canvas", Static).update(self._canvas_text())
+        if self._layout_key is not None:
+            self._card_w, self._spare = pipeline_layout(self._layout_key[0], len(self._blocks))
+        self.query_one("#flow_pipeline", Static).update(pipeline_text(self._blocks, self._card_w, self._spare))
+        count = len(self._blocks)
+        self.query_one("#flow_pipeline_scroll").border_title = f"chain · {count} block{'' if count == 1 else 's'}"
+        self.query_one("#flow_legend", Static).update(
+            flow_legend_text(any(isinstance(b, ReportBlock) for b in self._blocks))
+        )
+        self._refresh_name_strip()
+
+    # -- the layout pass (D21): widths read from the regions after layout ----
+
+    def on_resize(self) -> None:
+        self.call_after_refresh(self._apply_layout)
+
+    def on_show(self) -> None:
+        self.call_after_refresh(self._apply_layout)
+
+    def _apply_layout(self) -> None:
+        """Derive the card width from the rail's measured width and recompose
+        the width-dependent text (cards, ribbon tail); an equal reading
+        repaints nothing."""
+        rail = self.query_one("#flow_pipeline_scroll").scrollable_content_region.width
+        ribbon = self.query_one("#flow_name_strip").content_region.width
+        if rail <= 0 or ribbon <= 0 or (rail, ribbon) == self._layout_key:
+            return
+        self._layout_key = (rail, ribbon)
+        self._refresh_blocks()
+        for line, path in zip(self.query(".flow-wrote-path"), self._wrote_paths):
+            line.update(safe_text(self._wrote_line(path)))
+
+    def _wrote_line(self, path: str) -> str:
+        """One written-path line, ``wrote <path>``, the path's tail kept at the
+        result area's content width (ux M1, LLR-149.4); the caller renders it
+        through ``safe_text`` (C-17)."""
+        width = self.query_one("#flow_result").scrollable_content_region.width - 1
+        plain = safe_text(path).plain
+        if width > len("wrote ") + 4:
+            plain = clip_tail(plain, width - len("wrote "))
+        return "wrote " + plain
 
     # -- funnel (batch-96 B1) -------------------------------------------------
 
@@ -1227,7 +1651,7 @@ class FlowBuilderPanel(ScrollableContainer):
         """One ``NAME = value`` line per declared variable (markup-safe)."""
         if not self._funnel:
             return safe_text(
-                "(funnel vacío — los ${NAME} de los change-docs pasan intactos)"
+                "no variables — ${NAME} placeholders in change docs pass through unchanged"
             )
         text = Text()
         for name, value in self._funnel:
@@ -1240,7 +1664,7 @@ class FlowBuilderPanel(ScrollableContainer):
         """Repaint the funnel table + the toggle's count badge."""
         self.query_one("#flow_funnel_list", Static).update(self._funnel_list_text())
         toggle = self.query_one("#flow_funnel_toggle", Button)
-        toggle.label = f"Funnel ({len(self._funnel)})"
+        toggle.label = f"Variables ({len(self._funnel)})"
 
     def _add_funnel_entry(self) -> None:
         """Declare (or update) one funnel variable from the editor row.
@@ -1254,13 +1678,13 @@ class FlowBuilderPanel(ScrollableContainer):
         value = self.query_one("#flow_funnel_value", Input).value
         if not FUNNEL_NAME_RE.match(name):
             self._show_wiring_notice(
-                "funnel rechazado: el nombre debe ser un placeholder "
-                "[A-Z0-9_] (p.ej. BOOST) — sin minúsculas ni espacios."
+                "Variable refused: the name must be a placeholder "
+                "[A-Z0-9_] (e.g. BOOST) - no lower case, no spaces."
             )
             return
         if not value.strip():
             self._show_wiring_notice(
-                "funnel rechazado: el valor no puede estar vacío."
+                "Variable refused: the value cannot be empty."
             )
             return
         table = [(n, v) for n, v in self._funnel if n != name]
@@ -1290,7 +1714,7 @@ class FlowBuilderPanel(ScrollableContainer):
         if raw:
             if not raw.isdigit() or not (1 <= int(raw) <= len(self._blocks)):
                 self._show_wiring_notice(
-                    f"copiar rechazado: no hay bloque nº {raw} (hay "
+                    f"Copy refused: there is no block #{raw} (the chain has "
                     f"{len(self._blocks)})."
                 )
                 return
@@ -1298,7 +1722,7 @@ class FlowBuilderPanel(ScrollableContainer):
         else:
             if not self._blocks:
                 self._show_wiring_notice(
-                    "copiar rechazado: el canvas está vacío."
+                    "Copy refused: the chain is empty."
                 )
                 return
             block = self._blocks[-1]
@@ -1324,7 +1748,7 @@ class FlowBuilderPanel(ScrollableContainer):
         """
         if self._clipboard is None:
             self._show_wiring_notice(
-                "pegar: el portapapeles está vacío — nada que pegar."
+                "Paste: the clipboard is empty - nothing to paste."
             )
             return
         base: Optional[Path] = None
@@ -1339,8 +1763,8 @@ class FlowBuilderPanel(ScrollableContainer):
             base = active() if callable(active) else None
         if base is None:
             self._show_wiring_notice(
-                "pegar rechazado: cargue un proyecto (se valida contra el "
-                "directorio de sesión)."
+                "Paste refused: load a project first (the paste is checked "
+                "against the session directory)."
             )
             return
         wire_blocks = fps.flow_to_dict(self.current_flow)["blocks"]
@@ -1351,14 +1775,14 @@ class FlowBuilderPanel(ScrollableContainer):
         }
         parsed, findings = fps.dict_to_flow(envelope, base)
         if parsed is None or findings:
-            message = findings[0].message if findings else "bloque inválido"
-            self._show_wiring_notice(f"pegar rechazado: {message}")
+            message = findings[0].message if findings else "invalid block"
+            self._show_wiring_notice(f"Paste refused: {message}")
             return
         block = parsed.blocks[-1]
         self._blocks.append(block)
         self._show_wiring_notice("")
         self._refresh_blocks()
-        self._refresh_clip_status(f"pegado: {block.kind}")
+        self._refresh_clip_status(f"pasted: {block.kind}")
         self._mark_dirty()
 
     # -- wiring -------------------------------------------------------------
@@ -1418,23 +1842,23 @@ class FlowBuilderPanel(ScrollableContainer):
         output_path = self.query_one("#flow_ext_output", Input).value.strip()
         if not instruction:
             noun = (
-                "el comando exacto" if mode == EXTERNAL_MODE_TERMINAL
-                else "la instrucción"
+                "the exact command" if mode == EXTERNAL_MODE_TERMINAL
+                else "the instruction"
             )
             self._show_wiring_notice(
-                f"paso externo rechazado: falta {noun} a correr fuera de la app."
+                f"External step refused: {noun} to run outside the app is missing."
             )
             return
         if not log_ref:
             self._show_wiring_notice(
-                "paso externo rechazado: el LOG es OBLIGATORIO (texto de "
-                "constancia, nunca opcional)."
+                "External step refused: the log file is required (the record "
+                "of the step, never optional)."
             )
             return
         if not output_path:
             self._show_wiring_notice(
-                "paso externo rechazado: falta el ARCHIVO DE SALIDA "
-                "(path absoluto preferido)."
+                "External step refused: the output file is missing (an "
+                "absolute path is preferred)."
             )
             return
         self._show_wiring_notice("")
@@ -1459,9 +1883,23 @@ class FlowBuilderPanel(ScrollableContainer):
             kind = event.button.id.removeprefix("flow_palette_")
             self.query_one("#flow_kind", Select).value = kind
             self._sync_kind_dependent_visibility(kind)
+            # A notice about the previous kind no longer applies (ux L-a).
+            self._show_wiring_notice("")
             return
         if event.button.id == "flow_add":
             kind = str(self.query_one("#flow_kind", Select).value)
+            # S4-1 (LLR-146.14): a NUL in a path-bearing input refuses the
+            # Add before any block is built; the inputs keep their text.
+            refusal = nul_add_refusal(
+                kind,
+                {
+                    input_id: self.query_one(input_id, Input).value
+                    for input_id, _field in _ADD_PATH_INPUTS.get(kind, ())
+                },
+            )
+            if refusal is not None:
+                self._show_wiring_notice(refusal)
+                return
             if kind == BLOCK_A2B:
                 self._add_a2b_block()
                 return
@@ -1472,6 +1910,10 @@ class FlowBuilderPanel(ScrollableContainer):
             gating = str(self.query_one("#flow_gating", Select).value)
             block = _make_flow_block(kind, ref, gating)
             if block is None:
+                # LLR-148.9 add-form error state (gate fold ux M3): name what
+                # the press needs instead of doing nothing silently.
+                field = _REF_FIELD.get(kind, ("a ref", ""))[0]
+                self._show_wiring_notice(f"Add needs {field} — nothing added")
                 return
             self._blocks.append(block)
             self.query_one("#flow_ref", Input).value = ""
@@ -1479,12 +1921,8 @@ class FlowBuilderPanel(ScrollableContainer):
             self._refresh_blocks()
             self._mark_dirty()
         elif event.button.id == "flow_run":
-            self.post_message(
-                self.RunRequested(
-                    self.current_flow,
-                    str(self.query_one("#flow_scope", Select).value),
-                )
-            )
+            self._show_wiring_notice("")
+            self.post_message(self.RunRequested(self.current_flow, FLOW_SCOPE_SINGLE))
         elif event.button.id == "flow_save":
             self.post_message(self.SaveRequested(self.current_flow))
         elif event.button.id == "flow_load":
@@ -1498,7 +1936,8 @@ class FlowBuilderPanel(ScrollableContainer):
             self._refresh_funnel_list()
             self._refresh_clip_status("")
             self._show_wiring_notice("")
-            self.query_one("#flow_result", VerticalScroll).remove_children()
+            self.query_one("#flow_pipeline_scroll").border_subtitle = None
+            self._show_result_empty()
             if had_blocks:
                 self._mark_dirty()
         elif event.button.id == "flow_funnel_toggle":
@@ -1513,6 +1952,12 @@ class FlowBuilderPanel(ScrollableContainer):
             self._paste_block()
 
     def on_mount(self) -> None:
+        # batch-97 Inc-5 (LLR-146.1, 146.11): the help sentence, the grid
+        # canvas, the numbered list, the kind select and the session line stay
+        # mounted, not displayed — the pipeline, the chips and the ribbon carry
+        # them.
+        for hidden in ("#flow_help", "#flow_canvas", "#flow_blocks", "#flow_kind", "#flow_ext_session"):
+            self.query_one(hidden).display = False
         # F3 (LLR-094.3): the per-block gating control is CHECK-only — hidden
         # for SOURCE (default), PATCH, WRITE-OUT, CRC and A2B; the A2B binding
         # inputs show only for A2B, the single ref for every other kind.
@@ -1525,26 +1970,66 @@ class FlowBuilderPanel(ScrollableContainer):
         self.query_one("#flow_funnel_list").display = False
         self._refresh_funnel_list()
         self._show_wiring_notice("")
+        self._refresh_blocks()
+        self._show_result_empty()
+        self.call_after_refresh(self._apply_layout)
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        # Only the block-kind selector toggles the ref-row visibility.
+        # The block-kind selector toggles the add form; the EXT-STEP mode
+        # renames the command field.
         if event.select.id == "flow_kind":
             self._sync_kind_dependent_visibility(str(event.value))
+        elif event.select.id == "flow_ext_mode":
+            terminal = event.value == EXTERNAL_MODE_TERMINAL
+            self.query_one(".flow-instruction-label", Label).update("command" if terminal else "instruction")
+            self.query_one("#flow_ext_instruction", Input).placeholder = (
+                "the exact command run outside the app" if terminal else "what the human does"
+            )
 
     def _sync_kind_dependent_visibility(self, kind: str) -> None:
-        """Show the gating control only for CHECK, the binding inputs only for
-        A2B, the single ref for every other kind, and the external-step config
-        row only for EXTERNAL_STEP (F3)."""
+        """Show only the chosen kind's add inputs (LLR-146.3): the gating
+        control for CHECK, the binding inputs for A2B, mode + command and the
+        log + output row for EXTERNAL_STEP, the single ref for every other
+        kind; tag the row with the kind and mark its chip selected."""
+        ext = kind == BLOCK_EXTERNAL_STEP
+        single = kind not in (BLOCK_A2B, BLOCK_EXTERNAL_STEP)
         self.query_one("#flow_gating", Select).display = kind == BLOCK_CHECK
-        # The single ref is for the ref-bearing kinds only — A2B wires two
-        # bindings, the external step its own config row (F3, spec v3).
-        self.query_one("#flow_ref", Input).display = kind not in (
-            BLOCK_A2B,
-            BLOCK_EXTERNAL_STEP,
-        )
-        self.query_one("#flow_ref_a", Input).display = kind == BLOCK_A2B
-        self.query_one("#flow_ref_b", Input).display = kind == BLOCK_A2B
-        self.query_one("#flow_ext_row").display = kind == BLOCK_EXTERNAL_STEP
+        self.query_one(".flow-gating-label", Label).display = kind == BLOCK_CHECK
+        self.query_one("#flow_ref", Input).display = single
+        self.query_one(".flow-ref-label", Label).display = single
+        for widget in (
+            self.query_one("#flow_ref_a", Input),
+            self.query_one("#flow_ref_b", Input),
+            *self.query(".flow-a2b-label"),
+        ):
+            widget.display = kind == BLOCK_A2B
+        for widget in (
+            self.query_one("#flow_ext_mode", Select),
+            self.query_one("#flow_ext_instruction", Input),
+            *self.query(".flow-ext-label"),
+        ):
+            widget.display = ext
+        self.query_one("#flow_ext_row").display = ext
+        if single:
+            label, hint = _REF_FIELD.get(kind, ("ref", ""))
+            self.query_one(".flow-ref-label", Label).update(label)
+            self.query_one("#flow_ref", Input).placeholder = hint
+        glyph, name, colour, _does = _KIND_LOOK.get(kind, ("·", kind.upper(), DGRAY, ""))
+        self.query_one(".flow-kind-tag", Static).update(Text(f"{glyph} {name}", style="bold " + colour))
+        for chip in self.query(KindChip):
+            chip.set_class(chip.id == f"flow_palette_{kind}", "chip-selected")
+
+    def _show_result_empty(self) -> None:
+        """The result area before a run: one line, the rest plain background
+        (decision B, LLR-149.5)."""
+        container = self.query_one("#flow_result", VerticalScroll)
+        container.remove_children()
+        line = Text()
+        line.append("No run yet", style="bold " + VALUE)
+        line.append(" — ", style=_S_DIM)
+        line.append("Run", style="bold " + HILITE)
+        line.append(" executes this chain against the loaded image; the block verdicts land here.", style=_S_DIM)
+        container.mount(Static(line, classes="flow-result-empty"))
 
     # -- run result ledger (Direction A Pipeline Ledger, unchanged) -----------
 
@@ -1576,6 +2061,10 @@ class FlowBuilderPanel(ScrollableContainer):
         banner_text, banner_class = _FLOW_STATUS_BANNER.get(
             result.status, (result.status.upper(), "sev-neutral")
         )
+        if result.status == FLOW_STATUS_ISSUES and all(
+            b.status != BLOCK_STATUS_ERROR for b in result.block_results
+        ):
+            banner_text, banner_class = _NOTICES_BANNER
         widgets.append(
             Static(banner_text, markup=False, classes=f"flow-banner {banner_class}")
         )
@@ -1660,12 +2149,13 @@ class FlowBuilderPanel(ScrollableContainer):
             )
         )
 
-        for path in result.written_paths:
+        self._wrote_paths = [str(path) for path in result.written_paths]
+        for path in self._wrote_paths:
             widgets.append(
                 Static(
-                    safe_text(str(path)),  # SINK: written path
+                    safe_text(self._wrote_line(path)),  # SINK: written path
                     markup=False,
-                    classes="flow-wrote sev-ok",
+                    classes="flow-wrote flow-wrote-path sev-ok",
                 )
             )
         for diagnostic in result.diagnostics:

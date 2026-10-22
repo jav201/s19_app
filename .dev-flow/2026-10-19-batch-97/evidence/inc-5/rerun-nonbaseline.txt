@@ -1,0 +1,12 @@
+# the two non-baseline gate failures, isolated: 5x on the Inc-5 tree (above, in the session) and 5x on a clean HEAD 09e44de worktree (here)
+2 passed in 10.17s
+2 passed in 10.27s
+2 passed in 10.51s
+2 passed in 10.25s
+2 passed in 10.28s
+# --- 5x on the Inc-5 tree (7bd6936d9766f211 flow_screens)
+2 passed in 10.12s
+2 passed in 9.98s
+2 passed in 10.22s
+2 passed in 10.44s
+2 passed in 10.06s

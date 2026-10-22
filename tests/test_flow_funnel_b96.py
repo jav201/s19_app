@@ -327,8 +327,10 @@ def test_tc1817_builder_funnel_table_edits(tmp_path: Path) -> None:
 
     assert funnel == [("BOOST", "CD")]
     assert "${BOOST} = CD" in painted
-    assert toggle_label == "Funnel (1)"
-    assert "rechazado" in notice and "[A-Z0-9_]" in notice
+    # batch-97 Inc-5 (LLR-146.10 / 146.7, named supersession): the chip is
+    # `Variables (n)` and the refusal is English.
+    assert toggle_label == "Variables (1)"
+    assert "refused" in notice and "[A-Z0-9_]" in notice
     assert current == (("BOOST", "CD"),)
 
 
@@ -433,7 +435,7 @@ def test_tc1818_copy_paste_duplicates_config_via_wire(tmp_path: Path) -> None:
         "change_doc_ref": "ch.json",
     }
     assert counts // 100 == 8 and counts % 100 == 8  # paste x4 grew, refusal didn't
-    assert "cargue un proyecto" in refused_notice
+    assert "load a project first" in refused_notice  # batch-97 LLR-146.7 (English)
     assert json.loads(a2b_refs) == ["0", "base.s19"]  # VERBATIM, not renumbered
 
 
@@ -472,7 +474,8 @@ def test_tc1819_paste_empty_clipboard_is_friendly_noop(tmp_path: Path) -> None:
         _drive()
     )
 
-    assert "portapapeles está vacío" in noop_notice
+    # batch-97 Inc-5 (LLR-146.7, named supersession): the notices are English.
+    assert "clipboard is empty" in noop_notice
     assert count == 0
-    assert "no hay bloque nº 7" in bad_pick_notice
+    assert "there is no block #7" in bad_pick_notice
     assert clipboard_still_empty is True

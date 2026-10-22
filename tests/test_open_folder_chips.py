@@ -453,11 +453,27 @@ def test_tc704_reports_without_project_disabled_status_reason_zero_opens(
     """TC-704 (LLR-139.2, the Reports no-project limb — negative control 7e):
     without a project the Reports chip is genuinely DISABLED (an enabled chip
     here would redden this assertion), dimmed with the no-project tooltip,
-    the disabling refresh names the reason on the status line, and pressing
-    opens nothing (0 seam calls)."""
-    spy = SeamSpy(monkeypatch)
+    and pressing opens nothing (0 seam calls).
 
-    async def _drive() -> Tuple[bool, bool, Optional[str], bool, List[Tuple[Path, str]]]:
+    Named supersession (batch-97, LED-2026-10-19-batch-97.24, operator
+    decision at the Inc-5 gate): the status-line reason is no longer written
+    by the chip's first refresh at mount — it is written on a transition to
+    disabled after mount. The arm now drops the project under a mounted,
+    enabled Reports chip and reads the reason there; at mount, with no
+    project, 0 status lines name it. The app's project-refresh loop queries
+    the default screen only (a modal chip re-resolves on its own mount), so
+    the arm calls the chip's own ``refresh_target`` after each change."""
+    spy = SeamSpy(monkeypatch)
+    statuses: List[str] = []
+    original_set_status = S19TuiApp.set_status
+
+    def _recording(self, message: str) -> None:
+        statuses.append(message)
+        original_set_status(self, message)
+
+    monkeypatch.setattr(S19TuiApp, "set_status", _recording)
+
+    async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 36)) as pilot:
             await _pilot_pause(pilot)
@@ -469,18 +485,30 @@ def test_tc704_reports_without_project_disabled_status_reason_zero_opens(
                 chip.disabled,
                 chip.has_class("-dimmed"),
                 chip.tooltip,
-                any("no active project" in line for line in app.log_lines),
+                any("no active project" in line for line in statuses),
             )
             _press_chip(chip)
             await _pilot_pause(pilot)
-            return (*state, list(spy.calls))
+            _set_project(app)
+            chip.refresh_target()
+            await _pilot_pause(pilot)
+            enabled = not chip.disabled
+            seen = len(statuses)
+            app.current_project = None
+            app.current_project_dir = None
+            chip.refresh_target()
+            await _pilot_pause(pilot)
+            reason = [line for line in statuses[seen:] if line == fos.REPORTS_NO_PROJECT_REASON]
+            return (*state, enabled, chip.disabled, reason, list(spy.calls))
 
-    disabled, dimmed, tooltip, status_named_reason, calls = asyncio.run(_drive())
+    disabled, dimmed, tooltip, status_at_mount, enabled, disabled_again, reason, calls = asyncio.run(_drive())
 
     assert disabled, "the no-project Reports chip must be genuinely disabled (7e)"
     assert dimmed, "the disabled chip still renders the dimmed look"
     assert tooltip == "no project — files are in the common folders"
-    assert status_named_reason, "a status-line reason must say why the chip is disabled"
+    assert not status_at_mount, "no status line at mount (LED-…97.24)"
+    assert enabled and disabled_again, "the project dropped under the chip disables it again"
+    assert reason == [fos.REPORTS_NO_PROJECT_REASON], "the transition names the reason on the status line"
     assert calls == [], "the disabled chip opens nothing (0 open calls)"
 
 

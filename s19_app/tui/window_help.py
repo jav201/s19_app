@@ -195,18 +195,95 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "`g` to jump to an address.",
         ),
     },
+    #: batch-97 Inc-5 (D25, LLR-148.6): rewritten code-authored — one
+    #: ``label — effect`` line per chip, field, key and glyph the Flow Builder
+    #: paints; it left the ``help_sections.md`` fidelity census.
     "flow": {
         "title": "Flow Builder",
         "steps": (
-            "Compose an operation chain by adding steps; each step's "
-            "parameters validate as you type.",
-            "Save the flow as JSON — flows are **project-only** and land "
-            "in the project's `flows\\` folder (LLR-003.7); load one back "
-            "from the same list.",
-            "Run the chain against the loaded image; every step's output "
-            "feeds the next.",
-            "Keep flows small and named after their intent — they are the "
-            "repeatable “macro” of a session.",
+            "Build a chain of blocks that runs on the loaded image: the "
+            "pipeline shows each block as a card, in run order, joined by "
+            "cables, and the area under Run lists each block's verdict. "
+            "Flows are project-only: Save… and Load… use the project's "
+            "`flows\\` folder (LLR-003.7).",
+            "LOAD — picks a load block: it reads the image file named beside it.",
+            "PATCH — picks a patch block: it applies a change doc to the image.",
+            "CHECK — picks a check block: it verifies addresses against a "
+            "check doc.",
+            "CRC — picks a CRC block: it stamps a CRC from a CRC template.",
+            "WRITE-OUT — picks a write-out block: it writes the image to an "
+            "output file.",
+            "A2B-DIFF — picks an A2B diff block: it compares two images and "
+            "writes a diff report.",
+            "EXT-STEP — picks an external step: a human runs a command or "
+            "follows an instruction outside the app, and the run pauses "
+            "there until its log and output file are confirmed in Flow "
+            "Execution.",
+            "image file — the image a load block reads, relative to the "
+            "project.",
+            "change doc — the change-set a patch block applies.",
+            "check doc — the check spec a check block verifies.",
+            "CRC template — the CRC configuration a CRC block stamps.",
+            "output file — the file a write-out block writes, or the file an "
+            "external step leaves behind (an absolute path is preferred "
+            "there).",
+            "gating — advisory reports a failed check; block-own-op also "
+            "stops the check block's own output.",
+            "image A — the first A2B input: a file name, or #n for the output "
+            "of block n.",
+            "image B — the second A2B input, the same way; at least one input "
+            "comes from this chain.",
+            "mode — Terminal: a command run outside the app; Manual: an "
+            "instruction for a human.",
+            "command — the exact command run outside the app (Terminal mode).",
+            "instruction — what the human does (Manual mode).",
+            "log — the file the external step writes as its record; required.",
+            "Add — appends a block of the chosen kind built from the fields "
+            "beside it; an empty required field, or one holding a NUL "
+            "character, is named on the line above Run and nothing is added.",
+            "copy block # — the number of the block Copy takes; empty takes "
+            "the last block.",
+            "Copy — copies that block to the clipboard.",
+            "Paste — appends the clipboard's block to the chain, checked "
+            "against this project.",
+            "Variables — shows or hides the variables editor; the count is "
+            "the number of variables declared.",
+            "variable — a placeholder name of capitals, digits and _ (for "
+            "example BOOST); a change doc writes it as ${BOOST}.",
+            "value — the text the placeholder is replaced with when the chain "
+            "runs.",
+            "Add var — declares the variable, or replaces its value.",
+            "Run — runs the chain on the loaded image; each block's verdict "
+            "lands under Run, and a write-out block writes its file.",
+            "Clear — empties the chain, its variables and the clipboard.",
+            "Save… — saves the chain as `flows\\<name>.json` in the project.",
+            "Load… — loads a saved chain; a file with an unsafe ref is refused "
+            "and the current chain is kept.",
+            "Open flows/ — opens the project's flows folder, where saved "
+            "chains are kept.",
+            "saved / unsaved — beside the flow name: whether the chain is "
+            "saved to its file (unsaved in yellow).",
+            "NOTICES — the run finished and some blocks reported notices.",
+            "ISSUES — the run finished, but a block failed without stopping "
+            "the chain.",
+            "? — opens this help.",
+            "enter — on a chip or a button, presses it.",
+            "space — on a kind chip, picks that kind.",
+            "◉ — a load block.",
+            "▣ — a patch block.",
+            "✓ — a check block (card and chip).",
+            "⊕ — a CRC block.",
+            "▼ — a write-out block.",
+            "⏚ — an A2B diff block.",
+            "» — an external step.",
+            "≡ — a report block (only when a loaded flow carries one).",
+            "─ — a cable between two blocks.",
+            "▶ — the cable feeds the next block.",
+            "● — a block that ran ok.",
+            "◈ — a block that ran with notices.",
+            "✗ — a block that failed.",
+            "○ — a block that was skipped.",
+            "□ — a block waiting for a human (an external step).",
         ),
     },
     "a2l": {

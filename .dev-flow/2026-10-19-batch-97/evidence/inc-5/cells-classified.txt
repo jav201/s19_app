@@ -1,0 +1,31 @@
+# PC-10 per-cell classification: HEAD 09e44de worktree vs the Inc-5 tree (snapshot_cells.py of inc-3)
+workspace-compact-80x24: 1 differing row(s) [20] -> ONLY the startup status line
+workspace-compact-120x30: 1 differing row(s) [26] -> ONLY the startup status line
+workspace-compact-160x40: 1 differing row(s) [36] -> ONLY the startup status line
+workspace-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+workspace-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+workspace-comfortable-160x40: 1 differing row(s) [37] -> ONLY the startup status line
+a2l-compact-80x24: 1 differing row(s) [20] -> ONLY the startup status line
+a2l-compact-120x30: 1 differing row(s) [26] -> ONLY the startup status line
+a2l-compact-160x40: 1 differing row(s) [36] -> ONLY the startup status line
+a2l-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+a2l-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+a2l-comfortable-160x40: 1 differing row(s) [37] -> ONLY the startup status line
+mac-compact-80x24: 1 differing row(s) [20] -> ONLY the startup status line
+mac-compact-120x30: 1 differing row(s) [26] -> ONLY the startup status line
+mac-compact-160x40: 1 differing row(s) [36] -> ONLY the startup status line
+mac-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+mac-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+mac-comfortable-160x40: 1 differing row(s) [37] -> ONLY the startup status line
+issues-compact-80x24: 1 differing row(s) [20] -> ONLY the startup status line
+issues-compact-120x30: 1 differing row(s) [26] -> ONLY the startup status line
+issues-compact-160x40: 1 differing row(s) [36] -> ONLY the startup status line
+issues-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+issues-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+issues-comfortable-160x40: 1 differing row(s) [37] -> ONLY the startup status line
+map-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+map-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+patch-comfortable-80x24: 1 differing row(s) [21] -> ONLY the startup status line
+patch-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+diff-comfortable-120x30: 1 differing row(s) [27] -> ONLY the startup status line
+cells: 29; differing: 29; differing only by the one status line '📂 Open flows/: no active project — load a project first.': 29

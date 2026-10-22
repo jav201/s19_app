@@ -1,0 +1,209 @@
+# Inc-5 mutation battery on the Inc-5 tree
+7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa *s19_app/tui/styles.tcss
+5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd *s19_app/tui/window_help.py
+mutants: 39 arms: 51
+M1-nul-check-removed-from-add [flow_screens.py] test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: a NUL image_ref was added (1 -> 2)
+    | 1 failed in 3.69s
+M1-nul-check-removed-from-add [flow_screens.py] test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: a NUL image_a.ref was added (1 -> 2)
+    | 1 failed in 3.78s
+M1-nul-check-removed-from-add [flow_screens.py] test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: a NUL output_path was added (1 -> 2)
+    | 1 failed in 3.70s
+M1-nul-check-removed-from-add [flow_screens.py] test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1416: AssertionError: (4, 5, [])
+    | 1 failed in 9.42s
+M2-helper-reads-flow-ref-only [flow_screens.py] test_tc_b97_62_nul_refusal_helper_names_kind_and_field[a2b.image_a.ref]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1221: AssertionError: assert None == 'Add refused: [FLOW-UNSAFE-REF] a2b image_a.ref carries a NUL character - not a path'
+    | 1 failed in 0.36s
+M2-helper-reads-flow-ref-only [flow_screens.py] test_tc_b97_62_nul_refusal_helper_names_kind_and_field[external_step.log_ref]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1221: AssertionError: assert None == 'Add refused: [FLOW-UNSAFE-REF] external_step log_ref carries a NUL character - not a path'
+    | 1 failed in 0.35s
+M2-helper-reads-flow-ref-only [flow_screens.py] test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1273: AssertionError: a NUL image_b.ref was added (1 -> 2)
+    | 1 failed in 3.68s
+M3-error-glyph-back-to-heavy-x [flow_screens.py] test_tc_b97_33_flow_glyphs_are_narrow_in_windows_terminal: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1396: AssertionError: ['✖']
+    | 1 failed in 0.33s
+M4-crc-card-in-waiting-colour [flow_screens.py] test_tc_b97_18_crc_card_painted_in_the_crc_colour: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:769: AssertionError: [('⊕ CRC', '#e8ad3d'), ('stamps a CRC', '#969aad')]
+    | 1 failed in 3.01s
+M5-crc-card-in-fbA-amber [flow_screens.py] test_tc_b97_18_crc_card_painted_in_the_crc_colour: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:769: AssertionError: [('⊕ CRC', '#d9a35b'), ('stamps a CRC', '#969aad')]
+    | 1 failed in 3.01s
+M6-tcss-mirror-swapped [styles.tcss] test_tc_b97_18_tcss_mirrors_equal_their_tokens: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:791: AssertionError: ('crc-family', '#e8ad3d')
+    | 1 failed in 0.37s
+M7-card-line-from-markup [flow_screens.py] test_tc_b97_20_hostile_refs_render_literally: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 failed in 3.34s
+M7-card-line-from-markup [flow_screens.py] test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 failed in 7.44s
+M8-command-keeps-tail [flow_screens.py] test_tc_b97_16_cards_clip_every_line_to_the_card: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:682: AssertionError: ['» EXT-STEP', 'terminal · human', 'in · image', '← #1', 'in · cmd', '…all fw_app_patc.s19', ...]
+    | 1 failed in 0.37s
+M9-clip-tail-keeps-head [flow_screens.py] test_tc_b97_16_clip_head_and_clip_tail: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:637: AssertionError: assert 'C:\\work\\flash\\releas…' == '…q\\fw_app_flashed.s19'
+    | 1 failed in 0.36s
+M9-clip-tail-keeps-head [flow_screens.py] test_tc_b97_16_cards_clip_every_line_to_the_card: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:684: AssertionError: []
+    | 1 failed in 0.35s
+M10-second-filled-chip [flow_screens.py] test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:738: AssertionError: ('source', ['flow_run', 'flow_clear'])
+    | 1 failed in 8.45s
+M11-selected-kind-filled [flow_screens.py] test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:738: AssertionError: ('source', ['flow_palette_source', 'flow_run'])
+    | 1 failed in 8.71s
+M12-kind-chip-unfocusable [flow_screens.py] test_tc_b97_51_keyboard_order_keys_and_chip_states: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1111: AssertionError: []
+    | 1 failed in 3.98s
+M13-kind-chip-space-removed [flow_screens.py] test_tc_b97_51_keyboard_order_keys_and_chip_states: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1174: AssertionError: {('flow_palette_a2b', 'space'): False, ('flow_palette_check', 'space'): False, ('flow_palette_crc', 'space'): False, ('flow_palette_external_step', 'space'): False, ...}
+    | 1 failed in 50.61s
+M14-run-requests-a-variant-scope [flow_screens.py] test_tc_b97_50_run_requests_the_single_image_scope: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1051: AssertionError: ['all']
+    | 1 failed in 3.16s
+M15-variables-count-dropped [flow_screens.py] test_tc_b97_48_variables_chip_counts_and_toggles: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:963: AssertionError: ['Variables']
+    | 1 failed in 2.37s
+M16-ribbon-keeps-path-head [flow_screens.py] test_tc_b97_49_session_on_the_ribbon[project]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1006: AssertionError: [' Flow: flow  ✓                                                     session C:\\Users\\jjgh8\\AppData\\Local\\Temp\\p…']
+    | 1 failed in 2.61s
+M16-ribbon-keeps-path-head [flow_screens.py] test_tc_b97_37_builder_no_wrapped_row_and_tail_kept_ribbon[size0]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:926: AssertionError: [' Flow: patch_chain  ✓  LOAD → PATCH → CHECK → WRITE-OUT            session C:\\Users\\jjgh8\\AppData\\Local\\Temp\\p…']
+    | 1 failed in 3.36s
+M17-ext-session-displayed [flow_screens.py] test_tc_b97_49_session_on_the_ribbon[project]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:999: AssertionError: #flow_ext_session is displayed
+    | 1 failed in 2.53s
+M18-numbered-list-displayed [flow_screens.py] test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:534: AssertionError: list / canvas displayed: (False, True)
+    | 1 failed in 3.04s
+M19-cable-left-out [flow_screens.py] test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:543: AssertionError: []
+    | 1 failed in 3.19s
+M19-cable-left-out [flow_screens.py] test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x54]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 failed in 3.49s
+M20-palette-kind-left-out [flow_screens.py] test_tc_b97_14_palette_offers_every_kind_in_order: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:566: AssertionError: ['flow_palette_source', 'flow_palette_patch', 'flow_palette_check', 'flow_palette_crc', 'flow_palette_write_out', 'flow_palette_a2b']
+    | 1 failed in 2.21s
+M21-ext-row-hidden [flow_screens.py] test_tc_b97_15_add_form_shows_exactly_the_kind_inputs: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:610: AssertionError: ('external_step', {'flow_ext_instruction', 'flow_ext_mode'})
+    | 1 failed in 11.26s
+M22-gating-for-every-kind [flow_screens.py] test_tc_b97_15_add_form_shows_exactly_the_kind_inputs: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:610: AssertionError: ('source', {'flow_gating', 'flow_ref'})
+    | 1 failed in 7.28s
+M23-clip-status-fixed-wide [styles.tcss] test_tc_b97_47_copy_paste_strip_on_one_row_inside: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:934: AssertionError: outside the panel: {'flow_clip_status'}
+    | 1 failed in 2.97s
+M24-pegado-left [flow_screens.py] test_tc_b97_19_builder_constants_carry_no_spanish: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:834: AssertionError: ['pegado: ']
+    | 1 failed in 0.38s
+M25-paused-banner-reverted [flow_screens.py] test_tc_b97_25_module_constant_in_english: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:223: AssertionError: assert ['PAUSED - ESPERANDO HUMANO'] == []
+    | 1 failed in 0.35s
+M25-paused-banner-reverted [flow_screens.py] test_at_b97_19_first_task_from_the_keyboard: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1473: AssertionError: ['  PAUSED - ESPERANDO HUMANO                                                                                     ']
+    | 1 failed in 10.68s
+M26-pipeline-frame-1fr [styles.tcss] test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1005: AssertionError: (17, 13, ['                                                                                                           ...    ', '                                                                                               
+    | 1 failed in 3.21s
+M27-cards-fixed-at-24 [flow_screens.py] test_tc_b97_34_pipeline_layout_monotonic_in_its_inputs: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 failed in 0.34s
+M27-cards-fixed-at-24 [flow_screens.py] test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width[size1]: GREEN (SURVIVED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 passed in 2.86s
+M28-resize-trigger-removed [flow_screens.py] test_tc_b97_34_builder_painted_widths_follow_four_resizes: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:835: AssertionError: [24, 24, 24, 24]
+    | 1 failed in 18.35s
+M29-show-trigger-removed [flow_screens.py] test_tc_b97_34_builder_resize_while_hidden_rederives_on_show: GREEN (SURVIVED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | 1 passed in 7.90s
+M30-panel-overflow-hidden [styles.tcss] test_tc_b97_59_builder_below_the_range_run_reachable[size0]: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1048: AssertionError: ((80, 24), 20)
+    | 1 failed in 14.14s
+M31-shared-name-strip-edited [styles.tcss] test_tc_b97_flow_css_shared_rules_byte_equal_and_section_scoped: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1526: AssertionError: '.flow-name-strip {' changed or duplicated
+    | 1 failed in 0.40s
+M32-unscoped-flow-result-rule [styles.tcss] test_tc_b97_flow_css_shared_rules_byte_equal_and_section_scoped: RED (KILLED)
+    restore sha256 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa == before 95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1538: AssertionError: ['#flow_result']
+    | 1 failed in 0.77s
+M33-glyph-outside-vocabulary [flow_screens.py] test_tc_b97_33_flow_glyphs_closed_and_in_the_legend[patch_chain]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1375: AssertionError: {'✪'}
+    | 1 failed in 3.56s
+M34-help-line-without-effect [window_help.py] test_tc_b97_32_flow_help_names_every_label: RED (KILLED)
+    restore sha256 5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd == before 5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1307: AssertionError: labels with no `label — effect` line: ['Copy']
+    | 1 failed in 4.37s
+M35-flows-chip-off-the-header [app.py] test_tc_b97_31_flow_builder_header_carries_both_chips: RED (KILLED)
+    restore sha256 fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 == before fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1221: AssertionError: one folder chip and one help chip in the header: (0, 1)
+    | 1 failed in 2.23s
+M36-refusal-line-off-the-frame [flow_screens.py] test_tc_b97_58_flow_builder_region_states[load_refused]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1438: AssertionError: ('load_refused', [])
+    | 1 failed in 7.05s
+M37-result-empty-line-removed [flow_screens.py] test_tc_b97_38_builder_height_goes_to_the_result[before_run-size0]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1008: AssertionError: []
+    | 1 failed in 3.07s
+M38-quarantine-line-without-code [flow_screens.py] test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:1414: AssertionError: []
+    | 1 failed in 5.56s
+M39-pipeline-empty-line-removed [flow_screens.py] test_tc_b97_58_flow_builder_region_states[pipeline_empty]: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1442: AssertionError: — a chain starts with ◉ LOAD: pick it below, type the image file, press Add.
+    | 1 failed in 2.55s
+M39-pipeline-empty-line-removed [flow_screens.py] test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas: RED (KILLED)
+    restore sha256 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 == before 7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_builder.py:547: AssertionError: [' — a chain starts with ◉ LOAD: pick it below, type the image file, press Add.']
+    | 1 failed in 3.18s
+exit=0
+7bd6936d9766f21186e1cf05f88458a978dea85f8d5daccebabf9af401fe8ff5 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+95455cc67476557889fce0c91fa16c7aa923b0dfcd4f28dd68db0f286839beaa *s19_app/tui/styles.tcss
+5ad9838ea7630f53b3001efe9b605e58f8290f22ba18a9296117ed8f073f91cd *s19_app/tui/window_help.py

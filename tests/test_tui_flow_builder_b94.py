@@ -169,11 +169,9 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
 
     palette_kinds, canvas, screen_box, canvas_width = asyncio.run(_drive())
 
-    # Palette exposes exactly the fb_a placeable types (batch-96 adds the
-    # external-step type to the batch-94 three).
-    assert sorted(palette_kinds) == sorted(
-        [BLOCK_PATCH, BLOCK_CRC, BLOCK_A2B, BLOCK_EXTERNAL_STEP]
-    )
+    # batch-97 Inc-5 (LLR-146.2, named supersession): the palette offers every
+    # kind of ``_KIND_OPTIONS`` in its order (was the four fb_a types).
+    assert palette_kinds == [kind for _label, kind in FlowBuilderPanel._KIND_OPTIONS]
     # Box-drawn blocks with typed stubs and >=1 cable run (fb_a geometry).
     assert "PATCH" in canvas and "WRITE-OUT" in canvas
     assert "prg.s19" in canvas  # SOURCE chip
@@ -316,7 +314,9 @@ def test_at_b94_17_template_save_listing_import_and_dedup(tmp_path: Path) -> Non
     saved_kinds, dedup_kinds, strip = asyncio.run(_drive())
 
     assert saved_kinds == ["source", "patch"]
-    assert "chain1" in strip and "✓" in strip
+    # batch-97 named supersession (LED-2026-10-19-batch-97.26): the saved state
+    # is the word ``· saved``, no longer the ``✓`` glyph.
+    assert "chain1" in strip and "· saved" in strip and "unsaved" not in strip
     # The import listing (Flow Execution's surface) carries BOTH templates.
     assert fps.list_saved_flows(project) == ["chain1", "chain1_2"]
     # The dedup-suffix: the first template is intact, the second is its own.
@@ -365,7 +365,10 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
             app.query_one("#flow_palette_a2b", Button).press()
             await pilot.pause()
             app.query_one("#flow_ref_a", Input).value = "#1"
-            app.query_one("#flow_ref_b", Input).value = _HOSTILE_SYMBOL
+            # batch-97 Inc-5 (S4-1, LLR-146.14, named supersession): the add
+            # form refuses a NUL in a path-bearing input, so the canvas arm
+            # binds the payload minus its NUL; the NUL arm is TC-B97-62.
+            app.query_one("#flow_ref_b", Input).value = _HOSTILE_SYMBOL.replace("\x00", "")
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
             canvas, _spans = _painted_static(app, "#flow_canvas")
@@ -458,11 +461,13 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
         _drive((120, 30))
     )
     assert palette_count == 1  # one palette rail…
-    # …carrying the four placeable types (batch-96 adds the external step).
-    assert palette_buttons == 4
+    # batch-97 Inc-5 (LLR-146.2, named supersession): …carrying one chip per
+    # kind of ``_KIND_OPTIONS`` (was the four fb_a types of ``_PALETTE_TYPES``,
+    # retired with the canvas from view); the canvas stays mounted, hidden,
+    # and is still painted (its text is read below).
+    assert palette_buttons == len(FlowBuilderPanel._KIND_OPTIONS) == 7
     assert canvas_count == 1  # …one framed canvas
-    assert len(FlowBuilderPanel._PALETTE_TYPES) == 4  # 4 placeable types
-    assert {kind for *_rest, kind in FlowBuilderPanel._PALETTE_TYPES} == {
+    assert {kind for _label, kind in FlowBuilderPanel._KIND_OPTIONS} >= {
         BLOCK_PATCH,
         BLOCK_CRC,
         BLOCK_A2B,
@@ -479,5 +484,5 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
     small_palette, small_buttons, small_canvas, small_text, _ = asyncio.run(
         _drive((80, 24))
     )
-    assert small_palette == 1 and small_buttons == 4 and small_canvas == 1
+    assert small_palette == 1 and small_buttons == 7 and small_canvas == 1
     assert "PATCH" in small_text

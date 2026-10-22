@@ -1,0 +1,4 @@
+tests/test_b97_flow_builder.py -k "tc_b97_13 or tc_b97_14 or tc_b97_15 or tc_b97_16 or tc_b97_17 or crc_card or tcss_mirrors or tc_b97_19 or tc_b97_20 or tc_b97_47 or tc_b97_48 or tc_b97_49 or tc_b97_50 or tc_b97_51 or nul_refusal_helper or nul_pasted or at_b97 or flow_css"
+tests/test_b97_width.py -k "builder or pipeline_layout"
+tests/test_b97_chips_help.py -k "flow"
+tests/test_b97_flow_execution.py -k "module_constant"

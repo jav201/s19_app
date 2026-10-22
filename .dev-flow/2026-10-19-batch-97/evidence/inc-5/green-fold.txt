@@ -1,0 +1,50 @@
+# GREEN-fold gate: gate-files-fold.txt (Inc-5 gate set + guard host test_tui_directionb.py), fold source digests:
+f1557bacdc2b61e61f1f35bf95543e94e36202e6473c1388570bf50df393b720 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 *s19_app/tui/styles.tcss
+eaf189a6a5808502c06fb3b4c56dc54416b0802c6edee0d962dfe50cd5e73e55 *s19_app/tui/window_help.py
+5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea *s19_app/tui/open_folder_chip.py
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 40%]
+...................F.................................................... [ 50%]
+........................................................................ [ 60%]
+........................................................xxxxxxxxxxxxxxxx [ 70%]
+xxxxxxxxxxxxx........................................................... [ 80%]
+........................................................................ [ 90%]
+....................................................................     [100%]
+================================== FAILURES ===================================
+___________ test_at088b_every_render_sink_renders_hostile_literally ___________
+tests\test_flow_builder_render.py:441: in test_at088b_every_render_sink_renders_hostile_literally
+    assert len(safe_text_calls) == src.count("# SINK:"), (
+E   AssertionError: (4, 5)
+E   assert 4 == 5
+E    +  where 4 = len([<ast.Call object at 0x0000027514243190>, <ast.Call object at 0x00000275143893F0>, <ast.Call object at 0x0000027514388220>, <ast.Call object at 0x0000027514388E80>])
+E    +  and   5 = <built-in method count of str object at 0x000002750A84F030>('# SINK:')
+E    +    where <built-in method count of str object at 0x000002750A84F030> = '    def render_result(self, result: FlowRunResult) -> None:\n        """Paint the ``#flow_result`` pane as the Direct...           classes="flow-run-diag sev-error",\n                )\n            )\n\n        container.mount(*widgets)\n'.count
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=17315769;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_flow_builder_render.py::test_at088b_every_render_sink_renders_hostile_literally
+1 failed, 686 passed, 29 xfailed in 2146.45s (0:35:46)
+
+# Re-run after the at088b sink-census fix (written-path line rendered through safe_text at the # SINK: site; at088b expected 'wrote <path>', named supersession). Source digests:
+eae1ef95ec4365417e99078d450316e861d143310ab907d51e91db235990af8c *s19_app/tui/flow_screens.py
+362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 *s19_app/tui/styles.tcss
+eaf189a6a5808502c06fb3b4c56dc54416b0802c6edee0d962dfe50cd5e73e55 *s19_app/tui/window_help.py
+5c60ea67efbced57f079bc58d51b2445357e1ed278f9f2fda5040ae4722e09ea *s19_app/tui/open_folder_chip.py
+....................................                                     [100%]
+36 passed, 159 deselected in 70.27s (0:01:10)
+
+# Re-run of the Builder modules on the final fold source (after the sink fix):
+........................................................................ [ 47%]
+........................................................................ [ 94%]
+........                                                                 [100%]
+152 passed, 88 deselected in 459.89s (0:07:39)

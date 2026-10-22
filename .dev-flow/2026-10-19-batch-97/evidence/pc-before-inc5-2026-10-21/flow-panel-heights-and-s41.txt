@@ -1,0 +1,10 @@
+# HEAD 09e44de · Textual 8.2.8 · 2026-10-21T19:52:15-06:00
+# s41_heights.py — #flow_panel heights at HEAD, then the S4-1 write_out path
+118x54: #screen_flow (5, 2, 112, 42) #flow_panel (5, 4, 112, 40) content (5, 4, 112, 40)
+118x53: #screen_flow (5, 2, 112, 41) #flow_panel (5, 4, 112, 39) content (5, 4, 112, 39)
+220x60: #screen_flow (23, 2, 196, 48) #flow_panel (23, 4, 196, 46) content (23, 4, 196, 46)
+220x59: #screen_flow (23, 2, 196, 47) #flow_panel (23, 4, 196, 45) content (23, 4, 196, 45)
+input value after paste: 'o\x00ut.s19'
+blocks: [('source', 'prg.s19'), ('write_out', 'o\x00ut.s19')]
+notice displayed: False ''
+result texts: ['FAILED', '<textual.renderables.blank.Blank object at 0x000001BD8B77EDD0>', '● source    ok', 'loaded prg.s19 (11 ranges)', '<textual.renderables.blank.Blank object at 0x000001BD8B77FF50>', '✖ write_out error', 'error', 'ValueError: unlink: embedded null character in path', '█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█████', '11 ranges · 0x17E0‥ 0x10000']
