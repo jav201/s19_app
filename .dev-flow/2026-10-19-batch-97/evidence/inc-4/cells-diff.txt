@@ -1,0 +1,32 @@
+PC-10 per-cell C-22 verification: 29 snapshot cells rendered on a clean HEAD 98f3c84 worktree (cells-head.txt) and on the Inc-4 tree (cells-inc4.txt) with evidence/inc-3/snapshot_cells.py; frame hash per cell.
+Prediction (before Inc-4): 2 of 29 drift — the two 'patch' cells.
+
+same    a2l-comfortable-120x30
+same    a2l-comfortable-160x40
+same    a2l-comfortable-80x24
+same    a2l-compact-120x30
+same    a2l-compact-160x40
+same    a2l-compact-80x24
+same    diff-comfortable-120x30
+same    issues-comfortable-120x30
+same    issues-comfortable-160x40
+same    issues-comfortable-80x24
+same    issues-compact-120x30
+same    issues-compact-160x40
+same    issues-compact-80x24
+same    mac-comfortable-120x30
+same    mac-comfortable-160x40
+same    mac-comfortable-80x24
+same    mac-compact-120x30
+same    mac-compact-160x40
+same    mac-compact-80x24
+same    map-comfortable-120x30
+same    map-comfortable-80x24
+DIFFERS patch-comfortable-120x30
+DIFFERS patch-comfortable-80x24
+same    workspace-comfortable-120x30
+same    workspace-comfortable-160x40
+same    workspace-comfortable-80x24
+same    workspace-compact-120x30
+same    workspace-compact-160x40
+same    workspace-compact-80x24

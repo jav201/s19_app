@@ -1,4 +1,21 @@
-"""Patch Editor three-window layout tests — batch-46 (Inc-1), batch-94 (pe_b).
+"""Patch Editor layout tests — batch-46 (Inc-1), batch-94 (pe_b), batch-97 (pe_A).
+
+**batch-97 Inc-4 — named supersession of all nine tests (HLR-144, design §3
+Patch tree; design-proposal Inc-4 row: "Retires / rewrites
+test_tui_patch_layout.py (9 tests)").** The three stacked windows became a
+full-height PATCH SCRIPT ledger beside ONE bordered inspector whose
+Inspector / JSON / Checks tabs switch a ``ContentSwitcher``; the file row and
+the document controls are one-row docks of the panel. Each test keeps its id
+and its protected property, restated on the new tree: AT-063a/b — the two
+columns side by side, inside the panel, at both regimes (the layout is the
+same on both sides of 120, LLR-149.2); AT-063c — every must-preserve id at its
+batch-97 home and one routed action per surface; AT-064a/b/c — every named
+button reachable on its tab (the measured Refresh deficit is GONE: the file
+row is one row); TC-46.1 — each scroll body a ``VerticalScroll`` with its
+docked rows as siblings, and the retired ``width-narrow`` reflow rule absent
+(D23); TC-46.2 — the paste editor's first line in view on the JSON tab. The
+batch-94 text below is kept as history.
+
 
 Supersedes the batch-22 2x2 four-pane geometry tests. Verdicts HLR-063/064
 (US-U8/US-B2) through the Pilot region oracle at the 80x24 floor and 120x30:
@@ -81,6 +98,24 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 
 # The three window ids created by the batch-46 restructure.
 _WINDOW_IDS = ("patch_win_script", "patch_win_checks", "patch_win_json")
+# batch-97: the two columns of the ledger + inspector composition.
+_COLUMN_IDS = ("patch_win_script", "patch_inspector")
+# batch-97: every panel button's home — a tab pane of the inspector, the tab
+# row, or a one-row dock of the panel; never the ledger's scroll body.
+_BUTTON_HOMES = (
+    "patch_tabs",
+    "patch_pane_inspector",
+    "patch_win_json",
+    "patch_win_checks",
+    "patch_doc_file_row",
+    "patch_doc_controls",
+)
+# batch-97: the tab chip that shows each tab-resident home.
+_TAB_FOR_HOME = {
+    "patch_pane_inspector": "patch_tab_inspector",
+    "patch_win_json": "patch_tab_json",
+    "patch_win_checks": "patch_tab_checks",
+}
 
 # Pilot-measured usable floor (M-Q1 / C-23). Measured window minimums:
 # wide @120x30 → widths {44, 22, 23}, heights all 11; narrow @80x24 →
@@ -167,7 +202,8 @@ _MOVED_ID_HOMES = {
     # line 1 = the Select + the path input + Load BESIDE the input; line 2 =
     # Refresh + the section label. (Pre-fix the row was one Horizontal line
     # that clipped Refresh + the label past the 80x24 window edge.)
-    "patch_doc_file_row": "patch_win_script",
+    # batch-97: the file row is a one-row dock of the PANEL.
+    "patch_doc_file_row": "patch_editor_panel",
     "patch_doc_file_line1": "patch_doc_file_row",
     "patch_doc_file_line2": "patch_doc_file_row",
     "patch_doc_file_select": "patch_doc_file_line1",
@@ -175,12 +211,12 @@ _MOVED_ID_HOMES = {
     "patch_doc_load_button": "patch_doc_file_line1",
     "patch_doc_refresh_button": "patch_doc_file_line2",
     "patch_script_section_label": "patch_doc_file_line2",
-    # the per-entry input band + the before/after card ride the JSON BODY
-    "patch_doc_entry_inputs": "patch_win_json_body",
+    # batch-97: the entry form + the before/after strip ride the Inspector pane
+    "patch_doc_entry_inputs": "patch_pane_inspector",
     "patch_entry_address_input": "patch_doc_entry_inputs",
     "patch_entry_value_input": "patch_doc_entry_inputs",
     "patch_entry_bytes_input": "patch_doc_entry_inputs",
-    "patch_before_after_card": "patch_win_json_body",
+    "patch_before_after_card": "patch_pane_inspector",
     # the history strip / Undo-Redo / execute-scope group DOCK in the JSON window
     "patch_history_strip": "patch_win_json",
     "patch_history_controls": "patch_win_json",
@@ -234,8 +270,10 @@ _NAMED_BUTTONS = (
 # renders below the row's 2-row content region — every OTHER named button
 # must be reachable.
 _UNREACHABLE_UNDER_SCROLL: dict[tuple[int, int], tuple[str, ...]] = {
-    (80, 24): ("patch_doc_refresh_button",),
-    (120, 30): ("patch_doc_refresh_button",),
+    # batch-97: the one-row file row carries Refresh beside Load — the
+    # measured line-2 deficit is gone at both regimes.
+    (80, 24): (),
+    (120, 30): (),
 }
 
 
@@ -331,10 +369,10 @@ def _drive_window_geometry(
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
-            counts = {wid: len(app.query(f"#{wid}")) for wid in _WINDOW_IDS}
+            counts = {wid: len(app.query(f"#{wid}")) for wid in _COLUMN_IDS}
             regions: dict[str, tuple[int, int, int, int]] = {}
             auto_heights: dict[str, bool] = {}
-            for wid in _WINDOW_IDS:
+            for wid in _COLUMN_IDS:
                 if counts[wid] == 1:
                     window = app.query_one(f"#{wid}")
                     r = window.region
@@ -366,90 +404,49 @@ def _assert_no_overlap(regions: dict, size_label: str) -> None:
             )
 
 
-def test_at063a_three_across_at_120(tmp_path: Path) -> None:
-    """AT-063a — three windows VERTICALLY stacked, content-height, at 120x30.
-
-    Intent (HLR-063, batch-94 LLR-003.1 form): the pe_b row-focus doctrine
-    retired the three-column regime — the narrow STACK is the ONLY regime, so
-    at the comfortable width the three windows lay out as ONE column (exactly
-    one distinct ``region.x``), ascending in script/json/checks order, each
-    full-width, content-height (``auto`` — the panel scrolls as a whole,
-    FOLD-8 at every regime), at/above the pilot-measured usable floor, no
-    overlap, no right-edge clip. Counterfactual on the pre-batch-94 tree:
-    three distinct x's (the 3-across regime) -> RED; a window pinned to a
-    fixed height -> the auto-height assert goes RED.
-    """
-    dims = _drive_window_geometry(tmp_path, (120, 30))
+def _assert_two_columns(dims: dict, size_label: str) -> None:
+    """batch-97: the ledger (left) and the inspector (right) side by side —
+    two distinct x's, one shared y, both at/above the usable floor, inside the
+    panel, non-overlapping."""
     counts, regions = dims["counts"], dims["regions"]
-    assert all(counts[wid] == 1 for wid in _WINDOW_IDS), (
-        f"@120x30: each window id must resolve once, got {counts}"
+    assert all(counts[wid] == 1 for wid in _COLUMN_IDS), (
+        f"@{size_label}: each column id must resolve once, got {counts}"
     )
-    xs = {r[0] for r in regions.values()}
-    assert len(xs) == 1, (
-        f"@120x30: the batch-94 stack needs ONE column x at every regime, got "
-        f"{sorted(xs)} from {regions}"
+    (lx, ly, lw, lh), (ix, iy, iw, ih) = (regions[w] for w in _COLUMN_IDS)
+    assert lx < ix and ly == iy, (
+        f"@{size_label}: the ledger must sit LEFT of the inspector on one row, "
+        f"got {regions}"
     )
-    ys = {wid: r[1] for wid, r in regions.items()}
-    assert (
-        ys["patch_win_script"]
-        < ys["patch_win_json"]
-        < ys["patch_win_checks"]
-    ), (
-        f"@120x30: the stack order must be script above json above checks, "
-        f"got y's {ys}"
-    )
-    for wid in _WINDOW_IDS:
-        assert dims["auto_heights"][wid] is True, (
-            f"@120x30: {wid} must be content-height (styles auto) so the "
-            "panel scrolls as a whole (FOLD-8 at every regime)"
-        )
-    panel_right, host_w = dims["panel_right"], dims["host_content_w"]
+    panel_right = dims["panel_right"]
     for wid, (x, _y, w, h) in regions.items():
-        assert w >= _MIN_USABLE_W, (
-            f"@120x30: {wid} width {w} below usable floor {_MIN_USABLE_W}"
-        )
-        assert h >= _MIN_USABLE_H, (
-            f"@120x30: {wid} height {h} below usable floor {_MIN_USABLE_H}"
-        )
-        assert w <= host_w, (
-            f"@120x30: {wid} width {w} exceeds host content {host_w}"
+        assert w >= _MIN_USABLE_W and h >= _MIN_USABLE_H, (
+            f"@{size_label}: {wid} {w}x{h} below the usable floor"
         )
         assert x + w <= panel_right, (
-            f"@120x30: {wid} right edge {x + w} clips past panel "
-            f"right {panel_right}"
+            f"@{size_label}: {wid} right edge {x + w} clips past panel right "
+            f"{panel_right}"
         )
-    _assert_no_overlap(regions, "120x30")
+    _assert_no_overlap(regions, size_label)
+
+
+def test_at063a_three_across_at_120(tmp_path: Path) -> None:
+    """AT-063a — batch-97 form: the ledger and the inspector side by side at 120x30.
+
+    Intent (HLR-063 restated by HLR-144): the change document and its
+    inspector are both on screen. Counterfactual on the batch-94 tree: one
+    column x (the stack) -> RED.
+    """
+    _assert_two_columns(_drive_window_geometry(tmp_path, (120, 30)), "120x30")
 
 
 def test_at063b_stacked_at_80(tmp_path: Path) -> None:
-    """AT-063b — three windows STACK (1 column, 3 ascending rows) at 80x24.
+    """AT-063b — batch-97 form: the same two columns at the 80x24 floor.
 
-    Intent: HLR-063 — at the narrow floor the ``width-narrow`` reflow stacks the
-    windows vertically: one distinct ``region.x``, three ascending ``region.y``,
-    each full-width. Counterfactual on the 2x2 tree: two distinct x's (a grid),
-    not one → RED.
+    Intent (LLR-149.2 / LLR-149.6): the layout is the same on both sides of the
+    120-column breakpoint; below the range the panel scrolls vertically, the
+    columns keep their split. Counterfactual on the batch-94 tree: one x.
     """
-    dims = _drive_window_geometry(tmp_path, (80, 24))
-    counts, regions = dims["counts"], dims["regions"]
-    assert all(counts[wid] == 1 for wid in _WINDOW_IDS), (
-        f"@80x24: each window id must resolve once, got {counts}"
-    )
-    xs = {r[0] for r in regions.values()}
-    ys = sorted(r[1] for r in regions.values())
-    assert len(xs) == 1, (
-        f"@80x24: stacked windows need ONE column x, got {sorted(xs)}"
-    )
-    assert ys == sorted(set(ys)) and len(ys) == 3, (
-        f"@80x24: three windows need three ascending row y's, got {ys}"
-    )
-    for wid, (_x, _y, w, h) in regions.items():
-        assert w >= _MIN_USABLE_W, (
-            f"@80x24: {wid} width {w} below usable floor {_MIN_USABLE_W}"
-        )
-        assert h >= _MIN_USABLE_H, (
-            f"@80x24: {wid} height {h} below usable floor {_MIN_USABLE_H}"
-        )
-    _assert_no_overlap(regions, "80x24")
+    _assert_two_columns(_drive_window_geometry(tmp_path, (80, 24)), "80x24")
 
 
 # ---------------------------------------------------------------------------
@@ -595,25 +592,17 @@ def _drive_button_reachability(
                 await pilot.pause()
 
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            # batch-97 B2 census: every button has a home of _BUTTON_HOMES and
+            # none sits inside the ledger's scroll body.
             trapped: list[str] = []
             for button in panel.walk_children(Button):
-                node = button.parent
-                in_window = False
-                in_body = False
-                while node is not None and node is not app.screen:
-                    if getattr(node, "id", None) in _WINDOW_IDS:
-                        in_window = True
-                    if "patch-window-body" in (
-                        set(getattr(node, "classes", ()) or ())
-                    ):
-                        in_body = True
-                    node = node.parent
-                if in_body or not in_window:
+                homes = {getattr(a, "id", None) for a in button.ancestors}
+                if "patch_win_script_body" in homes or not homes & set(_BUTTON_HOMES):
                     trapped.append(button.id or type(button).__name__)
 
-            # At 120x30 the SCRIPT window's docked rows are fully visible at
-            # panel scroll 0 (the batch-94 stack keeps them in the first
-            # screenful); captured BEFORE any scrolling happens.
+            # At 120x30 the panel's one-row docks and the Inspector tab's entry
+            # chips are fully visible at panel scroll 0 (the first screenful);
+            # captured BEFORE any scrolling happens.
             script_rows_at_scroll0: list[str] = []
             if size == (120, 30):
                 for row_id in (
@@ -628,6 +617,11 @@ def _drive_button_reachability(
             unreachable: list[str] = []
             for bid in button_ids:
                 btn = app.query_one(f"#{bid}", Button)
+                homes = {getattr(a, "id", None) for a in btn.ancestors}
+                for home, chip in _TAB_FOR_HOME.items():
+                    if home in homes:
+                        app.query_one(f"#{chip}", Button).press()
+                        await pilot.pause()
                 await _reach(app, pilot, btn)
                 if not _fully_visible(app, btn):
                     unreachable.append(bid)
@@ -745,11 +739,18 @@ def test_at064c_revealed_rows_reachable_at_80(tmp_path: Path) -> None:
 # TC-46.1 / TC-46.2 — white-box structure (layout-agnostic) + paste in-viewport
 # ---------------------------------------------------------------------------
 
-# The docked button-row / group docked as a sibling of each window's body.
+# The docked button-row / group docked as a sibling of each scroll body.
+# batch-97: the ledger's docks are the panel's one-row file row and document
+# controls, siblings of ``#patch_main`` (which holds the ledger body).
 _WINDOW_DOCKED = {
-    "patch_win_script": "patch_doc_entry_buttons",
+    "patch_win_script": "patch_doc_controls",
     "patch_win_checks": "patch_checks_controls",
     "patch_win_json": "patch_paste_controls",
+}
+_DOCK_PARENT = {
+    "patch_win_script": "patch_editor_panel",
+    "patch_win_checks": "patch_win_checks",
+    "patch_win_json": "patch_win_json",
 }
 _WINDOW_BODY = {
     "patch_win_script": "patch_win_script_body",
@@ -759,30 +760,14 @@ _WINDOW_BODY = {
 
 
 def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
-    """TC-46.1 (white-box, layout-agnostic) — window structure + reflow rule.
+    """TC-46.1 (white-box) — batch-97 form: bodies scroll, docks are siblings.
 
-    Intent: LLR-063.1 / LLR-064.1 (q-m3) — each window SELF-DESCRIBES with a
-    constant title, holds a ``VerticalScroll`` body, and has a docked
-    button-row that is a SIBLING of the body (not a descendant); and the
-    ``width-narrow`` reflow selector exists in ``styles.tcss``. No
-    ``layout.name`` is pinned (the wide token is a design call, M-A3); the AT
-    geometry oracle carries the actual arrangement.
-
-    **batch-48 (§6.5 Amendment D) — DELETE-AND-RESTATE, not hide.** This test
-    asserted ``any("patch-window-title" in c.classes for c in win.children)``.
-    Inc-1 gave each window a ``border_title`` carrying the same constant, so
-    the in-body ``Label`` rendered the title a SECOND time; Inc-2 removes the
-    Label. The protected property is *each window self-describes* — NOT *a
-    Label with a given class exists* — so the assertion is RESTATED on
-    ``border_title``, which is strictly stronger:
-
-    - it pins the title's TEXT (the class check passed on an empty Label), and
-    - it cannot be satisfied by a hidden widget.
-
-    That last point is why the Label was DELETED rather than hidden via CSS: a
-    ``display: none`` Label still satisfies ``"patch-window-title" in
-    c.classes``, which would have converted this line into a false-confidence
-    test that stays green while the window shows nothing.
+    Intent: LLR-063.1 / LLR-064.1 restated on the ledger + inspector tree
+    (named supersession): the ledger self-describes with its constant border
+    title and the inspector's title follows its tab; each scroll body (ledger,
+    JSON, Checks) is a ``VerticalScroll``; each dock is NOT a descendant of
+    that body (the B2 fix); and the retired ``width-narrow`` reflow of the
+    panel is gone — one scoped section replaces it (D23, LLR-149.2).
 
     # TC-046.1
     """
@@ -795,91 +780,51 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
             await pilot.pause()
             result: dict[str, object] = {}
             for win_id in _WINDOW_IDS:
-                win = app.query_one(f"#{win_id}")
-                child_ids = [c.id for c in win.children]
-                border_title = str(win.border_title or "")
-                # Any direct child re-rendering the window's own name is the
-                # duplicate §6.5 Amendment D removed. Matched on the RENDERED
-                # TEXT (not the retired `.patch-window-title` class) so a
-                # re-added Label cannot dodge it by dropping the class.
-                #
-                # `Label.render()` -> `Content`, whose `.plain` is the text.
-                # NOTE: a `Label` at textual==8.2.8 has NO `.renderable`
-                # attribute — an earlier `getattr(c, "renderable", "")` form
-                # of this check silently compared "" and passed VACUOUSLY
-                # (mutation-caught: it stayed green with the duplicate Label
-                # re-added). Read the render path, not a guessed attribute.
-                bare_title = border_title.lstrip("¹²³")
-                title_labels = [
-                    c.id or type(c).__name__
-                    for c in win.children
-                    if isinstance(c, Label)
-                    and c.render().plain.strip() == bare_title
-                ]
                 body = app.query_one(f"#{_WINDOW_BODY[win_id]}")
                 docked = app.query_one(f"#{_WINDOW_DOCKED[win_id]}")
                 result[win_id] = {
-                    "border_title": border_title,
-                    "title_labels": title_labels,
                     "body_is_scroll": isinstance(body, VerticalScroll),
-                    "docked_is_body_sibling": (
-                        docked.parent is win and body.parent is win
-                    ),
+                    "dock_parent": getattr(docked.parent, "id", None),
                     "docked_not_in_body": docked
                     not in body.walk_children(with_self=False),
-                    "child_ids": child_ids,
                 }
+            titles = {"script": str(app.query_one("#patch_win_script").border_title or "")}
+            for chip, key in (("patch_tab_json", "json"), ("patch_tab_checks", "checks")):
+                app.query_one(f"#{chip}", Button).press()
+                await pilot.pause()
+                titles[key] = str(app.query_one("#patch_inspector").border_title or "")
+            result["titles"] = titles
             return result
 
     result = asyncio.run(_run())
+    titles = result.pop("titles")
+    assert titles["script"] == PatchEditorPanel._WINDOW_BORDER_TITLES["patch_win_script"]
+    assert titles["json"] == "JSON" and titles["checks"] == "CHECKS", titles
     for win_id, r in result.items():
-        # batch-48 §6.5 Amendment D: the window self-describes on its OWN
-        # border chrome. Sourced from the panel's constant, not re-spelled, so
-        # a title rename cannot pass here by being copied into the oracle.
-        expected = PatchEditorPanel._WINDOW_BORDER_TITLES[win_id]
-        assert r["border_title"] == expected, (
-            f"{win_id} must self-describe via its constant border_title "
-            f"{expected!r}; got {r['border_title']!r}"
-        )
-        # The de-dup itself: the in-body title Label must NOT come back. The
-        # border title is the single title surface — a re-added Label would
-        # render the window's name twice (the Inc-1 -> Inc-2 defect).
-        assert not r["title_labels"], (
-            f"{win_id} carries {r['title_labels']} in-body title Label(s) "
-            "duplicating its border_title (§6.5 Amendment D removed them)"
-        )
-        assert r["body_is_scroll"], (
-            f"{win_id} body must be a VerticalScroll, got {r['child_ids']}"
-        )
-        assert r["docked_is_body_sibling"], (
-            f"{win_id} docked row must be a direct child of the window "
-            f"(sibling of the body), got children {r['child_ids']}"
-        )
+        assert r["body_is_scroll"], f"{win_id} body must be a VerticalScroll"
+        assert r["dock_parent"] == _DOCK_PARENT[win_id], (win_id, r["dock_parent"])
         assert r["docked_not_in_body"], (
-            f"{win_id} docked row must NOT be a descendant of the body "
-            "(the B2 fix)"
+            f"{win_id} docked row must NOT be a descendant of the body (the B2 fix)"
         )
 
-    # The narrow reflow reuses the existing width-narrow class (inspection).
     css = (
         Path(__file__).resolve().parents[1]
         / "s19_app"
         / "tui"
         / "styles.tcss"
     ).read_text(encoding="utf-8")
-    assert "#workspace_body.width-narrow #patch_editor_panel" in css, (
-        "the narrow reflow must reuse the existing width-narrow class on "
-        "#patch_editor_panel (mirrors the batch-45 map reflow)"
+    assert "#workspace_body.width-narrow #patch_editor_panel" not in css, (
+        "D23: the width-narrow reflow of the Patch Editor is retired"
     )
+    assert "/* batch-97 patch_editor" in css
 
 
 def test_tc46_2_paste_in_viewport_at_body_scroll0(tmp_path: Path) -> None:
     """TC-46.2 (FOLD-4) — the paste editor's first line is in-viewport.
 
-    Intent: R-TUI-046 (amended) — at the JSON window body's scroll 0 the
+    Intent: R-TUI-046 (amended) — at the JSON body's scroll 0 the
     ``#patch_paste_text`` editor's first line lies inside the body's visible
-    ``content_region`` (not below a fold), the single authoritative verifier of
-    the paste-in-viewport outcome.
+    ``content_region``. batch-97 (named supersession): read on the JSON tab.
     """
 
     async def _run() -> dict[str, object]:
@@ -887,6 +832,8 @@ def test_tc46_2_paste_in_viewport_at_body_scroll0(tmp_path: Path) -> None:
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             app.action_show_screen("patch")
+            await pilot.pause()
+            app.query_one("#patch_tab_json", Button).press()
             await pilot.pause()
             body = app.query_one("#patch_win_json_body")
             paste = app.query_one("#patch_paste_text", TextArea)

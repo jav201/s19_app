@@ -1,0 +1,92 @@
+===== check-editor 118x54
+                                       Check Editor                                         ?  📂 Open patches/ 
+                                                                                                                
+╭─ A2L PARAMETERS ───────────────────────────────────────────────────╮╭─ REPORT FIELDS ────────────────────────╮
+│Filter filter parameters                                            ││   Fields    JSON    Addendum           │
+│ ✓  Parameter                                   Address     Fmt     ││ 2 fields: 2 params · 0 memory rows     │
+│ ✓  ASAM.M.SCALAR.UBYTE.IDENTICAL               0x00013A00  u8 ho…  ││ ◆ 0x00013A00 ….SCALAR.UBYTE.IDENTICAL  │
+│    ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE  0x00013A00  u8      ││ ◆ 0x00013A00 …B_VERB_NO_DEFAULT_VALUE  │
+│ ✓  ASAM…CALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE  0x00013A00  u8      ││                                        │
+│    ASAM…SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE  0x00013A00  u8      ││ MEMORY LOCATIONS                       │
+│    ASAM…LAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x00013A00  u8      ││  Address     Label              Fmt    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Address      0x100                    │
+│    ASAM…CALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Label        label                    │
+│    ASAM…SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Size (bytes) 1                        │
+│    ASAM…LAR.UBYTE.TAB_NOINTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││   Add row     Remove row               │
+│    ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4           0x00013A00  u8      ││                                        │
+│    ASAM.M.SCALAR.SBYTE.IDENTICAL               0x00013A01  u8 ho…  ││ Validate compares fields to the image  │
+│    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2            0x00013A01  u8 m/s  ││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL               0x00013A02  u16 h… ▄││                                        │
+│    ASAM.M.SCALAR.SWORD.IDENTICAL               0x00013A04  u16 h…  ││                                        │
+│    ASAM.M.SCALAR.ULONG.IDENTICAL               0x00013A08  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.SLONG.IDENTICAL               0x00013A0C  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.FLOAT32.IDENTICAL             0x00013A10  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.FLOAT64.IDENTICAL             0x00013A14  u64 h…  ││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0  0x00013A20  u16 h…  ││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008  0x00013A20  u16 h…  ││                                        │
+│    ASAM.M.ARRAY_SIZE_16.UBYTE.IDENTICAL        0x00013A30  u8 ho…  ││                                        │
+│    ASAM.M.MATRIX_DIM_16_1_1.UBYTE.IDENTICAL    0x00013A30  u128 …  ││                                        │
+│    ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL     0x00013A30  u64 h…  ││                                        │
+│    ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL     0x00013A30  u64 h…  ││                                        │
+│    ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL        0x00000000  u8      ││                                        │
+│    ASAM.C.SCALAR.UBYTE.IDENTICAL               0x00810000  u8 ho…  ││                                        │
+│    ASAM.C.SCALAR.SBYTE.IDENTICAL               0x00810001  u8 ho…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL               0x00810002  u16 h…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0  0x00810002  u16 h…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001  0x00810002  u16 h…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010  0x00810002  u16 h…  ││                                        │
+│ 0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL                ││                                        │
+│  Include parameter    space also toggles ✓ on the highlighted row  ││                                        │
+╰───────────────────────────────────────────── 75 params · 2 picked ─╯╰────────────────────────────────────────╯
+Spec Check specs in patches/     ▼   Write as spec.chk.json                                                     
+  Validate     Write .chk.json    APPLY — not available  2 fields → report               apply: n/a — check spec
+ ✓ included   ◆ parameter field   ▪ memory-row field                                                            
+===== check-editor 220x60
+                                                                                 Check Editor                                                                                   ?  📂 Open patches/ 
+                                                                                                                                                                                                    
+╭─ A2L PARAMETERS ───────────────────────────────────────────────────────────────────────────────────────────────────────╮╭─ REPORT FIELDS ────────────────────────────────────────────────────────╮
+│Filter filter parameters                                                                                                ││   Fields    JSON    Addendum                                           │
+│ ✓  Parameter                                                                                  Address     Fmt · Unit   ││ 2 fields: 2 params · 0 memory rows                                     │
+│ ✓  ASAM.M.SCALAR.UBYTE.IDENTICAL                                                              0x00013A00  u8 hours     ││ ◆ 0x00013A00 ASAM.M.SCALAR.UBYTE.IDENTICAL                             │
+│    ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE                                                 0x00013A00  u8           ││ ◆ 0x00013A00 ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE             │
+│ ✓  ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE                                              0x00013A00  u8           ││                                                                        │
+│    ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE                                               0x00013A00  u8           ││ MEMORY LOCATIONS                                                       │
+│    ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE                                            0x00013A00  u8           ││  Address     Label                                              Fmt    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE                                                 0x00013A00  u8 U/  min   ││  Address      0x100                                                    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE                                              0x00013A00  u8 U/  min   ││  Label        label                                                    │
+│    ASAM.M.SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE                                               0x00013A00  u8 U/  min   ││  Size (bytes) 1                                                        │
+│    ASAM.M.SCALAR.UBYTE.TAB_NOINTP_NO_DEFAULT_VALUE                                            0x00013A00  u8 U/  min   ││   Add row     Remove row                                               │
+│    ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4                                                          0x00013A00  u8           ││                                                                        │
+│    ASAM.M.SCALAR.SBYTE.IDENTICAL                                                              0x00013A01  u8 hours     ││ Validate compares fields to the image                                  │
+│    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2                                                           0x00013A01  u8 m/s       ││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL                                                              0x00013A02  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.SWORD.IDENTICAL                                                              0x00013A04  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.ULONG.IDENTICAL                                                              0x00013A08  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.SLONG.IDENTICAL                                                              0x00013A0C  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.FLOAT32.IDENTICAL                                                            0x00013A10  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.FLOAT64.IDENTICAL                                                            0x00013A14  u64 hours    ││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0                                                 0x00013A20  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008                                                 0x00013A20  u16 hours    ││                                                                        │
+│    ASAM.M.ARRAY_SIZE_16.UBYTE.IDENTICAL                                                       0x00013A30  u8 hours     ││                                                                        │
+│    ASAM.M.MATRIX_DIM_16_1_1.UBYTE.IDENTICAL                                                   0x00013A30  u128 hours   ││                                                                        │
+│    ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL                                                    0x00013A30  u64 hours    ││                                                                        │
+│    ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL                                                    0x00013A30  u64 hours    ││                                                                        │
+│    ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL                                                       0x00000000  u8           ││                                                                        │
+│    ASAM.C.SCALAR.UBYTE.IDENTICAL                                                              0x00810000  u8 hours     ││                                                                        │
+│    ASAM.C.SCALAR.SBYTE.IDENTICAL                                                              0x00810001  u8 hours     ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL                                                              0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.IDENTICAL                                                              0x00810004  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.LINEAR_MUL_2                                                           0x00810004  u16 m/s      ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10                                                        0x00810004  u16 km/h     ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.FORM_X_PLUS_4                                                          0x00810004  u16          ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.TAB_INTP_DEFAULT_VALUE                                                 0x00810004  u16 U/  min  ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.TAB_INTP_NO_DEFAULT_VALUE                                              0x00810004  u16 U/  min  ││                                                                        │
+│ 0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL                                                                    ││                                                                        │
+│  Include parameter    space also toggles ✓ on the highlighted row                                                      ││                                                                        │
+╰───────────────────────────────────────────────────────────────────────────────────────────────── 75 params · 2 picked ─╯╰────────────────────────────────────────────────────────────────────────╯
+Spec Check specs in patches/     ▼   Write as spec.chk.json                                                                                                                                         
+  Validate     Write .chk.json    APPLY — not available  2 fields → report                                                                                                   apply: n/a — check spec
+ ✓ included   ◆ parameter field   ▪ memory-row field                                                                                                                                                

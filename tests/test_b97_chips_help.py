@@ -906,3 +906,235 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
     assert "Traceback" not in lines[0]
     if arm.startswith("write_"):
         assert "refused" in lines[0].lower() and "MF-WRITE-CONTAINMENT" in lines[0], lines[0]
+
+
+# --------------------------------------------------------------------------- #
+# Inc-4 — the Patch Editor arms of LLR-148.6, 148.7, 148.9
+# --------------------------------------------------------------------------- #
+
+PATCH_TABS = ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks")
+
+
+def _help_lines(key: str) -> dict:
+    from s19_app.tui.window_help import section_body_text
+
+    lines = {}
+    for raw in section_body_text(key).split("\n"):
+        text = raw.strip()
+        text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
+        if " — " in text:
+            label, effect = text.split(" — ", 1)
+            lines[label.strip()] = effect.strip()
+    return lines
+
+
+def _control_label(screen, widget) -> str:
+    """D20 normalisation: a button up to its first ``:``; an input or select by
+    the ``Label`` on its own row to its left (``:`` stripped), else its
+    placeholder."""
+    from textual.widgets import Button, Label as _Label
+
+    if isinstance(widget, Button):
+        return _strip_glyph(str(widget.label)).split(":", 1)[0].strip()
+    row = [
+        str(lab.render()).strip()
+        for lab in screen.query(_Label)
+        if lab.display and lab.region.width and lab.region.y == widget.region.y
+        and lab.region.right <= widget.region.x
+    ]
+    return (row[-1] if row else getattr(widget, "placeholder", "")).rstrip(":").strip()
+
+
+def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
+    """TC-B97-32 (LLR-148.6, Patch arm, D20): the ``patch`` help body holds one
+    ``label — effect`` line, effect non-empty, for every button, tab chip,
+    input and select label the screen renders over its driven states
+    (Inspector, JSON and Checks tabs; the save-back prompt and the
+    before/after report offered), every key it binds and every glyph of
+    ``PATCH_GLYPHS``. The floor is derived over ``PE_IDS_9C7BEAF`` by the type
+    tuple Button · Input · Select and equals 26; the count of covered control
+    WIDGETS is at least that floor; the one ``Edit JSON`` line names both tabs.
+
+    RED on main (P-21): 6 of 19 labels named. Mutation: a body line without
+    `` — effect``; coverage from one tab only; the ``TextArea`` put back in
+    the tuple (derived 27 ≠ 26).
+    """
+    from textual.widgets import Button, Input as _Input, Select as _Select
+
+    from s19_app.tui import screens_directionb as sdb
+    from tests.b97_fixtures import PE_IDS_9C7BEAF, calib_hotfix, load_change_file, open_patch_editor
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            panel = await open_patch_editor(app, pilot)
+            screen = app.query_one("#screen_patch")
+            derived = {
+                i for i in PE_IDS_9C7BEAF
+                if isinstance(app.query_one(f"#{i}"), (Button, _Input, _Select))
+            }
+            await load_change_file(app, pilot, panel, calib_hotfix(tmp_path))
+            seen = {}
+
+            def harvest():
+                for widget in screen.query("*"):
+                    if not isinstance(widget, (Button, _Input, _Select)):
+                        continue
+                    if not widget.display or widget.region.width == 0:
+                        continue
+                    if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                        continue
+                    seen[widget] = _control_label(screen, widget)
+
+            for tab in PATCH_TABS:
+                if panel.query(f"#{tab}"):
+                    panel.query_one(f"#{tab}").press()
+                    await settle(pilot, 3)
+                harvest()
+            if panel.query("#patch_tab_json"):
+                panel.query_one("#patch_tab_json").press()
+                await settle(pilot, 2)
+            panel.query_one("#patch_doc_apply_button").press()
+            await settle(pilot, 6)
+            harvest()
+            panel.query_one("#patch_saveback_confirm_button").press()
+            await settle(pilot, 8)
+            harvest()
+            in_panel = {w: label for w, label in seen.items() if panel in w.ancestors}
+            return derived, in_panel, set(seen.values())
+
+    derived, in_panel, labels = asyncio.run(_drive())
+    from s19_app.tui import screens_directionb as sdb
+
+    lines = _help_lines("patch")
+    keys = {"ctrl+z", "ctrl+y", "space", "enter", "?"}
+    glyphs = set(getattr(sdb, "PATCH_GLYPHS", {}) or {"(no PATCH_GLYPHS)"})
+    assert len(derived) == 26, sorted(derived)
+    missing = sorted((labels | keys | glyphs) - set(lines))
+    assert missing == [], f"labels with no `label — effect` line: {missing}"
+    assert all(lines[label] for label in labels | keys | glyphs)
+    covered = [w for w, label in in_panel.items() if label in lines]
+    assert len(covered) >= len(derived), (len(covered), len(derived))
+    assert "Inspector" in lines["Edit JSON"] and "JSON tab" in lines["Edit JSON"], lines["Edit JSON"]
+
+
+def test_tc_b97_33_patch_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None:
+    """TC-B97-33 (LLR-148.7, Patch arm): the glyphs painted at the head of each
+    ledger Kind cell and as tokens in the before→after strip belong to
+    ``PATCH_GLYPHS`` (>= 2 painted: ``·`` and the unmapped ``--`` of an entry
+    outside the image), every vocabulary glyph is named in the one-row
+    ``#patch_legend``, and no painted text says ``issues``.
+
+    RED on main: no ``PATCH_GLYPHS``. Mutation: the strip painting ``??`` for an
+    unmapped byte (M27).
+    """
+    from s19_app.tui import screens_directionb as sdb
+    from tests.b97_fixtures import (
+        CALIB_ENTRIES,
+        _bytes_entry,
+        load_change_file,
+        open_patch_editor,
+        write_changeset,
+    )
+    from tests.b97_probes import painted_rows
+
+    vocabulary = getattr(sdb, "PATCH_GLYPHS", None)
+    assert vocabulary, "the Patch Editor's closed glyph vocabulary exists"
+    entries = [_bytes_entry(a, r) for a, r in CALIB_ENTRIES] + [_bytes_entry(0x7FFF0, (1, 2))]
+    path = write_changeset(tmp_path / "with_outside.json", entries)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            panel = await open_patch_editor(app, pilot)
+            await load_change_file(app, pilot, panel, path)
+            table = panel.query_one("#patch_doc_entries_table")
+            x0 = table.cell_padding
+            kinds = [row[x0:x0 + 1] for row in painted_rows(app, table)[1:] if row.strip()]
+            table.move_cursor(row=6)
+            await settle(pilot, 3)
+            card = panel.query_one("#patch_before_after_card")
+            strip = [row[10:] for row in painted_rows(app, card) if row[3:6] in ("was", "now")]
+            tokens = {tok for row in strip for tok in row.split()}
+            legend = panel.query_one("#patch_legend")
+            legend_rows = [r for r in painted_rows(app, legend) if r.strip()]
+            texts = []
+            for tab in PATCH_TABS:
+                panel.query_one(f"#{tab}").press()
+                await settle(pilot, 3)
+                texts.append("\n".join(painted_rows(app, panel)))
+            return kinds, tokens, legend_rows, legend.region.height, "\n".join(texts)
+
+    kinds, tokens, legend_rows, legend_h, panel_text = asyncio.run(_drive())
+    hexes = {t for t in tokens if len(t) == 2 and all(c in "0123456789ABCDEF" for c in t)}
+    painted = {k for k in kinds if k.strip()} | (tokens - hexes)
+    assert painted <= set(vocabulary), painted - set(vocabulary)
+    assert {"·", "--"} <= painted, painted
+    assert legend_h <= 2 and 1 <= len(legend_rows) <= 2
+    assert all(glyph in "".join(legend_rows) for glyph in vocabulary), legend_rows
+    assert "issues" not in panel_text
+
+
+@pytest.mark.parametrize(
+    "arm", ["ledger_empty", "ledger_refused", "strip_no_image", "strip_no_entries", "json_no_document", "checks_no_run"]
+)
+def test_tc_b97_58_patch_editor_region_states(tmp_path: Path, arm: str) -> None:
+    """TC-B97-58 (LLR-148.9, Patch arms): the ledger with no document and after
+    a refused load (its finding), the before→after strip with no image and
+    with no entry, the JSON view before any document and the Checks tab before
+    a run each paint exactly one English line in their region, and no
+    traceback.
+
+    RED on main: the empty ledger line wraps (3 rows at 118 columns); a
+    refused load paints nothing in the ledger; no JSON view exists.
+    """
+    from tests.b97_fixtures import ES_MARKER_RE, legacy_v1, load_change_file, open_patch_editor
+    from tests.b97_probes import painted_rows
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            # With an image, its install pushes the (empty) draft document to the
+            # JSON view, so the no-document arm runs before any image.
+            panel = await open_patch_editor(
+                app, pilot, image=arm not in ("strip_no_image", "json_no_document")
+            )
+            if arm == "ledger_refused":
+                await load_change_file(app, pilot, panel, legacy_v1(tmp_path))
+            if arm == "strip_no_image":
+                panel.query_one("#patch_entry_address_input").value = "0xEB10"
+                panel.query_one("#patch_entry_bytes_input").value = "01 02"
+                panel.query_one("#patch_entry_add_button").press()
+                await settle(pilot, 4)
+            region = {
+                "ledger_empty": "#patch_doc_empty_state",
+                "ledger_refused": "#patch_doc_empty_state",
+                "strip_no_image": "#patch_before_after_card",
+                "strip_no_entries": "#patch_before_after_card",
+                "json_no_document": "#patch_json_view",
+                "checks_no_run": "#patch_checks_status",
+            }[arm]
+            tab = {"json_no_document": "patch_tab_json", "checks_no_run": "patch_tab_checks"}.get(arm)
+            if tab and panel.query(f"#{tab}"):
+                panel.query_one(f"#{tab}").press()
+                await settle(pilot, 3)
+            holder = panel.query(region)
+            if not holder:
+                return []
+            rows = painted_rows(app, holder.first())
+            if region == "#patch_before_after_card":
+                rows = rows[1:]  # the border-top row carries the title
+            return [r.strip() for r in rows if r.strip()]
+
+    lines = asyncio.run(_drive())
+    assert len(lines) == 1, (arm, lines)
+    assert not ES_MARKER_RE.search(lines[0]), lines[0]
+    assert "Traceback" not in lines[0]
+    if arm == "ledger_refused":
+        assert lines[0].startswith("Refused: [CHG-V1-FORMAT]") or "Refused:" in lines[0], lines[0]
+    # Inc-4 gate (code-reviewer L1): the two fixed lines are compared whole, as
+    # literals, so a rewritten constant fails here directly (M34).
+    if arm == "ledger_empty":
+        assert lines[0] == "No entries yet: Add one, paste a change-set or Load a file.", lines[0]
+    if arm == "json_no_document":
+        assert lines[0] == "No document yet: Load, paste or Add.", lines[0]

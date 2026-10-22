@@ -1,0 +1,9 @@
+RED re-run of TC-B97-40 after its PC-11 reorder: a clean HEAD 98f3c84 worktree (unchanged source; git status of s19_app/ empty) with the Inc-4 test files copied in
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc4\head\tests\test_b97_patch_editor.py:846: AssertionError: ('patch_entry_address_input', ['patch_doc_entry_inputs', 'patch_win_json_body', 'patch_win_json', 'patch_editor_panel', 'screen_patch', 'workspace_body', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\inc4\head\tests\test_b97_patch_editor.py:846: AssertionError: ('patch_entry_address_input', ['patch_doc_entry_inputs', 'patch_win_json_body', 'patch_win_json', 'patch_editor_panel', 'screen_patch', 'workspace_body', ...])
+=========================== short test summary info ===========================
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size1]
+2 failed, 29 deselected in 6.37s

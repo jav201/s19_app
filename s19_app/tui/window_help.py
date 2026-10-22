@@ -2,7 +2,7 @@
 HLR-140 / LLR-140.1..140.2).
 
 Each shipped window gains a ``?`` ghost chip beside its title (left side of the
-header row, never displacing the ``📂 Open folder`` chip) and a focused-window
+header row, never displacing the ``📂 Open <folder>/`` chip) and a focused-window
 ``?`` binding: while a widget of that window holds focus, ``?`` opens THIS
 window's "how to use this window's functions" section instead of the app-wide
 stock ``HelpPanel`` — the global ``question_mark`` binding (action
@@ -55,29 +55,74 @@ logger = logging.getLogger(__name__)
 # them — NOT an md port — and documents the v2 change-set file notation.
 
 WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
+    #: batch-97 Inc-4 (D25, LLR-148.6): rewritten and CODE-authored like
+    #: ``check_editor`` — no longer an md port, so outside TC-707's md census.
+    #: One ``label — effect`` line per label, key and glyph the Patch Editor
+    #: paints (TC-B97-32 parses this body). The key lines are hand-typed until
+    #: Inc-8's generated keys block replaces them (D27).
     "patch": {
         "title": "Patch Editor",
         "steps": (
-            "Load an S19/HEX image first (`^L`) — patching needs bytes in "
-            "memory.",
-            "Type an address (`0x…`) plus either a string value or a run of "
-            "hex bytes, then press **Add** to append a change entry. The "
-            "entry list below previews the bytes of whichever row is "
-            "selected.",
-            "Alternatively paste or load a v2 change-set JSON "
-            "(`s19app-changeset`, `\"kind\": \"change\"`) — the JSON EDIT "
-            "pane accepts a pasted document and validates it against the v2 "
-            "schema.",
-            "Press **Run checks** (same screen) to verify every entry "
-            "against the loaded image; uncheckable rows name their reason "
-            "(declaration fault, partial/outside range, no image) and "
-            "healthy entries are still checked.",
-            "The variant selector beside the editor picks which firmware "
-            "image of the project loads — it appears only when the project "
-            "holds at least two images.",
-            "**Open folder** (change 2) jumps to where your change-set "
-            "files live: the project folder when a project is saved, the "
-            "common `workarea\\patches\\` otherwise.",
+            "Edit a change-set: the PATCH SCRIPT ledger on the left lists its "
+            "entries; the inspector on the right shows the highlighted entry "
+            "and holds the Inspector, JSON and Checks tabs. Load an S19/HEX "
+            "image first (`^L`) to see the bytes an entry replaces.",
+            "Inspector — shows the highlighted entry's BEFORE → AFTER bytes, "
+            "the entry form and the DOCUMENT tally.",
+            "JSON — shows the loaded document as read-only JSON under its "
+            "stamp, and the editable paste buffer.",
+            "Checks — shows the declaration faults and the check results, "
+            "with Run checks.",
+            "Address — the entry's start address, `0x…` hex.",
+            "String — a text value, written in the document's encoding.",
+            "Bytes — a run of hex bytes, such as `DE AD BE EF`.",
+            "Add — appends the entry typed in the form.",
+            "Edit — replaces the entry at the typed address with the form's "
+            "value.",
+            "Remove — removes the entry at the typed address.",
+            "Edit JSON — on the Inspector tab, edits the highlighted entry as "
+            "JSON; on the JSON tab, opens the paste buffer full size. Both "
+            "are off for a document loaded from a file.",
+            "Parse pasted — loads the paste buffer as the document.",
+            "Undo — steps the document back one edit (a pasted or typed "
+            "document only).",
+            "Redo — steps it forward again.",
+            "Scope — cycles which variants Execute scope runs over.",
+            "Execute scope — applies the document over the chosen variants.",
+            "Save patched image as — the file name an applied image is "
+            "written under.",
+            "Width — cycles the S19 record width of that file (32 or 16 "
+            "bytes per line).",
+            "Write file — writes the patched image.",
+            "Don't save — closes the prompt without writing.",
+            "Write before/after report — writes the report of the last "
+            "save.",
+            "Run checks — runs a check document's entries against the loaded "
+            "image; uncheckable rows name their reason.",
+            "File — picks a change file in `patches/`, or takes a typed path "
+            "for Load.",
+            "Load — loads the typed path (a pick in the list loads at once).",
+            "Refresh — re-reads the file list of `patches/`.",
+            "Validate — checks the document against the loaded image.",
+            "Apply loaded changes — writes the entries into the loaded image "
+            "and offers to save it.",
+            "Save — writes the document as a change-set file.",
+            "Open patches/ — opens the folder change-set files live in: the "
+            "project's, or the common `workarea\\patches\\` without a "
+            "project.",
+            "? — opens this help.",
+            "ctrl+z — Undo, from anywhere on the screen.",
+            "ctrl+y — Redo, from anywhere on the screen.",
+            "space — on a tab chip, opens its tab.",
+            "enter — presses the focused chip or button.",
+            "arrow keys — move the ledger highlight, and scroll the read-only "
+            "JSON view.",
+            "✓ — the entry's check passed.",
+            "✗ — the entry's check failed.",
+            "◐ — the entry could not be checked; Checks names the reason.",
+            "· — the entry has not been checked yet.",
+            "-- — in the BEFORE → AFTER bytes, an address the image does not "
+            "hold.",
         ),
     },
     "checks": {
@@ -114,7 +159,7 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Save reusable parameter sets as templates — they land in the "
             "template library (`.s19tool\\templates\\`, or the project "
             "folder under change 1) and reload by name.",
-            "**Open folder** (change 2) opens exactly that template "
+            "**Open templates/** (change 2) opens exactly that template "
             "library.",
         ),
     },
@@ -133,7 +178,7 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "**Context bytes** controls how many bytes of surrounding "
             "memory accompany each change in the report.",
             "**Generate new report** writes the `*.md` + `*.html` pair "
-            "into the project's `reports\\` folder; **Open folder** "
+            "into the project's `reports\\` folder; **Open reports/** "
             "(change 2) opens that folder directly.",
         ),
     },
@@ -280,7 +325,7 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
         "steps": (
             "A change-set file is ONE JSON object (UTF-8) that you can "
             "hand-write in any text editor, then load (`^L`) or paste into "
-            "the Patch Editor's JSON EDIT pane. The five envelope fields "
+            "the Patch Editor's paste buffer (JSON tab). The five envelope fields "
             "are required: `format` = `s19app-changeset`, `version` = "
             "`2.0`, `kind` = `change` (modifications) or `check` "
             "(expected values), `encoding` = a text codec such as `utf-8`, "
@@ -459,7 +504,7 @@ class WindowHelpChip(Button):
             section that does not exist (the no-orphan-seat limb).
 
     Sits beside the window title (left side of the header row), a no-key
-    control like the ``📂 Open folder`` chip — the focused-window ``?``
+    control like the ``📂 Open <folder>/`` chip — the focused-window ``?``
     binding rides :class:`WindowSection`, not this chip.
     """
 

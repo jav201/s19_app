@@ -1,0 +1,23 @@
+fold tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path run1: 1 passed in 2.29s
+fold tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path run2: 1 passed in 2.35s
+fold tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path run3: 1 passed in 2.44s
+fold tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run1: 1 failed in 2.37s
+fold tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run2: 1 failed in 2.53s
+fold tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run3: 1 passed in 2.34s
+fold tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run1: 1 failed in 7.39s
+fold tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run2: 1 passed in 6.82s
+fold tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run3: 1 passed in 6.76s
+HEAD-98f3c84 tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run1: 1 failed in 3.16s
+HEAD-98f3c84 tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run2: 1 passed in 2.43s
+HEAD-98f3c84 tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run3: 1 passed in 2.35s
+HEAD-98f3c84 tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run4: 1 failed in 2.61s
+HEAD-98f3c84 tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears run5: 1 passed in 2.45s
+HEAD-98f3c84 tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run1: 1 passed in 5.16s
+HEAD-98f3c84 tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run2: 1 passed in 4.51s
+HEAD-98f3c84 tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run3: 1 passed in 4.80s
+HEAD-98f3c84 tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run4: 1 passed in 4.60s
+HEAD-98f3c84 tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface run5: 1 passed in 5.04s
+# at068a fold tree before hardening: 4 failed / 10 (assert after_paste == [] at :3655, one fixed pause after Parse pasted); HEAD 98f3c84: 5/5 passed
+# at068a after _settled hardening (test-only), 10 runs:      10 1 passed
+# verify_loud_mismatch_notice isolated on fold tree, 5 runs:       1 1 failed
+# verify_loud_mismatch_notice isolated on fold tree, 5 runs:       4 1 passed

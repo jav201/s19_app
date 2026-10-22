@@ -797,6 +797,10 @@ def test_tc081_5_strip_geometry_painted() -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            # batch-97 Inc-4 (named supersession, HLR-144): the strip lives on
+            # the inspector's JSON tab — open it before reading the paint.
+            panel.query_one("#patch_tab_json").press()
+            await pilot.pause()
             panel.set_undo_redo_enabled(
                 True, {"back": _HISTORY_MAX, "forward": 0, "bound": _HISTORY_MAX}
             )

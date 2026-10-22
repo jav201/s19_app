@@ -1,4 +1,4 @@
-"""Batch-97 width and height derivation (HLR-149) — the Check Editor arms (Inc-3).
+"""Batch-97 width and height derivation (HLR-149) — the Check Editor (Inc-3) and Patch Editor (Inc-4) arms.
 
 TC-B97-34..38 and TC-B97-59 over the Check Editor; the Patch, Builder and
 Execution arms join at Inc-4..6 and the full sweep at Inc-7. Every reading
@@ -449,6 +449,278 @@ def test_tc_b97_59_below_the_range_actions_reachable(tmp_path: Path, size) -> No
         return out, overlaps
 
     out, overlaps = run(tmp_path, size, body)
+    for wid, (presses, inside_tab, pages, inside_page) in out.items():
+        assert presses < 200 and inside_tab, (size, wid, presses)
+        assert pages < 20 and inside_page, (size, wid, pages)
+    assert overlaps == [], overlaps
+
+
+# =========================================================================== #
+# Inc-4 — the Patch Editor arms of TC-B97-34..38 and TC-B97-59
+# =========================================================================== #
+
+from tests.b97_fixtures import (  # noqa: E402
+    CALIB_ENTRIES,
+    _bytes_entry,
+    calib_hotfix,
+    load_change_file,
+    open_patch_editor,
+    write_changeset,
+)
+
+PATCH_PRIMARY = (
+    "patch_doc_load_button",
+    "patch_doc_save_button",
+    "patch_doc_validate_button",
+    "patch_doc_apply_button",
+)
+PATCH_CATEGORIES = ("nowrap-ledger", "nowrap-heading", "nowrap-ribbon", "nowrap-legend")
+#: A change-file name far wider than the ribbon at any size of the range; the
+#: ribbon must keep its tail (LLR-149.4, file names).
+LONG_FILE = "calib_" + "_".join(f"segment{i:02d}" for i in range(11)) + "_TAIL_MARK.json"
+
+
+def run_patch(tmp_path: Path, size, body, *, path=None):
+    """Open the Patch Editor at ``size`` with ``prg.s19`` and a change-set loaded."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            panel = await open_patch_editor(app, pilot)
+            await load_change_file(app, pilot, panel, path or calib_hotfix(tmp_path))
+            return await body(app, pilot, panel)
+
+    return asyncio.run(_drive())
+
+
+def test_tc_b97_34_patch_layout_monotonic_in_its_inputs() -> None:
+    """TC-B97-34 (LLR-149.1, Patch arm, layer 0): every width ``patch_layout``
+    derives is non-decreasing as the measured ledger / inspector widths grow,
+    and the Value column and the strip's bytes per row are strictly greater at
+    the 220x60 reading (115 / 75) than at 118x54 (65 / 41) — 8 then 16 bytes.
+
+    RED on main: no ``patch_layout``. Mutation: the strip fixed at 8 bytes.
+    """
+    layout = getattr(sdb, "patch_layout", None)
+    assert layout is not None
+    samples = [(65, 41), (90, 57), (115, 75), (140, 92)]
+    readings = [layout(ledger, inspector, 6) for ledger, inspector in samples]
+    for field in ("value", "strip_bytes", "status", "address"):
+        series = [getattr(r, field) for r in readings]
+        assert series == sorted(series), (field, series)
+    small, large = layout(65, 41, 6), layout(115, 75, 6)
+    assert small.strip_bytes == 8 and large.strip_bytes == 16
+    assert large.value > small.value
+
+
+def _patch_reading(app, panel) -> dict:
+    from tests.test_b97_patch_editor import strip_reading
+
+    table = panel.query_one("#patch_doc_entries_table", DataTable)
+    rows = painted_rows(app, table)
+    span = column_span(table, 2)
+    return {
+        "msx": table.max_scroll_x,
+        "values": [r[span[0]:span[1]].rstrip() for r in rows[1:] if r.strip()],
+        "strip": [len(r["offsets"]) for r in strip_reading(app, panel)],
+        "rows": rows,
+    }
+
+
+def test_tc_b97_34_patch_painted_widths_follow_four_resizes(tmp_path: Path) -> None:
+    """TC-B97-34 (LLR-149.1, Patch painted arm, PC-19): in one session 118x54,
+    160x56, 220x60, 260x70 and back to 118x54 the ledger and the strip repaint
+    at every step — no horizontal scroll, the 8-byte ``A5`` run clipped with
+    one ``…`` at 118 and whole from 220, the strip 8 bytes per row at 118 and
+    16 from 220 — and back at 118x54 the painted ledger equals the first
+    reading.
+
+    RED: the strip not re-rendered on resize (M15); ``Column.width`` +
+    ``refresh(layout=True)`` alone (the PC-8 vacuous path, M22).
+    """
+
+    async def body(app, pilot, panel):
+        table = panel.query_one("#patch_doc_entries_table", DataTable)
+        table.move_cursor(row=3)
+        await settle(pilot, 3)
+        out = []
+        for size in ((118, 54), (160, 56), (220, 60), (260, 70), (118, 54)):
+            await pilot.resize_terminal(*size)
+            await settle(pilot, 6)
+            out.append((size, _patch_reading(app, panel)))
+        return out
+
+    readings = run_patch(tmp_path, (118, 54), body)
+    run_a5 = " ".join(["A5"] * 8)
+    for size, reading in readings:
+        assert reading["msx"] == 0, (size, reading["msx"])
+        assert len(reading["values"]) >= 4, (size, reading["values"])
+        value = reading["values"][3]
+        if size[0] >= 220:
+            assert value == run_a5 and reading["strip"] == [16], (size, value, reading["strip"])
+        if size[0] == 118:
+            assert value.count("…") == 1 and run_a5.startswith(value[:-1]), (size, value)
+            assert reading["strip"] == [8], (size, reading["strip"])
+    assert readings[0][1]["rows"] == readings[-1][1]["rows"]
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+def test_tc_b97_35_patch_no_horizontal_overflow(tmp_path: Path, size) -> None:
+    """TC-B97-35 (LLR-149.2, Patch arm): 0 displayed descendants of the Patch
+    Editor whose clipped region leaves the panel on x, over >= 10, on each of
+    the three tabs and both sides of the 120-column breakpoint.
+
+    RED on main (P-10): 1 overflowing descendant at 118x54.
+    """
+
+    async def body(app, pilot, panel):
+        found = []
+        for chip in ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks"):
+            if panel.query(f"#{chip}"):
+                panel.query_one(f"#{chip}").press()
+                await settle(pilot, 3)
+            found += [w.id or type(w).__name__ for w in clipped_overflow(panel)]
+        return found, len(displayed_descendants(panel))
+
+    offenders, population = run_patch(tmp_path, size, body)
+    assert offenders == [], (size, offenders)
+    assert population >= 10
+
+
+@pytest.mark.parametrize("size", RANGE_SAMPLES)
+def test_tc_b97_36_patch_document_actions_inside_at_scroll_zero(tmp_path: Path, size) -> None:
+    """TC-B97-36 (LLR-149.3, Patch arm; PC-24 at 118x53): Load, Save, Validate
+    and Apply lie inside the panel region with the panel at its top.
+
+    RED by mutation: the ledger given a fixed height past the panel (M23).
+    """
+
+    async def body(app, pilot, panel):
+        panel.scroll_home(animate=False)
+        await settle(pilot, 2)
+        return {i: panel.query_one(f"#{i}").region for i in PATCH_PRIMARY}, panel.region
+
+    regions, panel_region = run_patch(tmp_path, size, body)
+    for wid, region in regions.items():
+        assert panel_region.contains_region(region), (size, wid, region, panel_region)
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+def test_tc_b97_37_patch_no_wrapped_row_and_clips(tmp_path: Path, size) -> None:
+    """TC-B97-37 (LLR-149.4, Patch arm): every member of the no-wrap set (by
+    category class: the ledger, the inspector headings, the ribbon, the legend)
+    paints one row per logical line; a Value cell wider than its column keeps
+    its head with exactly one ``…``; the ribbon keeps the tail of a file name
+    wider than itself; the 6 painted ledger rows are pairwise distinct.
+
+    RED on main: no member carries a no-wrap category class (the guard); the
+    ribbon clipped head-first (M24).
+    """
+    path = write_changeset(tmp_path / LONG_FILE, [_bytes_entry(a, r) for a, r in CALIB_ENTRIES])
+
+    async def body(app, pilot, panel):
+        if panel.query("#patch_tab_json"):
+            panel.query_one("#patch_tab_json").press()  # the inspector headings live there
+        await settle(pilot, 4)
+        members = {c: [w for w in panel.query(f".{c}") if is_displayed(w)] for c in PATCH_CATEGORIES}
+        wrapped = []
+        for category, widgets in members.items():
+            for w in widgets:
+                if isinstance(w, Static):
+                    lines = str(w.render()).count("\n") + 1
+                    height = w.get_content_height(w.size, app.size, w.content_region.width)
+                    if height != lines:
+                        wrapped.append((category, w.id, height, lines))
+        reading = _patch_reading(app, panel)
+        holder = panel.query_one("#patch_identity_ribbon")
+        ribbon = painted_rows(app, holder)[0].rstrip()
+        return {c: len(ws) for c, ws in members.items()}, wrapped, reading, (ribbon, holder.content_region.width)
+
+    members, wrapped, reading, ribbon = run_patch(tmp_path, size, body, path=path)
+    assert all(n >= 1 for n in members.values()), members
+    assert wrapped == [], wrapped
+    for value in reading["values"]:
+        if "…" in value:
+            assert value.count("…") == 1 and value.endswith("…"), value
+    assert len(set(reading["rows"][1:7])) == 6
+    ribbon, ribbon_w = ribbon
+    assert ribbon.endswith("_TAIL_MARK.json · change"), ribbon
+    # The name is clipped exactly where it does not fit (it fits from 220 on;
+    # Windows' path limit caps how long a fixture name can be).
+    assert ("…" in ribbon) is (len(LONG_FILE) + len(" · change") > ribbon_w), (ribbon, ribbon_w)
+
+
+@pytest.mark.parametrize("size", [(160, 56), (220, 60), (260, 70)])
+def test_tc_b97_38_patch_ledger_takes_its_width(tmp_path: Path, size) -> None:
+    """TC-B97-38 (LLR-149.5, Patch width clause): the ledger's header row leaves
+    at most 2 void cells after its painted extent, and the Value column is
+    wider at these sizes than at 118x54.
+
+    RED by mutation: the Value column fixed at 22 cells (M25).
+    """
+
+    async def body(app, pilot, panel):
+        table = panel.query_one("#patch_doc_entries_table", DataTable)
+        void, header = _header_void(app, table)
+        return void, header, table.ordered_columns[2].width
+
+    void, header, width = run_patch(tmp_path, size, body)
+    assert void <= 2, (size, void, header)
+    assert width > sdb.patch_layout(65, 41, 6).value
+
+
+@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+def test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card(tmp_path: Path, size) -> None:
+    """TC-B97-38 (LLR-149.5, Patch height clause; PC-24 at 118x53): no panel row
+    is painted blank across the panel outside the ledger and the inspector.
+
+    RED on main (P-32): 3 / 2 blank rows outside the ledger.
+    """
+
+    async def body(app, pilot, panel):
+        main = panel.query("#patch_main")
+        return blank_panel_rows(app, panel, outside=main.first() if main else None)
+
+    assert run_patch(tmp_path, size, body) == []
+
+
+@pytest.mark.parametrize("size", [(80, 24), (100, 40), (220, 40)])
+def test_tc_b97_59_patch_below_the_range_actions_reachable(tmp_path: Path, size) -> None:
+    """TC-B97-59 (LLR-149.6, Patch arm): below the range ``tab`` from the panel
+    top reaches each document action (<= 200 presses) and it lies inside the
+    panel once focused; ``pagedown`` from scroll 0 brings each inside (<= 20);
+    no two displayed buttons overlap.
+
+    RED by mutation: ``overflow: hidden`` on the panel (M26).
+    """
+
+    async def body(app, pilot, panel):
+        out = {}
+        for wid in PATCH_PRIMARY:
+            panel.scroll_home(animate=False)
+            panel.query_one("#patch_doc_entries_table").focus()
+            await settle(pilot, 2)
+            presses = 0
+            while (app.focused is None or app.focused.id != wid) and presses < 200:
+                await pilot.press("tab")
+                presses += 1
+            await settle(pilot, 3)
+            inside_tab = panel.region.contains_region(panel.query_one(f"#{wid}").region)
+            panel.scroll_home(animate=False)
+            panel.focus()
+            await settle(pilot, 2)
+            pages = 0
+            while not panel.region.contains_region(panel.query_one(f"#{wid}").region) and pages < 20:
+                await pilot.press("pagedown")
+                await settle(pilot, 1)
+                pages += 1
+            inside_page = panel.region.contains_region(panel.query_one(f"#{wid}").region)
+            out[wid] = (presses, inside_tab, pages, inside_page)
+        buttons = [b.region for b in panel.query(Button) if is_displayed(b) and b.region.width]
+        overlaps = [(a, b) for i, a in enumerate(buttons) for b in buttons[:i] if a.overlaps(b)]
+        return out, overlaps
+
+    out, overlaps = run_patch(tmp_path, size, body)
     for wid, (presses, inside_tab, pages, inside_page) in out.items():
         assert presses < 200 and inside_tab, (size, wid, presses)
         assert pages < 20 and inside_page, (size, wid, pages)

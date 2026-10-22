@@ -1,0 +1,13 @@
+RED re-run of the 4 nodes whose first RED failed before their clause (PC-11): unchanged source, HEAD 98f3c844f50d4ef5b850382aa0c2642d73f2299e
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:534: AssertionError: paste
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:575: AssertionError:
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:609: AssertionError: (None, '')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:557: AssertionError: ((118, 54), ['43 41 4C 2D 3', 'A5 A5 A5 A5 A'])
+=========================== short test summary info ===========================
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_every_writer_refreshes_the_view_at_once
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_dirty_flag_arms_save_and_typing
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_equal_payload_and_fresh_start
+FAILED tests/test_b97_width.py::test_tc_b97_34_patch_painted_widths_follow_four_resizes
+4 failed, 90 deselected in 23.84s

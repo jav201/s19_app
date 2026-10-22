@@ -9126,7 +9126,10 @@ def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "ob
 # rework (batch-48 Amendment D precedent — the window's border title
 # supersedes the in-body title; the protected property "the window
 # self-describes as the change-document surface" rides the border title).
-PATCH_DOC_SECTION_TITLE = "¹PATCH SCRIPT"
+# batch-97 Inc-4 (named supersession, HLR-144 / pe_A): the superscript ordinal
+# named the window's read order in the retired three-window regime; the
+# ledger + inspector layout has one titled ledger, so the title is plain.
+PATCH_DOC_SECTION_TITLE = "PATCH SCRIPT"
 PATCH_DOC_PATH_PLACEHOLDER = (
     "or type a path to the same change-set JSON "
     "(alternative to the patches/ dropdown)"

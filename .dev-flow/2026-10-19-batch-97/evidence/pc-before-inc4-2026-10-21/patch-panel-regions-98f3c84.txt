@@ -1,0 +1,5 @@
+# #patch_editor_panel region on HEAD 98f3c84 (headless run_test)
+(118, 54) screen (5, 2, 112, 42) panel region (5, 4, 112, 40) content (7, 5, 108, 38) scrollbar_v 2 children [(None, (5, 2, 112, 2)), ('patch_editor_panel', (5, 4, 112, 40))]
+(118, 53) screen (5, 2, 112, 41) panel region (5, 4, 112, 39) content (7, 5, 108, 37) scrollbar_v 2 children [(None, (5, 2, 112, 2)), ('patch_editor_panel', (5, 4, 112, 39))]
+(220, 60) screen (23, 2, 196, 48) panel region (23, 4, 196, 46) content (25, 5, 192, 44) scrollbar_v 2 children [(None, (23, 2, 196, 2)), ('patch_editor_panel', (23, 4, 196, 46))]
+(220, 59) screen (23, 2, 196, 47) panel region (23, 4, 196, 45) content (25, 5, 192, 43) scrollbar_v 2 children [(None, (23, 2, 196, 2)), ('patch_editor_panel', (23, 4, 196, 45))]

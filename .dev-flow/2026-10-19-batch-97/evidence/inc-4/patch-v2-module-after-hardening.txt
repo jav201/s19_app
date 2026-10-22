@@ -1,0 +1,212 @@
+............F....F........................F.........                     [100%]
+================================== FAILURES ===================================
+______________________ test_verify_loud_mismatch_notice _______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23791/test_verify_loud_mismatch_noti0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A682CAB4D0>
+
+    def test_verify_loud_mismatch_notice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A verify mismatch surfaces a prominent error notice naming the file
+        and the per-kind run/byte summary, while the written file stays on disk.
+    
+        Intent: LLR-004.2 (HLR-004 hybrid) — on a mismatch the surface is loud:
+        an error-severity notification that names the written file and carries
+        a non-zero run/byte count built from ``DiffStats``. The save is NOT
+        aborted (collect-don't-abort): the file written by the real save engine
+        remains on disk. The mismatch is injected by substituting
+        ``verify_written_image`` so the surfacing logic is exercised against a
+        known ``mismatch`` VerifyResult (the file itself is faithfully written).
+        """
+        from textual.widgets import Button
+    
+        hex_path = _make_hex_image(tmp_path)
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        def _mismatch_verify(written_path, intended_mem_map, file_type):
+            # One changed run of length 1 — the canonical one-byte-mutation fault.
+            runs = [DiffRun(start=0x100, end=0x101, kind="changed")]
+            stats = DiffStats(
+                run_counts={"changed": 1, "only_a": 0, "only_b": 0},
+                byte_counts={"changed": 1, "only_a": 0, "only_b": 0},
+            )
+            return VerifyResult(
+                status=STATUS_MISMATCH,
+                runs=runs,
+                stats=stats,
+                written_path=written_path,
+            )
+    
+        monkeypatch.setattr(
+            change_service_module, "verify_written_image", _mismatch_verify
+        )
+    
+        async def _drive() -> tuple[list[str], list[str], list[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_hex_image(app, hex_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _apply_one_entry(app, pilot, panel)
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                error_notices = [
+                    str(n.message)
+                    for n in app._notifications
+                    if getattr(n, "severity", None) == "error"
+                ]
+                written = sorted(p.name for p in workarea.rglob("*.hex"))
+                return list(app.log_lines), error_notices, written
+    
+        log_lines, error_notices, written = asyncio.run(_drive())
+>       assert any("Verify MISMATCH" in line for line in log_lines), log_lines
+E       AssertionError: ['Patch Editor: entry added.', 'Apply: 1 applied, 0 skipped, 0 blocked']
+E       assert False
+E        +  where False = any(<generator object test_verify_loud_mismatch_notice.<locals>.<genexpr> at 0x000001A68031A9B0>)
+
+tests\test_tui_patch_editor_v2.py:995: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23791/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23791/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23791/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+___________ test_at064c_edit_json_disabled_for_file_backed_document ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23791/test_at064c_edit_json_disabled0')
+
+    def test_at064c_edit_json_disabled_for_file_backed_document(
+        tmp_path: Path,
+    ) -> None:
+        """Edit JSON is DISABLED for a file-backed doc → no popup, no clobber.
+    
+        Intent (AT-064c, US-064b / LLR-064b.4, A-01 data-loss guard): after a
+        FILE load (``source_path is not None``) the Edit-JSON control is disabled
+        and the popup cannot open — so the stale ``DUMMY_CHANGESET_TEXT`` buffer
+        can never be Confirmed to ``load_text``-REPLACE the loaded document. The
+        test also drives the mechanism directly (posting ``EditJsonRequested``) to
+        prove the handler's guard refuses to push the modal and mutates nothing.
+        For a paste-authored doc (``source_path is None``) the same control is
+        ENABLED and the popup opens — the two states asserted in ONE node so the
+        guard is a real discriminator (C-10), not a constant.
+        """
+        from textual.widgets import Button
+    
+        from s19_app.tui.screens import ChangeSetJsonScreen
+    
+        doc_path = _write_v2_document(
+            tmp_path / "loaded.json",
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+        )
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x222", "value": "PASTED"}]
+        )
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                # (a) FILE-backed document → source_path not None → disabled.
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+                await pilot.pause()
+                outcomes["file_source"] = (
+                    app._change_service.document.source_path is not None
+                )
+                outcomes["disabled_when_file"] = app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                outcomes["entries_before"] = _entry_addresses(app)
+    
+                # Drive the mechanism directly — the guard must refuse to push.
+                panel.post_message(
+                    PatchEditorPanel.EditJsonRequested(paste_text="{}")
+                )
+                await pilot.pause()
+                outcomes["popup_after_guarded_open"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                outcomes["entries_after_guarded_open"] = _entry_addresses(app)
+    
+                # (b) PASTE-authored document → source_path None → enabled + opens.
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["paste_source_none"] = (
+                    app._change_service.document.source_path is None
+                )
+                outcomes["enabled_when_paste"] = not app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                app.query_one("#patch_edit_json_button", Button).press()
+                await pilot.pause()
+                outcomes["popup_opens_for_paste"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        # (a) file-backed → disabled, guarded open is a no-op, 0 clobber.
+        assert outcomes["file_source"] is True
+        assert outcomes["disabled_when_file"] is True, (
+            "Edit JSON must be DISABLED when a file-backed document is loaded"
+        )
+        assert outcomes["popup_after_guarded_open"] is False, (
+            "the guard must refuse to push the popup over a file-backed document"
+        )
+        assert outcomes["entries_after_guarded_open"] == outcomes[
+            "entries_before"
+        ], "a guarded open must not mutate the loaded document (no clobber)"
+        # (b) paste-authored → enabled, popup opens.
+>       assert outcomes["paste_source_none"] is True
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:3372: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_loud_mismatch_notice - ...
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+3 failed, 49 passed in 129.96s (0:02:09)

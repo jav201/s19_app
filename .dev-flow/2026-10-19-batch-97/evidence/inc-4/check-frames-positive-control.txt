@@ -1,0 +1,11 @@
+Positive control for check_frames.py: an unscoped '.patch-docked-row { padding: 0; }' appended to styles.tcss (restored after; sha256 before e23e06701ae452d4aac270e4c759b9e3f4e43fd688d0e842fe1be5d48d3eadd6 after e23e06701ae452d4aac270e4c759b9e3f4e43fd688d0e842fe1be5d48d3eadd6)
+differing rows vs 98f3c84:
+6
+12,14c12,14
+< │    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Address      0x100                    │
+< │    ASAM…CALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Label        label                    │
+< │    ASAM…SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Size (bytes) 1                        │
+---
+> │    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││ Address      0x100                     │
+> │    ASAM…CALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││ Label        label                     │
+> │    ASAM…SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││ Size (bytes) 1                         │

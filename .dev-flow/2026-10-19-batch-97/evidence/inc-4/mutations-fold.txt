@@ -1,0 +1,66 @@
+# Inc-4 gate fold — mutation run: M34 (re-run after L1) + M40..M48 (new), 2026-10-21T17:38:14-06:00
+mutants: 10 arms: 13
+M34-long-ledger-line [screens_directionb.py] test_tc_b97_58_patch_editor_region_states[ledger_empty]: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1138: AssertionError: No change entries yet - type an address (0x...) plus a string …
+    | 1 failed in 3.47s
+M40-changed-now-byte-white [screens_directionb.py] test_tc_b97_39_changed_bytes_and_count_paint_teal: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:985: AssertionError: (2, 3, 'bold #e9e9e9')
+    | 1 failed in 0.40s
+M40-changed-now-byte-white [screens_directionb.py] test_tc_b97_39_strip_follows_the_highlight: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:866: AssertionError: (1, '0xeb40', ['#e9e9e9', '#e9e9e9', '#e9e9e9', '#e9e9e9', '#969aad', '#969aad', ...])
+    | 1 failed in 6.22s
+M41-count-not-teal [screens_directionb.py] test_tc_b97_39_changed_bytes_and_count_paint_teal: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:992: AssertionError: ['#e9e9e9']
+    | 1 failed in 0.42s
+M42-parse-without-dirty [app.py] test_tc_b97_06_paste_parse_marks_the_document_unsaved: RED (KILLED)
+    restore sha256 6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e == before 6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:696: AssertionError: ('draft · change', '6 entries · 00:00:02 · saved')
+    | 1 failed in 4.91s
+M42-parse-without-dirty [app.py] test_tc_b97_06_every_writer_refreshes_the_view_at_once: RED (KILLED)
+    restore sha256 6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e == before 6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:668: AssertionError: assert ('saved' == 'unsaved changes'
+    | 1 failed in 8.05s
+M43-heading-never-example [screens_directionb.py] test_tc_b97_05_paste_heading_names_the_example: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:528: AssertionError: PASTE BUFFER · editable      0.3K / 64.0K
+    | 1 failed in 4.54s
+M48-heading-never-editable [screens_directionb.py] test_tc_b97_05_paste_heading_names_the_example: RED (KILLED)
+    restore sha256 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 == before 16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:531: AssertionError: PASTE BUFFER · example       0.3K / 64.0K
+    | 1 failed in 4.87s
+M44-theme-scrollbar [styles.tcss] test_tc_b97_05_text_area_scrollbars_are_muted: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:562: AssertionError: ('patch_json_view', '#003054')
+    | 1 failed in 2.80s
+M45-no-spacer-rows [styles.tcss] test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1063: AssertionError: [10, 11, 12]
+    | 1 failed in 3.59s
+M45-no-spacer-rows [styles.tcss] test_tc_b97_40_capped_strip_chips_reachable[size1]: GREEN (SURVIVED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | 1 passed in 7.78s
+M46-input-background-as-pane [styles.tcss] test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1065: AssertionError: ('#0a0e1b', '#0a0e1b')
+    | 1 failed in 3.63s
+M47-unscoped-patch-id-rule [styles.tcss] test_tc_b97_04_no_unscoped_patch_rule_in_the_whole_stylesheet: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:420: AssertionError: ['#patch_doc_issues']
+    | 1 failed in 0.42s
+exit 0
+
+# retarget of the M45 survivor, 2026-10-21T17:39:44-06:00
+mutants: 1 arms: 2
+M49-form-height-back-to-3 [styles.tcss] test_tc_b97_40_capped_strip_chips_reachable[size1]: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 53), 0)
+    | 1 failed in 7.47s
+M49-form-height-back-to-3 [styles.tcss] test_tc_b97_40_capped_strip_chips_reachable[size0]: RED (KILLED)
+    restore sha256 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b == before 478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 54), -1)
+    | 1 failed in 7.54s
+exit 0

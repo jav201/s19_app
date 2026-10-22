@@ -381,3 +381,129 @@ async def open_check_editor(app, pilot, *, a2l=DEMO_A2L, cover_image: bool = Fal
     app.action_show_screen("check_editor")
     await settle(pilot, 6)
     return app.query_one("#check_editor_panel")
+
+
+# --------------------------------------------------------------------------- #
+# A.5 builders — Inc-4: the change-sets of the Patch Editor (P-5, P-27, P-29)
+# --------------------------------------------------------------------------- #
+
+#: ``calib_hotfix.json`` — six ``bytes`` entries inside ``prg.s19`` (A.5). The
+#: third is the 11-byte run at ``0xEC00`` the design budget reads (§3), the
+#: ASCII of ``CAL-2026-10``.
+CALIB_ENTRIES: tuple[tuple[int, tuple[int, ...]], ...] = (
+    (0xEB10, (0xDE, 0xAD, 0xBE, 0xEF)),
+    (0xEB40, (0x00, 0x00, 0x00, 0x01)),
+    (0xEC00, tuple(b"CAL-2026-10")),
+    (0xECA0, (0xA5,) * 8),
+    (0xED00, (0x7F, 0xFF)),
+    (0xED40, (0x01, 0x02, 0x03, 0x04, 0x05, 0x06)),
+)
+CALIB_ADDRESSES = ["0xEB10", "0xEB40", "0xEC00", "0xECA0", "0xED00", "0xED40"]
+assert len(CALIB_ENTRIES) == 6
+
+
+def _document(entries) -> object:
+    from s19_app.tui.changes.model import ChangeDocument
+
+    return ChangeDocument(
+        format="s19app-changeset",
+        version="2.0",
+        kind="change",
+        encoding="utf-8",
+        value_mode="text",
+        entries=list(entries),
+    )
+
+
+def _bytes_entry(address: int, run) -> object:
+    from s19_app.tui.changes.model import ChangeEntry
+
+    return ChangeEntry(entry_type="bytes", address=address, encoded_bytes=tuple(run))
+
+
+def write_changeset(path: Path, entries) -> Path:
+    """Serialise ``entries`` with the shipped serialiser into ``path``."""
+    from s19_app.tui.changes.io import serialize_change_document
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(serialize_change_document(_document(entries)))
+    return path
+
+
+def calib_hotfix(dest_dir: Path, name: str = "calib_hotfix.json") -> Path:
+    """``calib_hotfix.json`` (A.5): the six entries of :data:`CALIB_ENTRIES`."""
+    return write_changeset(dest_dir / name, [_bytes_entry(a, r) for a, r in CALIB_ENTRIES])
+
+
+def empty_changeset(dest_dir: Path) -> Path:
+    """``empty.json`` (A.5): the serialiser over 0 entries."""
+    return write_changeset(dest_dir / "empty.json", [])
+
+
+def legacy_v1(dest_dir: Path) -> Path:
+    """``legacy_v1.json`` (A.5): a literal batch-04 v1 unified dict — the v1
+    format token and its ``parameters`` / ``memory`` shape (loads as the empty
+    document plus one ``CHG-V1-FORMAT`` ERROR, LLR-003.5)."""
+    import json
+
+    path = dest_dir / "legacy_v1.json"
+    path.write_text(json.dumps({"format": "s19app-unified-changeset", "parameters": [], "memory": [{"address": "0xEB10", "bytes": "DE AD"}]}), encoding="utf-8")
+    return path
+
+
+def hostile_name_changeset(dest_dir: Path) -> Path:
+    """``HOSTILE_NAME.json`` (A.5, P-27): calib_hotfix under the hostile name."""
+    return calib_hotfix(dest_dir, f"{HOSTILE_NAME}.json")
+
+
+def hostile_content_changeset(dest_dir: Path) -> Path:
+    """``hostile_content.json`` (A.5, P-29): a ``string`` entry whose value is
+    ``HOSTILE_CONTENT + HOSTILE_C1`` and a ``bytes`` entry whose ``symbol`` is
+    ``HOSTILE_CONTENT`` (refused with an echoing finding — no A2L context)."""
+    import json
+
+    payload = {
+        "format": "s19app-changeset",
+        "version": "2.0",
+        "kind": "change",
+        "encoding": "utf-8",
+        "value_mode": "text",
+        "entries": [
+            {"type": "string", "address": "0xEC00", "value": HOSTILE_CONTENT + HOSTILE_C1},
+            {"type": "bytes", "address": "0xEB10", "bytes": "DE AD", "symbol": HOSTILE_CONTENT},
+        ],
+    }
+    path = dest_dir / "hostile_content.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+async def open_patch_editor(app, pilot, *, image: bool = True) -> object:
+    """Load ``prg.s19`` (when ``image``) through the app's own loader, then show
+    the Patch Editor through ``action_show_screen``. Returns the panel."""
+    from tests.b97_probes import settle
+
+    await settle(pilot)
+    if image:
+        copy = app.base_dir / "prg.s19"
+        shutil.copyfile(EXAMPLES_DIR / "prg.s19", copy)
+        app.load_from_path(copy)
+        for _ in range(100):
+            if app.current_file is not None:
+                break
+            await pilot.pause(0.05)
+        assert app.current_file is not None, "prg.s19 did not load"
+    app.action_show_screen("patch")
+    await settle(pilot, 6)
+    return app.query_one("#patch_editor_panel")
+
+
+async def load_change_file(app, pilot, panel, path: Path) -> None:
+    """Type ``path`` beside Load and press Load (the shipped control)."""
+    from textual.widgets import Button, Input
+
+    from tests.b97_probes import settle
+
+    panel.query_one("#patch_doc_path_input", Input).value = str(path)
+    panel.query_one("#patch_doc_load_button", Button).press()
+    await settle(pilot, 6)

@@ -135,6 +135,19 @@ _PAYLOADS = (
 )
 
 
+
+async def _show_patch_json(app: S19TuiApp, pilot: object) -> None:
+    """Show the Patch Editor with its JSON tab open.
+
+    batch-97 Inc-4 (named supersession, HLR-144): the paste buffer and its
+    docked rows live on the inspector's JSON tab, so every observation of them
+    opens that tab first, as the operator does.
+    """
+    app.action_show_screen("patch")
+    await pilot.pause()
+    app.query_one("#patch_tab_json", Button).press()
+    await pilot.pause()
+
 def _payload_buffer() -> str:
     """The payload set as a buffer: a control line, then ONE payload per line.
 
@@ -340,8 +353,7 @@ def test_at079c_hostile_paste_renders_literally() -> None:
         # is width-independent, and `_assert_no_wrapping` fails loudly if this
         # assumption ever stops holding.
         async with app.run_test(size=(80, 24)) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             buffer = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             # Through the real surface: replace the buffer's whole document.
             buffer.text = _payload_buffer()
@@ -546,8 +558,7 @@ def test_at079b_structure_differentiated_in_place() -> None:
         # 80x24 — the JSON buffer is ~60 cells here, so the fixture does not
         # wrap and `_render_line`'s visual y maps to the document line.
         async with app.run_test(size=(80, 24)) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             buffer = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             # Line 0 is sacrificed to the cursor (whose line-styling would mask
             # the token hues, `_assert_off_cursor_line`); the JSON under test
@@ -708,8 +719,7 @@ def test_at079a_gauge_tracks_buffer() -> None:
     async def _run() -> tuple[str, str]:
         app = S19TuiApp()
         async with app.run_test(size=(120, 30)) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             gauge = app.query_one("#patch_paste_gauge", Static)
             buffer = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             buffer.text = "x" * 4096
@@ -805,6 +815,11 @@ _CLAIMED_HUES = {
     # so they claim. Both sit inside the RED..YELLOW flank, far from MAGENTA.
     "insight_style.WAITING_HUMAN (flow waiting-human elements)": "#e8ad3d",
     "insight_style.CRC_FAMILY (flow CRC card)": "#c9562b",
+    # batch-97 Inc-4 gate (operator, 2026-10-21): the PATCH family teal on the
+    # before/after strip's changed `now` bytes and its `N changed` count
+    # (screens_directionb.PATCH_TEAL) — a foreground cue inside the Patch
+    # Editor, so it claims.
+    "screens_directionb.PATCH_TEAL (strip changed bytes + count)": "#56e0d6",
     # Rich NAMED styles: not hex, so the source sweep cannot see them. RESOLVED
     # through rich rather than transcribed — transcribing is how Inc-5 recorded
     # orange3 as #d75f00 (darkorange3) and measured a hue the app never paints.
@@ -1172,7 +1187,10 @@ def test_tc079_5b_cap_gauge_escalates_without_verdict_hues() -> None:
 # covered by a no-regression / floor arm. This is a spec/reality reconciliation
 # surfaced in the review packet, not a silent test-size swap.
 
-_FILL_TALL = (120, 50)  # JSON window has real free vertical space here
+#: batch-97 Inc-4 (named supersession, HLR-144 / design §3): the JSON tab
+#: shares its height between the read-only view and the paste buffer, so the
+#: growth regime is the in-range size 118x54 (12 + 12 rows), not 120x50.
+_FILL_TALL = (118, 54)  # JSON tab has real free vertical space here
 _FLOOR = (80, 24)  # the tight floor (min-height keeps the editor usable)
 _PRIMARY = (120, 30)  # the spec's AC-1 size — panel too short to grow (see above)
 
@@ -1249,8 +1267,7 @@ def test_ac1_editor_fills_json_window_when_room_exists() -> None:
     async def _run() -> tuple[int, int, int]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             body = _json_window_bodies(app)["patch_win_json"]
             return (
@@ -1286,8 +1303,7 @@ def test_ac1b_editor_holds_min_floor_at_primary_size() -> None:
     async def _run() -> tuple[int, int, int]:
         app = S19TuiApp()
         async with app.run_test(size=_PRIMARY) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             body = _json_window_bodies(app)["patch_win_json"]
             return (
@@ -1324,8 +1340,7 @@ def test_ac2_docked_buttons_reachable_under_scroll_at_floor() -> None:
     async def _run() -> tuple[int, dict[str, bool]]:
         app = S19TuiApp()
         async with app.run_test(size=_FLOOR) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             reach = {}
             for bid in _DOCKED_JSON_BUTTONS:
@@ -1353,53 +1368,57 @@ def test_ac2_docked_buttons_reachable_under_scroll_at_floor() -> None:
 
 
 def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
-    """The 1fr fill is scoped to the JSON window; CHECKS / SCRIPT are untouched.
+    """Each tab's scroll body fills ITS tab; the JSON fill stays JSON-scoped.
 
-    MEASURED at 120x50, where the discriminator is sharpest: the JSON body fills
-    its tall window (~28 of 29 rows), but the CHECKS window — whose content is a
-    few rows — must NOT stretch to fill its equally-tall window. Had the shared
-    ``.patch-window-body`` rule been given ``1fr`` (the C-30 leak this guards),
-    the CHECKS body would stretch too. The SCRIPT body stays content-driven
-    (its own tall table), i.e. ``height: auto`` behaviour unchanged.
+    batch-97 Inc-4 (named supersession, HLR-144 / design §3): the three windows
+    became the ledger and two tabs of one inspector. By design every body now
+    fills its own region — the ledger body (the hero), the JSON body (the paste
+    buffer's share of the JSON tab) and the Checks body (the Checks tab's scroll
+    view). What this arm keeps from the batch-48 C-30 intent: the JSON body
+    never claims the read-only view's share (it ends where the tab's docked
+    rows begin, below the view), and no Patch rule leaks to another screen
+    (the scope arm of TC-B97-04, ``tests/test_b97_patch_editor.py``).
     """
 
-    async def _run() -> dict[str, tuple[int, int]]:
+    async def _run() -> dict[str, object]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            app.action_show_screen("patch")
+            await _show_patch_json(app, pilot)
+            bodies = _json_window_bodies(app)
+            view = app.query_one("#patch_json_view", TextArea)
+            controls = app.query_one("#patch_paste_controls")
+            out = {
+                "json": (bodies["patch_win_json"].region, view.region, controls.region),
+                "script": (
+                    app.query_one("#patch_win_script").content_region.height,
+                    bodies["patch_win_script"].region.height,
+                ),
+            }
+            app.query_one("#patch_tab_checks", Button).press()
             await pilot.pause()
-            out = {}
-            for wid, body in _json_window_bodies(app).items():
-                win = app.query_one(f"#{wid}")
-                out[wid] = (win.content_region.height, body.region.height)
+            out["checks"] = (
+                app.query_one("#patch_win_checks").content_region.height,
+                bodies["patch_win_checks"].region.height,
+                app.query_one("#patch_checks_controls").region.height,
+            )
             return out
 
     dims = asyncio.run(_run())
-    json_win_h, json_body_h = dims["patch_win_json"]
-    checks_win_h, checks_body_h = dims["patch_win_checks"]
-    script_win_h, script_body_h = dims["patch_win_script"]
-
-    # The JSON body DID fill its window (the intended effect / the contrast).
-    assert json_body_h >= json_win_h - 2, (
-        f"the JSON body should fill its window; body {json_body_h} vs window "
-        f"content {json_win_h}"
+    json_body, view, controls = dims["json"]
+    assert json_body.y >= view.bottom, (
+        f"the JSON body must sit below the read-only view, not claim it: "
+        f"body {json_body} vs view {view}"
     )
-    # The CHECKS window is just as tall, but its body must stay content-sized —
-    # this is the no-leak proof.
-    assert checks_win_h >= 20, (
-        f"precondition: the CHECKS window must be tall at 120x50 for the leak "
-        f"test to bite; got window content height {checks_win_h}"
+    assert json_body.bottom <= controls.y, (
+        f"the JSON body must end where the docked paste controls begin: "
+        f"body {json_body} vs controls {controls}"
     )
-    assert checks_body_h <= 6, (
-        f"C-30 LEAK: the CHECKS window body stretched to {checks_body_h} rows in "
-        f"a {checks_win_h}-row window — the fill was NOT scoped to the JSON "
-        f"window (the shared .patch-window-body rule was changed)"
-    )
-    # The SCRIPT body remains content-driven (auto), not forced to the window.
-    assert script_body_h != script_win_h or script_body_h > script_win_h, (
-        f"the SCRIPT body should track its own content, not the window; body "
-        f"{script_body_h} vs window {script_win_h}"
-    )
+    assert view.height >= 8 and json_body.height >= 8, (view, json_body)
+    script_win_h, script_body_h = dims["script"]
+    assert script_body_h == script_win_h, dims["script"]
+    checks_win_h, checks_body_h, checks_controls_h = dims["checks"]
+    # The Checks body takes the tab less its docked controls (Run checks + help).
+    assert checks_win_h >= 20 and checks_body_h == checks_win_h - checks_controls_h, dims["checks"]
 
 
 # ---------------------------------------------------------------------------
@@ -1423,8 +1442,7 @@ def test_ac4_hostile_paste_inert_after_resize() -> None:
     async def _run() -> tuple[list, list, int]:
         app = S19TuiApp()
         async with app.run_test(size=_FLOOR) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             buffer = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             buffer.text = _payload_buffer()
             await pilot.pause()
@@ -1462,8 +1480,7 @@ def test_ac5_gauge_stays_above_editor() -> None:
     async def _run() -> tuple[int, int, int]:
         app = S19TuiApp()
         async with app.run_test(size=_FILL_TALL) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
+            await _show_patch_json(app, pilot)
             gauge = app.query_one("#patch_paste_gauge", Static)
             editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
             return gauge.region.bottom, editor.region.y, editor.region.height

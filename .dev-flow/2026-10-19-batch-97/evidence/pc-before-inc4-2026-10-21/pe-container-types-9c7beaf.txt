@@ -1,0 +1,15 @@
+# patch_win_* / container ids: type at 9c7beaf (LLR-144.1 container census)
+patch_win_script Container True
+patch_win_script_body VerticalScroll False
+patch_win_json Container True
+patch_win_json_body VerticalScroll False
+patch_win_json_dock_spacer Container True
+patch_win_checks Container True
+patch_win_checks_body VerticalScroll False
+patch_saveback_row Container True
+patch_before_after_row Container True
+patch_checks_results Container True
+patch_pane_entries Container True
+patch_paste_row Container True
+patch_doc_entry_inputs Container True
+patch_history_controls Horizontal False

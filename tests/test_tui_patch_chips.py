@@ -128,8 +128,14 @@ _GROUP_BY_CONTAINER = {
 # label on line 2), so the two LINES are the live button-bearing containers
 # enumerated here — the row itself holds no button directly anymore.
 _NO_GROUP_CONTAINERS = frozenset(
-    {"patch_doc_file_line1", "patch_doc_file_line2"}
+    {"patch_doc_file_line1", "patch_doc_file_line2", "patch_tabs"}
 )
+# batch-97 Inc-4 (named supersession, HLR-144 / LLR-144.10): ``#patch_tabs``
+# holds the inspector's three TAB chips — navigation, not an action group —
+# styled by the tab-chip family (unfocused / focused / selected), so it
+# carries no group class and its buttons carry ``tab-chip``, not the action
+# chip class.
+_TAB_CHIP_CLASS = "tab-chip"
 
 _GROUP_CLASSES = frozenset(_GROUP_BY_CONTAINER.values())
 
@@ -188,7 +194,11 @@ def test_at076a_docked_buttons_are_grouped_chips() -> None:
             await pilot.pause()
             panel = app.query_one(f"#{_PANEL_ID}")
             buttons = list(panel.walk_children(Button))
-            naked = [b.id for b in buttons if _CHIP_CLASS not in b.classes]
+            naked = [
+                b.id
+                for b in buttons
+                if _CHIP_CLASS not in b.classes and _TAB_CHIP_CLASS not in b.classes
+            ]
             # One button from each of the three groups, through the REAL tree.
             # MEASURED (batch-94): the entry probe rides
             # ``#patch_entry_remove_button`` — ``#patch_entry_add_button`` /
@@ -201,13 +211,18 @@ def test_at076a_docked_buttons_are_grouped_chips() -> None:
                 "apply": app.query_one("#patch_doc_apply_button", Button),
                 "checks": app.query_one("#patch_checks_run_button", Button),
             }
+            heights = {k: b.region.height for k, b in probes.items() if k != "checks"}
+            # batch-97 Inc-4: Run checks lives on the inspector's Checks tab.
+            app.query_one("#patch_tab_checks", Button).press()
+            await pilot.pause()
+            heights["checks"] = probes["checks"].region.height
             return {
                 "count": len(buttons),
                 "naked": naked,
                 "colours": {
                     k: b.styles.color.rgb for k, b in probes.items()
                 },
-                "heights": {k: b.region.height for k, b in probes.items()},
+                "heights": heights,
             }
 
     for size in _SIZES:

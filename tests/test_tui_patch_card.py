@@ -33,6 +33,7 @@ from textual.widget import Widget
 
 from s19_app.tui.app import A2LDetailCard, S19TuiApp
 from s19_app.tui.screens_directionb import (
+    CARD_NO_ENTRIES,
     CARD_NO_IMAGE,
     CARD_NO_SELECTION,
     CARD_UNMAPPED_TOKEN,
@@ -136,7 +137,8 @@ def test_at080a_before_after(tmp_path: Path) -> None:
             return _card_plain(app)
 
     plain = asyncio.run(_run())
-    assert "0x200" in plain, f"card does not name the selected entry: {plain!r}"
+    # batch-97 D5 (d): the summary line names the address as 8 hex digits.
+    assert "0x00000200" in plain, f"card does not name the selected entry: {plain!r}"
     assert "AA BB CC DD" in plain, f"before-bytes are not the image's: {plain!r}"
     assert "01 02 03 04" in plain, f"after-bytes are not the entry's: {plain!r}"
     # The discriminator: row 0's bytes must NOT appear. An off-by-one that
@@ -305,10 +307,12 @@ def test_at080c_unmapped(tmp_path: Path) -> None:
     assert CARD_UNMAPPED_TOKEN in plain, (
         f"unmapped positions did not render the placeholder: {plain!r}"
     )
+    # batch-97 D5 (b): the ``was`` line holds the image bytes of the aligned
+    # row — the span first (0x200 is row-aligned), then its context.
     before_line = [
-        line for line in plain.splitlines() if line.startswith("before")
+        line for line in plain.splitlines() if line.strip().startswith("was")
     ][0]
-    assert before_line.split()[1:] == ["AA", "BB", "--", "--"], (
+    assert before_line.split()[1:5] == ["AA", "BB", "--", "--"], (
         f"partial span did not mix bytes and placeholders: {before_line!r}"
     )
 
@@ -345,7 +349,7 @@ def test_tc080_3_before_after_derivation() -> None:
     ).plain
     # Origin 0x402, length 3 ⇒ image bytes 0x12 0x13 0x14.
     assert "12 13 14" in panel_view, panel_view
-    assert "0x402" in panel_view
+    assert "0x00000402" in panel_view
 
 
 def test_tc080_3b_stub_row_shape_matches_the_real_dataclass() -> None:
@@ -385,12 +389,31 @@ def test_tc080_3b_stub_row_shape_matches_the_real_dataclass() -> None:
 # containment is unachievable; the FOLD-8 contract is that the operator's
 # scroll brings the widget INTO view. The docked-row neighbors are 1 row and
 # fully visible under the same oracle.
-_CARD_NEIGHBORS = (
-    "patch_doc_entry_inputs",
-    "patch_before_after_card",
-    "patch_paste_controls",
-    "patch_history_controls",
-    "patch_execute_row",
+#: batch-97 Inc-4 (named supersession, D5): the card moved to the top of the
+#: inspector's Inspector pane, above the entry form and chips; the JSON
+#: window's docked rows are now on the JSON tab. Neighbors per tab chip.
+_CARD_NEIGHBORS = {
+    "patch_tab_inspector": (
+        "patch_before_after_card",
+        "patch_doc_entry_inputs",
+        "patch_doc_entry_buttons",
+    ),
+    "patch_tab_json": (
+        "patch_paste_controls",
+        "patch_history_controls",
+        "patch_execute_row",
+    ),
+}
+#: Every panel button lives in one of these homes (the B2 census in its
+#: batch-97 form): a tab pane of the inspector or a docked row of the panel —
+#: never the ledger's scroll body.
+_BUTTON_HOMES = (
+    "patch_tabs",
+    "patch_pane_inspector",
+    "patch_win_json",
+    "patch_win_checks",
+    "patch_doc_file_row",
+    "patch_doc_controls",
 )
 
 
@@ -456,29 +479,23 @@ def _drive_reachability_with_card(tmp_path: Path, size) -> dict:
             # .patch-window-body.
             trapped = []
             for button in panel.walk_children(Button):
-                node = button.parent
-                in_window = False
-                in_body = False
-                while node is not None and node is not app.screen:
-                    if getattr(node, "id", None) in (
-                        "patch_win_script",
-                        "patch_win_json",
-                        "patch_win_checks",
-                    ):
-                        in_window = True
-                    if "patch-window-body" in (
-                        set(getattr(node, "classes", ()) or ())
-                    ):
-                        in_body = True
-                    node = node.parent
-                if in_body or not in_window:
+                homes = [
+                    a.id for a in button.ancestors if getattr(a, "id", None) in _BUTTON_HOMES
+                ]
+                in_ledger = any(
+                    getattr(a, "id", None) == "patch_win_script_body" for a in button.ancestors
+                )
+                if in_ledger or not homes:
                     trapped.append(button.id or type(button).__name__)
             unreachable = []
-            for nid in _CARD_NEIGHBORS:
-                target = app.query_one(f"#{nid}")
-                await _reach(app, pilot, target)
-                if not _on_screen(app, target):
-                    unreachable.append(nid)
+            for chip, neighbors in _CARD_NEIGHBORS.items():
+                app.query_one(f"#{chip}", Button).press()
+                await pilot.pause()
+                for nid in neighbors:
+                    target = app.query_one(f"#{nid}")
+                    await _reach(app, pilot, target)
+                    if not _on_screen(app, target):
+                        unreachable.append(nid)
             return {
                 "trapped": trapped,
                 "unreachable": unreachable,
@@ -532,9 +549,11 @@ def test_at080d_reachable_with_card(tmp_path: Path, size) -> None:
     assert dims["card_area"] > 0, (
         f"@{size}: the card occupies no rows — it cannot be said to be present"
     )
-    assert dims["card_parent"] == "patch_win_json_body", (
-        f"@{size}: batch-94 moved the card under the JSON window body (beneath "
-        f"the entry inputs); got parent {dims['card_parent']!r}"
+    # batch-97 Inc-4 (named supersession, D5): the card's home is the top of
+    # the inspector's Inspector pane.
+    assert dims["card_parent"] == "patch_pane_inspector", (
+        f"@{size}: batch-97 moved the card to the Inspector pane; got parent "
+        f"{dims['card_parent']!r}"
     )
     assert dims["trapped"] == [], (
         f"@{size}: B2 REGRESSION — buttons trapped inside a scrollable body: "
@@ -551,7 +570,11 @@ def test_at080d_reachable_with_card(tmp_path: Path, size) -> None:
 #: C-29 both axes, card mounted + row selected). NOT the old script-window
 #: 36 @120x30 (the three-column regime is gone); the card's own
 #: `padding: 0 1` costs 2 cells off the JSON body's content width.
-_MEASURED_CARD_BUDGET = {(80, 24): 60, (120, 30): 81}
+#: batch-97 Inc-4 (named supersession, D5 (f)): the card is the inspector's
+#: strip; its content width at these two below-range sizes, measured on the
+#: re-composed tree (the 45-cell inspector floor), and the strip's own line
+#: width ``3·per_row + 8`` must fit it.
+_MEASURED_CARD_BUDGET = {(80, 24): 38, (120, 30): 38}
 
 
 @pytest.mark.parametrize("size", _SIZES)
@@ -594,9 +617,9 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
 
     out = asyncio.run(_run())
     budget = _MEASURED_CARD_BUDGET[size]
-    assert out["card_parent"] == "patch_win_json_body", (
-        f"@{size}: the card's measured container is the JSON window body at "
-        f"batch-94; got {out['card_parent']!r}"
+    assert out["card_parent"] == "patch_pane_inspector", (
+        f"@{size}: the card's measured container is the Inspector pane at "
+        f"batch-97; got {out['card_parent']!r}"
     )
     assert out["content_w"] >= budget, (
         f"@{size}: the card's container narrowed to {out['content_w']}, below "
@@ -604,11 +627,14 @@ def test_tc080_6_card_fits_its_measured_container(tmp_path: Path, size) -> None:
     )
     assert out["widest"] <= budget, (
         f"@{size}: the card paints {out['widest']} cells into a {budget}-cell "
-        f"container — it will wrap. CARD_BYTES_MAX or the header is too wide"
+        f"container — it will wrap. The strip's per_row or its summary is too wide"
     )
     assert out["region_h"] > 0, f"@{size}: the card paints no rows"
-    assert out["lines"] == 3, (
-        f"@{size}: expected header + before + after; got {out['lines']} lines"
+    # batch-97 D5 (b)(c): a 64-byte run at 0xFFFFFFFF (7 context bytes lead
+    # its aligned row) needs 9 rows of 3 lines; the strip paints the cap of
+    # 8, one ``showing N of M bytes`` note line and the summary line.
+    assert out["lines"] == 3 * 8 + 2, (
+        f"@{size}: expected 8 stacked byte rows + note + summary; got {out['lines']} lines"
     )
 
 
@@ -700,7 +726,8 @@ def test_tc080_1_card_never_mounts_blank(tmp_path: Path) -> None:
 
     plain = asyncio.run(_run())
     assert plain.strip() != "", "the card MOUNTED BLANK"
-    assert plain.strip() == CARD_NO_SELECTION, (
+    # batch-97 D5 (h): with no entry the card names that state.
+    assert plain.strip() == CARD_NO_ENTRIES, (
         f"the card mounted in an unexpected state: {plain!r}"
     )
 
@@ -900,7 +927,7 @@ def test_tc080_4_no_selection_and_out_of_range(tmp_path: Path) -> None:
             return empty, _card_plain(app)
 
     empty, out_of_range = asyncio.run(_run())
-    assert empty.strip() == CARD_NO_SELECTION, empty
+    assert empty.strip() == CARD_NO_ENTRIES, empty  # batch-97 D5 (h)
     assert out_of_range.strip() == CARD_NO_SELECTION, out_of_range
 
 

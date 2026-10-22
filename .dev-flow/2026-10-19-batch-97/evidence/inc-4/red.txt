@@ -1,0 +1,125 @@
+RED run on the unchanged source: HEAD 98f3c844f50d4ef5b850382aa0c2642d73f2299e
+git diff --stat -- s19_app:
+(empty = unchanged)
+..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.......FFFFFFFFFFFFFFF.FFFFFFFF    [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:202: AssertionError: (3, 6)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:202: AssertionError: (3, 6)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:71: AssertionError: #patch_tab_switcher: expected exactly 1 widget, found 0
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:278: AssertionError: ((5, 3, 30, 28), (5, 3, 30, 28))
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:338: AssertionError: [('#patch_win_script', 'width', '2fr'), ('#patch_doc_entry_buttons', 'layout', 'grid'), ('#patch_doc_entries_table', 'height', '10'), ('#patch_doc_controls', 'layout', 'grid')]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:354: AssertionError: the scoped Patch Editor section exists
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:399: AssertionError: no JSON view; the buffer still reads the template: True
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:414: AssertionError: the I-2/I-3 payload type exists
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:453: AttributeError: <module 's19_app.tui.screens_directionb' from 'C:\\Users\\jjgh8\\Github\\s19_app\\s19_app\\tui\\screens_directionb.py'> has no attribute '_json_clock'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:453: AttributeError: <module 's19_app.tui.screens_directionb' from 'C:\\Users\\jjgh8\\Github\\s19_app\\s19_app\\tui\\screens_directionb.py'> has no attribute '_json_clock'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:453: AttributeError: <module 's19_app.tui.screens_directionb' from 'C:\\Users\\jjgh8\\Github\\s19_app\\s19_app\\tui\\screens_directionb.py'> has no attribute '_json_clock'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:71: AssertionError: #patch_identity_ribbon: expected exactly 1 widget, found 0
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:71: AssertionError: #patch_identity_ribbon: expected exactly 1 widget, found 0
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:691: AssertionError: row 1: no strip painted
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:734: AssertionError: []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:747: AssertionError: Select an entry row to preview its bytes.
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:71: AssertionError: #patch_pane_inspector: expected exactly 1 widget, found 0
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_check_editor.py:71: AssertionError: #patch_pane_inspector: expected exactly 1 widget, found 0
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_tab_json' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:996: AssertionError: ('patch_tab_inspector', [])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1098: AssertionError: ['no tab switcher (base tree)']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1098: AssertionError: ['no tab switcher (base tree)']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1098: AssertionError: ['no tab switcher (base tree)']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1135: AssertionError: [' · bytes  0xEB10   DE AD BE EF                            inside  -                                 ▅▅', ' · bytes  0xEB40   00 00 00 01                            inside  -                                   ']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1170: assert (None is not None)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1200: AssertionError:
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1203: assert (None is not None)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1246: AssertionError: {'json': False, 'ledger': True, 'paste': True, 'select': True}
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:505: assert None is not None
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:557: IndexError: list index out of range
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((118, 54), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((119, 54), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((120, 54), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((160, 56), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((220, 60), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:585: AssertionError: ((260, 70), ['patch_script_section_label', 'patch_script_section_label', 'patch_script_section_label'])
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_identity_ribbon' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:660: AssertionError: ((160, 56), 52, ' Kind     Address  Value / bytes                          Status  Linkage                                                    ')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:660: AssertionError: ((220, 60), 112, ' Kind     Address  Value / bytes                          Status  Linkage                                                                                                                ')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:660: AssertionError: ((260, 70), 152, ' Kind     Address  Value / bytes                          Status  Linkage                           ...                                                                                                                     ')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:676: assert [4, 17, 43] == []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:676: assert [4, 17, 42] == []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:676: assert [4, 49] == []
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:719: AssertionError: [(Region(x=9, y=5, width=8, height=1), Region(x=8, y=5, width=9, height=1))]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:719: AssertionError: [(Region(x=9, y=13, width=8, height=1), Region(x=8, y=13, width=9, height=1))]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:719: AssertionError: [(Region(x=27, y=13, width=8, height=1), Region(x=26, y=13, width=9, height=1))]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1014: AssertionError: labels with no `label — effect` line: ['', '(no PATCH_GLYPHS)', '0x100', '?', 'Add', 'Apply loaded changes', 'DE AD BE EF', "Don't save", 'Edit', 'Edit JSON', 'Execute scope', 'Load', 'Open patches/', 'Parse pasted', 'Redo', 'Refresh', 'Remove', 'Run checks', 'Save', 'Scope', 'Undo', 'Validate', 'Width', 'Write before/after report', 'Write file', 'ctrl+y', 'ctrl+z', 'enter', 'or type a path to the same change-set JSON (alternative to the patches/ dropdown)', 'space', 'text (document encoding)']
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1042: AssertionError: the Patch Editor's closed glyph vocabulary exists
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('ledger_empty', ['No change entries yet - type an address (0x...) plus a string value or a run of hex bytes and press', 'Add, or load a v2 change-set JSON file.'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('ledger_refused', ['No change entries yet - type an address (0x...) plus a string value or a run of hex bytes and press', 'Add, or load a v2 change-set JSON file.'])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('strip_no_image', [])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('strip_no_entries', [])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('json_no_document', [])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1126: AssertionError: ('checks_no_run', [])
+=========================== short test summary info ===========================
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_02_ledger_grows_with_the_panel[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_02_ledger_grows_with_the_panel[size1]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_02_tab_chips_nine_activations
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_03_columns_once_and_no_geometry_pass
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_04_e3_pairs_absent - Asser...
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_04_patch_rules_scoped_and_check_rule_untouched
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_05_json_view_shows_the_loaded_document
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_05_cap_note_and_display_only
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_every_writer_refreshes_the_view_at_once
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_dirty_flag_arms_save_and_typing
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_equal_payload_and_fresh_start
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_07_file_derived_text_renders_literally[name]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_07_file_derived_text_renders_literally[content]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_long_entry_stacks_rows_and_follows_a_resize
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_strip_builder_states_and_cap
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size1]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_41_keyboard_order_enter_and_chip_states
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_42_save_is_the_one_filled_element
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size1]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_60_every_control_displayed_in_its_home[size2]
+FAILED tests/test_b97_patch_editor.py::test_at_b97_01_load_shows_every_entry_and_the_document
+FAILED tests/test_b97_patch_editor.py::test_at_b97_02_add_save_empty_and_legacy
+FAILED tests/test_b97_patch_editor.py::test_at_b97_03_hostile_name_and_content_read_literally[name]
+FAILED tests/test_b97_patch_editor.py::test_at_b97_03_hostile_name_and_content_read_literally[content]
+FAILED tests/test_b97_patch_editor.py::test_at_b97_17_first_task_from_the_keyboard
+FAILED tests/test_b97_width.py::test_tc_b97_34_patch_layout_monotonic_in_its_inputs
+FAILED tests/test_b97_width.py::test_tc_b97_34_patch_painted_widths_follow_four_resizes
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size4]
+FAILED tests/test_b97_width.py::test_tc_b97_35_patch_no_horizontal_overflow[size5]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size4]
+FAILED tests/test_b97_width.py::test_tc_b97_37_patch_no_wrapped_row_and_clips[size5]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_ledger_takes_its_width[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_ledger_takes_its_width[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_ledger_takes_its_width[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_59_patch_below_the_range_actions_reachable[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_59_patch_below_the_range_actions_reachable[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_59_patch_below_the_range_actions_reachable[size2]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+FAILED tests/test_b97_chips_help.py::test_tc_b97_33_patch_glyphs_closed_and_in_the_legend
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[ledger_empty]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[ledger_refused]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[strip_no_image]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[strip_no_entries]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[json_no_document]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[checks_no_run]
+59 failed, 10 passed, 65 deselected in 355.99s (0:05:55)

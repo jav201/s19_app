@@ -735,6 +735,10 @@ def test_tc078_5_strip_geometry_painted(tmp_path: Path) -> None:
             app.action_show_screen("patch")
             await pilot.pause()
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            # batch-97 Inc-4 (named supersession, HLR-144): the strip lives on
+            # the inspector's Checks tab — open it before reading the paint.
+            panel.query_one("#patch_tab_checks").press()
+            await pilot.pause()
             # Drive the strip through its real render entry point; the 2-digit
             # counts are what make a mid-token wrap visible.
             panel.refresh_check_results(

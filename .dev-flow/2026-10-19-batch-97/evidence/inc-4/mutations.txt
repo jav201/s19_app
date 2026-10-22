@@ -1,0 +1,185 @@
+mutants: 37 arms: 48
+M1-drop-a-shipped-id [screens_directionb.py] test_tc_b97_01_shipped_ids_and_container_types[size0]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:176: AssertionError: ['patch_doc_file_line2']
+    | 1 failed in 3.33s
+M2-ledger-3-rows [styles.tcss] test_tc_b97_02_ledger_grows_with_the_panel[size0]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:202: AssertionError: (3, 6)
+    | 1 failed in 3.79s
+M2-ledger-3-rows [styles.tcss] test_at_b97_01_load_shows_every_entry_and_the_document: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1180: AssertionError: [' · bytes   0xEB10      DE AD BE EF             inside   -       ▅', ' · bytes   0xEB40      00 00 00 01             inside   -        ']
+    | 1 failed in 5.35s
+M3-unscoped-docked-rule [styles.tcss] test_tc_b97_04_patch_rules_scoped_and_check_rule_untouched: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:362: AssertionError: ['.patch-docked-row']
+    | 1 failed in 0.29s
+M4-e3-grid-back [styles.tcss] test_tc_b97_04_e3_pairs_absent: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:338: AssertionError: [('#patch_doc_controls', 'layout', 'grid')]
+    | 1 failed in 0.28s
+M5-no-json-cap [screens_directionb.py] test_tc_b97_05_cap_note_and_display_only: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:439: AssertionError: assert (5001 == 5001 and 'line 5000' == 'showing 5000 of 5001 lines'
+    | 1 failed in 8.43s
+M6-parse-reads-the-view [screens_directionb.py] test_tc_b97_05_cap_note_and_display_only: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 4.61s
+M7-undo-site-without-document [app.py] test_tc_b97_06_every_writer_refreshes_the_view_at_once: RED (KILLED)
+    restore sha256 83561794287d3d96b750f85c45511a30026665e8cf4bd45ce8354f4d1aaf8f23 == before 83561794287d3d96b750f85c45511a30026665e8cf4bd45ce8354f4d1aaf8f23
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:538: AssertionError: undo
+    | 1 failed in 6.83s
+M8-stamp-by-document-path-only [screens_directionb.py] test_tc_b97_06_dirty_flag_arms_save_and_typing: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:581: AssertionError: 7 entries · 00:00:03 · unsaved changes
+    | 1 failed in 5.35s
+M8-stamp-by-document-path-only [screens_directionb.py] test_at_b97_02_add_save_empty_and_legacy: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1217: AssertionError: 7 entries · 14:05:02 · unsaved changes
+    | 1 failed in 5.92s
+M9-equal-payload-repainted [screens_directionb.py] test_tc_b97_06_equal_payload_and_fresh_start: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:617: AssertionError: (('{
+    | 1 failed in 3.65s
+M9-equal-payload-repainted [screens_directionb.py] test_tc_b97_06_dirty_flag_arms_save_and_typing: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:580: AssertionError: ('7 entries · 00:00:04 · unsaved changes', '7 entries · 00:00:05 · saved')
+    | 1 failed in 5.36s
+M10-ribbon-from-markup [screens_directionb.py] test_tc_b97_07_file_derived_text_renders_literally[name]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 5.15s
+M10-ribbon-from-markup [screens_directionb.py] test_at_b97_03_hostile_name_and_content_read_literally[name]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 5.46s
+M11-strip-bound-to-row-0 [screens_directionb.py] test_tc_b97_39_strip_follows_the_highlight: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:712: AssertionError: assert 'DE' == '20'
+    | 1 failed in 4.89s
+M11-strip-bound-to-row-0 [screens_directionb.py] test_at_b97_17_first_task_from_the_keyboard: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1294: AssertionError: ('0000EB10 +0 +1 +2 +3 +4 +5 +6 +7
+    | 1 failed in 28.55s
+M12-bold-on-unchanged-span-byte [screens_directionb.py] test_tc_b97_39_bold_marks_only_changed_span_bytes: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:796: AssertionError: [('10', False), ('11', False), ('12', True), ('FF', True), ('14', False), ('15', False), ...]
+    | 1 failed in 0.32s
+M13-bold-on-context-byte [screens_directionb.py] test_tc_b97_39_bold_marks_only_changed_span_bytes: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:796: AssertionError: [('10', True), ('11', True), ('12', False), ('FF', True), ('14', True), ('15', True), ...]
+    | 1 failed in 0.32s
+M13-bold-on-context-byte [screens_directionb.py] test_tc_b97_39_strip_follows_the_highlight: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:713: AssertionError: (1, '0xeb44')
+    | 1 failed in 5.33s
+M14-rows-elided-to-one [screens_directionb.py] test_tc_b97_39_long_entry_stacks_rows_and_follows_a_resize: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:740: AssertionError: [(60176, 8)]
+    | 1 failed in 7.11s
+M15-strip-not-recomposed-on-resize [screens_directionb.py] test_tc_b97_39_long_entry_stacks_rows_and_follows_a_resize: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:741: AssertionError: [(60176, 8), (60184, 8), (60192, 8)]
+    | 1 failed in 7.27s
+M15-strip-not-recomposed-on-resize [screens_directionb.py] test_tc_b97_34_patch_painted_widths_follow_four_resizes: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:560: AssertionError: ((220, 60), 'A5 A5 A5 A5 A5 A5 A5 A5', [8])
+    | 1 failed in 9.01s
+M16-no-row-cap [screens_directionb.py] test_tc_b97_39_strip_builder_states_and_cap: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:759: AssertionError: assert 25 == 8
+    | 1 failed in 0.32s
+M17-control-cannot-focus [screens_directionb.py] test_tc_b97_41_keyboard_order_enter_and_chip_states: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:987: AssertionError: ('patch_tab_inspector', ['patch_entry_remove_button'])
+    | 1 failed in 16.46s
+M17-control-cannot-focus [screens_directionb.py] test_tc_b97_60_every_control_displayed_in_its_home[size0]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1143: AssertionError: [('patch_tab_inspector', 'patch_entry_remove_button', 'not in focus chain')]
+    | 1 failed in 6.58s
+M18-second-filled-chip [screens_directionb.py] test_tc_b97_42_save_is_the_one_filled_element: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1037: AssertionError: ('patch_tab_inspector', ['patch_doc_apply_button', 'patch_doc_save_button'])
+    | 1 failed in 4.56s
+M19-active-chip-filled [screens_directionb.py] test_tc_b97_42_save_is_the_one_filled_element: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1037: AssertionError: ('patch_tab_inspector', ['patch_tab_inspector', 'patch_doc_save_button'])
+    | 1 failed in 4.43s
+M20-control-hidden [screens_directionb.py] test_tc_b97_60_every_control_displayed_in_its_home[size0]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1143: AssertionError: [('patch_tab_json', 'patch_win_json', 'patch_execute_run_button', Region(x=0, y=0, width=0, height=0), Region(x=74, y=7, width=41, height=33)), ('patch_tab_json', 'patch_execute_run_button', 'not in focus chain')]
+    | 1 failed in 6.66s
+M21-paste-read-only [screens_directionb.py] test_tc_b97_60_every_control_displayed_in_its_home[size0]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 6.55s
+M22-vacuous-repaint [screens_directionb.py] test_tc_b97_34_patch_painted_widths_follow_four_resizes: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:560: AssertionError: ((220, 60), 'A5 A5 A5 A5 A5 A5 A5 …', [16])
+    | 1 failed in 8.88s
+M23-ledger-past-the-panel [styles.tcss] test_tc_b97_36_patch_document_actions_inside_at_scroll_zero[size0]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:605: AssertionError: ((118, 54), 'patch_doc_load_button', Region(x=97, y=65, width=6, height=1), Region(x=5, y=4, width=112, height=40))
+    | 1 failed in 3.73s
+M24-ribbon-keeps-head [screens_directionb.py] test_tc_b97_37_patch_no_wrapped_row_and_clips[size0]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:647: AssertionError:  calib_segment00_segment01_segment02_segment03_segment04_segment05_segment06_segment07_segment08_segm… · change
+    | 1 failed in 4.16s
+M25-value-fixed-22 [screens_directionb.py] test_tc_b97_38_patch_ledger_takes_its_width[size1]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:668: AssertionError: ((220, 60), 52, ' Kind      Address     Value / bytes           Status   Linkage                                                    ')
+    | 1 failed in 3.50s
+M25-value-fixed-22 [screens_directionb.py] test_tc_b97_34_patch_layout_monotonic_in_its_inputs: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 0.36s
+M26-panel-overflow-hidden [styles.tcss] test_tc_b97_59_patch_below_the_range_actions_reachable[size0]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:725: AssertionError: ((80, 24), 'patch_doc_load_button', 12)
+    | 1 failed in 30.90s
+M27-unmapped-outside-vocabulary [screens_directionb.py] test_tc_b97_33_patch_glyphs_closed_and_in_the_legend: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1071: AssertionError: {'??'}
+    | 1 failed in 4.63s
+M28-help-line-without-effect [window_help.py] test_tc_b97_32_patch_help_names_every_label: RED (KILLED)
+    restore sha256 cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 == before cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1014: AssertionError: labels with no `label — effect` line: ['Add']
+    | 1 failed in 5.93s
+M29-textarea-in-the-tuple [test_b97_chips_help.py] test_tc_b97_32_patch_help_names_every_label: RED (KILLED)
+    restore sha256 f9d5b123ead6956d369e4390c6d155d70237b0a774d05e12c698ed20176dc976 == before f9d5b123ead6956d369e4390c6d155d70237b0a774d05e12c698ed20176dc976
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1012: AssertionError: ['patch_before_after_button', 'patch_checks_run_button', 'patch_doc_apply_button', 'patch_doc_file_select', 'patch_doc_load_button', 'patch_doc_path_input', ...]
+    | 1 failed in 5.86s
+M30-edit-json-one-tab [window_help.py] test_tc_b97_32_patch_help_names_every_label: RED (KILLED)
+    restore sha256 cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 == before cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1018: AssertionError: on the Inspector tab, edits the highlighted entry as JSON; elsewhere, opens the paste buffer full size. Both are off for a document loaded from a file.
+    | 1 failed in 5.81s
+M31-blank-row-before-dock [styles.tcss] test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card[size0]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | 1 failed in 3.84s
+M32-strip-fixed-8 [screens_directionb.py] test_tc_b97_34_patch_layout_monotonic_in_its_inputs: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 failed in 0.34s
+M32-strip-fixed-8 [screens_directionb.py] test_tc_b97_39_long_entry_stacks_rows_and_follows_a_resize: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:741: AssertionError: [(60176, 8), (60184, 8), (60192, 8)]
+    | 1 failed in 7.03s
+M34-long-ledger-line [screens_directionb.py] test_tc_b97_58_patch_editor_region_states[ledger_empty]: GREEN (SURVIVED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | 1 passed in 3.24s
+M35-refusal-not-in-ledger [screens_directionb.py] test_tc_b97_58_patch_editor_region_states[ledger_refused]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1134: AssertionError: No entries yet: Add one, paste a change-set or Load a file.
+    | 1 failed in 3.81s
+M36-checks-no-run-line-removed [screens_directionb.py] test_tc_b97_58_patch_editor_region_states[checks_no_run]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1130: AssertionError: ('checks_no_run', [])
+    | 1 failed in 3.54s
+M37-no-fresh-start-line [screens_directionb.py] test_tc_b97_06_equal_payload_and_fresh_start: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:614: AssertionError: ('', 'no document yet')
+    | 1 failed in 3.69s
+M37-no-fresh-start-line [screens_directionb.py] test_tc_b97_58_patch_editor_region_states[json_no_document]: RED (KILLED)
+    restore sha256 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc == before 163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1130: AssertionError: ('json_no_document', [])
+    | 1 failed in 2.91s
+M38-no-inspector-floor [styles.tcss] test_tc_b97_35_patch_no_horizontal_overflow[size2]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:586: AssertionError: ((120, 54), ['patch_execute_run_button'])
+    | 1 failed in 3.94s

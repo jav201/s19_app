@@ -1,0 +1,52 @@
+# Inc-4 gate fold — RED of the new / changed arms on the PRE-FOLD source
+# test_zz_prefold_*: temporary copies of the two help census modules with their PRE-FOLD key sets, run against the RESTORED draft (removed after this run)
+# source digests (s19_app untouched since the gate):
+163cbd041347afbffffb00de694fd0e48f8552fafc0038b1f351453eb6fa36dc *s19_app/tui/screens_directionb.py
+83561794287d3d96b750f85c45511a30026665e8cf4bd45ce8354f4d1aaf8f23 *s19_app/tui/app.py
+8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc *s19_app/tui/styles.tcss
+cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/window_help.py
+# date: 2026-10-21T16:27:13-06:00
+
+FFFFFFFFFFF......F.F..................................F................. [ 78%]
+....................                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:982: AssertionError: (2, 3, 'bold #e9e9e9')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:863: AssertionError: (1, '0xeb40', ['#e9e9e9', '#e9e9e9', '#e9e9e9', '#e9e9e9', '#969aad', '#969aad', ...])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:693: AssertionError: ('draft · change', '6 entries · 00:00:02 · saved')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:665: AssertionError: assert ('saved' == 'unsaved changes'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:528: AssertionError: PASTE BUFFER · editable      0.3K / 64.0K
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:562: AssertionError: ('patch_json_view', '#003054')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1060: AssertionError: [10, 11, 12]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 54), -2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1125: AssertionError: ((118, 53), -1)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:420: AssertionError: ['#patch_variant_row', '#patch_execute_row', '#patch_variant_select_row', '#patch_doc_issues', '#patch_checks_results']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1094: AssertionError: _CLAIMED_HUES names hues no longer painted in s19_app/: ['#56e0d6']. A phantom claimant over-constrains the hue search and could push MAGENTA off its optimum for no reason
+C:\Users\jjgh8\Github\s19_app\tests\test_zz_prefold_window_usage_help.py:217: AssertionError: crc_designer: step not found verbatim in help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
+C:\Users\jjgh8\Github\s19_app\tests\test_zz_prefold_changes_file_notation_help.py:174: AssertionError: crc_designer: batch-95 step drifted from help_sections.md: '**Open templates/** (change 2) opens exactly that template library.'
+=========================== short test summary info ===========================
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_changed_bytes_and_count_paint_teal
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_39_strip_follows_the_highlight
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_paste_parse_marks_the_document_unsaved
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_06_every_writer_refreshes_the_view_at_once
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_05_paste_heading_names_the_example
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_05_text_area_scrollbars_are_muted
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_labelled_form_and_chips_in_the_inspector[size1]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size1]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_04_no_unscoped_patch_rule_in_the_whole_stylesheet
+FAILED tests/test_tui_patch_json.py::test_tc079_5c_hue_census_is_complete - A...
+FAILED tests/test_zz_prefold_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_zz_prefold_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+14 failed, 78 passed in 271.55s (0:04:31)
+
+# re-run of TC-B97-40 capped-strip arm after moving its entry to 0xEB14 (9 aligned rows -> cap + note), still PRE-FOLD source
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 54), -1)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1127: AssertionError: ((118, 53), 0)
+=========================== short test summary info ===========================
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size1]
+2 failed in 13.65s

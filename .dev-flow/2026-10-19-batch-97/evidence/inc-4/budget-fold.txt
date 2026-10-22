@@ -1,0 +1,60 @@
+== 118x54  panel H 40
+   patch_identity_ribbon      y=  4 h=1
+   patch_main                 y=  5 h=36
+   patch_doc_entries_table    y=  6 h=34
+   patch_tab_switcher         y=  7 h=33
+   patch_before_after_card    y=  7 h=8
+   patch_doc_entry_inputs     y= 16 h=5
+   patch_doc_entry_buttons    y= 21 h=1
+   patch_doc_tally            y= 23 h=4
+   patch_doc_file_row         y= 41 h=1
+   patch_doc_controls         y= 42 h=1
+   patch_legend               y= 43 h=1
+   Inspector pane: 33 rows, 20 used, 13 empty at the foot
+   JSON tab: view 12 · paste text 12
+   JSON tab with save-back + report offered (True, True): view 10 · paste text 9 · tab scroll max 0
+== 118x53  panel H 39
+   patch_identity_ribbon      y=  4 h=1
+   patch_main                 y=  5 h=35
+   patch_doc_entries_table    y=  6 h=33
+   patch_tab_switcher         y=  7 h=32
+   patch_before_after_card    y=  7 h=8
+   patch_doc_entry_inputs     y= 16 h=5
+   patch_doc_entry_buttons    y= 21 h=1
+   patch_doc_tally            y= 23 h=4
+   patch_doc_file_row         y= 40 h=1
+   patch_doc_controls         y= 41 h=1
+   patch_legend               y= 42 h=1
+   Inspector pane: 32 rows, 20 used, 12 empty at the foot
+   JSON tab: view 12 · paste text 11
+   JSON tab with save-back + report offered (True, True): view 9 · paste text 9 · tab scroll max 0
+== 220x60  panel H 46
+   patch_identity_ribbon      y=  4 h=1
+   patch_main                 y=  5 h=42
+   patch_doc_entries_table    y=  6 h=40
+   patch_tab_switcher         y=  7 h=39
+   patch_before_after_card    y=  7 h=5
+   patch_doc_entry_inputs     y= 13 h=5
+   patch_doc_entry_buttons    y= 18 h=1
+   patch_doc_tally            y= 20 h=4
+   patch_doc_file_row         y= 47 h=1
+   patch_doc_controls         y= 48 h=1
+   patch_legend               y= 49 h=1
+   Inspector pane: 39 rows, 17 used, 22 empty at the foot
+   JSON tab: view 15 · paste text 15
+   JSON tab with save-back + report offered (True, True): view 13 · paste text 12 · tab scroll max 0
+== 220x59  panel H 45
+   patch_identity_ribbon      y=  4 h=1
+   patch_main                 y=  5 h=41
+   patch_doc_entries_table    y=  6 h=39
+   patch_tab_switcher         y=  7 h=38
+   patch_before_after_card    y=  7 h=5
+   patch_doc_entry_inputs     y= 13 h=5
+   patch_doc_entry_buttons    y= 18 h=1
+   patch_doc_tally            y= 20 h=4
+   patch_doc_file_row         y= 46 h=1
+   patch_doc_controls         y= 47 h=1
+   patch_legend               y= 48 h=1
+   Inspector pane: 38 rows, 17 used, 21 empty at the foot
+   JSON tab: view 15 · paste text 14
+   JSON tab with save-back + report offered (True, True): view 12 · paste text 12 · tab scroll max 0

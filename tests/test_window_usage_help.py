@@ -94,10 +94,15 @@ _HELP_SECTIONS_MD = (
 #: keys + ``reports`` + the inc-004 ``split_join_export``.
 _EXPECTED_KEYS = frozenset(
     {
-        "patch",
+        # batch-97 Inc-4 (named supersession, D25 / LLR-148.6): ``patch`` is
+        # rewritten as a code-authored ``label — effect`` body and leaves the
+        # md-fidelity census, like ``check_editor`` (_CODE_AUTHORED_SHIPPED).
+        # Inc-4 gate (operator, asked at the Inc-4 gate 2026-10-21): the
+        # tests no longer depend on the untracked draft for ``crc_designer``
+        # and ``reports`` either — their step 6 names its folder in code
+        # (F3/F4) while the draft keeps the operator's wording; both are
+        # code-authored now.
         "checks",
-        "crc_designer",
-        "reports",
         "map",
         "flow",
         "a2l",
@@ -122,8 +127,10 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
 
 #: Code-authored shipped sections (not md ports, so outside TC-707's md
 #: fidelity census): batch-97 Inc-3 adds ``check_editor`` (D10 / D25,
-#: LLR-148.6); Inc-6 adds ``flow_execution``.
-_CODE_AUTHORED_SHIPPED = frozenset({"check_editor"})
+#: LLR-148.6); Inc-4 adds ``patch``, and at its gate ``crc_designer`` and
+#: ``reports`` (their step 6 names the folder; the draft is not versioned);
+#: Inc-6 adds ``flow_execution``.
+_CODE_AUTHORED_SHIPPED = frozenset({"check_editor", "patch", "crc_designer", "reports"})
 
 
 async def _pilot_pause(pilot) -> None:
@@ -224,7 +231,7 @@ def test_tc707_numbering_generated_sequential() -> None:
         heading = chunk.splitlines()[0]
         count = len(re.findall(r"(?m)^\d+\.", chunk))
         for key, section in WINDOW_HELP_SECTIONS.items():
-            if heading.startswith(str(section["title"])):
+            if key in _EXPECTED_KEYS and heading.startswith(str(section["title"])):
                 md_numbered_counts[key] = count
     assert frozenset(md_numbered_counts) == _EXPECTED_KEYS, (
         f"every authored section must be found in the md by its title; "

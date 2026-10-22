@@ -487,6 +487,10 @@ def _drive_variant_geometry(
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
+            # batch-97 Inc-4 (named supersession, HLR-144): the execute row
+            # lives on the inspector's JSON tab.
+            app.query_one("#patch_tab_json").press()
+            await pilot.pause()
             row = app.query_one("#patch_execute_row")
             scope_line = app.query_one("#patch_scope_line", Static)
             child_ids = [child.id for child in row.children if child.id]

@@ -1,0 +1,42 @@
+GREEN gate set on the Inc-4 tree (HEAD 98f3c84 + working tree); files: tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_before_after_report.py tests/test_capped_text_area.py tests/test_changes_file_notation_help.py tests/test_flow_chainset_b94.py tests/test_id_registry.py tests/test_loadfilescreen_input.py tests/test_open_folder_chips.py tests/test_patch_dual_entry.py tests/test_report_logging.py tests/test_tui_check_editor.py tests/test_tui_checks_screen.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_flow_execution_b94.py tests/test_tui_insight_style.py tests/test_tui_memory_patch.py tests/test_tui_patch_big.py tests/test_tui_patch_card.py tests/test_tui_patch_checks_strip.py tests/test_tui_patch_chips.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_glyphs.py tests/test_tui_patch_history_strip.py tests/test_tui_patch_json.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_snapshot.py tests/test_tui_variants.py tests/test_undo_redo_ux.py tests/test_variant_execution.py tests/test_window_usage_help.py 
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 25%]
+........................................................................ [ 33%]
+.......F...........................................F.................... [ 42%]
+........................................................................ [ 50%]
+........................................................................ [ 59%]
+........................................................................ [ 67%]
+................................................................F....... [ 76%]
+......F........F.........F.......F...................................... [ 84%]
+................................F.......xxxxxxxxxxxxxxxxxxxxxxxxxxxxx... [ 93%]
+............F..............................................              [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:311: assert 0 == 1
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23481/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1887: AssertionError: pressing the Checks button must still route run_checks (behavior unchanged)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2567: AssertionError: Apply: line must post
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+C:\Users\jjgh8\Github\s19_app\tests\test_undo_redo_ux.py:201: AssertionError: the real Add must append 0x300, got ['0x200']
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=10501654;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key
+9 failed, 813 passed, 29 xfailed in 2666.27s (0:44:26)

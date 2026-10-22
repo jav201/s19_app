@@ -1,0 +1,22 @@
+Flake comparison: the 5 non-baseline failures of green.txt, re-run 6x each on a clean HEAD 98f3c84 worktree and on the Inc-4 tree (single-pause timing class)
+== tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc4/head
+5 passed in 11.41s
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+1 failed, 4 passed in 12.19s
+5 passed in 11.87s
+5 passed in 11.93s
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+2 failed, 3 passed in 12.08s
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+1 failed, 4 passed in 11.54s
+== tree: /c/Users/jjgh8/Github/s19_app
+5 passed in 11.98s
+5 passed in 11.67s
+5 passed in 12.23s
+5 passed in 11.62s
+FAILED tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key
+1 failed, 4 passed in 11.57s
+FAILED tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+2 failed, 3 passed in 11.34s

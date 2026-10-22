@@ -1,0 +1,5 @@
+# PC-21 / H-P2: one D1 document push (serialize + decode + 5000-line cap) vs service.rows(None), HEAD 98f3c84, median ms
+n=     6  bytes=       706  lines=      39  serialize=    0.03 ms  serialize+decode+cap=    0.03 ms  rows()=    0.01 ms
+n=  1000  bytes=    94,312  lines=   5,009  serialize=    3.25 ms  serialize+decode+cap=    3.31 ms  rows()=    1.71 ms
+n= 10000  bytes=   941,812  lines=  50,009  serialize=   35.26 ms  serialize+decode+cap=   37.46 ms  rows()=   19.69 ms
+n=100000  bytes= 9,416,812  lines= 500,009  serialize=  401.94 ms  serialize+decode+cap=  413.40 ms  rows()=  245.64 ms

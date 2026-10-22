@@ -1,0 +1,7 @@
+# CSS mock of the §3 Patch Editor tree at the measured panel sizes (112x40 = 118x54, 112x39 = 118x53, 196x46 = 220x60, 196x45 = 220x59)
+(112, 40, '') {'main': 36, 'ledger_w': 67, 'table_h': 34, 'insp_w': 45, 'insp_content_w': 41, 'switch_h': 33, 'card_content_w': 38, 'view_h': 12, 'paste_h': 12, 'k': 8}
+(112, 39, '') {'main': 35, 'ledger_w': 67, 'table_h': 33, 'insp_w': 45, 'insp_content_w': 41, 'switch_h': 32, 'card_content_w': 38, 'view_h': 12, 'paste_h': 11, 'k': 8}
+(196, 46, '') {'main': 42, 'ledger_w': 117, 'table_h': 40, 'insp_w': 79, 'insp_content_w': 75, 'switch_h': 39, 'card_content_w': 72, 'view_h': 15, 'paste_h': 15, 'k': 16}
+(196, 45, '') {'main': 41, 'ledger_w': 117, 'table_h': 39, 'insp_w': 79, 'insp_content_w': 75, 'switch_h': 38, 'card_content_w': 72, 'view_h': 15, 'paste_h': 14, 'k': 16}
+(112, 40, 'offered') {'main': 36, 'ledger_w': 67, 'table_h': 34, 'insp_w': 45, 'insp_content_w': 41, 'switch_h': 33, 'card_content_w': 38, 'view_h': 10, 'paste_h': 9, 'k': 8}
+(112, 39, 'offered') {'main': 35, 'ledger_w': 67, 'table_h': 33, 'insp_w': 45, 'insp_content_w': 41, 'switch_h': 32, 'card_content_w': 38, 'view_h': 9, 'paste_h': 9, 'k': 8}

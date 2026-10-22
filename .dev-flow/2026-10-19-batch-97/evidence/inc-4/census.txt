@@ -1,0 +1,71 @@
+# Inc-4 reverse census (B1/B2/B3/A3), tree = HEAD 98f3c84 + Inc-4 working tree
+
+## B1a — test files reaching Patch Editor ids/symbols (grep over tests/*.py)
+tests/b97_fixtures.py
+tests/test_before_after_report.py
+tests/test_capped_text_area.py
+tests/test_flow_chainset_b94.py
+tests/test_loadfilescreen_input.py
+tests/test_patch_dual_entry.py
+tests/test_report_logging.py
+tests/test_tui_check_editor.py
+tests/test_tui_checks_screen.py
+tests/test_tui_diff_screen.py
+tests/test_tui_directionb.py
+tests/test_tui_flow_builder_b94.py
+tests/test_tui_flow_execution_b94.py
+tests/test_tui_insight_style.py
+tests/test_tui_memory_patch.py
+tests/test_tui_patch_big.py
+tests/test_tui_patch_card.py
+tests/test_tui_patch_checks_strip.py
+tests/test_tui_patch_chips.py
+tests/test_tui_patch_editor_b94.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_patch_glyphs.py
+tests/test_tui_patch_history_strip.py
+tests/test_tui_patch_json.py
+tests/test_tui_patch_layout.py
+tests/test_tui_patch_variant.py
+tests/test_tui_report_filter_surface.py
+tests/test_tui_snapshot.py
+tests/test_tui_variants.py
+tests/test_undo_redo_ux.py
+tests/test_variant_execution.py
+
+## B1b — removed/renamed symbols, test references
+CARD_BYTES_MAX               tests/test_tui_patch_card.py:1 
+_apply_window_geometry       
+_FILL_PANEL_MIN_ROWS         
+_SHORT_BODY_VIEWPORT_ROWS    
+patch-window-body            tests/test_tui_patch_card.py:1 tests/test_tui_patch_layout.py:4 tests/test_tui_snapshot.py:1 
+max_bytes=                   s19_app/tui/services/report_service.py:5 tests/test_report_field_census.py:3 tests/test_report_producer_bound.py:7 
+JSON EDIT                    s19_app/tui/window_help.py:1 tests/test_tui_patch_layout.py:3 tests/test_tui_snapshot.py:1 
+¹PATCH SCRIPT               tests/test_tui_snapshot.py:1 
+
+## B1c — hex literals added by the diff
+      6 #969aad
+      1 #b565f3
+
+## B1d — Binding( lines added/removed in app.py (TC-081.4)
+0
+
+## B1e — chip selectors added outside #patch_editor_panel
++ * rows still carry the `patch-docked-row` / `patch-chip*` classes (Inc-3 F9;
+(none above = clean)
+
+## A3 — panel private state read outside screens_directionb.py
+s19_app/tui/app.py:10143:            tuple: ``(records_identity, len(records), id(a2l_data), file_type,
+s19_app/tui/app.py:10168:        records_identity = id(records) if records else id(loaded)
+s19_app/tui/app.py:10170:            records_identity,
+(none above = clean)
+
+## refresh_entries call sites in app.py (all pass document=)
+3278:        panel.refresh_entries(
+3468:        panel.refresh_entries(
+5314:        panel.refresh_entries(
+10780:            panel.refresh_entries(
+3281:            document=self._patch_document_view(),
+3471:            document=self._patch_document_view(),
+5317:            document=self._patch_document_view(),
+10783:                document=self._patch_document_view(),

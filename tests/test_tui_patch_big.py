@@ -294,7 +294,14 @@ def test_at075e_c17_entries_table(tmp_path: Path) -> None:
         # non-control projection, because safe_text now deletes the C0/C1
         # class. The equality — and with it the bracket observable — is
         # retained exactly; only the ANSI payload's expected value moves.
-        assert value_cell.plain == _scrub(payload), (
+        # batch-97 Inc-4 (named supersession, LLR-149.4): a value wider than
+        # its derived column is clipped head-kept with ONE ellipsis; the
+        # painted prefix must still be the payload's own literal characters.
+        expected = _scrub(payload)
+        shown = value_cell.plain
+        if shown != expected and shown.endswith("…") and shown.count("…") == 1:
+            expected = expected[: len(shown) - 1] + "…"
+        assert value_cell.plain == expected, (
             f"payload {payload!r} must render VERBATIM (non-control) in the "
             f"value cell; got {value_cell.plain!r}. A mangled plain (e.g. "
             "'PWNED' from '[red]PWNED[/red]') means from_markup consumed the "
@@ -320,9 +327,8 @@ def test_at075e_c17_entries_table(tmp_path: Path) -> None:
 
 def _window_chrome(app: S19TuiApp, window_id: str) -> tuple[str, str]:
     """Return one patch window's (border_title, border_subtitle)."""
-    from textual.containers import Container
-
-    window = app.query_one(f"#{window_id}", Container)
+    # batch-97 Inc-4: the inspector is a ``Vertical`` (any widget's chrome).
+    window = app.query_one(f"#{window_id}")
     return (str(window.border_title or ""), str(window.border_subtitle or ""))
 
 
@@ -355,9 +361,15 @@ def test_at075a_titles(tmp_path: Path) -> None:
             _load_document(app, doc_path)
             await pilot.pause()
 
+            # batch-97 Inc-4 (named supersession, HLR-144): the CHECKS and
+            # JSON windows became tabs of ONE bordered inspector, whose title
+            # and subtitle follow the active tab — read them per tab.
             outcomes["script"] = _window_chrome(app, "patch_win_script")
-            outcomes["checks"] = _window_chrome(app, "patch_win_checks")
-            outcomes["json"] = _window_chrome(app, "patch_win_json")
+            panel = app.query_one("#patch_editor_panel")
+            for key, chip in (("checks", "#patch_tab_checks"), ("json", "#patch_tab_json")):
+                panel.query_one(chip, Button).press()
+                await pilot.pause()
+                outcomes[key] = _window_chrome(app, "patch_inspector")
 
             # Liveness: add a 4th entry through the REAL add ingress.
             app.query_one("#patch_entry_address_input", Input).value = "0x130"
@@ -376,7 +388,7 @@ def test_at075a_titles(tmp_path: Path) -> None:
     # Every window self-describes with a non-empty border title.
     assert "PATCH SCRIPT" in script_title, script_title
     assert "CHECKS" in checks_title, checks_title
-    assert "JSON EDIT" in json_title, json_title
+    assert "JSON" in json_title, json_title
 
     # The subtitles carry CONTENT, not decoration.
     assert "3" in script_subtitle, (
@@ -509,6 +521,10 @@ def test_at075c_variant_scope_line(tmp_path: Path) -> None:
             # all 17. `pilot.click` needs the target in the visible region, so
             # reach it first with the established primitive, then click for
             # real (C-10(a) — the operator's actual path to this control).
+            # batch-97 Inc-4 (named supersession): the execute row lives on
+            # the inspector's JSON tab — open it first, as the operator does.
+            await pilot.click("#patch_tab_json")
+            await pilot.pause()
             button = app.query_one("#patch_execute_scope_button", Button)
             await _reach(app, pilot, button)
             await pilot.click("#patch_execute_scope_button")

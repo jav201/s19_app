@@ -1,0 +1,126 @@
+.............F.......................................................... [ 11%]
+F.....................F...........................................F..... [ 23%]
+........................................................................ [ 35%]
+.............................F.......................................... [ 46%]
+......................................FF..............................FF [ 58%]
+.F....................F...F.F.FFFF...F.....F..........FF..F..F.......... [ 70%]
+.....................F.......FFF....FF.F.F.......F........F..........F.. [ 81%]
+..F.......F....FFFFFFFFFFFFFFF.....F...........F.......xxxxxxxxxxxxxxxxx [ 93%]
+xxxxxxxxxxxx.............................                                [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: textual.worker.WorkerFailed: Worker raised exception: NoMatches("No nodes match '#log_line_1' on Screen(id='_default')")
+C:\Users\jjgh8\Github\s19_app\tests\test_report_logging.py:180: AssertionError: ['[2026-10-21 11:58:23] WARNING s19tui: report kind=before-after source=img.s19 output=- outcome=refused']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:5275: AssertionError: 80x24: both widgets must have width; {'narrow': True, 'body_right': 79, 'grid_content_width': 62, 'bar': (0, 0, 0, 0), 'glance': (0, 0, 0, 0)}
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:9214: AssertionError: section title must read '¹PATCH SCRIPT', got 'PATCH SCRIPT'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:9243: AssertionError: assert 'PATCH SCRIPT' == '¹PATCH SCRIPT'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_big.py:297: AssertionError: payload '[red]PWNED[/red]' must render VERBATIM (non-control) in the value cell; got '[red]PWNED[…'. A mangled plain (e.g. 'PWNED' from '[red]PWNED[/red]') means from_markup consumed the brackets.
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_big.py:532: AssertionError: one click of the REAL scope button must advance the line to the next scope; got 'Scope active variant'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:139: AssertionError: card does not name the selected entry: '00000200 +0 +1 +2 +3 +4 +5 +6 +7\n  was    AA BB CC DD -- -- -- --\n  now    01 02 03 04 -- -- -- --\n4 B @ 0x00000200 · 4 changed'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:308: IndexError: list index out of range
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:348: AssertionError: assert '0x402' in '00000402 +2 +3 +4\n  was    12 13 14\n  now    01 02 03\n3 B @ 0x00000402 · 3 changed'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:535: AssertionError: @(80, 24): batch-94 moved the card under the JSON window body (beneath the entry inputs); got parent 'patch_pane_inspector'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:535: AssertionError: @(120, 30): batch-94 moved the card under the JSON window body (beneath the entry inputs); got parent 'patch_pane_inspector'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:597: AssertionError: @(80, 24): the card's measured container is the JSON window body at batch-94; got 'patch_pane_inspector'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:597: AssertionError: @(120, 30): the card's measured container is the JSON window body at batch-94; got 'patch_pane_inspector'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:703: AssertionError: the card mounted in an unexpected state: 'No entry yet: Add one or Load a file.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_card.py:903: AssertionError: No entry yet: Add one or Load a file.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_checks_strip.py:754: AssertionError: (80, 24): the strip must paint exactly TWO lines — counts then bar (the intentional shape forced by the 14-cell budget at 120x30); got height=0. height==0 means it painted NOTHING
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_chips.py:216: AssertionError: @(80, 24): 3 docked Button(s) carry NO chip class — the family must cover every one of them: ['patch_tab_inspector', 'patch_tab_json', 'patch_tab_checks']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_chips.py:395: AssertionError: the live button-bearing containers drifted from the mapped set — a new one must be assigned a group (or the no-group set), not left unmapped (LLR-076.2). live=['patch_before_after_buttons', 'patch_checks_controls', 'patch_doc_controls', 'patch_doc_entry_buttons', 'patch_doc_file_line1', 'patch_doc_file_line2', 'patch_execute_buttons', 'patch_history_controls', 'patch_paste_controls', 'patch_saveback_buttons', 'patch_tabs'] mapped=['patch_before_after_buttons', 'patch_checks_controls', 'patch_doc_controls', 'patch_doc_entry_buttons', 'patch_doc_file_line1', 'patch_doc_file_line2', 'patch_execute_buttons', 'patch_history_controls', 'patch_paste_controls', 'patch_saveback_buttons']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_b94.py:250: AssertionError: the table is visible at 80x24
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23173/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1813: AssertionError: the Checks help must state what + which artifact, got 'Runs a check document on the image.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1878: AssertionError: the Checks affordance must be qualified, got 'Runs a check document on the image.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1917: AssertionError: #patch_paste_text must render >= 6 lines (fixed height 8); got 0
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2176: assert "runs the loaded change document's checks against the loaded image" in 'Runs a check document on the image.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2203: assert "Needs kind 'check'" in 'Runs a check document on the image.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2441: AssertionError: ids not at their batch-94 homes: ["patch_doc_file_row (under 'patch_editor_panel')", "patch_doc_controls (under 'patch_editor_panel')", "patch_doc_entry_inputs (under 'patch_pane_inspector')", 'patch_entry_address_input (under None)', 'patch_entry_value_input (under None)', 'patch_entry_bytes_input (under None)', "patch_before_after_card (under 'patch_pane_inspector')"]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:2666: AssertionError: the AT-032a locked Checks-help token span must survive the reparent, got 'Runs a check document on the image.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:3637: AssertionError: Undo must restore the pre-add change-set byte/field-for-field (0x200='REV_A' only), got [('0x200', 'REV_A'), ('0x300', 'DE AD')]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_glyphs.py:356: AssertionError: PRECONDITION: the run must render real verdicts before the mutation, or the post-mutation assertion is vacuous
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_history_strip.py:814: AssertionError: (80, 24): the strip must paint exactly TWO lines — position then key hints; got height=0. height==0 means it painted NOTHING
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:725: AssertionError: got ''
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1263: AssertionError: the JSON editor must GROW past the old fixed cap of 8 when the window has free vertical space (120x50); painted region.height is 0
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1300: AssertionError: the min-height floor must keep the editor usable at the primary size; painted region.height is 0 (a bare 1fr would collapse to 7)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1339: AssertionError: at 80x24 the editor must keep its usable floor; region.height 0
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1389: AssertionError: precondition: the CHECKS window must be tall at 120x50 for the leak test to bite; got window content height 0
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1443: assert 0 >= 8
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_json.py:1472: AssertionError: precondition: the editor must have grown at 120x50
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:388: AssertionError: @120x30: the batch-94 stack needs ONE column x at every regime, got [0, 23] from {'patch_win_script': (23, 5, 51, 12), 'patch_win_checks': (0, 0, 0, 0), 'patch_win_json': (0, 0, 0, 0)}
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:439: AssertionError: @80x24: stacked windows need ONE column x, got [0, 5]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:531: AssertionError: @80x24: batch-94 re-parent census — ids not at their new homes: ['patch_doc_file_row (not under patch_win_script)', 'patch_doc_entry_inputs (not under patch_win_json_body)', 'patch_before_after_card (not under patch_win_json_body)']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:531: AssertionError: @120x30: batch-94 re-parent census — ids not at their new homes: ['patch_doc_file_row (not under patch_win_script)', 'patch_doc_entry_inputs (not under patch_win_json_body)', 'patch_before_after_card (not under patch_win_json_body)']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:666: AssertionError: @80x24: buttons trapped inside a scrollable body (below the inner fold), not docked siblings: ['patch_tab_inspector', 'patch_tab_json', 'patch_tab_checks', 'patch_entry_add_button', 'patch_entry_edit_button', 'patch_entry_remove_button', 'patch_entry_edit_json_button', 'patch_doc_load_button', 'patch_doc_refresh_button', 'patch_doc_validate_button', 'patch_doc_apply_button', 'patch_doc_save_button']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:698: AssertionError: @120x30: buttons trapped inside a scrollable body: ['patch_tab_inspector', 'patch_tab_json', 'patch_tab_checks', 'patch_entry_add_button', 'patch_entry_edit_button', 'patch_entry_remove_button', 'patch_entry_edit_json_button', 'patch_doc_load_button', 'patch_doc_refresh_button', 'patch_doc_validate_button', 'patch_doc_apply_button', 'patch_doc_save_button']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:734: AssertionError: @80x24: revealed buttons trapped inside a scrollable body: ['patch_tab_inspector', 'patch_tab_json', 'patch_tab_checks', 'patch_entry_add_button', 'patch_entry_edit_button', 'patch_entry_remove_button', 'patch_entry_edit_json_button', 'patch_doc_load_button', 'patch_doc_refresh_button', 'patch_doc_validate_button', 'patch_doc_apply_button', 'patch_doc_save_button']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:854: AssertionError: patch_win_script docked row must be a direct child of the window (sibling of the body), got children ['patch_win_script_body']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_layout.py:903: AssertionError: the paste editor's first line y=0 must lie inside the body's visible rows [0, 0)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_variant.py:553: AssertionError: @80x24: the execute row must be laid out (non-zero height); region=(0, 0, 0, 0)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=3218712;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_report_logging.py::test_before_after_report_generation_logs_to_file
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_directionb.py::test_at073b_glance_geometry_fits_and_reflows
+FAILED tests/test_tui_directionb.py::test_at065a_change_doc_label_reads_as_dropdown_alternative
+FAILED tests/test_tui_directionb.py::test_tc332_change_doc_copy_pins_verbatim
+FAILED tests/test_tui_patch_big.py::test_at075e_c17_entries_table - Assertion...
+FAILED tests/test_tui_patch_big.py::test_at075a_titles - textual.css.query.No...
+FAILED tests/test_tui_patch_big.py::test_at075c_variant_scope_line - Assertio...
+FAILED tests/test_tui_patch_card.py::test_at080a_before_after - AssertionErro...
+FAILED tests/test_tui_patch_card.py::test_at080c_unmapped - IndexError: list ...
+FAILED tests/test_tui_patch_card.py::test_tc080_3_before_after_derivation - A...
+FAILED tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size0]
+FAILED tests/test_tui_patch_card.py::test_at080d_reachable_with_card[size1]
+FAILED tests/test_tui_patch_card.py::test_tc080_6_card_fits_its_measured_container[size0]
+FAILED tests/test_tui_patch_card.py::test_tc080_6_card_fits_its_measured_container[size1]
+FAILED tests/test_tui_patch_card.py::test_tc080_1_card_never_mounts_blank - A...
+FAILED tests/test_tui_patch_card.py::test_tc080_4_no_selection_and_out_of_range
+FAILED tests/test_tui_patch_checks_strip.py::test_tc078_5_strip_geometry_painted
+FAILED tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips
+FAILED tests/test_tui_patch_chips.py::test_tc076_2_group_assignment_on_docked_containers
+FAILED tests/test_tui_patch_editor_b94.py::test_at_b94_03_expanded_editor_primary_surface
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at032a_checks_help_states_what_and_which_artifact
+FAILED tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged
+FAILED tests/test_tui_patch_editor_v2.py::test_ac4_patch_paste_textarea_min_height
+FAILED tests/test_tui_patch_editor_v2.py::test_at052a_checks_help_states_semantics
+FAILED tests/test_tui_patch_editor_v2.py::test_at052b_checks_help_survives_screen_cycle
+FAILED tests/test_tui_patch_editor_v2.py::test_at057a_two_labeled_sections_ids_and_parentage
+FAILED tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent
+FAILED tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - Asserti...
+FAILED tests/test_tui_patch_history_strip.py::test_at081b_bounds - textual.cs...
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_5_strip_geometry_painted
+FAILED tests/test_tui_patch_json.py::test_at079a_gauge_tracks_buffer - Assert...
+FAILED tests/test_tui_patch_json.py::test_ac1_editor_fills_json_window_when_room_exists
+FAILED tests/test_tui_patch_json.py::test_ac1b_editor_holds_min_floor_at_primary_size
+FAILED tests/test_tui_patch_json.py::test_ac2_docked_buttons_reachable_under_scroll_at_floor
+FAILED tests/test_tui_patch_json.py::test_ac3_fill_does_not_leak_to_sibling_windows
+FAILED tests/test_tui_patch_json.py::test_ac4_hostile_paste_inert_after_resize
+FAILED tests/test_tui_patch_json.py::test_ac5_gauge_stays_above_editor - Asse...
+FAILED tests/test_tui_patch_layout.py::test_at063a_three_across_at_120 - Asse...
+FAILED tests/test_tui_patch_layout.py::test_at063b_stacked_at_80 - AssertionE...
+FAILED tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_80 - As...
+FAILED tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120 - A...
+FAILED tests/test_tui_patch_layout.py::test_at064a_reachable_under_scroll_at_80
+FAILED tests/test_tui_patch_layout.py::test_at064b_reachable_under_scroll_at_120
+FAILED tests/test_tui_patch_layout.py::test_at064c_revealed_rows_reachable_at_80
+FAILED tests/test_tui_patch_layout.py::test_tc46_1_window_structure_layout_agnostic
+FAILED tests/test_tui_patch_layout.py::test_tc46_2_paste_in_viewport_at_body_scroll0
+FAILED tests/test_tui_patch_variant.py::test_tc_035_2_variant_group_above_execute_row
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+53 failed, 535 passed, 29 xfailed in 1553.61s (0:25:53)

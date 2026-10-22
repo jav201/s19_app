@@ -42,6 +42,7 @@ from .changes.io import (
     list_change_documents,
     parse_change_document,
     read_change_document,
+    serialize_change_document,
     write_change_document,
 )
 from .changes.model import ChangeDocument, ChangeEntry
@@ -75,6 +76,7 @@ from .screens_directionb import (
     LoadedArtifactsPanel,
     LoadGuardScreen,
     MemoryMapPanel,
+    PatchDocumentView,
     PatchEditorPanel,
     bytes_per_cell,
     cell_count_for_geometry,
@@ -2455,7 +2457,7 @@ class S19TuiApp(App):
 
         Returns:
             Container: ``#screen_crc_designer`` holding the header row
-            (title + the ``📂 Open folder`` chip, HLR-139) and the
+            (title + the ``📂 Open templates/`` chip, HLR-139) and the
             ``CrcDesignerPanel``. Hidden at startup.
 
         Data Flow:
@@ -3025,7 +3027,7 @@ class S19TuiApp(App):
 
         Returns:
             Container: ``#screen_patch`` holding the header row (title + the
-            ``📂 Open folder`` chip, HLR-139) and a ``PatchEditorPanel``.
+            ``📂 Open patches/`` chip, HLR-139) and a ``PatchEditorPanel``.
             Hidden at startup.
 
         Data Flow:
@@ -3187,11 +3189,12 @@ class S19TuiApp(App):
                 panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
                 result = service.load_text(event.paste_text)
                 self._report_change_result(result)
-                # w4 (LLR-005.1): a successful paste parse rebinds BOTH
-                # regions to the parsed document — the dirty state of the
-                # replaced buffer is gone with it.
+                # batch-97 Inc-4 gate (ux H1, LLR-144.6 amended): a parsed
+                # paste is a draft no file holds — unsaved work, so the stamp
+                # reads `unsaved changes` beside the ribbon's `draft` and a
+                # Load asks first (was w4 `mark_loaded`, batch-94 LLR-005.1).
                 if result.ok:
-                    panel.mark_loaded()
+                    panel.mark_pasted()
             elif event.action == "refresh_doc":
                 # batch-94 (annotation 6 / HLR-008 / LLR-008.2): Refresh
                 # repopulates the file dropdown from the patches-folder
@@ -3273,7 +3276,11 @@ class S19TuiApp(App):
         # already resolved above (`loaded.mem_map if loaded is not None else
         # None`), and an explicit `None` is MEANINGFUL ("no image loaded"),
         # which the panel's sentinel default keeps distinct from "not supplied".
-        panel.refresh_entries(service.rows(loaded_ranges), mem_map=mem_map)
+        panel.refresh_entries(
+            service.rows(loaded_ranges),
+            mem_map=mem_map,
+            document=self._patch_document_view(),
+        )
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
         # paste-authored / empty document — disable Edit-JSON whenever the
@@ -3462,6 +3469,7 @@ class S19TuiApp(App):
         panel.refresh_entries(
             service.rows(loaded_ranges),
             mem_map=loaded.mem_map if loaded is not None else None,
+            document=self._patch_document_view(),
         )
         panel.refresh_issues(service.issue_lines())
         # batch-40 S1: a history move (undo/redo) restores a change-set whose
@@ -5274,6 +5282,23 @@ class S19TuiApp(App):
             panel.mark_loaded()
         self._patch_editor_load_tail(panel)
 
+    def _patch_document_view(self) -> PatchDocumentView:
+        """The Patch Editor document as plain data for the panel (batch-97 D1/D2).
+
+        The ONE builder of the I-2/I-3 payload, passed at all four
+        ``refresh_entries`` sites so the rows, the ribbon and the JSON view
+        read one document. The serialiser emits ASCII JSON (``ensure_ascii``),
+        so the ``bytes`` decode as ASCII (Code-Wire H-P4).
+        """
+        document = self._change_service.document
+        source = document.source_path
+        return PatchDocumentView(
+            name=None if source is None else source.name,
+            kind=document.kind,
+            json_text=serialize_change_document(document).decode("ascii"),
+            entry_count=len(document.entries),
+        )
+
     def _patch_editor_load_tail(self, panel: PatchEditorPanel) -> None:
         """Re-render the panel after any document load (the shared tail).
 
@@ -5290,6 +5315,7 @@ class S19TuiApp(App):
         panel.refresh_entries(
             service.rows(loaded_ranges),
             mem_map=loaded.mem_map if loaded is not None else None,
+            document=self._patch_document_view(),
         )
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: a file-backed document disables
@@ -6973,26 +6999,6 @@ class S19TuiApp(App):
             self._prefill_diff_check_files()
         elif screen_key == "patch":
             self._prefill_patch_change_files()
-            # batch-94 P4 fix (RC-3): apply the panel's window geometry NOW,
-            # from the laid-out workspace (the panel's height is the
-            # workspace's minus the 2-row screen-title chrome — measured at
-            # every shipped size), so the show's relayout lands on the right
-            # regime in ONE pass. From the panel's own ``on_resize`` the
-            # same application would arrive one reflow too late for
-            # single-pump drivers (the panel may not read ``self.app``, C-7,
-            # so the app threads the figure in — the ``refresh_entries``
-            # data-in idiom). A not-yet-mounted panel/workspace is tolerated
-            # as a no-op (the ``_prefill_*`` idiom) — ``on_resize`` applies
-            # the geometry once the tree exists.
-            from .screens_directionb import PatchEditorPanel
-
-            try:
-                panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-                workspace_rows = self.query_one("#workspace_body").region.height
-            except Exception:
-                pass
-            else:
-                panel._apply_window_geometry(max(0, workspace_rows - 2))
         elif screen_key == "check_editor":
             # batch-94 (LLR-001.2): the collector is populated on entry — the
             # suffix-distinguished spec dropdown from the folder scan, and the
@@ -10775,6 +10781,7 @@ class S19TuiApp(App):
             panel.refresh_entries(
                 self._change_service.rows(loaded.ranges),
                 mem_map=loaded.mem_map,
+                document=self._patch_document_view(),
             )
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,

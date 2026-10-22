@@ -1,0 +1,5 @@
+mutants: 1 arms: 1
+M39-ledger-state-line-wraps [styles.tcss] test_tc_b97_58_patch_editor_region_states[ledger_refused]: RED (KILLED)
+    restore sha256 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc == before 8a9e0385f5e903cba423cb7945de3aee6e28da7e26796cf88e0f2cc87dba64dc
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_chips_help.py:1130: AssertionError: ('ledger_refused', ['Refused: [CHG-V1-FORMAT] error: this is a retired v1 unified', "change-set document — the v2 format is 's19app-changeset'", "version '2.0'; v1 files are not supported and are not migrated"])
+    | 1 failed in 3.61s

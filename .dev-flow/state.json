@@ -184,6 +184,11 @@
       "station": "P3",
       "date": "2026-10-21",
       "decision": "P3 increment 003 approved under the standing authorization after the operator decided the gate's HIGH-adjacent items (asked at the gate 2026-10-21: glyph ◆ LED-.12, 120-133 degraded band LED-.13, memory form now LED-.14): code-reviewer OK to advance after F1 HIGH re-read; ux-reviewer approve with conditions, discharged by the fold; full suite node by node vs baseline: no regression (5 non-baseline nodes are flakes, save_back_prompt intermittent on clean HEAD)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-21",
+      "decision": "P3 increment 004 approved under the standing authorization after the operator decided the gate items (asked at the gate 2026-10-21: teal strip LED-.18, spaced form LED-.19, help-draft decoupling LED-.20); code-reviewer OK to advance (no HIGH); ux-reviewer approve on re-read (H1 HIGH stamp saved after Parse pasted, folded LED-.21, re-walked); full suite node by node vs baseline: no regression; at068a single-pause race made frequent by the heavier paste refresh hardened with the _settled poll (10/10)."
     }
   ],
   "obsidian_synced": false,

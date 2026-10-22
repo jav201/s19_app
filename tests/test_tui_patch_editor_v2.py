@@ -1911,6 +1911,10 @@ def test_ac4_patch_paste_textarea_min_height(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
+            # batch-97 Inc-4 (named supersession, HLR-144): the paste buffer
+            # lives on the inspector's JSON tab.
+            app.query_one("#patch_tab_json").press()
+            await pilot.pause()
             return app.query_one("#patch_paste_text", TextArea).outer_size.height
 
     height = asyncio.run(_drive())
@@ -2315,9 +2319,15 @@ _PRESERVED_REGROUP_IDS = (
 
 # The post-rework DIRECT-parent census (see the note above): every id maps to
 # the widget it must be a direct child of — the batch-94 homes.
+#: batch-97 Inc-4 (named supersession, HLR-144 / design §3 Patch tree): the
+#: homes below moved with the ledger + inspector re-composition — the file
+#: row and the document controls are one-row docks of the PANEL; the entry
+#: form, its chips and the before/after strip ride the inspector's Inspector
+#: pane (each input on an unnamed label row, LLR-144.9, so its parent id is
+#: ``None``); the JSON window's docks are unchanged.
 _REGROUP_PARENTAGE = {
-    # the change-file row docks in the PATCH SCRIPT window, split in two lines
-    "patch_doc_file_row": "patch_win_script",
+    # the change-file row docks in the panel, its controls in two line groups
+    "patch_doc_file_row": "patch_editor_panel",
     "patch_doc_file_line1": "patch_doc_file_row",
     "patch_doc_file_line2": "patch_doc_file_row",
     "patch_doc_file_select": "patch_doc_file_line1",
@@ -2326,7 +2336,7 @@ _REGROUP_PARENTAGE = {
     "patch_doc_refresh_button": "patch_doc_file_line2",
     "patch_script_section_label": "patch_doc_file_line2",
     # the document controls hold exactly Validate / Apply loaded changes / Save
-    "patch_doc_controls": "patch_win_script",
+    "patch_doc_controls": "patch_editor_panel",
     "patch_doc_validate_button": "patch_doc_controls",
     "patch_doc_apply_button": "patch_doc_controls",
     "patch_doc_save_button": "patch_doc_controls",
@@ -2335,12 +2345,12 @@ _REGROUP_PARENTAGE = {
     "patch_checks_controls": "patch_win_checks",
     "patch_checks_run_button": "patch_checks_controls",
     "patch_checks_help": "patch_checks_controls",
-    # the entry-input band + the before/after card ride the JSON window BODY
-    "patch_doc_entry_inputs": "patch_win_json_body",
-    "patch_entry_address_input": "patch_doc_entry_inputs",
-    "patch_entry_value_input": "patch_doc_entry_inputs",
-    "patch_entry_bytes_input": "patch_doc_entry_inputs",
-    "patch_before_after_card": "patch_win_json_body",
+    # the entry form + the before/after strip ride the Inspector pane
+    "patch_doc_entry_inputs": "patch_pane_inspector",
+    "patch_entry_address_input": None,
+    "patch_entry_value_input": None,
+    "patch_entry_bytes_input": None,
+    "patch_before_after_card": "patch_pane_inspector",
     # the history strip / Undo-Redo / execute-scope group dock in the JSON
     # window (siblings of the body, never inside it — the B2 invariant)
     "patch_history_strip": "patch_win_json",
@@ -2389,6 +2399,9 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
+            # batch-97 Inc-4: the Checks section is the inspector's Checks tab.
+            app.query_one("#patch_tab_checks", Button).press()
+            await pilot.pause()
             outcomes["script_label"] = str(
                 app.query_one("#patch_script_section_label", Label).render()
             )
@@ -2412,9 +2425,13 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
                 "id",
                 None,
             )
-            outcomes["checks_label_y"] = app.query_one(
-                "#patch_checks_section_label", Label
-            ).region.y
+            # batch-97 Inc-4 (named supersession): both section labels stay
+            # mounted for this census with ``display: none`` — their words are
+            # carried by the ledger's border title and the Checks tab chip.
+            outcomes["labels_displayed"] = [
+                app.query_one(f"#{wid}", Label).display
+                for wid in ("patch_script_section_label", "patch_checks_section_label")
+            ]
             run_button = app.query_one("#patch_checks_run_button", Button)
             outcomes["run_parent"] = getattr(run_button.parent, "id", None)
             outcomes["run_y"] = run_button.region.y
@@ -2446,10 +2463,8 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
         "the 'Patch script' section label must ride file-row line 2 beside "
         f"Refresh (finding B), got {outcomes['script_label_parent']!r}"
     )
-    assert outcomes["checks_label_y"] < outcomes["run_y"], (
-        "the 'Checks' section label must sit ABOVE the Run-checks button in "
-        "the CHECKS window"
-    )
+    assert outcomes["labels_displayed"] == [False, False], outcomes["labels_displayed"]
+    assert outcomes["run_y"] > 0, "Run checks paints on the Checks tab"
     assert outcomes["run_parent"] == "patch_checks_controls", (
         f"Run checks must live under #patch_checks_controls, got "
         f"{outcomes['run_parent']!r}"
@@ -3583,6 +3598,13 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
         """
         panel = app.query_one("#patch_editor_panel")
         target = app.query_one(selector)
+        # batch-97 Inc-4 (named supersession, HLR-144): a control on an
+        # inspector tab is clicked with its tab open, as the operator does.
+        homes = {a.id for a in target.ancestors if getattr(a, "id", None)}
+        for pane, chip in (("patch_win_json", "#patch_tab_json"), ("patch_pane_inspector", "#patch_tab_inspector")):
+            if pane in homes:
+                await pilot.click(chip)
+                await pilot.pause()
         for _ in range(4):
             panel.scroll_y = max(
                 0,
@@ -3609,7 +3631,14 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
 
             # Paste-author a one-entry change-set (source_path None → enabled).
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            # batch-97 Inc-4: the paste refresh now also rebuilds the JSON view
+            # and stamp, so one fixed pause can land before the table re-render
+            # (4/10 locally) — bounded poll, same as the _settled precedent.
+            await _settled(
+                pilot,
+                lambda: bool(_entry_addr_values(app)),
+                "pasted entry rendered in the entries table",
+            )
             outcomes["after_paste"] = _entry_addr_values(app)
 
             # Add a second entry through the REAL Add button (surface mutation).

@@ -1,0 +1,38 @@
+# Inc-4 gate fold — the 2 non-baseline nodes of the orchestrator's full suite, re-run 3x each on the FOLD tree (2026-10-21T17:28:32-06:00)
+16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 *s19_app/tui/screens_directionb.py
+6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e *s19_app/tui/app.py
+478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b *s19_app/tui/styles.tcss
+cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/window_help.py
+== fold tree · tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent · run 1
+1 passed in 1.99s
+== fold tree · tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent · run 2
+1 passed in 1.96s
+== fold tree · tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent · run 3
+1 passed in 1.87s
+== fold tree · tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates · run 1
+1 passed in 2.20s
+== fold tree · tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates · run 2
+1 passed in 2.31s
+== fold tree · tests/test_tui_patch_glyphs.py::test_at077e_image_generation_invalidates · run 3
+1 passed in 2.39s
+== fold tree · whole module tests/test_tui_patch_glyphs.py (order context of the full suite)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_glyphs.py:400: AssertionError: arm (b) remove_entry: the mutation must actually have taken effect; expected 2 rows, got 3
+1 failed, 11 passed in 19.11s
+
+== clean HEAD 98f3c84 worktree (C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc4/head), for comparison (removed after)
+98f3c84 batch-97 Inc-3: Check Editor as a ledger + report-fields card
+-- at077e run 1
+1 passed in 2.79s
+-- at077e run 2
+1 passed in 2.24s
+-- at077e run 3
+1 passed in 2.32s
+-- at_061a on HEAD: 8/20 failed
+
+== the 4 gate-set nodes that failed in green-fold.txt and not in green.txt (same session, transcripts in the agent's terminal):
+-- isolated x2 on the fold tree: test_at_038d (1/2 failed), test_at_061a (2/2 failed), test_saveback_width_32 (0/2), test_tc081_1_derived (0/2)
+-- test_at_061a + test_at_038d, 10 runs on the fold tree: at_061a failed 5/10 (at_038d 0/10 when paired)
+-- test_at_061a, the fold tree with the four gate-fold source edits reversed (a HEAD worktree overlaid with the working tree, then unfold.py): 1/10, then 11/20 with the pre-fold stylesheet
+-- test_at_061a, fold stylesheet on that tree: 4/10; minus the scrollbar block 5/12; minus the spacer rows 3/12 (no CSS edit moves the rate)
+-- test_at_061a on clean HEAD 98f3c84 (above): 8/20
+Verdict: test_at_061a is a single-pause timing node (one pilot.pause() after button.press() before reading the reports folder) that fails at 40-55% on HEAD, on the pre-fold tree and on the fold tree alike - not caused by Inc-4 or its fold. test_at077e: 3/3 green on the fold tree and 3/3 on HEAD; in the module run another single-pause arm (at077 arm (b)) failed instead - same class. Neither is fixed here (backlog: single-pause timing class).

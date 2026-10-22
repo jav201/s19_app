@@ -1,0 +1,864 @@
+...............................ss.......s............................... [  2%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+......F............F.................................................... [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+............................................................x........... [ 62%]
+................................................................F....... [ 64%]
+................................................................F....... [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+............................F...........................F........F...... [ 85%]
+.....................................................x...............F.. [ 88%]
+....................................................xxxxxxxxxxxxxxxxxxxx [ 90%]
+xxxxxxxxx............................................................... [ 92%]
+..........................................................F............. [ 94%]
+........................................................................ [ 96%]
+.................x...................................................... [ 98%]
+.........................................                                [100%]
+================================== FAILURES ===================================
+_____ test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_038a_saveback_trigger_0')
+
+    def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
+        tmp_path: Path,
+    ) -> None:
+        """Apply -> collide-save -> key ``b`` -> surfaced path == dir-diff file ->
+        re-read shows -/+ bytes, linkage row, pinned dedup "after" identity.
+    
+        Intent: HLR-038 acceptance (Q-M1 chain): the AT snapshots the reports
+        listing BEFORE the trigger, captures the surfaced status text, asserts the
+        surfaced md/html paths equal the exactly-two new files, then re-reads THE
+        SURFACED md path for the content asserts. C-10: the typed save-back name
+        collides with a pre-planted file so the header's "after" MUST be the
+        dedup-suffixed ``img-patched_1.s19`` — a typed-name echo fails.
+        Counterfactual: pre-implementation key ``b`` is unbound -> no new file ->
+        the dir-diff assert fails (the RED captured in increment-4.md).
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                await _drive_apply(app, pilot)
+    
+                # C-10 collision drive: plant the suggested name BEFORE confirming.
+                (project_dir / "img-patched.s19").write_text(
+                    "S00600004844521B\nS9030000FC\n", encoding="ascii"
+                )
+                notices = _notices(app)
+                statuses = _statuses(app)
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["offer_notices"] = list(notices)
+                # Failure DIAGNOSTIC only — never an expected operand (Q-M2):
+                outcomes["saved_path_diag"] = app._change_service.last_summary.saved_path
+    
+                before = _report_names(reports_dir)
+                statuses.clear()
+                progress: list[int] = []
+                _original_progress = type(app).set_progress
+                app.set_progress = (  # type: ignore[method-assign]
+                    lambda value, message=None: (
+                        progress.append(value),
+                        _original_progress(app, value, message),
+                    )[1]
+                )
+                app.set_focus(None)
+                await pilot.press("b")
+                # batch-68 N5: the composer now runs on a worker thread, so the
+                # report pair does NOT exist when the key handler returns. Waiting
+                # on the worker makes this deterministic; a bare `pause()` passed
+                # only because the composition happened to be fast, which is a race
+                # this suite must not depend on.
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                outcomes["progress"] = list(progress)
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+                outcomes["notices_all"] = list(notices)
+                outcomes["reports_dir"] = reports_dir
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        # --- dir-diff: exactly one new md + one new html -----------------------
+        new_files = outcomes["new_files"]
+        md_new = [n for n in new_files if n.endswith(".md")]
+        html_new = [n for n in new_files if n.endswith(".html")]
+        assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+            f"AT-038a: expected exactly one new md + one new html under reports/, "
+            f"got {new_files}; saved_path diagnostic: {outcomes['saved_path_diag']}; "
+            f"statuses: {outcomes['statuses']}"
+        )
+        assert _MD_NAME.match(md_new[0]), md_new[0]
+        assert _HTML_NAME.match(html_new[0]), html_new[0]
+    
+        # --- surfaced path equals the dir-diff file (Q-M1) ----------------------
+        # batch-68 AC-3 (success arm): the bar must REACH 100 on a written report.
+        # Asserted here rather than in tests/test_report_off_ui_thread.py because
+        # this is the only place with a real save-back that makes the composer
+        # succeed; the standalone AC-3 test can only reach the refusal arm.
+        progress = outcomes["progress"]
+        assert progress and progress[-1] == 100, (
+            f"a successfully written before/after report must leave the progress "
+            f"bar at 100, not mid-fill. Sequence: {progress}"
+        )
+    
+        written = [s for s in outcomes["statuses"] if "Before/after report written" in s]
+        assert len(written) == 1, (
+            f"AT-038a: expected exactly one surfaced written-status line, "
+            f"got {outcomes['statuses']}"
+        )
+        surfaced = written[0].split("Before/after report written:", 1)[1]
+        surfaced_md, surfaced_html = [p.strip() for p in surfaced.split("|")]
+        assert Path(surfaced_md).name == md_new[0], (
+            f"surfaced md path {surfaced_md!r} != new file {md_new[0]!r}"
+        )
+        assert Path(surfaced_html).name == html_new[0]
+    
+        # --- re-read THE SURFACED path (C-12) -----------------------------------
+        text = Path(surfaced_md).read_text(encoding="utf-8")
+    
+        # Provenance header: before = the original; after = the PINNED dedup
+        # literal (typed-name-echo discriminator, Q-M2).
+        before_match = _PROVENANCE_BEFORE.search(text)
+        after_match = _PROVENANCE_AFTER.search(text)
+        assert before_match is not None and after_match is not None, text[:800]
+        assert Path(before_match.group(1)) == image_path
+        assert Path(after_match.group(1)).name == "img-patched_1.s19", (
+            f"AT-038a C-10: the 'after' identity must be the dedup-suffixed "
+            f"saved_path basename, got {after_match.group(1)!r}"
+        )
+    
+        # Linkage table row for the applied entry.
+        assert (
+            "| 1 | bytes | 0x00000100 | 0x00000102 | applied | standalone | - "
+            "| 00 00 \\|..\\| | AA BB \\|..\\| |" in text
+        ), "AT-038a: linkage row for the applied entry missing"
+    
+        # Diff fence: pre-patch bytes as '-' lines, after_bytes as '+' lines.
+        heading = "### Run 0x00000100-0x00000102 (changed)"
+        assert heading in text
+        fence = text[text.index("```diff", text.index(heading)) + len("```diff"):]
+        fence = fence[: fence.index("```")]
+        minus = [ln for ln in fence.splitlines() if ln.startswith("-")]
+        plus = [ln for ln in fence.splitlines() if ln.startswith("+")]
+        assert any("00 00" in ln for ln in minus), minus
+        assert any("AA BB" in ln for ln in plus), plus
+    
+        # Offer notify (LLR-038.3): information severity, names action + key b.
+        offers = [
+            (title, msg, sev)
+            for title, msg, sev in outcomes["offer_notices"]
+            if "before_after_report" in msg
+        ]
+>       assert offers and offers[0][2] == "information", outcomes["offer_notices"]
+E       AssertionError: []
+E       assert ([])
+
+tests\test_before_after_report.py:324: AssertionError
+____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_061a_persistent_contro0')
+
+    def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back reveals a persistent report control that survives an unrelated
+        action, writes the same report pair on activation, and hides on a new load.
+    
+        Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+        surface. After a successful save-back (the path that today fires only the
+        transient ``notify``), a persistent, queryable control
+        (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+        is shown. Activating it routes to the EXISTING ``action_before_after_report``
+        writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+        produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+        diff heading + the provenance header), not merely "a file was written" (C-10).
+    
+        Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+        a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+        an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+        This proxy asserts widget durability, NOT the notify wall-clock TTL.
+    
+        Activation mechanism: the control is activated through the real button-press
+        dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+        → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+        ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+        ``action_before_after_report``; the message routing is exercised end-to-end.
+    
+        Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+        is re-hidden — a stale "report ready" offer must not persist once the editing
+        context (``last_summary``) has cleared.
+    
+        Counterfactual (RED, C-20): pre-implementation there is no
+        ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+        the transient-only notify cannot satisfy this node.
+        """
+        from textual.css.query import NoMatches
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _drive_apply(app, pilot)
+    
+                # Before the save-back the persistent control must be hidden.
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_before_saveback"] = row.has_class("hidden")
+    
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["revealed_after_saveback"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Persistence proxy: an unrelated action + re-render must NOT drop
+                # the control (a notify Toast would be gone).
+                _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                button = panel.query_one("#patch_before_after_button", Button)
+                outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Activate through the real button-press dispatch (not a proxy call).
+                statuses = _statuses(app)
+                before = _report_names(reports_dir)
+                button.press()
+                await pilot.pause()
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+    
+                # Clear-on-context boundary: a new load re-hides the control.
+                (tmp_path / "changes.json").write_text(
+                    '{"version": 2, "changes": []}', encoding="utf-8"
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    tmp_path / "changes.json"
+                )
+                panel.request_action("load_doc")
+                await pilot.pause()
+                try:
+                    outcomes["hidden_after_new_load"] = panel.query_one(
+                        "#patch_before_after_row"
+                    ).has_class("hidden")
+                except NoMatches:  # pragma: no cover - row must persist as a widget
+                    outcomes["hidden_after_new_load"] = True
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["hidden_before_saveback"], (
+            "AT-061a: the report control must be hidden before any save-back"
+        )
+>       assert outcomes["revealed_after_saveback"], (
+            "AT-061a: a successful save-back must reveal the persistent control"
+        )
+E       AssertionError: AT-061a: a successful save-back must reveal the persistent control
+E       assert False
+
+tests\test_before_after_report.py:1182: AssertionError
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains one more item: 'open_split_join_export'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2704: AssertionError
+_______________ test_at_b78_32_app_bindings_block_is_untouched ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_b78_32_app_bindings_bl0')
+
+    def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+        """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+    
+        RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+    
+        The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+        ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+        MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+        and **eight** entries sit BELOW it and outside the range --
+        ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+        ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+        from batch-40 S2. An entry added or removed among those eight leaves the
+        range-based predicate GREEN, so the guard would report "untouched" for a
+        block that was touched. It fails in the safe-looking direction.
+    
+        ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+        SIXTH merge gate measured it.** Both were wrong, and the second followed from
+        the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+        so believing the boundary sat there silently dropped ``plus``/``minus`` from
+        the inventory. The figure came in from Phase 0's premise table and was
+        carried through two rewrites of this very paragraph without being
+        re-executed -- including one whose stated purpose was removing false
+        references from it. *A figure inherited inside a sentence you are editing is
+        still an inherited figure.* The paragraph's THESIS is unaffected: the range
+        does stop mid-block, entries do escape the predicate, and the node's
+        assertions never depended on the count.
+    
+        It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+        batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+        written and survived three Phase-2 rounds -- because a line range looks like
+        a measurement. A code comment in ``screens_directionb.py`` carried the
+        CORRECT extent, so the two artifacts disagreed and the code was right.
+    
+        **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+        took three commits to get there.** Numbers still appear below, and they are
+        NARRATION -- the record of which ranges were claimed and how each was wrong.
+        Read none of them as an address. (Two earlier drafts got this wrong in
+        opposite directions: the first claimed "EVERY line number is now gone" while
+        five remained, and the fifth gate then noted that one of the survivors,
+        ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+        which is exactly what makes narration read as a pointer. The wording above
+        is scoped to POINTERS for that reason.)
+        The first pass cited
+        ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+        ``:6822``. The second pass removed that one and left the block's own range
+        ``1338-1392`` in place -- and the very next commit added an import at the
+        top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+        been "corrected" was **also wrong on arrival**.
+    
+        So the docstring arguing that a line range is "one insertion away from
+        failing the same silent way" demonstrated the claim three times on itself.
+        Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
+        go stale is the whole point of the node below.
+    
+        A corrected range would not fix this, and this batch proved it twice: any
+        edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+        within days -- one of them wrong the moment it was written. This
+        resolves the block from the CLASS instead, which no line movement can blind,
+        and pins two independent projections of it.
+        """
+        rows = _b79_app_binding_rows()
+    
+        # The FULL row set, frozen. The node pinned only a count plus a key-only
+        # projection of the shown bindings until the independent review measured the
+        # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+        # and description were certified by the count alone. Executed, all three of
+        # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+        # key changed, and one hidden removed while another was added. The shown
+        # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+        # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+        #
+        # The spec's line-range predicate would have caught every one of those. The
+        # re-authoring is still right about range fragility, but it was not the
+        # strict improvement the Inc-6 record claimed: its counterfactual was an
+        # ADDITION, the one class a count can see. A frozen row set is a superset of
+        # both old projections and no line movement blinds it.
+>       assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+            "the App BINDINGS block must be byte-for-byte the committed set. "
+            f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+            f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+        )
+E       AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+E       assert frozenset({('... False), ...}) == frozenset({('... False), ...})
+E         
+E         Extra items in the left set:
+E         ('d', 'a2l_describe_tag', 'Describe tag', False)
+E         Use -v to get more diff
+
+tests\test_tui_diff_screen.py:3882: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+_______________ test_at068a_undo_redo_roundtrip_through_surface _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at068a_undo_redo_roundtri0')
+
+    def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
+        """Undo restores the prior change-set; Redo re-applies it (AT-068a).
+    
+        Intent (AT-068a, US-068a / LLR-068a.2/.3, C-16 real click, C-10 content):
+        with a paste-authored change-set (``source_path`` None → controls enabled)
+        the operator adds an entry through the REAL Add button, then a REAL Undo
+        click restores the pre-add change-set byte/field-for-field (the SPECIFIC
+        prior entry — address AND value — not merely "the table re-rendered"), and
+        a REAL Redo click re-applies the add. An empty-history Undo click on a
+        fresh document is a no-op (boundary). Every mutation and Undo/Redo is driven
+        by ``pilot.click`` on the shipped surface (no ``.focus()``, no direct
+        service call).
+        """
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x200", "value": "REV_A"}]
+        )
+    
+        async def _click(pilot: object, app: S19TuiApp, selector: str) -> None:
+            """Drive a REAL pointer click on a panel control (C-16).
+    
+            batch-94: the panel is the ONE vertical scroll (all three
+            ``#patch_win_*`` windows are content-height ``auto``, stacked
+            script→json→checks), so the docked rows — the entry chips in the
+            SCRIPT window and the history strip / Undo-Redo in the JSON window —
+            are reached by scrolling the PANEL, not a window. Scroll
+            ``#patch_editor_panel`` so the target control is on-screen, then
+            ``pilot.click`` delivers a genuine mouse event to the button (no
+            ``.focus()``, no direct handler / service call).
+            """
+            panel = app.query_one("#patch_editor_panel")
+            target = app.query_one(selector)
+            # batch-97 Inc-4 (named supersession, HLR-144): a control on an
+            # inspector tab is clicked with its tab open, as the operator does.
+            homes = {a.id for a in target.ancestors if getattr(a, "id", None)}
+            for pane, chip in (("patch_win_json", "#patch_tab_json"), ("patch_pane_inspector", "#patch_tab_inspector")):
+                if pane in homes:
+                    await pilot.click(chip)
+                    await pilot.pause()
+            for _ in range(4):
+                panel.scroll_y = max(
+                    0,
+                    target.region.y
+                    - panel.content_region.y
+                    + panel.scroll_offset.y,
+                )
+                await pilot.pause()
+            await pilot.click(selector)
+            await pilot.pause()
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 50)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+    
+                # Boundary: empty-history Undo on a fresh (empty) document is a
+                # no-op — the real click must not crash and the table stays empty.
+                await _click(pilot, app, "#patch_undo_button")
+                outcomes["empty_undo_rows"] = _entry_addresses(app)
+    
+                # Paste-author a one-entry change-set (source_path None → enabled).
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["after_paste"] = _entry_addr_values(app)
+    
+                # Add a second entry through the REAL Add button (surface mutation).
+                _set_entry_inputs(app, address="0x300", bytes_text="DE AD")
+                await _click(pilot, app, "#patch_entry_add_button")
+                outcomes["after_add"] = _entry_addresses(app)
+    
+                # UNDO via the REAL button (C-16).
+                await _click(pilot, app, "#patch_undo_button")
+                outcomes["after_undo"] = _entry_addr_values(app)
+    
+                # REDO via the REAL button (C-16).
+                await _click(pilot, app, "#patch_redo_button")
+                outcomes["after_redo"] = _entry_addresses(app)
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["empty_undo_rows"] == [], (
+            "an empty-history Undo must be a no-op (table stays empty)"
+        )
+>       assert outcomes["after_paste"] == [("0x200", "REV_A")]
+E       AssertionError: assert [] == [('0x200', 'REV_A')]
+E         
+E         Right contains one more item: ('0x200', 'REV_A')
+E         Use -v to get more diff
+
+tests\test_tui_patch_editor_v2.py:3655: AssertionError
+________________________ test_at077c_stale_provenance _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at077c_stale_provenance0')
+
+    def test_at077c_stale_provenance(tmp_path: Path) -> None:
+        """Mutating the document reverts every glyph to ``·`` — three ways.
+    
+        Intent (AT-077c ★, LLR-077.2, GATE-BLOCKING — the wrong-answer class):
+        ``last_check_result`` is NOT reset by document mutation (only by undo/redo),
+        so without the provenance stamp a mutated document is index-aligned onto a
+        stale result and rows are labelled with verdicts belonging to entries that
+        no longer exist at that index. There is no error path — the table simply
+        lies.
+    
+        Three arms, each through a REAL button:
+    
+          (a) ``#patch_entry_add_button``    — count grows
+          (b) ``#patch_entry_remove_button`` — count shrinks
+          (c) ``#patch_entry_edit_button``   — **count UNCHANGED**, bytes replaced
+    
+        Arm (c) is the counterfactual that makes this AT non-vacuous: a
+        count-equality guard passes (a) and (b) and silently mislabels (c). Measured
+        (M-3): weakening the signature to ``len(entries)`` fails arm (c) ALONE.
+    
+        The **non-invalidation** arm is asserted first and is equally load-bearing:
+        without it, an implementation that renders ``·`` unconditionally passes
+        every other assertion here.
+        """
+        image = _write_image(tmp_path / "image.s19", _BRANCH_IMAGE)
+    
+        def _drive(mutate) -> list[str]:
+            async def _run() -> list[str]:
+                doc = _write_check_document(
+                    tmp_path / f"checks-{id(mutate)}.json", list(_BRANCH_ENTRIES)
+                )
+                app = S19TuiApp(base_dir=tmp_path)
+                async with app.run_test(size=(120, 30)) as pilot:
+                    await pilot.pause()
+                    app.load_selected_file(image)
+                    await pilot.pause()
+                    _open_patch(app, doc)
+                    await pilot.pause()
+                    _run_checks(app)
+                    await pilot.pause()
+                    assert _glyphs(app) != [GLYPH_NO_RESULT] * 3, (
+                        "PRECONDITION: the run must render real verdicts before the "
+                        "mutation, or the post-mutation assertion is vacuous"
+                    )
+                    mutate(app)
+                    await pilot.pause()
+                    return _glyphs(app)
+    
+            return asyncio.run(_run())
+    
+        def _no_mutation(app: S19TuiApp) -> None:
+            pass
+    
+        def _add(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x200"
+            app.query_one("#patch_entry_value_input", Input).value = "added"
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+            app.query_one("#patch_entry_add_button", Button).press()
+    
+        def _remove(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x110"
+            app.query_one("#patch_entry_remove_button", Button).press()
+    
+        def _edit_in_place(app: S19TuiApp) -> None:
+            # Same address, NEW bytes -> the entry count is IDENTICAL.
+            app.query_one("#patch_entry_address_input", Input).value = "0x100"
+            app.query_one("#patch_entry_value_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = "DE AD"
+            app.query_one("#patch_entry_edit_button", Button).press()
+    
+        # Non-invalidation FIRST — the anti-vacuity arm.
+        unchanged = _drive(_no_mutation)
+        assert unchanged == [GLYPH_PASS, GLYPH_FAIL, GLYPH_UNCHECKABLE], (
+            "with NO mutation the stamp must still match and the glyphs must "
+            f"render; got {unchanged!r}. If this reads all-'·' the implementation "
+            "refuses unconditionally and every arm below is vacuous."
+        )
+    
+        for arm, mutate, expected_rows in (
+            ("(a) add_entry", _add, 4),
+            ("(b) remove_entry", _remove, 2),
+            ("(c) in-place edit, COUNT UNCHANGED", _edit_in_place, 3),
+        ):
+>           glyphs = _drive(mutate)
+                     ^^^^^^^^^^^^^^
+
+tests\test_tui_patch_glyphs.py:399: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_tui_patch_glyphs.py:364: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _run() -> list[str]:
+        doc = _write_check_document(
+            tmp_path / f"checks-{id(mutate)}.json", list(_BRANCH_ENTRIES)
+        )
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.load_selected_file(image)
+            await pilot.pause()
+            _open_patch(app, doc)
+            await pilot.pause()
+            _run_checks(app)
+            await pilot.pause()
+>           assert _glyphs(app) != [GLYPH_NO_RESULT] * 3, (
+                "PRECONDITION: the run must render real verdicts before the "
+                "mutation, or the post-mutation assertion is vacuous"
+            )
+E           AssertionError: PRECONDITION: the run must render real verdicts before the mutation, or the post-mutation assertion is vacuous
+E           assert ['·', '·', '·'] != (['·'] * 3)
+E            +  where ['·', '·', '·'] = _glyphs(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+tests\test_tui_patch_glyphs.py:356: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028755F44B90>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23735/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=15495772;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - Asserti...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+9 failed, 3309 passed, 3 skipped, 32 xfailed in 5065.29s (1:24:25)

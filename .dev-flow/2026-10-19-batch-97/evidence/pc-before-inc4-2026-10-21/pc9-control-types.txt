@@ -1,0 +1,13 @@
+# PC-9: control types over PE_IDS_9C7BEAF on the live Patch panel (118x54), Textual 8.2.8
+## tree 9c7beaf (git archive)
+{'Button': 20, 'Select': 1, 'Input': 5, 'TextArea': 1} total(B+I+S)= 26
+Button ['patch_before_after_button:Button', 'patch_checks_run_button:Button', 'patch_doc_apply_button:Button', 'patch_doc_load_button:Button', 'patch_doc_refresh_button:Button', 'patch_doc_save_button:Button', 'patch_doc_validate_button:Button', 'patch_edit_json_button:Button', 'patch_entry_add_button:Button', 'patch_entry_edit_button:Button', 'patch_entry_edit_json_button:Button', 'patch_entry_remove_button:Button', 'patch_execute_run_button:Button', 'patch_execute_scope_button:Button', 'patch_paste_parse_button:Button', 'patch_redo_button:Button', 'patch_saveback_confirm_button:Button', 'patch_saveback_decline_button:Button', 'patch_saveback_width_button:Button', 'patch_undo_button:Button']
+Select ['patch_doc_file_select:Select']
+Input ['patch_doc_path_input:OsClipboardInput', 'patch_entry_address_input:OsClipboardInput', 'patch_entry_bytes_input:OsClipboardInput', 'patch_entry_value_input:OsClipboardInput', 'patch_saveback_name_input:OsClipboardInput']
+TextArea ['patch_paste_text:JsonHighlightTextArea']
+## tree HEAD 98f3c84
+{'Button': 20, 'Select': 1, 'Input': 5, 'TextArea': 1} total(B+I+S)= 26
+Button ['patch_before_after_button:Button', 'patch_checks_run_button:Button', 'patch_doc_apply_button:Button', 'patch_doc_load_button:Button', 'patch_doc_refresh_button:Button', 'patch_doc_save_button:Button', 'patch_doc_validate_button:Button', 'patch_edit_json_button:Button', 'patch_entry_add_button:Button', 'patch_entry_edit_button:Button', 'patch_entry_edit_json_button:Button', 'patch_entry_remove_button:Button', 'patch_execute_run_button:Button', 'patch_execute_scope_button:Button', 'patch_paste_parse_button:Button', 'patch_redo_button:Button', 'patch_saveback_confirm_button:Button', 'patch_saveback_decline_button:Button', 'patch_saveback_width_button:Button', 'patch_undo_button:Button']
+Select ['patch_doc_file_select:Select']
+Input ['patch_doc_path_input:OsClipboardInput', 'patch_entry_address_input:OsClipboardInput', 'patch_entry_bytes_input:OsClipboardInput', 'patch_entry_value_input:OsClipboardInput', 'patch_saveback_name_input:OsClipboardInput']
+TextArea ['patch_paste_text:JsonHighlightTextArea']

@@ -224,6 +224,10 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
             panel.refresh_entries(service.rows(None), mem_map=None)
             await pilot.pause()
+            # batch-97 Inc-4 (named supersession, HLR-144): the editor is the
+            # paste buffer on the inspector's JSON tab, beside the ledger.
+            app.query_one("#patch_tab_json").press()
+            await pilot.pause()
             table = app.query_one("#patch_doc_entries_table", DataTable)
             editor = app.query_one("#patch_paste_text", TextArea)
             workspace = app.query_one("#workspace_body").region
@@ -234,6 +238,11 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
                 "editor_visible": editor.region.y < workspace.y + workspace.height,
             }
             if size == (80, 24):
+                table.scroll_visible()
+                await pilot.pause()
+                visible["table_reachable"] = (
+                    table.region.y < workspace.y + workspace.height
+                )
                 editor.scroll_visible()
                 await pilot.pause()
                 visible["editor_reachable"] = (
@@ -247,10 +256,10 @@ def test_at_b94_03_expanded_editor_primary_surface(tmp_path: Path) -> None:
         "the expanded editor is visible with the table at 120x30"
     )
     at_80 = asyncio.run(_drive((80, 24)))
-    assert at_80["table_visible"], "the table is visible at 80x24"
-    assert not at_80["editor_visible"], (
-        "precondition: the editor is below the 80x24 fold"
-    )
+    # batch-97 Inc-4 (named supersession, LLR-149.6): below the range the
+    # ledger + inspector stay REACHABLE under the panel's scroll; the ledger
+    # is the growing region, so it is not promised whole at 80x24.
+    assert at_80["table_reachable"], "the table is reachable at 80x24"
     assert at_80["editor_reachable"], (
         "the editor is reachable by panel scroll at 80x24"
     )

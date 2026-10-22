@@ -1,0 +1,46 @@
+# Inc-4 gate fold — GREEN gate set (gate-files.txt) on the fold tree, 2026-10-21T16:36:28-06:00
+16f059d6a18131c8467bc2f86f91232b04e91ec5d7bd702ed98bf2ee68104797 *s19_app/tui/screens_directionb.py
+6d799e8bb81cefae7f046feae2298f86ea19b2a344a1d49084783a502969c69e *s19_app/tui/app.py
+478811c37e2dcf742a07ca40cc4e5e9533dff71cceb9a3eb71afa0bd1358b83b *s19_app/tui/styles.tcss
+cc11018c2c457d2594211db7b9e40c5d3664f877e897bf5bc22f0247a7b8dd76 *s19_app/tui/window_help.py
+........................................................................ [  8%]
+........................................................................ [ 16%]
+.....................................F.........F........................ [ 25%]
+........................................................................ [ 33%]
+..............F...........................................F............. [ 41%]
+........................................................................ [ 50%]
+........................................................................ [ 58%]
+........................................................................ [ 67%]
+........................................................................ [ 75%]
+.........F...F..........................F.....................F......... [ 83%]
+.......................................F.......xxxxxxxxxxxxxxxxxxxxxxxxx [ 92%]
+xxxx..............................................................       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_before_after_report.py:462: AssertionError: AT-038d: no surfaced refusal diagnostic; statuses: ['Before/after report written: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-23611\\test_at_038d_stale_summary_cro0\\.s19tool\\workarea\\projB\\reports\\20261021T225210Z-before-after-report.md | C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-23611\\test_at_038d_stale_summary_cro0\\.s19tool\\workarea\\projB\\reports\\20261021T225210Z-before-after-report.html']
+C:\Users\jjgh8\Github\s19_app\tests\test_before_after_report.py:1182: AssertionError: AT-061a: a successful save-back must reveal the persistent control
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1088: AssertionError: pressing the width selector must change the displayed value, stayed at 32
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-23611/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_history_strip.py:427: AssertionError: newest_end: 3 adds then 0 undos must leave stacks (3, 0); got (2, 0)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=9835796;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_038d_stale_summary_cross_project_refusal_writes_nothing
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_1_derived - Assertio...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+9 failed, 820 passed, 29 xfailed in 2636.03s (0:43:56)

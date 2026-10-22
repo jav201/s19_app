@@ -1,0 +1,20 @@
+--- help_sections.md (before restore, Inc-4 tree)
++++ help_sections.md (after restore)
+@@ -48,7 +48,7 @@
+    endianness) — preview-only until an image is loaded.
+ 5. Save reusable parameter sets as templates — they land in the template library
+    (`.s19tool\templates\`, or the project folder under change 1) and reload by name.
+-6. **Open templates/** (change 2) opens exactly that template library.
++6. **Open folder** (change 2) opens exactly that template library.
+ 
+ ## Reports (`t`)
+ 
+@@ -61,7 +61,7 @@
+ 5. **Context bytes** controls how many bytes of surrounding memory accompany each
+    change in the report.
+ 6. **Generate new report** writes the `*.md` + `*.html` pair into the project's
+-   `reports\` folder; **Open reports/** (change 2) opens that folder directly.
++   `reports\` folder; **Open folder** (change 2) opens that folder directly.
+ 
+ ## Memory Map (rail `4`)
+ 
