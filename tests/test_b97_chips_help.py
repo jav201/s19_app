@@ -772,11 +772,21 @@ def test_tc_b97_31_check_editor_header_carries_both_chips(
     assert [path for path, _ in calls] == [target, target]
 
 
-def _check_help_lines() -> dict:
+def window_keys_text(app, key: str) -> str:
+    """The help modal's generated keys block (Inc-8, D27), imported at call
+    time so the module still collects on a tree without it."""
+    from s19_app.tui.window_help import window_keys_text as generated
+
+    return generated(app, key)
+
+
+def _check_help_lines(keys_text: str = "") -> dict:
+    """The ``label — effect`` lines of the check_editor help: its steps, then
+    (since Inc-8, D27) the generated keys block ``keys_text``."""
     from s19_app.tui.window_help import section_body_text
 
     lines = {}
-    for raw in section_body_text("check_editor").split("\n"):
+    for raw in (section_body_text("check_editor") + "\n" + keys_text).split("\n"):
         text = raw.strip()
         text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
         if " — " in text:
@@ -837,13 +847,13 @@ def test_tc_b97_32_check_editor_help_names_every_label(tmp_path: Path) -> None:
                     for binding in getattr(type(widget), "BINDINGS", []):
                         key = binding.key if hasattr(binding, "key") else binding[0]
                         keys.add({"question_mark": "?"}.get(key, key))
-            return controls, keys
+            return controls, keys, window_keys_text(app, "check_editor")
 
-    controls, keys = asyncio.run(_drive())
+    controls, keys, keys_text = asyncio.run(_drive())
     keys &= {"space", "enter", "?"}
     keys.add("enter")
     glyphs = set(sdb.CHECK_GLYPHS)
-    lines = _check_help_lines()
+    lines = _check_help_lines(keys_text)
     assert len(controls) >= 12, sorted(controls)
     missing = sorted((controls | keys | glyphs) - set(lines))
     assert missing == [], f"labels with no `label — effect` line: {missing}"
@@ -992,11 +1002,13 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
 PATCH_TABS = ("patch_tab_inspector", "patch_tab_json", "patch_tab_checks")
 
 
-def _help_lines(key: str) -> dict:
+def _help_lines(key: str, keys_text: str = "") -> dict:
+    """The ``label — effect`` lines of a help modal: the section's steps, then
+    (since Inc-8, D27) its generated keys block ``keys_text``."""
     from s19_app.tui.window_help import section_body_text
 
     lines = {}
-    for raw in section_body_text(key).split("\n"):
+    for raw in (section_body_text(key) + "\n" + keys_text).split("\n"):
         text = raw.strip()
         text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
         if " — " in text:
@@ -1078,13 +1090,15 @@ def test_tc_b97_32_patch_help_names_every_label(tmp_path: Path) -> None:
             await settle(pilot, 8)
             harvest()
             in_panel = {w: label for w, label in seen.items() if panel in w.ancestors}
-            return derived, in_panel, set(seen.values())
+            return derived, in_panel, set(seen.values()), window_keys_text(app, "patch")
 
-    derived, in_panel, labels = asyncio.run(_drive())
+    derived, in_panel, labels, keys_text = asyncio.run(_drive())
     from s19_app.tui import screens_directionb as sdb
 
-    lines = _help_lines("patch")
-    keys = {"ctrl+z", "ctrl+y", "space", "enter", "?"}
+    lines = _help_lines("patch", keys_text)
+    # Inc-8 (D27): ^z / ^y are lines of the generated keys block, keyed by the
+    # key bar's display (`^z`), no longer the hand-typed `ctrl+z`.
+    keys = {"^z", "^y", "space", "enter", "?"}
     glyphs = set(getattr(sdb, "PATCH_GLYPHS", {}) or {"(no PATCH_GLYPHS)"})
     assert len(derived) == 26, sorted(derived)
     missing = sorted((labels | keys | glyphs) - set(lines))
@@ -1697,15 +1711,15 @@ def test_tc_b97_32_flow_execution_help_names_every_label(tmp_path: Path) -> None
             await run_lanes(app, pilot, panel, key=True)
             await settle(pilot, 4)
             harvest()
-            return controls, keys
+            return controls, keys, window_keys_text(app, "flow_execution")
 
-    controls, keys = asyncio.run(_drive())
+    controls, keys, keys_text = asyncio.run(_drive())
     keys &= {"space", "enter", "?"}
     keys |= {"enter", "c"}
     glyphs = set(getattr(fs, "FX_CABLE_GLYPHS", {}) or {"(no FX_CABLE_GLYPHS)"})
     glyphs |= {getattr(fs, "FX_PENDING_GLYPH", "(no FX_PENDING_GLYPH)")}
     glyphs |= set(fs.FLOW_KIND_GLYPHS) | set(fs.FLOW_CABLE_GLYPHS)
-    lines = _help_lines("flow_execution") if "flow_execution" in _help_keys() else {}
+    lines = _help_lines("flow_execution", keys_text) if "flow_execution" in _help_keys() else {}
     assert len(controls) >= 6, sorted(controls)
     missing = sorted((controls | keys | glyphs) - set(lines))
     assert missing == [], f"labels with no `label — effect` line: {missing}"

@@ -1,0 +1,43 @@
+# Inc-8 GATE after the gate fold (2026-10-23); source sha256: b09bb8ce78503323 *s19_app/tui/app.py 7212592d4271b88d *s19_app/tui/window_help.py 4b894b9754edb6a0 *s19_app/tui/styles.tcss edfe50de4efcd7bf *s19_app/tui/screens_directionb.py 
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 57%]
+.....F...................................................F.............. [ 61%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 79%]
+..F..................................................................... [ 83%]
+.................................F...................................... [ 87%]
+.....xxxxxxxxxxxxxxxxxxxxxxxxxxxxx...................................... [ 92%]
+........................................................................ [ 96%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('ctrl+s', 'save_project', 'Save project', True), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('ctrl+s', 'save_project', 'Save', True)]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_map_big.py:1930: AssertionError: {'focus_live': False, 'focus_start': None, 'markers': [2147483648], 'n_rows': 1, ...}
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=9163874;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_map_big.py::test_tc_b77_22_b77_select_single_run_is_selected_and_marked[size1]
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+4 failed, 1605 passed, 29 xfailed in 5534.60s (1:32:14)

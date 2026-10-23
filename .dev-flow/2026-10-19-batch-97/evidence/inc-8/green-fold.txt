@@ -1,0 +1,25 @@
+# Inc-8 gate fold: the gate's non-baseline nodes + every module the fold touched; source sha256: ae33ceea789c22c4 *s19_app/tui/app.py 3d0db1b11c2a5234 *s19_app/tui/window_help.py 957a0ec720c74140 *s19_app/tui/styles.tcss edfe50de4efcd7bf *s19_app/tui/screens_directionb.py 
+.................F..........................................F........... [ 44%]
+..........xxxxxxxxxxxxxxxxxxxxxxxxxxxxx........F........F............F.. [ 88%]
+..................                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:568: AssertionError: assert 'bad destination' in 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:4523: AssertionError: region row 0x80010000 never became hit-testable after scrolling its viewport
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1082: AssertionError: ((118, 53), 1, ['NOTICES', '● source    ok', 'loaded prg.s19 (11 ranges)', '──────────────────────────────────────────────────────────────────────────────────────────────────────────', '● patch     ok', 'applied 6 entries', ...])
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_key_bar.py:587: AssertionError: diff f: s19_app/tui/screens_directionb.py:7905 no longer holds 'Binding("f", "toggle_run_overlay", "Run list", show=False),'
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=3937551;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_invalid_dest_refused
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_directionb.py::test_at074_single_click_repositions_hex
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size1]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_derived_rows_follow_their_guards
+5 failed, 128 passed, 29 xfailed in 745.76s (0:12:25)

@@ -1,0 +1,39 @@
+# Inc-8 gate-fold RED on the PRE-FOLD Inc-8 tree (worktree scratchpad/prefold8 = 9793fcd + the Inc-8 tree as reported); source sha256: ae33ceea789c22c4 *s19_app/tui/app.py 3d0db1b11c2a5234 *s19_app/tui/window_help.py 957a0ec720c74140 *s19_app/tui/styles.tcss edfe50de4efcd7bf *s19_app/tui/screens_directionb.py 
+# s19_app from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\s19_app\__init__.py
+FFFFFFFF.FFFF                                                            [ 69%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:891: AssertionError: a dimmed token paints one colour: ['#b47d2f', '#6b80ae', '#6b80ae', '#6b80ae', '#6b80ae']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\b97_probes.py:323: AssertionError: did not settle: owned keys dimmed with the focus on the rail
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:299: AssertionError: Map help quotes keys that do not act on the Map: ['+', ',', '-', '.', 'g']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:1031: AssertionError: [Span(9, 11, Style(dim=True)), Span(11, 17, Style(dim=True))]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:299: AssertionError: Map help quotes keys that do not act on the Map: ['+', ',', '-', '.', 'g']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:406: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load', '^s Save', 'x Operations', '? Help', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:406: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load', '^s Save', 'x Operations', '? Help', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:429: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load', '^s Save', 'x Operations', '? Help', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:891: AssertionError: a dimmed token paints one colour: ['#b47d2f', '#6b80ae', '#6b80ae', '#6b80ae', '#6b80ae']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\b97_probes.py:323: AssertionError: did not settle: owned keys dimmed with the focus on the rail
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:1031: AssertionError: [Span(9, 11, Style(dim=True)), Span(11, 17, Style(dim=True))]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_key_bar.py:1355: AssertionError: ((118, 54), 'workspace', ' ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                 ')
+=========================== short test summary info ===========================
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_a_dimmed_token_paints_whole_in_one_colour
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_owned_keys_dim_outside_their_window
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_map_help_names_only_keys_that_act_on_the_map
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_pack_key_row_dims_and_does_not_hit_disabled
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_map_help_names_only_keys_that_act_on_the_map
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_at_80x24_drops_palette_whole
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_a_dimmed_token_paints_whole_in_one_colour
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_owned_keys_dim_outside_their_window
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_pack_key_row_dims_and_does_not_hit_disabled
+FAILED tests/test_b97_key_bar.py::test_at_b97_25_two_rows_on_every_window_and_clicks
+12 failed, 1 passed, 26 deselected in 72.72s (0:01:12)
+# second selection (the -k above deselected these two)
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_tui_directionb.py:4523: AssertionError: region row 0x80010000 never became hit-testable after scrolling its viewport
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold8\tests\test_b97_flow_execution.py:1976: AssertionError: the .map-region-scroll block is located in both sheets
+=========================== short test summary info ===========================
+FAILED tests/test_tui_directionb.py::test_at074_single_click_repositions_hex
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped
+2 failed in 3.04s

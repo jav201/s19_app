@@ -7770,7 +7770,11 @@ _DIFF_MIN_W = 94
 #: between Inc-5 and Inc-10 the heights 28..30 select the fallback regime while
 #: painting no hex row. Recorded, not hidden; `TC-B78-54` pins both sides of the
 #: floor in the end state the constant is defined for.
-_DIFF_MIN_H = 28
+#:
+#: batch-97 Inc-8 (HLR-150): the two-row key bar takes one more chrome row, so
+#: the floor moves up one. Re-measured on the Inc-8 tree: 28 -> 0, **29 -> 1**,
+#: 30 -> 1 visible hex rows.
+_DIFF_MIN_H = 29
 
 
 class AbDiffPanel(Container):

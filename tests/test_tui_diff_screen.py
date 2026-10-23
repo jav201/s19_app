@@ -3606,6 +3606,35 @@ _B79_COMMITTED_SHOWN_KEYS: tuple[str, ...] = (
 )
 
 
+#: batch-97 Inc-8 (HLR-150, PC-25) -- named supersession of the chip-set
+#: clauses below (AT-B78-28 clause 3, TC-B78-38): the one-row Footer is gone,
+#: so "the footer-visible set is unchanged" is re-derived from the PAINTED key
+#: bar on the diff window: row 1's global keys + the palette, row 2 the diff
+#: window's keys from ``window_help.WINDOW_KEYS["diff"]`` (the panel's own
+#: run-list and window-page keys, now painted where they act). Frozen as a
+#: constant so the clause stays SET-EQUALITY, never containment.
+_B97_DIFF_BAR_KEYS: tuple[str, ...] = (
+    "?", "[", "]", "^d", "^k", "^l", "^p", "^s", "esc", "f", "k", "q", "x",
+)
+
+
+def _b97_painted_bar_keys(app) -> list[str]:
+    """The keys painted on the key bar (first word of every token, both rows)."""
+    import re
+
+    from tests.b97_probes import painted_rows
+
+    keys = set()
+    for row in app.query("#key_bar KeyRow"):
+        text = painted_rows(app, row)[0]
+        for token in re.split(r" {2,}", text.strip())[(1 if row.id == "key_bar_window" else 0):]:
+            for lead in ("· go ", "go "):
+                if token.startswith(lead):
+                    token = token[len(lead):]
+            keys.add(token.split(" ", 1)[0])
+    return sorted(keys)
+
+
 def _b79_app_binding_rows() -> frozenset:
     """The App ``BINDINGS`` block as a comparable set of rows.
 
@@ -3723,7 +3752,7 @@ def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
         )
 
         list_text = _b78_run_list_text(app)
-        shown_before = _b79_shown_keys(app)
+        shown_before = _b97_painted_bar_keys(app)
 
         await pilot.press("question_mark")
         await pilot.pause()
@@ -3795,11 +3824,12 @@ def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
         f"green against the whole panel; section=\n{section}"
     )
 
-    # Clause 3 -- the footer-visible set is UNCHANGED, by set-equality.
-    assert tuple(shown_keys) == _B79_COMMITTED_SHOWN_KEYS, (
-        f"the shown+enabled key set must be SET-EQUAL to its committed "
-        f"pre-change set of {len(_B79_COMMITTED_SHOWN_KEYS)}; "
-        f"observed {len(shown_keys)}: {shown_keys}"
+    # Clause 3 -- superseded by name at batch-97 Inc-8 (HLR-150, PC-25): the
+    # painted key bar on the diff window is SET-EQUAL to its committed set
+    # (the 14-key Footer set re-derived per window from the painted bar).
+    assert tuple(shown_keys) == _B97_DIFF_BAR_KEYS, (
+        f"the painted key-bar set must be SET-EQUAL to its committed set of "
+        f"{len(_B97_DIFF_BAR_KEYS)}; observed {len(shown_keys)}: {shown_keys}"
     )
 
 
@@ -3922,13 +3952,14 @@ def test_tc_b78_38_help_panel_before_any_comparison_does_not_raise(
             await pilot.press("question_mark")
             await pilot.pause()
             panel = app.screen.query_one(HelpPanel)
-            return _b79_painted_text(app, panel), _b79_shown_keys(app)
+            return _b79_painted_text(app, panel), _b97_painted_bar_keys(app)
 
     text, shown = asyncio.run(_drive())
 
     assert text.strip(), "the help panel painted nothing over an empty run list"
-    assert tuple(shown) == _B79_COMMITTED_SHOWN_KEYS, (
-        f"the chip set must be unchanged in the pre-comparison state too; "
+    # batch-97 Inc-8 (PC-25): the chip set is the painted key bar now.
+    assert tuple(shown) == _B97_DIFF_BAR_KEYS, (
+        f"the key-bar set must be unchanged in the pre-comparison state too; "
         f"observed {shown}"
     )
 

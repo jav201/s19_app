@@ -1080,7 +1080,10 @@ def _css_token(name: str) -> str:
 #: Rows the Add / Edit / Remove chips sit below the pane's fold at scroll 0
 #: when the strip is at its 8-row cap (an entry of >= 57 bytes): the cost the
 #: operator accepted for the spaced form (Inc-4 gate 2026-10-21, decision 2).
-_CHIPS_BELOW_FOLD = {(118, 53): 2, (118, 54): 1}
+#: batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row: 118x54 now has the
+#: body height 118x53 had (PC-24), and reads the operator-accepted 2 rows; the
+#: 118x53 arm reads one more (3), measured at Inc-8, flagged in its packet.
+_CHIPS_BELOW_FOLD = {(118, 53): 3, (118, 54): 2}
 
 
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])

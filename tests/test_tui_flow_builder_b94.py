@@ -182,7 +182,8 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
     assert all(len(line) <= 88 for line in canvas.splitlines())
     # The boxed budget: the screen is the measured 96x18 at 120x30 and the
     # canvas paints inside it (C-23 measured, C-32 painted oracle).
-    assert screen_box == (96, 18), screen_box
+    # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row: 96x17.
+    assert screen_box == (96, 17), screen_box
     assert canvas_width <= 96
     # The wired run wrote the patched image: 100% of the declared addresses.
     mem_map = _reload(project / "out.s19")

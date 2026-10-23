@@ -1,0 +1,20 @@
+# Inc-8 RED re-run after the PC-11 reorders (worktree head_9793fcd, unchanged source)
+# source sha256: a0be1dd747c6fadd *s19_app/tui/app.py a488a0bce5201ee3 *s19_app/tui/window_help.py 4c790e6e1182e901 *s19_app/tui/styles.tcss 
+FFFFFFF                                                                  [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:669: AssertionError: ('workspace', [' ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Pa▏^p palette '])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:667: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load', '^s Save', '/ Find', 'g Go-to', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:837: AssertionError: ('workspace', [' ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+                                                                     ▏^p palette '])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:1136: AssertionError: ((118, 54), 'workspace', ' ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Pa▏^p palette ')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:1227: AssertionError: ['^k Palette', '^d Density', '^l Load', '^s Save', '/ Find', 'g Go-to', ...]
+=========================== short test summary info ===========================
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_painted_keys_within_the_allowed_set[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_painted_keys_within_the_allowed_set[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[80x24]
+FAILED tests/test_b97_key_bar.py::test_at_b97_25_two_rows_on_every_window_and_clicks
+FAILED tests/test_b97_key_bar.py::test_at_b97_26_keys_only_help_and_hidden_view
+7 failed, 23 deselected in 21.22s

@@ -30,11 +30,17 @@ change 4 (inc-004) — no placeholder window is invented; a future seat calls
 from __future__ import annotations
 
 import logging
-from typing import Dict, Tuple
+from dataclasses import dataclass, replace
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
 
+from rich.cells import cell_len
+from rich.style import Style
+from rich.text import Text
+from textual import events
+from textual.actions import parse as parse_action
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Container
+from textual.containers import Container, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label, Static
 
@@ -58,8 +64,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     #: batch-97 Inc-4 (D25, LLR-148.6): rewritten and CODE-authored like
     #: ``check_editor`` — no longer an md port, so outside TC-707's md census.
     #: One ``label — effect`` line per label, key and glyph the Patch Editor
-    #: paints (TC-B97-32 parses this body). The key lines are hand-typed until
-    #: Inc-8's generated keys block replaces them (D27).
+    #: paints (TC-B97-32 parses this body). Since Inc-8 the window's keys
+    #: (``WINDOW_KEYS["patch"]``) are the generated keys block (D27).
     "patch": {
         "title": "Patch Editor",
         "steps": (
@@ -111,8 +117,6 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "project's, or the common `workarea\\patches\\` without a "
             "project.",
             "? — opens this help.",
-            "ctrl+z — Undo, from anywhere on the screen.",
-            "ctrl+y — Redo, from anywhere on the screen.",
             "space — on a tab chip, opens its tab.",
             "enter — presses the focused chip or button.",
             "arrow keys — move the ledger highlight, and scroll the read-only "
@@ -182,17 +186,20 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "(change 2) opens that folder directly.",
         ),
     },
+    #: batch-97 Inc-8 (operator decision at the Inc-8 gate, LED-…97.41):
+    #: CODE-authored — it left the help_sections.md census. The md port named
+    #: `+ -`, `, .` and `g`, none of which acts on the Memory Map; the steps
+    #: now name no key, and the keys block lists the window's own (`k`).
     "map": {
         "title": "Memory Map",
         "steps": (
-            "Load an image, then page through memory with `+` / `-` "
-            "(context pages) and `,` / `.` (hex zoom out/in).",
+            "Load an image (`^L`) to see where its bytes sit in memory.",
             "The band bar maps which addresses hold data — entropy "
             "colouring separates code-like from fill-like content.",
             "The ruler gives absolute addresses; the region list names "
-            "each contiguous run with its span.",
-            "The inspector hex peek shows bytes around the cursor — use "
-            "`g` to jump to an address.",
+            "each contiguous run with its span. Double-click a region to "
+            "open it in the Workspace hex view.",
+            "The inspector shows the highlighted region's details.",
         ),
     },
     #: batch-97 Inc-5 (D25, LLR-148.6): rewritten code-authored — one
@@ -344,8 +351,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     },
     #: batch-97 Inc-6 (D10 / D25, LLR-148.6): CODE-authored like
     #: ``check_editor`` — one ``label — effect`` line per chip, field, key and
-    #: glyph Flow Execution paints (TC-B97-32 parses this body). The ``c``
-    #: line is hand-typed until Inc-8's generated keys block replaces it (D27).
+    #: glyph Flow Execution paints (TC-B97-32 parses this body). Since Inc-8
+    #: its ``c`` key is in the generated keys block (D27).
     "flow_execution": {
         "title": "Flow Execution",
         "steps": (
@@ -389,8 +396,6 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "enter — on a chip or a button, presses it.",
             "space — on a chip or a button, presses it; on the mode switch, "
             "switches the mode.",
-            "c — Confirm: confirms the attention lane's waiting external step "
-            "once it has waited 0.5 s.",
             "arrow keys — on the lanes area, scroll the lanes sideways and up "
             "or down.",
             "▓ — done: on a cable, the block before it ran ok; at a lane's head, "
@@ -419,8 +424,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     #: batch-97 Inc-3 (D10 / D25, LLR-148.6): CODE-authored like the tenth
     #: section below — not an md port, so outside TC-707's md census. One
     #: ``label — effect`` line per label, key and glyph the Check Editor
-    #: paints (TC-B97-32 parses this body). The key lines are hand-typed until
-    #: Inc-8's generated keys block replaces them (D27).
+    #: paints (TC-B97-32 parses this body). Since Inc-8 its ``space`` key is in
+    #: the generated keys block (D27).
     "check_editor": {
         "title": "Check Editor",
         "steps": (
@@ -432,8 +437,6 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Include parameter — adds the highlighted ledger row to the "
             "REPORT FIELDS, or removes it when it is already included; the "
             "line under the ledger shows that row's full name and address.",
-            "space — on the ledger, includes or excludes the highlighted row, "
-            "like Include parameter; on a tab chip, opens its tab.",
             "enter — on the ledger, includes or excludes the highlighted "
             "row, like space; on a chip or button, presses it.",
             "Fields — shows the included fields, one line each, then the "
@@ -615,13 +618,19 @@ class WindowHelpScreen(ModalScreen[None]):
 
     def compose(self) -> ComposeResult:
         section = WINDOW_HELP_SECTIONS[self.section_key]
-        yield Container(
-            Label(str(section["title"]), classes="modal-title"),
+        body = [
             Static(
                 section_body_text(self.section_key),
                 id="window_help_body",
                 markup=False,
-            ),
+            )
+        ]
+        keys_text = window_keys_text(self.app, self.section_key)
+        if keys_text:
+            body.append(Static(keys_text, id="window_help_keys", markup=False))
+        yield Container(
+            Label(str(section["title"]), classes="modal-title"),
+            *body,
             Container(
                 Button(
                     "Close",
@@ -707,3 +716,447 @@ class WindowSection(Container):
 
     def action_show_window_usage_help(self) -> None:
         open_window_help(self.app, self._window_help_key)
+
+
+# --------------------------------------------------------------------------- #
+# batch-97 Inc-8 — the window-key table (I-10) and the two-row key bar (I-11)
+# --------------------------------------------------------------------------- #
+#
+# One table feeds row 2 of the key bar and the help modal's keys block, so the
+# two cannot drift (D27). It stores binding KEYS only: every label is the
+# description of the binding the key resolves to, read when the bar mounts.
+# The app is passed in at runtime — this module imports nothing from app.py.
+
+
+@dataclass(frozen=True)
+class KeyEntry:
+    """One row-2 entry: a bound key, its state condition, its owner.
+
+    ``owner`` is ``None`` for a key of ``S19TuiApp.BINDINGS``, else a selector
+    naming the widget (inside the window, or the window itself) whose class
+    bindings hold the key. ``when`` names a condition the app evaluates on
+    each paint (``has_image``, ``patch_history``, ``has_variants``); a false
+    condition paints the token dimmed.
+    """
+
+    key: str
+    when: Optional[str] = None
+    owner: Optional[str] = None
+
+
+#: Row 1, in display order; Textual's command-palette token follows them.
+GLOBAL_KEYS: Tuple[str, ...] = (
+    "ctrl+k", "ctrl+d", "ctrl+l", "ctrl+s", "x", "question_mark", "q",
+)
+
+#: Row 2 per window, in display order. The rows of workspace, patch,
+#: check_editor, flow and flow_execution are the ones the prototype round
+#: rendered (frozen at the 2026-10-20 delta). The other eight are derived from
+#: each action's own guard: a key belongs to a window when its action changes
+#: something on that window and it is not global (PC-26; the guards' file:line
+#: are held by tests/test_b97_key_bar.py, which asserts each still holds).
+WINDOW_KEYS: Mapping[str, Tuple[KeyEntry, ...]] = {
+    "workspace": (
+        KeyEntry("slash"), KeyEntry("g"),
+        KeyEntry("comma", when="has_image"), KeyEntry("period", when="has_image"),
+        KeyEntry("k"), KeyEntry("p"), KeyEntry("o"), KeyEntry("r"),
+        KeyEntry("U", when="has_image"),
+    ),
+    "a2l": (
+        KeyEntry("slash"), KeyEntry("g"), KeyEntry("plus"), KeyEntry("minus"),
+        KeyEntry("d"), KeyEntry("k"),
+    ),
+    "mac": (
+        KeyEntry("slash"), KeyEntry("g"), KeyEntry("plus"), KeyEntry("minus"),
+        KeyEntry("k"),
+    ),
+    "map": (KeyEntry("k"),),
+    "issues": (KeyEntry("pagedown"), KeyEntry("pageup"), KeyEntry("k")),
+    "patch": (
+        KeyEntry("ctrl+z", when="patch_history"), KeyEntry("ctrl+y", when="patch_history"),
+        KeyEntry("v", when="has_variants"), KeyEntry("k"),
+    ),
+    "check_editor": (KeyEntry("space", owner="#check_param_table"),),
+    "diff": (
+        KeyEntry("k"),
+        KeyEntry("f", owner="#ab_diff_panel"),
+        KeyEntry("escape", owner="#ab_diff_panel"),
+        KeyEntry("right_square_bracket", owner="#ab_diff_panel"),
+        KeyEntry("left_square_bracket", owner="#ab_diff_panel"),
+    ),
+    "flow": (),
+    "flow_execution": (KeyEntry("c"),),
+    "checks": (KeyEntry("k"),),
+    "crc_designer": (),
+    "split_join": tuple(
+        KeyEntry(key, owner="#screen_split_join")
+        for key in ("space", "a", "n", "t", "m", "g", "f", "p", "d", "e", "escape")
+    ),
+}
+
+#: The rail keys row 2 offers after the window keys — only on the five windows
+#: the prototype round rendered (PC-26: no go keys on the derived rows).
+WINDOW_GO_KEYS: Mapping[str, Tuple[str, ...]] = {
+    "workspace": (),
+    "a2l": (),
+    "mac": (),
+    "map": (),
+    "issues": (),
+    "patch": ("equals_sign", "9"),
+    "check_editor": ("6", "9"),
+    "diff": (),
+    "flow": ("right_square_bracket", "6", "equals_sign"),
+    "flow_execution": ("8", "t"),
+    "checks": (),
+    "crc_designer": (),
+    "split_join": (),
+}
+
+#: Help section -> the window whose keys block its modal shows; ``None`` shows
+#: none (Reports is a modal, the notation section is copy only).
+HELP_KEY_WINDOW: Mapping[str, Optional[str]] = {
+    **{key: key for key in WINDOW_HELP_SECTIONS if key in WINDOW_KEYS},
+    "split_join_export": "split_join",
+    "reports": None,
+    "changes_file_notation": None,
+}
+
+#: The action that opens a window with no rail binding (its tag reads the
+#: palette entry naming that action).
+_OPEN_ACTIONS: Mapping[str, str] = {"split_join": "open_split_join_export"}
+
+
+@dataclass(frozen=True)
+class KeyToken:
+    """One painted token: the binding's key, display, label, action, owner.
+
+    ``lead`` is painted before the token and is not clickable (the go
+    separator). A ``tag`` token is the window name: never clickable. A
+    disabled token paints whole in the dim colour and is not clickable.
+    """
+
+    key: str
+    key_display: str
+    label: str
+    action: str
+    owner: Optional[str] = None
+    enabled: bool = True
+    when: Optional[str] = None
+    lead: str = ""
+    tag: bool = False
+
+
+class PackedRow(NamedTuple):
+    """A packed key row: its text, the click ranges of its enabled tokens,
+    how many tokens it dropped, and the ranges of its dimmed tokens."""
+
+    text: Text
+    hits: Tuple[Tuple[int, int, str], ...]
+    dropped: int
+    dimmed: Tuple[Tuple[int, int, str], ...] = ()
+
+
+def _class_bindings(cls) -> list:
+    bindings = []
+    for klass in cls.__mro__:
+        for item in klass.__dict__.get("BINDINGS", ()):
+            bindings.append(item if isinstance(item, Binding) else Binding(*item))
+    return bindings
+
+
+def _binding_for(bindings, key: str, where: str) -> Binding:
+    for binding in bindings:
+        if binding.key == key:
+            if not binding.description:
+                raise ValueError(f"key {key!r} of {where} has an empty description")
+            return binding
+    raise KeyError(f"key {key!r} is not bound in {where}")
+
+
+def _container_id(app, window: str) -> str:
+    return app.SCREEN_CONTAINER_IDS.get(window, f"screen_{window}")
+
+
+def owner_widget(app, window: str, selector: str):
+    """The widget ``selector`` names: the window's container or a widget
+    inside it."""
+    container = app.query_one(f"#{_container_id(app, window)}")
+    widget = app.query_one(selector)
+    if widget is not container and container not in widget.ancestors:
+        raise ValueError(f"{selector!r} is not inside window {window!r}")
+    return widget
+
+
+def _token(app, binding: Binding, **fields) -> KeyToken:
+    return KeyToken(
+        key=binding.key,
+        key_display=app.get_key_display(binding),
+        label=fields.pop("label", binding.description),
+        action=binding.action,
+        **fields,
+    )
+
+
+def resolve_window_tokens(app, window: str) -> Tuple[Tuple[KeyToken, ...], Tuple[KeyToken, ...]]:
+    """Resolve ``window``'s entries and go keys against the live bindings.
+
+    Raises ``KeyError`` for an unbound key and ``ValueError`` for an empty
+    description, so the table can never paint a key the app lacks.
+    """
+    app_bindings = _class_bindings(type(app))
+    tokens = []
+    for entry in WINDOW_KEYS[window]:
+        if entry.owner is None:
+            binding = _binding_for(app_bindings, entry.key, "S19TuiApp.BINDINGS")
+        else:
+            widget = owner_widget(app, window, entry.owner)
+            binding = _binding_for(_class_bindings(type(widget)), entry.key, entry.owner)
+        tokens.append(_token(app, binding, owner=entry.owner, when=entry.when))
+    go = tuple(
+        _token(app, _binding_for(app_bindings, key, "S19TuiApp.BINDINGS"))
+        for key in WINDOW_GO_KEYS[window]
+    )
+    return tuple(tokens), go
+
+
+def global_tokens(app) -> Tuple[KeyToken, ...]:
+    """Row 1: the global keys, then Textual's command palette (``palette``)."""
+    app_bindings = _class_bindings(type(app))
+    tokens = [
+        _token(app, _binding_for(app_bindings, key, "S19TuiApp.BINDINGS"))
+        for key in GLOBAL_KEYS
+    ]
+    palette = Binding(app.COMMAND_PALETTE_BINDING, "command_palette", "palette")
+    tokens.append(_token(app, palette, label="palette"))
+    return tuple(tokens)
+
+
+def more_token(app) -> KeyToken:
+    """Row 2's overflow tail: the ``?`` binding relabelled ``more``."""
+    binding = _binding_for(_class_bindings(type(app)), "question_mark", "S19TuiApp.BINDINGS")
+    return _token(app, binding, label="more")
+
+
+def window_tag(app, window: str) -> str:
+    """The window's name: the description of the binding (or palette entry)
+    whose action opens it."""
+    action = _OPEN_ACTIONS.get(window, f"show_screen('{window}')")
+    for binding in _class_bindings(type(app)):
+        if binding.action == action:
+            return binding.description
+    for label, entry_action in getattr(app, "EXTRA_PALETTE_ENTRIES", ()):
+        if entry_action == action:
+            return label
+    raise KeyError(f"no binding or palette entry opens window {window!r}")
+
+
+def window_keys_text(app, help_key: str) -> str:
+    """The help modal's keys block for ``help_key``: one ``key — label`` line
+    per entry of the window it maps to; empty when it maps to none."""
+    window = HELP_KEY_WINDOW.get(help_key)
+    if window is None:
+        return ""
+    tokens, _ = resolve_window_tokens(app, window)
+    return "\n".join(f"{token.key_display} — {token.label}" for token in tokens)
+
+
+def _token_text(token: KeyToken) -> str:
+    if token.tag:
+        return f" {token.label} "
+    return f" {token.key_display} {token.label} "
+
+
+def _token_width(token: KeyToken) -> int:
+    return cell_len(token.lead) + cell_len(_token_text(token))
+
+
+def pack_key_row(
+    tokens: Sequence[KeyToken],
+    width: int,
+    *,
+    keep: frozenset = frozenset(),
+    more: Optional[KeyToken] = None,
+    styles: Optional[Mapping[str, Style]] = None,
+) -> PackedRow:
+    """Pack whole tokens into ``width`` cells (LLR-150.5).
+
+    When every token fits, all are painted. Otherwise the mandatory tokens
+    (indexes in ``keep``) and the ``more`` tail are reserved first, then the
+    longest display-order prefix of the others that fits is kept — never a
+    greedy skip — and ``more`` ends the row. No token is cut.
+    """
+    styles = styles or {}
+    plain = Style()
+    widths = [_token_width(token) for token in tokens]
+    if sum(widths) <= width:
+        kept = set(range(len(tokens)))
+    else:
+        budget = width - sum(widths[i] for i in keep) - (_token_width(more) if more else 0)
+        kept = set(keep)
+        for index, token_width in enumerate(widths):
+            if index in kept:
+                continue
+            if token_width > budget:
+                break
+            budget -= token_width
+            kept.add(index)
+    dropped = len(tokens) - len(kept)
+    painted = [tokens[i] for i in sorted(kept)]
+    if dropped and more is not None:
+        painted.append(more)
+    text = Text(no_wrap=True, overflow="crop", end="")
+    hits, dimmed = [], []
+    for token in painted:
+        if token.lead:
+            text.append(token.lead, styles.get("separator", plain))
+        if token.tag:
+            text.append(_token_text(token), styles.get("tag", plain))
+            continue
+        start = text.cell_len
+        if token.enabled:
+            text.append(f" {token.key_display}", styles.get("key", plain))
+            text.append(f" {token.label} ", styles.get("description", plain))
+        else:
+            dim = styles.get("dim", Style(dim=True))
+            text.append(f" {token.key_display} {token.label} ", dim)
+        (hits if token.enabled else dimmed).append((start, text.cell_len, token.key))
+    if text.cell_len > width:
+        text.truncate(width)
+        hits = [hit for hit in hits if hit[1] <= width]
+        dimmed = [hit for hit in dimmed if hit[1] <= width]
+    return PackedRow(text, tuple(hits), dropped, tuple(dimmed))
+
+
+class KeyRow(Static):
+    """One row of the key bar, packed from its tokens on every paint."""
+
+    COMPONENT_CLASSES = {
+        "key-bar--key",
+        "key-bar--description",
+        "key-bar--tag",
+        "key-bar--separator",
+        "key-bar--dim",
+    }
+
+    def __init__(self, row: str, **kwargs) -> None:
+        super().__init__("", **kwargs)
+        self._row = row
+        self._packed = PackedRow(Text(), (), 0)
+        self._painted: Dict[str, KeyToken] = {}
+
+    def render(self) -> Text:
+        bar = self.parent
+        assert isinstance(bar, KeyBar)
+        tokens, keep, more = bar.row_tokens(self._row)
+        styles = {
+            role: self.get_component_rich_style(f"key-bar--{role}")
+            for role in ("key", "description", "tag", "separator", "dim")
+        }
+        self._packed = pack_key_row(tokens, self.size.width, keep=keep, more=more, styles=styles)
+        self._painted = {token.key: token for token in (*tokens, *([more] if more else []))}
+        return self._packed.text
+
+    async def on_click(self, event: events.Click) -> None:
+        """Run the clicked token's action in its own namespace (H-1), never
+        through the focused widget, so nothing is typed or pressed there."""
+        event.stop()
+        for x0, x1, key in self._packed.hits:
+            if x0 <= event.x < x1:
+                bar = self.parent
+                assert isinstance(bar, KeyBar)
+                await bar.run_token(self._painted[key])
+                return
+        for x0, x1, _key in self._packed.dimmed:
+            if x0 <= event.x < x1:
+                self.app.bell()
+                return
+
+
+class KeyBar(Vertical):
+    """The two-row key bar (HLR-150): row 1 the global keys, row 2 the active
+    window's tag, keys and go keys.
+
+    Reads the app at runtime: ``_active_screen_key`` (the active window),
+    ``key_condition(when)`` (a ``when`` condition) and ``check_action`` (an
+    app key answering ``False`` there is left out). An OWNED key acts only
+    while the focus is inside its window (the binding sits on a widget of it)
+    and its owner's ``check_action`` allows it; otherwise it paints dimmed
+    (operator decision at the Inc-8 gate, LED-…97.39). Repaints on the
+    screen's bindings signal — focus changes and ``app.refresh_bindings()`` —
+    with no timer.
+    """
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._globals: Tuple[KeyToken, ...] = ()
+        self._windows: Dict[str, Tuple[Tuple[KeyToken, ...], Tuple[KeyToken, ...]]] = {}
+        self._tags: Dict[str, str] = {}
+        self._more: Optional[KeyToken] = None
+
+    def compose(self) -> ComposeResult:
+        yield KeyRow("global", id="key_bar_global")
+        yield KeyRow("window", id="key_bar_window")
+
+    def on_mount(self) -> None:
+        self._globals = global_tokens(self.app)
+        self._more = more_token(self.app)
+        for window in WINDOW_KEYS:
+            self._windows[window] = resolve_window_tokens(self.app, window)
+            self._tags[window] = window_tag(self.app, window)
+        self.screen.bindings_updated_signal.subscribe(self, self._bindings_changed)
+
+    def on_unmount(self) -> None:
+        self.screen.bindings_updated_signal.unsubscribe(self)
+
+    def _bindings_changed(self, _screen) -> None:
+        for row in self.query(KeyRow):
+            row.refresh()
+
+    def _app_check(self, token: KeyToken) -> Optional[bool]:
+        _target, name, params = parse_action(token.action)
+        return self.app.check_action(name, params)
+
+    def _owner_live(self, window: str, token: KeyToken) -> bool:
+        """An owned key acts only while the focus is inside its window and the
+        owner's own ``check_action`` allows the action."""
+        container = self.app.query_one(f"#{_container_id(self.app, window)}")
+        focused = self.app.focused
+        if focused is None or (focused is not container and container not in focused.ancestors):
+            return False
+        owner = owner_widget(self.app, window, token.owner)
+        _target, name, params = parse_action(token.action)
+        return owner.check_action(name, params) is True
+
+    def row_tokens(self, row: str):
+        """(tokens, mandatory indexes, overflow tail) of ``row`` right now."""
+        if row == "global":
+            keep = frozenset(i for i, t in enumerate(self._globals) if t.key == "question_mark")
+            return list(self._globals), keep, None
+        window = self.app._active_screen_key
+        entries, go = self._windows[window]
+        tokens = []
+        for token in entries:
+            if token.owner is not None:
+                tokens.append(replace(token, enabled=self._owner_live(window, token)))
+                continue
+            allowed = self._app_check(token)
+            if allowed is False:
+                continue
+            enabled = allowed is True and (
+                token.when is None or self.app.key_condition(token.when)
+            )
+            tokens.append(replace(token, enabled=enabled))
+        go_tokens = [token for token in go if self._app_check(token) is not False]
+        if go_tokens:
+            go_tokens[0] = replace(go_tokens[0], lead=" · go" if tokens else " go")
+        tag = KeyToken("", "", self._tags[window], "", tag=True)
+        return [tag, *tokens, *go_tokens], frozenset({0}), self._more
+
+    async def run_token(self, token: KeyToken) -> None:
+        """Run ``token``'s action: an app key through ``app.run_action``
+        (which honours ``check_action``), an owned key on its owner widget."""
+        if token.owner is None:
+            await self.app.run_action(token.action)
+        else:
+            widget = owner_widget(self.app, self.app._active_screen_key, token.owner)
+            await widget.run_action(token.action)

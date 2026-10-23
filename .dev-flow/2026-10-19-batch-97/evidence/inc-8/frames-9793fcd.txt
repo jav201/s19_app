@@ -1,0 +1,360 @@
+===== check-editor size#0
+                                       Check Editor                                         ?  📂 Open patches/ 
+                                                                                                                
+╭─ A2L PARAMETERS ───────────────────────────────────────────────────╮╭─ REPORT FIELDS ────────────────────────╮
+│Filter filter parameters                                            ││   Fields    JSON    Addendum           │
+│ ✓  Parameter                                   Address     Fmt     ││ 2 fields: 2 params · 0 memory rows     │
+│ ✓  ASAM.M.SCALAR.UBYTE.IDENTICAL               0x00013A00  u8 ho…  ││ ◆ 0x00013A00 ….SCALAR.UBYTE.IDENTICAL  │
+│    ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE  0x00013A00  u8      ││ ◆ 0x00013A00 …B_VERB_NO_DEFAULT_VALUE  │
+│ ✓  ASAM…CALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE  0x00013A00  u8      ││                                        │
+│    ASAM…SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE  0x00013A00  u8      ││ MEMORY LOCATIONS                       │
+│    ASAM…LAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE  0x00013A00  u8      ││  Address     Label              Fmt    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Address      0x100                    │
+│    ASAM…CALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Label        label                    │
+│    ASAM…SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE  0x00013A00  u8 U/…  ││  Size (bytes) 1                        │
+│    ASAM…LAR.UBYTE.TAB_NOINTP_NO_DEFAULT_VALUE  0x00013A00  u8 U/…  ││   Add row     Remove row               │
+│    ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4           0x00013A00  u8      ││                                        │
+│    ASAM.M.SCALAR.SBYTE.IDENTICAL               0x00013A01  u8 ho…  ││ Validate compares fields to the image  │
+│    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2            0x00013A01  u8 m/s ▂││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL               0x00013A02  u16 h…  ││                                        │
+│    ASAM.M.SCALAR.SWORD.IDENTICAL               0x00013A04  u16 h…  ││                                        │
+│    ASAM.M.SCALAR.ULONG.IDENTICAL               0x00013A08  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.SLONG.IDENTICAL               0x00013A0C  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.FLOAT32.IDENTICAL             0x00013A10  u32 h…  ││                                        │
+│    ASAM.M.SCALAR.FLOAT64.IDENTICAL             0x00013A14  u64 h…  ││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0  0x00013A20  u16 h…  ││                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008  0x00013A20  u16 h…  ││                                        │
+│    ASAM.M.ARRAY_SIZE_16.UBYTE.IDENTICAL        0x00013A30  u8 ho…  ││                                        │
+│    ASAM.M.MATRIX_DIM_16_1_1.UBYTE.IDENTICAL    0x00013A30  u128 …  ││                                        │
+│    ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL     0x00013A30  u64 h…  ││                                        │
+│    ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL     0x00013A30  u64 h…  ││                                        │
+│    ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL        0x00000000  u8      ││                                        │
+│    ASAM.C.SCALAR.UBYTE.IDENTICAL               0x00810000  u8 ho…  ││                                        │
+│    ASAM.C.SCALAR.SBYTE.IDENTICAL               0x00810001  u8 ho…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL               0x00810002  u16 h…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0  0x00810002  u16 h…  ││                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001  0x00810002  u16 h…  ││                                        │
+│ 0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL                ││                                        │
+│  Include parameter    space also toggles ✓ on the highlighted row  ││                                        │
+╰───────────────────────────────────────────── 75 params · 2 picked ─╯╰────────────────────────────────────────╯
+Spec Check specs in patches/     ▼   Write as spec.chk.json                                                     
+  Validate     Write .chk.json    APPLY — not available  2 fields → report               apply: n/a — check spec
+ ✓ included   ◆ parameter field   ▪ memory-row field                                                            
+===== check-editor size#1
+                                                                                 Check Editor                                                                                   ?  📂 Open patches/ 
+                                                                                                                                                                                                    
+╭─ A2L PARAMETERS ───────────────────────────────────────────────────────────────────────────────────────────────────────╮╭─ REPORT FIELDS ────────────────────────────────────────────────────────╮
+│Filter filter parameters                                                                                                ││   Fields    JSON    Addendum                                           │
+│ ✓  Parameter                                                                                  Address     Fmt · Unit   ││ 2 fields: 2 params · 0 memory rows                                     │
+│ ✓  ASAM.M.SCALAR.UBYTE.IDENTICAL                                                              0x00013A00  u8 hours     ││ ◆ 0x00013A00 ASAM.M.SCALAR.UBYTE.IDENTICAL                             │
+│    ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE                                                 0x00013A00  u8           ││ ◆ 0x00013A00 ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE             │
+│ ✓  ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE                                              0x00013A00  u8           ││                                                                        │
+│    ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE                                               0x00013A00  u8           ││ MEMORY LOCATIONS                                                       │
+│    ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE                                            0x00013A00  u8           ││  Address     Label                                              Fmt    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE                                                 0x00013A00  u8 U/  min   ││  Address      0x100                                                    │
+│    ASAM.M.SCALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE                                              0x00013A00  u8 U/  min   ││  Label        label                                                    │
+│    ASAM.M.SCALAR.UBYTE.TAB_NOINTP_DEFAULT_VALUE                                               0x00013A00  u8 U/  min   ││  Size (bytes) 1                                                        │
+│    ASAM.M.SCALAR.UBYTE.TAB_NOINTP_NO_DEFAULT_VALUE                                            0x00013A00  u8 U/  min   ││   Add row     Remove row                                               │
+│    ASAM.M.SCALAR.UBYTE.FORM_X_PLUS_4                                                          0x00013A00  u8           ││                                                                        │
+│    ASAM.M.SCALAR.SBYTE.IDENTICAL                                                              0x00013A01  u8 hours     ││ Validate compares fields to the image                                  │
+│    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2                                                           0x00013A01  u8 m/s       ││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL                                                              0x00013A02  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.SWORD.IDENTICAL                                                              0x00013A04  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.ULONG.IDENTICAL                                                              0x00013A08  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.SLONG.IDENTICAL                                                              0x00013A0C  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.FLOAT32.IDENTICAL                                                            0x00013A10  u32 hours    ││                                                                        │
+│    ASAM.M.SCALAR.FLOAT64.IDENTICAL                                                            0x00013A14  u64 hours   ▇││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0                                                 0x00013A20  u16 hours    ││                                                                        │
+│    ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008                                                 0x00013A20  u16 hours    ││                                                                        │
+│    ASAM.M.ARRAY_SIZE_16.UBYTE.IDENTICAL                                                       0x00013A30  u8 hours     ││                                                                        │
+│    ASAM.M.MATRIX_DIM_16_1_1.UBYTE.IDENTICAL                                                   0x00013A30  u128 hours   ││                                                                        │
+│    ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL                                                    0x00013A30  u64 hours    ││                                                                        │
+│    ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL                                                    0x00013A30  u64 hours    ││                                                                        │
+│    ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL                                                       0x00000000  u8           ││                                                                        │
+│    ASAM.C.SCALAR.UBYTE.IDENTICAL                                                              0x00810000  u8 hours     ││                                                                        │
+│    ASAM.C.SCALAR.SBYTE.IDENTICAL                                                              0x00810001  u8 hours     ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL                                                              0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010                                                 0x00810002  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.IDENTICAL                                                              0x00810004  u16 hours    ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.LINEAR_MUL_2                                                           0x00810004  u16 m/s      ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10                                                        0x00810004  u16 km/h     ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.FORM_X_PLUS_4                                                          0x00810004  u16          ││                                                                        │
+│    ASAM.C.SCALAR.SWORD.TAB_INTP_DEFAULT_VALUE                                                 0x00810004  u16 U/  min  ││                                                                        │
+│ 0x00013A00  u8 hours  ASAM.M.SCALAR.UBYTE.IDENTICAL                                                                    ││                                                                        │
+│  Include parameter    space also toggles ✓ on the highlighted row                                                      ││                                                                        │
+╰───────────────────────────────────────────────────────────────────────────────────────────────── 75 params · 2 picked ─╯╰────────────────────────────────────────────────────────────────────────╯
+Spec Check specs in patches/     ▼   Write as spec.chk.json                                                                                                                                         
+  Validate     Write .chk.json    APPLY — not available  2 fields → report                                                                                                   apply: n/a — check spec
+ ✓ included   ◆ parameter field   ▪ memory-row field                                                                                                                                                
+===== patch-editor size#0
+                                       Patch Editor                                         ?  📂 Open patches/ 
+                                                                                                                
+ calib_hotfix.json · change                                                                                     
+╭─ PATCH SCRIPT ──────────────────────────────────────────────────╮╭─ INSPECTOR ───────────────────────────────╮
+│ Kind      Address     Value / bytes           Status   Linkage  ││   Inspector    JSON    Checks             │
+│ · bytes   0xEB10      DE AD BE EF             inside   -        ││ ─BEFORE → AFTER─────────────────────────  │
+│ · bytes   0xEB40      00 00 00 01             inside   -        ││  0000EB10 +0 +1 +2 +3 +4 +5 +6 +7         │
+│ · bytes   0xEC00      43 41 4C 2D 32 30 32 …  inside   -        ││    was    20 41 70 70 6C 69 63 61         │
+│ · bytes   0xECA0      A5 A5 A5 A5 A5 A5 A5 …  inside   -        ││    now    DE AD BE EF 6C 69 63 61         │
+│ · bytes   0xED00      7F FF                   inside   -        ││  4 B @ 0x0000EB10 · 4 changed             │
+│ · bytes   0xED40      01 02 03 04 05 06       inside   -        ││                                           │
+│                                                                 ││ Address 0x100                             │
+│                                                                 ││                                           │
+│                                                                 ││ String  text (document encoding)          │
+│                                                                 ││                                           │
+│                                                                 ││ Bytes   DE AD BE EF                       │
+│                                                                 ││  Add   Edit   Remove   Edit JSON          │
+│                                                                 ││                                           │
+│                                                                 ││ DOCUMENT                                  │
+│                                                                 ││ ▓▓▓▓▓▓░░░░░░                              │
+│                                                                 ││ 6 entries · 6 inside · 0 partial          │
+│                                                                 ││ 0 outside · 0 faults                      │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+│                                                                 ││                                           │
+╰───────────────────────────────────────────────────── 6 entries ─╯╰───────────────────────────────────────────╯
+ File    Change files in patches/ ▼  C:\Users\jjgh8\AppData\Local\Temp\TMP\calib_hotf  Load   Refresh   
+  Validate   Apply loaded changes   Save                                                                        
+ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                     
+===== patch-editor size#1
+                                                                                 Patch Editor                                                                                   ?  📂 Open patches/ 
+                                                                                                                                                                                                    
+ calib_hotfix.json · change                                                                                                                                                                         
+╭─ PATCH SCRIPT ────────────────────────────────────────────────────────────────────────────────────────────────────╮╭─ INSPECTOR ─────────────────────────────────────────────────────────────────╮
+│ Kind      Address     Value / bytes                                                             Status   Linkage  ││   Inspector    JSON    Checks                                               │
+│ · bytes   0xEB10      DE AD BE EF                                                               inside   -        ││ ─BEFORE → AFTER───────────────────────────────────────────────────────────  │
+│ · bytes   0xEB40      00 00 00 01                                                               inside   -        ││  0000EB10 +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F                   │
+│ · bytes   0xEC00      43 41 4C 2D 32 30 32 36 .. (11 bytes)                                     inside   -        ││    was    20 41 70 70 6C 69 63 61 74 69 6F 6E 20 69 73 20                   │
+│ · bytes   0xECA0      A5 A5 A5 A5 A5 A5 A5 A5                                                   inside   -        ││    now    DE AD BE EF 6C 69 63 61 74 69 6F 6E 20 69 73 20                   │
+│ · bytes   0xED00      7F FF                                                                     inside   -        ││  4 B @ 0x0000EB10 · 4 changed                                               │
+│ · bytes   0xED40      01 02 03 04 05 06                                                         inside   -        ││                                                                             │
+│                                                                                                                   ││ Address 0x100                                                               │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││ String  text (document encoding)                                            │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││ Bytes   DE AD BE EF                                                         │
+│                                                                                                                   ││  Add   Edit   Remove   Edit JSON                                            │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││ DOCUMENT                                                                    │
+│                                                                                                                   ││ ▓▓▓▓▓▓░░░░░░                                                                │
+│                                                                                                                   ││ 6 entries · 6 inside · 0 partial                                            │
+│                                                                                                                   ││ 0 outside · 0 faults                                                        │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+│                                                                                                                   ││                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────── 6 entries ─╯╰─────────────────────────────────────────────────────────────────────────────╯
+ File    Change files in patches/                             ▼  C:\Users\jjgh8\AppData\Local\Temp\TMP\calib_hotfix.json                                                   Load   Refresh   
+  Validate   Apply loaded changes   Save                                                                                                                                                            
+ ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                                                                                                         
+===== flow-builder size#0
+                                        Flow Builder                                          ?  📂 Open flows/ 
+                                                                                                                
+ Flow: patch_chain  · saved  LOAD → PATCH → CHECK → WRITE-OUT      session …TMP\.s19tool\workarea\proj1 
+╭─ chain · 4 blocks ───────────────────────────────────────────────────────────────────────────────────────────╮
+│ ╭─ 1 ──────────────────╮    ╭─ 2 ──────────────────╮    ╭─ 3 ──────────────────╮    ╭─ 4 ──────────────────╮ │
+│ │ ◉ LOAD               │    │ ▣ PATCH              │    │ ✓ CHECK              │    │ ▼ WRITE-OUT          │ │
+│ │ reads an image       │    │ applies a change doc │    │ verifies addresses   │    │ writes the image     │ │
+│ │ in · file            │    │ in · image           │    │ in · image           │    │ in · image           │ │
+│ │ prg.s19              │    │ ← #1                 │    │ ← #2                 │    │ ← #3                 │ │
+│ │ in · fmt             │    │ in · doc             │    │ in · doc             │    │                      │ │
+│ │ s19                  │    │ calib_hotfix.json    │    │ baseline.chk.json    │    │                      │ │
+│ │                      │    │                      │    │ gating advisory      │    │ fmt s19              │ │
+│ │ out                  │    │ out                  │    │ out                  │    │ out · file           │ │
+│ │ image                │───▶│ image                │───▶│ image                │───▶│ fw_app_patched.s19   │ │
+│ ╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                                                                                
+ add block  ◉ LOAD   ▣ PATCH   ✓ CHECK   ⊕ CRC   ▼ WRITE-OUT   ⏚ A2B-DIFF   » EXT-STEP                          
+ ◉ LOAD       image file e.g. prg.s19                                                                   + Add   
+                                                                                                                
+ copy block # last    Copy   Paste                                                              Variables (0)   
+                                                                                                                
+  Run    Clear   Save…   Load…                                                                                  
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  NOTICES                                                                                                       
+  ● source    ok                                                                                                
+    loaded prg.s19 (11 ranges)                                                                                  
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ● patch     ok                                                                                                
+    applied 6 entries                                                                                           
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ◈ check     notices                                                                                           
+    passed=3 failed=1 uncheckable=0                                                                             
+      1 check entry failed                                                                                      
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ● write_out ok                                                                                                
+    wrote fw_app_patched.s19                                                                                    
+ █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█████                                                               
+ 11 ranges · 0x17E0‥ 0x10000                                                                                    
+  wrote C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                
+ ◉ load  ▣ patch  ✓ check  ⊕ CRC  ▼ write-out  ⏚ A2B diff  » external step  ─ cable  ▶ feeds the next block     
+===== flow-builder size#1
+                                                                                  Flow Builder                                                                                    ?  📂 Open flows/ 
+                                                                                                                                                                                                    
+ Flow: patch_chain  · saved  LOAD → PATCH → CHECK → WRITE-OUT                                                         session C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1 
+╭─ chain · 4 blocks ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ╭─ 1 ───────────────────────────────────────╮    ╭─ 2 ───────────────────────────────────────╮    ╭─ 3 ───────────────────────────────────────╮    ╭─ 4 ───────────────────────────────────────╮ │
+│ │ ◉ LOAD                                    │    │ ▣ PATCH                                   │    │ ✓ CHECK                                   │    │ ▼ WRITE-OUT                               │ │
+│ │ reads an image                            │    │ applies a change doc                      │    │ verifies addresses                        │    │ writes the image                          │ │
+│ │ in · file                                 │    │ in · image                                │    │ in · image                                │    │ in · image                                │ │
+│ │ prg.s19                                   │    │ ← #1                                      │    │ ← #2                                      │    │ ← #3                                      │ │
+│ │ in · fmt                                  │    │ in · doc                                  │    │ in · doc                                  │    │                                           │ │
+│ │ s19                                       │    │ calib_hotfix.json                         │    │ baseline.chk.json                         │    │                                           │ │
+│ │                                           │    │                                           │    │ gating advisory                           │    │ fmt s19                                   │ │
+│ │ out                                       │    │ out                                       │    │ out                                       │    │ out · file                                │ │
+│ │ image                                     │───▶│ image                                     │───▶│ image                                     │───▶│ fw_app_patched.s19                        │ │
+│ ╰───────────────────────────────────────────╯    ╰───────────────────────────────────────────╯    ╰───────────────────────────────────────────╯    ╰───────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                                                                                                                                                                    
+ add block  ◉ LOAD   ▣ PATCH   ✓ CHECK   ⊕ CRC   ▼ WRITE-OUT   ⏚ A2B-DIFF   » EXT-STEP                                                                                                              
+ ◉ LOAD       image file e.g. prg.s19                                                                                                                                                       + Add   
+                                                                                                                                                                                                    
+ copy block # last    Copy   Paste                                                                                                                                                  Variables (0)   
+                                                                                                                                                                                                    
+  Run    Clear   Save…   Load…                                                                                                                                                                      
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  NOTICES                                                                                                                                                                                           
+  ● source    ok                                                                                                                                                                                    
+    loaded prg.s19 (11 ranges)                                                                                                                                                                      
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ● patch     ok                                                                                                                                                                                    
+    applied 6 entries                                                                                                                                                                               
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ◈ check     notices                                                                                                                                                                               
+    passed=3 failed=1 uncheckable=0                                                                                                                                                                 
+      1 check entry failed                                                                                                                                                                          
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+  ● write_out ok                                                                                                                                                                                    
+    wrote fw_app_patched.s19                                                                                                                                                                        
+ █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█████                                                                                                                                                   
+ 11 ranges · 0x17E0‥ 0x10000                                                                                                                                                                        
+  wrote C:\Users\jjgh8\AppData\Local\Temp\TMP\.s19tool\workarea\proj1\fw_app_patched.s19                                                                                                    
+                                                                                                                                                                                                    
+                                                                                                                                                                                                    
+                                                                                                                                                                                                    
+                                                                                                                                                                                                    
+                                                                                                                                                                                                    
+                                                                                                                                                                                                    
+ ◉ load  ▣ patch  ✓ check  ⊕ CRC  ▼ write-out  ⏚ A2B diff  » external step  ─ cable  ▶ feeds the next block                                                                                         
+===== flow-execution size#0
+                                       Flow Execution                                        ?  📂 Open session 
+                                                                                                                
+ Set: chain-set  · saved                  session …ool\workarea\proj1  Import…   sequential · parallel   Run    
+ set name chain-set                   Save Set  saved sets (no saved sets)                       ▼   Load Set   
+╭─ lanes · 0 chains ───────────────────────────────────────────────────────────────────────────────────────────╮
+│ No chains yet — Import… adds a lane from a saved flow.                                                       │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+│                                                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ No run yet — Run executes every lane.                                                                          
+ ▓ done  ░ not run / skipped  ✗ error  ◇ notices  □ waiting for a human  ▪ owed before the lane goes on         
+===== flow-execution size#1
+                                                                                 Flow Execution                                                                                  ?  📂 Open session 
+                                                                                                                                                                                                    
+ Set: chain-set  · saved                                                                     session …Data\Local\Temp\TMP\.s19tool\workarea\proj1  Import…   sequential · parallel   Run    
+ set name chain-set                                                                                                       Save Set  saved sets (no saved sets)                       ▼   Load Set   
+╭─ lanes · 0 chains ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ No chains yet — Import… adds a lane from a saved flow.                                                                                                                                           │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+│                                                                                                                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ No run yet — Run executes every lane.                                                                                                                                                              
+ ▓ done  ░ not run / skipped  ✗ error  ◇ notices  □ waiting for a human  ▪ owed before the lane goes on                                                                                             

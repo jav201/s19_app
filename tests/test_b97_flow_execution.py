@@ -1463,12 +1463,15 @@ def test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane(tmp_path: Path,
         await pilot.press("c")
         await poll(pilot, lambda: len(spy.calls) > calls and not panel.query_one("#fx_run").disabled, 200)
         await settle(pilot, 4)
+        from s19_app.tui.window_help import window_keys_text
+
         return (
             required, list(confirms.posts), spy.calls[calls:], panel._lanes[1].last_status,
             panel.query_one("#fx_required").display, list(app.log_lines)[-1:],
+            window_keys_text(app, "flow_execution"),
         )
 
-    required, posts, calls, status, shown, status_line = run_fx(
+    required, posts, calls, status, shown, status_line, keys_text = run_fx(
         tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True
     )
     assert posts == [(1, 2)], posts
@@ -1476,7 +1479,10 @@ def test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane(tmp_path: Path,
     assert status != "paused" and shown is False, (status, shown)
     assert status_line == ["Confirmed flash_chain — re-running from block 3/4."], status_line
     assert "press c to confirm" in required[0]
-    assert "c — Confirm: confirms the attention lane's waiting external step" in section_body_text("flow_execution")
+    # batch-97 Inc-8 (D27, named supersession): the `c` line is the generated
+    # keys block now, and no longer a hand-typed step.
+    assert "c — Confirm" in keys_text.split("\n"), keys_text
+    assert "c — Confirm" not in section_body_text("flow_execution")
 
 
 def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:
@@ -1941,6 +1947,10 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
     marker = "/* batch-97 flow_execution"
     assert marker in sheet, "a scoped flow_execution section exists"
     section = sheet[sheet.index(marker):]
+    # batch-97 Inc-8 (named supersession): the key bar's section is appended
+    # after this one, so this section ends at the next batch-97 section.
+    later = section.find("/* batch-97 ", len(marker))
+    section = section if later < 0 else section[:later]
     section = re.sub(r"/\*.*?\*/", "", section, flags=re.S)
     selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", section) for s in block.split(",")]
     assert selectors, "the section holds rules"
@@ -1957,6 +1967,14 @@ def test_tc_b97_flow_execution_css_section_is_scoped() -> None:
         start = text.index(head)
         return text[start:text.index("}", start) + 1]
 
+    # batch-97 Inc-8 gate fold (named supersession, operator decision at the
+    # Inc-8 gate 2026-10-23, LED-…97.37): the one shipped rule Inc-8 edits is
+    # `.map-region-scroll`'s floor (2 -> 1) and its comment; every other byte
+    # of the b514b07 sheet is still a prefix.
+    map_old = re.search(r" \* remaining height; the scrollbar renders.*?min-height: 2;\n\}", old, re.S)
+    map_new = re.search(r" \* remaining height; the scrollbar renders.*?min-height: 1;\n\}", sheet, re.S)
+    assert map_old and map_new, "the .map-region-scroll block is located in both sheets"
+    old = old.replace(map_old.group(0), map_new.group(0))
     assert sheet.startswith(old.rstrip()), "every rule shipped at b514b07 is byte-equal; Inc-6 only appends"
     for head in (".flow-name-strip {", ".modal-hint", ".patch-docked-row, .patch-docked-group", ".sev-ok", ".sev-warning", ".sev-error", ".sev-neutral"):
         assert block(sheet, head) == block(old, head), head

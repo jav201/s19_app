@@ -1,0 +1,73 @@
+# Inc-8 GATE on the Inc-8 tree; source sha256: ae33ceea789c22c4 *s19_app/tui/app.py 3d0db1b11c2a5234 *s19_app/tui/window_help.py 957a0ec720c74140 *s19_app/tui/styles.tcss 
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+.................F..................F................................... [ 17%]
+...........................FF........................................... [ 21%]
+...................................................................F.... [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 35%]
+.......................................................F.....F...FF..... [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 57%]
+........F..F....F.........................................F.F........... [ 61%]
+........................................................................ [ 65%]
+...............F........................................................ [ 70%]
+..................................F......FF............................. [ 74%]
+........................................................................ [ 78%]
+........................................................................ [ 83%]
+....................................F................................... [ 87%]
+........xxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................... [ 92%]
+........................................................................ [ 96%]
+.........................................................                [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1479: assert "c — Confirm: confirms the attention lane's waiting external step" in '1. Run saved flows as a set of lanes, one lane per chain: each lane shows its blocks as cards joined by cables, and e...ard.\n\n33. ≡ — a report block card.\n\n34. ─ — a cable between two blocks.\n\n35. ▶ — the cable feeds the next block.'
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1948: AssertionError: ['#key_bar', '#key_bar KeyRow', '#key_bar KeyRow > .key-bar--key', '#key_bar #key_bar_global > .key-bar--description', '#key_bar #key_bar_window > .key-bar--description', '#key_bar KeyRow > .key-bar--tag', ...]
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 54), 2)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_patch_editor.py:1130: AssertionError: ((118, 53), 3)
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1082: AssertionError: ((118, 53), 1, ['NOTICES', '● source    ok', 'loaded prg.s19 (11 ranges)', '──────────────────────────────────────────────────────────────────────────────────────────────────────────', '● patch     ok', 'applied 6 entries', ...])
+C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:503: AssertionError: G2 (registry -> node) failed with 1 offender(s):
+C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:550: AssertionError: the guard scanned 198 test modules, not the declared 197. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:726: AssertionError: G2 failed with 1 offender(s):
+C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:748: AssertionError: the counterfactual is only meaningful from a green baseline; these rules were already red: ['G2']
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:3017: AssertionError: 1 LIVE registry rows name a node that no longer exists:
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3498: AssertionError: _DIFF_MIN_H is only the right floor if at least one HEX ROW is visible AT it: painted content height 1, of which 1 is the 'Image A - Run #...' header, leaving 0 hex rows. A floor that declares a terminal deliverable and then shows a header and nothing else is WORSE than the notice it replaces
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:4523: AssertionError: region row 0x80010000 never became hit-testable after scrolling its viewport
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_builder_b94.py:185: AssertionError: (96, 17)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_execution_b94.py:340: AssertionError: (96, 17)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_flow_execution_b94.py:424: assert (96, 17) == (96, 18)
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=7836340;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size0]
+FAILED tests/test_b97_patch_editor.py::test_tc_b97_40_capped_strip_chips_reachable[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_builder_height_goes_to_the_result[after_run-size1]
+FAILED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+FAILED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail - Asse...
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_commandbar.py::test_at_b78_14_no_live_registry_row_names_a_missing_node
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_tc_b78_54_the_height_floor_delivers_a_hex_row
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_directionb.py::test_at074_single_click_repositions_hex
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_26_lane_mounting_and_render_census
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+19 failed, 1593 passed, 29 xfailed in 5122.56s (1:25:22)

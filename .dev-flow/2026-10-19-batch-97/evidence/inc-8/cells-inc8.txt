@@ -1,0 +1,919 @@
+===== workspace-compact-80x24 sha256 abd8052164742313acfb50f23a09f55544e188955673872f4a4752b99658470c
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                               Workspace                                ?  
+ ▏◫ │                                                                           
+ ▏≡ │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏◉ │                                                                           
+ ▏▤ │ PROJ  (none)                                                              
+ ▏! │ S19   snap.s19  1.0 KiB · 5 rng                                   [u]     
+ ▏✎ │▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏✔ │▊     Load      ▎▊            Hex View             ▎▊   Coverage Stats   ▎ 
+ ▏⏚ │▊   Workarea    ▎▊                                 ▎▊                    ▎ 
+ ▏✦ │▊     Files     ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔ ▎▊ Coverage: 0.00%    ▎ 
+    │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+  Density: compact                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  ? more  
+                                                                                
+===== workspace-compact-120x30 sha256 0262fd00652bf090faf7c14c9f379eddd835877ee39507064a2ec60619a93189
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                          Workspace                                           ?  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏ ◉  MAC View        │                                                                                                 
+ ▏ ▤  Memory Map      │ Loaded                                                                                          
+ ▏ !  Issues Report   │ PROJ  (none)                                                                                    
+ ▏ ✎  Patch Editor    │ S19   snap.s19  1.0 KiB · 5 rng                                                           [u]   
+ ▏ ✔  Check Editor    │ MAC   snap.mac  24 records                                                                [u]   
+ ▏ ⏚  A2B Diff        │ A2L   snap.a2l  32 tags                                                                   [u]   
+ ▏ ✦  Flow Builder    │                                                                               unload all  [U]   
+ ▏ ▶  Flow Execution  │▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ☑  Checks          │▊  Load project (p)  ▎▊            Hex View            ▎▊            Coverage Stats            ▎ 
+ ▏ ⊕  CRC Designer    │▊   Workarea Files   ▎▊                                ▎▊                                      ▎ 
+                      │▊                    ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔ ▎▊ Coverage: 0.00%                      ▎ 
+                      │▊                    ▎▊ ▊    ▎   Find Next    ▊    ▎   ▎▊ Ranges: 5                            ▎ 
+                      │▊   Data Sections    ▎▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁ ▎▊ Errors: 0                            ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  Density: compact                                                                                                      
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  ? more     
+                                                                                                                        
+===== workspace-compact-160x40 sha256 bee73990d41424c0366fe8c6bf1228128e4f92423578eb8426682a5a0815f08d
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                              Workspace                                                               ?  
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏ ◉  MAC View        │                                                                                                                                         
+ ▏ ▤  Memory Map      │ Loaded                                                                                                                                  
+ ▏ !  Issues Report   │ PROJ  (none)                                                                                                                            
+ ▏ ✎  Patch Editor    │ S19   snap.s19  1.0 KiB · 5 rng                                                                                                   [u]   
+ ▏ ✔  Check Editor    │ MAC   snap.mac  24 records                                                                                                        [u]   
+ ▏ ⏚  A2B Diff        │ A2L   snap.a2l  32 tags                                                                                                           [u]   
+ ▏ ✦  Flow Builder    │                                                                                                                       unload all  [U]   
+ ▏ ▶  Flow Execution  │▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ☑  Checks          │▊  Load project (p)  ▎▊                                Hex View                                ▎▊            Coverage Stats            ▎ 
+ ▏ ⊕  CRC Designer    │▊   Workarea Files   ▎▊                                                                        ▎▊                                      ▎ 
+                      │▊                    ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊ Coverage: 0.00%                      ▎ 
+                      │▊                    ▎▊ ▊  Search ASCII   ▎   Find Next    ▊  Goto 0xADDR    ▎      Goto       ▎▊ Ranges: 5                            ▎ 
+                      │▊                    ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊ Errors: 0                            ▎ 
+                      │▊                    ▎▊                                                                        ▎▊ Warnings: 0                          ▎ 
+                      │▊                    ▎▊   0x00000000  53 54 52 45 53 53                                |STRE   ▎▊ Loader 0 err · ⚠0 OOO · Entry        ▎ 
+                      │▊                    ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....   ▎▊ 0x00000000                           ▎ 
+                      │▊   Data Sections    ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.   ▎▊                                      ▎ 
+                      │▊                    ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....   ▎▊               Context                ▎ 
+                      │▊ ✓ 0x00000000       ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?   ▎▊                                      ▎ 
+                      │▊ – 0x00000005    ▂▂ ▎▊   0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#   ▎▊ A2L summary lines 1-71 / 71          ▎ 
+                      │▊ █░░░░░░░           ▎▊   0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.   ▎▊ ---------------------------          ▎ 
+                      │▊ ✓ 0x08000000       ▎▊   0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12  |..3J   ▎▊ A2L Sections:                        ▎ 
+                      │▊ – 0x080000FF       ▎▊   0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3  |.c^?   ▎▊ - PROJECT StressProject (lines       ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  Density: compact                                                                                                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  U Unload all                                       
+                                                                                                                                                                
+===== workspace-comfortable-80x24 sha256 9505420d801384eb96b64ae1f41ca878eb5e321d6cb628e3925b3e99877f4b47
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                               Workspace                                ?  
+ ▏◫ │                                                                           
+ ▏≡ │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏◉ │                                                                           
+ ▏▤ │ PROJ  (none)                                                              
+ ▏! │ S19   snap.s19  1.0 KiB · 5 rng                                   [u]     
+ ▏✎ │▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏✔ │▊               ▎▊                                 ▎▊                    ▎ 
+ ▏⏚ │▊     Load      ▎▊            Hex View             ▎▊   Coverage Stats   ▎ 
+ ▏✦ │▊               ▎▊                                 ▎▊                    ▎ 
+    │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  ? more  
+                                                                                
+===== workspace-comfortable-120x30 sha256 5df44d4de6c22c41bf68727a7068e559766d753a91f0da14255c44b2bf829170
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                          Workspace                                           ?  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏ ◉  MAC View        │                                                                                                 
+ ▏ ▤  Memory Map      │ Loaded                                                                                          
+ ▏ !  Issues Report   │ PROJ  (none)                                                                                    
+ ▏ ✎  Patch Editor    │ S19   snap.s19  1.0 KiB · 5 rng                                                           [u]   
+ ▏ ✔  Check Editor    │ MAC   snap.mac  24 records                                                                [u]   
+ ▏ ⏚  A2B Diff        │ A2L   snap.a2l  32 tags                                                                   [u]   
+ ▏ ✦  Flow Builder    │                                                                               unload all  [U]   
+ ▏ ▶  Flow Execution  │▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ☑  Checks          │▊                    ▎▊                                ▎▊                                      ▎ 
+ ▏ ⊕  CRC Designer    │▊  Load project (p)  ▎▊            Hex View            ▎▊            Coverage Stats            ▎ 
+                      │▊   Workarea Files   ▎▊                                ▎▊                                      ▎ 
+                      │▊                    ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔ ▎▊ Coverage: 0.00%                      ▎ 
+                      │▊                    ▎▊                                ▎▊                                      ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  ? more     
+                                                                                                                        
+===== workspace-comfortable-160x40 sha256 e312afb2f9af5481939d6e86015e7cb7c67dfe89094b05737b94b1a2026a4755
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                              Workspace                                                               ?  
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒ 
+ ▏ ◉  MAC View        │                                                                                                                                         
+ ▏ ▤  Memory Map      │ Loaded                                                                                                                                  
+ ▏ !  Issues Report   │ PROJ  (none)                                                                                                                            
+ ▏ ✎  Patch Editor    │ S19   snap.s19  1.0 KiB · 5 rng                                                                                                   [u]   
+ ▏ ✔  Check Editor    │ MAC   snap.mac  24 records                                                                                                        [u]   
+ ▏ ⏚  A2B Diff        │ A2L   snap.a2l  32 tags                                                                                                           [u]   
+ ▏ ✦  Flow Builder    │                                                                                                                       unload all  [U]   
+ ▏ ▶  Flow Execution  │▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ☑  Checks          │▊                    ▎▊                                                                        ▎▊                                      ▎ 
+ ▏ ⊕  CRC Designer    │▊  Load project (p)  ▎▊                                Hex View                                ▎▊            Coverage Stats            ▎ 
+                      │▊   Workarea Files   ▎▊                                                                        ▎▊                                      ▎ 
+                      │▊                    ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊ Coverage: 0.00%                      ▎ 
+                      │▊                    ▎▊ ▊  Search ASCII   ▎   Find Next    ▊  Goto 0xADDR    ▎      Goto       ▎▊ Ranges: 5                            ▎ 
+                      │▊                    ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊ Errors: 0                            ▎ 
+                      │▊                    ▎▊                                                                        ▎▊ Warnings: 0                          ▎ 
+                      │▊                    ▎▊   0x00000000  53 54 52 45 53 53                                |STRE   ▎▊ Loader 0 err · ⚠0 OOO · Entry        ▎ 
+                      │▊   Data Sections    ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....   ▎▊ 0x00000000                           ▎ 
+                      │▊                    ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.▆▆ ▎▊                                      ▎ 
+                      │▊ ✓ 0x00000000       ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....   ▎▊               Context                ▎ 
+                      │▊ – 0x00000005    ▇▇ ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?   ▎▊                                      ▎ 
+                      │▊ █░░░░░░░           ▎▊   0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#   ▎▊ A2L summary lines 1-71 / 71          ▎ 
+                      │▊ ✓ 0x08000000       ▎▊   0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.   ▎▊ ---------------------------          ▎ 
+                      │▊                    ▎▊                                                                        ▎▊                                      ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  U Unload all                                       
+                                                                                                                                                                
+===== a2l-compact-80x24 sha256 9739faaa528809ffebba9461f20f20b8804be95ead3311967ae74f8c71d9b9fd
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                             A2L Explorer                               ?  
+ ▏◫ │                                                                           
+ ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏◉ │▊                A2L Tags                ▎▊                              ▎ 
+ ▏▤ │▊                                        ▎▊  · MEAS_000000  0x08005000   ▎ 
+ ▏! │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  unit unit                   ▎ 
+ ▏✎ │▊ ▊    ▎  Field: name         All        ▎▊  byteorder little            ▎ 
+ ▏✔ │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊  limits 0..65535             ▎ 
+ ▏⏚ │▊                                        ▎▊ ──────────────────────────── ▎ 
+ ▏✦ │▊            ▍                           ▎▊                              ▎ 
+    │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+  Density: compact                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend     
+                                                                                
+===== a2l-compact-120x30 sha256 54f59deded50f8e9a2435ffc234d16b19d03a5adfbb2561705d3c74bfc8e0c6a
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                        A2L Explorer                                          ?  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◉  MAC View        │▊                      A2L Tags                      ▎▊                                        ▎ 
+ ▏ ▤  Memory Map      │▊                                                    ▎▊  · MEAS_000000  0x08005000             ▎ 
+ ▏ !  Issues Report   │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  unit unit                             ▎ 
+ ▏ ✎  Patch Editor    │▊ ▊    ▎  Field: name         All           Invalid  ▎▊  byteorder little                      ▎ 
+ ▏ ✔  Check Editor    │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊  limits 0..65535                       ▎ 
+ ▏ ⏚  A2B Diff        │▊                                                    ▎▊ ────────────────────────────────────── ▎ 
+ ▏ ✦  Flow Builder    │▊ Tag          Address   LengthSource  RawPhysical   ▎▊               Hex Viewer               ▎ 
+ ▏ ▶  Flow Execution  │▊ · MEAS_0000000x080050002     assigned              ▎▊                                        ▎ 
+ ▏ ☑  Checks          │▊ · MEAS_0000010x080050042     assigned              ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ⊕  CRC Designer    │▊ ✓ MEAS_0000020x080000082     assigned              ▎▊ ▊    ▎   Find Next    ▊    ▎      Goto ▎ 
+                      │▊ ✓ MEAS_0000030x0800000C2     assigned              ▎▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁ ▎ 
+                      │▊                     ▎                              ▎▊                                        ▎ 
+                      │▊  Page 1/1 | tags 1-32 / 32 (page size 200; +/- to  ▎▊                                        ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                             (none)  |  (none)  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  Density: compact                                                                                                      
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend                                             
+                                                                                                                        
+===== a2l-compact-160x40 sha256 503136faf6d43a8b1d4774bd5d263b9f5f98028bbc10ae933768fd44f28c7ab5
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                            A2L Explorer                                                              ?  
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◉  MAC View        │▊                                 A2L Tags                                  ▎▊                                                         ▎ 
+ ▏ ▤  Memory Map      │▊                                                                           ▎▊  · MEAS_000000  0x08005000                              ▎ 
+ ▏ !  Issues Report   │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔ ▎▊  unit unit                                              ▎ 
+ ▏ ✎  Patch Editor    │▊ ▊    ▎  Field: name         All           Invalid        In-Memory    ▊   ▎▊  byteorder little                                       ▎ 
+ ▏ ✔  Check Editor    │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁ ▎▊  limits 0..65535                                        ▎ 
+ ▏ ⏚  A2B Diff        │▊                                                                           ▎▊ ─────────────────────────────────────────────────────── ▎ 
+ ▏ ✦  Flow Builder    │▊ Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni   ▎▊                       Hex Viewer                        ▎ 
+ ▏ ▶  Flow Execution  │▊ · MEAS_0000000x080050002     assigned           no   unknown0..65535uni   ▎▊                                                         ▎ 
+ ▏ ☑  Checks          │▊ · MEAS_0000010x080050042     assigned           no   unknown0..65535uni   ▎▊ ▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ⊕  CRC Designer    │▊ ✓ MEAS_0000020x080000082     assigned           yes  unknown0..65535uni   ▎▊ ▊  Searc  ▎   Find Next    ▊  Goto    ▎      Goto       ▎ 
+                      │▊ ✓ MEAS_0000030x0800000C2     assigned           yes  unknown0..65535uni   ▎▊ ▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+                      │▊ ✓ MEAS_0000040x080000102     assigned           yes  unknown0..65535uni   ▎▊                                                         ▎ 
+                      │▊ ✓ MEAS_0000050x080000142     assigned           yes  unknown0..65535uni▁▁ ▎▊   0x00000000  53 54 52 45 53 53                         ▎ 
+                      │▊ · MEAS_0000060x080050182     assigned           no   unknown0..65535uni   ▎▊ |STRESS          |                                      ▎ 
+                      │▊ ✓ MEAS_0000070x0800001C2     assigned           yes  unknown0..65535uni   ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47    ▎ 
+                      │▊ ✓ MEAS_0000080x080000202     assigned           yes  unknown0..65535uni   ▎▊ 30 80 4B  |.........oG.G0.K|                         ▅▅ ▎ 
+                      │▊ ✓ MEAS_0000090x080000242     assigned           yes  unknown0..65535uni   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85    ▎ 
+                      │▊ · MEAS_0000100x080050282     assigned           no   unknown0..65535uni   ▎▊ 1F 07 2F  |.2%..3...h...../|                            ▎ 
+                      │▊ ✓ MEAS_0000110x0800002C2     assigned           yes  unknown0..65535uni   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E    ▎ 
+                      │▊ ✓ MEAS_0000120x080000302     assigned           yes  unknown0..65535uni   ▎▊ 29 A3 FA  |....|. aqzH..)..|                            ▎ 
+                      │▊ · MEAS_0000130x080050342     assigned           no   unknown0..65535uni   ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94    ▎ 
+                      │▊                                             ▎                             ▎▊ 5E 60 5F  |7..?.h.....{.^`_|                            ▎ 
+                      │▊  Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in  ▎▊                                                         ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  Density: compact                                                                                                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend                                                                                     
+                                                                                                                                                                
+===== a2l-comfortable-80x24 sha256 35407ed6c6113b7268c62011ce34cbb0aaefc055802c74edf3b41694287b4102
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                             A2L Explorer                               ?  
+ ▏◫ │                                                                           
+ ▏≡ │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏◉ │▊                A2L Tags                ▎▊                              ▎ 
+ ▏▤ │▊                                        ▎▊  · MEAS_000000  0x08005000   ▎ 
+ ▏! │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  unit unit                   ▎ 
+ ▏✎ │▊ ▊    ▎  Field: name         All        ▎▊  byteorder little            ▎ 
+ ▏✔ │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊  limits 0..65535             ▎ 
+ ▏⏚ │▊                                        ▎▊ ──────────────────────────── ▎ 
+ ▏✦ │▊            ▍                           ▎▊                              ▎ 
+    │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend     
+                                                                                
+===== a2l-comfortable-120x30 sha256 d91df0e52a898cb4c47b6aa5a7511169d5326bf981f4157d6284755e2b7720a7
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                        A2L Explorer                                          ?  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◉  MAC View        │▊                      A2L Tags                      ▎▊                                        ▎ 
+ ▏ ▤  Memory Map      │▊                                                    ▎▊  · MEAS_000000  0x08005000             ▎ 
+ ▏ !  Issues Report   │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎▊  unit unit                             ▎ 
+ ▏ ✎  Patch Editor    │▊ ▊    ▎  Field: name         All           Invalid  ▎▊  byteorder little                      ▎ 
+ ▏ ✔  Check Editor    │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎▊  limits 0..65535                       ▎ 
+ ▏ ⏚  A2B Diff        │▊                                                    ▎▊ ────────────────────────────────────── ▎ 
+ ▏ ✦  Flow Builder    │▊ Tag          Address   LengthSource  RawPhysical   ▎▊               Hex Viewer               ▎ 
+ ▏ ▶  Flow Execution  │▊ · MEAS_0000000x080050002     assigned              ▎▊                                        ▎ 
+ ▏ ☑  Checks          │▊ · MEAS_0000010x080050042     assigned              ▎▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ⊕  CRC Designer    │▊ ✓ MEAS_0000020x080000082     assigned              ▎▊ ▊    ▎   Find Next    ▊    ▎      Goto ▎ 
+                      │▊ ✓ MEAS_0000030x0800000C2     assigned              ▎▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁ ▎ 
+                      │▊                     ▎                              ▎▊                                        ▎ 
+                      │▊  Page 1/1 | tags 1-32 / 32 (page size 200; +/- to  ▎▊                                        ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend                                             
+                                                                                                                        
+===== a2l-comfortable-160x40 sha256 72a64e1cfd8e9b07f3756b6d84187c665adccaa1838a3e5b6590bc9d168cb685
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                            A2L Explorer                                                              ?  
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◉  MAC View        │▊                                 A2L Tags                                  ▎▊                                                         ▎ 
+ ▏ ▤  Memory Map      │▊                                                                           ▎▊  · MEAS_000000  0x08005000                              ▎ 
+ ▏ !  Issues Report   │▊ ▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔ ▎▊  unit unit                                              ▎ 
+ ▏ ✎  Patch Editor    │▊ ▊    ▎  Field: name         All           Invalid        In-Memory    ▊   ▎▊  byteorder little                                       ▎ 
+ ▏ ✔  Check Editor    │▊ ▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁ ▎▊  limits 0..65535                                        ▎ 
+ ▏ ⏚  A2B Diff        │▊                                                                           ▎▊ ─────────────────────────────────────────────────────── ▎ 
+ ▏ ✦  Flow Builder    │▊ Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni   ▎▊                       Hex Viewer                        ▎ 
+ ▏ ▶  Flow Execution  │▊ · MEAS_0000000x080050002     assigned           no   unknown0..65535uni   ▎▊                                                         ▎ 
+ ▏ ☑  Checks          │▊ · MEAS_0000010x080050042     assigned           no   unknown0..65535uni   ▎▊ ▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ⊕  CRC Designer    │▊ ✓ MEAS_0000020x080000082     assigned           yes  unknown0..65535uni   ▎▊ ▊  Searc  ▎   Find Next    ▊  Goto    ▎      Goto       ▎ 
+                      │▊ ✓ MEAS_0000030x0800000C2     assigned           yes  unknown0..65535uni   ▎▊ ▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+                      │▊ ✓ MEAS_0000040x080000102     assigned           yes  unknown0..65535uni   ▎▊                                                         ▎ 
+                      │▊ ✓ MEAS_0000050x080000142     assigned           yes  unknown0..65535uni▁▁ ▎▊   0x00000000  53 54 52 45 53 53                         ▎ 
+                      │▊ · MEAS_0000060x080050182     assigned           no   unknown0..65535uni   ▎▊ |STRESS          |                                      ▎ 
+                      │▊ ✓ MEAS_0000070x0800001C2     assigned           yes  unknown0..65535uni   ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47    ▎ 
+                      │▊ ✓ MEAS_0000080x080000202     assigned           yes  unknown0..65535uni   ▎▊ 30 80 4B  |.........oG.G0.K|                         ▅▅ ▎ 
+                      │▊ ✓ MEAS_0000090x080000242     assigned           yes  unknown0..65535uni   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85    ▎ 
+                      │▊ · MEAS_0000100x080050282     assigned           no   unknown0..65535uni   ▎▊ 1F 07 2F  |.2%..3...h...../|                            ▎ 
+                      │▊ ✓ MEAS_0000110x0800002C2     assigned           yes  unknown0..65535uni   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E    ▎ 
+                      │▊ ✓ MEAS_0000120x080000302     assigned           yes  unknown0..65535uni   ▎▊ 29 A3 FA  |....|. aqzH..)..|                            ▎ 
+                      │▊ · MEAS_0000130x080050342     assigned           no   unknown0..65535uni   ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94    ▎ 
+                      │▊                                             ▎                             ▎▊ 5E 60 5F  |7..?.h.....{.^`_|                            ▎ 
+                      │▊  Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in  ▎▊                                                         ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend                                                                                     
+                                                                                                                                                                
+===== mac-compact-80x24 sha256 03b4f6679087acb8fd0d4c0f20d3cee5e41f6fb6a4cf97631c9b37343755a6a5
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │▊▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ 
+ ▏◫ │▊  ▎▊                                                                      
+ ▏≡ │▊  ▎▊ Hex Viewer                                                           
+ ▏◉ │▊  ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔ 
+ ▏▤ │▊  ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎       
+ ▏! │▊  ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁ 
+ ▏✎ │▊  ▎▊                                                                      
+ ▏✔ │▊  ▎▊   0x00000000  53 54 52 45 53 53                                |STRE 
+ ▏⏚ │▊  ▎▊ |                                                                    
+ ▏✦ │▊  ▎▊                                                                      
+    │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+  Density: compact                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                         
+                                                                                
+===== mac-compact-120x30 sha256 8ce83ef2601b265e646ec3a6e1f3c78d1bf94de3ed4c1a2c3b23119bf9ab206a
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │▊▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◫  Workspace       │▊            ▎▊                                                                                ▎ 
+ ▏ ≡  A2L Explorer    │▊ MAC File C ▎▊ Hex Viewer                                                                     ▎ 
+ ▏ ◉  MAC View        │▊ ▔▔▔▔▔▔▔▔▔▔ ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ▤  Memory Map      │▊ MAC→S19 20 ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎      Goto       ▎ 
+ ▏ !  Issues Report   │▊ of 20      ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+ ▏ ✎  Patch Editor    │▊ █████  ·   ▎▊                                                                                ▎ 
+ ▏ ✔  Check Editor    │▊ A2L↔MAC 5  ▎▊   0x00000000  53 54 52 45 53 53                                |STRESS         ▎ 
+ ▏ ⏚  A2B Diff        │▊ matches    ▎▊ |                                                                           ▅▅ ▎ 
+ ▏ ✦  Flow Builder    │▊  Tag       ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B                  ▎ 
+ ▏ ▶  Flow Execution  │▊  ✓ MAC_T   ▎▊ |.........oG.G0.K|                                                             ▎ 
+ ▏ ☑  Checks          │▊  ✗ BADHE   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F                  ▎ 
+ ▏ ⊕  CRC Designer    │▊  ✓ MEAS_▆▆ ▎▊ |.2%..3...h...../|                                                             ▎ 
+                      │▊  ✓ MAC_T   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....|.         ▎ 
+                      │▊  ✓ MAC_T   ▎▊ aqzH..)..|                                                                     ▎ 
+                      │▊            ▎▊                                                                                ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  Density: compact                                                                                                      
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                                                                 
+                                                                                                                        
+===== mac-compact-160x40 sha256 60dd3945a3fd65dc641e0681b81de1e1a82ae1bd0c4eb9ec2943da6cc928bbcb
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◫  Workspace       │▊                                                    ▎▊                                                                                ▎ 
+ ▏ ≡  A2L Explorer    │▊ MAC File Content                                   ▎▊ Hex Viewer                                                                     ▎ 
+ ▏ ◉  MAC View        │▊ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                   ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ▤  Memory Map      │▊ MAC→S19 20 of 20 █████  ·  A2L↔MAC 5 matches       ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎      Goto       ▎ 
+ ▏ !  Issues Report   │▊  Tag               Address     InA2L  InMem  Sta   ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+ ▏ ✎  Patch Editor    │▊  ✓ MAC_TAG_000000  0x08000000  no     yes    NOT   ▎▊                                                                                ▎ 
+ ▏ ✔  Check Editor    │▊  ✗ BADHEX_1        n/a         no     n/a    ERR   ▎▊   0x00000000  53 54 52 45 53 53                                |STRESS         ▎ 
+ ▏ ⏚  A2B Diff        │▊  ✓ MEAS_000002     0x08000008  yes    yes    OK    ▎▊ |                                                                              ▎ 
+ ▏ ✦  Flow Builder    │▊  ✓ MAC_TAG_000003  0x08000018  no     yes    NOT   ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B                  ▎ 
+ ▏ ▶  Flow Execution  │▊  ✓ MAC_TAG_000004  0x08000020  no     yes    NOT   ▎▊ |.........oG.G0.K|                                                             ▎ 
+ ▏ ☑  Checks          │▊  ✓ MAC_TAG_000005  0x08000028  no     yes    NOT   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F               ▇▇ ▎ 
+ ▏ ⊕  CRC Designer    │▊  ✓ MEAS_000006     0x08000018  yes    yes    A2L   ▎▊ |.2%..3...h...../|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000007  0x08000038  no     yes    NOT   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....|.         ▎ 
+                      │▊  ✗ (invalid)       n/a         no     n/a    ERR   ▎▊ aqzH..)..|                                                                     ▎ 
+                      │▊  ✓ MEAS_000009     0x08000024  yes    yes    OK    ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F                  ▎ 
+                      │▊  ✓ MEAS_000010     0x08000028  yes    yes    A2L   ▎▊ |7..?.h.....{.^`_|                                                             ▎ 
+                      │▊  ✓ MEAS_000011     0x0800002C  yes    yes    OK    ▎▊   0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6                  ▎ 
+                      │▊  ✗ (invalid)       n/a         no     n/a    ERR   ▎▊ |...#-BL.)..xn...|                                                             ▎ 
+                      │▊  ✗ BADHEX_13       n/a         no     n/a    ERR▄▄ ▎▊   0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA                  ▎ 
+                      │▊  ✓ MEAS_000014     0x08000038  yes    yes    OK    ▎▊ |..*.;..a|..;p.W.|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000015  0x08000078  no     yes    NOT   ▎▊   0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12                  ▎ 
+                      │▊  ✓ MAC_TAG_000016  0x08000080  no     yes    NOT   ▎▊ |..3Jp.%.?`=...;.|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000017  0x08000088  no     yes    NOT   ▎▊   0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3                  ▎ 
+                      │▊                                                    ▎▊ |.c^?.k...3.#q$..|                                                             ▎ 
+                      │▊                                                    ▎▊                                                                                ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  Density: compact                                                                                                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                                                                                                         
+                                                                                                                                                                
+===== mac-comfortable-80x24 sha256 ec1f206e4b79a57cc2c0b8f19801bdd3db129e4130e10a134e843c90aab7e7f9
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │▊▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ 
+ ▏◫ │▊  ▎▊                                                                      
+ ▏≡ │▊  ▎▊ Hex Viewer                                                           
+ ▏◉ │▊  ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔ 
+ ▏▤ │▊  ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎       
+ ▏! │▊  ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁ 
+ ▏✎ │▊  ▎▊                                                                      
+ ▏✔ │▊  ▎▊   0x00000000  53 54 52 45 53 53                                |STRE 
+ ▏⏚ │▊  ▎▊ |                                                                    
+ ▏✦ │▊  ▎▊                                                                      
+    │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                         
+                                                                                
+===== mac-comfortable-120x30 sha256 83974157c4c56dfad862c8cb1536c059fd91c9b67c4b0219665f10474c044b57
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │▊▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◫  Workspace       │▊            ▎▊                                                                                ▎ 
+ ▏ ≡  A2L Explorer    │▊ MAC File C ▎▊ Hex Viewer                                                                     ▎ 
+ ▏ ◉  MAC View        │▊ ▔▔▔▔▔▔▔▔▔▔ ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ▤  Memory Map      │▊ MAC→S19 20 ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎      Goto       ▎ 
+ ▏ !  Issues Report   │▊ of 20      ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+ ▏ ✎  Patch Editor    │▊ █████  ·   ▎▊                                                                                ▎ 
+ ▏ ✔  Check Editor    │▊ A2L↔MAC 5  ▎▊   0x00000000  53 54 52 45 53 53                                |STRESS         ▎ 
+ ▏ ⏚  A2B Diff        │▊ matches    ▎▊ |                                                                           ▅▅ ▎ 
+ ▏ ✦  Flow Builder    │▊  Tag       ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B                  ▎ 
+ ▏ ▶  Flow Execution  │▊  ✓ MAC_T   ▎▊ |.........oG.G0.K|                                                             ▎ 
+ ▏ ☑  Checks          │▊  ✗ BADHE   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F                  ▎ 
+ ▏ ⊕  CRC Designer    │▊  ✓ MEAS_▆▆ ▎▊ |.2%..3...h...../|                                                             ▎ 
+                      │▊  ✓ MAC_T   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....|.         ▎ 
+                      │▊  ✓ MAC_T   ▎▊ aqzH..)..|                                                                     ▎ 
+                      │▊            ▎▊                                                                                ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                                                                 
+                                                                                                                        
+===== mac-comfortable-160x40 sha256 05af574c5bdec5b70fe17c1c890abdc6dc506c43bedc45fc137975202015816e
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ 
+ ▏ ◫  Workspace       │▊                                                    ▎▊                                                                                ▎ 
+ ▏ ≡  A2L Explorer    │▊ MAC File Content                                   ▎▊ Hex Viewer                                                                     ▎ 
+ ▏ ◉  MAC View        │▊ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                   ▎▊ ▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ ▎ 
+ ▏ ▤  Memory Map      │▊ MAC→S19 20 of 20 █████  ·  A2L↔MAC 5 matches       ▎▊ ▊  Search ASCII text  ▎   Find Next    ▊  Goto 0xADDR        ▎      Goto       ▎ 
+ ▏ !  Issues Report   │▊  Tag               Address     InA2L  InMem  Sta   ▎▊ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▎ 
+ ▏ ✎  Patch Editor    │▊  ✓ MAC_TAG_000000  0x08000000  no     yes    NOT   ▎▊                                                                                ▎ 
+ ▏ ✔  Check Editor    │▊  ✗ BADHEX_1        n/a         no     n/a    ERR   ▎▊   0x00000000  53 54 52 45 53 53                                |STRESS         ▎ 
+ ▏ ⏚  A2B Diff        │▊  ✓ MEAS_000002     0x08000008  yes    yes    OK    ▎▊ |                                                                              ▎ 
+ ▏ ✦  Flow Builder    │▊  ✓ MAC_TAG_000003  0x08000018  no     yes    NOT   ▎▊   0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B                  ▎ 
+ ▏ ▶  Flow Execution  │▊  ✓ MAC_TAG_000004  0x08000020  no     yes    NOT   ▎▊ |.........oG.G0.K|                                                             ▎ 
+ ▏ ☑  Checks          │▊  ✓ MAC_TAG_000005  0x08000028  no     yes    NOT   ▎▊   0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F               ▇▇ ▎ 
+ ▏ ⊕  CRC Designer    │▊  ✓ MEAS_000006     0x08000018  yes    yes    A2L   ▎▊ |.2%..3...h...../|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000007  0x08000038  no     yes    NOT   ▎▊   0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....|.         ▎ 
+                      │▊  ✗ (invalid)       n/a         no     n/a    ERR   ▎▊ aqzH..)..|                                                                     ▎ 
+                      │▊  ✓ MEAS_000009     0x08000024  yes    yes    OK    ▎▊   0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F                  ▎ 
+                      │▊  ✓ MEAS_000010     0x08000028  yes    yes    A2L   ▎▊ |7..?.h.....{.^`_|                                                             ▎ 
+                      │▊  ✓ MEAS_000011     0x0800002C  yes    yes    OK    ▎▊   0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6                  ▎ 
+                      │▊  ✗ (invalid)       n/a         no     n/a    ERR   ▎▊ |...#-BL.)..xn...|                                                             ▎ 
+                      │▊  ✗ BADHEX_13       n/a         no     n/a    ERR▄▄ ▎▊   0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA                  ▎ 
+                      │▊  ✓ MEAS_000014     0x08000038  yes    yes    OK    ▎▊ |..*.;..a|..;p.W.|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000015  0x08000078  no     yes    NOT   ▎▊   0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12                  ▎ 
+                      │▊  ✓ MAC_TAG_000016  0x08000080  no     yes    NOT   ▎▊ |..3Jp.%.?`=...;.|                                                             ▎ 
+                      │▊  ✓ MAC_TAG_000017  0x08000088  no     yes    NOT   ▎▊   0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3                  ▎ 
+                      │▊                                                    ▎▊ |.c^?.k...3.#q$..|                                                             ▎ 
+                      │▊                                                    ▎▊                                                                                ▎ 
+                      │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend                                                                                                         
+                                                                                                                                                                
+===== issues-compact-80x24 sha256 2016de6807beba5b98c90002e4caac0db00f2fdd300eac9bb956265532c75ae9
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                              Issues Report                                
+ ▏◫ │                                                                           
+ ▏≡ │                                                                           
+ ▏◉ │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔           
+ ▏▤ │  Issues: All        Errors         Warnings         Legend                
+ ▏! │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁           
+ ▏✎ │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                            
+ ▏✔ │╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮ 
+ ▏⏚ ││                                               ││                       │ 
+ ▏✦ │╰───────────────────────────────────── grouped ─╯╰───────────────────────╯ 
+    │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                     (none)  |  (none)  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+  Density: compact                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Issues Report  pgdn Page+  pgup Page-  k Legend                               
+                                                                                
+===== issues-compact-120x30 sha256 dba7f3aa3b53ea80ad18dcda496f94411ff1219a9dc2259bafb29e90051440ea
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                         Issues Report                                           
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │                                                                                                 
+ ▏ ◉  MAC View        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                 
+ ▏ ▤  Memory Map      │  Issues: All        Errors         Warnings         Legend                                      
+ ▏ !  Issues Report   │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁                                 
+ ▏ ✎  Patch Editor    │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                                                  
+ ▏ ✔  Check Editor    │╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮ 
+ ▏ ⏚  A2B Diff        ││                                                              ││                              │ 
+ ▏ ✦  Flow Builder    ││ ✗ ERRORS  (3)                                                ││                              │ 
+ ▏ ▶  Flow Execution  ││ SNAP_CODE_0      SNAP_SYM_0  0x08000000  synthetic issue - ▆▆││                              │ 
+ ▏ ☑  Checks          ││                  0                                           ││                              │ 
+ ▏ ⊕  CRC Designer    ││ SNAP_CODE_3      SNAP_SYM_3  0x08000003  synthetic issue -   ││                              │ 
+                      ││                  3                                           ││                              │ 
+                      ││ SNAP_CODE_6      SNAP_SYM_6  0x08000006  synthetic issue -   ││                              │ 
+                      │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯ 
+                      │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9                     
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  Density: compact                                                                                                      
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Issues Report  pgdn Page+  pgup Page-  k Legend                                                                       
+                                                                                                                        
+===== issues-compact-160x40 sha256 6ac1f07aa927797573f0b3fb6bc308f3422ed76a92bfdfc322979ac4cbd3fc8a
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                             Issues Report                                                               
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │                                                                                                                                         
+ ▏ ◉  MAC View        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                                                         
+ ▏ ▤  Memory Map      │  Issues: All        Errors         Warnings         Legend                                                                              
+ ▏ !  Issues Report   │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁                                                                         
+ ▏ ✎  Patch Editor    │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                                                                                          
+ ▏ ✔  Check Editor    │╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮ 
+ ▏ ⏚  A2B Diff        ││                                                                                        ││                                            │ 
+ ▏ ✦  Flow Builder    ││ ✗ ERRORS  (3)                                                                          ││                                            │ 
+ ▏ ▶  Flow Execution  ││ SNAP_CODE_0      SNAP_SYM_0  0x08000000  synthetic issue 0                           - ││                                            │ 
+ ▏ ☑  Checks          ││ SNAP_CODE_3      SNAP_SYM_3  0x08000003  synthetic issue 3                           - ││                                            │ 
+ ▏ ⊕  CRC Designer    ││ SNAP_CODE_6      SNAP_SYM_6  0x08000006  synthetic issue 6                           - ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││ ⚠ WARNINGS  (6)                                                                        ││                                            │ 
+                      ││ SNAP_CODE_1      SNAP_SYM_1  0x08000001  synthetic issue 1                           - ││                                            │ 
+                      ││ SNAP_CODE_2      SNAP_SYM_2  0x08000002  synthetic issue 2                           - ││                                            │ 
+                      ││ SNAP_CODE_4      SNAP_SYM_4  0x08000004  synthetic issue 4                           - ││                                            │ 
+                      ││ SNAP_CODE_5      SNAP_SYM_5  0x08000005  synthetic issue 5                           - ││                                            │ 
+                      ││ SNAP_CODE_7      SNAP_SYM_7  0x08000007  synthetic issue 7                           - ││                                            │ 
+                      ││ SNAP_CODE_8      SNAP_SYM_8  0x08000008  synthetic issue 8                           - ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯ 
+                      │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9                                                             
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  Density: compact                                                                                                                                              
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  Issues Report  pgdn Page+  pgup Page-  k Legend                                                                                                               
+                                                                                                                                                                
+===== issues-comfortable-80x24 sha256 846e6d07ef5fb080df5a9135cca94d95e5de21e429b3b4d0b0e569c942317bca
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                              Issues Report                                
+ ▏◫ │                                                                           
+ ▏≡ │                                                                           
+ ▏◉ │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔           
+ ▏▤ │  Issues: All        Errors         Warnings         Legend                
+ ▏! │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁           
+ ▏✎ │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                            
+ ▏✔ │╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮ 
+ ▏⏚ ││                                               ││                       │ 
+ ▏✦ │╰───────────────────────────────────── grouped ─╯╰───────────────────────╯ 
+    │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Issues Report  pgdn Page+  pgup Page-  k Legend                               
+                                                                                
+===== issues-comfortable-120x30 sha256 3236919f4fc94b78ebdf0bb10ec1e26eb228ae02fb5e1f059dd3f34b3e87cc40
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                         Issues Report                                           
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │                                                                                                 
+ ▏ ◉  MAC View        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                 
+ ▏ ▤  Memory Map      │  Issues: All        Errors         Warnings         Legend                                      
+ ▏ !  Issues Report   │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁                                 
+ ▏ ✎  Patch Editor    │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                                                  
+ ▏ ✔  Check Editor    │╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮ 
+ ▏ ⏚  A2B Diff        ││                                                              ││                              │ 
+ ▏ ✦  Flow Builder    ││ ✗ ERRORS  (3)                                                ││                              │ 
+ ▏ ▶  Flow Execution  ││ SNAP_CODE_0      SNAP_SYM_0  0x08000000  synthetic issue - ▆▆││                              │ 
+ ▏ ☑  Checks          ││                  0                                           ││                              │ 
+ ▏ ⊕  CRC Designer    ││ SNAP_CODE_3      SNAP_SYM_3  0x08000003  synthetic issue -   ││                              │ 
+                      ││                  3                                           ││                              │ 
+                      ││ SNAP_CODE_6      SNAP_SYM_6  0x08000006  synthetic issue -   ││                              │ 
+                      │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯ 
+                      │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9                     
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Issues Report  pgdn Page+  pgup Page-  k Legend                                                                       
+                                                                                                                        
+===== issues-comfortable-160x40 sha256 0afeaca8119228ec54ee0f90b8f2dd379cc831b71de50b339e9045f4f1f580a2
+                                                                                                                                                                
+  ⭘                                                                     Hex Edit Tool                                                                           
+                      │                                                             Issues Report                                                               
+ ▏ ◫  Workspace       │                                                                                                                                         
+ ▏ ≡  A2L Explorer    │                                                                                                                                         
+ ▏ ◉  MAC View        │▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔                                                                         
+ ▏ ▤  Memory Map      │  Issues: All        Errors         Warnings         Legend                                                                              
+ ▏ !  Issues Report   │▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁                                                                         
+ ▏ ✎  Patch Editor    │ Errors 3 ██░░░  Warnings 6 ███░░  Info 0 ░░░░░                                                                                          
+ ▏ ✔  Check Editor    │╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮ 
+ ▏ ⏚  A2B Diff        ││                                                                                        ││                                            │ 
+ ▏ ✦  Flow Builder    ││ ✗ ERRORS  (3)                                                                          ││                                            │ 
+ ▏ ▶  Flow Execution  ││ SNAP_CODE_0      SNAP_SYM_0  0x08000000  synthetic issue 0                           - ││                                            │ 
+ ▏ ☑  Checks          ││ SNAP_CODE_3      SNAP_SYM_3  0x08000003  synthetic issue 3                           - ││                                            │ 
+ ▏ ⊕  CRC Designer    ││ SNAP_CODE_6      SNAP_SYM_6  0x08000006  synthetic issue 6                           - ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││ ⚠ WARNINGS  (6)                                                                        ││                                            │ 
+                      ││ SNAP_CODE_1      SNAP_SYM_1  0x08000001  synthetic issue 1                           - ││                                            │ 
+                      ││ SNAP_CODE_2      SNAP_SYM_2  0x08000002  synthetic issue 2                           - ││                                            │ 
+                      ││ SNAP_CODE_4      SNAP_SYM_4  0x08000004  synthetic issue 4                           - ││                                            │ 
+                      ││ SNAP_CODE_5      SNAP_SYM_5  0x08000005  synthetic issue 5                           - ││                                            │ 
+                      ││ SNAP_CODE_7      SNAP_SYM_7  0x08000007  synthetic issue 7                           - ││                                            │ 
+                      ││ SNAP_CODE_8      SNAP_SYM_8  0x08000008  synthetic issue 8                           - ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      ││                                                                                        ││                                            │ 
+                      │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯ 
+                      │ total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9                                                             
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                                                                   (none)  |  snap.a2l  
+                                                                                                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                                                            
+  Issues Report  pgdn Page+  pgup Page-  k Legend                                                                                                               
+                                                                                                                                                                
+===== map-comfortable-80x24 sha256 b4c7ebb05ffb0cda2827229ba69ed8740dfd04d225f7cc5b96cdb7e0cb9ea0ce
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                              Memory Map                                ?  
+ ▏◫ │                                                                           
+ ▏≡ │╭────────────────────────────────────────────────────────────────────────╮ 
+ ▏◉ ││                                                                        │ 
+ ▏▤ ││  Entropy bands - 5 region(s), 1030 B mapped                            │ 
+ ▏! ││  ▊▔ Memory Map ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎    │ 
+ ▏✎ ││  ▊                                                                ▎    │ 
+ ▏✔ ││                                                                        │ 
+ ▏⏚ ││  Mapped 1.0 KiB / 128.0 MiB 0.0008% · 5 rng (5 ok) · 4 gaps · 60 iss   │ 
+ ▏✦ ││                                                                        │ 
+    │╰────────────────────────────────────────────────────────────────────────╯ 
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Memory Map  k Legend                                                          
+                                                                                
+===== map-comfortable-120x30 sha256 5eb9cfcddbdc424e6a144b6e80bdf24e0072a10fa6cfa30e994e571fdc17b36a
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                         Memory Map                                           ?  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │╭──────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ ▏ ◉  MAC View        ││                                                                                              │ 
+ ▏ ▤  Memory Map      ││  Entropy bands - 5 region(s), 1030 B mapped                                                  │ 
+ ▏ !  Issues Report   ││  ▊▔ Memory Map ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎ ▊▔ Inspector — 0x00000000 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎  │ 
+ ▏ ✎  Patch Editor    ││  ▊                                           ▎ ▊                                          ▎  │ 
+ ▏ ✔  Check Editor    ││  ▊ ░╱▒▒▒▒▒▒▒▒▒╱▒▒▒▒▒▒▒▒▒╱▓▓▓▓▓▓▓▓▓╱▒▒▒▒▒▒▒▒▒ ▎ ▊ Status   VALID                           ▎  │ 
+ ▏ ⏚  A2B Diff        ││  ▊ 00000000  08000200  08000400  080006FF    ▎ ▊ Region   0x00000000-0x00000005           ▎  │ 
+ ▏ ✦  Flow Builder    ││  ▊ ░ 1 1%  ▒ 3 75%  ▓ 1 25%                  ▎ ▊ Size     6 B                          ▅▅ ▎  │ 
+ ▏ ▶  Flow Execution  ││  ▊  ░ 0x00000000     6 B  0 low      ↵       ▎ ▊ Band     ░ low                           ▎  │ 
+ ▏ ☑  Checks          ││  ▊                                           ▎ ▊                                          ▎  │ 
+ ▏ ⊕  CRC Designer    ││  ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ 5 regions · ░▒▓ k ▁▎ ▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ↑↓ · ↵ hex ▁▎  │ 
+                      ││                                                                                              │ 
+                      ││   Mapped 1.0 KiB / 128.0 MiB span (0.0008%) · 5 ranges (5 valid) · 4 gaps · 60 issues        │ 
+                      ││                                                                                              │ 
+                      │╰──────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Memory Map  k Legend                                                                                                  
+                                                                                                                        
+===== patch-comfortable-80x24 sha256 9eca95f5aa0d494a4767b30cab303cfe50cf2007af60c99e3c3d5b5ef5fe72df
+                                                                                
+  ⭘                             Hex Edit Tool                                   
+    │                    Patch Editor                      ?  📂 Open patches/  
+ ▏◫ │                                                                           
+ ▏≡ │ draft · change                                                            
+ ▏◉ │╭─ PATCH SCRIPT ──────────╮╭─ INSPECTOR ───────────────────────────────╮   
+ ▏▤ ││ No entries yet: Add on… ││   Inspector    JSON    Checks             │   
+ ▏! ││                         ││ ─BEFORE → AFTER─────────────────────────  │   
+ ▏✎ ││                         ││  No entry yet: Add one or Load a file.    │   
+ ▏✔ ││                         ││                                           │▇▇ 
+ ▏⏚ ││                         ││ Address 0x100                             │   
+ ▏✦ ││                         ││                                           │   
+    ││                         ││ String  text (document encoding)          │   
+ ────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                   (none)  |  snap.a2l  
+                                                                                
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit        
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more            
+                                                                                
+===== patch-comfortable-120x30 sha256 038d24da00fb403fe1ae5bf3395a6f2947b20fe3645e60df92b04e1c34ec5a6e
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                               Patch Editor                                 ?  📂 Open patches/  
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │ draft · change                                                                                  
+ ▏ ◉  MAC View        │╭─ PATCH SCRIPT ────────────────────────────────╮╭─ INSPECTOR ───────────────────────────────╮   
+ ▏ ▤  Memory Map      ││ No entries yet: Add one, paste a change-set … ││   Inspector    JSON    Checks             │   
+ ▏ !  Issues Report   ││                                               ││ ─BEFORE → AFTER─────────────────────────  │   
+ ▏ ✎  Patch Editor    ││                                               ││  No entry yet: Add one or Load a file.    │   
+ ▏ ✔  Check Editor    ││                                               ││                                           │   
+ ▏ ⏚  A2B Diff        ││                                               ││ Address 0x100                             │   
+ ▏ ✦  Flow Builder    ││                                               ││                                           │   
+ ▏ ▶  Flow Execution  ││                                               ││ String  text (document encoding)          │   
+ ▏ ☑  Checks          ││                                               ││                                         ▂ │   
+ ▏ ⊕  CRC Designer    ││                                               ││ Bytes   DE AD BE EF                       │   
+                      ││                                               ││  Add   Edit   Remove   Edit JSON          │   
+                      │╰─────────────────────────────────── 0 entries ─╯╰───────────────────────────────────────────╯   
+                      │ File    Change files in    ▼  or type a path to the same change-set JSON    Load   Refresh      
+                      │  Validate   Apply loaded changes   Save                                                      ▇▇ 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks                             
+                                                                                                                        
+===== diff-comfortable-120x30 sha256 831f9eb8e262cb44c135d27d4ef1415f034c4bbb4d8d07f33faccffdea1a0b66
+                                                                                                                        
+  ⭘                                                 Hex Edit Tool                                                       
+                      │                                            A2B Diff                                             
+ ▏ ◫  Workspace       │                                                                                                 
+ ▏ ≡  A2L Explorer    │                                                                                                 
+ ▏ ◉  MAC View        │   A   external path A                                                                           
+ ▏ ▤  Memory Map      │                                                                                                 
+ ▏ !  Issues Report   │   B   external path B                                                                           
+ ▏ ✎  Patch Editor    │                                                                                                 
+ ▏ ✔  Check Editor    │      Compare           Report       report destination dir (no-project only)                    
+ ▏ ⏚  A2B Diff        │                                                                                                 
+ ▏ ✦  Flow Builder    │   Select two images and press Compare.                                                          
+ ▏ ▶  Flow Execution  │                                                                                                 
+ ▏ ☑  Checks          │   Image A                                                                                       
+ ▏ ⊕  CRC Designer    │                                                                                                 
+                      │   Image B                                                                                       
+                      │                                                                                                 
+                      │                                                                                                 
+                      │                                                                                                 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  Ready.                                                                                           (none)  |  snap.a2l  
+                                                                                                                        
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   0% --:--:--                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+  ^k Palette  ^d Density  ^l Load  ^s Save  x Operations  ? Help  q Quit  ^p palette                                    
+  A2B Diff  k Legend  f Run list  esc Close the run list  ] Window page +  [ Window page -                              
+                                                                                                                        

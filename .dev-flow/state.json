@@ -199,6 +199,11 @@
       "station": "P3",
       "date": "2026-10-22",
       "decision": "P3 increment 006 (Flow Execution) approved under the batch's standing authorization (autonomous with exceptions: stop at PDR and on any HIGH): architect HIGH (second confirm bounced) asked at the gate and fixed in Inc-6; code-reviewer OK and ux-reviewer approve on re-read of the gate fold; operator answers asked at the gate: M3 head cut accepted with a next-batch prototype (LED-.33), new confirm wording kept (LED-.34); full suite found two TC-012 failures from a sixth sev-* class, renamed fx-waiting with F6 (LED-.35), affected modules 262 passed; commit and push to main."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-23",
+      "decision": "P3 increment 008 (two-row key bar) approved: asked at the gate — operator decisions folded (Map min 1 row, Load file/Save project, owned keys dim by window, whole-token dim, 118x53 arms retired); code-reviewer re-read OK to advance (F1 resolved); full suite 8 failed = 6 baseline + 2 load flakes passing isolated. Inc-7 is next."
     }
   ],
   "obsidian_synced": false,

@@ -1,0 +1,11 @@
+# test_tc_b77_22 (failed once in the 92-min fold gate run) isolated x8 on the fold tree
+2 passed in 3.96s
+2 passed in 4.08s
+2 passed in 4.11s
+2 passed in 3.84s
+2 passed in 3.63s
+2 passed in 3.85s
+2 passed in 3.75s
+2 passed in 3.85s
+# the whole map_big module once
+107 passed in 261.15s (0:04:21)

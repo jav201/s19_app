@@ -942,13 +942,16 @@ DataTable > .datatable--odd-row {
  * HLR-126 — the outer #map_content no longer scrolls, so the one-line stats
  * strip below the cockpit always paints). The container takes the pane's
  * remaining height; the scrollbar renders whenever the rows overflow. The
- * 2-row floor guarantees at least two rows paint wherever the pane is
- * height-constrained (the 80x24 stacked regime hands the pane its natural
- * height and lets #map_body scroll — see the narrow rules below). */
+ * 1-row floor keeps a region row painted and the list scrollable wherever
+ * the pane is height-constrained; batch-97 Inc-8 lowered it from 2 (operator
+ * decision at the Inc-8 gate, LED-2026-10-19-batch-97.37): with the two-row
+ * key bar a 2-row floor overflowed the pane at 120x30 and hid the second row
+ * where no scroll could reach it (the 80x24 stacked regime hands the pane its
+ * natural height and lets #map_body scroll — see the narrow rules below). */
 .map-region-scroll {
     width: 100%;
     height: 1fr;
-    min-height: 2;
+    min-height: 1;
 }
 
 /* The `.map-band-legend` container and its `.map-legend-row` children were
@@ -3527,4 +3530,51 @@ ModalScreen {
     padding: 0 1;
     text-wrap: nowrap;
     text-overflow: ellipsis;
+}
+
+/* batch-97 key bar (HLR-150, I-11) -------------------------------------------
+ * The two-row key bar replaces Textual's Footer: row 1 the global keys in the
+ * footer colours, row 2 the active window's tag in the `.db-screen-title`
+ * pair, then its keys with descriptions in the accent. Every colour reaches
+ * the painter through these component classes (no hex in Python).
+ */
+#key_bar {
+    dock: bottom;
+    height: 2;
+}
+
+#key_bar KeyRow {
+    height: 1;
+    width: 1fr;
+    background: $footer-background;
+}
+
+#key_bar KeyRow > .key-bar--key {
+    color: $footer-key-foreground;
+    text-style: bold;
+}
+
+#key_bar #key_bar_global > .key-bar--description {
+    color: $footer-description-foreground;
+}
+
+#key_bar #key_bar_window > .key-bar--description {
+    color: $accent-calm;
+}
+
+#key_bar KeyRow > .key-bar--tag {
+    color: $bg-base;
+    background: $accent-calm;
+    text-style: bold;
+}
+
+#key_bar KeyRow > .key-bar--separator {
+    color: $footer-description-foreground;
+    text-style: dim;
+}
+
+/* A token whose key cannot act now: the whole token, key and description,
+ * in one dim colour (operator decision at the Inc-8 gate, ux F2). */
+#key_bar KeyRow > .key-bar--dim {
+    color: $foreground-disabled;
 }

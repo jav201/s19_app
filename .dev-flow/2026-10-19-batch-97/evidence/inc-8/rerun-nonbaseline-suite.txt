@@ -1,0 +1,5 @@
+..                                                                       [100%]
+2 passed in 5.60s
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+1 failed, 62 passed in 190.65s (0:03:10)

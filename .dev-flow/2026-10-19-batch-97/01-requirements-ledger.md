@@ -354,3 +354,67 @@ above this line is ever edited._
   - (code-reviewer F6, MEDIUM, the gate re-read) `_rearm_attention` returned early on `target == current` after `restart` had cleared the attention. A new run with no lane waiting left the REQUIRED line, `fx-attention` and the scroll stale. The early return now reads `target == current and not restart`. (F7, LOW) The docstring names `_stamp_attention` as the scheduled writer.
 - **Why:** the rename is three lines and keeps a frozen interface frozen; widening `SEVERITY_CLASS_MAP` would reopen that frozen rule for a style hook that carries no severity.
 - **Evidence:** `evidence/inc-6/suite-full.txt` (the two TC-012 failures), `evidence/inc-6/green-post-suite.txt`; `tests/test_b97_flow_execution.py::test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention`, `evidence/inc-6/mutation-f6.txt`.
+
+### LED-2026-10-19-batch-97.36 — Inc-8 as built: what the key bar's tests and signatures differ in from their design text
+- **Requirement:** LLR-150.1, LLR-150.4, LLR-150.6, LLR-150.7 (Statements unchanged); TC-B97-67 / 69 / 71 / 72 procedures (appendix A.4); I-11's `pack_key_row` signature; PC-25's AT-B78-32 row
+- **Supersedes:** the literal parts named below; no requirement Statement changes
+- **Date:** 2026-10-22
+- **What changed:**
+  - (TC-B97-71) The bar's region is not at `y == height − 2`. The Screen has `padding: 1`, so the bar's two rows sit at `height − 3` and `height − 2`. The bottom row stays the padding row, where the Footer also left it. The test asserts that row 2 is at `height − 2`, the row the Footer used. Container rows are exactly `main − 1`: 42 → 41 at 118x54 and 48 → 47 at 220x60 (the 220x60 `main` reading comes from the Inc-8 RED run).
+  - (TC-B97-72) Clicks on row 2 go through a test helper that posts the same MouseDown / MouseUp / Click sequence as `Pilot.click`, without its bounds check. The pilot checks the target against `screen.size` (the app size minus the Screen padding), so it refuses every cell of row 2, which the compositor paints and a real terminal click reaches.
+  - (TC-B97-69) Dimming is read as colour. Textual paints `dim` as a colour blended toward the background (`#ffa62b` → `#b47d2f`), so the strips carry no `dim` attribute. Presses: `, .` are pressed on all 12 windows but Workspace and `+ -` on all 11 windows but A2L / MAC (46 presses; the procedure said 44). The test also asserts that each disabled key is absent from `app.active_bindings` ("neither painted nor live"). The repaint arms allow 3 pauses through `settled`, not one bare `pilot.pause()` (the batch's test-idiom rule). A 0.5 s timer cannot meet that bound.
+  - (TC-B97-67) The "first control" arm is skipped on a window with no focusable control in the state the test drives (the no-file empty state of Issues / Map / Checks). The node asserts the arm ran on ≥ 9 windows.
+  - (AT-B97-26) The change-set path and the 2-entry paste text are placed in their fields. Load and Parse pasted are pressed by key (`enter` on the focused chip).
+  - (I-11 signature) `pack_key_row(tokens, width, *, keep, more, styles=None)` takes one additive keyword: the component-class styles. A pure packer cannot read CSS. `PackedRow` gains a fourth field, `dimmed=()`: the ranges of dimmed tokens, so that a click on one rings the bell while `hits` still holds enabled tokens only. Both are additive; no caller passes positionally beyond the frozen part.
+  - (PC-25) AT-B78-32 is not re-pinned. Its row projection is `(key, action, description, show)` and carries no `key_display`, so the `period` change leaves its rows unchanged. The node keeps its baseline failure (rows `c` and `d`, from Inc-6 and batch-96). TC-B78-38 asserts the same chip-set clause as AT-B78-28 clause 3. The B1 census found it, and it is rewritten the same way (named supersession).
+  - (D27, help) Deleting the Check Editor's hand-typed `space —` line also drops its second meaning, "on a tab chip, opens its tab". The generated block reads `space — Include`. The Patch Editor keeps its own `space —` line, because its table has no `space`.
+  - (Gate fold, a fourth SOURCE file) `screens_directionb.py`: `_DIFF_MIN_H` 28 → 29. The floor is defined as the smallest terminal height at which the Diff shows one hex row (LLR-125.2). The bar adds one chrome row, and the Inc-8 tree re-measures 28 → 0, 29 → 1, 30 → 1 visible hex rows (it was 28 → 1, 30 → 2). `TC-B78-54` turned RED on the Inc-8 tree before the change (`evidence/inc-8/green.txt`) and is GREEN after it (`green-fold.txt`). The diff now shows 1 hex row at 120x30, against R-1's 2. `styles.tcss:1462`'s regime comment (`H >= 28`) is a shipped comment inside the byte-equal prefix and is left as is.
+  - (Gate fold, named supersessions of height pins.) The Flow Builder / Flow Execution b94 screen box at 120x30 / 160x40 goes 96x18 / 136x28 → 96x17 / 136x27 (AT-B94-15, AT-B94-19, TC-B94-26). `TC-B97-40`'s chips below the fold go to 2 at 118x54 (the reading the operator accepted at the Inc-4 gate for 118x53, which has the same body height) and 3 at 118x53, measured. `TC-B97-64` reads `c — Confirm` in the generated keys block, not in the steps. The Flow Execution CSS scope arm ends its section at the next `/* batch-97 ` section. The TC-030 helper keeps the name `_shown_footer_keys`, which the AT/TC registry row names.
+  - (Gate fold, NOT folded: owed to a decision.) At 120x30 the Memory Map's region list paints 1 of its 2 rows. The second row lies under `#map_grid`'s bottom padding row, and `.map-region-scroll` (`min-height: 2`) reports no scroll, so the second region cannot be reached. This is AT-074, RED on the Inc-8 tree only. Separately, `TC-B97-38`'s Flow Builder `after_run` arm at 118x53 (body 38 rows with the bar) scrolls the result area by one row. It holds at 118x54. Both are listed for the operator in the Inc-8 packet.
+- **Why:** each is either the real tree's geometry (Screen padding), a Textual test-harness limit, or a precision the procedure did not fix. None changes what a requirement asks.
+- **Evidence:** `tests/test_b97_key_bar.py` (`click_bar`, `_dim`, `MAIN_CONTAINER_ROWS`, `DERIVED_GUARDS`); `evidence/inc-8/red.txt` (container 42 / 48 on 9793fcd); `evidence/inc-8/mutations.txt`, `mutations-fold.txt`.
+
+### LED-2026-10-19-batch-97.37 — Memory Map region list: the 2-row floor becomes 1 (Inc-8 gate, code-reviewer F1 HIGH)
+- **Requirement:** HLR-150 / LLR-150.6 ("nothing else in the shell moves"); the batch-93 region-list note (outside this contract)
+- **Supersedes:** batch-93's `.map-region-scroll { min-height: 2 }` and its "2-row floor" comment (named supersession)
+- **Date:** 2026-10-23
+- **What changed:** `styles.tcss` `.map-region-scroll` `min-height: 2` → `1`, its comment rewritten. With the two-row key bar, at 120x30 the 2-row floor overflowed `#map_grid` and hid the second region row under the pane's bottom padding row, where no scroll reached it (AT-074 RED). With a 1-row floor the list paints one row and scrolls to the second. The Flow Execution CSS arm's b514b07-prefix check sanctions exactly this block.
+- **Why:** operator decision, asked at the Inc-8 gate 2026-10-23 (item 7, option a).
+- **Evidence:** `tests/test_tui_directionb.py::test_at074_single_click_repositions_hex` (RED on the pre-fold tree, `evidence/inc-8/red-fold.txt`; GREEN after); `evidence/inc-8/png/impl.keybar.map.120x30.png`.
+
+### LED-2026-10-19-batch-97.38 — Row 1 reads `^l Load file` and `^s Save project` (the two Saves / Loads)
+- **Requirement:** LLR-150.2 (token list and the 80x24 count amended), HLR-150's threshold, AT-B97-25
+- **Supersedes:** the descriptions `Load` / `Save` of the `ctrl+l` / `ctrl+s` bindings
+- **Date:** 2026-10-23
+- **What changed:** `app.py` gives `ctrl+l` and `ctrl+s` the descriptions their sibling `l` / `s` bindings already carry. Row 1 grows from 84 to 97 cells. At 80x24 it paints 6 tokens (`^k ^d ^l ^s x ? Help`): `q Quit` and `^p palette` drop whole, and row 1 still never paints `? more` (`? Help` lists every binding). TC-081.4 sanctions the two lines. The ^K palette's entries for these actions read the same words.
+- **Why:** operator decision, asked at the Inc-8 gate 2026-10-23 (item 1, option a): the global Save / Load were confusable with window-level Save / Load controls on the same window.
+- **Evidence:** TC-B97-67 ×3 and AT-B97-25 (RED on the pre-fold tree, `red-fold.txt`); `png/impl.keybar.workspace.png`.
+
+### LED-2026-10-19-batch-97.39 — Owned keys are dimmed while the focus is outside their window or their owner refuses the action (named interface change, I-10)
+- **Requirement:** LLR-150.4 (Statement extended), I-10 (amended)
+- **Supersedes:** I-10's frozen condition set (`when` ∈ {has_image, patch_history, has_variants}) gains an implicit condition for `owner` entries
+- **Date:** 2026-10-23
+- **What changed:** an `owner` entry (Check Editor `space`; Diff `f esc ] [`; Split / Join / Export's eleven keys) is enabled only if (1) the focus is inside the owner's WINDOW and (2) the owner's own `check_action` allows the action (code-reviewer F5). The bar repaints on the focus change through `Screen.bindings_updated_signal`. A disabled token is not clickable (bell). (2) covers ux F1 for the Diff: `AbDiffPanel.check_action` (`screens_directionb.py:8225`) allows `esc` only with the run list open, `f` only in the fallback regime, and `] [` unless the notice regime shows.
+- **Interpretation, recorded:** the instruction read "within the owner" for (1). For `space` (owner `#check_param_table`) that would dim the token while the focus is on a card tab chip, and LLR-150.7's threshold requires a click there to toggle the include. So (1) reads "inside the owner's window". It is the same for Split / Join (the owner is the window) and for the Diff (every focusable control of the window is inside `#ab_diff_panel`).
+- **Why:** operator decision, asked at the Inc-8 gate 2026-10-23 (item 3, combined with code-reviewer F5).
+- **Evidence:** `tests/test_b97_key_bar.py::test_tc_b97_69_owned_keys_dim_outside_their_window` (RED pre-fold); `png/impl.keybar.split_join.png` (focus inside), `png/impl.keybar.split_join.rail.png` (focus on the rail).
+
+### LED-2026-10-19-batch-97.40 — The 118x53 arms of TC-B97-38 retire
+- **Requirement:** LLR-149.5 (the Check, Patch, Builder and Execution height clauses), PC-24
+- **Supersedes:** the `(118, 53)` parameter of `test_tc_b97_38_no_blank_row_outside_the_ledger`, `…_patch_no_blank_row_outside_ledger_and_card`, `…_builder_height_goes_to_the_result` and `…_execution_height_goes_to_the_lanes` (named supersession)
+- **Date:** 2026-10-23
+- **What changed:** PC-24's 118x53 arms stood in for "118x54 with the two-row bar". With the bar real, 118x54 is that body height, and 118x53 now measures a height the PC-5 budget never had (the Builder `after_run` arm scrolled by one row there). Every other PC-24 118x53 arm still passes and is kept.
+- **Why:** operator decision, asked at the Inc-8 gate 2026-10-23 (item 8, option a).
+- **Evidence:** `evidence/inc-8/green.txt` (the failing arm); `tests/test_b97_width.py`.
+
+### LED-2026-10-19-batch-97.41 — Inc-8 gate package: whole-token dimming, the Map help, and what stays
+- **Requirement:** LLR-150.3, LLR-150.4 (the dim paint), LLR-148.6 (the Map help), HLR-150
+- **Supersedes:** the Rich `dim` on each half of a disabled token; the md-ported Map help steps (Map leaves the help_sections.md census, like Patch / Flow)
+- **Date:** 2026-10-23
+- **What changed:**
+  - A disabled token paints whole, key and description, in the `key-bar--dim` component colour (`$foreground-disabled`, painted `#6a7177` on the bar) (ux F2).
+  - The Memory Map help is code-authored. Its steps no longer quote `+ - , . g`, which do not act on the Map, and the keys block shows `k — Legend`.
+  - Unchanged by decision: `Page±` labels; `j` stays off the A2L row.
+  - **Accepted:** the Diff shows 1 hex row at 120x30, where R-1 accepted 2 (`_DIFF_MIN_H` 29, LED-…97.36).
+- **Why:** operator decisions, asked at the Inc-8 gate 2026-10-23 (item 5 and the package).
+- **Evidence:** `test_tc_b97_69_a_dimmed_token_paints_whole_in_one_colour`, `test_tc_b97_70_pack_key_row_dims_and_does_not_hit_disabled`, `test_tc_b97_66_map_help_names_only_keys_that_act_on_the_map` (RED pre-fold, `red-fold.txt`); `png/impl.keybar.patch.png`.

@@ -105,8 +105,10 @@ _EXPECTED_KEYS = frozenset(
         # batch-97 Inc-5 (named supersession, D25 / LLR-148.6): ``flow`` is
         # rewritten as a code-authored ``label — effect`` body and leaves the
         # md-fidelity census too.
+        # batch-97 Inc-8 (named supersession, operator decision at the Inc-8
+        # gate 2026-10-23): ``map`` is rewritten code-authored (its md steps
+        # named keys that do not act on the Map) and leaves the md census.
         "checks",
-        "map",
         "a2l",
         "workspace",
         "split_join_export",
@@ -135,7 +137,7 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
 # batch-97 Inc-6 (named supersession, D25 / I-4): ``flow_execution`` joins the
 # code-authored shipped seats (LLR-148.6).
 _CODE_AUTHORED_SHIPPED = frozenset(
-    {"check_editor", "patch", "crc_designer", "reports", "flow", "flow_execution"}
+    {"check_editor", "patch", "crc_designer", "reports", "flow", "flow_execution", "map"}
 )
 
 

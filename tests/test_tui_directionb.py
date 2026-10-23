@@ -6862,185 +6862,166 @@ def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None
 
 
 # ---------------------------------------------------------------------------
-# TC-030 — the footer reflects the active screen's show=True bindings
-#          (LLR-013.2 — expected set pinned by the increment-1 keymap)
+# TC-030 — the bottom key bar reflects the active screen
+#          (LLR-013.2, superseded by batch-97 HLR-150 — LED-2026-10-19-batch-97.10)
 # ---------------------------------------------------------------------------
 #
-# The increment-1 keymap-proposal.md pins the expected footer set:
-#   - the global footer set (always shown):
-#       ctrl+k, ctrl+d, ctrl+l, ctrl+s, slash, g, q
-#   - the per-screen paging set is realised through the single global
-#     dispatcher bindings period / comma / plus / minus (see the module
-#     docstring's increment-11 design note). Every screen the keymap §3
-#     assigns paging to (Workspace, A2L, MAC, Issues) keeps those keys in
-#     the footer; the scaffold screens (Map, Patch, Diff, Bookmarks) carry
-#     no per-screen set and show only the global footer set + the constant
-#     paging dispatchers.
+# Named supersession (batch-97 Inc-8, PC-25). These four nodes pinned the
+# one-row Footer set of the increment-1 keymap-proposal.md: a global footer set
+# ``ctrl+k ctrl+d ctrl+l ctrl+s slash g q`` on every screen and the paging
+# dispatchers ``period comma plus minus`` on Workspace / A2L / MAC / Issues.
+# batch-02 LLR-013.2 and keymap-proposal.md §2–§3 are SUPERSEDED by the
+# two-row key bar (HLR-150): row 1 carries the global keys
+# ``^k ^d ^l ^s x ? q`` + the palette on every window, and row 2 the window's
+# own keys from ``window_help.WINDOW_KEYS`` — ``/`` and ``g`` only where a
+# find / go-to input exists (Workspace, A2L, MAC), ``,`` ``.`` only on
+# Workspace, ``+`` ``-`` on A2L and MAC, PgDn / PgUp on Issues. The nodes now
+# read the painted key bar (the compositor strips), never ``active_bindings``.
 # ---------------------------------------------------------------------------
 
-# Global footer set — keymap-proposal.md §2 ("always shown").
-_GLOBAL_FOOTER_KEYS: frozenset[str] = frozenset(
-    {"ctrl+k", "ctrl+d", "ctrl+l", "ctrl+s", "slash", "g", "q"}
-)
+#: Row 1 of the key bar — the batch-97 global set (LLR-150.2), as painted keys.
+_GLOBAL_FOOTER_KEYS: frozenset[str] = frozenset({"^k", "^d", "^l", "^s", "x", "?", "q", "^p"})
 
-# The four paging keys that realise the keymap §3 per-screen paging sets.
-_PAGING_FOOTER_KEYS: frozenset[str] = frozenset(
-    {"period", "comma", "plus", "minus"}
-)
+#: The per-window paging keys of the superseded keymap §3, as row 2 paints
+#: them now (HLR-150 / D28): each screen's paging keys and nowhere else.
+_PAGING_BY_SCREEN: dict[str, frozenset[str]] = {
+    "workspace": frozenset({",", "."}),
+    "a2l": frozenset({"+", "-"}),
+    "mac": frozenset({"+", "-"}),
+    "issues": frozenset({"pgdn", "pgup"}),
+}
+_PAGING_KEYS: frozenset[str] = frozenset().union(*_PAGING_BY_SCREEN.values())
 
-# keymap-proposal.md §3: screens the keymap assigns a per-screen paging set.
-# Map / Patch / Diff / Bookmarks carry no per-screen bindings (scaffolds).
-_SCREENS_WITH_PAGING: frozenset[str] = frozenset({"workspace", "a2l", "mac", "issues"})
+
+def _shown_footer_keys(app: S19TuiApp) -> list[set[str]]:
+    """The keys painted on each key-bar row (the first word of each token)."""
+    import re
+
+    from tests.b97_probes import painted_rows
+
+    rows = []
+    for row in app.query("#key_bar KeyRow"):
+        text = painted_rows(app, row)[0]
+        keys = set()
+        for token in re.split(r" {2,}", text.strip()):
+            for lead in ("· go ", "go "):
+                if token.startswith(lead):
+                    token = token[len(lead):]
+            keys.add(token.split(" ", 1)[0])
+        rows.append(keys)
+    return rows
 
 
-def _shown_footer_keys(app: S19TuiApp) -> set[str]:
-    """Return the keys the footer shows — the app's ``show=True`` bindings.
+async def _key_bars_per_screen(tmp_path: Path) -> dict[str, list[set[str]]]:
+    from tests.b97_probes import settle
 
-    ``App.active_bindings`` is exactly what the Textual ``Footer`` renders;
-    filtering it to ``binding.show`` and ``enabled`` reproduces the footer's
-    visible chip set.
-    """
-    return {
-        key
-        for key, active in app.active_bindings.items()
-        if active.binding.show and active.enabled
-    }
+    app = S19TuiApp(base_dir=tmp_path)
+    bars: dict[str, list[set[str]]] = {}
+    async with app.run_test(size=(220, 60)) as pilot:
+        await settle(pilot)
+        for screen_key in SCREEN_KEYS:
+            app.action_show_screen(screen_key)
+            await settle(pilot, 3)
+            bars[screen_key] = _shown_footer_keys(app)
+    return bars
 
 
 def test_tc030_global_footer_set_present_on_every_screen(tmp_path: Path) -> None:
-    """The keymap §2 global footer set is shown on every rail screen.
+    """Row 1 of the key bar is the global set on every rail screen.
 
-    Intent: LLR-013.2 — the footer/status bar must surface the active
-    screen's ``show=True`` bindings. The keymap proposal §2 pins the global
-    footer set (``ctrl+k`` · ``ctrl+d`` · ``ctrl+l`` · ``ctrl+s`` · ``/`` ·
-    ``g`` · ``q``) as always-shown; this asserts every one of those keys is
-    in the footer's visible set on each of the eight rail screens.
+    Intent: the keys that act everywhere are always visible, whatever the
+    window (HLR-150 / LLR-150.2, superseding LLR-013.2's global footer set):
+    row 1 paints exactly ``^k ^d ^l ^s x ? q ^p`` on each of the twelve rail
+    screens, and ``/`` / ``g`` — no longer global — are painted (on row 2)
+    exactly where a find / go-to input exists.
     """
-
-    async def _drive() -> dict[str, set[str]]:
-        app = S19TuiApp(base_dir=tmp_path)
-        footers: dict[str, set[str]] = {}
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            for screen_key in SCREEN_KEYS:
-                app.action_show_screen(screen_key)
-                await pilot.pause()
-                footers[screen_key] = _shown_footer_keys(app)
-        return footers
-
-    footers = asyncio.run(_drive())
-    for screen_key, shown in footers.items():
-        missing = _GLOBAL_FOOTER_KEYS - shown
-        assert not missing, (
-            f"screen '{screen_key}' footer is missing global keymap §2 "
-            f"keys {sorted(missing)} — footer shows {sorted(shown)}"
-        )
+    bars = asyncio.run(_key_bars_per_screen(tmp_path))
+    for screen_key, rows in bars.items():
+        assert len(rows) == 2, f"screen '{screen_key}' has a two-row key bar"
+        assert rows[0] == _GLOBAL_FOOTER_KEYS, (screen_key, sorted(rows[0]))
+        has_find = {"/", "g"} <= rows[1]
+        assert has_find == (screen_key in {"workspace", "a2l", "mac"}), (screen_key, sorted(rows[1]))
 
 
 def test_tc030_per_screen_paging_bindings_in_footer(tmp_path: Path) -> None:
-    """Screens the keymap §3 assigns paging to show the paging keys.
+    """Each screen's paging keys are painted on its row 2 and nowhere else.
 
-    Intent: LLR-013.2 — the per-screen ``show=True`` set is TC-030's
-    expected column (keymap proposal §3). The keymap assigns a paging set to
-    Workspace, A2L Explorer, MAC View and Issues Report; this asserts the
-    four paging keys (``period`` / ``comma`` / ``plus`` / ``minus``, the
-    single global dispatchers realising the per-screen sets — see the module
-    docstring) are present in the footer on each of those screens.
+    Intent: a paging key is shown where it pages something (HLR-150 / D28,
+    superseding keymap §3's constant dispatchers): ``, .`` on Workspace,
+    ``+ -`` on A2L and MAC, PgDn / PgUp on Issues; no other screen paints any
+    of them, because there they would page a hidden view or nothing.
     """
-
-    async def _drive() -> dict[str, set[str]]:
-        app = S19TuiApp(base_dir=tmp_path)
-        footers: dict[str, set[str]] = {}
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            for screen_key in SCREEN_KEYS:
-                app.action_show_screen(screen_key)
-                await pilot.pause()
-                footers[screen_key] = _shown_footer_keys(app)
-        return footers
-
-    footers = asyncio.run(_drive())
-    for screen_key in _SCREENS_WITH_PAGING:
-        shown = footers[screen_key]
-        missing = _PAGING_FOOTER_KEYS - shown
-        assert not missing, (
-            f"screen '{screen_key}' has a keymap §3 paging set but its "
-            f"footer is missing paging keys {sorted(missing)}"
-        )
+    bars = asyncio.run(_key_bars_per_screen(tmp_path))
+    for screen_key, rows in bars.items():
+        painted = (rows[0] | rows[1]) & _PAGING_KEYS
+        expected = _PAGING_BY_SCREEN.get(screen_key, frozenset())
+        assert painted == expected, (screen_key, sorted(painted), sorted(expected))
 
 
 def test_tc030_footer_updates_and_reflects_active_screen(tmp_path: Path) -> None:
-    """The footer is a live ``Footer`` reflecting the running app's bindings.
+    """The key bar is live: row 2 follows the active screen.
 
-    Intent: LLR-013.2 acceptance criterion — the footer shows the *current*
-    screen's bindings and updates on screen change. This asserts (a) a
-    ``Footer`` widget is mounted, (b) its visible binding set is non-empty
-    and is exactly the app's ``show=True`` bindings on each screen, and (c)
-    navigating between screens keeps the footer consistent with
-    ``active_bindings`` (the property the ``Footer`` renders from). The
-    realised implementation uses one app-level ``BINDINGS`` set, so the chip
-    set is constant — this test pins that and verifies the footer never
-    drifts from ``active_bindings``.
+    Intent: the bottom bar shows the *current* screen's keys and updates on a
+    screen change (LLR-013.2's acceptance, now HLR-150): no ``Footer`` is
+    mounted, ``#key_bar`` is, row 1 is the same on every screen, and row 2
+    starts with the active screen's name after each switch.
     """
+    import re
+
     from textual.widgets import Footer
 
-    async def _drive() -> tuple[bool, dict[str, set[str]]]:
+    from tests.b97_probes import painted_rows, settle
+
+    async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            footer_mounted = bool(app.query(Footer))
-            per_screen: dict[str, set[str]] = {}
+        tags: dict[str, str] = {}
+        async with app.run_test(size=(220, 60)) as pilot:
+            await settle(pilot)
+            mounted = (len(app.query(Footer)), len(app.query("#key_bar")))
             for screen_key in SCREEN_KEYS:
                 app.action_show_screen(screen_key)
-                await pilot.pause()
-                per_screen[screen_key] = _shown_footer_keys(app)
-        return footer_mounted, per_screen
+                await settle(pilot, 3)
+                row = painted_rows(app, app.query_one("#key_bar_window"))[0]
+                tags[screen_key] = re.split(r" {2,}", row.strip())[0]
+        from textual.binding import Binding
 
-    footer_mounted, per_screen = asyncio.run(_drive())
-    assert footer_mounted, "a Footer widget must be mounted to show bindings"
-    for screen_key, shown in per_screen.items():
-        assert shown, (
-            f"screen '{screen_key}' must show a non-empty footer binding set"
-        )
-        # Every shown key is a real app binding (no phantom footer chips).
-        assert _GLOBAL_FOOTER_KEYS.issubset(shown), (
-            f"screen '{screen_key}' footer dropped a global binding"
-        )
+        bindings = [b if isinstance(b, Binding) else Binding(*b) for b in S19TuiApp.BINDINGS]
+        names = {
+            key: next(b.description for b in bindings if b.action == f"show_screen('{key}')")
+            for key in SCREEN_KEYS
+        }
+        return mounted, tags, names
+
+    mounted, tags, names = asyncio.run(_drive())
+    assert mounted == (0, 1), f"(Footer, key bar) mounted: {mounted}"
+    assert tags == names, (tags, names)
 
 
 def test_tc030_operations_binding_shown_in_footer(tmp_path: Path) -> None:
-    """The Operations view's ``x`` binding is footer-discoverable.
+    """The Operations view's ``x`` binding is discoverable on every screen.
 
-    Intent: fast-dev-flow AC "x/Operations is footer-discoverable" — the
-    Operations view (host of the CRC operation) was reachable only by the
-    undocumented ``x`` key. Flipping that binding to ``show=True`` surfaces it
-    in the footer. AC-1: ``x`` is in the footer's visible set on every rail
-    screen. AC-2: the chip's description reads ``Operations``.
+    Intent: fast-dev-flow AC "x/Operations is footer-discoverable" — now row 1
+    of the key bar: ``x Operations`` is painted on every rail screen (AC-1),
+    labelled with the binding's description ``Operations`` (AC-2).
     """
+    import re
 
-    async def _drive() -> tuple[dict[str, set[str]], str]:
+    from tests.b97_probes import painted_rows, settle
+
+    async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
-        footers: dict[str, set[str]] = {}
-        description = ""
-        async with app.run_test() as pilot:
-            await pilot.pause()
+        rows: dict[str, list[str]] = {}
+        async with app.run_test(size=(220, 60)) as pilot:
+            await settle(pilot)
             for screen_key in SCREEN_KEYS:
                 app.action_show_screen(screen_key)
-                await pilot.pause()
-                footers[screen_key] = _shown_footer_keys(app)
-            description = app.active_bindings["x"].binding.description
-        return footers, description
+                await settle(pilot, 3)
+                text = painted_rows(app, app.query_one("#key_bar_global"))[0]
+                rows[screen_key] = re.split(r" {2,}", text.strip())
+        return rows
 
-    footers, description = asyncio.run(_drive())
-    for screen_key, shown in footers.items():
-        assert "x" in shown, (
-            f"screen '{screen_key}' footer is missing the Operations key "
-            f"'x' — footer shows {sorted(shown)}"
-        )
-    assert description == "Operations", (
-        f"the 'x' binding footer description must read 'Operations', "
-        f"got {description!r}"
-    )
+    for screen_key, tokens in asyncio.run(_drive()).items():
+        assert "x Operations" in tokens, (screen_key, tokens)
 
 
 # ---------------------------------------------------------------------------

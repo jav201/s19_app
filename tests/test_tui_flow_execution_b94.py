@@ -338,7 +338,8 @@ def test_at_b94_19_import_mounts_lanes_side_by_side(tmp_path: Path) -> None:
         # The boxed budget: the screen is the measured 96x18 / 136x28 and
         # both lanes render fully inside it (side by side, no overlap).
         assert state["screen_box"] == (
-            (96, 18) if size == (120, 30) else (136, 28)
+            # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row.
+            (96, 17) if size == (120, 30) else (136, 27)
         ), state["screen_box"]
         assert state["lanes_visible"], "both lanes must be fully visible"
         # Each lane's block list == its template's blocks (kind chain).
@@ -421,13 +422,13 @@ def test_tc_b94_26_lane_mounting_and_render_census(tmp_path: Path) -> None:
     )
     assert wide["lane_count"] == 3
     assert wide["after_cancel"] == 3, "a cancelled import adds 0 lanes"
-    assert wide["screen_box"] == (96, 18)
+    assert wide["screen_box"] == (96, 17)  # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row
     assert wide["max_scroll_x"] <= 0 or wide["fit"], (
         "three lanes may scroll at 120x30 only with all lanes still laid out"
     )
 
     wider = asyncio.run(_drive((160, 40)))
-    assert wider["screen_box"] == (136, 28)
+    assert wider["screen_box"] == (136, 27)  # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row
     assert wider["lane_count"] == 3
     assert wider["after_cancel"] == 3
 

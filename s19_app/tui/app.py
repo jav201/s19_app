@@ -15,7 +15,6 @@ from textual.reactive import reactive
 from textual.widgets import (
     Button,
     DataTable,
-    Footer,
     Header,
     HelpPanel,
     Input,
@@ -158,7 +157,7 @@ from .services.project_gather_service import (
 )
 from .services import folder_open_service
 from .open_folder_chip import OpenFolderChip, titled_header
-from .window_help import WindowHelpChip, WindowSection
+from .window_help import KeyBar, WindowHelpChip, WindowSection
 from .a2l_describe import CurveDescriptionScreen
 from .a2l import describe_curve_tag
 from .segment_split_view import SplitJoinWindow
@@ -1386,8 +1385,8 @@ class S19TuiApp(App):
     BINDINGS = [
         Binding("ctrl+k", "focus_palette", "Palette", priority=True),
         Binding("ctrl+d", "cycle_density", "Density", priority=True),
-        Binding("ctrl+l", "load_file", "Load", priority=True),
-        Binding("ctrl+s", "save_project", "Save", priority=True),
+        Binding("ctrl+l", "load_file", "Load file", priority=True),
+        Binding("ctrl+s", "save_project", "Save project", priority=True),
         ("slash", "focus_find", "Find"),
         ("g", "focus_goto", "Go-to"),
         ("q", "quit", "Quit"),
@@ -1435,7 +1434,7 @@ class S19TuiApp(App):
         ("plus", "page_next_context", "Page+"),
         ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
-        ("period", "hex_page_next", "Hex+"),
+        Binding("period", "hex_page_next", "Hex+", key_display="."),
         # batch-31 AC-3 (B-04): PgUp/PgDn were advertised by the Issues
         # panel's truncation note but had no binding anywhere. They route
         # through the issues-aware context actions (Issues screen pages the
@@ -2082,7 +2081,9 @@ class S19TuiApp(App):
             Label("", id="log_line_4", markup=False),
             id="workspace_status_bar",
         )
-        yield Footer()
+        # batch-97 Inc-8 (HLR-150, D26): the two-row key bar replaces the
+        # one-row Footer — row 1 the global keys, row 2 the active window's.
+        yield KeyBar(id="key_bar")
 
     def _compose_screen_workspace(self) -> Container:
         """
@@ -3288,6 +3289,9 @@ class S19TuiApp(App):
             mem_map=mem_map,
             document=self._patch_document_view(),
         )
+        # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
+        # document's source, which this refresh may have changed.
+        self.refresh_bindings()
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
         # paste-authored / empty document — disable Edit-JSON whenever the
@@ -3478,6 +3482,9 @@ class S19TuiApp(App):
             mem_map=loaded.mem_map if loaded is not None else None,
             document=self._patch_document_view(),
         )
+        # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
+        # document's source, which this refresh may have changed.
+        self.refresh_bindings()
         panel.refresh_issues(service.issue_lines())
         # batch-40 S1: a history move (undo/redo) restores a change-set whose
         # entries no longer match the pre-move check run, so the stale Checks
@@ -5324,6 +5331,9 @@ class S19TuiApp(App):
             mem_map=loaded.mem_map if loaded is not None else None,
             document=self._patch_document_view(),
         )
+        # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
+        # document's source, which this refresh may have changed.
+        self.refresh_bindings()
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: a file-backed document disables
         # Edit-JSON (no clobber path).
@@ -7019,6 +7029,8 @@ class S19TuiApp(App):
             # batch-94 Inc-003 (LLR-021.2): the set picker repopulates on
             # entry, the ``_prefill_check_editor`` idiom.
             self._prefill_flow_execution_sets()
+        # batch-97 Inc-8 (D29): the key bar's row 2 follows the window.
+        self.refresh_bindings()
 
     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
         """Gate app actions by the active window (batch-97 I-11, D10).
@@ -7026,21 +7038,49 @@ class S19TuiApp(App):
         Summary:
             ``confirm_attention`` (the ``c`` key and its ^K palette entry)
             runs only while Flow Execution is the active window — off it the
-            key does nothing and the binding is not active; every other
-            action falls through to Textual's own check. Inc-8 adds D28's
-            arms here.
+            key does nothing and the binding is not active. Inc-8 (D28):
+            ``+`` / ``-`` page only on A2L and MAC, and ``,`` / ``.`` only
+            on Workspace — elsewhere they would page a hidden view. Every
+            other action falls through to Textual's own check.
 
         Args:
             action (str): The action name.
             parameters (tuple): The action's parameters.
 
         Returns:
-            Optional[bool]: ``False`` for ``confirm_attention`` off Flow
-            Execution, else what ``App.check_action`` returns.
+            Optional[bool]: ``False`` for an action off its window, else
+            what ``App.check_action`` returns.
         """
         if action == "confirm_attention":
             return self._active_screen_key == "flow_execution"
+        if action in ("page_next_context", "page_prev_context"):
+            return self._active_screen_key in ("a2l", "mac")
+        if action in ("hex_page_prev", "hex_page_next"):
+            return self._active_screen_key == "workspace"
         return super().check_action(action, parameters)
+
+    def key_condition(self, when: str) -> bool:
+        """Evaluate a window-key ``when`` condition for the key bar (I-10);
+        a false one paints that key dimmed."""
+        if when == "has_image":
+            return self.current_file is not None
+        if when == "patch_history":
+            return self._patch_history_action_allowed()
+        if when == "has_variants":
+            return self._variant_set is not None and bool(self._variant_set.variants)
+        raise ValueError(f"unknown key condition {when!r}")
+
+    @property
+    def _variant_set(self) -> Optional[ProjectVariantSet]:
+        """The active project's variant set (LLR-005.5/005.6), or ``None``."""
+        return self._variant_set_value
+
+    @_variant_set.setter
+    def _variant_set(self, value: Optional[ProjectVariantSet]) -> None:
+        # batch-97 Inc-8 (PC-23): one setter for the four writers, so the key
+        # bar's Select-variant token follows the set.
+        self._variant_set_value = value
+        self.refresh_bindings()
 
     def action_confirm_attention(self) -> None:
         """``c`` on Flow Execution: confirm the attention lane's waiting
@@ -7094,6 +7134,7 @@ class S19TuiApp(App):
         window.remove_class("hidden")
         self._active_screen_key = "split_join"
         window.refresh_window()
+        self.refresh_bindings()
 
     def action_show_help_panel(self) -> None:
         """
@@ -10702,6 +10743,8 @@ class S19TuiApp(App):
             Used by:
                 - The ``current_file`` reactive on every install/unload.
         """
+        # batch-97 Inc-8 (PC-23): the key bar dims the image keys by this.
+        self.refresh_bindings()
         try:
             window = self.query_one("#screen_split_join", SplitJoinWindow)
         except Exception:
@@ -10819,6 +10862,9 @@ class S19TuiApp(App):
                 mem_map=loaded.mem_map,
                 document=self._patch_document_view(),
             )
+            # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
+            # document's source, which this refresh may have changed.
+            self.refresh_bindings()
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,
         # so the sticky report-filter selection dies with the previous

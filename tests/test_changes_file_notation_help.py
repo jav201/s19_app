@@ -58,8 +58,10 @@ _MD_AUTHORED_KEYS = frozenset(
         # code names their folder, the untracked draft keeps its wording.
         # batch-97 Inc-5 (named supersession, D25): ``flow`` is rewritten
         # code-authored too and leaves the md census.
+        # batch-97 Inc-8 (named supersession, operator decision at the Inc-8
+        # gate 2026-10-23): ``map`` is rewritten code-authored (its md steps
+        # named keys that do not act on the Map) and leaves the md census.
         "checks",
-        "map",
         "a2l",
         "workspace",
         "split_join_export",
@@ -162,6 +164,8 @@ def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
         # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
         # code-authored ``flow_execution`` section joins the data home.
         "flow_execution",
+        # batch-97 Inc-8: the code-authored ``map`` section.
+        "map",
     }, (
         "the data home must hold exactly the nine md-authored sections "
         "plus the batch-96 changes_file_notation and batch-97 check_editor "

@@ -748,6 +748,18 @@ def test_tc081_4_no_binding_diff() -> None:
         # `show=False`, so the shipped Footer paints no new token and no
         # snapshot cell drifts (PC-10: 0 of 29).
         "confirm_attention",
+        # batch-97 Inc-8 (named supersession, D28 / PC-25): the `period`
+        # binding gains `key_display="."` so the key bar paints `.`, never the
+        # word `period` (P-65). Its key, action and description are unchanged;
+        # the drift is the key bar's, which moves the bottom rows of all 29
+        # snapshot cells (PC-10) and is reconciled by the Inc-7 regen.
+        'key_display="."',
+        # batch-97 Inc-8 gate fold (operator decision at the Inc-8 gate
+        # 2026-10-23, LED-…97.38): row 1 of the key bar reads `^l Load file`
+        # and `^s Save project` — the descriptions the sibling `l` / `s`
+        # bindings already carry; key and action unchanged.
+        '"ctrl+l", "load_file"',
+        '"ctrl+s", "save_project"',
     )
     changed = [
         line

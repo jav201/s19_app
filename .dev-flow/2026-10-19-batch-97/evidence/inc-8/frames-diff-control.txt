@@ -1,0 +1,26 @@
+18,19c18,19
+< │    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2            0x00013A01  u8 m/s  ││                                        │
+< │    ASAM.M.SCALAR.UWORD.IDENTICAL               0x00013A02  u16 h… ▄││                                        │
+---
+> │    ASAM.M.SCALAR.SBYTE.LINEAR_MUL_2            0x00013A01  u8 m/s ▂││                                        │
+> │    ASAM.M.SCALAR.UWORD.IDENTICAL               0x00013A02  u16 h…  ││                                        │
+37d36
+< │    ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010  0x00810002  u16 h…  ││                                        │
+67c66
+< │    ASAM.M.SCALAR.FLOAT64.IDENTICAL                                                            0x00013A14  u64 hours    ││                                                                        │
+---
+> │    ASAM.M.SCALAR.FLOAT64.IDENTICAL                                                            0x00013A14  u64 hours   ▇││                                                                        │
+86d84
+< │    ASAM.C.SCALAR.SWORD.TAB_INTP_NO_DEFAULT_VALUE                                              0x00810004  u16 U/  min  ││                                                                        │
+131d128
+< │                                                                 ││                                           │
+180d176
+< │                                                                                                                   ││                                                                             │
+226d221
+<                                                                                                                 
+275d269
+<                                                                                                                                                                                                     
+316d309
+< │                                                                                                              │
+327d319
+< │                                                                                                                                                                                                  │

@@ -1,0 +1,83 @@
+# Inc-8 RED on unchanged 9793fcd source (worktree scratchpad/head_9793fcd, detached at 9793fcd; tests copied from the Inc-8 tree)
+# source sha256: a0be1dd747c6fadd *s19_app/tui/app.py a488a0bce5201ee3 *s19_app/tui/window_help.py 4c790e6e1182e901 *s19_app/tui/styles.tcss 
+# s19_app imported from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\__init__.py
+FFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFF.                                 [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:152: AssertionError: window_help holds the window-key table
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:187: AttributeError: module 's19_app.tui.window_help' has no attribute 'WINDOW_KEYS'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:187: AttributeError: module 's19_app.tui.window_help' has no attribute 'WINDOW_KEYS'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:221: AssertionError: the help-key -> window table exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:293: AssertionError: the table literals were found
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:370: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load', '^s Save', '/ Find', 'g Go-to', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:370: AssertionError: ('workspace', 'rail', ['^k Palette', '^d Density', '^l Load', '^s Save', '/ Find', 'g Go-to', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:393: AssertionError: ('workspace', ['^k Palette', '^d Density', '^l Load', '^s Save', '/ Find', 'g Go-to', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:422: AssertionError: workspace: the key bar has two rows, got 1
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:478: AssertionError: the key bar has two rows
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:581: AttributeError: module 's19_app.tui.window_help' has no attribute 'WINDOW_KEYS'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:644: AssertionError: a disabled key paged something: [('map', 'period', (0, 0, 0), (200, 0, 0)), ('issues', 'comma', (200, 0, 0), (0, 0, 0)), ('issues', 'period', (0, 0, 0), (200, 0, 0)), ('patch', 'comma', (200, 0, 0), (0, 0, 0)), ('patch', 'period', (0, 0, 0), (200, 0, 0)), ('check_editor', 'comma', (200, 0, 0), (0, 0, 0)), ('check_editor', 'period', (0, 0, 0), (200, 0, 0)), ('diff', 'comma', (200, 0, 0), (0, 0, 0)), ('diff', 'period', (0, 0, 0), (200, 0, 0)), ('flow', 'comma', (200, 0, 0), (0, 0, 0)), ('flow', 'period', (0, 0, 0), (200, 0, 0)), ('flow_execution', 'comma', (200, 0, 0), (0, 0, 0)), ('flow_execution', 'period', (0, 0, 0), (200, 0, 0)), ('checks', 'comma', (200, 0, 0), (0, 0, 0)), ('checks', 'period', (0, 0, 0), (200, 0, 0)), ('crc_designer', 'comma', (200, 0, 0), (0, 0, 0)), ('crc_designer', 'period', (0, 0, 0), (200, 0, 0)), ('split_join', 'comma', (200, 0, 0), (0, 0, 0)), ('split_join', 'period', (0, 0, 0), (200, 0, 0))]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:710: AssertionError: the key bar has two rows
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:786: ImportError: cannot import name 'pack_key_row' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:786: ImportError: cannot import name 'pack_key_row' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:809: ImportError: cannot import name 'pack_key_row' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:881: AssertionError: {'a2l': 42, 'check_editor': 42, 'checks': 42, 'crc_designer': 42, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:881: AssertionError: {'a2l': 48, 'check_editor': 48, 'checks': 48, 'crc_designer': 48, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:952: assert []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:922: IndexError: list index out of range
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:922: IndexError: list index out of range
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:922: IndexError: list index out of range
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_key_bar.py:124: ImportError: cannot import name 'resolve_window_tokens' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\b97_probes.py:323: AssertionError: did not settle: undo / redo lit
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_tui_directionb.py:6940: AssertionError: screen 'workspace' has a two-row key bar
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_tui_directionb.py:6956: IndexError: list index out of range
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#key_bar_window' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#key_bar_global' on Screen(id='_default')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_tui_diff_screen.py:3830: AssertionError: the painted key-bar set must be SET-EQUAL to its committed set of 13; observed 0: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_tui_diff_screen.py:3961: AssertionError: the key-bar set must be unchanged in the pre-comparison state too; observed []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_chips_help.py:778: ImportError: cannot import name 'window_keys_text' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_chips_help.py:778: ImportError: cannot import name 'window_keys_text' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\tests\test_b97_chips_help.py:778: ImportError: cannot import name 'window_keys_text' from 's19_app.tui.window_help' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_9793fcd\s19_app\tui\window_help.py)
+=========================== short test summary info ===========================
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_table_covers_the_13_windows_and_resolves
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_unbound_key_or_empty_description_raises_at_mount[unbound]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_unbound_key_or_empty_description_raises_at_mount[empty]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_help_keys_block_is_generated_from_the_table
+FAILED tests/test_b97_key_bar.py::test_tc_b97_66_table_stores_no_labels - Ass...
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_is_the_eight_globals_whatever_the_focus[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_67_row_one_at_80x24_drops_palette_whole
+FAILED tests/test_b97_key_bar.py::test_tc_b97_68_row_two_tag_tokens_and_colours
+FAILED tests/test_b97_key_bar.py::test_tc_b97_68_go_separator_switch_and_modal
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_derived_rows_follow_their_guards
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_painted_keys_within_the_allowed_set[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_painted_keys_within_the_allowed_set[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_dimmed_entries_follow_their_condition
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_pack_key_row_keeps_a_whole_display_order_prefix[workspace]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_pack_key_row_keeps_a_whole_display_order_prefix[wide_second]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_pack_key_row_dims_and_does_not_hit_disabled
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_70_every_painted_row_is_whole_tokens[80x24]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_71_the_bar_replaces_the_footer_and_costs_one_row[118x54]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_71_the_bar_replaces_the_footer_and_costs_one_row[220x60]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_72_hit_ranges_are_the_painted_cells
+FAILED tests/test_b97_key_bar.py::test_tc_b97_72_clicks_run_the_action_and_type_nothing
+FAILED tests/test_b97_key_bar.py::test_tc_b97_72_owner_click_runs_on_its_widget_not_the_focus
+FAILED tests/test_b97_key_bar.py::test_tc_b97_72_confirm_click_with_the_focus_in_an_input
+FAILED tests/test_b97_key_bar.py::test_at_b97_25_two_rows_on_every_window_and_clicks
+FAILED tests/test_b97_key_bar.py::test_at_b97_26_keys_only_help_and_hidden_view
+FAILED tests/test_tui_directionb.py::test_tc030_global_footer_set_present_on_every_screen
+FAILED tests/test_tui_directionb.py::test_tc030_per_screen_paging_bindings_in_footer
+FAILED tests/test_tui_directionb.py::test_tc030_footer_updates_and_reflects_active_screen
+FAILED tests/test_tui_directionb.py::test_tc030_operations_binding_shown_in_footer
+FAILED tests/test_tui_diff_screen.py::test_at_b78_28_run_list_keys_are_discoverable
+FAILED tests/test_tui_diff_screen.py::test_tc_b78_38_help_panel_before_any_comparison_does_not_raise
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_check_editor_help_names_every_label
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_flow_execution_help_names_every_label
+38 failed, 2 passed in 222.60s (0:03:42)

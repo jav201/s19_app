@@ -135,8 +135,13 @@ from tools.id_registry import (
 # Check Editor increment adds ``tests/test_b97_check_editor.py`` (TC-B97-08..12,
 # 43..46, 61; AT-B97-04/05/18/21) and ``tests/test_b97_width.py`` (TC-B97-34..38,
 # 59, Check arms).
-EXPECTED_SCANNED_TEST_FILES = 197
+EXPECTED_SCANNED_TEST_FILES = 198
 """Test modules scanned, including this one.
+
+batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the
+two-row key bar (HLR-150, D18). MEASURED, not incremented:
+``scanned_test_files()`` reports 198, and ``ls tests/*.py tests/**/*.py | sort
+-u | wc -l`` agrees at 198.
 
 batch-97 Inc-4: 196 -> 197. ``tests/test_b97_patch_editor.py`` was added for
 the Patch Editor re-composition (HLR-144, D18). MEASURED, not incremented:

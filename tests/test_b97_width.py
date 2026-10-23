@@ -389,7 +389,10 @@ def test_tc_b97_38_ledger_takes_the_width_its_split_assigns(tmp_path: Path, size
         assert layout.param > small.param and layout.fields_name > small.fields_name, layout
 
 
-@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+# batch-97 Inc-8 gate fold (named supersession, operator decision at the Inc-8 gate
+# 2026-10-23, LED-…97.40): the 118x53 arm was PC-24's stand-in for "118x54 with
+# the two-row key bar"; with the bar real, 118x54 is that height and the arm retires.
+@pytest.mark.parametrize("size", [(118, 54), (220, 60)])
 def test_tc_b97_38_no_blank_row_outside_the_ledger(tmp_path: Path, size) -> None:
     """TC-B97-38 (LLR-149.5, height clause; PC-24 at 118x53): no panel row is
     painted blank across the panel outside the ledger's band.
@@ -669,7 +672,10 @@ def test_tc_b97_38_patch_ledger_takes_its_width(tmp_path: Path, size) -> None:
     assert width > sdb.patch_layout(65, 41, 6).value
 
 
-@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+# batch-97 Inc-8 gate fold (named supersession, operator decision at the Inc-8 gate
+# 2026-10-23, LED-…97.40): the 118x53 arm was PC-24's stand-in for "118x54 with
+# the two-row key bar"; with the bar real, 118x54 is that height and the arm retires.
+@pytest.mark.parametrize("size", [(118, 54), (220, 60)])
 def test_tc_b97_38_patch_no_blank_row_outside_ledger_and_card(tmp_path: Path, size) -> None:
     """TC-B97-38 (LLR-149.5, Patch height clause; PC-24 at 118x53): no panel row
     is painted blank across the panel outside the ledger and the inspector.
@@ -1020,7 +1026,10 @@ def test_tc_b97_38_builder_cards_and_ext_inputs_take_their_width(tmp_path: Path,
 BUILDER_SEPARATED = ("#flow_palette", "#flow_clip_row", "#flow_run_row")
 
 
-@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+# batch-97 Inc-8 gate fold (named supersession, operator decision at the Inc-8 gate
+# 2026-10-23, LED-…97.40): the 118x53 arm was PC-24's stand-in for "118x54 with
+# the two-row key bar"; with the bar real, 118x54 is that height and the arm retires.
+@pytest.mark.parametrize("size", [(118, 54), (220, 60)])
 @pytest.mark.parametrize("phase", ["before_run", "after_run"])
 def test_tc_b97_38_builder_height_goes_to_the_result(tmp_path: Path, size, phase) -> None:
     """TC-B97-38 (LLR-149.5, Builder height clause, decision B / LED-…97.11;
@@ -1365,7 +1374,10 @@ def test_tc_b97_38_execution_cards_take_their_width(tmp_path: Path, size) -> Non
     assert card_w >= 21
 
 
-@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+# batch-97 Inc-8 gate fold (named supersession, operator decision at the Inc-8 gate
+# 2026-10-23, LED-…97.40): the 118x53 arm was PC-24's stand-in for "118x54 with
+# the two-row key bar"; with the bar real, 118x54 is that height and the arm retires.
+@pytest.mark.parametrize("size", [(118, 54), (220, 60)])
 @pytest.mark.parametrize("phase", ["before_run", "after_run"])
 def test_tc_b97_38_execution_height_goes_to_the_lanes(tmp_path: Path, size, phase) -> None:
     """TC-B97-38 (LLR-149.5, Execution height clause; PC-24 at 118x53): no
