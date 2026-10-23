@@ -1,0 +1,86 @@
+== U1.0 start: Workarea Files = []
+== U1.1 first load of ext/firmware.s19 (case_01): dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware.s19...'), ('file_status', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19')]
+   painted      = {'#status_text': 'Loaded firmware.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware.s19...', '#log_line_3': 'Loaded firmware.s19 (S19 only)', '#log_line_4': 'Loaded firmware.s19'}
+   temp dir     = ['firmware.s19']
+   Workarea Files list = []
+   current_file = ('firmware.s19', '109B/7c802331e471')
+== U1.2 re-load, same bytes: dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware.s19...'), ('file_status', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19')]
+   painted      = {'#status_text': 'Loaded firmware.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware.s19...', '#log_line_3': 'Loaded firmware.s19 (S19 only)', '#log_line_4': 'Loaded firmware.s19'}
+   temp dir     = ['firmware.s19']
+   Workarea Files list = []
+   current_file = ('firmware.s19', '109B/7c802331e471')
+== U1.3 re-load after the source changed (case_02 bytes): dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware_1.s19...'), ('file_status', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19')]
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware_1.s19...', '#log_line_3': 'Loaded firmware_1.s19 (S19 only)', '#log_line_4': 'Loaded firmware_1.s19'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware_1.s19', '93B/5883d107ec4f')
+== U1.4 source changed back to case_01 bytes: dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware.s19...'), ('file_status', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19')]
+   painted      = {'#status_text': 'Loaded firmware.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware.s19...', '#log_line_3': 'Loaded firmware.s19 (S19 only)', '#log_line_4': 'Loaded firmware.s19'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware.s19', '109B/7c802331e471')
+== U1.5 load the work copy itself (temp/firmware_1.s19): dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware_1.s19...'), ('file_status', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19')]
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware_1.s19...', '#log_line_3': 'Loaded firmware_1.s19 (S19 only)', '#log_line_4': 'Loaded firmware_1.s19'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware_1.s19', '93B/5883d107ec4f')
+== U1.6 empty input, Load clicked: dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = LoadFileScreen
+   recorded     = []
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Copying into workarea temp...', '#log_line_2': 'Parsing firmware_1.s19...', '#log_line_3': 'Loaded firmware_1.s19 (S19 only)', '#log_line_4': 'Loaded firmware_1.s19'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware_1.s19', '93B/5883d107ec4f')
+   dialog still open after empty Load; recorded = []
+== U1.7 missing path: dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19')]
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Parsing firmware_1.s19...', '#log_line_2': 'Loaded firmware_1.s19 (S19 only)', '#log_line_3': 'Loaded firmware_1.s19', '#log_line_4': 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware_1.s19', '93B/5883d107ec4f')
+== U1.8 a folder path: dialog screen = LoadFileScreen
+   dialog title  = ['Load file (S19/HEX/MAC/A2L):']
+   dialog buttons= ['Load', 'Cancel']
+   dialog widgets= ['Button', 'Container', 'Label', 'OsClipboardInput']
+   after: screen = Screen
+   recorded     = [('log', 'Unsupported file type: ')]
+   painted      = {'#status_text': 'Loaded firmware_1.s19 (S19 only)', '#log_line_1': 'Loaded firmware_1.s19 (S19 only)', '#log_line_2': 'Loaded firmware_1.s19', '#log_line_3': 'File not found: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui__warhk1q\\nope.s19', '#log_line_4': 'Unsupported file type:'}
+   temp dir     = ['firmware.s19', 'firmware_1.s19']
+   Workarea Files list = []
+   current_file = ('firmware_1.s19', '93B/5883d107ec4f')
+== U1.9 Workarea Files items = []
+   workarea root files = []
+   workarea root dirs  = ['patches', 'temp']
+   #loaded_panel text = <textual.renderables.blank.Blank object at 0x0000020419F78750>

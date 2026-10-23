@@ -1,0 +1,31 @@
+== U5.0 CRC Designer before any load: `0`
+   active screen key = crc_designer | coverage preview = Load an image to preview coverage CRCs over real bytes.
+== U5.1 after loading prg.s19 (no field changed)
+   coverage preview = Load an image to preview coverage CRCs over real bytes.
+   coverage window  = Load an image to preview coverage CRCs over real bytes.
+   ranges field     = 0x00008000-0x00008008, 0x00008010-0x00008018
+== U5.2 ranges field set to 20000-30000 (no bytes of prg.s19 there)
+   coverage preview = Active policy: join=concat / concat: 0x00000000 / fill:   0x00000000
+   warnings         = ✓ none
+== U5.3 load case_01 firmware.s19 over it (ranges field unchanged)
+   coverage preview (case_01, 80000000-80000080) = Active policy: join=concat / concat: 0x6EC3F848 / fill:   0x6EC3F848
+   coverage preview after loading case_02, no field touched = Active policy: join=concat / concat: 0x6EC3F848 / fill:   0x6EC3F848
+   identical text after a different image? = True
+   after a forced _recompute = Active policy: join=concat / concat: 0x00000000 / fill:   0x00000000
+== U5.4 Check Editor `=`; reload case_01
+   active screen key = check_editor | focused = _SegTable sje_table
+   buttons = {'check_param_include_button': 'Include parameter', 'check_tab_fields': 'Fields', 'check_tab_json': 'JSON', 'check_tab_addendum': 'Addendum', 'check_mem_add_button': 'Add row', 'check_mem_remove_button': 'Remove row', 'check_validate_button': 'Validate', 'check_write_button': 'Write .chk.json', 'check_preview_toggle_button': 'Addendum preview'}
+   check_status = Validate compares fields to the image
+   [validate, clean image] recorded = [('log', 'Checks: 1 passed, 0 failed, 0 uncheckable')]
+   image @0x8000007C = 3C 3D 3E 3F
+== U5.5 Patch Editor apply DE AD BE EF @0x8000007C (not saved), back to Check Editor, Validate + Write
+   image @0x8000007C = DE AD BE EF
+   [validate, patched unsaved image] recorded = [('log', 'Checks: 1 passed, 0 failed, 0 uncheckable')]
+   [write] recorded = [('log', 'Check Editor: wrote spec.chk.json (1 fields, kind=check).')]
+   written .s19tool\workarea\patches\spec.chk.json = {   "format": "s19app-changeset",   "version": "2.0",   "kind": "check",   "encoding": "utf-8",   "value_mode": "text",   "entries": [     {       "type": "bytes",       "address": "0x8000007C",       "bytes": "DE AD BE EF"     }   ] } 
+== U5.6 a row outside the image (0x90000000), Validate
+   check_status = validation complete
+   recorded = [('log', 'Check Editor: 1 field(s) outside the loaded image — not declared.'), ('log', 'Checks: 1 passed, 0 failed, 0 uncheckable')]
+== U5.7 Bytes field vs paste grammar: same text '11 22'
+   Bytes field parse_new_bytes('11 22') = ['0B', '16'] | parse_new_bytes('10 1A 08') = ['0A', '1A', '08']
+   paste JSON bytes '11 22' -> ok = True entries = [('0x8000007c', '11 22')]

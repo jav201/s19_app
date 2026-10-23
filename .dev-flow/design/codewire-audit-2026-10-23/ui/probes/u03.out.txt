@@ -1,0 +1,102 @@
+== U3.0 on Patch Editor; focused = _SegTable sje_table
+== U3.1 Add
+   [add] recorded = [('log', 'Patch Editor: entry added.')]
+   [add] table = ['· bytes | 0x8000007C | DE AD BE EF | inside | -']
+   [add] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 1 inside · 0 partial
+0 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [add] image @0x8000007C = 3C 3D 3E 3F | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [add] card = 80000078 +8 +9 +A +B +C +D +E +F /   was    38 39 3A 3B 3C 3D 3E 3F /   now    38 39 3A 3B DE AD BE EF / 4 B @ 0x8000007C · 4 changed
+   [add] save-back row hidden = True; undo enabled = True
+== U3.2 Apply loaded changes
+   [apply] recorded = [('log', 'Apply: 1 applied, 0 skipped, 0 blocked')]
+   [apply] table = ['· bytes | 0x8000007C | DE AD BE EF | inside | standa…']
+   [apply] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 1 inside · 0 partial
+0 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [apply] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [apply] card = 80000078 +8 +9 +A +B +C +D +E +F /   was    38 39 3A 3B DE AD BE EF /   now    38 39 3A 3B DE AD BE EF / 4 B @ 0x8000007C · 0 changed
+   [apply] save-back row hidden = False; undo enabled = True
+   save-back name prefill = firmware-patched.s19
+== U3.3 Decline save-back
+   [decline] recorded = [('log', 'Patch Editor: save-back declined')]
+   [decline] table = ['· bytes | 0x8000007C | DE AD BE EF | inside | standa…']
+   [decline] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 1 inside · 0 partial
+0 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [decline] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [decline] card = 80000078 +8 +9 +A +B +C +D +E +F /   was    38 39 3A 3B DE AD BE EF /   now    38 39 3A 3B DE AD BE EF / 4 B @ 0x8000007C · 0 changed
+   [decline] save-back row hidden = True; undo enabled = True
+== U3.4 ctrl+z (undo)
+   [undo] recorded = []
+   [undo] table = []
+   [undo] tally = DOCUMENT
+0 entries | history = ↶ 0 back  ↷ 1 fwd  1/20
+ctrl+z / ctrl+y
+   [undo] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [undo] card = No entry yet: Add one or Load a file.
+   [undo] save-back row hidden = True; undo enabled = True
+== U3.5 Apply again with the empty document
+   [apply-empty] recorded = [('log', 'Apply: 0 applied, 0 skipped, 0 blocked')]
+   [apply-empty] table = []
+   [apply-empty] tally = DOCUMENT
+0 entries | history = ↶ 0 back  ↷ 1 fwd  1/20
+ctrl+z / ctrl+y
+   [apply-empty] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [apply-empty] card = No entry yet: Add one or Load a file.
+   [apply-empty] save-back row hidden = True; undo enabled = True
+== U3.6 Add 0x80000080 01 02 + Apply
+   [apply2] recorded = [('log', 'Patch Editor: entry added.'), ('log', 'Apply: 0 applied, 1 skipped, 0 blocked')]
+   [apply2] table = ['· bytes | 0x80000080 | 01 02 | outside | standa…']
+   [apply2] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 0 inside · 0 partial
+1 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [apply2] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [apply2] card = 80000080 +0 +1 +2 +3 +4 +5 +6 +7 /   was    -- -- -- -- -- -- -- -- /   now    01 02 -- -- -- -- -- -- / 2 B @ 0x80000080 · 2 changed
+   [apply2] save-back row hidden = True; undo enabled = True
+== U3.7 Confirm save-back with the default name
+   [saveback] recorded = [('log', 'Patched image saved as firmware-patched.s19'), ('log', 'Saved + verified: firmware-patched.s19'), ('notify:information', 'Before/after report ready - press b to write it to the project reports directory (action: before_after_report).')]
+   [saveback] table = ['· bytes | 0x80000080 | 01 02 | outside | standa…']
+   [saveback] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 0 inside · 0 partial
+1 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [saveback] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [saveback] card = 80000080 +0 +1 +2 +3 +4 +5 +6 +7 /   was    -- -- -- -- -- -- -- -- /   now    01 02 -- -- -- -- -- -- / 2 B @ 0x80000080 · 2 changed
+   [saveback] save-back row hidden = True; undo enabled = True
+   files written in workarea root = ['firmware-patched.s19']
+   independent read of firmware-patched.s19 @0x8000007C = DE AD BE EF  (source case_01 = 3C 3D 3E 3F)
+== U3.8 Patch 'Save' button (save_doc)
+   [save_doc] recorded = [('log', 'Saved change-set to changes.json')]
+   [save_doc] table = ['· bytes | 0x80000080 | 01 02 | outside | standa…']
+   [save_doc] tally = DOCUMENT
+▓░░░░░░░░░░░
+1 entry · 0 inside · 0 partial
+1 outside · 0 faults | history = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+   [save_doc] image @0x8000007C = DE AD BE EF | status_text = Loaded firmware.s19 (S19 only) | context = (none)  |  (none)
+   [save_doc] card = 80000080 +0 +1 +2 +3 +4 +5 +6 +7 /   was    -- -- -- -- -- -- -- -- /   now    01 02 -- -- -- -- -- -- / 2 B @ 0x80000080 · 2 changed
+   [save_doc] save-back row hidden = True; undo enabled = True
+   patches dir = ['changes.json']
+== U3.9 Load another file over the patched, unsaved image (case_02)
+   before load: image @0x8000007C = 0B 16 BE EF
+   [load-over] recorded = [('log', 'Copying into workarea temp...'), ('log', 'Parsing firmware_1.s19...'), ('file_status', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19 (S19 only)'), ('log', 'Loaded firmware_1.s19')]
+   [load-over] table = ['· bytes | 0x80000080 | 01 02 | outside | standa…', '· bytes | 0x8000007C | 0B 16 | outside | standa…']
+   [load-over] tally = DOCUMENT
+▓▓░░░░░░░░░░
+2 entries · 0 inside · 0 partial
+2 outside · 0 faults | history = ↶ 2 back  ↷ 0 fwd  2/20
+ctrl+z / ctrl+y
+   [load-over] image @0x8000007C = -- -- -- -- | status_text = Loaded firmware_1.s19 (S19 only) | context = (none)  |  (none)
+   [load-over] card = 80000080 +0 +1 +2 +3 +4 +5 +6 +7 /   was    -- -- -- -- -- -- -- -- /   now    01 02 -- -- -- -- -- -- / 2 B @ 0x80000080 · 2 changed
+   [load-over] save-back row hidden = True; undo enabled = True
+   screen after load = Screen

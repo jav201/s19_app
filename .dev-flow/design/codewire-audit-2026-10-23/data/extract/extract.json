@@ -1,0 +1,4338 @@
+{
+  "marks": [
+    {
+      "name": "S19File.__init__",
+      "reqs": [
+        "R-READ-001",
+        "R-PARSE-001",
+        "LLR-122.1"
+      ],
+      "file": "s19_app/core.py",
+      "line": 224,
+      "def": {
+        "qualname": "S19File.__init__",
+        "line": 225,
+        "params": [
+          {
+            "name": "path",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "endian",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": null
+      }
+    },
+    {
+      "name": "S19File.get_memory_ranges",
+      "reqs": [
+        "LLR-122.1"
+      ],
+      "file": "s19_app/core.py",
+      "line": 497,
+      "def": {
+        "qualname": "S19File.get_memory_ranges",
+        "line": 498,
+        "params": [],
+        "returns": "List[tuple[int, int]]"
+      }
+    },
+    {
+      "name": "build_mem_map_s19",
+      "reqs": [
+        "LLR-122.1",
+        "R-S19-S0HEADER-001"
+      ],
+      "file": "s19_app/render/hexview.py",
+      "line": 60,
+      "def": {
+        "qualname": "build_mem_map_s19",
+        "line": 61,
+        "params": [
+          {
+            "name": "s19",
+            "type": "S19File",
+            "default": null
+          }
+        ],
+        "returns": "Dict[int, int]"
+      }
+    },
+    {
+      "name": "fill_range",
+      "reqs": [
+        "LLR-137.3"
+      ],
+      "file": "s19_app/segment_ops.py",
+      "line": 280,
+      "def": {
+        "qualname": "fill_range",
+        "line": 281,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "start",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "end",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "pad_byte",
+            "type": "int",
+            "default": "DEFAULT_PAD_BYTE"
+          },
+          {
+            "name": "intra_gap",
+            "type": "str",
+            "default": "'fill'"
+          }
+        ],
+        "returns": "tuple[dict[int, int], list[tuple[int, int]]]"
+      }
+    },
+    {
+      "name": "emit_image",
+      "reqs": [
+        "LLR-137.2",
+        "R-HEX-EMIT-001"
+      ],
+      "file": "s19_app/segment_ops.py",
+      "line": 465,
+      "def": {
+        "qualname": "emit_image",
+        "line": 466,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "ranges",
+            "type": "list[tuple[int, int]]",
+            "default": null
+          },
+          {
+            "name": "fmt",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "bytes_per_line",
+            "type": "int",
+            "default": "32"
+          }
+        ],
+        "returns": "Union[str, bytes]"
+      }
+    },
+    {
+      "name": "_apply_compu_method",
+      "reqs": [],
+      "file": "s19_app/tui/a2l.py",
+      "line": 1721,
+      "def": {
+        "qualname": "_apply_compu_method",
+        "line": 1722,
+        "params": [
+          {
+            "name": "raw_value",
+            "type": "Any",
+            "default": null
+          },
+          {
+            "name": "method",
+            "type": "Optional[dict]",
+            "default": null
+          },
+          {
+            "name": "compu_tables_by_name",
+            "type": "dict[str, dict]",
+            "default": null
+          }
+        ],
+        "returns": "tuple[Any, str, str]"
+      }
+    },
+    {
+      "name": "_invert_physical_to_raw",
+      "reqs": [
+        "LLR-141.1",
+        "REQUIREMENTS.md:217-228 (COMPU_METHOD Execution",
+        "no id)"
+      ],
+      "file": "s19_app/tui/a2l.py",
+      "line": 1841,
+      "def": {
+        "qualname": "_invert_physical_to_raw",
+        "line": 1842,
+        "params": [
+          {
+            "name": "physical",
+            "type": "float",
+            "default": null
+          },
+          {
+            "name": "method",
+            "type": "Optional[dict]",
+            "default": null
+          },
+          {
+            "name": "compu_tabs_by_name",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "tuple[Optional[float], Optional[str]]"
+      }
+    },
+    {
+      "name": "encode_physical_to_raw_bytes",
+      "reqs": [
+        "LLR-141.1"
+      ],
+      "file": "s19_app/tui/a2l.py",
+      "line": 2095,
+      "def": {
+        "qualname": "encode_physical_to_raw_bytes",
+        "line": 2096,
+        "params": [
+          {
+            "name": "tag",
+            "type": "dict",
+            "default": null
+          },
+          {
+            "name": "physical_value",
+            "type": "Any",
+            "default": null
+          },
+          {
+            "name": "compu_methods_by_name",
+            "type": "Optional[dict]",
+            "default": "None"
+          },
+          {
+            "name": "compu_tabs_by_name",
+            "type": "Optional[dict]",
+            "default": "None"
+          },
+          {
+            "name": "record_layouts_by_name",
+            "type": "Optional[dict]",
+            "default": "None"
+          }
+        ],
+        "returns": "tuple[Optional[tuple[int, ...]], Optional[str], list[str]]"
+      }
+    },
+    {
+      "name": "parse_a2l_file",
+      "reqs": [
+        "R-A2L-001"
+      ],
+      "file": "s19_app/tui/a2l.py",
+      "line": 2508,
+      "def": {
+        "qualname": "parse_a2l_file",
+        "line": 2509,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "dict"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "R-TUI-057",
+        "LLR-003.4"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3108,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "line": 3109,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.ActionRequested",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-015.3",
+        "R-CHG-003",
+        "LLR-038.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 3311,
+      "def": {
+        "qualname": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "line": 3312,
+        "params": [
+          {
+            "name": "event",
+            "type": "PatchEditorPanel.SaveBackDecision",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "R-TUI-012",
+        "R-PROJ-001",
+        "LLR-017.2",
+        "LLR-017.3",
+        "LLR-015.3"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 7901,
+      "def": {
+        "qualname": "S19TuiApp._handle_save_dialog",
+        "line": 7902,
+        "params": [
+          {
+            "name": "payload",
+            "type": "Optional[SaveProjectPayload]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "R-TUI-013",
+        "R-RPT-REGION-PERSIST-002",
+        "R-PROJ-002"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 8201,
+      "def": {
+        "qualname": "S19TuiApp._handle_load_project",
+        "line": 8202,
+        "params": [
+          {
+            "name": "name",
+            "type": "Optional[str]",
+            "default": null
+          }
+        ],
+        "returns": "None"
+      }
+    },
+    {
+      "name": "S19TuiApp._load_mac_file",
+      "reqs": [],
+      "file": "s19_app/tui/app.py",
+      "line": 9596,
+      "def": {
+        "qualname": "S19TuiApp._load_mac_file",
+        "line": 9597,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "LoadedFile"
+      }
+    },
+    {
+      "name": "S19TuiApp._merge_primary_with_existing_mac",
+      "reqs": [
+        "LLR-066.7",
+        "LLR-005.6"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 9828,
+      "def": {
+        "qualname": "S19TuiApp._merge_primary_with_existing_mac",
+        "line": 9829,
+        "params": [
+          {
+            "name": "primary_loaded",
+            "type": "LoadedFile",
+            "default": null
+          }
+        ],
+        "returns": "LoadedFile"
+      }
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "R-TUI-013",
+        "LLR-066.7"
+      ],
+      "file": "s19_app/tui/app.py",
+      "line": 10527,
+      "def": {
+        "qualname": "S19TuiApp._parse_loaded_file",
+        "line": 10528,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "a2l_files",
+            "type": "Optional[list[Path]]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[LoadedFile]"
+      }
+    },
+    {
+      "name": "apply_change_document",
+      "reqs": [
+        "R-CHG-002",
+        "LLR-002.1",
+        "LLR-143.1"
+      ],
+      "file": "s19_app/tui/changes/apply.py",
+      "line": 226,
+      "def": {
+        "qualname": "apply_change_document",
+        "line": 227,
+        "params": [
+          {
+            "name": "document",
+            "type": "ChangeDocument",
+            "default": null
+          },
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          },
+          {
+            "name": "ranges",
+            "type": "Optional[Sequence[Tuple[int, int]]]",
+            "default": null
+          },
+          {
+            "name": "mac_records",
+            "type": "Optional[Sequence[dict]]",
+            "default": null
+          },
+          {
+            "name": "a2l_tags",
+            "type": "Optional[Sequence[dict]]",
+            "default": null
+          },
+          {
+            "name": "now_fn",
+            "type": "Optional[Callable[[], datetime]]",
+            "default": "None"
+          },
+          {
+            "name": "variant_id",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChangeSummary"
+      }
+    },
+    {
+      "name": "save_patched_image",
+      "reqs": [
+        "LLR-002.7",
+        "LLR-015.3",
+        "R-MAN-WRITE-001"
+      ],
+      "file": "s19_app/tui/changes/apply.py",
+      "line": 626,
+      "def": {
+        "qualname": "save_patched_image",
+        "line": 627,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "ranges",
+            "type": "Sequence[Tuple[int, int]]",
+            "default": null
+          },
+          {
+            "name": "dest_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "filename",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "source_kind",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "bytes_per_line",
+            "type": "int",
+            "default": "32"
+          },
+          {
+            "name": "s0_header",
+            "type": "bytes | None",
+            "default": "None"
+          }
+        ],
+        "returns": "Tuple[Optional[Path], List[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "verify_written_image",
+      "reqs": [
+        "R-HEX-VERIFY-001"
+      ],
+      "file": "s19_app/tui/changes/verify.py",
+      "line": 119,
+      "def": {
+        "qualname": "verify_written_image",
+        "line": 120,
+        "params": [
+          {
+            "name": "written_path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "intended_mem_map",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "file_type",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "VerifyResult"
+      }
+    },
+    {
+      "name": "parse_mac_file",
+      "reqs": [],
+      "file": "s19_app/tui/mac.py",
+      "line": 166,
+      "def": {
+        "qualname": "parse_mac_file",
+        "line": 167,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          }
+        ],
+        "returns": "dict[str, Any]"
+      }
+    },
+    {
+      "name": "inject_crcs",
+      "reqs": [
+        "LLR-089.3",
+        "LLR-090.1"
+      ],
+      "file": "s19_app/tui/operations/crc.py",
+      "line": 1081,
+      "def": {
+        "qualname": "inject_crcs",
+        "line": 1082,
+        "params": [
+          {
+            "name": "op_input",
+            "type": "OperationInput",
+            "default": null
+          },
+          {
+            "name": "crc_regions",
+            "type": "list[CrcRegionResult]",
+            "default": null
+          }
+        ],
+        "returns": "tuple[dict[int, int], list[tuple[int, int]], list[CrcRegionResult]]"
+      }
+    },
+    {
+      "name": "build_plan",
+      "reqs": [
+        "LLR-136.1",
+        "LLR-136.6",
+        "LLR-135.5"
+      ],
+      "file": "s19_app/tui/segment_split_view.py",
+      "line": 335,
+      "def": {
+        "qualname": "build_plan",
+        "line": 336,
+        "params": [
+          {
+            "name": "rows",
+            "type": "List[SegRow]",
+            "default": null
+          },
+          {
+            "name": "sel",
+            "type": "set",
+            "default": null
+          },
+          {
+            "name": "src",
+            "type": "List[Tuple[int, int]]",
+            "default": null
+          },
+          {
+            "name": "mem_map",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "mode",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "gap",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "stem",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "ext",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "pad_byte",
+            "type": "Optional[int]",
+            "default": "None"
+          }
+        ],
+        "returns": "Plan"
+      }
+    },
+    {
+      "name": "write_split_join_export",
+      "reqs": [
+        "LLR-136.5",
+        "LLR-136.6",
+        "HLR-137"
+      ],
+      "file": "s19_app/tui/segment_split_view.py",
+      "line": 494,
+      "def": {
+        "qualname": "write_split_join_export",
+        "line": 495,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Dict[int, int]",
+            "default": null
+          },
+          {
+            "name": "rows",
+            "type": "List[SegRow]",
+            "default": null
+          },
+          {
+            "name": "mode",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "gap",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "pad_byte",
+            "type": "int",
+            "default": null
+          },
+          {
+            "name": "fmt",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "stem",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "dest_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "zero_coverage_empty",
+            "type": "bool",
+            "default": "False"
+          }
+        ],
+        "returns": "List[Path]"
+      }
+    },
+    {
+      "name": "parse_new_bytes",
+      "reqs": [
+        "LLR-001.2"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 170,
+      "def": {
+        "qualname": "parse_new_bytes",
+        "line": 171,
+        "params": [
+          {
+            "name": "bytes_text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "list[int]"
+      }
+    },
+    {
+      "name": "resolve_symbol_entry",
+      "reqs": [
+        "LLR-141.2",
+        "HLR-141"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 412,
+      "def": {
+        "qualname": "resolve_symbol_entry",
+        "line": 413,
+        "params": [
+          {
+            "name": "symbol_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "value_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": null
+          },
+          {
+            "name": "value_mode",
+            "type": "str",
+            "default": "'text'"
+          }
+        ],
+        "returns": "SymbolPickResult"
+      }
+    },
+    {
+      "name": "ChangeService.undo",
+      "reqs": [
+        "R-TUI-057",
+        "LLR-068a.2"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 836,
+      "def": {
+        "qualname": "ChangeService.undo",
+        "line": 837,
+        "params": [],
+        "returns": "ChangeDocument"
+      }
+    },
+    {
+      "name": "ChangeService.add_entry",
+      "reqs": [
+        "LLR-003.4",
+        "LLR-001.2"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 1041,
+      "def": {
+        "qualname": "ChangeService.add_entry",
+        "line": 1042,
+        "params": [
+          {
+            "name": "address_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "value_text",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "bytes_text",
+            "type": "str",
+            "default": null
+          }
+        ],
+        "returns": "ChangeEntry"
+      }
+    },
+    {
+      "name": "ChangeService.apply",
+      "reqs": [
+        "LLR-003.4",
+        "R-CHG-002"
+      ],
+      "file": "s19_app/tui/services/change_service.py",
+      "line": 1606,
+      "def": {
+        "qualname": "ChangeService.apply",
+        "line": 1607,
+        "params": [
+          {
+            "name": "mem_map",
+            "type": "Optional[Dict[int, int]]",
+            "default": null
+          },
+          {
+            "name": "ranges",
+            "type": "Optional[Sequence[Tuple[int, int]]]",
+            "default": null
+          },
+          {
+            "name": "mac_records",
+            "type": "Optional[Sequence[dict]]",
+            "default": null
+          },
+          {
+            "name": "a2l_tags",
+            "type": "Optional[Sequence[dict]]",
+            "default": null
+          },
+          {
+            "name": "variant_id",
+            "type": "Optional[str]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChangeSummary"
+      }
+    },
+    {
+      "name": "run_flow",
+      "reqs": [
+        "R-TUI-059",
+        "LLR-085.2",
+        "LLR-086.4",
+        "LLR-087.2",
+        "LLR-089.2",
+        "LLR-143.1"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 171,
+      "def": {
+        "qualname": "run_flow",
+        "line": 172,
+        "params": [
+          {
+            "name": "flow",
+            "type": "Flow",
+            "default": null
+          },
+          {
+            "name": "ctx",
+            "type": "FlowContext",
+            "default": null
+          }
+        ],
+        "returns": "FlowRunResult"
+      }
+    },
+    {
+      "name": "run_chain_set",
+      "reqs": [
+        "HLR-019",
+        "LLR-019.2",
+        "LLR-020.2"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 1444,
+      "def": {
+        "qualname": "run_chain_set",
+        "line": 1445,
+        "params": [
+          {
+            "name": "chains",
+            "type": "Sequence[ChainSpec]",
+            "default": null
+          },
+          {
+            "name": "ctx",
+            "type": "FlowContext",
+            "default": null
+          },
+          {
+            "name": "mode",
+            "type": "str",
+            "default": "CHAIN_RUN_SEQUENTIAL"
+          },
+          {
+            "name": "set_name",
+            "type": "str",
+            "default": "'chain-set'"
+          },
+          {
+            "name": "run_one",
+            "type": "Optional[Callable[[Flow, FlowContext], FlowRunResult]]",
+            "default": "None"
+          },
+          {
+            "name": "clock",
+            "type": "Optional[Callable[[], float]]",
+            "default": "None"
+          }
+        ],
+        "returns": "ChainSetRunRecord"
+      }
+    },
+    {
+      "name": "compose_chain_set_report",
+      "reqs": [
+        "LLR-020.1",
+        "LLR-020.2"
+      ],
+      "file": "s19_app/tui/services/flow_execution_service.py",
+      "line": 1563,
+      "def": {
+        "qualname": "compose_chain_set_report",
+        "line": 1564,
+        "params": [
+          {
+            "name": "record",
+            "type": "ChainSetRunRecord",
+            "default": null
+          },
+          {
+            "name": "set_name",
+            "type": "str",
+            "default": null
+          },
+          {
+            "name": "generated_at",
+            "type": "datetime",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "compose_flow_report",
+      "reqs": [
+        "LLR-001.1",
+        "LLR-001.2",
+        "AMD-8"
+      ],
+      "file": "s19_app/tui/services/flow_report_service.py",
+      "line": 356,
+      "def": {
+        "qualname": "compose_flow_report",
+        "line": 357,
+        "params": [
+          {
+            "name": "state",
+            "type": "FlowReportState",
+            "default": null
+          },
+          {
+            "name": "generated_at",
+            "type": "datetime",
+            "default": null
+          }
+        ],
+        "returns": "str"
+      }
+    },
+    {
+      "name": "build_loaded_s19",
+      "reqs": [
+        "LLR-015.2",
+        "LLR-066.5",
+        "R-S19-S0HEADER-001"
+      ],
+      "file": "s19_app/tui/services/load_service.py",
+      "line": 18,
+      "def": {
+        "qualname": "build_loaded_s19",
+        "line": 19,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "s19",
+            "type": "S19File",
+            "default": null
+          },
+          {
+            "name": "a2l_path",
+            "type": "Optional[Path]",
+            "default": null
+          },
+          {
+            "name": "a2l_data",
+            "type": "Optional[dict]",
+            "default": null
+          }
+        ],
+        "returns": "LoadedFile"
+      }
+    },
+    {
+      "name": "write_project_manifest",
+      "reqs": [
+        "R-MAN-SER-001",
+        "LLR-017.2",
+        "HLR-027"
+      ],
+      "file": "s19_app/tui/services/manifest_writer.py",
+      "line": 414,
+      "def": {
+        "qualname": "write_project_manifest",
+        "line": 415,
+        "params": [
+          {
+            "name": "variant_set",
+            "type": "ProjectVariantSet",
+            "default": null
+          },
+          {
+            "name": "project_root",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "base_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "batch",
+            "type": "Sequence[str]",
+            "default": "()"
+          },
+          {
+            "name": "assignments",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "declared_regions",
+            "type": "Sequence[DeclaredRegion]",
+            "default": "()"
+          },
+          {
+            "name": "gathered",
+            "type": "Optional[Mapping[str, Sequence[str]]]",
+            "default": "None"
+          },
+          {
+            "name": "schema_version",
+            "type": "int",
+            "default": "DEFAULT_SCHEMA_VERSION"
+          }
+        ],
+        "returns": "tuple[Optional[Path], list[ValidationIssue]]"
+      }
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "R-VAR-002",
+        "LLR-017.4"
+      ],
+      "file": "s19_app/tui/services/variant_execution_service.py",
+      "line": 376,
+      "def": {
+        "qualname": "read_project_manifest",
+        "line": 377,
+        "params": [
+          {
+            "name": "project_dir",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "size_probe",
+            "type": "Optional[SizeProbe]",
+            "default": "None"
+          }
+        ],
+        "returns": "Optional[ProjectManifest]"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "S19File.__init__",
+      "reqs": [
+        "R-READ-001",
+        "R-PARSE-001",
+        "LLR-122.1"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19File",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "endian",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "S19File",
+        "names": [
+          "s19"
+        ],
+        "raw": "S19File s19"
+      },
+      "modulo_file": "s19_app/core.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1a) path \".../case_01_basic_valid/firmware.s19\" → s19 record 1 of 9 {type \"S0\", address `0`, raw_line \"S00F00004341534530315F4241534943B2\"}; record 2 {type \"S3\", address 0x80000000}",
+        "(T1, t1b) path \".../firmware_cut.s19\" (lines 1 to 5 of 9, no S7) → s19 with no error and no terminator record"
+      ],
+      "modify": []
+    },
+    {
+      "name": "build_mem_map_s19",
+      "reqs": [
+        "LLR-122.1",
+        "R-S19-S0HEADER-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "S19File",
+          "name": "s19",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Dict[int, int]",
+        "names": [
+          "mem_map"
+        ],
+        "raw": "Dict[int, int] mem_map"
+      },
+      "modulo_file": "s19_app/render/hexview.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1a) s19 (S0 data CASE01_BASIC) → mem_map 0x0: 0x43, 0x1: 0x41, 0x80000000: 0x53; the S0 text is data at address zero"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19File.get_memory_ranges",
+      "reqs": [
+        "LLR-122.1"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19File",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "List[tuple[int, int]]",
+        "names": [
+          "ranges"
+        ],
+        "raw": "List[tuple[int, int]] ranges"
+      },
+      "modulo_file": "s19_app/core.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1a) → ranges [[`0`, `12`], [`2147483648`, `2147483681`], [`2147483712`, `2147483776`]] (3 ranges; the case_01 README says two used ranges)",
+        "(T1, t1b) → last range ends at `2147483728` (0x80000050), the cut tail is absent with no error"
+      ],
+      "modify": []
+    },
+    {
+      "name": "build_loaded_s19",
+      "reqs": [
+        "LLR-015.2",
+        "LLR-066.5",
+        "R-S19-S0HEADER-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "S19File",
+          "name": "s19",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Path]",
+          "name": "a2l_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LoadedFile",
+        "names": [
+          "loaded"
+        ],
+        "raw": "LoadedFile loaded"
+      },
+      "modulo_file": "s19_app/tui/services/load_service.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1a) path \".../firmware.s19\" → loaded {source_s0_header \"CASE01_BASIC\", entry_point 0x80000000, errors []}",
+        "(T1, t1b) path \".../firmware_cut.s19\" → loaded {errors [], entry_point None}; nothing says the file is cut"
+      ],
+      "modify": []
+    },
+    {
+      "name": "parse_mac_file",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict[str, Any]",
+        "names": [
+          "mac_data"
+        ],
+        "raw": "dict[str, Any] mac_data"
+      },
+      "modulo_file": "s19_app/tui/mac.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1e) path \".../firmware.mac\" → records 2 of 2: {raw \"; Synthetic MAC\", parse_ok False}, {name \"BLOCK_A\", address 0x80000000, parse_ok True}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._load_mac_file",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "LoadedFile",
+        "names": [
+          "loaded"
+        ],
+        "raw": "LoadedFile loaded"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1e) path \".../temp/firmware.mac\" → loaded {file_type \"mac\", mem_map 0x80000000: 0x0, ranges []}"
+      ],
+      "modify": [
+        "[Data: S19TuiApp.current_file]"
+      ]
+    },
+    {
+      "name": "S19TuiApp._merge_primary_with_existing_mac",
+      "reqs": [
+        "LLR-066.7",
+        "LLR-005.6"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "LoadedFile",
+          "name": "primary_loaded",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LoadedFile",
+        "names": [
+          "merged"
+        ],
+        "raw": "LoadedFile merged"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1d) primary_loaded {path \".../temp/other.s19\" (case_02)} with current MAC \"firmware.mac\" (case_01) → merged keeps mac_records {name \"BLOCK_A\", address 0x80000000}; the status line names only other.s19"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._parse_loaded_file",
+      "reqs": [
+        "R-TUI-013",
+        "LLR-066.7"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[list[Path]]",
+          "name": "a2l_files",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Optional[LoadedFile]",
+        "names": [
+          "loaded"
+        ],
+        "raw": "LoadedFile? loaded"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "build_loaded_s19",
+        "S19TuiApp._merge_primary_with_existing_mac",
+        "S19TuiApp._load_mac_file"
+      ],
+      "examples": [
+        "(T1, t1d) path \".../temp/firmware.s19\" → loaded {file_type \"s19\", mem_map 0x0: 0x43}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "parse_a2l_file",
+      "reqs": [
+        "R-A2L-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "a2l_data"
+        ],
+        "raw": "dict a2l_data"
+      },
+      "modulo_file": "s19_app/tui/a2l.py",
+      "inner": [
+        "extract_a2l_tags"
+      ],
+      "examples": [
+        "(T1, t1d) path \".../temp/firmware.a2l\" (case_01, `BYTE_ORDER MSB_FIRST`) → a2l_data with section \"PROJECT\""
+      ],
+      "modify": []
+    },
+    {
+      "name": "_apply_compu_method",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Any",
+          "name": "raw_value",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "method",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "dict[str, dict]",
+          "name": "compu_tables_by_name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Any, str, str]",
+        "names": [
+          "physical",
+          "status",
+          "message"
+        ],
+        "raw": "tuple(Any physical, str status, str message)"
+      },
+      "modulo_file": "s19_app/tui/a2l.py",
+      "inner": [],
+      "examples": [
+        "(T1, t1d) raw_value `3`; method {name \"CM_IDENT\", conversion_type \"IDENTICAL\", unit \"%6.2\"} → physical `3`, status \"ok\"; the A2L line 32 declares an empty unit, the method carries the format text as its unit",
+        "(T4, t4b) raw_value `300`; method {name \"CM.RAT_FUNC.DIV_10\", unit \"km/h\"} → physical (3000.0), status \"ok\" (the A2L text gives 30 km/h)",
+        "(T4, t4b) raw_value `300`; method {name \"CM.LINEAR.MUL_2\", unit \"m/s\"} → physical (600.0), status \"ok\" (correct)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "reqs": [
+        "R-TUI-057",
+        "LLR-003.4"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.ActionRequested",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "ChangeService.add_entry",
+        "ChangeService.apply"
+      ],
+      "examples": [
+        "(T2, t2a) event {action \"add_entry\", address_text \"0x80010080\", bytes_text \"DE AD BE EF\"} → None",
+        "(T2, t2a) event {action \"add_entry\", address_text \"0x80010005\", bytes_text \"30 35 31 38 32 30 32 35\"} → None"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "ChangeService.add_entry",
+      "reqs": [
+        "LLR-003.4",
+        "LLR-001.2"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "ChangeService",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "address_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "value_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "bytes_text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ChangeEntry",
+        "names": [
+          "entry"
+        ],
+        "raw": "ChangeEntry entry"
+      },
+      "modulo_file": "s19_app/tui/services/change_service.py",
+      "inner": [
+        "parse_new_bytes"
+      ],
+      "examples": [
+        "(T2, t2a) address_text \"0x80010005\"; bytes_text \"30 35 31 38 32 30 32 35\" → entry {address 0x80010005, encoded_bytes [`30`, `35`, `31`, `38`, `32`, `30`, `32`, `35`]} (decimal values 0x1E 0x23 …)"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "parse_new_bytes",
+      "reqs": [
+        "LLR-001.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "bytes_text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[int]",
+        "names": [
+          "values"
+        ],
+        "raw": "list[int] values"
+      },
+      "modulo_file": "s19_app/tui/services/change_service.py",
+      "inner": [],
+      "examples": [
+        "(T2, t2b) bytes_text \"DE AD 10 20\" → values [0xDE, 0xAD, 0xA, 0x14]",
+        "(T2, t2b) bytes_text \"0F 10 1F 20\" → values [0xF, 0xA, 0x1F, 0x14] (one dump, two bases)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "ChangeService.apply",
+      "reqs": [
+        "LLR-003.4",
+        "R-CHG-002"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "ChangeService",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[Tuple[int, int]]]",
+          "name": "ranges",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[dict]]",
+          "name": "mac_records",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[dict]]",
+          "name": "a2l_tags",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "variant_id",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChangeSummary",
+        "names": [
+          "summary"
+        ],
+        "raw": "ChangeSummary summary"
+      },
+      "modulo_file": "s19_app/tui/services/change_service.py",
+      "inner": [
+        "apply_change_document"
+      ],
+      "examples": [
+        "(T2, t2a) entry 0x80010080 DE AD BE EF on case_02 → summary {counts {applied `1`}, entries 1 of 1 {before_bytes [`170`, `187`, `204`, `221`], after_bytes [`222`, `173`, `190`, `239`]}}",
+        "(T2, t2a) after the undo, entry 0x80010005 only → summary entries 1 of 1 {address_start `2147549189`, after_bytes [`30`, `35`, `31`, `38`, `32`, `30`, `32`, `35`]}"
+      ],
+      "modify": [
+        "mem_map"
+      ]
+    },
+    {
+      "name": "ChangeService.undo",
+      "reqs": [
+        "R-TUI-057",
+        "LLR-068a.2"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "ChangeService",
+          "name": "self",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ChangeDocument",
+        "names": [
+          "document"
+        ],
+        "raw": "ChangeDocument document"
+      },
+      "modulo_file": "s19_app/tui/services/change_service.py",
+      "inner": [],
+      "examples": [
+        "(T2, t2a) two undos after add + apply → document {format \"s19app-changeset\", entries []}; the image byte at the first target stays DE (read after the call, see t2a-undo in the run log)"
+      ],
+      "modify": [
+        "[Data: ChangeService.document]"
+      ]
+    },
+    {
+      "name": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "reqs": [
+        "LLR-015.3",
+        "R-CHG-003",
+        "LLR-038.3"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "PatchEditorPanel.SaveBackDecision",
+          "name": "event",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "ChangeService.save_patched"
+      ],
+      "examples": [
+        "(T2, t2a) event {filename \"p16.s19\", bytes_per_line `16`} → None",
+        "(T2, t2a) event {filename \"p32.s19\", bytes_per_line `32`} → None"
+      ],
+      "modify": []
+    },
+    {
+      "name": "save_patched_image",
+      "reqs": [
+        "LLR-002.7",
+        "LLR-015.3",
+        "R-MAN-WRITE-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[Tuple[int, int]]",
+          "name": "ranges",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "dest_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "filename",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "source_kind",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "bytes_per_line",
+          "default": "32"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[bytes]",
+          "name": "s0_header",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Path], List[ValidationIssue]]",
+        "names": [
+          "saved_path",
+          "issues"
+        ],
+        "raw": "tuple(Path? saved_path, List[ValidationIssue] issues)"
+      },
+      "modulo_file": "s19_app/tui/changes/apply.py",
+      "inner": [],
+      "examples": [
+        "(T2, t2a) filename \"p16.s19\"; bytes_per_line `16` → file line 1 \"S0030000FC\" (empty S0), line 2 \"S310000000004341534530325F47415053E7\" (S0 text as data at 0x0), \"S31580010000444154453D1E231F26201E20233B415338\", \"S31580010080DEADBEEFEEFF00112233445566778899C7\" (undone entry), \"S70500000000FA\" (entry point 0)",
+        "(T2, t2a) filename \"p32.s19\"; bytes_per_line `32` → file line 1 \"S00E00004341534530325F47415053E9\"",
+        "(T3, t3a) filename \"out.s19\"; source_kind \"s19\" → saved_path \".../workarea/P/out.s19\""
+      ],
+      "modify": [
+        "[I/O: patched image]"
+      ]
+    },
+    {
+      "name": "verify_written_image",
+      "reqs": [
+        "R-HEX-VERIFY-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "written_path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "intended_mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "file_type",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "VerifyResult",
+        "names": [
+          "result"
+        ],
+        "raw": "VerifyResult result"
+      },
+      "modulo_file": "s19_app/tui/changes/verify.py",
+      "inner": [],
+      "examples": [
+        "(T2, t2a) written_path \".../workarea/p16.s19\"; intended_mem_map holds 0x0: 0x43 and 0x80010005: 0x1E → result {status \"verified\", byte_counts {changed `0`}}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "run_flow",
+      "reqs": [
+        "R-TUI-059",
+        "LLR-085.2",
+        "LLR-086.4",
+        "LLR-087.2",
+        "LLR-089.2",
+        "LLR-143.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Flow",
+          "name": "flow",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "FlowContext",
+          "name": "ctx",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "FlowRunResult",
+        "names": [
+          "result"
+        ],
+        "raw": "FlowRunResult result"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [
+        "build_loaded_s19",
+        "read_change_document",
+        "apply_change_document",
+        "check_regions",
+        "inject_crcs",
+        "run_check_document",
+        "save_patched_image",
+        "compose_flow_report"
+      ],
+      "examples": [
+        "(T3, t3a) flow \"t3\" → result {status \"ok\", block_results [source \"loaded firmware.s19 (3 ranges)\", patch \"applied 1 entry\", crc \"injected 1 CRC region\", check \"passed=1 failed=0 uncheckable=0\", write_out \"wrote out.s19\"]}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "apply_change_document",
+      "reqs": [
+        "R-CHG-002",
+        "LLR-002.1",
+        "LLR-143.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChangeDocument",
+          "name": "document",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Dict[int, int]]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[Tuple[int, int]]]",
+          "name": "ranges",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[dict]]",
+          "name": "mac_records",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Sequence[dict]]",
+          "name": "a2l_tags",
+          "default": null
+        },
+        {
+          "kind": "callable",
+          "type": "Optional[Callable[[], datetime]]",
+          "name": "now_fn",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "variant_id",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChangeSummary",
+        "names": [
+          "summary"
+        ],
+        "raw": "ChangeSummary summary"
+      },
+      "modulo_file": "s19_app/tui/changes/apply.py",
+      "inner": [],
+      "examples": [
+        "(T3, t3a) entries 2 of 2 → summary {counts {applied `1`, skipped-outside `1`}, entries [{address_start `2147483728`, disposition \"applied\"}, {address_start `2147483904`, disposition \"skipped-outside\"}]}"
+      ],
+      "modify": [
+        "mem_map"
+      ]
+    },
+    {
+      "name": "inject_crcs",
+      "reqs": [
+        "LLR-089.3",
+        "LLR-090.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "OperationInput",
+          "name": "op_input",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[CrcRegionResult]",
+          "name": "crc_regions",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[dict[int, int], list[tuple[int, int]], list[CrcRegionResult]]",
+        "names": [
+          "mem_map",
+          "ranges",
+          "written"
+        ],
+        "raw": "tuple(dict[int, int] mem_map, list[tuple[int, int]] ranges, list[CrcRegionResult] written)"
+      },
+      "modulo_file": "s19_app/tui/operations/crc.py",
+      "inner": [],
+      "examples": [
+        "(T3, t3a) → written [{output_address `2147483772`, computed_crc `2344078287`, stored_value `1061043516`, written True}]; ranges keep [`0`, `12`] (the phantom S0 range)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "compose_flow_report",
+      "reqs": [
+        "LLR-001.1",
+        "LLR-001.2",
+        "AMD-8"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "FlowReportState",
+          "name": "state",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "datetime",
+          "name": "generated_at",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "markdown"
+        ],
+        "raw": "str markdown"
+      },
+      "modulo_file": "s19_app/tui/services/flow_report_service.py",
+      "inner": [],
+      "examples": [
+        "(T3, t3a) → markdown with \"**Status:** CLEAN\", \"| 2 | PATCH | ● ok | applied 1 entry |\", \"0x80000050 | 2 | 10 11 | DE AD\", \"**Before CRC:** 0x00000000–0x0000000C\"; no line for 0x80000100"
+      ],
+      "modify": []
+    },
+    {
+      "name": "run_chain_set",
+      "reqs": [
+        "HLR-019",
+        "LLR-019.2",
+        "LLR-020.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Sequence[ChainSpec]",
+          "name": "chains",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "FlowContext",
+          "name": "ctx",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "mode",
+          "default": "'sequential'"
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "set_name",
+          "default": "'chain-set'"
+        },
+        {
+          "kind": "callable",
+          "type": "Callable[[Flow, FlowContext], Optional[FlowRunResult]]",
+          "name": "run_one",
+          "default": "None"
+        },
+        {
+          "kind": "callable",
+          "type": "Optional[Callable[[], float]]",
+          "name": "clock",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "ChainSetRunRecord",
+        "names": [
+          "record"
+        ],
+        "raw": "ChainSetRunRecord record"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [
+        "run_flow",
+        "compose_chain_set_report"
+      ],
+      "examples": [
+        "(T3, t3b) chains [laneA, laneB]; mode \"parallel\" → record {outcomes [{chain \"laneA\", status \"ok\"}, {chain \"laneB\", status \"ok\", block_results with \"applied 0 entries\"}]}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "compose_chain_set_report",
+      "reqs": [
+        "LLR-020.1",
+        "LLR-020.2"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ChainSetRunRecord",
+          "name": "record",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "set_name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "datetime",
+          "name": "generated_at",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "markdown"
+        ],
+        "raw": "str markdown"
+      },
+      "modulo_file": "s19_app/tui/services/flow_execution_service.py",
+      "inner": [],
+      "examples": [
+        "(T3, t3b) → markdown with \"| 2 | laneB | t | ✓ ok | 3 |\", «[bound] path=» and «AppData/Local/Temp» (an absolute host path; C16 turns each backslash into a slash), and no written file name"
+      ],
+      "modify": []
+    },
+    {
+      "name": "resolve_symbol_entry",
+      "reqs": [
+        "LLR-141.2",
+        "HLR-141"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "symbol_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "value_text",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "a2l_data",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "value_mode",
+          "default": "'text'"
+        }
+      ],
+      "out": {
+        "type": "SymbolPickResult",
+        "names": [
+          "result"
+        ],
+        "raw": "SymbolPickResult result"
+      },
+      "modulo_file": "s19_app/tui/services/change_service.py",
+      "inner": [
+        "encode_physical_to_raw_bytes"
+      ],
+      "examples": [
+        "(T4, t4a) symbol_text \"ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10\"; value_text \"30\" → entry {address `8454148`, encoded_bytes [`3`, `0`]}, issues []",
+        "(T4, t4a) value_text \"25\" → entry None; issue \"the converted raw value 2.5 is not integral\""
+      ],
+      "modify": []
+    },
+    {
+      "name": "encode_physical_to_raw_bytes",
+      "reqs": [
+        "LLR-141.1"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict",
+          "name": "tag",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Any",
+          "name": "physical_value",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "compu_methods_by_name",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "compu_tabs_by_name",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "record_layouts_by_name",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[tuple[int, ...]], Optional[str], list[str]]",
+        "names": [
+          "raw_bytes",
+          "reason",
+          "flags"
+        ],
+        "raw": "tuple(tuple[int, ...]? raw_bytes, str? reason, list[str] flags)"
+      },
+      "modulo_file": "s19_app/tui/a2l.py",
+      "inner": [
+        "_invert_physical_to_raw"
+      ],
+      "examples": [
+        "(T4, t4a) tag \"ASAM.C.SCALAR.SWORD.RAT_FUNC_DIV_10\"; physical_value (30.0, a float: C16 cannot anchor it) → raw_bytes [`3`, `0`]",
+        "(T4, t4a) tag \"ASAM.C.SCALAR.SWORD.LINEAR_MUL_2\"; physical_value (30.0) → raw_bytes [`15`, `0`] (correct: phys = 2·int)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "_invert_physical_to_raw",
+      "reqs": [
+        "LLR-141.1",
+        "REQUIREMENTS.md:217-228 (COMPU_METHOD Execution",
+        "no id)"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "float",
+          "name": "physical",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "method",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[dict]",
+          "name": "compu_tabs_by_name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[float], Optional[str]]",
+        "names": [
+          "raw",
+          "reason"
+        ],
+        "raw": "tuple(float? raw, str? reason)"
+      },
+      "modulo_file": "s19_app/tui/a2l.py",
+      "inner": [],
+      "examples": [
+        "(T4, t4a) physical (30.0); method {name \"CM.RAT_FUNC.DIV_10\", conversion_type \"RAT_FUNC\"} → raw (3.0) (the A2L text gives impl = phys · 10 = 300)"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._handle_save_dialog",
+      "reqs": [
+        "R-TUI-012",
+        "R-PROJ-001",
+        "LLR-017.2",
+        "LLR-017.3",
+        "LLR-015.3"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[SaveProjectPayload]",
+          "name": "payload",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "copy_into_workarea",
+        "write_project_manifest"
+      ],
+      "examples": [
+        "(T5, t5a) payload {project_name \"P\", batch [\"patch.json\"], assignments {firmware [\"patch.json\"]}} into P that holds firmware.a2l → None; the status line says the project already has an A2L file; project.json keeps batch [] (C16 cannot see a status line or an entity write)",
+        "(T5b, t5b) payload {project_name \"Q\", batch [], assignments {}} after Load project Q → None; project.json batch [] (it held patch.json)"
+      ],
+      "modify": [
+        "[I/O: project folder]",
+        "[I/O: project.json]"
+      ]
+    },
+    {
+      "name": "write_project_manifest",
+      "reqs": [
+        "R-MAN-SER-001",
+        "LLR-017.2",
+        "HLR-027"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "ProjectVariantSet",
+          "name": "variant_set",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[str]",
+          "name": "batch",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "assignments",
+          "default": "None"
+        },
+        {
+          "kind": "value",
+          "type": "Sequence[DeclaredRegion]",
+          "name": "declared_regions",
+          "default": "()"
+        },
+        {
+          "kind": "value",
+          "type": "Optional[Mapping[str, Sequence[str]]]",
+          "name": "gathered",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "tuple[Optional[Path], list[ValidationIssue]]",
+        "names": [
+          "path",
+          "issues"
+        ],
+        "raw": "tuple(Path? path, list[ValidationIssue] issues)"
+      },
+      "modulo_file": "s19_app/tui/services/manifest_writer.py",
+      "inner": [],
+      "examples": [
+        "(T5b, t5b) variant_set {project_name \"Q\", variant_id \"firmware\"} → path \".../workarea/Q/project.json\", issues []"
+      ],
+      "modify": [
+        "[I/O: project.json]"
+      ]
+    },
+    {
+      "name": "read_project_manifest",
+      "reqs": [
+        "R-VAR-002",
+        "LLR-017.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "project_dir",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "ProjectManifest",
+        "names": [
+          "manifest"
+        ],
+        "raw": "ProjectManifest manifest"
+      },
+      "modulo_file": "s19_app/tui/services/variant_execution_service.py",
+      "inner": [],
+      "examples": [
+        "(T5b, t5b) project_dir \".../workarea/Q\" after the batch save → manifest {active_variant \"firmware\", batch [\".../workarea/Q/patch.json\"]}",
+        "(T5, t5a) project_dir \".../workarea/P\" → manifest {declared_regions [{name \"cal\", start `2147483648`, end `2147483664`}], issues []}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "S19TuiApp._handle_load_project",
+      "reqs": [
+        "R-TUI-013",
+        "R-RPT-REGION-PERSIST-002",
+        "R-PROJ-002"
+      ],
+      "in": [
+        {
+          "kind": "self",
+          "type": "S19TuiApp",
+          "name": "self",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[str]",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "None",
+        "names": [],
+        "raw": "None"
+      },
+      "modulo_file": "s19_app/tui/app.py",
+      "inner": [
+        "read_project_manifest"
+      ],
+      "examples": [
+        "(T5b, t5b) name \"Q\" → None; the manifest batch is read and not kept in the session",
+        "(T5, t5a) name \"P\" → None; the declared region named cal comes back (read from the session after the call)"
+      ],
+      "modify": [
+        "[Data: S19TuiApp.current_file]",
+        "[Data: S19TuiApp._declared_regions]"
+      ]
+    },
+    {
+      "name": "build_plan",
+      "reqs": [
+        "LLR-136.1",
+        "LLR-136.6",
+        "LLR-135.5"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "List[SegRow]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "set",
+          "name": "sel",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "List[Tuple[int, int]]",
+          "name": "src",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "mode",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "gap",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "stem",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "ext",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[int]",
+          "name": "pad_byte",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "Plan",
+        "names": [
+          "plan"
+        ],
+        "raw": "Plan plan"
+      },
+      "modulo_file": "s19_app/tui/segment_split_view.py",
+      "inner": [],
+      "examples": [
+        "(T6, t6b) rows [{name \"locality_00\", base 0x80000000, size `16`}]; src []; mem_map 0x80000000: 0x0 → plan {files [{label \"firmware_locality_00.s19\", packed `0`, empty True}]}"
+      ],
+      "modify": []
+    },
+    {
+      "name": "write_split_join_export",
+      "reqs": [
+        "LLR-136.5",
+        "LLR-136.6",
+        "HLR-137"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "List[SegRow]",
+          "name": "rows",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "mode",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "gap",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "pad_byte",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "fmt",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "stem",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "dest_dir",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "zero_coverage_empty",
+          "default": "False"
+        }
+      ],
+      "out": {
+        "type": "List[Path]",
+        "names": [
+          "written"
+        ],
+        "raw": "List[Path] written"
+      },
+      "modulo_file": "s19_app/tui/segment_split_view.py",
+      "inner": [
+        "fill_range",
+        "join_concat",
+        "emit_image"
+      ],
+      "examples": [
+        "(T6, t6a) mem_map of case_01 (with 0x0: 0x43); rows range_00 to range_02 → written [\".../splits/firmware_range_00.s19\", \".../firmware_range_01.s19\", \".../firmware_range_02.s19\"]",
+        "(T6, t6b) mem_map 0x80000000: 0x0; rows [locality_00] → written [\".../splits/firmware_locality_00.s19\"]"
+      ],
+      "modify": [
+        "[I/O: export file]"
+      ]
+    },
+    {
+      "name": "fill_range",
+      "reqs": [
+        "LLR-137.3"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "start",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "end",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "pad_byte",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "intra_gap",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[dict[int, int], list[tuple[int, int]]]",
+        "names": [
+          "planned_map",
+          "planned_ranges"
+        ],
+        "raw": "tuple(dict[int, int] planned_map, list[tuple[int, int]] planned_ranges)"
+      },
+      "modulo_file": "s19_app/segment_ops.py",
+      "inner": [],
+      "examples": [
+        "(T6, t6a) start `0`; end `12` → planned_map 0x0: 0x43 … 0xb: 0x43"
+      ],
+      "modify": []
+    },
+    {
+      "name": "emit_image",
+      "reqs": [
+        "LLR-137.2",
+        "R-HEX-EMIT-001"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "dict[int, int]",
+          "name": "mem_map",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "list[tuple[int, int]]",
+          "name": "ranges",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "fmt",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "text"
+        ],
+        "raw": "str text"
+      },
+      "modulo_file": "s19_app/segment_ops.py",
+      "inner": [],
+      "examples": [
+        "(T6, t6a) mem_map 0x0: 0x43 … (12 bytes); ranges [[`0`, `12`]] → text \"S0030000FC\" / \"S10F00004341534530315F4241534943B2\" / \"S9030000FC\"",
+        "(T6, t6b) mem_map 0x80000000: 0x0 → text with \"S306800000000079\" (one data byte 0x00)"
+      ],
+      "modify": []
+    }
+  ],
+  "edges": [
+    {
+      "src": {
+        "entity": "[I/O: S19 file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19File.__init__",
+        "port": "path"
+      },
+      "when": null,
+      "raw": "[I/O: S19 file] ──▶ S19File.__init__.path",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19File.__init__",
+        "port": "s19"
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_mem_map_s19",
+        "port": "s19"
+      },
+      "when": null,
+      "raw": "S19File.__init__.s19 ──▶ build_mem_map_s19.s19",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19File.__init__",
+        "port": "s19"
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_loaded_s19",
+        "port": "s19"
+      },
+      "when": null,
+      "raw": "S19File.__init__.s19 ──▶ build_loaded_s19.s19",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "build_mem_map_s19",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_loaded_s19",
+        "port": null
+      },
+      "when": null,
+      "raw": "build_mem_map_s19 ──▶ build_loaded_s19",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19File.get_memory_ranges",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_loaded_s19",
+        "port": null
+      },
+      "when": null,
+      "raw": "S19File.get_memory_ranges ──▶ build_loaded_s19",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "build_loaded_s19",
+        "port": "loaded"
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._merge_primary_with_existing_mac",
+        "port": "primary_loaded"
+      },
+      "when": null,
+      "raw": "build_loaded_s19.loaded ──▶ S19TuiApp._merge_primary_with_existing_mac.primary_loaded",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._merge_primary_with_existing_mac",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp._merge_primary_with_existing_mac",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._merge_primary_with_existing_mac",
+        "port": "merged"
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._parse_loaded_file",
+        "port": null
+      },
+      "when": null,
+      "raw": "S19TuiApp._merge_primary_with_existing_mac.merged ──▶ S19TuiApp._parse_loaded_file",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[I/O: MAC file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "parse_mac_file",
+        "port": "path"
+      },
+      "when": null,
+      "raw": "[I/O: MAC file] ──▶ parse_mac_file.path",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "parse_mac_file",
+        "port": "mac_data"
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._load_mac_file",
+        "port": null
+      },
+      "when": null,
+      "raw": "parse_mac_file.mac_data ──▶ S19TuiApp._load_mac_file",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._parse_loaded_file",
+        "port": "loaded"
+      },
+      "dst": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "S19TuiApp._parse_loaded_file.loaded ──▶ [Data: S19TuiApp.current_file]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: Load file dialog]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._parse_loaded_file",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Outside: Load file dialog] ──▶ S19TuiApp._parse_loaded_file",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: Bytes field]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "port": "event"
+      },
+      "when": null,
+      "raw": "[Outside: Bytes field] ──▶ S19TuiApp.on_patch_editor_panel_action_requested.event",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "ChangeService.add_entry",
+        "port": "bytes_text"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_patch_editor_panel_action_requested ──▶ ChangeService.add_entry.bytes_text",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "ChangeService.add_entry",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "parse_new_bytes",
+        "port": "bytes_text"
+      },
+      "when": null,
+      "raw": "ChangeService.add_entry ──▶ parse_new_bytes.bytes_text",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: ChangeService.document]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "ChangeService.apply",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: ChangeService.document] ──▶ ChangeService.apply",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "ChangeService.apply",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ ChangeService.apply.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "ChangeService.apply",
+        "port": "mem_map"
+      },
+      "dst": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "ChangeService.apply.mem_map ──▶ [Data: S19TuiApp.current_file]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "save_patched_image",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_patch_editor_panel_save_back_decision ──▶ save_patched_image.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "save_patched_image",
+        "port": "saved_path"
+      },
+      "dst": {
+        "entity": null,
+        "node": "verify_written_image",
+        "port": "written_path"
+      },
+      "when": null,
+      "raw": "save_patched_image.saved_path ──▶ verify_written_image.written_path",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "verify_written_image",
+        "port": "intended_mem_map"
+      },
+      "when": null,
+      "raw": "S19TuiApp.on_patch_editor_panel_save_back_decision ──▶ verify_written_image.intended_mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "save_patched_image",
+        "port": null
+      },
+      "dst": {
+        "entity": "[I/O: patched image]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "save_patched_image ──▶ [I/O: patched image]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: Bytes field]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp.on_patch_editor_panel_action_requested",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Outside: Bytes field] ──▶ S19TuiApp.on_patch_editor_panel_action_requested",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[I/O: firmware.s19]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "ctx"
+      },
+      "when": null,
+      "raw": "[I/O: firmware.s19] ──▶ run_flow.ctx",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[I/O: patch.json]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "apply_change_document",
+        "port": "document"
+      },
+      "when": null,
+      "raw": "[I/O: patch.json] ──▶ apply_change_document.document",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_flow",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "apply_change_document",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "run_flow ──▶ apply_change_document.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "apply_change_document",
+        "port": "mem_map"
+      },
+      "dst": {
+        "entity": null,
+        "node": "inject_crcs",
+        "port": "op_input"
+      },
+      "when": null,
+      "raw": "apply_change_document.mem_map ──▶ inject_crcs.op_input",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "inject_crcs",
+        "port": "mem_map"
+      },
+      "dst": {
+        "entity": null,
+        "node": "save_patched_image",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "inject_crcs.mem_map ──▶ save_patched_image.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "save_patched_image",
+        "port": null
+      },
+      "dst": {
+        "entity": "[I/O: out.s19]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "save_patched_image ──▶ [I/O: out.s19]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "apply_change_document",
+        "port": "summary"
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "result"
+      },
+      "when": null,
+      "raw": "apply_change_document.summary ──▶ run_flow.result",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "result"
+      },
+      "dst": {
+        "entity": null,
+        "node": "compose_flow_report",
+        "port": "state"
+      },
+      "when": null,
+      "raw": "run_flow.result ──▶ compose_flow_report.state",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "compose_flow_report",
+        "port": "markdown"
+      },
+      "dst": {
+        "entity": "[I/O: flow report]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "compose_flow_report.markdown ──▶ [I/O: flow report]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "flow"
+      },
+      "when": null,
+      "raw": "run_chain_set ──▶ run_flow.flow",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "result"
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "record"
+      },
+      "when": null,
+      "raw": "run_flow.result ──▶ run_chain_set.record",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "record"
+      },
+      "dst": {
+        "entity": null,
+        "node": "compose_chain_set_report",
+        "port": "record"
+      },
+      "when": null,
+      "raw": "run_chain_set.record ──▶ compose_chain_set_report.record",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "compose_chain_set_report",
+        "port": "markdown"
+      },
+      "dst": {
+        "entity": "[I/O: chain-set report]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "compose_chain_set_report.markdown ──▶ [I/O: chain-set report]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: Flow Builder run key]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_flow",
+        "port": "flow"
+      },
+      "when": null,
+      "raw": "[Outside: Flow Builder run key] ──▶ run_flow.flow",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: Flow Execution panel]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "run_chain_set",
+        "port": "chains"
+      },
+      "when": null,
+      "raw": "[Outside: Flow Execution panel] ──▶ run_chain_set.chains",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[I/O: A2L file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "resolve_symbol_entry",
+        "port": "a2l_data"
+      },
+      "when": null,
+      "raw": "[I/O: A2L file] ──▶ resolve_symbol_entry.a2l_data",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "resolve_symbol_entry",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "encode_physical_to_raw_bytes",
+        "port": "physical_value"
+      },
+      "when": null,
+      "raw": "resolve_symbol_entry ──▶ encode_physical_to_raw_bytes.physical_value",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "encode_physical_to_raw_bytes",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_invert_physical_to_raw",
+        "port": "physical"
+      },
+      "when": null,
+      "raw": "encode_physical_to_raw_bytes ──▶ _invert_physical_to_raw.physical",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "_invert_physical_to_raw",
+        "port": "raw"
+      },
+      "dst": {
+        "entity": null,
+        "node": "encode_physical_to_raw_bytes",
+        "port": null
+      },
+      "when": null,
+      "raw": "_invert_physical_to_raw.raw ──▶ encode_physical_to_raw_bytes",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "resolve_symbol_entry",
+        "port": "result"
+      },
+      "dst": {
+        "entity": "[Data: ChangeService.document]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "resolve_symbol_entry.result ──▶ [Data: ChangeService.document]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[I/O: A2L file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_apply_compu_method",
+        "port": "method"
+      },
+      "when": null,
+      "raw": "[I/O: A2L file] ──▶ _apply_compu_method.method",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: symbol picker]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "resolve_symbol_entry",
+        "port": "symbol_text"
+      },
+      "when": null,
+      "raw": "[Outside: symbol picker] ──▶ resolve_symbol_entry.symbol_text",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: symbol picker]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "resolve_symbol_entry",
+        "port": "value_text"
+      },
+      "when": null,
+      "raw": "[Outside: symbol picker] ──▶ resolve_symbol_entry.value_text",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: tag view]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "_apply_compu_method",
+        "port": "raw_value"
+      },
+      "when": null,
+      "raw": "[Outside: tag view] ──▶ _apply_compu_method.raw_value",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._handle_save_dialog",
+        "port": null
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ S19TuiApp._handle_save_dialog",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._handle_save_dialog",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_project_manifest",
+        "port": "batch"
+      },
+      "when": null,
+      "raw": "S19TuiApp._handle_save_dialog ──▶ write_project_manifest.batch",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._handle_save_dialog",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_project_manifest",
+        "port": "assignments"
+      },
+      "when": null,
+      "raw": "S19TuiApp._handle_save_dialog ──▶ write_project_manifest.assignments",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp._declared_regions]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_project_manifest",
+        "port": "declared_regions"
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp._declared_regions] ──▶ write_project_manifest.declared_regions",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "write_project_manifest",
+        "port": null
+      },
+      "dst": {
+        "entity": "[I/O: project.json]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "write_project_manifest ──▶ [I/O: project.json]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[I/O: project.json]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "read_project_manifest",
+        "port": "project_dir"
+      },
+      "when": null,
+      "raw": "[I/O: project.json] ──▶ read_project_manifest.project_dir",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "read_project_manifest",
+        "port": "manifest"
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._handle_load_project",
+        "port": null
+      },
+      "when": null,
+      "raw": "read_project_manifest.manifest ──▶ S19TuiApp._handle_load_project",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "S19TuiApp._handle_load_project",
+        "port": null
+      },
+      "dst": {
+        "entity": "[Data: S19TuiApp._declared_regions]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "S19TuiApp._handle_load_project ──▶ [Data: S19TuiApp._declared_regions]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: SaveProjectScreen]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._handle_save_dialog",
+        "port": "payload"
+      },
+      "when": null,
+      "raw": "[Outside: SaveProjectScreen] ──▶ S19TuiApp._handle_save_dialog.payload",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: LoadProjectScreen]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "S19TuiApp._handle_load_project",
+        "port": "name"
+      },
+      "when": null,
+      "raw": "[Outside: LoadProjectScreen] ──▶ S19TuiApp._handle_load_project.name",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_plan",
+        "port": "src"
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ build_plan.src",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Data: S19TuiApp.current_file]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_split_join_export",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "[Data: S19TuiApp.current_file] ──▶ write_split_join_export.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "write_split_join_export",
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "fill_range",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "write_split_join_export ──▶ fill_range.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "fill_range",
+        "port": "planned_map"
+      },
+      "dst": {
+        "entity": null,
+        "node": "emit_image",
+        "port": "mem_map"
+      },
+      "when": null,
+      "raw": "fill_range.planned_map ──▶ emit_image.mem_map",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "emit_image",
+        "port": "text"
+      },
+      "dst": {
+        "entity": "[I/O: export file]",
+        "node": null,
+        "port": null
+      },
+      "when": null,
+      "raw": "emit_image.text ──▶ [I/O: export file]",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": null,
+        "node": "build_plan",
+        "port": "plan"
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_split_join_export",
+        "port": null
+      },
+      "when": "build_plan.plan",
+      "raw": "build_plan.plan ──▶ write_split_join_export",
+      "boundary": false
+    },
+    {
+      "src": {
+        "entity": "[Outside: Split window rows]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "build_plan",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "[Outside: Split window rows] ──▶ build_plan.rows",
+      "boundary": true
+    },
+    {
+      "src": {
+        "entity": "[Outside: Split window rows]",
+        "node": null,
+        "port": null
+      },
+      "dst": {
+        "entity": null,
+        "node": "write_split_join_export",
+        "port": "rows"
+      },
+      "when": null,
+      "raw": "[Outside: Split window rows] ──▶ write_split_join_export.rows",
+      "boundary": true
+    }
+  ],
+  "c15": [
+    {
+      "caller": "ChangeService.add_entry",
+      "callee": "parse_new_bytes",
+      "sites": [
+        "s19_app/tui/services/change_service.py:1003"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "ChangeService.apply",
+      "callee": "apply_change_document",
+      "sites": [
+        "s19_app/tui/services/change_service.py:1662"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "S19TuiApp._parse_loaded_file",
+      "sites": [
+        "s19_app/tui/app.py:10508"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp._handle_load_project",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:8226"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/services/manifest_writer.py:702"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp._handle_save_dialog",
+      "callee": "write_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:8101"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._load_mac_file",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/app.py:11250"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp._load_mac_file",
+      "callee": "parse_mac_file",
+      "sites": [
+        "s19_app/tui/app.py:9629"
+      ],
+      "declared_via": "edge"
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19File.__init__",
+      "sites": [
+        "s19_app/tui/app.py:10578"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19TuiApp._load_mac_file",
+      "sites": [
+        "s19_app/tui/app.py:10616"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "S19TuiApp._merge_primary_with_existing_mac",
+      "sites": [
+        "s19_app/tui/app.py:10582",
+        "s19_app/tui/app.py:10601"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "build_loaded_s19",
+      "sites": [
+        "s19_app/tui/app.py:10581"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp._parse_loaded_file",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/app.py:11250"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "ChangeService.add_entry",
+      "sites": [
+        "s19_app/tui/app.py:3173"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "ChangeService.apply",
+      "sites": [
+        "s19_app/tui/app.py:3221"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "S19File.__init__",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:764"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "_apply_compu_method",
+      "sites": [
+        "s19_app/tui/a2l.py:2619"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "apply_change_document",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:787"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "build_loaded_s19",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:763"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:879"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "parse_mac_file",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:877"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "read_project_manifest",
+      "sites": [
+        "s19_app/tui/app.py:4192",
+        "s19_app/tui/services/variant_execution_service.py:958"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "S19TuiApp.on_patch_editor_panel_action_requested",
+      "callee": "save_patched_image",
+      "sites": [
+        "s19_app/tui/services/variant_execution_service.py:798"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "build_loaded_s19",
+      "callee": "S19File.get_memory_ranges",
+      "sites": [
+        "s19_app/tui/services/load_service.py:61"
+      ],
+      "declared_via": "edge"
+    },
+    {
+      "caller": "build_loaded_s19",
+      "callee": "build_mem_map_s19",
+      "sites": [
+        "s19_app/tui/services/load_service.py:60"
+      ],
+      "declared_via": "edge"
+    },
+    {
+      "caller": "encode_physical_to_raw_bytes",
+      "callee": "_invert_physical_to_raw",
+      "sites": [
+        "s19_app/tui/a2l.py:2060",
+        "s19_app/tui/a2l.py:2236"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "resolve_symbol_entry",
+      "callee": "encode_physical_to_raw_bytes",
+      "sites": [
+        "s19_app/tui/services/change_service.py:542"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_chain_set",
+      "callee": "compose_chain_set_report",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:1701"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_chain_set",
+      "callee": "run_flow",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:1503 (ref)"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "S19File.__init__",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:315",
+        "s19_app/tui/services/flow_execution_service.py:728"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "run_flow",
+      "callee": "_apply_compu_method",
+      "sites": [
+        "s19_app/tui/a2l.py:2619"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "run_flow",
+      "callee": "apply_change_document",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:448"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "build_loaded_s19",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:314",
+        "s19_app/tui/services/flow_execution_service.py:727"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "compose_flow_report",
+      "sites": [
+        "s19_app/tui/services/flow_report_service.py:545"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "inject_crcs",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:651"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "run_flow",
+      "callee": "parse_a2l_file",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:342",
+        "s19_app/tui/services/flow_execution_service.py:422"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "run_flow",
+      "callee": "save_patched_image",
+      "sites": [
+        "s19_app/tui/services/flow_execution_service.py:520"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "verify_written_image",
+      "callee": "S19File.__init__",
+      "sites": [
+        "s19_app/tui/changes/verify.py:115"
+      ],
+      "declared_via": null
+    },
+    {
+      "caller": "write_split_join_export",
+      "callee": "emit_image",
+      "sites": [
+        "s19_app/tui/segment_split_view.py:544"
+      ],
+      "declared_via": "inner"
+    },
+    {
+      "caller": "write_split_join_export",
+      "callee": "fill_range",
+      "sites": [
+        "s19_app/tui/segment_split_view.py:562"
+      ],
+      "declared_via": "inner"
+    }
+  ],
+  "top_level_sites": {
+    "S19TuiApp.on_patch_editor_panel_action_requested": [
+      "cwaudit/cwh.py:105"
+    ],
+    "build_loaded_s19": [
+      "cwaudit/test_t1_load.py:13",
+      "cwaudit/test_t1_load.py:28",
+      "cwaudit/test_t1_load.py:38",
+      "cwaudit/test_t6_split.py:10",
+      "docs/images/capture_readme_media.py:80",
+      "s19_app/tui/app.py:5855",
+      "s19_app/tui/services/before_after_service.py:178",
+      "s19_app/tui/services/change_service.py:2360",
+      "s19_app/tui/services/compare_service.py:169"
+    ],
+    "S19File.__init__": [
+      "cwaudit/test_t1_load.py:12",
+      "cwaudit/test_t1_load.py:28",
+      "cwaudit/test_t1_load.py:37",
+      "cwaudit/test_t6_split.py:10",
+      "docs/images/capture_readme_media.py:79",
+      "prototypes/screen_upgrades.prototype.py:101",
+      "prototypes/screen_upgrades.prototype.py:85",
+      "s19_app/cli.py:98",
+      "s19_app/tui/app.py:10398",
+      "s19_app/tui/app.py:5855",
+      "s19_app/tui/services/before_after_service.py:178",
+      "s19_app/tui/services/change_service.py:2361",
+      "s19_app/tui/services/compare_service.py:169"
+    ],
+    "S19TuiApp.on_patch_editor_panel_save_back_decision": [
+      "cwaudit/test_t2_patch_editor.py:34",
+      "cwaudit/test_t2_patch_editor.py:38"
+    ],
+    "ChangeService.undo": [
+      "cwaudit/test_t2_patch_editor.py:25",
+      "cwaudit/test_t2_patch_editor.py:26",
+      "s19_app/tui/app.py:3617"
+    ],
+    "parse_new_bytes": [
+      "cwaudit/test_t2_patch_editor.py:56"
+    ],
+    "run_flow": [
+      "cwaudit/test_t3_flow.py:37",
+      "s19_app/tui/app.py:2587",
+      "s19_app/tui/services/flow_execution_service.py:1184 (ref)"
+    ],
+    "run_chain_set": [
+      "cwaudit/test_t3_flow.py:61",
+      "s19_app/tui/app.py:2799",
+      "s19_app/tui/app.py:2889"
+    ],
+    "resolve_symbol_entry": [
+      "cwaudit/test_t4_a2l_encode.py:20",
+      "cwaudit/test_t4_a2l_encode.py:25",
+      "s19_app/tui/services/change_service.py:1134"
+    ],
+    "parse_a2l_file": [
+      "cwaudit/test_t4_a2l_encode.py:17",
+      "cwaudit/test_t4_a2l_encode.py:32",
+      "cwaudit/test_t4_a2l_encode.py:44",
+      "docs/images/capture_readme_media.py:78",
+      "prototypes/screen_upgrades.prototype.py:88",
+      "s19_app/tui/services/change_service.py:2354"
+    ],
+    "S19TuiApp._handle_save_dialog": [
+      "cwaudit/test_t5_project.py:27",
+      "cwaudit/test_t5_project.py:34",
+      "cwaudit/test_t5_project.py:51",
+      "cwaudit/test_t5_project.py:72",
+      "cwaudit/test_t5_project.py:78",
+      "cwaudit/test_t5_project.py:91"
+    ],
+    "S19TuiApp._handle_load_project": [
+      "cwaudit/test_t5_project.py:46",
+      "cwaudit/test_t5_project.py:89"
+    ],
+    "write_split_join_export": [
+      "cwaudit/test_t6_split.py:19",
+      "cwaudit/test_t6_split.py:38",
+      "cwaudit/test_t6_split.py:57",
+      "s19_app/tui/segment_split_view.py:1632"
+    ],
+    "build_plan": [
+      "cwaudit/test_t6_split.py:42",
+      "s19_app/tui/segment_split_view.py:1236"
+    ],
+    "parse_mac_file": [
+      "cwaudit/test_t6_split.py:34",
+      "docs/images/capture_readme_media.py:81",
+      "prototypes/screen_upgrades.prototype.py:92",
+      "s19_app/tui/services/change_service.py:2364"
+    ],
+    "S19File.get_memory_ranges": [
+      "prototypes/screen_upgrades.prototype.py:87",
+      "s19_app/core.py:645",
+      "s19_app/core.py:661",
+      "s19_app/core.py:667",
+      "s19_app/core.py:676",
+      "s19_app/core.py:687"
+    ],
+    "_apply_compu_method": [
+      "s19_app/tui/a2l.py:2851",
+      "s19_app/tui/a2l.py:2898",
+      "s19_app/tui/a2l.py:3000"
+    ],
+    "read_project_manifest": [
+      "s19_app/tui/app.py:4666",
+      "s19_app/tui/app.py:4774"
+    ],
+    "S19TuiApp._parse_loaded_file": [
+      "s19_app/tui/app.py:11143"
+    ],
+    "verify_written_image": [
+      "s19_app/tui/operations/crc.py:1367",
+      "s19_app/tui/services/change_service.py:1758"
+    ],
+    "inject_crcs": [
+      "s19_app/tui/operations/crc.py:1327",
+      "s19_app/tui/screens.py:2792"
+    ],
+    "save_patched_image": [
+      "s19_app/tui/services/change_service.py:1735"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/tui/services/flow_execution_service.py:1444",
+      "msg": "`mode`: graph default `'sequential'` vs code `CHAIN_RUN_SEQUENTIAL`"
+    },
+    {
+      "kind": "input_type_mismatch",
+      "where": "s19_app/tui/services/flow_execution_service.py:1444",
+      "msg": "`run_one`: graph `Callable[[Flow, FlowContext], Optional[FlowRunResult]]` vs code `Optional[Callable[[Flow, FlowContext], FlowRunResult]]`"
+    },
+    {
+      "kind": "input_missing_in_code",
+      "where": "s19_app/tui/services/manifest_writer.py:414",
+      "msg": "graph input `project_dir` not a parameter of `write_project_manifest`"
+    },
+    {
+      "kind": "input_missing_in_graph",
+      "where": "s19_app/tui/services/manifest_writer.py:414",
+      "msg": "parameter `project_root: Path` not in graph"
+    },
+    {
+      "kind": "input_missing_in_graph",
+      "where": "s19_app/tui/services/manifest_writer.py:414",
+      "msg": "parameter `base_dir: Path` not in graph"
+    },
+    {
+      "kind": "input_missing_in_graph",
+      "where": "s19_app/tui/services/manifest_writer.py:414",
+      "msg": "parameter `schema_version: int` not in graph"
+    },
+    {
+      "kind": "input_missing_in_graph",
+      "where": "s19_app/tui/services/variant_execution_service.py:376",
+      "msg": "parameter `size_probe: Optional[SizeProbe]` not in graph"
+    },
+    {
+      "kind": "output_type_mismatch",
+      "where": "s19_app/tui/services/variant_execution_service.py:376",
+      "msg": "graph `ProjectManifest` vs code `Optional[ProjectManifest]`"
+    },
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/segment_ops.py:280",
+      "msg": "`pad_byte`: graph default `None` vs code `DEFAULT_PAD_BYTE`"
+    },
+    {
+      "kind": "default_mismatch",
+      "where": "s19_app/segment_ops.py:280",
+      "msg": "`intra_gap`: graph default `None` vs code `'fill'`"
+    },
+    {
+      "kind": "input_missing_in_graph",
+      "where": "s19_app/segment_ops.py:465",
+      "msg": "parameter `bytes_per_line: int` not in graph"
+    },
+    {
+      "kind": "output_type_mismatch",
+      "where": "s19_app/segment_ops.py:465",
+      "msg": "graph `str` vs code `Union[str, bytes]`"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:10508",
+      "msg": "`S19TuiApp._handle_load_project` → `S19TuiApp._parse_loaded_file` (sites: s19_app/tui/app.py:10508) not declared in `inner:` of `S19TuiApp._handle_load_project` nor as an edge; also called at top level: s19_app/tui/app.py:11143"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/manifest_writer.py:702",
+      "msg": "`S19TuiApp._handle_save_dialog` → `read_project_manifest` (sites: s19_app/tui/services/manifest_writer.py:702) not declared in `inner:` of `S19TuiApp._handle_save_dialog` nor as an edge; also called at top level: s19_app/tui/app.py:4666, s19_app/tui/app.py:4774"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:11250",
+      "msg": "`S19TuiApp._load_mac_file` → `parse_a2l_file` (sites: s19_app/tui/app.py:11250) not declared in `inner:` of `S19TuiApp._load_mac_file` nor as an edge; also called at top level: cwaudit/test_t4_a2l_encode.py:17, cwaudit/test_t4_a2l_encode.py:32, cwaudit/test_t4_a2l_encode.py:44, docs/images/capture_readme_media.py:78, prototypes/screen_upgrades.prototype.py:88 (+1 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:10578",
+      "msg": "`S19TuiApp._parse_loaded_file` → `S19File.__init__` (sites: s19_app/tui/app.py:10578) not declared in `inner:` of `S19TuiApp._parse_loaded_file` nor as an edge; also called at top level: cwaudit/test_t1_load.py:12, cwaudit/test_t1_load.py:28, cwaudit/test_t1_load.py:37, cwaudit/test_t6_split.py:10, docs/images/capture_readme_media.py:79 (+8 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:11250",
+      "msg": "`S19TuiApp._parse_loaded_file` → `parse_a2l_file` (sites: s19_app/tui/app.py:11250) not declared in `inner:` of `S19TuiApp._parse_loaded_file` nor as an edge; also called at top level: cwaudit/test_t4_a2l_encode.py:17, cwaudit/test_t4_a2l_encode.py:32, cwaudit/test_t4_a2l_encode.py:44, docs/images/capture_readme_media.py:78, prototypes/screen_upgrades.prototype.py:88 (+1 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:764",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `S19File.__init__` (sites: s19_app/tui/services/variant_execution_service.py:764) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: cwaudit/test_t1_load.py:12, cwaudit/test_t1_load.py:28, cwaudit/test_t1_load.py:37, cwaudit/test_t6_split.py:10, docs/images/capture_readme_media.py:79 (+8 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/a2l.py:2619",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `_apply_compu_method` (sites: s19_app/tui/a2l.py:2619) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: s19_app/tui/a2l.py:2851, s19_app/tui/a2l.py:2898, s19_app/tui/a2l.py:3000"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:787",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `apply_change_document` (sites: s19_app/tui/services/variant_execution_service.py:787) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:763",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `build_loaded_s19` (sites: s19_app/tui/services/variant_execution_service.py:763) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: cwaudit/test_t1_load.py:13, cwaudit/test_t1_load.py:28, cwaudit/test_t1_load.py:38, cwaudit/test_t6_split.py:10, docs/images/capture_readme_media.py:80 (+4 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:879",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `parse_a2l_file` (sites: s19_app/tui/services/variant_execution_service.py:879) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: cwaudit/test_t4_a2l_encode.py:17, cwaudit/test_t4_a2l_encode.py:32, cwaudit/test_t4_a2l_encode.py:44, docs/images/capture_readme_media.py:78, prototypes/screen_upgrades.prototype.py:88 (+1 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:877",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `parse_mac_file` (sites: s19_app/tui/services/variant_execution_service.py:877) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: cwaudit/test_t6_split.py:34, docs/images/capture_readme_media.py:81, prototypes/screen_upgrades.prototype.py:92, s19_app/tui/services/change_service.py:2364"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/app.py:4192",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `read_project_manifest` (sites: s19_app/tui/app.py:4192, s19_app/tui/services/variant_execution_service.py:958) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: s19_app/tui/app.py:4666, s19_app/tui/app.py:4774"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/variant_execution_service.py:798",
+      "msg": "`S19TuiApp.on_patch_editor_panel_action_requested` → `save_patched_image` (sites: s19_app/tui/services/variant_execution_service.py:798) not declared in `inner:` of `S19TuiApp.on_patch_editor_panel_action_requested` nor as an edge; also called at top level: s19_app/tui/services/change_service.py:1735"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/flow_execution_service.py:315",
+      "msg": "`run_flow` → `S19File.__init__` (sites: s19_app/tui/services/flow_execution_service.py:315, s19_app/tui/services/flow_execution_service.py:728) not declared in `inner:` of `run_flow` nor as an edge; also called at top level: cwaudit/test_t1_load.py:12, cwaudit/test_t1_load.py:28, cwaudit/test_t1_load.py:37, cwaudit/test_t6_split.py:10, docs/images/capture_readme_media.py:79 (+8 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/a2l.py:2619",
+      "msg": "`run_flow` → `_apply_compu_method` (sites: s19_app/tui/a2l.py:2619) not declared in `inner:` of `run_flow` nor as an edge; also called at top level: s19_app/tui/a2l.py:2851, s19_app/tui/a2l.py:2898, s19_app/tui/a2l.py:3000"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/services/flow_execution_service.py:342",
+      "msg": "`run_flow` → `parse_a2l_file` (sites: s19_app/tui/services/flow_execution_service.py:342, s19_app/tui/services/flow_execution_service.py:422) not declared in `inner:` of `run_flow` nor as an edge; also called at top level: cwaudit/test_t4_a2l_encode.py:17, cwaudit/test_t4_a2l_encode.py:32, cwaudit/test_t4_a2l_encode.py:44, docs/images/capture_readme_media.py:78, prototypes/screen_upgrades.prototype.py:88 (+1 more)"
+    },
+    {
+      "kind": "c15_divergence",
+      "where": "s19_app/tui/changes/verify.py:115",
+      "msg": "`verify_written_image` → `S19File.__init__` (sites: s19_app/tui/changes/verify.py:115) not declared in `inner:` of `verify_written_image` nor as an edge; also called at top level: cwaudit/test_t1_load.py:12, cwaudit/test_t1_load.py:28, cwaudit/test_t1_load.py:37, cwaudit/test_t6_split.py:10, docs/images/capture_readme_media.py:79 (+8 more)"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "parse_a2l_file",
+      "msg": "`extract_a2l_tags` in `inner:` of `parse_a2l_file` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "S19TuiApp.on_patch_editor_panel_save_back_decision",
+      "msg": "`ChangeService.save_patched` in `inner:` of `S19TuiApp.on_patch_editor_panel_save_back_decision` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "run_flow",
+      "msg": "`read_change_document` in `inner:` of `run_flow` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "run_flow",
+      "msg": "`check_regions` in `inner:` of `run_flow` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "run_flow",
+      "msg": "`run_check_document` in `inner:` of `run_flow` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "S19TuiApp._handle_save_dialog",
+      "msg": "`copy_into_workarea` in `inner:` of `S19TuiApp._handle_save_dialog` is not a graph node"
+    },
+    {
+      "kind": "interior_unknown_node",
+      "where": "write_split_join_export",
+      "msg": "`join_concat` in `inner:` of `write_split_join_export` is not a graph node"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "build_loaded_s19",
+      "msg": "`build_loaded_s19` declared inside `S19TuiApp._parse_loaded_file`, `run_flow`: two call sites by design"
+    },
+    {
+      "kind": "info_declared_in_two_interiors",
+      "where": "apply_change_document",
+      "msg": "`apply_change_document` declared inside `ChangeService.apply`, `run_flow`: two call sites by design"
+    }
+  ],
+  "parse_failures": [
+    {
+      "file": "tools/mutation_harness.py",
+      "error": "f-string expression part cannot include a backslash (<unknown>, line 190)"
+    }
+  ]
+}

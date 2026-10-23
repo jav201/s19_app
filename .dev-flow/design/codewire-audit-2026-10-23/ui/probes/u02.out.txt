@@ -1,0 +1,65 @@
+== U2.1 load case_01 s19 + mac + a2l, Save as P1
+   [before save] project=None file=temp/firmware.s19 mac=firmware.mac a2l=temp/firmware.a2l entries=0
+   [before save] #status_context = (none)  |  firmware.a2l
+   save dialog = SaveProjectScreen; labels=['Save project folder under:', 'Project name (new folder name):']; buttons=['Browse...', 'Save', 'Cancel']
+   parent prefill = C:\Users\jjgh8\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
+   after save: screen = Screen
+   recorded = [('log', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P1 (variant 'firmware')"), ('log', 'Project saved + manifest verified')]
+   painted status = Loaded firmware.mac (S19+MAC)
+== U2.2 `U` unload all
+   recorded = [('log', 'Unloaded all artifacts.')]
+   [after U] project='P1' file=None mac=None a2l=None entries=0
+   [after U] #status_context = P1  |  (none)
+== U2.3 load case_00 prg.s19, Save as P2
+   recorded (load prg) = [('log', 'Copying into workarea temp...'), ('log', 'Parsing prg.s19...'), ('file_status', 'Loaded prg.s19 (S19 only)'), ('log', 'Loaded prg.s19 (S19 only)'), ('log', 'Loaded prg.s19'), ('log', "Added variant 'prg' to project 'P1'")]
+   [after load prg] project='P1' file=temp/prg.s19 mac=None a2l=None entries=0
+   [after load prg] #status_context = P1:prg (2/2)  |  (none)
+   P1 tree after loose load = ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'prg.s19', 'project.json']
+   save dialog = SaveProjectScreen; labels=['Save project folder under:', 'Project name (new folder name):']; buttons=['Browse...', 'Save', 'Cancel']
+   parent prefill = C:\Users\jjgh8\AppData\Local\Temp\cwui_pt526fax\.s19tool\workarea
+   after save: screen = Screen
+   recorded = [('log', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwui_pt526fax\\.s19tool\\workarea\\P2 (variant 'prg')"), ('log', 'Project saved + manifest verified')]
+   painted status = Loaded prg.s19 (S19 only)
+   P2 tree = ['prg.s19', 'project.json']
+   P1 tree = ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'prg.s19', 'project.json']
+== U2.4 `p` -> pick P1 -> Load button
+   focused before `p` = _SegTable sje_table
+   load dialog after `p` = Screen
+   load dialog after clicking 'Load project (p)' button = LoadProjectScreen
+   listed projects = ['P1', 'P2', 'patches']
+   via=button: dismiss value = ['Label()']; screen now = Screen
+   recorded = [('log', 'Project not found: Label()')]
+   painted status = Loaded prg.s19 (S19 only)
+   [after Load P1 via button] project='P2' file=temp/prg.s19 mac=None a2l=None entries=0
+   [after Load P1 via button] #status_context = P2  |  (none)
+== U2.5 `p` -> pick P1 -> enter on the list
+   focused before `p` = Button ws_load_project_button
+   load dialog after `p` = LoadProjectScreen
+   listed projects = ['P1', 'P2', 'patches']
+   via=enter: dismiss value = []; screen now = LoadProjectScreen
+   recorded = []
+   painted status = Loaded prg.s19 (S19 only)
+   [after Load P1 via enter] project='P2' file=temp/prg.s19 mac=None a2l=None entries=0
+   [after Load P1 via enter] #status_context = P2  |  (none)
+== U2.6 direct handler (what tests call): _handle_load_project('P1')
+   recorded = [('file_status', 'Loaded firmware.s19 (S19 only)'), ('log', 'Loaded firmware.s19 (S19 only)'), ('file_status', 'Loaded firmware.mac (S19+MAC)'), ('log', 'Loaded firmware.mac (S19+MAC)'), ('log', "Loaded project 'P1' -> firmware.s19 + firmware.mac")]
+   [after handler P1] project='P1' file=P1/firmware.s19 mac=firmware.mac a2l=P1/firmware.a2l entries=0
+   [after handler P1] #status_context = P1:firmware (1/2)  |  firmware.a2l
+== U2.7 `p` -> P2 over P1 (load over an open project)
+   focused before `p` = _SegTable sje_table
+   load dialog after `p` = Screen
+   load dialog after clicking 'Load project (p)' button = LoadProjectScreen
+   listed projects = ['P1', 'P2', 'patches']
+   via=button: dismiss value = ['Label()']; screen now = Screen
+   recorded = [('log', 'Project not found: Label()')]
+   painted status = Loaded firmware.mac (S19+MAC)
+   recorded (handler P2) = [('file_status', 'Loaded prg.s19 (S19+MAC: firmware.mac)'), ('log', 'Loaded prg.s19 (S19+MAC: firmware.mac)'), ('log', "Loaded project 'P2' -> prg.s19")]
+   [after handler P2] project='P2' file=P2/prg.s19 mac=firmware.mac a2l=P1/firmware.a2l entries=0
+   [after handler P2] #status_context = P2  |  firmware.a2l
+   A2L screen title = Context | ws a2l view head = A2L summary lines 1-20 / 20
+---------------------------
+A2L Sections:
+- PROJECT CASE01 "Synthetic project for S19Tool stress testing" (lines 1-53)
+  - HEADER (l
+== U2.8 Save dialog with an empty name, Save clicked
+   screen now = SaveProjectScreen recorded = []

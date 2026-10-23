@@ -1,0 +1,31 @@
+== U6.0 app bindings with no action method = []
+== U6.1 Footer keys shown = [('ctrl+k', 'Palette'), ('ctrl+d', 'Density'), ('ctrl+l', 'Load'), ('ctrl+s', 'Save'), ('slash', 'Find'), ('g', 'Go-to'), ('q', 'Quit'), ('x', 'Operations'), ('k', 'Legend'), ('question_mark', 'Help'), ('plus', 'Page+'), ('minus', 'Page-'), ('comma', 'Hex-'), ('period', 'Hex+'), ('ctrl+p', 'palette')]
+   focus at start = RailItem rail_item_workspace
+== U6.2 after load: screen = workspace | focused = _SegTable sje_table
+   SJE window hidden? = True | sje display = False
+   key `p`: screen Screen -> Screen; active=workspace; recorded=[]
+   key `t`: screen Screen -> Screen; active=workspace; recorded=[]
+   key `a`: screen Screen -> Screen; active=workspace; recorded=[('log', 'manual: dropped a')]
+   key `e`: screen Screen -> Screen; active=workspace; recorded=[('log', 'manual: dropped ae')]
+   key `e`: screen Screen -> Screen; active=workspace; recorded=[('log', 'manual: dropped aee')]
+   key `k`: screen Screen -> Screen; active=workspace; recorded=[('log', 'manual: dropped aeek')]
+   files in workarea (not temp) after the keys = []
+== U6.3 the same keys with the focus moved to the hex view
+   focused = ScrollableContainer hex_scroll
+   key `p`: screen -> LoadProjectScreen; recorded=[]
+   after `escape`: screen = LoadProjectScreen
+   `l` opened LoadFileScreen; after `escape`: LoadFileScreen
+   `s` opened SaveProjectScreen; after `escape`: SaveProjectScreen
+== U6.4 rail items
+   rail items = [('rail_item_workspace', '◫  Workspace'), ('rail_item_a2l', '≡  A2L Explorer'), ('rail_item_mac', '◉  MAC View'), ('rail_item_map', '▤  Memory Map'), ('rail_item_issues', '!  Issues Report'), ('rail_item_patch', '✎  Patch Editor'), ('rail_item_check_editor', '✔  Check Editor'), ('rail_item_diff', '⏚  A2B Diff'), ('rail_item_flow', '✦  Flow Builder'), ('rail_item_flow_execution', '▶  Flow Execution'), ('rail_item_checks', '☑  Checks'), ('rail_item_crc_designer', '⊕  CRC Designer')]
+== U6.5 `?` help panel
+   screen = WindowHelpScreen | help panel shown = False
+   help screen text head = <textual.renderables.blank.Blank object at 0x0000027B1E686D10> Workspace 1. Load files with `^L` / `l` — S19/HEX images, A2L, MAC. Loaded artifacts appear in the Loaded panel with their diagnostics.
+
+2. Save a project (`^S` / `s`) to gather the loaded files into one project folder; load one back with `p`. Change 1 extends the gather to the JSON artifacts.
+
+3. `o` opens the workarea in Explorer; `r` refreshes the file list.
+
+4. `U` unloads everything (with per-artifact unload from the Loaded panel).
+
+5. Without a project, artifacts stay in the workspace's common folders — see the folders.html b

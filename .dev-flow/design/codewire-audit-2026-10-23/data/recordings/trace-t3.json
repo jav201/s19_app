@@ -1,0 +1,5284 @@
+{
+ "_skipped": [],
+ "run_flow": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 0,
+   "in": {
+    "flow": {
+     "Flow": {
+      "name": "t3",
+      "blocks": [
+       {
+        "SourceBlock": {
+         "image_ref": "firmware.s19",
+         "file_type": "s19",
+         "a2l_ref": null,
+         "kind": "source"
+        }
+       },
+       {
+        "PatchBlock": {
+         "change_doc_ref": "patch.json",
+         "a2l_ref": null,
+         "kind": "patch"
+        }
+       },
+       {
+        "CrcBlock": {
+         "config_ref": "crc.json",
+         "kind": "crc"
+        }
+       },
+       {
+        "CheckBlock": {
+         "check_doc_ref": "check.chk.json",
+         "gating": "advisory",
+         "kind": "check"
+        }
+       },
+       {
+        "WriteOutBlock": {
+         "output_name": "out.s19",
+         "fmt": "s19",
+         "kind": "write_out"
+        }
+       },
+       {
+        "ReportBlock": {
+         "kind": "report"
+        }
+       }
+      ],
+      "schema_version": 1,
+      "funnel": []
+     }
+    },
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": null
+     }
+    }
+   },
+   "out": {
+    "FlowRunResult": {
+     "status": "ok",
+     "block_results": [
+      {
+       "BlockResult": {
+        "index": 0,
+        "kind": "source",
+        "status": "ok",
+        "summary": "loaded firmware.s19 (3 ranges)",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 1,
+        "kind": "patch",
+        "status": "ok",
+        "summary": "applied 1 entry",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 2,
+        "kind": "crc",
+        "status": "ok",
+        "summary": "injected 1 CRC region",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 3,
+        "kind": "check",
+        "status": "ok",
+        "summary": "passed=1 failed=0 uncheckable=0",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 4,
+        "kind": "write_out",
+        "status": "ok",
+        "summary": "wrote out.s19",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 5,
+        "kind": "report",
+        "status": "ok",
+        "summary": "wrote reports/20261023T180938Z-report.md",
+        "diagnostics": [],
+        "findings": []
+       }
+      }
+     ],
+     "written_paths": [
+      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
+     ],
+     "diagnostics": [],
+     "image_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "pre_crc_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "change_records": [
+      {
+       "FlowChangeRecord": {
+        "block_index": 1,
+        "change_doc_ref": "patch.json",
+        "a2l_ref": null,
+        "entry_type": "bytes",
+        "symbol": null,
+        "address_start": 2147483728,
+        "address_end": 2147483730,
+        "disposition": "applied",
+        "before_bytes": [
+         16,
+         17
+        ],
+        "after_bytes": [
+         222,
+         173
+        ]
+       }
+      },
+      {
+       "FlowChangeRecord": {
+        "block_index": 1,
+        "change_doc_ref": "patch.json",
+        "a2l_ref": null,
+        "entry_type": "bytes",
+        "symbol": null,
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "disposition": "skipped-outside",
+        "before_bytes": null,
+        "after_bytes": [
+         1
+        ]
+       }
+      }
+     ],
+     "refusals": []
+    }
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 1,
+   "in": {
+    "flow": {
+     "Flow": {
+      "name": "a",
+      "blocks": [
+       {
+        "SourceBlock": {
+         "image_ref": "firmware.s19",
+         "file_type": "s19",
+         "a2l_ref": null,
+         "kind": "source"
+        }
+       },
+       {
+        "PatchBlock": {
+         "change_doc_ref": "patch.json",
+         "a2l_ref": null,
+         "kind": "patch"
+        }
+       },
+       {
+        "WriteOutBlock": {
+         "output_name": "a.s19",
+         "fmt": "s19",
+         "kind": "write_out"
+        }
+       }
+      ],
+      "schema_version": 1,
+      "funnel": []
+     }
+    },
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": null
+     }
+    }
+   },
+   "out": {
+    "FlowRunResult": {
+     "status": "ok",
+     "block_results": [
+      {
+       "BlockResult": {
+        "index": 0,
+        "kind": "source",
+        "status": "ok",
+        "summary": "loaded firmware.s19 (3 ranges)",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 1,
+        "kind": "patch",
+        "status": "ok",
+        "summary": "applied 1 entry",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 2,
+        "kind": "write_out",
+        "status": "ok",
+        "summary": "wrote a.s19",
+        "diagnostics": [],
+        "findings": []
+       }
+      }
+     ],
+     "written_paths": [
+      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+     ],
+     "diagnostics": [],
+     "image_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "pre_crc_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "change_records": [
+      {
+       "FlowChangeRecord": {
+        "block_index": 1,
+        "change_doc_ref": "patch.json",
+        "a2l_ref": null,
+        "entry_type": "bytes",
+        "symbol": null,
+        "address_start": 2147483728,
+        "address_end": 2147483730,
+        "disposition": "applied",
+        "before_bytes": [
+         16,
+         17
+        ],
+        "after_bytes": [
+         222,
+         173
+        ]
+       }
+      },
+      {
+       "FlowChangeRecord": {
+        "block_index": 1,
+        "change_doc_ref": "patch.json",
+        "a2l_ref": null,
+        "entry_type": "bytes",
+        "symbol": null,
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "disposition": "skipped-outside",
+        "before_bytes": null,
+        "after_bytes": [
+         1
+        ]
+       }
+      }
+     ],
+     "refusals": []
+    }
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 2,
+   "in": {
+    "flow": {
+     "Flow": {
+      "name": "b",
+      "blocks": [
+       {
+        "SourceBlock": {
+         "image_ref": "firmware.s19",
+         "file_type": "s19",
+         "a2l_ref": null,
+         "kind": "source"
+        }
+       },
+       {
+        "PatchBlock": {
+         "change_doc_ref": "lane_b.json",
+         "a2l_ref": null,
+         "kind": "patch"
+        }
+       },
+       {
+        "WriteOutBlock": {
+         "output_name": "b.s19",
+         "fmt": "s19",
+         "kind": "write_out"
+        }
+       }
+      ],
+      "schema_version": 1,
+      "funnel": []
+     }
+    },
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": null
+     }
+    }
+   },
+   "out": {
+    "FlowRunResult": {
+     "status": "ok",
+     "block_results": [
+      {
+       "BlockResult": {
+        "index": 0,
+        "kind": "source",
+        "status": "ok",
+        "summary": "loaded firmware.s19 (3 ranges)",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 1,
+        "kind": "patch",
+        "status": "ok",
+        "summary": "applied 0 entries",
+        "diagnostics": [],
+        "findings": []
+       }
+      },
+      {
+       "BlockResult": {
+        "index": 2,
+        "kind": "write_out",
+        "status": "ok",
+        "summary": "wrote b.s19",
+        "diagnostics": [],
+        "findings": []
+       }
+      }
+     ],
+     "written_paths": [
+      "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+     ],
+     "diagnostics": [],
+     "image_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "pre_crc_ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "change_records": [
+      {
+       "FlowChangeRecord": {
+        "block_index": 1,
+        "change_doc_ref": "lane_b.json",
+        "a2l_ref": null,
+        "entry_type": "bytes",
+        "symbol": null,
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "disposition": "skipped-outside",
+        "before_bytes": null,
+        "after_bytes": [
+         2
+        ]
+       }
+      }
+     ],
+     "refusals": []
+    }
+   }
+  }
+ ],
+ "S19File.__init__": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19"
+   },
+   "out": {
+    "S19File": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+     "records": [
+      {
+       "SRecord": {
+        "raw_line": "S00F00004341534530315F4241534943B2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S0",
+        "byte_count": 15,
+        "address_length": 2,
+        "address": 0,
+        "data": [
+         67,
+         65,
+         83,
+         69,
+         48,
+         49,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [
+         83,
+         49,
+         57,
+         84,
+         79,
+         79,
+         76,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67,
+         0,
+         1,
+         2
+        ],
+        "checksum": 171
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483664,
+        "data": [
+         3,
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14
+        ],
+        "checksum": 238
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S306800000200F4A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 6,
+        "address_length": 4,
+        "address": 2147483680,
+        "data": [
+         15
+        ],
+        "checksum": 74
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483712,
+        "data": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14,
+         15
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483728,
+        "data": [
+         16,
+         17,
+         18,
+         19,
+         20,
+         21,
+         22,
+         23,
+         24,
+         25,
+         26,
+         27,
+         28,
+         29,
+         30,
+         31
+        ],
+        "checksum": 162
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483744,
+        "data": [
+         32,
+         33,
+         34,
+         35,
+         36,
+         37,
+         38,
+         39,
+         40,
+         41,
+         42,
+         43,
+         44,
+         45,
+         46,
+         47
+        ],
+        "checksum": 146
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483760,
+        "data": [
+         48,
+         49,
+         50,
+         51,
+         52,
+         53,
+         54,
+         55,
+         56,
+         57,
+         58,
+         59,
+         60,
+         61,
+         62,
+         63
+        ],
+        "checksum": 130
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S705800000007A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S7",
+        "byte_count": 5,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [],
+        "checksum": 122
+       }
+      }
+     ],
+     "load_errors": [],
+     "endian": "big"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 3,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
+   },
+   "out": {
+    "S19File": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "records": [
+      {
+       "SRecord": {
+        "raw_line": "S00F00004341534530315F4241534943B2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S0",
+        "byte_count": 15,
+        "address_length": 2,
+        "address": 0,
+        "data": [
+         67,
+         65,
+         83,
+         69,
+         48,
+         49,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [
+         83,
+         49,
+         57,
+         84,
+         79,
+         79,
+         76,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67,
+         0,
+         1,
+         2
+        ],
+        "checksum": 171
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483664,
+        "data": [
+         3,
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14
+        ],
+        "checksum": 238
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S306800000200F4A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 6,
+        "address_length": 4,
+        "address": 2147483680,
+        "data": [
+         15
+        ],
+        "checksum": 74
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483712,
+        "data": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14,
+         15
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483728,
+        "data": [
+         16,
+         17,
+         18,
+         19,
+         20,
+         21,
+         22,
+         23,
+         24,
+         25,
+         26,
+         27,
+         28,
+         29,
+         30,
+         31
+        ],
+        "checksum": 162
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483744,
+        "data": [
+         32,
+         33,
+         34,
+         35,
+         36,
+         37,
+         38,
+         39,
+         40,
+         41,
+         42,
+         43,
+         44,
+         45,
+         46,
+         47
+        ],
+        "checksum": 146
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483760,
+        "data": [
+         48,
+         49,
+         50,
+         51,
+         52,
+         53,
+         54,
+         55,
+         56,
+         57,
+         58,
+         59,
+         60,
+         61,
+         62,
+         63
+        ],
+        "checksum": 130
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S705800000007A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S7",
+        "byte_count": 5,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [],
+        "checksum": 122
+       }
+      }
+     ],
+     "load_errors": [],
+     "endian": "big"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19"
+   },
+   "out": {
+    "S19File": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "records": [
+      {
+       "SRecord": {
+        "raw_line": "S00F00004341534530315F4241534943B2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S0",
+        "byte_count": 15,
+        "address_length": 2,
+        "address": 0,
+        "data": [
+         67,
+         65,
+         83,
+         69,
+         48,
+         49,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [
+         83,
+         49,
+         57,
+         84,
+         79,
+         79,
+         76,
+         95,
+         66,
+         65,
+         83,
+         73,
+         67,
+         0,
+         1,
+         2
+        ],
+        "checksum": 171
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483664,
+        "data": [
+         3,
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14
+        ],
+        "checksum": 238
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S306800000200F4A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 6,
+        "address_length": 4,
+        "address": 2147483680,
+        "data": [
+         15
+        ],
+        "checksum": 74
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483712,
+        "data": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9,
+         10,
+         11,
+         12,
+         13,
+         14,
+         15
+        ],
+        "checksum": 178
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483728,
+        "data": [
+         16,
+         17,
+         18,
+         19,
+         20,
+         21,
+         22,
+         23,
+         24,
+         25,
+         26,
+         27,
+         28,
+         29,
+         30,
+         31
+        ],
+        "checksum": 162
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483744,
+        "data": [
+         32,
+         33,
+         34,
+         35,
+         36,
+         37,
+         38,
+         39,
+         40,
+         41,
+         42,
+         43,
+         44,
+         45,
+         46,
+         47
+        ],
+        "checksum": 146
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S3",
+        "byte_count": 21,
+        "address_length": 4,
+        "address": 2147483760,
+        "data": [
+         48,
+         49,
+         50,
+         51,
+         52,
+         53,
+         54,
+         55,
+         56,
+         57,
+         58,
+         59,
+         60,
+         61,
+         62,
+         63
+        ],
+        "checksum": 130
+       }
+      },
+      {
+       "SRecord": {
+        "raw_line": "S705800000007A",
+        "valid": true,
+        "validation_errors": [],
+        "type": "S7",
+        "byte_count": 5,
+        "address_length": 4,
+        "address": 2147483648,
+        "data": [],
+        "checksum": 122
+       }
+      }
+     ],
+     "load_errors": [],
+     "endian": "big"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  }
+ ],
+ "build_loaded_s19": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    },
+    "a2l_path": null,
+    "a2l_data": null
+   },
+   "out": {
+    "LoadedFile": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+     "file_type": "s19",
+     "mem_map": {
+      "0x0": 67,
+      "0x1": 65,
+      "0x2": 83,
+      "0x3": 69,
+      "0x4": 48,
+      "0x5": 49,
+      "0x6": 95,
+      "0x7": 66,
+      "0x8": 65,
+      "0x9": 83,
+      "0xa": 73,
+      "0xb": 67,
+      "0x80000000": 83,
+      "0x80000001": 49,
+      "0x80000002": 57,
+      "0x80000003": 84,
+      "0x80000004": 79,
+      "0x80000005": 79,
+      "0x80000006": 76,
+      "0x80000007": 95,
+      "0x80000008": 66,
+      "0x80000009": 65,
+      "0x8000000a": 83,
+      "0x8000000b": 73,
+      "0x8000000c": 67,
+      "0x8000000d": 0,
+      "0x8000000e": 1,
+      "0x8000000f": 2,
+      "0x80000010": 3,
+      "0x80000011": 0,
+      "0x80000012": 1,
+      "0x80000013": 2,
+      "0x80000014": 3,
+      "0x80000015": 4,
+      "0x80000016": 5,
+      "0x80000017": 6,
+      "0x80000018": 7,
+      "0x80000019": 8,
+      "0x8000001a": 9,
+      "0x8000001b": 10,
+      "…total": 109
+     },
+     "row_bases": [
+      0,
+      2147483648,
+      2147483664,
+      2147483680,
+      2147483712,
+      2147483728,
+      2147483744,
+      2147483760
+     ],
+     "ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "range_validity": [
+      true,
+      true,
+      true
+     ],
+     "errors": [],
+     "a2l_path": null,
+     "a2l_data": null,
+     "mac_path": null,
+     "mac_records": [],
+     "mac_diagnostics": [],
+     "range_index": null,
+     "bases_set": null,
+     "variant_id": null,
+     "source_s0_header": {
+      "bytes": 12,
+      "text": "CASE01_BASIC"
+     },
+     "entropy_windows": [
+      {
+       "EntropyWindow": {
+        "start": 0,
+        "end": 12,
+        "sample_count": 12,
+        "entropy": 3.084962500721156,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483648,
+        "end": 2147483681,
+        "sample_count": 33,
+        "entropy": 4.68075775572209,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483712,
+        "end": 2147483776,
+        "sample_count": 64,
+        "entropy": 6.0,
+        "band": "medium",
+        "low_confidence": false
+       }
+      }
+     ],
+     "out_of_order_count": 0,
+     "entry_point": 2147483648
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 3,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    },
+    "a2l_path": null,
+    "a2l_data": null
+   },
+   "out": {
+    "LoadedFile": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "file_type": "s19",
+     "mem_map": {
+      "0x0": 67,
+      "0x1": 65,
+      "0x2": 83,
+      "0x3": 69,
+      "0x4": 48,
+      "0x5": 49,
+      "0x6": 95,
+      "0x7": 66,
+      "0x8": 65,
+      "0x9": 83,
+      "0xa": 73,
+      "0xb": 67,
+      "0x80000000": 83,
+      "0x80000001": 49,
+      "0x80000002": 57,
+      "0x80000003": 84,
+      "0x80000004": 79,
+      "0x80000005": 79,
+      "0x80000006": 76,
+      "0x80000007": 95,
+      "0x80000008": 66,
+      "0x80000009": 65,
+      "0x8000000a": 83,
+      "0x8000000b": 73,
+      "0x8000000c": 67,
+      "0x8000000d": 0,
+      "0x8000000e": 1,
+      "0x8000000f": 2,
+      "0x80000010": 3,
+      "0x80000011": 0,
+      "0x80000012": 1,
+      "0x80000013": 2,
+      "0x80000014": 3,
+      "0x80000015": 4,
+      "0x80000016": 5,
+      "0x80000017": 6,
+      "0x80000018": 7,
+      "0x80000019": 8,
+      "0x8000001a": 9,
+      "0x8000001b": 10,
+      "…total": 109
+     },
+     "row_bases": [
+      0,
+      2147483648,
+      2147483664,
+      2147483680,
+      2147483712,
+      2147483728,
+      2147483744,
+      2147483760
+     ],
+     "ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "range_validity": [
+      true,
+      true,
+      true
+     ],
+     "errors": [],
+     "a2l_path": null,
+     "a2l_data": null,
+     "mac_path": null,
+     "mac_records": [],
+     "mac_diagnostics": [],
+     "range_index": null,
+     "bases_set": null,
+     "variant_id": null,
+     "source_s0_header": {
+      "bytes": 12,
+      "text": "CASE01_BASIC"
+     },
+     "entropy_windows": [
+      {
+       "EntropyWindow": {
+        "start": 0,
+        "end": 12,
+        "sample_count": 12,
+        "entropy": 3.084962500721156,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483648,
+        "end": 2147483681,
+        "sample_count": 33,
+        "entropy": 4.68075775572209,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483712,
+        "end": 2147483776,
+        "sample_count": 64,
+        "entropy": 6.0,
+        "band": "medium",
+        "low_confidence": false
+       }
+      }
+     ],
+     "out_of_order_count": 0,
+     "entry_point": 2147483648
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 3,
+   "in": {
+    "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    },
+    "a2l_path": null,
+    "a2l_data": null
+   },
+   "out": {
+    "LoadedFile": {
+     "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+     "file_type": "s19",
+     "mem_map": {
+      "0x0": 67,
+      "0x1": 65,
+      "0x2": 83,
+      "0x3": 69,
+      "0x4": 48,
+      "0x5": 49,
+      "0x6": 95,
+      "0x7": 66,
+      "0x8": 65,
+      "0x9": 83,
+      "0xa": 73,
+      "0xb": 67,
+      "0x80000000": 83,
+      "0x80000001": 49,
+      "0x80000002": 57,
+      "0x80000003": 84,
+      "0x80000004": 79,
+      "0x80000005": 79,
+      "0x80000006": 76,
+      "0x80000007": 95,
+      "0x80000008": 66,
+      "0x80000009": 65,
+      "0x8000000a": 83,
+      "0x8000000b": 73,
+      "0x8000000c": 67,
+      "0x8000000d": 0,
+      "0x8000000e": 1,
+      "0x8000000f": 2,
+      "0x80000010": 3,
+      "0x80000011": 0,
+      "0x80000012": 1,
+      "0x80000013": 2,
+      "0x80000014": 3,
+      "0x80000015": 4,
+      "0x80000016": 5,
+      "0x80000017": 6,
+      "0x80000018": 7,
+      "0x80000019": 8,
+      "0x8000001a": 9,
+      "0x8000001b": 10,
+      "…total": 109
+     },
+     "row_bases": [
+      0,
+      2147483648,
+      2147483664,
+      2147483680,
+      2147483712,
+      2147483728,
+      2147483744,
+      2147483760
+     ],
+     "ranges": [
+      [
+       0,
+       12
+      ],
+      [
+       2147483648,
+       2147483681
+      ],
+      [
+       2147483712,
+       2147483776
+      ]
+     ],
+     "range_validity": [
+      true,
+      true,
+      true
+     ],
+     "errors": [],
+     "a2l_path": null,
+     "a2l_data": null,
+     "mac_path": null,
+     "mac_records": [],
+     "mac_diagnostics": [],
+     "range_index": null,
+     "bases_set": null,
+     "variant_id": null,
+     "source_s0_header": {
+      "bytes": 12,
+      "text": "CASE01_BASIC"
+     },
+     "entropy_windows": [
+      {
+       "EntropyWindow": {
+        "start": 0,
+        "end": 12,
+        "sample_count": 12,
+        "entropy": 3.084962500721156,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483648,
+        "end": 2147483681,
+        "sample_count": 33,
+        "entropy": 4.68075775572209,
+        "band": "low",
+        "low_confidence": true
+       }
+      },
+      {
+       "EntropyWindow": {
+        "start": 2147483712,
+        "end": 2147483776,
+        "sample_count": 64,
+        "entropy": 6.0,
+        "band": "medium",
+        "low_confidence": false
+       }
+      }
+     ],
+     "out_of_order_count": 0,
+     "entry_point": 2147483648
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S31580000000533139544F4F4C5F4241534943000102AB",
+     "S3158000001003000102030405060708090A0B0C0D0EEE",
+     "S306800000200F4A",
+     "S31580000040000102030405060708090A0B0C0D0E0FB2",
+     "S31580000050101112131415161718191A1B1C1D1E1FA2",
+     "S31580000060202122232425262728292A2B2C2D2E2F92",
+     "S31580000070303132333435363738393A3B3C3D3E3F82",
+     "S705800000007A"
+    ]
+   }
+  }
+ ],
+ "build_mem_map_s19": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 2,
+   "in": {
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    }
+   },
+   "out": {
+    "0x0": 67,
+    "0x1": 65,
+    "0x2": 83,
+    "0x3": 69,
+    "0x4": 48,
+    "0x5": 49,
+    "0x6": 95,
+    "0x7": 66,
+    "0x8": 65,
+    "0x9": 83,
+    "0xa": 73,
+    "0xb": 67,
+    "0x80000000": 83,
+    "0x80000001": 49,
+    "0x80000002": 57,
+    "0x80000003": 84,
+    "0x80000004": 79,
+    "0x80000005": 79,
+    "0x80000006": 76,
+    "0x80000007": 95,
+    "0x80000008": 66,
+    "0x80000009": 65,
+    "0x8000000a": 83,
+    "0x8000000b": 73,
+    "0x8000000c": 67,
+    "0x8000000d": 0,
+    "0x8000000e": 1,
+    "0x8000000f": 2,
+    "0x80000010": 3,
+    "0x80000011": 0,
+    "0x80000012": 1,
+    "0x80000013": 2,
+    "0x80000014": 3,
+    "0x80000015": 4,
+    "0x80000016": 5,
+    "0x80000017": 6,
+    "0x80000018": 7,
+    "0x80000019": 8,
+    "0x8000001a": 9,
+    "0x8000001b": 10,
+    "…total": 109
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    }
+   },
+   "out": {
+    "0x0": 67,
+    "0x1": 65,
+    "0x2": 83,
+    "0x3": 69,
+    "0x4": 48,
+    "0x5": 49,
+    "0x6": 95,
+    "0x7": 66,
+    "0x8": 65,
+    "0x9": 83,
+    "0xa": 73,
+    "0xb": 67,
+    "0x80000000": 83,
+    "0x80000001": 49,
+    "0x80000002": 57,
+    "0x80000003": 84,
+    "0x80000004": 79,
+    "0x80000005": 79,
+    "0x80000006": 76,
+    "0x80000007": 95,
+    "0x80000008": 66,
+    "0x80000009": 65,
+    "0x8000000a": 83,
+    "0x8000000b": 73,
+    "0x8000000c": 67,
+    "0x8000000d": 0,
+    "0x8000000e": 1,
+    "0x8000000f": 2,
+    "0x80000010": 3,
+    "0x80000011": 0,
+    "0x80000012": 1,
+    "0x80000013": 2,
+    "0x80000014": 3,
+    "0x80000015": 4,
+    "0x80000016": 5,
+    "0x80000017": 6,
+    "0x80000018": 7,
+    "0x80000019": 8,
+    "0x8000001a": 9,
+    "0x8000001b": 10,
+    "…total": 109
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "s19": {
+     "S19File": {
+      "path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19",
+      "records": [
+       {
+        "SRecord": {
+         "raw_line": "S00F00004341534530315F4241534943B2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S0",
+         "byte_count": 15,
+         "address_length": 2,
+         "address": 0,
+         "data": [
+          67,
+          65,
+          83,
+          69,
+          48,
+          49,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000000533139544F4F4C5F4241534943000102AB",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [
+          83,
+          49,
+          57,
+          84,
+          79,
+          79,
+          76,
+          95,
+          66,
+          65,
+          83,
+          73,
+          67,
+          0,
+          1,
+          2
+         ],
+         "checksum": 171
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S3158000001003000102030405060708090A0B0C0D0EEE",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483664,
+         "data": [
+          3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+         ],
+         "checksum": 238
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S306800000200F4A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 6,
+         "address_length": 4,
+         "address": 2147483680,
+         "data": [
+          15
+         ],
+         "checksum": 74
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000040000102030405060708090A0B0C0D0E0FB2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483712,
+         "data": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+         ],
+         "checksum": 178
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000050101112131415161718191A1B1C1D1E1FA2",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483728,
+         "data": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+         ],
+         "checksum": 162
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000060202122232425262728292A2B2C2D2E2F92",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483744,
+         "data": [
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+         ],
+         "checksum": 146
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S31580000070303132333435363738393A3B3C3D3E3F82",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S3",
+         "byte_count": 21,
+         "address_length": 4,
+         "address": 2147483760,
+         "data": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+         ],
+         "checksum": 130
+        }
+       },
+       {
+        "SRecord": {
+         "raw_line": "S705800000007A",
+         "valid": true,
+         "validation_errors": [],
+         "type": "S7",
+         "byte_count": 5,
+         "address_length": 4,
+         "address": 2147483648,
+         "data": [],
+         "checksum": 122
+        }
+       }
+      ],
+      "load_errors": [],
+      "endian": "big"
+     }
+    }
+   },
+   "out": {
+    "0x0": 67,
+    "0x1": 65,
+    "0x2": 83,
+    "0x3": 69,
+    "0x4": 48,
+    "0x5": 49,
+    "0x6": 95,
+    "0x7": 66,
+    "0x8": 65,
+    "0x9": 83,
+    "0xa": 73,
+    "0xb": 67,
+    "0x80000000": 83,
+    "0x80000001": 49,
+    "0x80000002": 57,
+    "0x80000003": 84,
+    "0x80000004": 79,
+    "0x80000005": 79,
+    "0x80000006": 76,
+    "0x80000007": 95,
+    "0x80000008": 66,
+    "0x80000009": 65,
+    "0x8000000a": 83,
+    "0x8000000b": 73,
+    "0x8000000c": 67,
+    "0x8000000d": 0,
+    "0x8000000e": 1,
+    "0x8000000f": 2,
+    "0x80000010": 3,
+    "0x80000011": 0,
+    "0x80000012": 1,
+    "0x80000013": 2,
+    "0x80000014": 3,
+    "0x80000015": 4,
+    "0x80000016": 5,
+    "0x80000017": 6,
+    "0x80000018": 7,
+    "0x80000019": 8,
+    "0x8000001a": 9,
+    "0x8000001b": 10,
+    "…total": 109
+   }
+  }
+ ],
+ "S19File.get_memory_ranges": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 2,
+   "in": {},
+   "out": [
+    [
+     0,
+     12
+    ],
+    [
+     2147483648,
+     2147483681
+    ],
+    [
+     2147483712,
+     2147483776
+    ]
+   ]
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {},
+   "out": [
+    [
+     0,
+     12
+    ],
+    [
+     2147483648,
+     2147483681
+    ],
+    [
+     2147483712,
+     2147483776
+    ]
+   ]
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {},
+   "out": [
+    [
+     0,
+     12
+    ],
+    [
+     2147483648,
+     2147483681
+    ],
+    [
+     2147483712,
+     2147483776
+    ]
+   ]
+  }
+ ],
+ "read_change_document": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "a2l_context": null
+   },
+   "out": {
+    "ChangeDocument": {
+     "format": "s19app-changeset",
+     "version": "2.0",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "entries": [
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483728,
+        "encoded_bytes": [
+         222,
+         173
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      },
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483904,
+        "encoded_bytes": [
+         1
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json": [
+     "{",
+     "  \"format\": \"s19app-changeset\",",
+     "  \"version\": \"2.0\",",
+     "  \"kind\": \"change\",",
+     "  \"encoding\": \"utf-8\",",
+     "  \"value_mode\": \"text\",",
+     "  \"entries\": [",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000050\",",
+     "      \"bytes\": \"DE AD\"",
+     "    },",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000100\",",
+     "      \"bytes\": \"01\"",
+     "    }",
+     "  ]",
+     "}"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "a2l_context": null
+   },
+   "out": {
+    "ChangeDocument": {
+     "format": "s19app-changeset",
+     "version": "2.0",
+     "kind": "check",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "entries": [
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483648,
+        "encoded_bytes": [
+         83,
+         49,
+         57,
+         84
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json": [
+     "{",
+     "  \"format\": \"s19app-changeset\",",
+     "  \"version\": \"2.0\",",
+     "  \"kind\": \"check\",",
+     "  \"encoding\": \"utf-8\",",
+     "  \"value_mode\": \"text\",",
+     "  \"entries\": [",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000000\",",
+     "      \"bytes\": \"53 31 39 54\"",
+     "    }",
+     "  ]",
+     "}"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 3,
+   "in": {
+    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "a2l_context": null
+   },
+   "out": {
+    "ChangeDocument": {
+     "format": "s19app-changeset",
+     "version": "2.0",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "entries": [
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483728,
+        "encoded_bytes": [
+         222,
+         173
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      },
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483904,
+        "encoded_bytes": [
+         1
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json": [
+     "{",
+     "  \"format\": \"s19app-changeset\",",
+     "  \"version\": \"2.0\",",
+     "  \"kind\": \"change\",",
+     "  \"encoding\": \"utf-8\",",
+     "  \"value_mode\": \"text\",",
+     "  \"entries\": [",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000050\",",
+     "      \"bytes\": \"DE AD\"",
+     "    },",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000100\",",
+     "      \"bytes\": \"01\"",
+     "    }",
+     "  ]",
+     "}"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "path_text": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
+    "base_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "a2l_context": null
+   },
+   "out": {
+    "ChangeDocument": {
+     "format": "s19app-changeset",
+     "version": "2.0",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "entries": [
+      {
+       "ChangeEntry": {
+        "entry_type": "bytes",
+        "address": 2147483904,
+        "encoded_bytes": [
+         2
+        ],
+        "value": null,
+        "status": "unvalidated-no-image",
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
+    }
+   },
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json": [
+     "{",
+     "  \"format\": \"s19app-changeset\",",
+     "  \"version\": \"2.0\",",
+     "  \"kind\": \"change\",",
+     "  \"encoding\": \"utf-8\",",
+     "  \"value_mode\": \"text\",",
+     "  \"entries\": [",
+     "    {",
+     "      \"type\": \"bytes\",",
+     "      \"address\": \"0x80000100\",",
+     "      \"bytes\": \"02\"",
+     "    }",
+     "  ]",
+     "}"
+    ]
+   }
+  }
+ ],
+ "apply_change_document": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "document": {
+     "ChangeDocument": {
+      "format": "s19app-changeset",
+      "version": "2.0",
+      "kind": "change",
+      "encoding": "utf-8",
+      "value_mode": "text",
+      "entries": [
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483728,
+         "encoded_bytes": [
+          222,
+          173
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       },
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483904,
+         "encoded_bytes": [
+          1
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       }
+      ],
+      "issues": [],
+      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json"
+     }
+    },
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "mac_records": null,
+    "a2l_tags": null
+   },
+   "out": {
+    "ChangeSummary": {
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\patch.json",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "timestamp_utc": "2026-10-23T18:09:38.077621+00:00",
+     "variant_id": null,
+     "counts": {
+      "applied": 1,
+      "skipped-partial": 0,
+      "skipped-outside": 1,
+      "skipped-no-image": 0,
+      "blocked": 0
+     },
+     "entries": [
+      {
+       "ChangeSummaryEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483728,
+        "address_end": 2147483730,
+        "before_bytes": [
+         16,
+         17
+        ],
+        "after_bytes": [
+         222,
+         173
+        ],
+        "disposition": "applied",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "symbol": null
+       }
+      },
+      {
+       "ChangeSummaryEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "before_bytes": null,
+        "after_bytes": [
+         1
+        ],
+        "disposition": "skipped-outside",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "saved_path": null,
+     "verify_result": null,
+     "source_image_path": null
+    }
+   },
+   "after": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    }
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "document": {
+     "ChangeDocument": {
+      "format": "s19app-changeset",
+      "version": "2.0",
+      "kind": "change",
+      "encoding": "utf-8",
+      "value_mode": "text",
+      "entries": [
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483728,
+         "encoded_bytes": [
+          222,
+          173
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       },
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483904,
+         "encoded_bytes": [
+          1
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       }
+      ],
+      "issues": [],
+      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json"
+     }
+    },
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "mac_records": null,
+    "a2l_tags": null
+   },
+   "out": {
+    "ChangeSummary": {
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\patch.json",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "timestamp_utc": "2026-10-23T18:09:38.104865+00:00",
+     "variant_id": null,
+     "counts": {
+      "applied": 1,
+      "skipped-partial": 0,
+      "skipped-outside": 1,
+      "skipped-no-image": 0,
+      "blocked": 0
+     },
+     "entries": [
+      {
+       "ChangeSummaryEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483728,
+        "address_end": 2147483730,
+        "before_bytes": [
+         16,
+         17
+        ],
+        "after_bytes": [
+         222,
+         173
+        ],
+        "disposition": "applied",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "symbol": null
+       }
+      },
+      {
+       "ChangeSummaryEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "before_bytes": null,
+        "after_bytes": [
+         1
+        ],
+        "disposition": "skipped-outside",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "saved_path": null,
+     "verify_result": null,
+     "source_image_path": null
+    }
+   },
+   "after": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    }
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 2,
+   "in": {
+    "document": {
+     "ChangeDocument": {
+      "format": "s19app-changeset",
+      "version": "2.0",
+      "kind": "change",
+      "encoding": "utf-8",
+      "value_mode": "text",
+      "entries": [
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483904,
+         "encoded_bytes": [
+          2
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       }
+      ],
+      "issues": [],
+      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json"
+     }
+    },
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "mac_records": null,
+    "a2l_tags": null
+   },
+   "out": {
+    "ChangeSummary": {
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\lane_b.json",
+     "kind": "change",
+     "encoding": "utf-8",
+     "value_mode": "text",
+     "timestamp_utc": "2026-10-23T18:09:38.110062+00:00",
+     "variant_id": null,
+     "counts": {
+      "applied": 0,
+      "skipped-partial": 0,
+      "skipped-outside": 1,
+      "skipped-no-image": 0,
+      "blocked": 0
+     },
+     "entries": [
+      {
+       "ChangeSummaryEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483904,
+        "address_end": 2147483905,
+        "before_bytes": null,
+        "after_bytes": [
+         2
+        ],
+        "disposition": "skipped-outside",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "symbol": null
+       }
+      }
+     ],
+     "issues": [],
+     "saved_path": null,
+     "verify_result": null,
+     "source_image_path": null
+    }
+   },
+   "after": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    }
+   }
+  }
+ ],
+ "check_regions": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "op_input": {
+     "OperationInput": {
+      "mem_map": {
+       "0x0": 67,
+       "0x1": 65,
+       "0x2": 83,
+       "0x3": 69,
+       "0x4": 48,
+       "0x5": 49,
+       "0x6": 95,
+       "0x7": 66,
+       "0x8": 65,
+       "0x9": 83,
+       "0xa": 73,
+       "0xb": 67,
+       "0x80000000": 83,
+       "0x80000001": 49,
+       "0x80000002": 57,
+       "0x80000003": 84,
+       "0x80000004": 79,
+       "0x80000005": 79,
+       "0x80000006": 76,
+       "0x80000007": 95,
+       "0x80000008": 66,
+       "0x80000009": 65,
+       "0x8000000a": 83,
+       "0x8000000b": 73,
+       "0x8000000c": 67,
+       "0x8000000d": 0,
+       "0x8000000e": 1,
+       "0x8000000f": 2,
+       "0x80000010": 3,
+       "0x80000011": 0,
+       "0x80000012": 1,
+       "0x80000013": 2,
+       "0x80000014": 3,
+       "0x80000015": 4,
+       "0x80000016": 5,
+       "0x80000017": 6,
+       "0x80000018": 7,
+       "0x80000019": 8,
+       "0x8000001a": 9,
+       "0x8000001b": 10,
+       "…total": 109
+      },
+      "ranges": [
+       [
+        0,
+        12
+       ],
+       [
+        2147483648,
+        2147483681
+       ],
+       [
+        2147483712,
+        2147483776
+       ]
+      ],
+      "input_path": null,
+      "variant_id": null,
+      "file_type": "s19"
+     }
+    },
+    "config": {
+     "CrcConfig": {
+      "regions": [
+       {
+        "CrcRegion": {
+         "start": 2147483712,
+         "end": 2147483760,
+         "output_address": 2147483772
+        }
+       }
+      ],
+      "polynomial": 79764919,
+      "init": 4294967295,
+      "reverse": true,
+      "final_xor": 4294967295,
+      "groups": []
+     }
+    }
+   },
+   "out": [
+    {
+     "CrcRegionResult": {
+      "output_address": 2147483772,
+      "computed_crc": 2344078287,
+      "stored_value": 1061043516,
+      "matched": false,
+      "written": false,
+      "output_bytes": 4
+     }
+    }
+   ]
+  }
+ ],
+ "inject_crcs": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "op_input": {
+     "OperationInput": {
+      "mem_map": {
+       "0x0": 67,
+       "0x1": 65,
+       "0x2": 83,
+       "0x3": 69,
+       "0x4": 48,
+       "0x5": 49,
+       "0x6": 95,
+       "0x7": 66,
+       "0x8": 65,
+       "0x9": 83,
+       "0xa": 73,
+       "0xb": 67,
+       "0x80000000": 83,
+       "0x80000001": 49,
+       "0x80000002": 57,
+       "0x80000003": 84,
+       "0x80000004": 79,
+       "0x80000005": 79,
+       "0x80000006": 76,
+       "0x80000007": 95,
+       "0x80000008": 66,
+       "0x80000009": 65,
+       "0x8000000a": 83,
+       "0x8000000b": 73,
+       "0x8000000c": 67,
+       "0x8000000d": 0,
+       "0x8000000e": 1,
+       "0x8000000f": 2,
+       "0x80000010": 3,
+       "0x80000011": 0,
+       "0x80000012": 1,
+       "0x80000013": 2,
+       "0x80000014": 3,
+       "0x80000015": 4,
+       "0x80000016": 5,
+       "0x80000017": 6,
+       "0x80000018": 7,
+       "0x80000019": 8,
+       "0x8000001a": 9,
+       "0x8000001b": 10,
+       "…total": 109
+      },
+      "ranges": [
+       [
+        0,
+        12
+       ],
+       [
+        2147483648,
+        2147483681
+       ],
+       [
+        2147483712,
+        2147483776
+       ]
+      ],
+      "input_path": null,
+      "variant_id": null,
+      "file_type": "s19"
+     }
+    },
+    "crc_regions": [
+     {
+      "CrcRegionResult": {
+       "output_address": 2147483772,
+       "computed_crc": 2344078287,
+       "stored_value": 1061043516,
+       "matched": false,
+       "written": false,
+       "output_bytes": 4
+      }
+     }
+    ]
+   },
+   "out": [
+    {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    [
+     {
+      "CrcRegionResult": {
+       "output_address": 2147483772,
+       "computed_crc": 2344078287,
+       "stored_value": 1061043516,
+       "matched": false,
+       "written": true,
+       "output_bytes": 4
+      }
+     }
+    ]
+   ]
+  }
+ ],
+ "run_check_document": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "document": {
+     "ChangeDocument": {
+      "format": "s19app-changeset",
+      "version": "2.0",
+      "kind": "check",
+      "encoding": "utf-8",
+      "value_mode": "text",
+      "entries": [
+       {
+        "ChangeEntry": {
+         "entry_type": "bytes",
+         "address": 2147483648,
+         "encoded_bytes": [
+          83,
+          49,
+          57,
+          84
+         ],
+         "value": null,
+         "status": "unvalidated-no-image",
+         "symbol": null
+        }
+       }
+      ],
+      "issues": [],
+      "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json"
+     }
+    },
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "mac_records": null,
+    "a2l_tags": null
+   },
+   "out": {
+    "CheckRunResult": {
+     "source_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\check.chk.json",
+     "timestamp_utc": "2026-10-23T18:09:38.081653+00:00",
+     "variant_id": null,
+     "aggregates": {
+      "passed": 1,
+      "failed": 0,
+      "uncheckable": 0
+     },
+     "entries": [
+      {
+       "CheckRunEntry": {
+        "entry_type": "bytes",
+        "address_start": 2147483648,
+        "address_end": 2147483652,
+        "expected_bytes": [
+         83,
+         49,
+         57,
+         84
+        ],
+        "actual_bytes": [
+         83,
+         49,
+         57,
+         84
+        ],
+        "result": "pass",
+        "linkage": "standalone",
+        "linkage_symbol": null,
+        "reason_code": null,
+        "reason": null
+       }
+      }
+     ],
+     "issues": [],
+     "run_blocked_reason_code": null,
+     "run_blocked_reason": null
+    }
+   }
+  }
+ ],
+ "save_patched_image": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+    "filename": "out.s19",
+    "source_kind": "s19",
+    "bytes_per_line": 32,
+    "s0_header": {
+     "bytes": 12,
+     "text": "CASE01_BASIC"
+    }
+   },
+   "out": [
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
+    []
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3BCFCBB78B24",
+     "S70500000000FA"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 4,
+   "in": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "filename": "a.s19",
+    "source_kind": "s19",
+    "bytes_per_line": 32,
+    "s0_header": {
+     "bytes": 12,
+     "text": "CASE01_BASIC"
+    }
+   },
+   "out": [
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
+    []
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 2,
+   "in": {
+    "mem_map": {
+     "0x0": 67,
+     "0x1": 65,
+     "0x2": 83,
+     "0x3": 69,
+     "0x4": 48,
+     "0x5": 49,
+     "0x6": 95,
+     "0x7": 66,
+     "0x8": 65,
+     "0x9": 83,
+     "0xa": 73,
+     "0xb": 67,
+     "0x80000000": 83,
+     "0x80000001": 49,
+     "0x80000002": 57,
+     "0x80000003": 84,
+     "0x80000004": 79,
+     "0x80000005": 79,
+     "0x80000006": 76,
+     "0x80000007": 95,
+     "0x80000008": 66,
+     "0x80000009": 65,
+     "0x8000000a": 83,
+     "0x8000000b": 73,
+     "0x8000000c": 67,
+     "0x8000000d": 0,
+     "0x8000000e": 1,
+     "0x8000000f": 2,
+     "0x80000010": 3,
+     "0x80000011": 0,
+     "0x80000012": 1,
+     "0x80000013": 2,
+     "0x80000014": 3,
+     "0x80000015": 4,
+     "0x80000016": 5,
+     "0x80000017": 6,
+     "0x80000018": 7,
+     "0x80000019": 8,
+     "0x8000001a": 9,
+     "0x8000001b": 10,
+     "…total": 109
+    },
+    "ranges": [
+     [
+      0,
+      12
+     ],
+     [
+      2147483648,
+      2147483681
+     ],
+     [
+      2147483712,
+      2147483776
+     ]
+    ],
+    "dest_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+    "filename": "b.s19",
+    "source_kind": "s19",
+    "bytes_per_line": 32,
+    "s0_header": {
+     "bytes": 12,
+     "text": "CASE01_BASIC"
+    }
+   },
+   "out": [
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
+    []
+   ],
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2A",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ]
+   }
+  }
+ ],
+ "copy_into_workarea": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 2,
+   "in": {
+    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19",
+    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19",
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3BCFCBB78B24",
+     "S70500000000FA"
+    ],
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\temp\\out.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3BCFCBB78B24",
+     "S70500000000FA"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 5,
+   "in": {
+    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19",
+    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19",
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ],
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\a.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0FDEAD12131415161718191A1B1C1D1E1FC0",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ]
+   }
+  },
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 3,
+   "in": {
+    "source": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19",
+    "destination": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P"
+   },
+   "out": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19",
+   "files": {
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2A",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ],
+    "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\temp\\b.s19": [
+     "S00F00004341534530315F4241534943B2",
+     "S311000000004341534530315F4241534943B0",
+     "S32580000000533139544F4F4C5F424153494300010203000102030405060708090A0B0C0D0E2F",
+     "S306800000200F4A",
+     "S32580000040000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2A",
+     "S32580000060202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F0A",
+     "S70500000000FA"
+    ]
+   }
+  }
+ ],
+ "compose_flow_report": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3a_flow_case01",
+   "depth": 1,
+   "in": {
+    "state": {
+     "FlowReportState": {
+      "flow_name": "t3",
+      "block_results": [
+       {
+        "BlockResult": {
+         "index": 0,
+         "kind": "source",
+         "status": "ok",
+         "summary": "loaded firmware.s19 (3 ranges)",
+         "diagnostics": [],
+         "findings": []
+        }
+       },
+       {
+        "BlockResult": {
+         "index": 1,
+         "kind": "patch",
+         "status": "ok",
+         "summary": "applied 1 entry",
+         "diagnostics": [],
+         "findings": []
+        }
+       },
+       {
+        "BlockResult": {
+         "index": 2,
+         "kind": "crc",
+         "status": "ok",
+         "summary": "injected 1 CRC region",
+         "diagnostics": [],
+         "findings": []
+        }
+       },
+       {
+        "BlockResult": {
+         "index": 3,
+         "kind": "check",
+         "status": "ok",
+         "summary": "passed=1 failed=0 uncheckable=0",
+         "diagnostics": [],
+         "findings": []
+        }
+       },
+       {
+        "BlockResult": {
+         "index": 4,
+         "kind": "write_out",
+         "status": "ok",
+         "summary": "wrote out.s19",
+         "diagnostics": [],
+         "findings": []
+        }
+       }
+      ],
+      "aborted": false,
+      "image_ranges": [
+       [
+        0,
+        12
+       ],
+       [
+        2147483648,
+        2147483681
+       ],
+       [
+        2147483712,
+        2147483776
+       ]
+      ],
+      "pre_crc_ranges": [
+       [
+        0,
+        12
+       ],
+       [
+        2147483648,
+        2147483681
+       ],
+       [
+        2147483712,
+        2147483776
+       ]
+      ],
+      "written_paths": [
+       "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P\\out.s19"
+      ],
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_eav7d9x8\\.s19tool\\workarea\\P",
+      "change_records": [
+       {
+        "FlowChangeRecord": {
+         "block_index": 1,
+         "change_doc_ref": "patch.json",
+         "a2l_ref": null,
+         "entry_type": "bytes",
+         "symbol": null,
+         "address_start": 2147483728,
+         "address_end": 2147483730,
+         "disposition": "applied",
+         "before_bytes": [
+          16,
+          17
+         ],
+         "after_bytes": [
+          222,
+          173
+         ]
+        }
+       },
+       {
+        "FlowChangeRecord": {
+         "block_index": 1,
+         "change_doc_ref": "patch.json",
+         "a2l_ref": null,
+         "entry_type": "bytes",
+         "symbol": null,
+         "address_start": 2147483904,
+         "address_end": 2147483905,
+         "disposition": "skipped-outside",
+         "before_bytes": null,
+         "after_bytes": [
+          1
+         ]
+        }
+       }
+      ]
+     }
+    },
+    "generated_at": "datetime.datetime(2026, 10, 23, 18, 9, 38, 87740, tzinfo=datetime.timezone.utc)"
+   },
+   "out": "# Flow report — t3\n\n- **Generated:** 2026-10-23 18:09:38 UTC\n- **Status:** CLEAN\n- **Blocks reported:** 5 (up to the report block)\n\n## Pipeline ledger\n\n| # | Block | Status | Summary |\n|---|-------|--------|---------|\n| 1 | SOURCE | ● ok | loaded firmware\\.s19 (3 ranges) |\n| 2 | PATCH | ● ok | applied 1 entry |\n| 3 | CRC | ● ok | injected 1 CRC region |\n| 4 | CHECK | ● ok | passed=1 failed=0 uncheckable=0 |\n| 5 | WRITE\\_OUT | ● ok | wrote out\\.s19 |\n\n## Change attribution\n\n| Patch | Change document | Address | Length | Before | After | Symbol | A2L reference |\n|---|---|---|---|---|---|---|---|\n| #2 | patch\\.json | 0x80000050 | 2 | 10 11 | DE AD | - | - |\n\n## Image footprint\n\n- **Before CRC:** 0x00000000–0x0000000C, 0x80000000–0x80000021, 0x80000040–0x80000080  (112 bytes)\n- **Final:** 0x00000000–0x0000000C, 0x80000000–0x80000021, 0x80000040–0x80000080  (112 bytes)\n\n## Written files\n\n- out\\.s19\n\n---\n*Generated by the s19_app Flow Builder (FB-P1b).*"
+  }
+ ],
+ "run_chain_set": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 0,
+   "in": {
+    "chains": [
+     {
+      "ChainSpec": {
+       "name": "laneA",
+       "template": "t",
+       "flow": {
+        "Flow": {
+         "name": "a",
+         "blocks": [
+          "SourceBlock(image_ref='firmware.s19', file_type='s19', a2l_ref=None, kind='source')",
+          "PatchBlock(change_doc_ref='patch.json', a2l_ref=None, kind='patch')",
+          "WriteOutBlock(output_name='a.s19', fmt='s19', kind='write_out')"
+         ],
+         "schema_version": 1,
+         "funnel": []
+        }
+       },
+       "bindings": {}
+      }
+     },
+     {
+      "ChainSpec": {
+       "name": "laneB",
+       "template": "t",
+       "flow": {
+        "Flow": {
+         "name": "b",
+         "blocks": [
+          "SourceBlock(image_ref='firmware.s19', file_type='s19', a2l_ref=None, kind='source')",
+          "PatchBlock(change_doc_ref='lane_b.json', a2l_ref=None, kind='patch')",
+          "WriteOutBlock(output_name='b.s19', fmt='s19', kind='write_out')"
+         ],
+         "schema_version": 1,
+         "funnel": []
+        }
+       },
+       "bindings": {}
+      }
+     }
+    ],
+    "ctx": {
+     "FlowContext": {
+      "project_dir": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P",
+      "mac_records": null,
+      "a2l_data": null,
+      "variant": null,
+      "defer_report": false,
+      "external_confirmations": null
+     }
+    },
+    "mode": "parallel"
+   },
+   "out": {
+    "ChainSetRunRecord": {
+     "mode": "parallel",
+     "outcomes": [
+      {
+       "ChainRunOutcome": {
+        "chain": "laneA",
+        "template": "t",
+        "status": "ok",
+        "block_results": [
+         "BlockResult(index=0, kind='source', status='ok', summary='loaded firmware.s19 (3 ranges)', diagnostics=[], findings=[])",
+         "BlockResult(index=1, kind='patch', status='ok', summary='applied 1 entry', diagnostics=[], findings=[])",
+         "BlockResult(index=2, kind='write_out', status='ok', summary='wrote a.s19', diagnostics=[], findings=[])"
+        ],
+        "written_paths": [
+         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+        ],
+        "inputs": [
+         "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+        ],
+        "started_at": 2036424.0102094,
+        "finished_at": 2036424.0189433,
+        "diagnostics": []
+       }
+      },
+      {
+       "ChainRunOutcome": {
+        "chain": "laneB",
+        "template": "t",
+        "status": "ok",
+        "block_results": [
+         "BlockResult(index=0, kind='source', status='ok', summary='loaded firmware.s19 (3 ranges)', diagnostics=[], findings=[])",
+         "BlockResult(index=1, kind='patch', status='ok', summary='applied 0 entries', diagnostics=[], findings=[])",
+         "BlockResult(index=2, kind='write_out', status='ok', summary='wrote b.s19', diagnostics=[], findings=[])"
+        ],
+        "written_paths": [
+         "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+        ],
+        "inputs": [
+         "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+        ],
+        "started_at": 2036424.0104416,
+        "finished_at": 2036424.0275329,
+        "diagnostics": []
+       }
+      }
+     ],
+     "report_path": "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\reports\\20261023T180938Z-chain-set-report.md",
+     "diagnostics": []
+    }
+   }
+  }
+ ],
+ "compose_chain_set_report": [
+  {
+   "test": "cwaudit/test_t3_flow.py::test_t3b_chain_set_two_lanes",
+   "depth": 1,
+   "in": {
+    "record": {
+     "ChainSetRunRecord": {
+      "mode": "parallel",
+      "outcomes": [
+       {
+        "ChainRunOutcome": {
+         "chain": "laneA",
+         "template": "t",
+         "status": "ok",
+         "block_results": [
+          "BlockResult(index=0, kind='source', status='ok', summary='loaded firmware.s19 (3 ranges)', diagnostics=[], findings=[])",
+          "BlockResult(index=1, kind='patch', status='ok', summary='applied 1 entry', diagnostics=[], findings=[])",
+          "BlockResult(index=2, kind='write_out', status='ok', summary='wrote a.s19', diagnostics=[], findings=[])"
+         ],
+         "written_paths": [
+          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\a.s19"
+         ],
+         "inputs": [
+          "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+         ],
+         "started_at": 2036424.0102094,
+         "finished_at": 2036424.0189433,
+         "diagnostics": []
+        }
+       },
+       {
+        "ChainRunOutcome": {
+         "chain": "laneB",
+         "template": "t",
+         "status": "ok",
+         "block_results": [
+          "BlockResult(index=0, kind='source', status='ok', summary='loaded firmware.s19 (3 ranges)', diagnostics=[], findings=[])",
+          "BlockResult(index=1, kind='patch', status='ok', summary='applied 0 entries', diagnostics=[], findings=[])",
+          "BlockResult(index=2, kind='write_out', status='ok', summary='wrote b.s19', diagnostics=[], findings=[])"
+         ],
+         "written_paths": [
+          "C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\b.s19"
+         ],
+         "inputs": [
+          "('firmware.s19', 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\cwaudit_590pb6g1\\\\.s19tool\\\\workarea\\\\P\\\\firmware.s19')"
+         ],
+         "started_at": 2036424.0104416,
+         "finished_at": 2036424.0275329,
+         "diagnostics": []
+        }
+       }
+      ],
+      "report_path": null,
+      "diagnostics": []
+     }
+    },
+    "set_name": "chain-set",
+    "generated_at": "datetime.datetime(2026, 10, 23, 18, 9, 38, 117660, tzinfo=datetime.timezone.utc)"
+   },
+   "out": "# Chain-set report — chain-set\n\n- **Generated:** 2026-10-23 18:09:38 UTC\n- **Mode:** parallel\n- **Chains:** 2\n\n## Chain ledger\n\n| # | Chain | Template | Status | Blocks | Elapsed |\n|---|-------|----------|--------|--------|---------|\n| 1 | laneA | t | ✓ ok | 3 | 0.009s |\n| 2 | laneB | t | ✓ ok | 3 | 0.017s |\n\n## Input provenance\n\n- Chain laneA input 1: firmware\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n- Chain laneB input 1: firmware\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\cwaudit_590pb6g1\\.s19tool\\workarea\\P\\firmware.s19`\n\n---\n*Generated by the s19_app Flow Execution (chain-set run).*"
+  }
+ ]
+}
