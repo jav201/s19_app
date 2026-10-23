@@ -67,7 +67,7 @@ from .screens import (
     SaveProjectScreen,
     SelectVariantScreen,
 )
-from .flow_screens import FlowBuilderPanel, FlowExecutionPanel
+from .flow_screens import FlowBuilderPanel, FlowExecutionPanel, fx_run_error_line
 from .screens_directionb import (
     AbDiffPanel,
     CheckEditorPanel,
@@ -1448,6 +1448,12 @@ class S19TuiApp(App):
         # so a press on any other screen / file-backed doc is a safe no-op.
         Binding("ctrl+z", "patch_undo", "Undo", show=False),
         Binding("ctrl+y", "patch_redo", "Redo", show=False),
+        # batch-97 Inc-6 (D10 amended, PC-13): `c` confirms the Flow
+        # Execution attention lane. An APP binding gated by `check_action`,
+        # so it works wherever the focus is on that screen (arriving with
+        # `]` leaves the focus on the rail). An Input still types `c`; a
+        # modal blocks it.
+        Binding("c", "confirm_attention", "Confirm", show=False),
     ]
 
     workarea: Path
@@ -2418,31 +2424,35 @@ class S19TuiApp(App):
         """Build the Flow Execution rail screen (``#screen_flow_execution``).
 
         Summary:
-            The batch-94 Inc-003 fx_a surface (US-007, HLR-017…021) — one
-            :class:`FlowExecutionPanel` mounted between Flow Builder and
-            Checks (the R-1 order). The panel is presentational: Import… /
-            Run / Save Set / Load Set post ``FlowExecutionPanel.*`` messages
-            that the ``on_flow_execution_panel_*`` handlers route — template
-            import through the hardened ``load_flow_json``, the run through
-            the service's ``run_chain_set``, the set through
-            ``save_chain_set`` / ``load_chain_set``. A plain Container (not a
-            ``WindowSection``): ``window_help.py``'s section table is
-            batch-95's frozen surface and names no ``flow_execution`` section,
-            so this window ships no focused-``?`` chip rather than forking
-            the frozen table.
+            The fx_A surface (batch-97 Inc-6, HLR-147; batch-94 Inc-003
+            before it) — one :class:`FlowExecutionPanel` mounted between Flow
+            Builder and Checks (the R-1 order). The panel is presentational:
+            Import… / Run / Save Set / Load Set / Confirm post
+            ``FlowExecutionPanel.*`` messages that the
+            ``on_flow_execution_panel_*`` handlers route. A plain
+            ``WindowSection`` (D10 amended): its header carries the
+            ``📂 Open session`` chip and the window's ``?`` chip
+            (LLR-148.5); ``c`` is the app's own binding, gated by
+            ``check_action``.
 
         Returns:
-            Container: ``#screen_flow_execution`` holding the title row and
-            the ``FlowExecutionPanel``. Hidden at startup.
+            Container: ``#screen_flow_execution`` holding the header and the
+            ``FlowExecutionPanel``. Hidden at startup.
 
         Dependencies:
             Uses:
-                - ``FlowExecutionPanel`` / ``titled_header``
+                - ``FlowExecutionPanel`` / ``OpenFolderChip`` /
+                  ``WindowHelpChip``
             Used by:
                 - ``compose``
         """
-        return Container(
-            titled_header("Flow Execution"),
+        return WindowSection(
+            "flow_execution",
+            titled_header(
+                "Flow Execution",
+                OpenFolderChip("session"),
+                help_button=WindowHelpChip("flow_execution"),
+            ),
             FlowExecutionPanel(),
             id="screen_flow_execution",
             classes="db-screen hidden",
@@ -2783,31 +2793,39 @@ class S19TuiApp(App):
             )
             for lane in event.lanes
         ]
-        record = run_chain_set(
-            chains,
-            FlowContext(project_dir=project_dir),
-            mode=event.mode,
-            set_name=event.set_name,
-        )
+        # batch-97 D14: a run that raises paints one English line and
+        # enables Run again; it never escapes the handler.
+        try:
+            record = run_chain_set(
+                chains,
+                FlowContext(project_dir=project_dir),
+                mode=event.mode,
+                set_name=event.set_name,
+            )
+        except Exception as exc:  # noqa: BLE001 - every raise becomes one line
+            panel.render_run_error(fx_run_error_line(exc))
+            return
         panel.render_run(record)
 
     def on_flow_execution_panel_external_step_confirmed(
         self, event: "FlowExecutionPanel.ExternalStepConfirmed"
     ) -> None:
-        """Re-run ONE lane with its paused external step confirmed (spec v3).
+        """Re-run ONE lane with its confirmed external steps (spec v3).
 
         Summary:
-            prototype v3 (spec "paso externo"): the operator pressed the
-            lane's confirm button — the human ran the step OUTSIDE the app
-            and the MANDATORY log + the output file exist. Build that lane's
-            confirmation from the block's OWN declared fields (the log ref
-            and the absolute output path the operator configured), re-run
-            JUST that lane through the real ``run_chain_set`` with the
-            confirmation riding the run context, and hand the outcome back
-            to the panel's :meth:`FlowExecutionPanel.apply_confirmed_run`.
-            The executor validates the evidence, COPIES the output into the
-            session artifact folder and the chain continues; the lane's
-            remaining blocks execute.
+            The operator confirmed the lane's waiting external step (its
+            Confirm or ``c``): the human ran the step OUTSIDE the app and the
+            MANDATORY log + the output file exist. Build one confirmation per
+            block the lane has confirmed in its current wait sequence
+            (:meth:`FlowExecutionPanel.confirmed_blocks`, batch-97 I-7 (d)),
+            each from its own block's declared fields — so a lane with two
+            external steps reaches its end instead of waiting again at its
+            first (LED-2026-10-19-batch-97.29) — re-run JUST that lane
+            through the real ``run_chain_set`` and hand the outcome back to
+            :meth:`FlowExecutionPanel.apply_confirmed_run`. Every exit ends
+            in ``apply_confirmed_run`` or ``render_confirm_error`` (D14): the
+            panel disabled Run and every Confirm before posting, and both
+            painters enable them again.
 
         Args:
             event (FlowExecutionPanel.ExternalStepConfirmed): Carries the
@@ -2821,26 +2839,40 @@ class S19TuiApp(App):
         )
 
         panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        lane_index, block_index = event.lane_index, event.block_index
         project_dir = self._active_project_dir()
         if project_dir is None:
-            panel.render_run_error(
-                "no project loaded - load or save a project first"
+            panel.render_confirm_error(
+                lane_index, "no project loaded - load or save a project first"
             )
             return
-        specs = panel.lane_specs()
-        if event.lane_index >= len(specs):
-            return
-        spec = specs[event.lane_index]
-        if event.block_index >= len(spec.flow.blocks):
-            return
-        block = spec.flow.blocks[event.block_index]
-        if not isinstance(block, ExternalStepBlock):
-            return
-        confirmation = ExternalStepConfirmation(
-            block_index=event.block_index,
-            log_ref=block.log_ref,
-            source_path=block.output_path,
+        refused = (
+            f"confirm refused - lane {lane_index + 1} no longer waits at "
+            f"block {block_index + 1}"
         )
+        specs = panel.lane_specs()
+        if lane_index >= len(specs):
+            panel.render_confirm_error(lane_index, refused)
+            return
+        spec = specs[lane_index]
+        blocks = spec.flow.blocks
+        confirmed = panel.confirmed_blocks(lane_index)
+        if (
+            block_index not in confirmed
+            or block_index >= len(blocks)
+            or not isinstance(blocks[block_index], ExternalStepBlock)
+        ):
+            panel.render_confirm_error(lane_index, refused)
+            return
+        confirmations = {
+            index: ExternalStepConfirmation(
+                block_index=index,
+                log_ref=blocks[index].log_ref,
+                source_path=blocks[index].output_path,
+            )
+            for index in confirmed
+            if index < len(blocks) and isinstance(blocks[index], ExternalStepBlock)
+        }
         chains = [
             ChainSpec(
                 name=spec.name,
@@ -2851,15 +2883,21 @@ class S19TuiApp(App):
         ]
         ctx = FlowContext(
             project_dir=project_dir,
-            external_confirmations={event.block_index: confirmation},
+            external_confirmations=confirmations,
         )
-        record = run_chain_set(
-            chains,
-            ctx,
-            mode="sequential",
-            set_name=str(self.query_one("#fx_set_name", Input).value),
-        )
-        panel.apply_confirmed_run(event.lane_index, record)
+        try:
+            record = run_chain_set(
+                chains,
+                ctx,
+                mode="sequential",
+                set_name=str(self.query_one("#fx_set_name", Input).value),
+            )
+        except Exception as exc:  # noqa: BLE001 - every raise becomes one line
+            panel.render_confirm_error(lane_index, fx_run_error_line(exc))
+            return
+        failed = panel.apply_confirmed_run(lane_index, record)
+        if failed:
+            self.set_status(failed)
 
     def on_flow_execution_panel_save_requested(
         self, event: "FlowExecutionPanel.SaveRequested"
@@ -6981,6 +7019,35 @@ class S19TuiApp(App):
             # batch-94 Inc-003 (LLR-021.2): the set picker repopulates on
             # entry, the ``_prefill_check_editor`` idiom.
             self._prefill_flow_execution_sets()
+
+    def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
+        """Gate app actions by the active window (batch-97 I-11, D10).
+
+        Summary:
+            ``confirm_attention`` (the ``c`` key and its ^K palette entry)
+            runs only while Flow Execution is the active window — off it the
+            key does nothing and the binding is not active; every other
+            action falls through to Textual's own check. Inc-8 adds D28's
+            arms here.
+
+        Args:
+            action (str): The action name.
+            parameters (tuple): The action's parameters.
+
+        Returns:
+            Optional[bool]: ``False`` for ``confirm_attention`` off Flow
+            Execution, else what ``App.check_action`` returns.
+        """
+        if action == "confirm_attention":
+            return self._active_screen_key == "flow_execution"
+        return super().check_action(action, parameters)
+
+    def action_confirm_attention(self) -> None:
+        """``c`` on Flow Execution: confirm the attention lane's waiting
+        external step (LLR-147.13) and write the panel's one-line answer to
+        the status line (D15)."""
+        panel = self.query_one("#fx_panel", FlowExecutionPanel)
+        self.set_status(panel.confirm_attention())
 
     def action_open_split_join_export(self) -> None:
         """

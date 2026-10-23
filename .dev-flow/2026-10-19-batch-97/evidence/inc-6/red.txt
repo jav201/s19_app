@@ -1,0 +1,291 @@
+# Inc-6 RED run on HEAD b514b07 source (worktree C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/head_b514b07)
+# git HEAD: b514b07a329b7f429342a57472172d8b7833e049  status of source: 0 modified source files
+# s19_app imported from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\__init__.py
+# source digests:
+0e1f00310bee5f68513585892d49fd862e4f91ade350b248b94a5cf7af51b390 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+362f962bf8d3ff175323ab55e6e8252d5c372ddb65a38d2d24ea54f4e0b4f2b2 *s19_app/tui/styles.tcss
+eaf189a6a5808502c06fb3b4c56dc54416b0802c6edee0d962dfe50cd5e73e55 *s19_app/tui/window_help.py
+# command: pytest <selection> -q -rfE --tb=line -p no:cacheprovider (one invocation per selection line)
+
+.......FFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFF..FFFFFFFFFFFFFFFF.FFFFFFFFFF     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:418: AssertionError: a cable_glyph renderer exists
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_cable_0_0' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_cable_0_0' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_0_0' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:542: AssertionError: a REQUIRED line is shown while a lane waits
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:542: AssertionError: a REQUIRED line is shown while a lane waits
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_2_4' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_2_4' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_4_4' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_4_4' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:694: AssertionError: the mode control is 80 cells wide
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:694: AssertionError: the mode control is 80 cells wide
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:714: AssertionError: the mode control is 80 cells wide
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:758: AssertionError: assert ['✓ Confirmar... HUMANO', ...] == []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:795: AssertionError: the confirmed re-run is painted
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_head' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_1_2' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_0_1' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1028: AssertionError: [5, 13, 42]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1028: AssertionError: [5, 13, 49]
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:1641: textual.app.ScreenStackError: No screens on stack
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1128: AssertionError: the run's raise escaped the handler: RuntimeError('boom')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_panel' on Screen(id='_default')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1225: AssertionError: the confirm re-run's raise escaped the handler: RuntimeError('boom')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1265: AssertionError: one folder chip and one help chip in the header: (0, 0)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1340: AssertionError: the panel scrolls sideways: 77
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1384: AssertionError: ['┌', '┌', '┌']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1414: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1449: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1497: AttributeError: '_FxLane' object has no attribute 'block_status'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1519: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1519: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1556: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1556: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1556: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1556: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1629: assert None is not None
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1648: assert None is not None
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1672: AssertionError: Button( constructors at lines [2679, 2508, 2515, 2522, 2529, 1172, 1176, 1177, 1179, 1185, 1191, 1192, 1193, 1194, 2671]
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1690: AssertionError: a scoped flow_execution section exists
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1746: AssertionError: the run log is in English: "00:00.000 ▶ patch_chain · started\n00:00.017 ◈ patch_chain · done · wrote fw_app_patched.s19\n00:00.017 ▶ flash_chain · started\n00:00.022 □ flash_chain · ESPERANDO HUMANO — paso externo (block 3/4) · LOG 'flash_log.txt' pendiente\n00:00.022 ▶ err_chain · started\n00:00.026 ✗ err_chain · block 2/4 PATCH — change doc 'err_missing.json' missing · chain halted\n"
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1796: AssertionError: header ids outside the panel: ['fx_save', 'fx_set_select', 'fx_load']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1796: AssertionError: header ids outside the panel: ['fx_save', 'fx_set_select', 'fx_load']
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_head' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1926: AssertionError: c is bound on the app
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_execution.py:1982: AssertionError: the mode control is narrow
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[ok-waiting-\u25a1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[notices-waiting-\u25a1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[ok-ok-\u2593]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[notices-skipped-\u25c7]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[error-skipped-\u2717]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[skipped-ok-\u2591]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[waiting-skipped-\u2591]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_cable_glyph_truth_table[None-None-\u2591]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_three_lane_run_paints_each_cable
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_wait_third_6_cables
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_22_rebind_input_and_bind_inside_the_source_card
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_two_waiting_lanes_one_attention
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[wait_third_6-size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[wait_third_6-size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_24_header_rows_inside_and_mode_control_narrow[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_24_header_rows_inside_and_mode_control_narrow[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_24_mode_click_selects_the_word_keys_toggle_report_records_it
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_panel_constants_carry_no_spanish
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_painted_lanes_log_and_rerun_in_english
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_26_hostile_text_renders_literally
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_52_waiting_colour_only_on_waiting_human_elements
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_52_crc_card_beside_the_waiting_card_keeps_its_colour
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size2]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_lanes_one_line_and_no_blank_row_outside[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_lanes_one_line_and_no_blank_row_outside[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_a_run_that_raises_paints_one_english_line
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_confirm_rerun_is_one_run_at_a_time
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_56_focus_order_keys_and_chip_states
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_63_wide_lanes_scroll_inside_the_lanes_area
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_63_three_lane_head_marks
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_two_external_steps_end_ok
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[rail]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[none]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_confirms_nothing_out_of_scope[hidden]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_confirms_nothing_out_of_scope[modal]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_confirms_nothing_out_of_scope[input]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_confirms_nothing_out_of_scope[nothing_waits]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_34_lane_layout_is_the_builder_rule_minus_the_confirm_reserve
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_error_line_is_one_english_line_without_a_traceback
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_56_every_flow_button_is_a_space_chip
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped
+FAILED tests/test_b97_flow_execution.py::test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log
+FAILED tests/test_b97_flow_execution.py::test_at_b97_10_save_set_then_load_it_in_a_new_app[size0]
+FAILED tests/test_b97_flow_execution.py::test_at_b97_10_save_set_then_load_it_in_a_new_app[size1]
+FAILED tests/test_b97_flow_execution.py::test_at_b97_11_hostile_and_nul_inputs_render_literally_or_are_refused
+FAILED tests/test_b97_flow_execution.py::test_at_b97_20_keys_only_run_pause_confirm
+FAILED tests/test_b97_flow_execution.py::test_at_b97_22_parallel_rebind_runs_each_lane_on_its_own_image
+57 failed, 11 passed in 386.44s (0:06:26)
+=== chips_help ===
+....FFFFFFFFFFFFFFFFFFFFFFFF....FF                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1557: AssertionError: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1587: AssertionError: ['open_folder_checks', 'open_folder_checks_editor', 'open_folder_flows', 'open_folder_patch', 'open_folder_reports', 'open_folder_templates']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1637: AssertionError: one folder chip and one help chip in the header: (0, 0)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1646: ImportError: cannot import name 'ModeToggle' from 's19_app.tui.flow_screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\tui\flow_screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1757: AssertionError: one legend row in #fx_panel: []
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1785: AssertionError: ['(none)']
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1869: AssertionError: ('lanes_empty', '(no chains — Import… adds a lane)')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1858: AssertionError: ('log_empty', [])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1812: RuntimeError: boom
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1858: AssertionError: ('import_refused', ["import refused: flows/nul_flow.json — blocks[1] (patch) change_doc_ref 'calib\\x00hotfix.json' carries a NUL", 'character - not a path'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1858: AssertionError: ('set_refused', ["load refused: flowsets/nul_set.json — chains[0].template 'patch\\x00chain' must be a plain flows/ file name (no", 'separators, no traversal, not absolute, no NUL)'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1869: AssertionError: ('nul_bind', "00:00.000 ✗ patch_chain · block 1/4 SOURCE — source 'prg.s19' missing · chain halted")
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1927: AssertionError: {'open_folder_checks': '📂 Open checks/', 'open_folder_checks_editor': '📂 Open checks/', 'open_folder_flows': '📂 Open flows/', 'open_folder_patch': '📂 Open patches/', ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1975: AssertionError: Flow Execution's header carries the session chip
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#open_folder_session' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#open_folder_session' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#open_folder_session' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#open_folder_session' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#open_folder_session' on Screen(id='_default')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:2116: AssertionError: {'flows': True}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1646: ImportError: cannot import name 'ModeToggle' from 's19_app.tui.flow_screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\tui\flow_screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1646: ImportError: cannot import name 'ModeToggle' from 's19_app.tui.flow_screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\tui\flow_screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1646: ImportError: cannot import name 'ModeToggle' from 's19_app.tui.flow_screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\tui\flow_screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:1646: ImportError: cannot import name 'ModeToggle' from 's19_app.tui.flow_screens' (C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\tui\flow_screens.py)
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:2350: AssertionError: ('fx_import_refused', ["import refused: flows/nul_flow.json — blocks[1] (patch) change_doc_ref 'calib\\x00hotfix.json' carries a NUL", 'character - not a path'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_chips_help.py:2353: AssertionError: 00:00.000 ✗ patch_chain · block 1/4 SOURCE — source 'prg.s19' missing · chain halted
+=========================== short test summary info ===========================
+FAILED tests/test_b97_chips_help.py::test_tc_b97_29_session_chip_silent_at_startup
+FAILED tests/test_b97_chips_help.py::test_tc_b97_30_every_chip_id_unique_with_the_reports_modal_open
+FAILED tests/test_b97_chips_help.py::test_tc_b97_31_flow_execution_header_carries_both_chips
+FAILED tests/test_b97_chips_help.py::test_tc_b97_32_flow_execution_help_names_every_label
+FAILED tests/test_b97_chips_help.py::test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend
+FAILED tests/test_b97_chips_help.py::test_tc_b97_33_flow_execution_glyphs_are_narrow_in_windows_terminal
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[lanes_empty]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[log_empty]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[run_raised]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[import_refused]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[set_refused]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[nul_bind]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_seven_chips_labelled_and_the_four_screen_chips_open_their_folder
+FAILED tests/test_b97_chips_help.py::test_tc_b97_65_session_header_chip_names_its_reason_after_a_drop
+FAILED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[real]
+FAILED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[absent]
+FAILED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[file]
+FAILED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[junction]
+FAILED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[seam_raises]
+FAILED tests/test_b97_chips_help.py::test_at_b97_13_no_project_flow_chips_disabled_and_name_their_folder
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[check_editor]
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow]
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow_execution]
+FAILED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[fx_import_refused]
+FAILED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[fx_nul_bind]
+26 failed, 8 passed, 45 deselected in 153.78s (0:02:33)
+=== width ===
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((120, 54), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((160, 56), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((220, 60), ['fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((260, 70), ['fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((118, 54), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((119, 54), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((120, 54), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((160, 56), ['fx_help', 'fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', ...])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((220, 60), ['fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1291: AssertionError: ((260, 70), ['fx_save', 'fx_set_select', 'SelectCurrent', 'label', 'NonSelectableStatic', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((118, 54), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((118, 53), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((119, 54), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((120, 54), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((160, 56), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((220, 60), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1311: AssertionError: ((260, 70), ['fx_save', 'fx_load'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_width.py:1338: AssertionError: {'nowrap-legend': 0, 'nowrap-log': 0, 'nowrap-pipeline': 0, 'nowrap-ribbon': 0}
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_row' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_row' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_row' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_row' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_lane_0_row' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_required' on FlowExecutionPanel(id='fx_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#window_help_flow_execution' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#window_help_flow_execution' on Screen(id='_default')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#window_help_flow_execution' on Screen(id='_default')
+=========================== short test summary info ===========================
+FAILED tests/test_b97_width.py::test_tc_b97_34_execution_cards_follow_four_resizes_in_columns
+FAILED tests/test_b97_width.py::test_tc_b97_34_execution_resize_while_hidden_rederives_on_show
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size3]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size4]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[three-size5]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size3]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size4]
+FAILED tests/test_b97_width.py::test_tc_b97_35_execution_no_horizontal_overflow[six-size5]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size4]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size5]
+FAILED tests/test_b97_width.py::test_tc_b97_36_execution_actions_inside_at_scroll_zero[size6]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size4]
+FAILED tests/test_b97_width.py::test_tc_b97_37_execution_no_wrapped_row[size5]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_cards_take_their_width[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_cards_take_their_width[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_cards_take_their_width[size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_cards_take_their_width[size3]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_cards_take_their_width[size4]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size2]
+41 failed, 1 passed, 105 deselected in 262.59s (0:04:22)
+=== builder space + superseded ===
+F..F..FFFFF.FFF.                                                         [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_b97_flow_builder.py:1358: AssertionError: {'flow_add': False, 'flow_copy': False, 'flow_funnel_add': False, 'flow_funnel_toggle': False, ...}
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:352: ValueError: substring not found
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:611: AssertionError: assert ('▓ base' in '00:00.000 ▶ base · started\n00:00.017 ✓ base · done · wrote base_out.s19\n00:00.017 ▶ base_2 · started\n00:00.021 ✓ base_2 · done · wrote base_out.s19\n')
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:642: AttributeError: 'Select' object has no attribute 'press'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:711: AttributeError: 'Select' object has no attribute 'mode'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:797: AssertionError: base must have a terminal line: "00:00.000 ▶ base · started\n00:00.005 ✓ base · done · wrote base_out.s19\n00:00.005 ▶ base_crc · started\n00:00.007 ✗ base_crc · block 3/4 CRC — config 'crc_regions.json' missing · chain halted\n"
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_tui_flow_execution_b94.py:858: AssertionError: 00:00.000 ▶ base · started
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_flow_external_step_b96.py:516: AssertionError: assert 'waiting for a human' in '┌─[ ext ]──────────────────────────────────┐\n│ tpl ext· 3 blocks                        │\n│ source → external_step ...firmar - esperando human │\n│ ▓▓▓▓▓░░░░░░░░░  33% □  ESPERANDO HUMANO  │\n└──────────────────────────────────────────┘'
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_window_usage_help.py:271: AssertionError: the shipped seats are the nine md sections minus split_join_export, plus the code-authored check_editor section
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\tests\test_changes_file_notation_help.py:155: AssertionError: the data home must hold exactly the nine md-authored sections plus the batch-96 changes_file_notation and batch-97 check_editor sections
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_51_space_presses_every_builder_button_group
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_19_import_mounts_lanes_side_by_side
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_21_parallel_mode_overlaps_isolates_and_captures
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_22_default_run_is_strictly_sequential
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm
+FAILED tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun
+FAILED tests/test_window_usage_help.py::test_tc707_boundary_no_orphan_seats_no_blank_modal
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+10 failed, 6 passed in 94.72s (0:01:34)

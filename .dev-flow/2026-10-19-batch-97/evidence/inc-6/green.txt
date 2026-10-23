@@ -1,0 +1,36 @@
+# Inc-6 GREEN gate run on the Inc-6 tree
+a2afd60ab61a0da6f44606c80d85decd5cc15c22bd3525b64d11fee424313896 *s19_app/tui/flow_screens.py
+6f32fbaea12f68d865ac71f0162e78c9b91b1131c00786734e2f493f1855402e *s19_app/tui/app.py
+f91bd8698e62046c3203040b682e03513487ce860d0e696447a9c339bc614496 *s19_app/tui/styles.tcss
+303be19ea83453bd36062ee60f10581b8a47c65debcc89d223646c761444757f *s19_app/tui/window_help.py
+# pytest $(cat gate-files.txt) -q -rfE --tb=line -p no:cacheprovider
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+.................................................xxxxxxxxxxxxxxxxxxxxxxx [ 62%]
+xxxxxx.................................................................. [ 69%]
+..................................................F..................... [ 76%]
+........................................................................ [ 83%]
+.............................F.......................................... [ 90%]
+........................................................................ [ 96%]
+................................                                         [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_directionb.py:5275: AssertionError: 80x24: both widgets must have width; {'narrow': True, 'body_right': 79, 'grid_content_width': 62, 'bar': (0, 0, 0, 0), 'glance': (0, 0, 0, 0)}
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=8846200;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_directionb.py::test_at073b_glance_geometry_fits_and_reflows
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+2 failed, 1009 passed, 29 xfailed in 4183.92s (1:09:43)

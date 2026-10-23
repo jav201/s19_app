@@ -1,0 +1,12 @@
+# guard added to tests/test_b97_width.py::test_tc_b97_34_execution_card_width_holds_when_a_lane_starts_waiting after the first RED run (it passed vacuously on HEAD: no cards)
+## Inc-6 tree:
+.                                                                        [100%]
+1 passed in 6.10s
+## HEAD b514b07 worktree:
+=========================== short test summary info ===========================
+FAILED tests/test_b97_width.py::test_tc_b97_34_execution_card_width_holds_when_a_lane_starts_waiting
+1 failed in 5.39s
+## M29 on the Inc-6 tree:
+    restore sha256 a2afd60ab61a0da6f44606c80d85decd5cc15c22bd3525b64d11fee424313896 == before a2afd60ab61a0da6f44606c80d85decd5cc15c22bd3525b64d11fee424313896
+    | C:\Users\jjgh8\Github\s19_app\tests\test_b97_width.py:1246: AssertionError: ({0: {(7, 23)}, 1: {(35, 23)}, 2: {(63, 23)}, 3: {(91, 23)}}, {0: {(7, 21)}, 1: {(33, 21)}, 2: {(58, 21)}, 3: {(83, 21)}})
+    | 1 failed in 6.34s

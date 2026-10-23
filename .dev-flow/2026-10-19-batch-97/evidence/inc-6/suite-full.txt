@@ -1,0 +1,86 @@
+...............................ss.......s............................... [  2%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+.......................F................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+..........................................F............................. [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+..........................F............................................. [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........x............................................................... [ 66%]
+............F........................................................... [ 68%]
+............F........................................................... [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+................................................F....................... [ 86%]
+...........................F............................................ [ 88%]
+.x...............F...................................................... [ 90%]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx....FF..................................... [ 92%]
+............................................F........................... [ 94%]
+......F................................................................. [ 96%]
+.....................................x.................................. [ 98%]
+.............................................................            [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_flow_execution.py:1136: AssertionError: 2 run_chain_set calls for one Run
+C:\Users\jjgh8\Github\s19_app\tests\test_before_after_report.py:1182: AssertionError: AT-061a: a successful save-back must reveal the persistent control
+C:\Users\jjgh8\Github\s19_app\tests\test_report_addendum_bound.py:1342: AssertionError: AT-194 fixture precondition: the addendum must cost something to measure; delta(2000)=-56269
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3882: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_patch_editor_v2.py:1336: AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24074/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_theme.py:109: AssertionError: TC-012: severity classes in styles.tcss = ['sev-error', 'sev-info', 'sev-neutral', 'sev-ok', 'sev-waiting', 'sev-warning']; expected exactly ['sev-error', 'sev-info', 'sev-neutral', 'sev-ok', 'sev-warning'] — no class added/dropped/renamed.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_theme.py:125: AssertionError: TC-012: stylesheet sev-* classes drifted from SEVERITY_CLASS_MAP values ['sev-error', 'sev-info', 'sev-neutral', 'sev-ok', 'sev-warning'].
+C:\Users\jjgh8\Github\s19_app\tests\test_undo_redo_ux.py:201: AssertionError: the real Add must append 0x300, got ['0x200']
+C:\Users\jjgh8\Github\s19_app\tests\test_unified_write.py:385: AssertionError: the second save silently clobbered the first
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m29[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=11469511;file://C:\Users\jjgh8\Github\s19_app\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\Github\s19_app\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_report_addendum_bound.py::test_at194_addendum_marginal_resident_cost_flat_in_candidate_count
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_history_strip.py::test_tc081_3_sites - textual.cs...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_theme.py::test_tc_012_five_sev_rules_present_and_unchanged
+FAILED tests/test_tui_theme.py::test_tc_012_severity_class_names_match_color_policy
+FAILED tests/test_undo_redo_ux.py::test_ac2_1_ctrl_z_y_undo_redo_via_real_key
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+12 failed, 3542 passed, 3 skipped, 32 xfailed in 7213.30s (2:00:13)
+exit 1

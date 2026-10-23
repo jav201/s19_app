@@ -1,0 +1,4 @@
+[
+["`Confirmed <chain> — the run continues.`; implementation open — Inc-5/Inc-6 | `evidence/operator-pdr-verdict-2026-10-20.md` decision 2 |",
+ "`Confirmed <chain> — the run continues.`; implementation open — Inc-5/Inc-6. *Inc-6 design (2026-10-22):* D15's first wording is superseded by these three I-9 lines (returned by `confirm_attention()`, written to the status line); D7 (b)–(d): lane marks and run-log terminal marks from the cable vocabulary (`▓ <chain> · done`), `Confirm` without a glyph, `#fx_name_strip` on the words `· saved` / `· unsaved`; the run log's start mark `▶` (also the cable arrowhead on this screen) is operator question Q-B97-6a | `evidence/operator-pdr-verdict-2026-10-20.md` decision 2; `design/design-proposal.md:52` (D7 (a)–(e)), `:60` (D15) |"]
+]

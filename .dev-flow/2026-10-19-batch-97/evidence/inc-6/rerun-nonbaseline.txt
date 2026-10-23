@@ -1,0 +1,21 @@
+# test_at073b isolated x5 on the Inc-6 tree
+1 passed in 4.71s
+1 passed in 4.37s
+1 passed in 4.30s
+1 passed in 4.56s
+1 passed in 4.77s
+# on HEAD b514b07 worktree x5
+1 failed in 4.91s
+1 failed in 5.02s
+1 passed in 5.13s
+1 passed in 5.10s
+1 passed in 5.09s
+# AT-B78-03 on the Inc-6 tree (baseline failure; the new palette row):
+E   AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E     missing: []
+E     unexpected: ['a2l_describe_tag', 'confirm_attention']
+E   assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E     
+E     At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E     Left contains 2 more items, first extra item: 'open_settings_menu'
+E     Use -v to get more diff

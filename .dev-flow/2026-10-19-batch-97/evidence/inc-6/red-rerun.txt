@@ -1,0 +1,47 @@
+# Inc-6 RED re-run (PC-11 reorders + the log-cap arm) on HEAD b514b07 source, worktree; s19_app from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\__init__.py
+0e1f00310bee5f68513585892d49fd862e4f91ade350b248b94a5cf7af51b390 *s19_app/tui/flow_screens.py
+fd5c696021bd6972466ab96aa33b53ac55b2be20874a21bceeaf90ab7ad6f621 *s19_app/tui/app.py
+FFFFFFFFFFFFFFFFFFFF                                                     [100%]
+================================== FAILURES ===================================
+tests\test_b97_flow_execution.py:440: AssertionError: lane 0 paints its notices cable: '┌─[ patch_chain ]──────────────────────────┐\n│ tpl patch_chain· 4 blocks                │\n│ source → patch → check → write_out       │\n│ in1 prg.s19                              │\n│ sesión: …e_run_0\\.s19tool\\workarea\\proj1 │\n│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100% ◈  0.023s            │\n└──────────────────────────────────────────┘'
+tests\test_b97_flow_execution.py:852: AssertionError: the set picker parses its option as markup: ['bold', 'red', 'link=e', '@click=app.quit']
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#fx_card_1_2' on FlowExecutionPanel(id='fx_panel')
+tests\test_b97_flow_execution.py:1529: AssertionError: waiting at the second external step after one confirm: (0, 2, True, False)
+tests\test_b97_flow_execution.py:1056: AssertionError: ['00:00.000 ▶ patch_chain · started', '00:00.019 ◈ patch_chain · done · wrote fw_app_patched.s19', '00:00.019 ▶ patch_...atched.s19', '00:00.040 ▶ patch_chain_3 · started', '00:00.055 ◈ patch_chain_3 · done · wrote fw_app_patched.s19', ...]
+tests\test_b97_chips_help.py:1873: AssertionError: ('lanes_empty', '(no chains — Import… adds a lane)')
+tests\test_b97_chips_help.py:1861: IndexError: list index out of range
+tests\test_b97_chips_help.py:1861: AssertionError: ('run_raised', "escaped: RuntimeError('boom')")
+tests\test_b97_chips_help.py:1862: AssertionError: ('import_refused', ["import refused: flows/nul_flow.json — blocks[1] (patch) change_doc_ref 'calib\\x00hotfix.json' carries a NUL", 'character - not a path'])
+tests\test_b97_chips_help.py:1862: AssertionError: ('set_refused', ["load refused: flowsets/nul_set.json — chains[0].template 'patch\\x00chain' must be a plain flows/ file name (no", 'separators, no traversal, not absolute, no NUL)'])
+tests\test_b97_chips_help.py:1873: AssertionError: ('nul_bind', "00:00.000 ✗ patch_chain · block 1/4 SOURCE — source 'prg.s19' missing · chain halted")
+tests\test_b97_width.py:1385: AssertionError: ((118, 54), 'before_run', [5, 13, 42])
+tests\test_b97_width.py:1385: AssertionError: ((118, 53), 'before_run', [5, 13, 41])
+tests\test_b97_width.py:1385: AssertionError: ((220, 60), 'before_run', [5, 13, 49])
+tests\test_b97_width.py:1385: AssertionError: ((118, 54), 'after_run', [5, 13, 42])
+tests\test_b97_width.py:1385: AssertionError: ((118, 53), 'after_run', [5, 13, 41])
+tests\test_b97_width.py:1385: AssertionError: ((220, 60), 'after_run', [5, 13, 49])
+tests\test_b97_width.py:1433: AssertionError: ((80, 24), 'fx_save', 4)
+tests\test_b97_width.py:1433: AssertionError: ((100, 40), 'fx_save', 4)
+tests\test_b97_width.py:1433: AssertionError: ((220, 40), 'fx_save', 4)
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_three_lane_run_paints_each_cable
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_26_hostile_text_renders_literally
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_52_waiting_colour_only_on_waiting_human_elements
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_two_external_steps_end_ok
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_run_log_paints_at_most_eight_lines
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[lanes_empty]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[log_empty]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[run_raised]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[import_refused]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[set_refused]
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[nul_bind]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[before_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size0]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size1]
+FAILED tests/test_b97_width.py::test_tc_b97_38_execution_height_goes_to_the_lanes[after_run-size2]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size0]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size1]
+FAILED tests/test_b97_width.py::test_tc_b97_59_execution_below_the_range_actions_reachable[size2]
+20 failed in 205.53s (0:03:25)

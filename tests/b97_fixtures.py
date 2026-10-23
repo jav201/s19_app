@@ -677,3 +677,259 @@ async def load_flow(app, pilot, stem: str) -> None:
         lambda: panel._flow_name == stem or bool(panel.query("#flow_result .flow-quarantine")),
         f"flows/{stem}.json loaded or refused",
     )
+
+
+# --------------------------------------------------------------------------- #
+# A.5 builders — Inc-6: the Flow Execution sets (P-31, P-41, P-50, P-60)
+# --------------------------------------------------------------------------- #
+
+#: The external-step evidence of ``flash_chain`` (its ``log_ref`` and the file
+#: name of its ``output_path``, both inside the project).
+FLASH_LOG = "flash_log.txt"
+FLASH_OUT = "fw_app_flashed.s19"
+#: ``flash2_chain``'s two external steps (A.5): (log, output file name).
+FLASH2_STEPS = (("step1_log.txt", "ext1_out.s19"), ("step2_log.txt", "ext2_out.s19"))
+
+
+#: ``err_chain``'s change doc: never written, so the patch block errs.
+ERR_CHANGE_DOC = "err_missing.json"
+
+
+def err_chain_demo() -> list:
+    """``err_chain`` (A.5, P-31: ``ok error skipped skipped``): ``patch_chain``
+    whose patch ref names a change doc that does not exist.
+
+    Deviation from A.5, recorded in the Inc-6 packet: A.5 builds the error
+    with one entry at ``0x00020000`` (outside ``prg.s19``); on HEAD
+    ``b514b07`` such a patch reports ``ok`` — ``applied 0 entries`` — so the
+    chain never errs. A missing change doc is the error the run log's
+    ``'<ref>' missing`` line names."""
+    return patch_chain_blocks(ERR_CHANGE_DOC)[:3] + [patch_chain_demo()[3]]
+
+
+def crc_wait_chain_demo(project_dir: Path) -> list:
+    """``crc_wait_chain`` (A.5, P-41): load → CRC ``crc.json`` → EXT-STEP →
+    write-out (``ok notices waiting skipped``): a CRC card beside the
+    waiting card."""
+    from s19_app.tui.services.flow_model import CrcBlock
+
+    flash = flash_chain_demo(project_dir)
+    return [flash[0], CrcBlock("crc.json"), flash[2], flash[3]]
+
+
+def six_ok_demo(output: str) -> list:
+    """``six_ok_a`` / ``six_ok_b`` (A.5, P-41): load → patch → check → CRC →
+    CRC → write-out ``output``."""
+    from s19_app.tui.services.flow_model import CrcBlock, WriteOutBlock
+
+    return patch_chain_blocks()[:3] + [CrcBlock("crc.json"), CrcBlock("crc.json"), WriteOutBlock(output)]
+
+
+def six_wait_demo(project_dir: Path) -> list:
+    """``six_wait`` (A.5, P-41): load → patch → check → CRC → EXT-STEP →
+    write-out, waiting at block 4 (0-based)."""
+    from s19_app.tui.services.flow_model import CrcBlock
+
+    flash = flash_chain_demo(project_dir)
+    return patch_chain_blocks()[:3] + [CrcBlock("crc.json"), flash[2], flash[3]]
+
+
+def flash2_chain_demo(project_dir: Path) -> list:
+    """``flash2_chain`` (A.5, P-60): load → patch → EXT-STEP → EXT-STEP →
+    write-out; each step's log and output file inside the project."""
+    from s19_app.tui.services.flow_model import (
+        EXTERNAL_MODE_TERMINAL,
+        ExternalStepBlock,
+        WriteOutBlock,
+    )
+
+    steps = [
+        ExternalStepBlock(
+            mode=EXTERNAL_MODE_TERMINAL,
+            instruction=f"./step{n}.sh",
+            log_ref=log,
+            output_path=str(project_dir / out),
+        )
+        for n, (log, out) in enumerate(FLASH2_STEPS, start=1)
+    ]
+    return patch_chain_blocks()[:2] + steps + [WriteOutBlock("fw_two_steps.s19")]
+
+
+def flip_one_data_byte(source: Path, dest: Path, avoid: tuple = ()) -> int:
+    """Copy an S19 image flipping the first data byte of the first data
+    record whose span holds none of ``avoid``; the record's checksum is
+    recomputed. Returns the flipped byte's address (``prg_v2.s19``, A.5)."""
+    lines = source.read_text(encoding="ascii").splitlines()
+    widths = {"S1": 2, "S2": 3, "S3": 4}
+    for row, line in enumerate(lines):
+        kind = line[:2]
+        if kind not in widths:
+            continue
+        raw = bytes.fromhex(line[2:])
+        aw = widths[kind]
+        address = int.from_bytes(raw[1:1 + aw], "big")
+        data = bytearray(raw[1 + aw:-1])
+        if not data or any(address <= a < address + len(data) for a in avoid):
+            continue
+        data[0] ^= 0xFF
+        body = bytes([raw[0]]) + raw[1:1 + aw] + bytes(data)
+        checksum = (~sum(body)) & 0xFF
+        lines[row] = kind + (body + bytes([checksum])).hex().upper()
+        dest.write_text("\n".join(lines) + "\n", encoding="ascii")
+        return address
+    raise AssertionError("no data record to flip")
+
+
+def fx_project(app, name: str = "proj1") -> Path:
+    """A project opened through the app's own load (P-58) holding every
+    Flow Execution fixture of A.5: ``patch_chain``, ``flash_chain``,
+    ``err_chain``, ``crc_wait_chain``, ``six_ok_a``, ``six_ok_b``,
+    ``six_wait``, ``flash2_chain``, ``patch_chain_b`` and ``prg_v2.s19``."""
+    from dataclasses import replace
+
+    project_dir = flow_project(app, name)
+    write_flow(project_dir, "err_chain", err_chain_demo())
+    write_flow(project_dir, "crc_wait_chain", crc_wait_chain_demo(project_dir))
+    write_flow(project_dir, "six_ok_a", six_ok_demo("six_a.s19"))
+    write_flow(project_dir, "six_ok_b", six_ok_demo("six_b.s19"))
+    write_flow(project_dir, "six_wait", six_wait_demo(project_dir))
+    write_flow(project_dir, "flash2_chain", flash2_chain_demo(project_dir))
+    chain_b = patch_chain_demo()
+    chain_b[3] = replace(chain_b[3], output_name="fw_b.s19")
+    write_flow(project_dir, "patch_chain_b", chain_b)
+    patched = [a + i for a, run in CALIB_ENTRIES for i in range(len(run))]
+    flip_one_data_byte(project_dir / "prg.s19", project_dir / "prg_v2.s19", tuple(patched))
+    return project_dir
+
+
+def flash_evidence(project_dir: Path, steps=((FLASH_LOG, FLASH_OUT),)) -> None:
+    """The human ran the external step(s) outside the app: each log and
+    output file now exists inside the project."""
+    for log, out in steps:
+        (project_dir / log).write_text("flashed OK\n", encoding="utf-8")
+        shutil.copyfile(project_dir / "prg.s19", project_dir / out)
+
+
+def hostile_flow_file(project_dir: Path) -> Path:
+    """``hostile_flow`` (A.5): ``flows/<HOSTILE_NAME>.json`` holding
+    ``hostile_flow_demo`` under a safe flow name (a payload name is refused,
+    P-30)."""
+    import json
+
+    from s19_app.tui.services.flow_model import Flow
+    from s19_app.tui.services.flow_persistence_service import FLOWS_SUBDIR, flow_to_dict
+
+    path = project_dir / FLOWS_SUBDIR / f"{HOSTILE_NAME}.json"
+    payload = flow_to_dict(Flow(name="hostile_flow", blocks=hostile_flow_demo(project_dir)))
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def hostile_set_file(project_dir: Path) -> Path:
+    """``flowsets/<HOSTILE_NAME>.json`` (A.5, P-37): the 3-lane set saved by
+    the shipped serialiser under the hostile file name."""
+    import json
+
+    from s19_app.tui.services.flow_persistence_service import (
+        FLOWSETS_SUBDIR,
+        ChainSet,
+        ChainSetEntry,
+        chain_set_to_dict,
+    )
+
+    sets_dir = project_dir / FLOWSETS_SUBDIR
+    sets_dir.mkdir(parents=True, exist_ok=True)
+    chains = tuple(
+        ChainSetEntry(chain=stem, template=stem, inputs=((0, "prg.s19"),))
+        for stem in ("patch_chain", "flash_chain", "err_chain")
+    )
+    path = sets_dir / f"{HOSTILE_NAME}.json"
+    path.write_text(json.dumps(chain_set_to_dict(ChainSet(name="three", chains=chains))), encoding="utf-8")
+    return path
+
+
+async def open_flow_execution(app, pilot) -> object:
+    """Show Flow Execution through ``action_show_screen``; return the panel
+    once it is laid out."""
+    from tests.b97_probes import settled
+
+    app.action_show_screen("flow_execution")
+    panel = app.query_one("#fx_panel")
+    await settled(pilot, lambda: panel.region.height > 0, "the Flow Execution panel is laid out")
+    return panel
+
+
+async def import_flow(app, pilot, stem: str) -> None:
+    """Import ``flows/<stem>.json`` as a lane through ``#fx_import`` and the
+    picker (the shipped controls); wait until the lane is mounted or the
+    import is refused."""
+    from textual.widgets import Button, ListView
+
+    from tests.b97_probes import settled
+
+    panel = app.query_one("#fx_panel")
+    before = panel.lane_count()
+    panel.query_one("#fx_import", Button).press()
+    await settled(
+        pilot,
+        lambda: stem in [item.name for item in app.screen.query("#flow_list ListItem")],
+        f"the flow picker lists {stem}",
+    )
+    names = [item.name for item in app.screen.query("#flow_list ListItem")]
+    listing = app.screen.query_one("#flow_list", ListView)
+    target = names.index(stem)
+
+    def highlighted() -> bool:
+        child = listing.highlighted_child
+        if child is not None and child.name == stem:
+            return True
+        listing.index = target
+        return False
+
+    await settled(pilot, highlighted, f"{stem} highlighted in the flow picker")
+    app.screen.query_one("#flow_load_ok", Button).press()
+    await settled(
+        pilot,
+        lambda: (panel.lane_count() == before + 1 and bool(app.query(f"#fx_lane_{before}")))
+        or panel.query_one("#fx_notice").display,
+        f"flows/{stem}.json imported or refused",
+    )
+
+
+async def import_lanes(app, pilot, *stems: str) -> object:
+    """Open Flow Execution and import each stem in order; return the panel
+    once every lane is laid out (its first card painted, or on ``main`` its
+    lane box)."""
+    from tests.b97_probes import settled
+
+    panel = await open_flow_execution(app, pilot)
+    for stem in stems:
+        await import_flow(app, pilot, stem)
+    await settled(
+        pilot,
+        lambda: all(app.query_one(f"#fx_lane_{i}").region.width > 0 for i in range(len(stems))),
+        "every lane is laid out",
+    )
+    return panel
+
+
+async def run_lanes(app, pilot, panel, *, key: bool = False) -> None:
+    """Press ``#fx_run`` (``press()``, or ``enter`` with the focus on it when
+    ``key``) and wait until the run's record is painted and Run is enabled
+    again."""
+    from tests.b97_probes import settled
+
+    before = panel.last_run_record
+    run = panel.query_one("#fx_run")
+    if key:
+        run.focus()
+        await settled(pilot, lambda: app.focused is run, "Run focused")
+        await pilot.press("enter")
+    else:
+        run.press()
+    await settled(
+        pilot,
+        lambda: panel.last_run_record is not before and not run.disabled,
+        "the run is painted and Run is enabled again",
+        attempts=200,
+    )

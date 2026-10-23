@@ -132,7 +132,11 @@ _SEATS: Tuple[Tuple[str, str, str], ...] = (
 #: LLR-148.6); Inc-4 adds ``patch``, and at its gate ``crc_designer`` and
 #: ``reports`` (their step 6 names the folder; the draft is not versioned);
 #: Inc-5 adds ``flow``; Inc-6 adds ``flow_execution``.
-_CODE_AUTHORED_SHIPPED = frozenset({"check_editor", "patch", "crc_designer", "reports", "flow"})
+# batch-97 Inc-6 (named supersession, D25 / I-4): ``flow_execution`` joins the
+# code-authored shipped seats (LLR-148.6).
+_CODE_AUTHORED_SHIPPED = frozenset(
+    {"check_editor", "patch", "crc_designer", "reports", "flow", "flow_execution"}
+)
 
 
 async def _pilot_pause(pilot) -> None:

@@ -1,0 +1,15 @@
+# Inc-6 RED re-run 2 (TC-52 guard first, TC-58 empty-row read) on HEAD b514b07 worktree
+FF                                                                       [100%]
+================================== FAILURES ===================================
+tests\test_b97_flow_execution.py:908: AssertionError: guard: at least one cell paints the waiting colour while a lane waits
+tests\test_b97_chips_help.py:1862: AssertionError: ('log_empty', [])
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_52_waiting_colour_only_on_waiting_human_elements
+FAILED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[log_empty]
+2 failed in 8.35s
+# probe_two_ext.py on HEAD b514b07:
+S19_APP_FROM C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\head_b514b07\s19_app\__init__.py
+FIRST_RUN       paused_block, confirm_display = (1, True)
+AFTER_CONFIRM_1 paused_block, confirm_display, last_status = (None, False, 'paused')
+AFTER_CONFIRM_2 paused_block, confirm_display, last_status = (None, False, 'paused')
+RUN_LOG_TAIL ['00:00.000 ▶ ext2 · started', "00:00.006 □ ext2 · ESPERANDO HUMANO — paso externo (block 2/4) · LOG 'run1.log' pendiente", '32554:22.710 ▶ ext2 · re-run tras confirmar paso externo', '32554:22.713 □ ext2 · done · wrote out1.s19']

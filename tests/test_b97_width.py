@@ -1124,3 +1124,313 @@ def test_tc_b97_59_builder_below_the_range_run_reachable(tmp_path: Path, size) -
     assert presses < 200 and inside_tab, (size, presses)
     assert pages < 20 and inside_page, (size, pages)
     assert overlaps == [], overlaps
+
+
+# =========================================================================== #
+# Inc-6 — the Flow Execution arms of TC-B97-34..38 and TC-B97-59
+# =========================================================================== #
+
+from tests.b97_fixtures import (  # noqa: E402
+    flash_chain_demo,
+    flash_evidence,
+    fx_project,
+    import_lanes,
+    open_flow_execution,
+    run_lanes,
+    write_flow,
+)
+
+FX_THREE = ("patch_chain", "flash_chain", "err_chain")
+FX_SIX = ("six_ok_a", "six_ok_b", "six_wait")
+FX_CATEGORIES = ("nowrap-pipeline", "nowrap-ribbon", "nowrap-log", "nowrap-legend")
+FX_PRIMARY = ("fx_import", "fx_mode", "fx_run", "fx_save", "fx_load")
+
+
+def _fx_laid_out(panel) -> bool:
+    """Flow Execution's layout pass ran for the viewport now shown (D24)."""
+    scroll = panel.query("#fx_lanes_scroll")
+    key = getattr(panel, "_layout_key", None)
+    if not scroll or key is None:
+        return not scroll or not hasattr(panel, "_layout_key")
+    return key[0] == scroll.first().scrollable_content_region.width
+
+
+def run_flow_execution(tmp_path: Path, size, body, *, stems=FX_THREE, run: bool = True, wide: bool = False):
+    """Open Flow Execution at ``size`` with the A.5 project and ``stems``
+    imported (a 60-cell change-doc ref on ``flash_chain`` when ``wide``), run
+    them when ``run`` and return ``await body(app, pilot, panel)``."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await settle(pilot)
+            project_dir = fx_project(app)
+            names = list(stems)
+            if wide:
+                import shutil
+
+                blocks = flash_chain_demo(project_dir)
+                blocks[1] = type(blocks[1])(WIDE_REF)
+                shutil.copyfile(project_dir / "calib_hotfix.json", project_dir / WIDE_REF)
+                write_flow(project_dir, "wide_flash", blocks)
+                names = ["wide_flash"]
+            panel = await import_lanes(app, pilot, *names) if names else await open_flow_execution(app, pilot)
+            if run and names:
+                await run_lanes(app, pilot, panel, key=True)
+            await _poll(pilot, lambda: _fx_laid_out(panel))
+            await settle(pilot, 4)
+            return await body(app, pilot, panel)
+
+    return asyncio.run(_drive())
+
+
+def _columns(panel) -> dict:
+    """``{j: {(x, width) per lane}}`` — card j's painted column in every lane."""
+    columns = {}
+    for lane in range(panel.lane_count()):
+        j = 0
+        while panel.query(f"#fx_card_{lane}_{j}"):
+            region = panel.query_one(f"#fx_card_{lane}_{j}").region
+            columns.setdefault(j, set()).add((region.x, region.width))
+            j += 1
+    return columns
+
+
+def test_tc_b97_34_execution_cards_follow_four_resizes_in_columns(tmp_path: Path) -> None:
+    """TC-B97-34 (LLR-149.1, Execution painted arm; D24 / PC-4): in one session
+    118x54 → 160x56 → 220x60 → 260x70 → 118x54 with a 4-block lane, a 6-block
+    lane and a waiting lane, every card of every lane has the same painted
+    width and card *j* starts at the same x in every lane (columns), the card
+    width is non-decreasing and strictly greater at 220 than at 118, and back
+    at 118x54 the columns equal the first reading.
+
+    RED on main (P-22): no card columns. Mutations: ``n`` per lane (the
+    4-block lane wider than the 6-block one → columns differ); the resize
+    trigger removed.
+    """
+
+    async def body(app, pilot, panel):
+        readings = []
+        for size in ((118, 54), (160, 56), (220, 60), (260, 70), (118, 54)):
+            await pilot.resize_terminal(*size)
+            await _poll(pilot, lambda: app.size == size and _fx_laid_out(panel))
+            await settle(pilot, 3)
+            readings.append(_columns(panel))
+        return readings
+
+    readings = run_flow_execution(tmp_path, (118, 54), body, stems=("patch_chain", "six_ok_a", "flash_chain"))
+    for columns in readings:
+        assert columns and all(len(cells) == 1 for cells in columns.values()), columns
+        assert len({width for cells in columns.values() for _x, width in cells}) == 1, columns
+    widths = [next(iter(r[0]))[1] for r in readings]
+    assert widths[:4] == sorted(widths[:4]) and widths[2] > widths[0], widths
+    assert readings[0] == readings[-1]
+
+
+def test_tc_b97_34_execution_card_width_holds_when_a_lane_starts_waiting(tmp_path: Path) -> None:
+    """TC-B97-34 (D24 / PC-4): the Confirm reserve is taken whether or not a
+    lane waits, so no card changes width or x when the pause paints.
+
+    RED by mutation: the reserve taken only while a lane waits.
+    """
+
+    async def body(app, pilot, panel):
+        before = _columns(panel)
+        await run_lanes(app, pilot, panel, key=True)
+        await _poll(pilot, lambda: panel.query_one("#fx_confirm_1").display)
+        await settle(pilot, 4)
+        return before, _columns(panel)
+
+    before, after = run_flow_execution(tmp_path, (118, 54), body, run=False)
+    assert before and all(len(cells) == 1 for cells in before.values()), f"guard: card columns painted: {before}"
+    assert before == after, (before, after)
+
+
+def test_tc_b97_34_execution_resize_while_hidden_rederives_on_show(tmp_path: Path) -> None:
+    """TC-B97-34 (LLR-149.1, Execution hidden arm): resized to 220x60 while the
+    Workspace is shown, then shown, Flow Execution paints the card width
+    ``lane_layout`` derives from its measured viewport — wider than the
+    21-cell minimum — and the same width as a session started at 220x60.
+
+    RED by mutation: both layout triggers removed.
+    """
+
+    async def hidden(app, pilot, panel):
+        app.action_show_screen("workspace")
+        await settle(pilot, 2)
+        await pilot.resize_terminal(220, 60)
+        await _poll(pilot, lambda: app.size == (220, 60))
+        app.action_show_screen("flow_execution")
+        await _poll(pilot, lambda: _fx_laid_out(panel))
+        await settle(pilot, 3)
+        viewport = panel.query_one("#fx_lanes_scroll").scrollable_content_region.width
+        return panel.query_one("#fx_card_0_0").region.width, viewport
+
+    async def direct(app, pilot, panel):
+        return panel.query_one("#fx_card_0_0").region.width
+
+    width, viewport = run_flow_execution(tmp_path / "a", (118, 54), hidden, run=False)
+    assert width == fs.lane_layout(viewport, 4).card_w and width > fs.CARD_MIN_W, (width, viewport)
+    assert width == run_flow_execution(tmp_path / "b", (220, 60), direct, run=False)
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+@pytest.mark.parametrize("stems", [FX_THREE, FX_SIX], ids=["three", "six"])
+def test_tc_b97_35_execution_no_horizontal_overflow(tmp_path: Path, size, stems) -> None:
+    """TC-B97-35 (LLR-149.2, Execution arm): after the paused run, 0 displayed
+    descendants of ``#fx_panel`` leave it on x over their clipped regions
+    (P-52) — the 6-block lanes scroll inside ``#fx_lanes_scroll`` — over >= 10
+    descendants, on both sides of the 120-column breakpoint.
+
+    RED on main (P-10): the lanes overflow the panel (``max_scroll_x`` 77).
+    """
+
+    async def body(app, pilot, panel):
+        return [w.id or type(w).__name__ for w in clipped_overflow(panel)], len(displayed_descendants(panel))
+
+    offenders, population = run_flow_execution(tmp_path, size, body, stems=stems)
+    assert offenders == [], (size, offenders)
+    assert population >= 10
+
+
+@pytest.mark.parametrize("size", RANGE_SAMPLES)
+def test_tc_b97_36_execution_actions_inside_at_scroll_zero(tmp_path: Path, size) -> None:
+    """TC-B97-36 (LLR-149.3, Execution arm; PC-24 at 118x53): after the
+    paused 3-lane run, Import…, the mode switch, Run, Save Set and Load Set
+    lie inside the panel region with the panel at its top.
+
+    RED on main (P-11): ``#fx_save`` / ``#fx_load`` outside.
+    """
+
+    async def body(app, pilot, panel):
+        panel.scroll_home(animate=False)
+        await _poll(pilot, lambda: panel.scroll_y == 0)
+        return {wid: panel.query_one(f"#{wid}").region for wid in FX_PRIMARY}, panel.region
+
+    regions, panel_region = run_flow_execution(tmp_path, size, body)
+    outside = [wid for wid, region in regions.items() if not panel_region.contains_region(region)]
+    assert outside == [], (size, outside)
+
+
+@pytest.mark.parametrize("size", [(118, 54), (119, 54), (120, 54), (160, 56), (220, 60), (260, 70)])
+def test_tc_b97_37_execution_no_wrapped_row(tmp_path: Path, size) -> None:
+    """TC-B97-37 (LLR-149.4, Execution arm): every member of the Execution
+    no-wrap set — the lane heads, pending lines, card lines and cables, the
+    ribbon, the run log and REQUIRED line, the legend, read from the DOM by
+    category — paints one terminal row per logical line, and the ribbon keeps
+    the session path's tail.
+
+    RED by mutation: a 20-cell width on ``#fx_log`` (its lines wrap).
+    """
+
+    async def body(app, pilot, panel):
+        members = {cat: [w for w in panel.query(f".{cat}") if is_displayed(w)] for cat in FX_CATEGORIES}
+        wraps = []
+        for widgets in members.values():
+            for w in widgets:
+                lines = str(w.render()).split("\n")
+                height = w.get_content_height(w.content_region.size, app.size, w.content_region.width)
+                if height != len(lines) or w.region.height < len(lines):
+                    wraps.append((w.id or w.classes, height, len(lines), w.region.height))
+        ribbon = [r.rstrip() for r in painted_rows(app, panel.query_one("#fx_name_strip")) if r.strip()]
+        return {c: len(m) for c, m in members.items()}, wraps, ribbon, app.active_project_dir().name
+
+    counts, wraps, ribbon, project = run_flow_execution(tmp_path, size, body)
+    assert all(n >= 1 for n in counts.values()), counts
+    assert wraps == [], wraps
+    assert len(ribbon) == 1 and ribbon[0].endswith(project), ribbon
+
+
+@pytest.mark.parametrize("size", [(160, 56), (163, 56), (220, 60), (223, 60), (260, 70)])
+def test_tc_b97_38_execution_cards_take_their_width(tmp_path: Path, size) -> None:
+    """TC-B97-38 (LLR-149.5, Execution width clause): with a 60-cell
+    change-doc ref (clipped in its card, the guard) on a waiting lane, the
+    lane row — its cards, cables and Confirm — leaves at most 2 void cells
+    inside the lanes viewport; every card is at least 21 cells wide.
+
+    RED by mutation: cards fixed at 21 cells.
+    """
+
+    async def body(app, pilot, panel):
+        await _poll(pilot, lambda: panel.query_one("#fx_confirm_0").display)
+        await settle(pilot, 3)
+        view = panel.query_one("#fx_lanes_scroll").scrollable_content_region
+        confirm = panel.query_one("#fx_confirm_0").region
+        clipped = sum(r.count("…") for r in painted_rows(app, panel.query_one("#fx_lane_0_row")))
+        return view.right - confirm.right, clipped, panel.query_one("#fx_card_0_0").region.width
+
+    void, clipped, card_w = run_flow_execution(tmp_path, size, body, wide=True)
+    assert clipped >= 1, "guard: the 60-cell ref clips in its card"
+    assert void <= 2, (size, void)
+    assert card_w >= 21
+
+
+@pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+@pytest.mark.parametrize("phase", ["before_run", "after_run"])
+def test_tc_b97_38_execution_height_goes_to_the_lanes(tmp_path: Path, size, phase) -> None:
+    """TC-B97-38 (LLR-149.5, Execution height clause; PC-24 at 118x53): no
+    panel row outside ``#fx_lanes_scroll`` is blank, and the lanes frame ends
+    on the row of the first shown of ``#fx_required`` / ``#fx_log`` — before
+    a run (one log line) and after the paused 3-lane run (REQUIRED + 6 log
+    lines).
+
+    RED on main (P-32): 3 blank rows outside the lanes frame.
+    """
+
+    async def body(app, pilot, panel):
+        if phase == "after_run":
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+        scroll = panel.query_one("#fx_lanes_scroll")
+        blank = blank_panel_rows(app, panel, outside=scroll)
+        assert blank == [], (size, phase, blank)
+        first = next(w for w in (panel.query_one("#fx_required"), panel.query_one("#fx_log")) if w.display)
+        return blank, scroll.region.bottom, first.region.y
+
+    blank, bottom, first_y = run_flow_execution(tmp_path, size, body, run=False)
+    assert blank == [], (size, phase, blank)
+    assert bottom == first_y, (bottom, first_y)
+
+
+@pytest.mark.parametrize("size", [(80, 24), (100, 40), (220, 40)])
+def test_tc_b97_59_execution_below_the_range_actions_reachable(tmp_path: Path, size) -> None:
+    """TC-B97-59 (LLR-149.6, Execution arm): below the range ``tab`` from the
+    header reaches Run, Save Set and Load Set (<= 200 presses each) and each
+    lies inside the panel once focused; ``pagedown`` from scroll 0 brings each
+    inside (<= 20); no two displayed buttons overlap.
+
+    RED by mutation: ``overflow: hidden`` on the panel.
+    """
+
+    async def body(app, pilot, panel):
+        results = {}
+        for wid in ("fx_run", "fx_save", "fx_load"):
+            panel.scroll_home(animate=False)
+            start = app.query("#window_help_flow_execution") or app.query("#fx_import")
+            start.first().focus()
+            await settle(pilot, 2)
+            presses = 0
+            while (app.focused is None or app.focused.id != wid) and presses < 200:
+                await pilot.press("tab")
+                presses += 1
+            target = panel.query_one(f"#{wid}")
+            await _poll(pilot, lambda: panel.region.contains_region(target.region))
+            inside_tab = panel.region.contains_region(target.region)
+            panel.scroll_home(animate=False)
+            panel.focus()
+            await _poll(pilot, lambda: panel.scroll_y == 0)
+            pages = 0
+            while not panel.region.contains_region(target.region) and pages < 20:
+                await pilot.press("pagedown")
+                await settle(pilot, 1)
+                pages += 1
+            results[wid] = (presses, inside_tab, pages, panel.region.contains_region(target.region))
+        buttons = [b.region for b in panel.query(Button) if is_displayed(b) and b.region.width]
+        overlaps = [(a, b) for i, a in enumerate(buttons) for b in buttons[:i] if a.overlaps(b)]
+        return results, overlaps
+
+    results, overlaps = run_flow_execution(tmp_path, size, body, stems=("patch_chain",))
+    for wid, (presses, inside_tab, pages, inside_page) in results.items():
+        assert presses < 200 and inside_tab, (size, wid, presses)
+        assert pages < 20 and inside_page, (size, wid, pages)
+    assert overlaps == [], overlaps

@@ -1,0 +1,12 @@
+# fold: AT-B94-17 isolated x5 on the folded tree
+1 passed in 3.23s
+1 passed in 3.22s
+1 passed in 3.31s
+1 passed in 3.16s
+1 failed in 2.27s
+# on the pre-fold Inc-6 worktree x5
+1 failed in 2.56s
+1 passed in 3.81s
+1 passed in 3.62s
+1 passed in 3.46s
+1 passed in 3.34s

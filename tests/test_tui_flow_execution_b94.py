@@ -342,11 +342,17 @@ def test_at_b94_19_import_mounts_lanes_side_by_side(tmp_path: Path) -> None:
         ), state["screen_box"]
         assert state["lanes_visible"], "both lanes must be fully visible"
         # Each lane's block list == its template's blocks (kind chain).
-        assert "source → patch → write_out" in state["paint0"]
-        assert "source → patch → write_out" in state["paint1"]
-        assert "tpl base" in state["paint0"] and "tpl nightly" in state["paint1"]
-        assert "in1 base.s19" in state["paint0"], (
-            f"the pinned input line must show the template's own ref"
+        # batch-97 Inc-6 (named supersession, LLR-147.1 / 147.2): the 44-cell
+        # lane box (its `source → patch → write_out` line, `tpl` and `in1`
+        # rows) is replaced by one card per block in order, the lane name
+        # heading it and the SOURCE card holding the bound ref.
+        for key, name in (("paint0", "base"), ("paint1", "nightly")):
+            paint = state[key]
+            cards = paint.splitlines()[1]
+            assert cards.index("◉ LOAD") < cards.index("▣ PATCH") < cards.index("▼ WRITE-OUT"), paint
+            assert name in paint.splitlines()[0], paint
+        assert "base.s19" in state["paint0"], (
+            f"the SOURCE card must show the template's own ref"
         )
         # Corrupt arm.
         shown, text, count = state["corrupt_notice"]
@@ -450,8 +456,11 @@ def test_tc_b94_26_lane_mounting_and_render_census(tmp_path: Path) -> None:
     assert fit, "2 lanes must be fully visible at 120x30 (A3's boxed budget)"
     for paint in paints:
         # chain name, pinned inputs, and the status region, without overlap.
+        # batch-97 Inc-6 (named supersession, LLR-147.1 / 147.2): the status
+        # rides the cables and card status lines (`░` before a run); the
+        # bound ref sits in the SOURCE card, no `in1` label.
         assert "▓" in paint or "░" in paint, "the status bar region renders"
-        assert "in1" in paint and "base.s19" in paint
+        assert "base.s19" in paint
 
     # The 80x24 floor: the layout errors NOT — the overflow scrolls.
     narrow = asyncio.run(_drive((80, 24)))
@@ -522,7 +531,9 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
     # B's binding record + UI field + painted lane are byte-identical.
     assert state["after_b"] == state["before_b"] == {}
     assert state["field_b_after"] == state["field_b"] == "base.s19"
-    assert "in1 base.s19" in state["paint_b"]
+    # batch-97 Inc-6 (named supersession, LLR-147.2): the bound ref sits in
+    # the SOURCE card (no `in1` label).
+    assert "base.s19" in state["paint_b"]
     assert "variant_b.hex" not in state["paint_b"], (
         "a cross-lane write leaked A's binding into B's lane"
     )
@@ -595,7 +606,9 @@ def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> No
     assert a_line.rstrip("`").endswith("variant_b.hex")
     assert b_line.rstrip("`").endswith("release.s19")
     # The run-log paints both lanes' completions.
-    assert "✓ base" in state["log"] and "✓ base_2" in state["log"]
+    # batch-97 Inc-6 (named supersession, D7 (b) / PC-2): the terminal mark of
+    # a clean chain is the cable vocabulary's `▓` (`✓` means check block).
+    assert "▓ base" in state["log"] and "▓ base_2" in state["log"]
 
 
 # --------------------------------------------------------------------------- #
@@ -623,7 +636,11 @@ def test_at_b94_21_parallel_mode_overlaps_isolates_and_captures(tmp_path: Path) 
             await pilot.pause()
 
             # Drive the NON-DEFAULT mode control (C-10).
-            app.query_one("#fx_mode", Select).value = "parallel"
+            # batch-97 Inc-6 (named supersession, D13 / LLR-147.4): the mode
+            # control is the one-row `sequential · parallel` toggle; `enter`
+            # / `space` (its press) switch it to parallel.
+            app.query_one("#fx_mode").press()
+            assert app.query_one("#fx_mode").mode == "parallel"
             await pilot.pause()
             app.query_one("#fx_run", Button).press()
             for _ in range(30):
@@ -690,7 +707,8 @@ def test_at_b94_22_default_run_is_strictly_sequential(tmp_path: Path) -> None:
             await _import_stem(app, pilot, "big_crc")
             await pilot.pause()
             # The mode control is UNTOUCHED — the default arm.
-            assert str(app.query_one("#fx_mode", Select).value) == "sequential"
+            # batch-97 Inc-6 (named supersession, D13): read the toggle.
+            assert app.query_one("#fx_mode").mode == "sequential"
             app.query_one("#fx_run", Button).press()
             for _ in range(30):
                 await pilot.pause()
@@ -711,10 +729,13 @@ def test_at_b94_22_default_run_is_strictly_sequential(tmp_path: Path) -> None:
         f"the default arm must not overlap chains: {state['windows']}"
     )
     # The run-log order arm: chain N+1's start line lands after chain N's
-    # terminal line (A's terminal is its ✓ line; B's start is its ▶ line).
+    # terminal line (A's terminal is its ▓ line; B's start is its `started`
+    # line). batch-97 Inc-6 (named supersession): the terminal mark is `▓`
+    # (D7 (b), PC-2) and the start line carries no mark (Q-B97-6a: `▶` is
+    # the cable arrowhead on this screen).
     log = state["log"]
-    a_terminal = log.index("✓ big")
-    b_start_pos = log.index("▶ big_crc")
+    a_terminal = log.index("▓ big")
+    b_start_pos = log.index("big_crc · started")
     assert b_start_pos > a_terminal, (
         f"chain N+1 must start after chain N's terminal status: {log!r}"
     )
@@ -768,9 +789,11 @@ def test_at_b94_23_run_log_inline_failure_and_report_provenance(
     state = asyncio.run(_drive())
     log = state["log"]
     # Per chain: one start line + one terminal status line (>= 2 lines each).
+    # batch-97 Inc-6 (named supersession, Q-B97-6a / D7 (b)): the start line
+    # carries no mark, the clean terminal mark is `▓`.
     for chain in ("base", "base_crc"):
-        assert f"▶ {chain}" in log, f"{chain} must have a start line: {log!r}"
-        terminal = f"✓ {chain}" if chain == "base" else f"✗ {chain}"
+        assert f"{chain} · started" in log, f"{chain} must have a start line: {log!r}"
+        terminal = f"▓ {chain}" if chain == "base" else f"✗ {chain}"
         assert terminal in log, f"{chain} must have a terminal line: {log!r}"
     # The inline ✗ names the block AND the missing config (suggestion #1 —
     # visible without opening anything).
@@ -828,9 +851,11 @@ def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
     state = asyncio.run(_drive())
     plain = state["plain"]
     # Per chain >=2 status lines (start + terminal), 2 chains.
+    # batch-97 Inc-6 (named supersession, Q-B97-6a / D7 (b)): the start line
+    # carries no mark, the clean terminal mark is `▓`.
     for chain in ("base", "base_2"):
-        assert f"▶ {chain}" in plain, plain
-        assert f"✓ {chain}" in plain, plain
+        assert f"{chain} · started" in plain, plain
+        assert f"▓ {chain}" in plain, plain
     # The all-clean arm: 0 ✗ lines anywhere.
     assert "✗" not in plain, f"the all-clean run invented a failure: {plain!r}"
     # The painted oracle: the strip carries real painted content (C-32) —

@@ -742,6 +742,12 @@ def test_tc081_4_no_binding_diff() -> None:
         "show_screen('crc_designer')",
         "show_screen('check_editor')",
         "show_screen('flow_execution')",
+        # batch-97 Inc-6 (named supersession, D10 amended / PC-13, key-bar
+        # QA M-3): `Binding("c", "confirm_attention", "Confirm", show=False)`
+        # is an APP binding gated by `check_action` to Flow Execution;
+        # `show=False`, so the shipped Footer paints no new token and no
+        # snapshot cell drifts (PC-10: 0 of 29).
+        "confirm_attention",
     )
     changed = [
         line

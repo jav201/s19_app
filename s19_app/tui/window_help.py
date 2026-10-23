@@ -268,7 +268,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "the chain.",
             "? — opens this help.",
             "enter — on a chip or a button, presses it.",
-            "space — on a kind chip, picks that kind.",
+            "space — on a kind chip, picks that kind; on any other chip or "
+            "button, presses it.",
             "◉ — a load block.",
             "▣ — a patch block.",
             "✓ — a check block (card and chip).",
@@ -339,6 +340,80 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "naming pattern. The sample filename updates live.",
             "Export: split writes `‹stem›_‹segment›.‹ext›` per range; "
             "join writes one `‹stem›_joined.‹ext›`.",
+        ),
+    },
+    #: batch-97 Inc-6 (D10 / D25, LLR-148.6): CODE-authored like
+    #: ``check_editor`` — one ``label — effect`` line per chip, field, key and
+    #: glyph Flow Execution paints (TC-B97-32 parses this body). The ``c``
+    #: line is hand-typed until Inc-8's generated keys block replaces it (D27).
+    "flow_execution": {
+        "title": "Flow Execution",
+        "steps": (
+            "Run saved flows as a set of lanes, one lane per chain: each lane "
+            "shows its blocks as cards joined by cables, and each cable shows "
+            "how the block before it ran. A lane that reaches an external "
+            "step waits for a human until you confirm it. The run log under "
+            "the lanes shows its newest 8 lines; the chain-set report under "
+            "`reports\\` keeps every line.",
+            "Import… — adds a lane from a saved flow (`flows\\<name>.json`); "
+            "a flow with an unsafe ref is refused and the lanes are kept.",
+            "sequential — Run runs the lanes one after another, in lane "
+            "order (the default). Click a word to choose it; enter or space "
+            "switches between the two.",
+            "parallel — Run runs every lane at the same time; the run report "
+            "records the mode.",
+            "Run — runs every lane on its bound inputs and writes one "
+            "chain-set report; Run and every Confirm stay disabled until the "
+            "run ends.",
+            "set name — the name Save Set saves the set under.",
+            "Save Set — saves the lanes, their bound inputs and their last "
+            "outputs as `flowsets\\<name>.json`.",
+            "saved sets — the sets saved in this project; Load Set restores "
+            "the one shown.",
+            "Load Set — replaces the lanes with the saved set's lanes; an "
+            "input whose file moved is named in its lane.",
+            "image file — the image a lane's load block reads; type another "
+            "file and press Bind.",
+            "Bind — binds the typed image file to this lane only; the next "
+            "Run reads it.",
+            "Confirm — on a lane waiting for a human: you ran the external "
+            "step and its log and output file exist, so the lane runs on from "
+            "that step (its output file is copied into the session folder).",
+            "REQUIRED — the line above the run log while a lane waits: it "
+            "names the lane whose Confirm is highlighted, the one c confirms.",
+            "Open session — opens the active project's folder, where a "
+            "confirmed external step's output file is copied.",
+            "saved / unsaved — beside the set name: whether the set is saved "
+            "to its file (unsaved in yellow).",
+            "? — opens this help.",
+            "enter — on a chip or a button, presses it.",
+            "space — on a chip or a button, presses it; on the mode switch, "
+            "switches the mode.",
+            "c — Confirm: confirms the attention lane's waiting external step "
+            "once it has waited 0.5 s.",
+            "arrow keys — on the lanes area, scroll the lanes sideways and up "
+            "or down.",
+            "▓ — done: on a cable, the block before it ran ok; at a lane's head, "
+            "the lane is done.",
+            "░ — not run / skipped: the block has not run yet, or was skipped.",
+            "✗ — on a cable: the block before it failed; at a lane's head: "
+            "the lane failed.",
+            "◇ — on a cable: the block before it finished with notices; at a "
+            "lane's head: the lane finished with notices.",
+            "□ — on a cable: it leads into a block waiting for a human; at a "
+            "lane's head: the lane waits.",
+            "▪ — owed by you before the lane can go on: the external step's "
+            "log and output file, or an input whose file moved.",
+            "◉ — a load block card.",
+            "▣ — a patch block card.",
+            "✓ — a check block card.",
+            "⊕ — a CRC block card.",
+            "▼ — a write-out block card.",
+            "⏚ — an A2B diff block card.",
+            "» — an external step card.",
+            "≡ — a report block card.",
+            "─ — a cable between two blocks.",
+            "▶ — the cable feeds the next block.",
         ),
     },
     #: batch-97 Inc-3 (D10 / D25, LLR-148.6): CODE-authored like the tenth
@@ -450,6 +525,7 @@ SHIPPED_WINDOW_KEYS: Tuple[str, ...] = (
     "a2l",
     "workspace",
     "check_editor",
+    "flow_execution",
 )
 
 

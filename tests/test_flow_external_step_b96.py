@@ -433,14 +433,18 @@ def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> No
 
 def test_tc1804_fx_lane_pause_confirm_rerun(tmp_path: Path) -> None:
     """TC-1804 (fx surface): running a lane whose flow carries an unconfirmed
-    external step PAUSES the lane — the painted lane names the pending LOG
-    and "ESPERANDO HUMANO", the run log carries the □ pause line, and the
+    external step PAUSES the lane — the painted lane names the pending log
+    and "waiting for a human", the run log carries the □ pause line, and the
     lane's confirm button mounts; pressing it re-runs THAT lane, the
     executor validates the evidence, copies the output into the session
-    artifact folder and the chain continues (out.s19 + the copied file)."""
+    artifact folder and the chain continues (out.s19 + the copied file).
+
+    batch-97 Inc-6 (named supersession, LLR-147.1 / 147.5): the lane box
+    ``#fx_lane_0_paint`` is replaced by the card pipeline, read through
+    ``lane_paint_plain``; the Spanish pins are English."""
     project = _make_project(tmp_path, {"base.s19": _S19})
-    # A SHORT relative log ref: the painted pending row is tail-clipped at
-    # the lane width, so the evidence text must fit "⚠ LOG '…' pendiente".
+    # A SHORT relative log ref, so the pending line reads it whole:
+    # "▪ log 'run.log' pending".
     block = _ext_block(tmp_path, log_ref="run.log")
     fps.save_flow_json(
         Flow(
@@ -481,7 +485,7 @@ def test_tc1804_fx_lane_pause_confirm_rerun(tmp_path: Path) -> None:
             app.query_one("#fx_run", Button).press()
             for _ in range(40):
                 await pilot.pause()
-            lane_paint = app.query_one("#fx_lane_0_paint", Static).render().plain
+            lane_paint = app.query_one("#fx_panel").lane_paint_plain(0)
             log_text = app.query_one("#fx_log", Static).render().plain
             confirm_visible = app.query_one("#fx_confirm_0", Button).display
 
@@ -493,7 +497,7 @@ def test_tc1804_fx_lane_pause_confirm_rerun(tmp_path: Path) -> None:
             app.query_one("#fx_confirm_0", Button).press()
             for _ in range(40):
                 await pilot.pause()
-            rerun_paint = app.query_one("#fx_lane_0_paint", Static).render().plain
+            rerun_paint = app.query_one("#fx_panel").lane_paint_plain(0)
             rerun_log = app.query_one("#fx_log", Static).render().plain
             confirm_hidden = not app.query_one("#fx_confirm_0", Button).display
             return (
@@ -509,14 +513,14 @@ def test_tc1804_fx_lane_pause_confirm_rerun(tmp_path: Path) -> None:
     )
 
     # The pause paints: pending LOG row + the human-wait state word.
-    assert "ESPERANDO HUMANO" in lane_paint
-    assert "LOG" in lane_paint and "pendiente" in lane_paint
-    assert "esperando humano" in log_text.lower() or "ESPERANDO HUMANO" in log_text
+    assert "waiting for a human" in lane_paint
+    assert "log 'run.log' pending" in lane_paint
+    assert "WAITING FOR A HUMAN" in log_text
     assert confirm_visible is True
     # The confirm re-run: the lane is CLEAN again, the button hides, and the
-    # log records the re-run + the written outputs.
-    assert "✓" in rerun_text
-    assert "re-run tras confirmar" in rerun_text
+    # log records the re-run + the written outputs (`▓` the done mark, D7).
+    assert "▓" in rerun_text
+    assert "re-run after confirming the external step" in rerun_text
     assert confirm_hidden is True
     assert (project / "salida.s19").is_file()
     assert (project / "out.s19").is_file()

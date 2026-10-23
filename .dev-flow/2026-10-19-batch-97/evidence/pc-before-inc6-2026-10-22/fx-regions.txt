@@ -1,0 +1,5 @@
+S19_APP_FROM C:\Users/jjgh8/Github/s19_app\s19_app\__init__.py textual 8.2.8
+(118, 54, (5, 2, 112, 42), (5, 4, 112, 40), (5, 4, 112, 40), 'rail_item_workspace')
+(118, 53, (5, 2, 112, 41), (5, 4, 112, 39), (5, 4, 112, 39), 'rail_item_workspace')
+(220, 60, (23, 2, 196, 48), (23, 4, 196, 46), (23, 4, 196, 46), 'rail_item_workspace')
+(220, 59, (23, 2, 196, 47), (23, 4, 196, 45), (23, 4, 196, 45), 'rail_item_workspace')

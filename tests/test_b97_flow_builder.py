@@ -1320,6 +1320,45 @@ def test_tc_b97_51_keyboard_order_keys_and_chip_states(tmp_path: Path) -> None:
     assert len({unfocused, focused, selected}) == 3, states["flow_palette_patch"]
 
 
+def test_tc_b97_51_space_presses_every_builder_button_group(tmp_path: Path) -> None:
+    """TC-B97-51 (LLR-146.13, re-run at Inc-6 for PC-3 / D13): ``space`` acts
+    on one member of each Builder button group — Add, Copy, Variables, Add
+    var, Run — as ``enter`` does: every button of the flow screens is a
+    ``FlowChip``, which binds ``space``.
+
+    Why: a keyboard user should not have to learn that only the kind chips
+    take ``space``. RED on HEAD ``b514b07``: only ``KindChip`` binds
+    ``space`` (Button binds ``enter`` alone). Mutation: the ``space``
+    binding removed from ``FlowChip``.
+    """
+
+    async def body(app, pilot, panel, project_dir):
+        await load_flow(app, pilot, "patch_chain")
+        acted = {}
+
+        async def space_on(wid, predicate):
+            widget = panel.query_one(f"#{wid}")
+            widget.focus()
+            await poll(pilot, lambda: app.focused is widget and not widget.has_class("-active"), 120)
+            await pilot.press("space")
+            acted[wid] = await poll(pilot, predicate)
+
+        await choose_kind(app, pilot, panel, BLOCK_WRITE_OUT)
+        panel.query_one("#flow_ref", Input).value = "spaced.s19"
+        await space_on("flow_add", lambda: card_count(app, panel) == 5)
+        await space_on("flow_copy", lambda: "write_out" in str(panel.query_one("#flow_clip_status").render()))
+        await space_on("flow_funnel_toggle", lambda: panel.query_one("#flow_funnel_editor").display)
+        panel.query_one("#flow_funnel_name", Input).value = "SPACED"
+        panel.query_one("#flow_funnel_value", Input).value = "1"
+        await space_on("flow_funnel_add", lambda: "(1)" in str(panel.query_one("#flow_funnel_toggle").label))
+        await space_on("flow_run", lambda: bool(result_text(app, panel).strip()) and "No run yet" not in result_text(app, panel))
+        return acted
+
+    acted = run_builder(tmp_path, (118, 54), body)
+    assert acted and all(acted.values()), acted
+    assert len(acted) == 5
+
+
 # --------------------------------------------------------------------------- #
 # TC-B97-62 — LLR-146.14, the add-form arms (Inc-5, S4-1, LED-…97.23)
 # --------------------------------------------------------------------------- #

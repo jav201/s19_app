@@ -1,0 +1,5 @@
+S19_APP_FROM C:\Users\jjgh8\Github\s19_app\s19_app\__init__.py
+FIRST_RUN       paused_block, confirm_display = (1, True)
+AFTER_CONFIRM_1 paused_block, confirm_display, last_status = (2, True, 'paused')
+AFTER_CONFIRM_2 paused_block, confirm_display, last_status = (None, False, 'ok')
+RUN_LOG_TAIL ['00:02.782 ext2 · re-run after confirming the external step (block 2/4)', "00:02.785 □ ext2 · WAITING FOR A HUMAN — external step (block 3/4) · log 'run2.log' pending", '00:05.594 ext2 · re-run after confirming the external step (block 3/4)', '00:05.603 ▓ ext2 · done · wrote out1.s19, out2.s19, out.s19']

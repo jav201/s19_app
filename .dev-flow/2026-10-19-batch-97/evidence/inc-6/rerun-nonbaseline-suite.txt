@@ -1,0 +1,6 @@
+# tc_b97_55_input_queued x5 isolated, final tree
+1 passed in 4.51s
+1 passed in 4.69s
+1 passed in 4.42s
+1 passed in 4.34s
+1 passed in 4.50s

@@ -159,6 +159,9 @@ def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
         "crc_designer",
         "reports",
         "flow",
+        # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
+        # code-authored ``flow_execution`` section joins the data home.
+        "flow_execution",
     }, (
         "the data home must hold exactly the nine md-authored sections "
         "plus the batch-96 changes_file_notation and batch-97 check_editor "

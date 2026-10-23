@@ -915,6 +915,10 @@ def test_tc_b97_33_check_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None
 WT_NARROW_GLYPHS = (
     "✓", "◆", "▪",
     "◉", "▣", "⊕", "▼", "⏚", "»", "≡", "─", "▶", "●", "◈", "○", "□", "✗",
+    # batch-97 Inc-6 (D7): the Execution cable vocabulary's three newcomers,
+    # one cell in the WT ruler (`glyph-ruler-readings.txt`) and re-confirmed
+    # on `evidence/inc-6/png/impl.flow-execution*.png`.
+    "▓", "░", "◇",
 )
 
 
@@ -1506,3 +1510,850 @@ def test_tc_b97_58_flow_builder_region_states(tmp_path: Path, arm: str) -> None:
         assert lines[0].endswith("(no active project)"), lines[0]
     if arm == "load_refused":
         assert "nul_flow" in lines[0] and "kept" in lines[0], lines[0]
+
+
+# --------------------------------------------------------------------------- #
+# Inc-6 — the Flow Execution arms of LLR-148.4, 148.5, 148.6, 148.7, 148.9,
+# 148.10 and AT-B97-12, -13, -14, -23 (the four screens)
+# --------------------------------------------------------------------------- #
+
+#: Every open-folder chip instance of the app (LLR-148.10's 7: six composed
+#: plus the Reports modal's).
+CHIP_IDS = (
+    "open_folder_patch",
+    "open_folder_checks",
+    "open_folder_checks_editor",
+    "open_folder_templates",
+    "open_folder_flows",
+    "open_folder_session",
+    "open_folder_reports",
+)
+FX_THREE = ("patch_chain", "flash_chain", "err_chain")
+
+
+def test_tc_b97_29_session_chip_silent_at_startup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """TC-B97-29 (LLR-148.3 as amended by LED-…97.24, Execution startup arm):
+    an app started with no project mounts the Flow Execution header's
+    ``📂 Open session`` chip disabled and writes no chip status line — on the
+    workspace and after Flow Execution is shown.
+
+    Why: a reason printed at startup for a chip nobody touched reads as an
+    error (PC-10: it would add a status row to all 29 snapshot cells). RED on
+    HEAD ``b514b07``: no session chip on the screen. Mutation: announce on the
+    first refresh.
+    """
+    statuses = record_statuses(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            app.action_show_screen("flow_execution")
+            await settle(pilot)
+            chips = list(app.query("#open_folder_session"))
+            return [line for line in statuses if NO_PROJECT_TAIL in line], [c.disabled for c in chips]
+
+    shown, disabled = asyncio.run(_drive())
+    assert disabled == [True], disabled
+    assert shown == [], shown
+
+
+def test_tc_b97_30_every_chip_id_unique_with_the_reports_modal_open(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-30 (LLR-148.4, closed at Inc-6): with a project loaded and the
+    Reports modal open at the same time, the app mounts the seven chip ids of
+    the four screens, the Checks and CRC Designer windows and the modal —
+    each exactly once (six composed + the modal's).
+
+    RED on HEAD ``b514b07``: no ``open_folder_session`` (Flow Execution's
+    header). Mutation: the Execution header mounting a second ``flows`` chip.
+    """
+    import collections
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            load_project(app)
+            app.push_screen(ReportViewerScreen("proj1", []))
+            await settle(pilot)
+            composed = collections.Counter(w.id for w in app.query(OpenFolderChip))
+            modal = collections.Counter(w.id for w in app.screen.query(OpenFolderChip))
+            return composed + modal
+
+    ids = asyncio.run(_drive())
+    assert set(ids) == set(CHIP_IDS), sorted(ids)
+    assert all(count == 1 for count in ids.values()), ids
+
+
+def test_tc_b97_31_flow_execution_header_carries_both_chips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-31 (LLR-148.5, Execution arm — 4 of 4 screens): the Flow
+    Execution header holds one ``OpenFolderChip`` (family ``session``,
+    ``📂 Open session``) and one ``WindowHelpChip``; with a project, a click
+    and an ``enter`` on the folder chip each make exactly one seam call with
+    ``resolve_chip_target``'s target (the project folder).
+
+    RED on HEAD ``b514b07``: a plain title, 0 chips.
+    """
+    from s19_app.tui.window_help import WindowHelpChip
+
+    spy = SeamSpy(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            project_dir = load_project(app)
+            app.action_show_screen("flow_execution")
+            await _poll(pilot, lambda: app.query_one("#fx_panel").region.height > 0)
+            screen = app.query_one("#screen_flow_execution")
+            headers = list(screen.query(".db-screen-header"))
+            counts = (
+                sum(len(h.query(OpenFolderChip)) for h in headers),
+                sum(len(h.query(WindowHelpChip)) for h in headers),
+            )
+            label = None
+            if counts[0] == 1:
+                chip = headers[0].query_one(OpenFolderChip)
+                await _poll(pilot, lambda: chip.region.width > 0 and not chip.disabled)
+                label = chip_label(chip)
+                await pilot.click(f"#{chip.id}")
+                await _poll(pilot, lambda: len(spy.calls) == 1)
+                chip.focus()
+                await _poll(pilot, lambda: app.focused is chip and not chip.has_class("-active"), 120)
+                await pilot.press("enter")
+                await _poll(pilot, lambda: len(spy.calls) == 2)
+            target = fos.resolve_chip_target(
+                project_dir, family="session", workarea=app.workarea, base_dir=tmp_path
+            )
+            return counts, label, target, list(spy.calls)
+
+    counts, label, target, calls = asyncio.run(_drive())
+    assert counts == (1, 1), f"one folder chip and one help chip in the header: {counts}"
+    assert label == "📂 Open session"
+    assert [path for path, _ in calls] == [target, target]
+
+
+def _fx_label(screen, widget) -> List[str]:
+    """Execution control labels: the mode toggle by its two words, every
+    other control by ``_control_label`` (a button up to its first ``:``, an
+    input or select by the ``Label`` on its row, else its placeholder)."""
+    from s19_app.tui.flow_screens import ModeToggle
+
+    if isinstance(widget, ModeToggle):
+        return [word.strip() for word in str(widget.label).split("·")]
+    return [_re.sub(r"\s*\(\d+\)$", "", _control_label(screen, widget))]
+
+
+def test_tc_b97_32_flow_execution_help_names_every_label(tmp_path: Path) -> None:
+    """TC-B97-32 (LLR-148.6, Execution arm): the ``flow_execution`` help body
+    holds one ``label — effect`` line, effect non-empty, for every button,
+    input, select and mode word the screen renders with no lanes and over the
+    paused 3-lane run, every key it binds (``space``, ``enter``, ``?``, ``c``)
+    and every glyph of ``FX_CABLE_GLYPHS``, ``FX_PENDING_GLYPH``,
+    ``FLOW_KIND_GLYPHS`` and ``FLOW_CABLE_GLYPHS``; the control subset counts
+    >= 6.
+
+    RED on HEAD ``b514b07``: no ``flow_execution`` section (P-21: 0 of 4).
+    Mutation: a body line without `` — effect``; coverage from the no-lanes
+    state only.
+    """
+    from textual.widgets import Button, Input as _Input, Select as _Select
+
+    from s19_app.tui import flow_screens as fs
+    from tests.b97_fixtures import flash_evidence, fx_project, import_lanes, run_lanes
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = fx_project(app)
+            flash_evidence(project_dir)
+            app.action_show_screen("flow_execution")
+            panel = app.query_one("#fx_panel")
+            await _poll(pilot, lambda: panel.region.height > 0)
+            screen = app.query_one("#screen_flow_execution")
+            controls, keys = set(), set()
+
+            def harvest():
+                for widget in screen.query("*"):
+                    if not widget.display or widget.region.width == 0:
+                        continue
+                    if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                        continue
+                    if isinstance(widget, (Button, _Input, _Select)):
+                        controls.update(_fx_label(screen, widget))
+                    for binding in getattr(type(widget), "BINDINGS", []):
+                        key = binding.key if hasattr(binding, "key") else binding[0]
+                        keys.add({"question_mark": "?"}.get(key, key))
+
+            harvest()
+            await import_lanes(app, pilot, *FX_THREE)
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            harvest()
+            return controls, keys
+
+    controls, keys = asyncio.run(_drive())
+    keys &= {"space", "enter", "?"}
+    keys |= {"enter", "c"}
+    glyphs = set(getattr(fs, "FX_CABLE_GLYPHS", {}) or {"(no FX_CABLE_GLYPHS)"})
+    glyphs |= {getattr(fs, "FX_PENDING_GLYPH", "(no FX_PENDING_GLYPH)")}
+    glyphs |= set(fs.FLOW_KIND_GLYPHS) | set(fs.FLOW_CABLE_GLYPHS)
+    lines = _help_lines("flow_execution") if "flow_execution" in _help_keys() else {}
+    assert len(controls) >= 6, sorted(controls)
+    missing = sorted((controls | keys | glyphs) - set(lines))
+    assert missing == [], f"labels with no `label — effect` line: {missing}"
+    assert all(lines[label] for label in controls | keys | glyphs)
+
+
+def _help_keys() -> set:
+    from s19_app.tui.window_help import WINDOW_HELP_SECTIONS
+
+    return set(WINDOW_HELP_SECTIONS)
+
+
+#: Characters Flow Execution paints as card frame and text structure, outside
+#: its vocabularies (D7: frame, ``→``, ``…``, ``·``, ``—``, ASCII punctuation).
+_FX_STRUCTURE = set("╭╮╰╯│→…·—") | set(_string.punctuation)
+
+
+def test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend(tmp_path: Path) -> None:
+    """TC-B97-33 (LLR-148.7, Execution arm): over the paused 3-lane run (so
+    ``▓ ░ ✗ ◇ □`` and the pending ``▪`` are all painted) the glyphs painted in
+    the lanes, the pending lines, the REQUIRED line, the run log and the
+    legend belong to ``FLOW_KIND_GLYPHS`` ∪ ``FX_CABLE_GLYPHS`` ∪
+    ``FLOW_CABLE_GLYPHS`` ∪ ``{FX_PENDING_GLYPH}``; the painted set holds all
+    six status / mark glyphs; the one-row legend names exactly the cable
+    vocabulary and the pending mark; no ``⚠ ✖ ✔ ☑ ⏸`` and no ``issues`` are
+    painted.
+
+    RED on HEAD ``b514b07``: no legend in ``#fx_panel``; ``⚠`` in the pending
+    rows. Mutation: a renderer painting a glyph outside its vocabulary.
+    """
+    from s19_app.tui import flow_screens as fs
+    from tests.b97_fixtures import fx_project, import_lanes, run_lanes
+    from tests.b97_probes import painted_rows
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            fx_project(app)
+            panel = await import_lanes(app, pilot, *FX_THREE)
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            legends = list(panel.query("#fx_legend"))
+            legend_rows = [r for r in painted_rows(app, legends[0]) if r.strip()] if legends else []
+            body = "\n".join(painted_rows(app, panel))
+            return legend_rows, body
+
+    legend_rows, body = asyncio.run(_drive())
+    assert len(legend_rows) == 1, f"one legend row in #fx_panel: {legend_rows}"
+    cables = set(getattr(fs, "FX_CABLE_GLYPHS", {}))
+    pending = {getattr(fs, "FX_PENDING_GLYPH", "")}
+    union = set(fs.FLOW_KIND_GLYPHS) | cables | set(fs.FLOW_CABLE_GLYPHS) | pending
+    painted = {c for c in body if not c.isalnum() and not c.isspace() and c not in _FX_STRUCTURE}
+    assert painted <= union, painted - union
+    assert cables | pending <= painted, (cables | pending) - painted
+    assert {c for c in "⚠✖✔☑⏸"} & painted == set()
+    assert {c for c in legend_rows[0] if c in union} == cables | pending, legend_rows
+    # Gate fold (ux L1): the legend words are the cards' words.
+    assert "▓ done" in legend_rows[0] and "░ not run / skipped" in legend_rows[0], legend_rows
+    assert "issues" not in body
+
+
+def test_tc_b97_33_flow_execution_glyphs_are_narrow_in_windows_terminal() -> None:
+    """TC-B97-33 (LLR-148.7, Execution WT width arm, D7): every glyph the
+    Execution screen may paint — the kind, cable and pending vocabularies —
+    is one a real Windows Terminal capture showed one cell wide
+    (``WT_NARROW_GLYPHS``, extended at Inc-6 with ``▓ ░ ◇`` from the ruler
+    and re-confirmed on ``png/impl.flow-execution*.png``).
+
+    Why: the headless compositor counts ``⚠`` as one cell; Windows Terminal
+    paints it two cells wide over its neighbour. RED on HEAD: no
+    ``FX_CABLE_GLYPHS``. Mutation: ``⚠`` back as the pending glyph.
+    """
+    from s19_app.tui import flow_screens as fs
+
+    union = set(getattr(fs, "FX_CABLE_GLYPHS", {}) or {"(none)"})
+    union |= {getattr(fs, "FX_PENDING_GLYPH", "(none)")}
+    union |= set(fs.FLOW_KIND_GLYPHS) | set(fs.FLOW_CABLE_GLYPHS)
+    assert union - set(WT_NARROW_GLYPHS) == set(), sorted(union - set(WT_NARROW_GLYPHS))
+    assert len(union) == 16, sorted(union)
+
+
+@pytest.mark.parametrize(
+    "arm", ["lanes_empty", "log_empty", "run_raised", "import_refused", "set_refused", "nul_bind"]
+)
+def test_tc_b97_58_flow_execution_region_states(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str) -> None:
+    """TC-B97-58 (LLR-148.9, Execution arms): the lanes area with no lanes,
+    the run log before a run, a run that raised, an import refused
+    (``nul_flow``), a set load refused (``nul_set``) and a NUL ref pasted into
+    ``#fx_in_0_0``, bound and run (``nul_bind``, P-50) each paint exactly one
+    English state line in their region (the refusals naming the loader's
+    code; ``nul_bind`` naming ``MANIFEST-PATH-ESCAPE``), and no traceback.
+
+    RED on HEAD ``b514b07``: the empty lines are Spanish-free but the refusal
+    lines name no code, and the bound NUL ref's line names the template's
+    ``prg.s19`` instead of the refused ref.
+    """
+    from textual import events
+
+    from s19_app.tui.services import flow_execution_service as fes
+    from tests.b97_fixtures import ES_MARKER_RE, fx_project, import_flow, import_lanes, nul_flow, nul_set, run_lanes
+    from tests.b97_probes import painted_rows
+
+    if arm == "run_raised":
+        def boom(*args, **kwargs):
+            raise RuntimeError("boom")
+
+        monkeypatch.setattr(fes, "run_chain_set", boom)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = fx_project(app)
+            nul_flow(project_dir)
+            nul_set(project_dir)
+            stems = () if arm in ("lanes_empty", "log_empty") else ("patch_chain",)
+            panel = await import_lanes(app, pilot, *stems)
+            if arm == "lanes_empty":
+                scroll = panel.query_one("#fx_lanes_scroll")
+                return painted_rows(app, scroll, scroll.scrollable_content_region)
+            if arm == "log_empty":
+                return painted_rows(app, panel.query_one("#fx_log"))
+            if arm == "run_raised":
+                panel.query_one("#fx_run").press()
+                await _poll(pilot, lambda: "boom" in panel.run_log_plain(), 120)
+                return painted_rows(app, panel.query_one("#fx_log"))
+            if arm == "import_refused":
+                await import_flow(app, pilot, "nul_flow")
+                return painted_rows(app, panel.query_one("#fx_notice"))
+            if arm == "set_refused":
+                app._prefill_flow_execution_sets()
+                select = panel.query_one("#fx_set_select")
+                select.value = "nul_set"
+                await _poll(pilot, lambda: select.value == "nul_set")
+                panel.query_one("#fx_load").press()
+                await _poll(pilot, lambda: panel.query_one("#fx_notice").display)
+                return painted_rows(app, panel.query_one("#fx_notice"))
+            field = panel.query_one("#fx_in_0_0")
+            field.focus()
+            field.value = ""
+            await _poll(pilot, lambda: app.focused is field)
+            field.post_message(events.Paste("base\x00.s19"))
+            await _poll(pilot, lambda: "\x00" in field.value)
+            panel.query_one("#fx_bind_0_0").press()
+            await settle(pilot, 2)
+            await run_lanes(app, pilot, panel)
+            await settle(pilot, 4)
+            return [r for r in painted_rows(app, panel.query_one("#fx_log")) if "✗" in r]
+
+    try:
+        rows = [r.strip() for r in asyncio.run(_drive()) if r.strip()]
+    except Exception as exc:  # noqa: BLE001 - the main-RED arm: the raise escapes
+        rows = [f"escaped: {exc!r}"]
+    assert not (rows and rows[0].startswith("escaped:")), (arm, rows)
+    assert len(rows) == 1, (arm, rows)
+    assert not ES_MARKER_RE.search(rows[0]), rows[0]
+    assert "Traceback" not in rows[0]
+    expected = {
+        "lanes_empty": "No chains yet",
+        "log_empty": "No run yet",
+        "run_raised": "✗ run failed - RuntimeError: boom",
+        "import_refused": "[FLOW-UNSAFE-REF]",
+        "set_refused": "[CHAIN-SET-UNSAFE-REF]",
+        "nul_bind": "[MANIFEST-PATH-ESCAPE]",
+    }[arm]
+    assert expected in rows[0], (arm, rows[0])
+
+
+def test_tc_b97_65_seven_chips_labelled_and_the_four_screen_chips_open_their_folder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-65 (LLR-148.10, closed at Inc-6: 7 instances): with a project the
+    seven chip instances read ``📂 Open patches/``, ``checks/`` (×2),
+    ``templates/``, ``flows/``, ``reports/`` and ``📂 Open session``; a press
+    of each of the four screens' chips (Patch, Check Editor, Flow Builder,
+    Flow Execution) paints a status line ending with the opened folder's full
+    path.
+
+    RED on HEAD ``b514b07``: no ``📂 Open session`` chip (6 of 7).
+    """
+    spy = SeamSpy(monkeypatch)
+    expected = {
+        "open_folder_patch": f"📂 Open {PROJECT_PATCHES_DIR}/",
+        "open_folder_checks": f"📂 Open {PROJECT_CHECKS_DIR}/",
+        "open_folder_checks_editor": f"📂 Open {PROJECT_CHECKS_DIR}/",
+        "open_folder_templates": f"📂 Open {PROJECT_TEMPLATES_DIR}/",
+        "open_folder_flows": f"📂 Open {FLOWS_SUBDIR}/",
+        "open_folder_session": "📂 Open session",
+        "open_folder_reports": f"📂 Open {REPORTS_DIR_NAME}/",
+    }
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            project_dir = load_project(app)
+            for folder in (PROJECT_PATCHES_DIR, PROJECT_CHECKS_DIR, FLOWS_SUBDIR):
+                (project_dir / folder).mkdir(exist_ok=True)
+            labels = {w.id: chip_label(w) for w in app.query(OpenFolderChip)}
+            modal = ReportViewerScreen("proj1", [])
+            app.push_screen(modal)
+            await settle(pilot)
+            labels["open_folder_reports"] = chip_label(modal.query_one("#open_folder_reports", OpenFolderChip))
+            modal.dismiss()
+            await settle(pilot)
+            statuses = {}
+            for screen, chip_id in (
+                ("patch", "open_folder_patch"),
+                ("check_editor", "open_folder_checks_editor"),
+                ("flow", "open_folder_flows"),
+                ("flow_execution", "open_folder_session"),
+            ):
+                app.action_show_screen(screen)
+                await settle(pilot)
+                chips = list(app.query(f"#{chip_id}"))
+                if chips:
+                    chips[0].press()
+                    await settle(pilot)
+                statuses[chip_id] = last_status(app)
+            return project_dir, labels, statuses
+
+    project_dir, labels, statuses = asyncio.run(_drive())
+    assert labels == expected, labels
+    targets = {
+        "open_folder_patch": project_dir / PROJECT_PATCHES_DIR,
+        "open_folder_checks_editor": project_dir / PROJECT_CHECKS_DIR,
+        "open_folder_flows": project_dir / FLOWS_SUBDIR,
+        "open_folder_session": project_dir,
+    }
+    for chip_id, target in targets.items():
+        assert statuses[chip_id].endswith(str(target)), (chip_id, statuses[chip_id])
+    assert len(spy.calls) == 4
+
+
+def test_tc_b97_65_session_header_chip_names_its_reason_after_a_drop(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-B97-65 / TC-B97-29 (LLR-148.10, LLR-148.3 as amended by
+    LED-…97.24, the mounted header chip): Flow Execution's ``📂 Open
+    session`` is enabled while a project is loaded; when the project is
+    dropped it turns disabled and the status line reads ``📂 Open session: no
+    active project — load a project first.``; a press then opens nothing.
+
+    RED on HEAD ``b514b07``: no session chip on the screen.
+    """
+    spy = SeamSpy(monkeypatch)
+    statuses = record_statuses(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            app.action_show_screen("flow_execution")
+            await settle(pilot)
+            chips = list(app.query("#open_folder_session"))
+            if not chips:
+                return None
+            chip = chips[0]
+            load_project(app)
+            await _poll(pilot, lambda: not chip.disabled)
+            enabled = not chip.disabled
+            seen = len(statuses)
+            unload_project(app)
+            await _poll(pilot, lambda: chip.disabled)
+            chip.press()
+            await settle(pilot)
+            return enabled, chip.disabled, list(statuses[seen:])
+
+    observed = asyncio.run(_drive())
+    assert observed is not None, "Flow Execution's header carries the session chip"
+    enabled, disabled, after = observed
+    assert enabled and disabled
+    assert "📂 Open session: no active project — load a project first." in after, after
+    assert spy.calls == []
+
+
+# --------------------------------------------------------------------------- #
+# AT-B97-12, -13, -14, -23 — HLR-148 across the four screens (black-box)
+# --------------------------------------------------------------------------- #
+
+#: The four screens' header chips: (screen key, chip id, family).
+FOUR_CHIPS = (
+    ("patch", "open_folder_patch", "patch"),
+    ("check_editor", "open_folder_checks_editor", "checks"),
+    ("flow", "open_folder_flows", "flows"),
+    ("flow_execution", "open_folder_session", "session"),
+)
+
+
+@pytest.mark.parametrize("flows_case", ["real", "absent", "file", "junction", "seam_raises"])
+def test_at_b97_12_four_chips_open_their_folder_or_refuse(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, flows_case: str
+) -> None:
+    """AT-B97-12 (US-138 / HLR-148, black-box): in a project opened through
+    the app's own load, a click on each of the four screens' folder chips
+    opens its folder — 4 seam calls with the targets ``patches/``,
+    ``checks/``, ``flows/`` and the project folder, labels ``📂 Open
+    patches/`` … ``📂 Open session``, each status line ending with the full
+    path; ``flows`` absent is created inside the project and then opened; a
+    ``flows`` that is a file or a junction out of the project opens nothing
+    and the status line refuses; a raising seam paints a status line, no
+    traceback.
+
+    RED on main: ``OpenFolderChip("flows")`` raises ``ValueError``.
+    """
+    if flows_case == "seam_raises":
+        def raising(*args, **kwargs):
+            raise OSError("no file manager")
+
+        # The real seam runs and its OS launch raises (the boundary below it).
+        monkeypatch.setattr(fos.subprocess, "Popen", raising)
+        spy = type("NoSpy", (), {"calls": []})()
+    else:
+        spy = SeamSpy(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            project_dir = load_project(app)
+            for folder in (PROJECT_PATCHES_DIR, PROJECT_CHECKS_DIR):
+                (project_dir / folder).mkdir(exist_ok=True)
+            flows = project_dir / FLOWS_SUBDIR
+            if flows_case in ("real", "seam_raises"):
+                flows.mkdir()
+            elif flows_case == "file":
+                flows.write_text("not a folder", encoding="utf-8")
+            elif flows_case == "junction":
+                make_junction(flows, tmp_path / "outside")
+            observed = {}
+            for screen, chip_id, family in FOUR_CHIPS:
+                app.action_show_screen(screen)
+                await settle(pilot)
+                chip = app.query_one(f"#{chip_id}", OpenFolderChip)
+                await _poll(pilot, lambda: chip.region.width > 0 and not chip.disabled)
+                label = chip_label(chip)
+                calls = len(spy.calls)
+                await pilot.click(f"#{chip_id}")
+                await settle(pilot, 3)
+                observed[family] = (label, len(spy.calls) - calls, last_status(app))
+            return project_dir, observed, [path for path, _ in spy.calls]
+
+    project_dir, observed, calls = asyncio.run(_drive())
+    labels = {family: label for family, (label, _, _) in observed.items()}
+    assert labels == {
+        "patch": f"📂 Open {PROJECT_PATCHES_DIR}/",
+        "checks": f"📂 Open {PROJECT_CHECKS_DIR}/",
+        "flows": f"📂 Open {FLOWS_SUBDIR}/",
+        "session": "📂 Open session",
+    }, labels
+    targets = {
+        "patch": project_dir / PROJECT_PATCHES_DIR,
+        "checks": project_dir / PROJECT_CHECKS_DIR,
+        "flows": project_dir / FLOWS_SUBDIR,
+        "session": project_dir,
+    }
+    if flows_case != "seam_raises":
+        for family in ("patch", "checks", "session"):
+            assert observed[family][1] == 1, (family, observed[family])
+            assert observed[family][2].endswith(str(targets[family])), (family, observed[family][2])
+    _label, flow_calls, flow_status = observed["flows"]
+    if flows_case in ("real", "absent"):
+        assert flow_calls == 1 and flow_status.endswith(str(targets["flows"])), (flow_calls, flow_status)
+        assert (project_dir / FLOWS_SUBDIR).is_dir()
+    if flows_case in ("file", "junction"):
+        assert flow_calls == 0 and flow_status, (flow_calls, flow_status)
+        assert "Traceback" not in flow_status
+    if flows_case == "seam_raises":
+        assert all("Traceback" not in status for _, _, status in observed.values())
+        assert all(status for _, _, status in observed.values())
+
+
+def test_at_b97_13_no_project_flow_chips_disabled_and_name_their_folder(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-B97-13 (US-138 / HLR-148, black-box): with no project, walk the
+    rail through the four screens: the ``flows`` and ``session`` chips are
+    disabled, a press opens nothing (0 seam calls) and nothing is announced at
+    startup; once a loaded project is dropped, each status line names its own
+    family's folder — never "Reports".
+
+    RED on main (P-18): the ``(Reports)`` message for every family.
+    """
+    spy = SeamSpy(monkeypatch)
+    statuses = record_statuses(monkeypatch)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        make_project(app)
+        async with app.run_test(size=CHIP_TEST_SIZE) as pilot:
+            await settle(pilot)
+            disabled = {}
+            for screen, chip_id, family in FOUR_CHIPS:
+                app.action_show_screen(screen)
+                await settle(pilot)
+                chips = list(app.query(f"#{chip_id}"))
+                if chips and family in ("flows", "session"):
+                    disabled[family] = chips[0].disabled
+                    chips[0].press()
+                    await settle(pilot)
+            at_start = [line for line in statuses if NO_PROJECT_TAIL in line]
+            load_project(app)
+            await settle(pilot, 3)
+            seen = len(statuses)
+            unload_project(app)
+            await settle(pilot, 3)
+            return disabled, at_start, list(statuses[seen:])
+
+    disabled, at_start, after = asyncio.run(_drive())
+    assert disabled == {"flows": True, "session": True}, disabled
+    assert spy.calls == []
+    assert at_start == [], at_start
+    assert fos.no_project_reason("flows") in after and fos.no_project_reason("session") in after, after
+    assert all("reports" not in line.lower() for line in after if NO_PROJECT_TAIL in line), after
+
+
+#: Each screen's driven states (AT-B97-14) and its control-label guard
+#: (LLR-148.6: 26 / 12 / 21 / 6).
+HELP_GUARD = {"patch": 26, "check_editor": 12, "flow": 21, "flow_execution": 6}
+
+
+async def _drive_states(app, pilot, screen_key: str, harvest) -> None:
+    """Drive one screen through its AT-B97-14 states, harvesting after each:
+    Patch — its three tab chips; Check — its three card chips; Builder — the
+    seven kind chips and ``Variables (n)``; Execution — Import… ×3, Run to the
+    pause."""
+    from tests.b97_fixtures import (
+        DEMO_A2L,
+        calib_hotfix,
+        import_lanes,
+        load_change_file,
+        load_flow,
+        open_check_editor,
+        open_flow_builder,
+        open_patch_editor,
+        run_lanes,
+    )
+
+    if screen_key == "patch":
+        panel = await open_patch_editor(app, pilot)
+        await load_change_file(app, pilot, panel, calib_hotfix(app.base_dir))
+        for tab in PATCH_TABS:
+            panel.query_one(f"#{tab}").press()
+            await settle(pilot, 3)
+            harvest()
+        # The save-back prompt and the before/after report row are offered
+        # after Apply (the D20 states of TC-B97-32's Patch arm).
+        panel.query_one("#patch_tab_json").press()
+        await settle(pilot, 2)
+        panel.query_one("#patch_doc_apply_button").press()
+        await settle(pilot, 6)
+        harvest()
+        panel.query_one("#patch_saveback_confirm_button").press()
+        await settle(pilot, 8)
+        harvest()
+    elif screen_key == "check_editor":
+        panel = await open_check_editor(app, pilot, a2l=DEMO_A2L)
+        for tab in CHECK_TABS:
+            panel.query_one(f"#{tab}").press()
+            await settle(pilot, 3)
+            harvest()
+    elif screen_key == "flow":
+        panel = await open_flow_builder(app, pilot)
+        await load_flow(app, pilot, "patch_chain")
+        panel.query_one("#flow_funnel_toggle").press()
+        await _poll(pilot, lambda: panel.query_one("#flow_funnel_editor").display)
+        for kind in FLOW_KINDS:
+            panel.query_one(f"#flow_palette_{kind}").press()
+            await _poll(pilot, lambda: str(panel.query_one("#flow_kind").value) == kind)
+            await settle(pilot, 2)
+            harvest()
+    else:
+        app.action_show_screen("flow_execution")
+        await settle(pilot, 2)
+        harvest()
+        panel = await import_lanes(app, pilot, *FX_THREE)
+        await run_lanes(app, pilot, panel, key=True)
+        await settle(pilot, 4)
+        harvest()
+
+
+@pytest.mark.parametrize("screen_key", ["patch", "check_editor", "flow", "flow_execution"])
+def test_at_b97_14_help_chip_opens_a_body_covering_the_screen(tmp_path: Path, screen_key: str) -> None:
+    """AT-B97-14 (US-138 / HLR-148, black-box): after each screen is driven
+    through its states, its ``?`` chip — clicked, then focused and pressed
+    with ``enter`` — opens the help modal; the modal body, read as painted,
+    parsed into ``label — effect`` lines covers every control label the
+    screen painted over those states (inputs included), with the control
+    guard 26 / 12 / 21 / 6.
+
+    RED on main (P-21): 6/19 · 0/6 · 2/13 · 0/4 covered.
+    """
+    from textual.widgets import Button, Input as _Input, Select as _Select
+
+    from tests.b97_fixtures import fx_project
+    from tests.b97_probes import painted_rows
+
+    screen_ids = {"patch": "screen_patch", "check_editor": "screen_check_editor", "flow": "screen_flow", "flow_execution": "screen_flow_execution"}
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            fx_project(app)
+            screen = app.query_one(f"#{screen_ids[screen_key]}")
+            labels = {}
+
+            def harvest():
+                for widget in screen.query("*"):
+                    if not isinstance(widget, (Button, _Input, _Select)):
+                        continue
+                    if not widget.display or widget.region.width == 0:
+                        continue
+                    if any(not a.display for a in widget.ancestors if hasattr(a, "display")):
+                        continue
+                    labels.setdefault(widget, set()).update(_fx_label(screen, widget))
+
+            await _drive_states(app, pilot, screen_key, harvest)
+            bodies = []
+            chip_id = f"window_help_{screen_key}"
+            for how in ("click", "enter"):
+                chip = app.query_one(f"#{chip_id}")
+                if how == "click":
+                    await pilot.click(f"#{chip_id}")
+                else:
+                    chip.focus()
+                    await _poll(pilot, lambda: app.focused is chip and not chip.has_class("-active"), 120)
+                    await pilot.press("enter")
+                opened = await _poll(pilot, lambda: type(app.screen).__name__ == "WindowHelpScreen", 120)
+                if opened:
+                    await settle(pilot, 2)
+                    modal_text = "\n".join(
+                        str(w.render()) for w in app.screen.query("Static") if w.display
+                    )
+                    bodies.append(modal_text)
+                    app.screen.dismiss()
+                    await _poll(pilot, lambda: type(app.screen).__name__ != "WindowHelpScreen")
+            return labels, bodies
+
+    labels, bodies = asyncio.run(_drive())
+    assert len(bodies) == 2, "the ? chip opens the help by click and by enter"
+    lines = {}
+    for raw in bodies[0].split("\n"):
+        text = raw.strip()
+        text = text.split(". ", 1)[1] if text[:1].isdigit() and ". " in text else text
+        if " — " in text:
+            label, effect = text.split(" — ", 1)
+            lines[label.strip()] = effect.strip()
+    controls = {label for names in labels.values() for label in names if label}
+    covered = [w for w, names in labels.items() if names and names <= set(lines)]
+    # D20: the guard counts control WIDGETS whose labels the body covers.
+    assert len(covered) >= HELP_GUARD[screen_key], (screen_key, len(covered), sorted(controls))
+    missing = sorted(controls - set(lines))
+    assert missing == [], f"{screen_key}: painted labels with no help line: {missing}"
+    assert bodies[0] == bodies[1]
+
+
+@pytest.mark.parametrize(
+    "arm", ["patch_missing_load", "check_write_dir", "check_write_readonly", "flow_refused", "fx_import_refused", "fx_nul_bind"]
+)
+def test_at_b97_23_each_failed_region_says_so_in_one_line(tmp_path: Path, arm: str) -> None:
+    """AT-B97-23 (US-138 / HLR-148, black-box): each region state of LLR-148.9
+    driven through its own control paints one English line and no traceback —
+    a Load of a missing change file (Patch ledger), Write .chk.json against a
+    staging directory and a read-only file (Check card, P-51), a refused flow
+    load (Builder pipeline), a refused import (Execution notice) and a NUL ref
+    bound and run (Execution log, naming ``MANIFEST-PATH-ESCAPE``).
+
+    RED on main (P-50): the ``nul_bind`` run raises ``ValueError`` at
+    ``variant_execution_service.py:273``; the Builder empty pipeline has no
+    line.
+    """
+    import os
+
+    from textual import events
+
+    from tests.b97_fixtures import (
+        DEMO_A2L,
+        ES_MARKER_RE,
+        fx_project,
+        import_flow,
+        import_lanes,
+        load_change_file,
+        load_flow,
+        nul_flow,
+        open_check_editor,
+        open_flow_builder,
+        open_patch_editor,
+        run_lanes,
+        staging_block,
+    )
+    from tests.b97_probes import painted_rows
+
+    blocker = None
+    if arm.startswith("check_write_"):
+        blocker = staging_block(tmp_path, "spec.chk.json", "dir" if arm == "check_write_dir" else "readonly")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            if arm == "patch_missing_load":
+                panel = await open_patch_editor(app, pilot)
+                await load_change_file(app, pilot, panel, tmp_path / "missing.json")
+                return painted_rows(app, panel.query_one("#patch_doc_empty_state"))
+            if arm.startswith("check_write_"):
+                panel = await open_check_editor(app, pilot, a2l=DEMO_A2L)
+                panel.query_one("#check_write_button").press()
+                await settle(pilot, 6)
+                return painted_rows(app, panel.query_one("#check_status"))
+            project_dir = fx_project(app)
+            nul_flow(project_dir)
+            if arm == "flow_refused":
+                panel = await open_flow_builder(app, pilot)
+                await load_flow(app, pilot, "nul_flow")
+                scroll = panel.query_one("#flow_pipeline_scroll")
+                await _poll(pilot, lambda: "refused" in "".join(painted_rows(app, scroll)))
+                return [r for r in painted_rows(app, scroll) if "refused" in r]
+            panel = await import_lanes(app, pilot, "patch_chain")
+            if arm == "fx_import_refused":
+                await import_flow(app, pilot, "nul_flow")
+                return painted_rows(app, panel.query_one("#fx_notice"))
+            field = panel.query_one("#fx_in_0_0")
+            field.focus()
+            field.value = ""
+            await _poll(pilot, lambda: app.focused is field)
+            field.post_message(events.Paste("base\x00.s19"))
+            await _poll(pilot, lambda: "\x00" in field.value)
+            panel.query_one("#fx_bind_0_0").press()
+            await settle(pilot, 2)
+            await run_lanes(app, pilot, panel)
+            await settle(pilot, 4)
+            return [r for r in painted_rows(app, panel.query_one("#fx_log")) if "✗" in r]
+
+    escaped = None
+    try:
+        rows = [r.strip() for r in asyncio.run(_drive()) if r.strip()]
+    except Exception as exc:  # noqa: BLE001 - the main-RED arm: the raise escapes
+        escaped, rows = exc, []
+    finally:
+        if blocker is not None and blocker.is_file():
+            os.chmod(blocker, 0o666)
+    assert escaped is None, f"{arm}: the failure escaped as {escaped!r}"
+    assert len(rows) == 1, (arm, rows)
+    assert not ES_MARKER_RE.search(rows[0]) and "Traceback" not in rows[0], rows[0]
+    if arm == "fx_nul_bind":
+        assert "MANIFEST-PATH-ESCAPE" in rows[0], rows[0]

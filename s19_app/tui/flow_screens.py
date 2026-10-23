@@ -19,12 +19,12 @@ upstream block of the CURRENT flow) or a project-relative file, with ≥1 input
 from this flow enforced at wiring time (HLR-014); SOURCE blocks render as file
 chips dropping onto the next block's image row.
 
-fx_a doctrine (``flow_bench.NOTES.md``: per-chain carriles + the RUN LOG
-strip — the operator's suggestion #1, mid-chain failure visible inline):
-imported templates mount one lane per chain, side by side; each lane paints
-its pinned inputs, a shaded ``▓/░`` progress bar and a status glyph
-(``▶✗✓``); the run-log strip below names a failed chain's block and its
-missing config on one inline ``✗`` line. The panel is presentational — Run
+fx_A doctrine (batch-97 Inc-6, HLR-147; batch-94 fx_a before it): imported
+templates mount one lane per chain, stacked; each lane is one row of block
+cards whose cables carry each block's run status (``▓ ░ ✗ ◇ □``), the SOURCE
+card holding its rebind input; the run-log strip below names a failed
+chain's block and its missing config on one inline ``✗`` line, and a lane
+waiting for a human shows its pending lines and Confirm. The panel is presentational — Run
 posts the lane payloads to the app, the app runs the service's chain-set
 runner and hands the record back for painting; Save Set / Load Set post the
 same way. Every file-derived string renders through ``safe_text`` (C-17).
@@ -44,11 +44,13 @@ serialize/validate, no execution semantics.
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 from rich.text import Text
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import (
@@ -58,6 +60,7 @@ from textual.containers import (
     Vertical,
     VerticalScroll,
 )
+from textual.css.query import NoMatches
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import (
@@ -80,6 +83,7 @@ from .insight_style import (
     RED,
     VALUE,
     DEPTH_BORDER,
+    WAITING_HUMAN,
     YELLOW,
 )
 from .os_clipboard_input import OsClipboardInput
@@ -844,7 +848,9 @@ def pipeline_text(blocks: Sequence[FlowBlock], card_w: int, spare: int = 0) -> T
 RIBBON_NO_SESSION = "(no active project)"
 
 
-def ribbon_text(name: str, dirty: bool, kinds: Sequence[str], session: str, width: int) -> Text:
+def ribbon_text(
+    name: str, dirty: bool, kinds: Sequence[str], session: str, width: int, *, prefix: str = "Flow: "
+) -> Text:
     """The identity ribbon, ``width`` cells (LLR-146.11).
 
     Args:
@@ -853,6 +859,8 @@ def ribbon_text(name: str, dirty: bool, kinds: Sequence[str], session: str, widt
         kinds (Sequence[str]): The chain's block kinds, in order.
         session (str): The session directory, ``""`` with no project.
         width (int): The ribbon's measured content width.
+        prefix (str): The identity label — ``Flow: `` on the Builder,
+            ``Set: `` on Flow Execution (batch-97 Inc-6, LLR-147.4).
 
     Returns:
         Text: ``Flow: <name>  · saved|· unsaved  LOAD → PATCH …`` and,
@@ -873,7 +881,8 @@ def ribbon_text(name: str, dirty: bool, kinds: Sequence[str], session: str, widt
         Uses:
             - ``clip_head`` / ``clip_tail``, ``_KIND_LOOK``, ``safe_text``
         Used by:
-            - ``FlowBuilderPanel._name_strip_text``
+            - ``FlowBuilderPanel._name_strip_text``,
+              ``FlowExecutionPanel._name_strip_text``
     """
     state, state_style = ("· unsaved", YELLOW) if dirty else ("· saved", DGRAY)
     path = safe_text(session).plain if session else ""
@@ -884,8 +893,8 @@ def ribbon_text(name: str, dirty: bool, kinds: Sequence[str], session: str, widt
         right.append(clip_tail(path, right_w - len("session ")), style=_S_OUT)
     else:
         right.append(clip_tail(RIBBON_NO_SESSION, right_w - len("session ")), style=_S_DIM)
-    left = Text("Flow: ")
-    room = max(4, width - right.cell_len - 2 - 6 - 2 - len(state))
+    left = Text(prefix)
+    room = max(4, width - right.cell_len - 2 - len(prefix) - 2 - len(state))
     left.append(clip_head(safe_text(name).plain, room), style="bold " + VALUE)
     left.append("  ")
     left.append(state, style=state_style)
@@ -931,7 +940,25 @@ def flow_legend_text(with_report: bool) -> Text:
     return text
 
 
-class KindChip(Button):
+class FlowChip(Button):
+    """A one-row chip of the two flow screens: ``enter`` (Button's own) and
+    ``space`` press it (batch-97 D13, PC-3). Every button the flow screens
+    compose is a ``FlowChip``, so ``space`` works the same on all of them with
+    no import edge to ``screens_directionb.TabChip``; CSS type selectors
+    (``Button``) match the subclass, so the paint is unchanged.
+
+    Dependencies:
+        Uses:
+            - ``textual.widgets.Button`` (``action_press``)
+        Used by:
+            - ``FlowBuilderPanel.compose``, ``FlowExecutionPanel`` (header
+              rows, Bind, Confirm), ``KindChip``, ``ModeToggle``
+    """
+
+    BINDINGS = [Binding("space", "press", "Press", show=False)]
+
+
+class KindChip(FlowChip):
     """A one-row block-kind chip: ``enter`` (Button's own) and ``space`` set
     the kind (LLR-146.13). Declared here, not reused from
     ``screens_directionb.TabChip``, so ``flow_screens`` gains no import edge.
@@ -943,12 +970,91 @@ class KindChip(Button):
 
     Dependencies:
         Uses:
-            - ``textual.widgets.Button`` (``action_press``)
+            - ``FlowChip`` (the ``space`` binding)
         Used by:
             - ``FlowBuilderPanel.compose`` (one per ``_KIND_OPTIONS`` kind)
     """
 
-    BINDINGS = [Binding("space", "press", "Press", show=False)]
+
+#: The run modes the toggle offers, in label order (LLR-019.1: sequential is
+#: the untouched default).
+FX_MODES: Tuple[str, str] = ("sequential", "parallel")
+
+
+class ModeToggle(FlowChip):
+    """Flow Execution's one-row run-mode control, ``sequential · parallel``
+    (batch-97 D13, LLR-147.4).
+
+    Summary:
+        A click selects the word under the pointer (it never toggles: a click
+        on the active word keeps it); ``enter`` / ``space`` toggle. The active
+        word paints in the ``mode-toggle--active`` component style, the other
+        word and the separator in ``DGRAY``. It posts no ``Button.Pressed``:
+        the panel reads :attr:`mode` when Run is pressed.
+
+    Data Flow:
+        - click → ``event.x`` → the word under it → :meth:`set_mode`.
+        - ``enter`` / ``space`` → ``action_press`` → :meth:`press` → toggle.
+
+    Dependencies:
+        Uses:
+            - ``FlowChip``
+        Used by:
+            - ``FlowExecutionPanel.compose`` (``#fx_mode``) and its ``mode``
+    """
+
+    COMPONENT_CLASSES = {"mode-toggle--active"}
+
+    #: The last cell of ``sequential`` and the first of ``parallel`` in widget
+    #: coordinates (Button's 1-cell line pad at x 0): ``sequential`` 1–10,
+    #: `` · `` 11–13, ``parallel`` 14–21.
+    _SEQUENTIAL_LAST_X = 10
+    _PARALLEL_FIRST_X = 14
+
+    def __init__(self, *, id: Optional[str] = None, mode: str = FX_MODES[0]) -> None:
+        self.mode = mode
+        super().__init__(self._label_text(None), id=id)
+
+    def _label_text(self, active_style) -> Text:
+        text = Text()
+        for index, word in enumerate(FX_MODES):
+            if index:
+                text.append(" · ", style=DGRAY)
+            if word == self.mode:
+                text.append(word, style=active_style or "bold")
+            else:
+                text.append(word, style=DGRAY)
+        return text
+
+    def _repaint(self) -> None:
+        style = self.get_component_rich_style("mode-toggle--active") if self.is_mounted else None
+        self.label = self._label_text(style)
+
+    def on_mount(self) -> None:
+        self._repaint()
+
+    def set_mode(self, mode: str) -> None:
+        """Select ``mode`` (one of :data:`FX_MODES`) and repaint."""
+        if mode in FX_MODES and mode != self.mode:
+            self.mode = mode
+            self._repaint()
+
+    def press(self) -> "ModeToggle":
+        """``enter`` / ``space``: toggle the mode; no ``Button.Pressed``."""
+        if self.disabled or not self.display:
+            return self
+        self.set_mode(FX_MODES[1] if self.mode == FX_MODES[0] else FX_MODES[0])
+        return self
+
+    async def _on_click(self, event: events.Click) -> None:
+        event.stop()
+        event.prevent_default()
+        if self.disabled:
+            return
+        if event.x <= self._SEQUENTIAL_LAST_X:
+            self.set_mode(FX_MODES[0])
+        elif event.x >= self._PARALLEL_FIRST_X:
+            self.set_mode(FX_MODES[1])
 
 
 class FlowBuilderPanel(ScrollableContainer):
@@ -1169,29 +1275,29 @@ class FlowBuilderPanel(ScrollableContainer):
                         id="flow_ext_output",
                         compact=True,
                     )
-            yield Button("+ Add", id="flow_add")
+            yield FlowChip("+ Add", id="flow_add")
         with Horizontal(id="flow_clip_row"):
             yield Label("copy block #", classes="flow-field-label")
             yield OsClipboardInput(placeholder="last", id="flow_pick", compact=True)
-            yield Button("Copy", id="flow_copy")
-            yield Button("Paste", id="flow_paste")
+            yield FlowChip("Copy", id="flow_copy")
+            yield FlowChip("Paste", id="flow_paste")
             yield Static("", id="flow_clip_status", markup=False)
-            yield Button("Variables (0)", id="flow_funnel_toggle")
+            yield FlowChip("Variables (0)", id="flow_funnel_toggle")
         with Horizontal(id="flow_funnel_editor"):
             yield Label("variable", classes="flow-field-label")
             yield OsClipboardInput(placeholder="NAME [A-Z0-9_]", id="flow_funnel_name", compact=True)
             yield Label("value", classes="flow-field-label")
             yield OsClipboardInput(placeholder="the value to substitute", id="flow_funnel_value", compact=True)
-            yield Button("+ Add var", id="flow_funnel_add")
+            yield FlowChip("+ Add var", id="flow_funnel_add")
         yield Static("", id="flow_funnel_list", markup=False)
         yield Static("", id="flow_wiring_notice", markup=False)
         #: Kept mounted, never displayed: the session rides the ribbon now.
         yield Static(f"session: {RIBBON_NO_SESSION}", id="flow_ext_session", markup=False)
         with Horizontal(id="flow_run_row"):
-            yield Button("Run", id="flow_run", classes="fill-accent")
-            yield Button("Clear", id="flow_clear")
-            yield Button("Save…", id="flow_save")
-            yield Button("Load…", id="flow_load")
+            yield FlowChip("Run", id="flow_run", classes="fill-accent")
+            yield FlowChip("Clear", id="flow_clear")
+            yield FlowChip("Save…", id="flow_save")
+            yield FlowChip("Load…", id="flow_load")
         yield VerticalScroll(id="flow_result")
         yield Static(
             flow_legend_text(False),
@@ -2268,38 +2374,168 @@ class FlowBuilderPanel(ScrollableContainer):
 
 
 # ---------------------------------------------------------------------------
-# fx_a — Flow Execution (batch-94 Inc-003, US-007; HLR-017…021): per-chain
-# lanes + shaded progress + status glyph + the RUN LOG strip with the inline
-# ✗ naming the block and the missing config (the operator's suggestion #1).
+# Flow Execution (batch-94 Inc-003 fx_a; batch-97 Inc-6 fx_A, HLR-147): one
+# pipeline per lane, stacked; each cable carries its block's run status from
+# the retained record; a waiting lane shows its pending lines, its Confirm and
+# the REQUIRED line; the run log and the legend close the panel.
 # ---------------------------------------------------------------------------
 
-#: The painted lane width. Two lanes at 46 cells (44 + frame) sit inside the
-#: measured 96×18 workspace at 120×30 (A3's boxed budget); the 74-cell floor
-#: at 80×24 scrolls horizontally inside ``#fx_lanes_scroll`` (LLR-017.2's
-#: reachable-under-scroll fallback — 74×12 cannot host two full lanes).
-_FX_LANE_W = 44
-
-#: The shaded progress bar's cell budget (fx_a doctrine: ▓ done / □ queued —
-#: the state carrier, never decoration).
-_FX_BAR_CELLS = 14
-_FX_BAR_DONE = "▓"
-_FX_BAR_GAP = "░"
-
-#: The pause shade (prototype v3) — bold YELLOW, the same hex as the
-#: ``.sev-warning`` class (insight_style is the token's home).
-_S_PAUSE = "bold " + YELLOW
-
-#: Terminal status → (glyph, shade style). Enum-derived, never file-derived
-#: (correctly outside the C-17 sweep, like ``_FLOW_STATUS_BANNER``).
-_FX_STATUS_STYLE = {
-    "": ("·", _S_DIM),
-    FLOW_STATUS_OK: ("✓", _S_OUT),
-    FLOW_STATUS_ISSUES: ("◈", _S_LABEL),
-    FLOW_STATUS_ERROR: ("✗", _S_ERR),
-    # prototype v3 (spec "paso externo"): the PAUSED pair — □ (a queued chain
-    # cell, the fx_a ▓/□ doctrine) in bold yellow (the .sev-warning hex).
-    FLOW_STATUS_PAUSED: ("□", _S_PAUSE),
+#: The cable vocabulary (D7, LLR-147.1): the mark painted on the cable after
+#: block *j*, the lane head's worst-status mark (LLR-147.12) and the run log's
+#: terminal marks. One meaning per glyph; the legend is generated from it.
+FX_CABLE_GLYPHS: Mapping[str, str] = {
+    "▓": "done",
+    "░": "not run / skipped",
+    "✗": "error",
+    "◇": "notices",
+    "□": "waiting for a human",
 }
+
+#: Heads the two red pending lines and the reload notice (D7 (a)): owed by
+#: the engineer before the lane can go on. Not in the cable vocabulary.
+FX_PENDING_GLYPH = "▪"
+
+#: A ``c`` press confirms the attention lane only once its attention class
+#: has been painted this long (LLR-147.13, D15).
+CONFIRM_DWELL_S = 0.5
+
+#: The cells every lane keeps right of its cards for Confirm (D24, PC-4): a
+#: 1-cell gap + the 9-cell ``Confirm`` chip (7 + the chip's two line pads),
+#: taken whether or not a lane waits, so no card moves when one starts.
+CONFIRM_RESERVE = 10
+
+#: The run log paints at most this many lines (LLR-147.8); the chain-set
+#: report keeps every line.
+FX_LOG_MAX_ROWS = 8
+
+#: An error line is clipped to this many cells (LLR-148.9, D14 (4)).
+FX_ERROR_LINE_MAX = 160
+
+#: The dwell clock seam (D15): tests may monkeypatch it (the ``_json_clock``
+#: idiom of the Patch Editor).
+_fx_clock = time.monotonic
+
+_S_WAIT = WAITING_HUMAN
+
+#: Lane (flow) status → (mark, lane status word, colour): the lane head's
+#: worst-status mark and the run log's terminal mark, on the cable vocabulary
+#: (D7 (b), PC-2). Enum-derived, never file-derived.
+_FX_STATUS_STYLE: Mapping[str, Tuple[str, str, str]] = {
+    "": ("░", "not run", _S_DIM),
+    FLOW_STATUS_OK: ("▓", "done", GREEN),
+    FLOW_STATUS_ISSUES: ("◇", "done with notices", YELLOW),
+    FLOW_STATUS_ERROR: ("✗", "failed", RED),
+    FLOW_STATUS_PAUSED: ("□", "waiting for a human", _S_WAIT),
+}
+
+#: Block status → (mark, card status word, colour): each card's status line.
+_FX_BLOCK_STYLE: Mapping[Optional[str], Tuple[str, str, str]] = {
+    BLOCK_STATUS_OK: ("▓", "done", GREEN),
+    BLOCK_STATUS_NOTICES: ("◇", "notices", YELLOW),
+    BLOCK_STATUS_ERROR: ("✗", "error", RED),
+    BLOCK_STATUS_SKIPPED: ("░", "skipped", _S_DIM),
+    BLOCK_STATUS_WAITING: ("□", "waiting", _S_WAIT),
+    None: ("░", "not run", _S_DIM),
+}
+
+#: The card row (0 = the top border) that carries the cables and Confirm.
+_FX_OUT_ROW = 2
+
+
+def cable_glyph(status: Optional[str], next_status: Optional[str]) -> str:
+    """The mark on the cable after a block (LLR-147.1's truth table).
+
+    Args:
+        status (Optional[str]): Block *j*'s recorded status (``None``: no
+            record yet).
+        next_status (Optional[str]): Block *j+1*'s recorded status.
+
+    Returns:
+        str: ``□`` into a waiting block; otherwise ``▓`` ok, ``◇`` notices,
+        ``✗`` error, ``░`` skipped / waiting / no record.
+
+    Dependencies:
+        Used by:
+            - ``FlowExecutionPanel._cable_text`` / ``lane_paint_plain``
+    """
+    if next_status == BLOCK_STATUS_WAITING:
+        return "□"
+    return {
+        BLOCK_STATUS_OK: "▓",
+        BLOCK_STATUS_NOTICES: "◇",
+        BLOCK_STATUS_ERROR: "✗",
+    }.get(status, "░")
+
+
+class LaneLayout(NamedTuple):
+    """Flow Execution's derived widths (D24): one card width for every lane,
+    and the spare cells, one more on each of the first ``spare`` cables."""
+
+    card_w: int
+    spare: int = 0
+
+
+def lane_layout(viewport_w: int, n_max: int) -> LaneLayout:
+    """The card width once per set (D24, PC-4).
+
+    Args:
+        viewport_w (int): ``#fx_lanes_scroll``'s scrollable content width.
+        n_max (int): The largest block count over all lanes (1 with none).
+
+    Returns:
+        LaneLayout: ``pipeline_layout(viewport_w − CONFIRM_RESERVE, n_max)``,
+        the Builder's rule over the viewport minus the Confirm reserve —
+        applied to every lane, so card *k* starts at the same x in every lane.
+
+    Dependencies:
+        Uses:
+            - ``pipeline_layout``
+        Used by:
+            - ``FlowExecutionPanel._apply_layout``
+    """
+    card_w, spare = pipeline_layout(viewport_w - CONFIRM_RESERVE, max(1, n_max))
+    return LaneLayout(card_w, spare)
+
+
+def fx_run_error_line(exc: BaseException) -> str:
+    """One English line for a run that raised (D14 (4), LLR-148.9).
+
+    Args:
+        exc (BaseException): What the run raised.
+
+    Returns:
+        str: ``run failed - <Type>: <first line of the message>``, scrubbed
+        through ``safe_text`` and clipped to ``FX_ERROR_LINE_MAX`` cells —
+        never a traceback.
+
+    Dependencies:
+        Used by:
+            - ``S19TuiApp`` Run and confirm handlers (their ``except`` limbs)
+    """
+    message = str(exc).splitlines()[0] if str(exc) else ""
+    line = safe_text(f"run failed - {type(exc).__name__}: {message}").plain
+    return clip_head(line, FX_ERROR_LINE_MAX)
+
+
+def fx_legend_text() -> Text:
+    """The one-row Execution legend, generated from ``FX_CABLE_GLYPHS`` and
+    ``FX_PENDING_GLYPH`` (LLR-148.7); kind glyphs are named in the help."""
+    pairs = list(FX_CABLE_GLYPHS.items()) + [(FX_PENDING_GLYPH, "owed before the lane goes on")]
+    text = Text()
+    for index, (glyph, meaning) in enumerate(pairs):
+        if index:
+            text.append("  ")
+        text.append(glyph, style=VALUE)
+        text.append(f" {meaning}", style=_S_DIM)
+    return text
+
+
+#: Before the first run the log paints this one line (LLR-148.9, LLR-147.8).
+FX_LOG_EMPTY = "No run yet — Run executes every lane."
+#: The lanes area with no lanes (LLR-148.9).
+FX_LANES_EMPTY = "No chains yet — Import… adds a lane from a saved flow."
+#: Run pressed with no lanes (HLR-147 empty arm).
+FX_NO_LANES_RUN = "No chains to run — Import… adds a lane first."
 
 
 @dataclass(frozen=True)
@@ -2338,72 +2574,110 @@ class _FxLane:
     last_outputs: List[Path] = field(default_factory=list)
     last_status: str = ""
     last_elapsed: float = 0.0
+    #: When the lane's last outcome finished, on the set run's clock (the
+    #: head reads the same time as the log stamps, gate fold ux L2).
+    last_finished: float = 0.0
     fail_block: Optional[int] = None
     missing: List[str] = field(default_factory=list)
-    #: prototype v3: the external-step block index the chain is PAUSED at
-    #: (``None`` when not paused) — drives the pending log/output rows and
-    #: the confirm button.
+    #: The external-step block index the lane waits at (``None`` when not
+    #: waiting) — drives the pending lines and Confirm.
     paused_block: Optional[int] = None
-    #: The session artifact dir shown in the lane (spec v3: ALWAYS visible).
+    #: The session artifact dir (rides the ribbon since batch-97 Inc-6).
     session_dir: str = ""
+    #: The EXT-STEP blocks confirmed in the current wait sequence (I-7 (b)):
+    #: every one rides the next re-run, so a lane with two external steps
+    #: reaches its end (LED-…97.29).
+    confirmed: Tuple[int, ...] = ()
+    #: Block index → recorded status of the lane's last run (the cables).
+    block_status: Dict[int, str] = field(default_factory=dict)
 
 
 def _fx_stamp(seconds: float) -> str:
-    """``mm:ss.mmm`` — the fx_a run-log timestamp shape (the spike's form)."""
+    """``mm:ss.mmm`` — the run-log timestamp shape."""
     seconds = max(0.0, seconds)
     minutes = int(seconds // 60)
     return f"{minutes:02d}:{seconds % 60:06.3f}"
 
 
-def _fx_progress_bar(frac: float) -> Text:
-    """The shaded ▓/░ bar — ``frac`` of :data:`_FX_BAR_CELLS` cells filled."""
-    filled = max(0, min(_FX_BAR_CELLS, round(_FX_BAR_CELLS * max(0.0, min(1.0, frac)))))
-    return Text(_FX_BAR_DONE * filled + _FX_BAR_GAP * (_FX_BAR_CELLS - filled))
+def _fx_card_io(block: FlowBlock, inner: int) -> List[Tuple[str, str]]:
+    """The two io lines of a non-SOURCE card, each ``(text, style)`` clipped
+    at ``inner`` cells: refs and paths keep the tail, commands the head
+    (LLR-146.4's classes); file-derived text is scrubbed (C-17)."""
+
+    def scrub(value: str) -> str:
+        return safe_text(value).plain
+
+    if isinstance(block, PatchBlock):
+        lines = [(clip_tail(scrub(block.change_doc_ref), inner), VALUE), ("→ image", _S_DIM)]
+    elif isinstance(block, CheckBlock):
+        lines = [(clip_tail(scrub(block.check_doc_ref), inner), VALUE), (f"{block.gating} → image", _S_DIM)]
+    elif isinstance(block, CrcBlock):
+        lines = [(clip_tail(scrub(block.config_ref), inner), VALUE), ("→ image", _S_DIM)]
+    elif isinstance(block, WriteOutBlock):
+        lines = [(clip_tail(scrub(block.output_name), inner), VALUE), (f"fmt {block.fmt} → file", _S_DIM)]
+    elif isinstance(block, ExternalStepBlock):
+        lines = [
+            (clip_head(scrub(block.instruction), inner), VALUE),
+            ("→ " + clip_tail(scrub(block.output_path), max(1, inner - 2)), _S_DIM),
+        ]
+    elif isinstance(block, A2BBlock):
+        lines = [
+            ("A " + clip_tail(scrub(_binding_label(block.image_a)), max(1, inner - 2)), VALUE),
+            ("B " + clip_tail(scrub(_binding_label(block.image_b)), max(1, inner - 2)), VALUE),
+        ]
+    elif isinstance(block, ReportBlock):
+        lines = [("report marker", _S_DIM), ("", _S_DIM)]
+    else:
+        lines = [(scrub(block.kind), _S_DIM), ("", _S_DIM)]
+    return [(clip_head(text, inner), style) for text, style in lines]
+
+
+def _fx_kind_title(block: FlowBlock) -> Text:
+    """A card's border title: the kind glyph and label in the kind colour."""
+    glyph, label, colour, _does = _KIND_LOOK.get(block.kind, ("·", block.kind.upper(), DGRAY, ""))
+    return Text(f"{glyph} {label}", style="bold " + colour)
 
 
 class FlowExecutionPanel(ScrollableContainer):
-    """Rail-9 Flow Execution — the fx_a chain-set supervisor (batch-94 Inc-003).
+    """Rail Flow Execution — one pipeline per lane (batch-97 Inc-6, fx_A).
 
     Summary:
-        The HLR-017…021 surface: Import… mounts one lane per builder template
-        (side by side, LLR-017); each lane paints its pinned inputs and offers
-        per-input rebinding that touches exactly that lane's record
-        (LLR-018.1); Run dispatches the set through the app's chain-set
-        runner — sequential by default, parallel per chain on demand
-        (LLR-019) — and paints each lane's shaded progress + status glyph +
-        elapsed, plus the RUN LOG strip: one start and one terminal status
-        line per chain, and a failed chain's inline ``✗`` line naming the
-        block and its missing config (LLR-020.1). Save Set persists the whole
-        set (chains + bound inputs + recorded outputs) and Load Set restores
-        it for a re-run without re-binding (LLR-021). Presentational — every
-        control posts a message the app routes; every file-derived string
-        renders markup-safe via ``safe_text`` (C-17).
+        The HLR-017…021 surface re-composed for HLR-147: a ribbon (set
+        identity, saved state, session folder, Import…, the mode toggle,
+        Run) and a set row (name, Save Set, saved sets, Load Set); the lanes
+        stacked in ``#fx_lanes_scroll``, each a head line (worst-status mark,
+        chain, status, elapsed, blocks, written files), its pending lines
+        while it waits, and one row of block cards joined by cables that
+        carry each block's run status from the retained record (LLR-147.1);
+        the SOURCE card holds its rebind input and Bind (LLR-147.2); a
+        waiting lane shows Confirm after its last card and the REQUIRED line
+        names the attention lane (LLR-147.3); the run log (at most
+        ``FX_LOG_MAX_ROWS`` lines) and the legend close the panel. The panel
+        owns the attention state (I-7 (b)–(c)); ``c`` confirms the attention
+        lane after ``CONFIRM_DWELL_S`` (LLR-147.13); one run at a time
+        (D14). Presentational — every control posts a message the app
+        routes; every file-derived string renders through ``safe_text``.
 
     Data Flow:
-        - Import… → ``ImportRequested`` → app (template picker) →
-          :meth:`add_lane` / :meth:`render_import_refusal`.
+        - Import… → ``ImportRequested`` → app → :meth:`add_lane` /
+          :meth:`render_import_refusal`.
         - Run → ``RunRequested(lane_specs, mode, set_name)`` → app →
-          ``run_chain_set`` → :meth:`render_run` (lanes + run log).
-        - Save Set → ``SaveRequested`` → app persists → :meth:`mark_saved`.
-        - Load Set → ``LoadSetRequested`` → app restores →
-          :meth:`restore_set`.
+          ``run_chain_set`` → :meth:`render_run` / :meth:`render_run_error`.
+        - Confirm / ``c`` → :meth:`_post_confirm` → ``ExternalStepConfirmed``
+          → app (every :meth:`confirmed_blocks` confirmation) →
+          :meth:`apply_confirmed_run` / :meth:`render_confirm_error`.
+        - Save Set → ``SaveRequested`` → app → :meth:`mark_saved`.
+        - Load Set → ``LoadSetRequested`` → app → :meth:`begin_set_restore`
+          / :meth:`restore_lane` / :meth:`restore_set`.
 
     Dependencies:
         Uses:
             - ``flow_model`` (read-only dataclasses, the declared R8 edge)
-            - ``safe_text`` / the ``_Grid`` painter (markup-safe paint)
+            - ``safe_text``, ``clip_head`` / ``clip_tail``, ``lane_layout``
         Used by:
             - ``S19TuiApp._compose_screen_flow_execution`` + the
-              ``on_flow_execution_panel_*`` handlers
+              ``on_flow_execution_panel_*`` handlers, ``action_confirm_attention``
     """
-
-    #: The run-mode control options (label, mode token). ``sequential`` is
-    #: the untouched default (LLR-019.1); the operator drives ``parallel``
-    #: per run (the C-10 non-default arm).
-    _MODE_OPTIONS = [
-        ("Sequential (default)", "sequential"),
-        ("Parallel per chain", "parallel"),
-    ]
 
     class ImportRequested(Message):
         """The operator pressed Import… — the app opens the template picker."""
@@ -2450,14 +2724,15 @@ class FlowExecutionPanel(ScrollableContainer):
             self.stem = stem
 
     class ExternalStepConfirmed(Message):
-        """The operator confirmed a paused external step (spec v3).
+        """The operator confirmed a waiting external step.
 
-        Posted by the lane's confirm button; the app re-runs THAT lane with
-        the block's confirmation in the run context and hands the outcome
+        Posted by the one confirm path (:meth:`_post_confirm`: the lane's
+        Confirm or ``c``); the app re-runs THAT lane with every confirmed
+        block's confirmation (:meth:`confirmed_blocks`) and hands the outcome
         back via :meth:`apply_confirmed_run`.
 
         Args:
-            lane_index (int): The paused lane's position.
+            lane_index (int): The waiting lane's position.
             block_index (int): The external-step block's position in the
                 lane's flow.
         """
@@ -2472,94 +2747,110 @@ class FlowExecutionPanel(ScrollableContainer):
         self._lanes: List[_FxLane] = []
         #: The set's display name; identity is the FILENAME on save.
         self._set_name = "chain-set"
-        #: Unsaved-edits flag — glyph ● (dirty) / ✓ (saved), the C-10 idiom.
+        #: Unsaved-edits flag — the ribbon's ``· saved`` / ``· unsaved``.
         self._dirty = False
         self._last_record = None
-        #: The retained run-log Text (append target for a lane's confirm
-        #: re-run — prototype v3).
-        self._log_text = Text()
-        #: The session artifact dir (spec v3: ALWAYS visible in every lane).
+        #: The run log's lines (each a ``Text``); a confirm re-run appends.
+        self._log: List[Text] = []
+        #: The session artifact dir (the ribbon's right end).
         self._session_dir: str = ""
+        #: D21 / D24 layout state: the last layout key and its result.
+        self._layout_key: Optional[tuple] = None
+        self._layout = LaneLayout(CARD_MIN_W)
+        self._viewport_w = 0
+        self._lanes_version = 0
+        #: The attention state (I-7 (b)); ``_rearm_attention`` is its only
+        #: writer of the three attention fields.
+        self._attention: Optional[int] = None
+        self._attention_block: Optional[int] = None
+        self._attention_since: Optional[float] = None
+        #: The set run's earliest ``started_at`` (the log stamps' origin).
+        self._run_start: float = 0.0
+        #: D14: a run (set run or confirm re-run) is in flight.
+        self._in_flight = False
 
     def set_session_dir(self, path: str) -> None:
-        """Publish the session artifact dir (spec v3) and repaint the lanes."""
+        """Publish the session artifact dir; it rides the ribbon."""
         self._session_dir = path
-        for index in range(len(self._lanes)):
-            self._lanes[index].session_dir = path
-            self._repaint_lane(index)
+        for lane in self._lanes:
+            lane.session_dir = path
+        if self.is_mounted:
+            self._refresh_name_strip()
 
     # -- composition ---------------------------------------------------------
 
     def compose(self) -> ComposeResult:
-        yield Static(
-            self._name_strip_text(),
-            id="fx_name_strip",
-            markup=False,
-            classes=self._name_strip_class(),
-        )
+        with Horizontal(id="fx_ribbon"):
+            yield Static(
+                self._name_strip_text(),
+                id="fx_name_strip",
+                markup=False,
+                classes=self._name_strip_class(),
+            )
+            with Horizontal(id="fx_run_row"):
+                yield FlowChip("Import…", id="fx_import")
+                yield ModeToggle(id="fx_mode")
+                yield FlowChip("Run", id="fx_run", classes="fill-accent")
         yield Label(
-            "Flow Execution (fx_a): Import… adds a chain lane from a builder "
-            "template; bind each lane's inputs; Run (sequential default, "
-            "parallel per chain); Save Set persists chains + inputs + outputs.",
+            "Flow Execution: Import… adds a chain lane from a saved flow; bind "
+            "each lane's inputs; Run (sequential default, parallel per chain); "
+            "Save Set persists chains + inputs + outputs.",
             id="fx_help",
             markup=False,
         )
-        run_row = Horizontal(
-            Button("Import…", id="fx_import"),
-            Select(
-                self._MODE_OPTIONS,
-                value="sequential",
-                allow_blank=False,
-                id="fx_mode",
-            ),
-            Button("Run", id="fx_run", variant="primary"),
-            id="fx_run_row",
-        )
-        run_row.styles.height = 3
-        yield run_row
-        set_row = Horizontal(
-            OsClipboardInput(placeholder="set name", id="fx_set_name"),
-            Button("Save Set", id="fx_save"),
-            Select(
-                [("(no saved sets)", "")],
+        with Horizontal(id="fx_set_row"):
+            yield Label("set name", classes="fx-field-label")
+            yield OsClipboardInput(placeholder="set name", id="fx_set_name", compact=True)
+            yield FlowChip("Save Set", id="fx_save")
+            yield Label("saved sets", classes="fx-field-label")
+            yield Select(
+                [(Text("(no saved sets)"), "")],
                 value="",
                 allow_blank=False,
                 id="fx_set_select",
-            ),
-            Button("Load Set", id="fx_load"),
-            id="fx_set_row",
-        )
-        set_row.styles.height = 3
-        yield set_row
+                compact=True,
+            )
+            yield FlowChip("Load Set", id="fx_load")
         yield Static("", id="fx_notice", markup=False)
-        yield ScrollableContainer(
-            Horizontal(
-                Static(
-                    "(no chains — Import… adds a lane)",
-                    id="fx_empty",
-                    markup=False,
-                ),
-                id="fx_lanes",
-            ),
-            id="fx_lanes_scroll",
-        )
-        yield Static("", id="fx_log", markup=False)
+        with ScrollableContainer(id="fx_lanes_scroll"):
+            with Vertical(id="fx_lanes"):
+                yield Static(self._lanes_empty_text(), id="fx_empty", classes="nowrap-pipeline")
+        yield Static("", id="fx_required", markup=False, classes="nowrap-log")
+        yield Static(Text(FX_LOG_EMPTY, style=_S_DIM), id="fx_log", classes="nowrap-log")
+        yield Static(fx_legend_text(), id="fx_legend", classes="glyph-legend nowrap-legend")
 
     def on_mount(self) -> None:
         self.query_one("#fx_set_name", Input).value = self._set_name
+        self.query_one("#fx_help").display = False
+        self.query_one("#fx_required").display = False
+        self._show_notice("")
+        self._refresh_frame_title()
+        self.call_after_refresh(self._apply_layout)
 
-    # -- name strip (the C-10 dirty-guard idiom) -----------------------------
-
-    def _name_strip_text(self) -> Text:
-        glyph = "●" if self._dirty else "✓"
-        text = Text()
-        text.append("Set: ")
-        text.append(safe_text(self._set_name))
-        text.append(f"  {glyph}")
+    @staticmethod
+    def _lanes_empty_text() -> Text:
+        text = Text("No chains yet", style="bold " + VALUE)
+        text.append(" — ", style=_S_DIM)
+        text.append("Import…", style="bold " + HILITE)
+        text.append(" adds a lane from a saved flow.", style=_S_DIM)
         return text
 
+    def _refresh_frame_title(self) -> None:
+        count = len(self._lanes)
+        self.query_one("#fx_lanes_scroll").border_title = (
+            f"lanes · {count} chain{'' if count == 1 else 's'}"
+        )
+
+    # -- the ribbon (the C-10 dirty-guard idiom, a word since Inc-6) ---------
+
+    def _name_strip_text(self) -> Text:
+        """``Set: <name>  · saved|· unsaved`` and, right-aligned, the session
+        path's tail (LLR-147.4; the Builder's ``ribbon_text``)."""
+        width = self._layout_key[1] if self._layout_key else 60
+        return ribbon_text(self._set_name, self._dirty, (), self._session_dir, width, prefix="Set: ")
+
     def _name_strip_class(self) -> str:
-        return "flow-name-strip " + ("sev-warning" if self._dirty else "sev-neutral")
+        return "flow-name-strip nowrap-ribbon " + ("sev-warning" if self._dirty else "sev-neutral")
 
     def _refresh_name_strip(self) -> None:
         strip = self.query_one("#fx_name_strip", Static)
@@ -2576,11 +2867,16 @@ class FlowExecutionPanel(ScrollableContainer):
         self._dirty = False
         self.query_one("#fx_set_name", Input).value = stem
         self._refresh_name_strip()
-        self._show_notice(f"✓ saved flowsets/{stem}.json")
+        self._show_notice(f"saved flowsets/{stem}.json")
 
     @property
     def is_dirty(self) -> bool:
         return self._dirty
+
+    @property
+    def mode(self) -> str:
+        """The run mode the toggle shows (``sequential`` / ``parallel``)."""
+        return self.query_one("#fx_mode", ModeToggle).mode
 
     # -- lanes ---------------------------------------------------------------
 
@@ -2616,10 +2912,7 @@ class FlowExecutionPanel(ScrollableContainer):
             flow=flow,
             session_dir=self._session_dir,
         )
-        self._lanes.append(lane)
-        empty = self.query_one("#fx_empty", Static)
-        empty.display = False
-        self.query_one("#fx_lanes", Horizontal).mount(self._lane_widgets(lane))
+        self._mount_lane(lane)
         self._mark_dirty()
         return lane.name
 
@@ -2635,8 +2928,8 @@ class FlowExecutionPanel(ScrollableContainer):
         """Mount one lane from a reloaded set (LLR-021.2), notices included.
 
         ``missing`` carries the bound refs whose files are absent at reload
-        time — the LLR-021.2 moved-input arm paints a per-lane
-        provenance-mismatch notice instead of running silently stale.
+        time — the lane paints one ``▪ '<ref>' missing - re-bind`` line each
+        instead of running silently stale.
         """
         lane = _FxLane(
             name=name,
@@ -2648,44 +2941,93 @@ class FlowExecutionPanel(ScrollableContainer):
             missing=list(missing),
             session_dir=self._session_dir,
         )
-        self._lanes.append(lane)
-        self.query_one("#fx_empty", Static).display = False
-        self.query_one("#fx_lanes", Horizontal).mount(self._lane_widgets(lane))
+        self._mount_lane(lane)
 
-    def _lane_widgets(self, lane: _FxLane) -> Vertical:
-        index = len(self._lanes) - 1
-        children: List[Widget] = [
-            Static(
-                self._lane_paint(lane),
-                id=f"fx_lane_{index}_paint",
-                markup=False,
-            )
-        ]
-        for src_index in self._source_indices(lane.flow):
-            edit_row = Horizontal(
-                OsClipboardInput(
-                    placeholder=f"input {src_index + 1} ref",
-                    id=f"fx_in_{index}_{src_index}",
-                    value=self._effective_ref(lane, src_index),
-                ),
-                Button("Bind", id=f"fx_bind_{index}_{src_index}"),
-                id=f"fx_lane_{index}_edit_{src_index}",
-            )
-            edit_row.styles.height = 3
-            children.append(edit_row)
-        #: prototype v3: the confirm affordance for a PAUSED external step —
-        #: hidden until the lane's run pauses on one (spec v3 semantics: the
-        #: execution waits for the human until log + output are confirmed).
-        confirm = Button(
-            "✓ Confirmar paso externo",
-            id=f"fx_confirm_{index}",
-            variant="primary",
+    def _mount_lane(self, lane: _FxLane) -> None:
+        self._lanes.append(lane)
+        self._lanes_version += 1
+        self.query_one("#fx_empty", Static).display = False
+        self.query_one("#fx_lanes", Vertical).mount(self._lane_widgets(len(self._lanes) - 1))
+        self._refresh_frame_title()
+        self._rearm_attention()
+        self.call_after_refresh(self._apply_layout)
+
+    def _lane_height(self, index: int) -> int:
+        """Card height of lane ``index`` (D24): border 2 + its largest card.
+        Every card holds three content rows: the SOURCE input, its Bind row
+        and its status line, or two io lines and the status line."""
+        return 2 + (3 if self._lanes[index].flow.blocks else 1)
+
+    def _lane_widgets(self, index: int) -> Vertical:
+        """Build lane ``index`` fully painted at the current layout."""
+        lane = self._lanes[index]
+        card_w, spare = self._layout
+        height = self._lane_height(index)
+        head = Static(
+            self._lane_head_text(index),
+            id=f"fx_lane_{index}_head",
+            classes="fx-lane-head nowrap-pipeline",
         )
-        confirm.display = False
-        children.append(confirm)
-        lane_widget = Vertical(*children, id=f"fx_lane_{index}", classes="fx-lane")
-        lane_widget.styles.width = _FX_LANE_W + 2
-        return lane_widget
+        pending_lines = self._pending_lines(index)
+        pending = Static(
+            self._pending_text(pending_lines),
+            id=f"fx_lane_{index}_pending",
+            classes="fx-lane-pending nowrap-pipeline",
+        )
+        pending.display = bool(pending_lines)
+        row: List[Widget] = []
+        blocks = lane.flow.blocks
+        for j, block in enumerate(blocks):
+            row.append(self._card_widget(index, j, card_w, height))
+            if j < len(blocks) - 1:
+                cable_w = CABLE_W + (1 if j < spare else 0)
+                cable = Static(
+                    self._cable_text(index, j, cable_w),
+                    id=f"fx_cable_{index}_{j}",
+                    classes="fx-cable nowrap-pipeline",
+                )
+                cable.styles.width = cable_w
+                cable.styles.height = height
+                row.append(cable)
+        confirm = FlowChip("Confirm", id=f"fx_confirm_{index}", variant="primary", classes="fx-confirm")
+        confirm.display = lane.paused_block is not None
+        row.append(confirm)
+        lane_row = Horizontal(*row, id=f"fx_lane_{index}_row", classes="fx-lane-row")
+        lane_row.styles.height = height
+        return Vertical(head, pending, lane_row, id=f"fx_lane_{index}", classes="fx-lane")
+
+    def _card_widget(self, index: int, j: int, card_w: int, height: int) -> Vertical:
+        lane = self._lanes[index]
+        block = lane.flow.blocks[j]
+        inner = card_w - 4
+        children: List[Widget] = []
+        if isinstance(block, SourceBlock):
+            children.append(
+                Vertical(
+                    OsClipboardInput(
+                        placeholder="image file",
+                        id=f"fx_in_{index}_{j}",
+                        value=self._effective_ref(lane, j),
+                        compact=True,
+                    ),
+                    Horizontal(
+                        FlowChip("Bind", id=f"fx_bind_{index}_{j}"),
+                        Static(Text(f"fmt {block.file_type}", style=_S_DIM), classes="fx-card-note"),
+                        classes="fx-bind-row",
+                    ),
+                    id=f"fx_lane_{index}_edit_{j}",
+                    classes="fx-card-edit",
+                )
+            )
+        else:
+            children.append(Static(self._card_body_text(block, inner), classes="fx-card-body nowrap-pipeline"))
+        children.append(Static(self._card_status_text(index, j, inner), classes="fx-card-status nowrap-pipeline"))
+        card = Vertical(*children, id=f"fx_card_{index}_{j}", classes="fx-card")
+        card.border_title = _fx_kind_title(block)
+        card.styles.width = card_w
+        card.styles.height = height
+        card.set_class(self._is_waiting_block(index, j), "fx-waiting")
+        return card
 
     def _effective_ref(self, lane: _FxLane, src_index: int) -> str:
         if src_index in lane.bindings:
@@ -2693,116 +3035,139 @@ class FlowExecutionPanel(ScrollableContainer):
         block = lane.flow.blocks[src_index]
         return block.image_ref if isinstance(block, SourceBlock) else ""
 
-    def _lane_paint(self, lane: _FxLane) -> Text:
-        """Paint one lane box: name, template, block list, pinned inputs,
-        missing-input notices, the session dir (spec v3: ALWAYS), the paused
-        external-step pending rows, and the shaded status bar (fx_a density)."""
-        src_indices = self._source_indices(lane.flow)
-        kinds = " → ".join(block.kind for block in lane.flow.blocks)
-        ext_paused = (
-            lane.paused_block is not None
-            and lane.last_status == FLOW_STATUS_PAUSED
-        )
-        rows = (
-            2  # title + template/blocks lines
-            + max(1, len(src_indices))  # pinned inputs
-            + len(lane.missing)  # reload mismatch notices
-            + 1  # session dir (spec v3 — always)
-            + (2 if ext_paused else 0)  # pending LOG + SALIDA (spec v3)
-            + 1  # status bar
-        )
-        g = _Grid(_FX_LANE_W, rows + 2)
-        g.box(0, 0, _FX_LANE_W, rows + 2)
-        title = f"[ {safe_text(lane.name).plain} ]"
-        g.put(2, 0, title[: _FX_LANE_W - 4], _S_HEAD)
-        g.put(2, 1, f"tpl {safe_text(lane.template).plain}", _S_DIM)
-        g.put(
-            2 + len(lane.template) + 4,
-            1,
-            f"· {len(lane.flow.blocks)} blocks",
-            _S_DIM,
-        )
-        g.put(2, 2, safe_text(kinds).plain[: _FX_LANE_W - 4], _S_LABEL)
-        row = 3
-        for src_index in src_indices:
-            ref = self._effective_ref(lane, src_index)
-            g.put(2, row, f"in{src_index + 1}", _S_LABEL)
-            g.put(6, row, safe_text(ref).plain[: _FX_LANE_W - 8], _S_VALUE)
-            row += 1
-        for missing in lane.missing:
-            g.put(
-                2,
-                row,
-                ("⚠ '" + safe_text(missing).plain + "' missing — re-bind").replace(
-                    "—", "-"
-                )[: _FX_LANE_W - 4],
-                _S_ERR,
-            )
-            row += 1
-        #: The session artifact dir is ALWAYS painted (spec v3) — on confirm
-        #: the external step's output is copied INTO it.
-        session = lane.session_dir or "(sin proyecto activo)"
-        g.put(
-            2,
-            row,
-            f"sesión: {_short_ext(safe_text(session).plain, _FX_LANE_W - 12)}",
-            _S_DIM,
-        )
-        row += 1
-        if ext_paused:
-            #: The pending evidence rows — the ⚠ idiom of the missing-input
-            #: notices, in the error shade: the MANDATORY log and the output
-            #: file are still owed by the human.
-            block = lane.flow.blocks[lane.paused_block]
-            log_ref = getattr(block, "log_ref", "?")
-            g.put(
-                2,
-                row,
-                ("⚠ LOG '" + safe_text(log_ref).plain + "' pendiente").replace(
-                    "—", "-"
-                )[: _FX_LANE_W - 4],
-                _S_ERR,
-            )
-            row += 1
-            g.put(
-                2,
-                row,
-                "⚠ SALIDA sin confirmar - esperando humano"[: _FX_LANE_W - 4],
-                _S_ERR,
-            )
-            row += 1
-        glyph, style = _FX_STATUS_STYLE.get(lane.last_status, ("·", _S_DIM))
-        blocks = max(1, len(lane.flow.blocks))
-        if lane.last_status == FLOW_STATUS_OK:
-            frac = 1.0
-        elif lane.last_status and lane.fail_block is not None:
-            frac = lane.fail_block / blocks
-        elif lane.last_status:
-            frac = 1.0
-        else:
-            frac = 0.0
-        bar = _fx_progress_bar(frac)
-        g.put(2, row, bar.plain, style)
-        pct = round(100 * frac)
-        g.put(2 + _FX_BAR_CELLS + 1, row, f"{pct:>3d}%", _S_VALUE)
-        g.put(2 + _FX_BAR_CELLS + 6, row, glyph, style)
-        if lane.last_status == FLOW_STATUS_PAUSED:
-            #: A paused lane has no terminal elapsed — the state word rides
-            #: the elapsed seat (cols 24..41, 16 of 18 cells — fits).
-            g.put(2 + _FX_BAR_CELLS + 9, row, "ESPERANDO HUMANO", _S_LABEL)
-        elif lane.last_status:
-            g.put(
-                2 + _FX_BAR_CELLS + 9,
-                row,
-                f"{lane.last_elapsed:.3f}s",
-                _S_LABEL,
-            )
-        return _join_lines(g.lines())
+    # -- lane painters (pure over the lane state + the layout) ---------------
 
-    def _repaint_lane(self, lane_index: int) -> None:
-        self.query_one(f"#fx_lane_{lane_index}_paint", Static).update(
-            self._lane_paint(self._lanes[lane_index])
+    def _is_waiting_block(self, index: int, j: int) -> bool:
+        lane = self._lanes[index]
+        return lane.paused_block == j and lane.last_status == FLOW_STATUS_PAUSED
+
+    def _block_status(self, index: int, j: int) -> Optional[str]:
+        return self._lanes[index].block_status.get(j)
+
+    @staticmethod
+    def _card_body_text(block: FlowBlock, inner: int) -> Text:
+        text = Text()
+        for row, (line, style) in enumerate(_fx_card_io(block, inner)):
+            if row:
+                text.append("\n")
+            text.append(line, style=style)
+        return text
+
+    def _card_status_text(self, index: int, j: int, inner: int) -> Text:
+        mark, word, style = _FX_BLOCK_STYLE.get(self._block_status(index, j), _FX_BLOCK_STYLE[None])
+        return Text(clip_head(f"{mark} {word}", max(1, inner)), style=style)
+
+    def _cable_text(self, index: int, j: int, cable_w: int) -> Text:
+        mark = cable_glyph(self._block_status(index, j), self._block_status(index, j + 1))
+        text = Text("\n" * _FX_OUT_ROW)
+        if mark == "□":
+            text.append("─" * (cable_w - 3) + mark + "─▶", style="bold " + _S_WAIT)
+            return text
+        wire = _S_DIM if mark == "░" else _S_CABLE
+        _glyph, _word, colour = next(
+            (look for look in _FX_BLOCK_STYLE.values() if look[0] == mark), _FX_BLOCK_STYLE[None]
         )
+        text.append("─" * (cable_w - 3), style=wire)
+        text.append(mark, style="bold " + colour)
+        text.append("─▶", style=wire)
+        return text
+
+    def _lane_head_text(self, index: int) -> Text:
+        """``<mark> <chain> · <status> · <elapsed> · N blocks · wrote <names>``
+        (LLR-147.12: the worst-status mark reads at scroll 0)."""
+        lane = self._lanes[index]
+        mark, word, colour = _FX_STATUS_STYLE.get(lane.last_status, _FX_STATUS_STYLE[""])
+        text = Text(mark, style="bold " + colour)
+        text.append(" ")
+        text.append(safe_text(lane.name).plain, style="bold " + VALUE)
+        text.append(" · ", style=_S_DIM)
+        waiting = lane.last_status == FLOW_STATUS_PAUSED and lane.paused_block is not None
+        text.append(word + (f" at #{lane.paused_block + 1}" if waiting else ""), style=colour)
+        if lane.last_status and not waiting:
+            text.append(f" · {_fx_stamp(lane.last_finished - self._run_start)}", style=_S_DIM)
+        count = len(lane.flow.blocks)
+        text.append(f" · {count} block{'' if count == 1 else 's'}", style=_S_DIM)
+        if lane.template != lane.name:
+            text.append(f" · tpl {safe_text(lane.template).plain}", style=_S_DIM)
+        if lane.last_outputs:
+            text.append(" · wrote ", style=_S_DIM)
+            text.append(safe_text(", ".join(path.name for path in lane.last_outputs)).plain, style=_S_OUT)
+        width = self._viewport_w
+        if width > 8 and text.cell_len > width:
+            text.truncate(width, overflow="ellipsis")
+        return text
+
+    def _pending_lines(self, index: int) -> List[str]:
+        """The lane's red lines: one per missing reload input, then the two
+        pending lines while it waits (LLR-147.3; the leading glyph is
+        ``FX_PENDING_GLYPH``, outside the cable vocabulary)."""
+        lane = self._lanes[index]
+        width = self._viewport_w or 104
+        lines = []
+        for missing in lane.missing:
+            ref = safe_text(missing).plain
+            room = max(8, width - len(f"{FX_PENDING_GLYPH} '' missing - re-bind"))
+            lines.append(f"{FX_PENDING_GLYPH} '{clip_tail(ref, room)}' missing - re-bind")
+        if lane.paused_block is not None and self._is_waiting_block(index, lane.paused_block):
+            block = lane.flow.blocks[lane.paused_block]
+            ref = safe_text(getattr(block, "log_ref", "?")).plain
+            room = max(8, width - len(f"{FX_PENDING_GLYPH} log '' pending"))
+            lines.append(f"{FX_PENDING_GLYPH} log '{clip_tail(ref, room)}' pending")
+            lines.append(f"{FX_PENDING_GLYPH} output file not confirmed — waiting for a human")
+        return [clip_head(line, width) for line in lines]
+
+    @staticmethod
+    def _pending_text(lines: Sequence[str]) -> Text:
+        text = Text()
+        for row, line in enumerate(lines):
+            if row:
+                text.append("\n")
+            text.append(line, style=RED)
+        return text
+
+    def _repaint_lane(self, index: int) -> bool:
+        """Repaint lane ``index``'s head, pending lines, cards, cables and
+        Confirm from its state at the current layout (D21 item 4).
+
+        Returns:
+            bool: ``False`` while the lane's widgets are not composed yet (a
+            lane mounted this tick), so the layout pass runs again.
+        """
+        try:
+            lane_widget = self.query_one(f"#fx_lane_{index}", Vertical)
+            lane_widget.query_one(f"#fx_confirm_{index}")
+        except NoMatches:
+            return False
+        if len(lane_widget.query(".fx-card-status")) != len(self._lanes[index].flow.blocks):
+            return False
+        lane = self._lanes[index]
+        card_w, spare = self._layout
+        height = self._lane_height(index)
+        inner = card_w - 4
+        lane_widget.query_one(f"#fx_lane_{index}_head", Static).update(self._lane_head_text(index))
+        pending_lines = self._pending_lines(index)
+        pending = lane_widget.query_one(f"#fx_lane_{index}_pending", Static)
+        pending.update(self._pending_text(pending_lines))
+        pending.display = bool(pending_lines)
+        lane_widget.query_one(f"#fx_lane_{index}_row").styles.height = height
+        blocks = lane.flow.blocks
+        for j, block in enumerate(blocks):
+            card = lane_widget.query_one(f"#fx_card_{index}_{j}")
+            card.styles.width = card_w
+            card.styles.height = height
+            card.set_class(self._is_waiting_block(index, j), "fx-waiting")
+            for body in card.query(".fx-card-body"):
+                body.update(self._card_body_text(block, inner))
+            for status in card.query(".fx-card-status"):
+                status.update(self._card_status_text(index, j, inner))
+            if j < len(blocks) - 1:
+                cable_w = CABLE_W + (1 if j < spare else 0)
+                cable = lane_widget.query_one(f"#fx_cable_{index}_{j}", Static)
+                cable.styles.width = cable_w
+                cable.styles.height = height
+                cable.update(self._cable_text(index, j, cable_w))
+        lane_widget.query_one(f"#fx_confirm_{index}").display = lane.paused_block is not None
+        return True
 
     def lane_names(self) -> List[str]:
         return [lane.name for lane in self._lanes]
@@ -2840,6 +3205,49 @@ class FlowExecutionPanel(ScrollableContainer):
             for lane in self._lanes
         ]
 
+    def confirmed_blocks(self, lane_index: int) -> Tuple[int, ...]:
+        """The EXT-STEP blocks lane ``lane_index`` has confirmed in its current
+        wait sequence, the one just posted included (I-7 (a)); the app sends
+        a confirmation for each (LED-…97.29)."""
+        return tuple(self._lanes[lane_index].confirmed)
+
+    # -- the layout pass (D21, D24) ------------------------------------------
+
+    def on_resize(self) -> None:
+        self.call_after_refresh(self._apply_layout)
+
+    def on_show(self) -> None:
+        self.call_after_refresh(self._apply_layout)
+
+    def _apply_layout(self) -> None:
+        """Derive the card width once per set from the lanes viewport and
+        repaint every lane, the ribbon and the head / pending clips; an equal
+        reading repaints nothing."""
+        try:
+            scroll = self.query_one("#fx_lanes_scroll")
+            ribbon = self.query_one("#fx_name_strip").content_region.width
+        except NoMatches:
+            return
+        viewport = scroll.scrollable_content_region.width
+        if viewport <= 0 or ribbon <= 0:
+            return
+        n_max = max((len(lane.flow.blocks) for lane in self._lanes), default=1)
+        layout = lane_layout(viewport, n_max)
+        heights = tuple(self._lane_height(i) for i in range(len(self._lanes)))
+        key = (viewport, ribbon, layout, heights, self._lanes_version)
+        if key == self._layout_key:
+            return
+        self._layout_key = key
+        self._layout = layout
+        self._viewport_w = viewport
+        self._refresh_name_strip()
+        composed = [self._repaint_lane(index) for index in range(len(self._lanes))]
+        if not all(composed):
+            # A lane mounted this tick is not composed yet: derive again
+            # after the next refresh so its cards take this layout.
+            self._layout_key = None
+            self.call_after_refresh(self._apply_layout)
+
     # -- notices -------------------------------------------------------------
 
     def _show_notice(self, message: str) -> None:
@@ -2853,13 +3261,75 @@ class FlowExecutionPanel(ScrollableContainer):
             notice.display = False
 
     def render_import_refusal(self, stem: str, findings: List[ValidationIssue]) -> None:
-        """Paint a rejected template import — the current lanes are untouched."""
-        first = findings[0].message if findings else "unreadable template"
+        """Paint a rejected template import — the current lanes are untouched.
+        The line names the loader's code (``[FLOW-UNSAFE-REF] …``), as the
+        Builder's refusal does (LLR-148.9)."""
+        first = _coded(findings[0]) if findings else "unreadable template"
         self._show_notice(
             f"import refused: flows/{stem}.json — {first}"
         )
 
-    # -- run -----------------------------------------------------------------
+    # -- the run log ---------------------------------------------------------
+
+    def _paint_log(self) -> None:
+        """Paint the retained log, at most ``FX_LOG_MAX_ROWS`` lines: the
+        newest ``FX_LOG_MAX_ROWS − 1`` under one ``… <k> earlier lines`` line
+        when it holds more (LLR-147.8)."""
+        lines = list(self._log)
+        if not lines:
+            painted = [Text(FX_LOG_EMPTY, style=_S_DIM)]
+        elif len(lines) > FX_LOG_MAX_ROWS:
+            kept = lines[-(FX_LOG_MAX_ROWS - 1):]
+            earlier = len(lines) - len(kept)
+            painted = [Text(f"… {earlier} earlier lines — the full log is in the run report", style=_S_DIM)] + kept
+        else:
+            painted = lines
+        self.query_one("#fx_log", Static).update(_join_lines(painted))
+
+    def _log_lines(self, lane: _FxLane, outcome, rerun_block: Optional[int] = None) -> List[Text]:
+        """One start line and one terminal line for a lane's outcome — the one
+        composer of a set run and a confirm re-run (I-7 (e)). The stamps are
+        the time since the set run began; the start line carries no mark
+        (Q-B97-6a: ``▶`` is the cable arrowhead on this screen)."""
+        total = max(1, len(lane.flow.blocks))
+        chain = safe_text(outcome.chain)
+        start = Text(f"{_fx_stamp(outcome.started_at - self._run_start)} ")
+        start.append_text(chain)
+        if rerun_block is None:
+            start.append(" · started", style=_S_DIM)
+        else:
+            start.append(
+                f" · re-run after confirming the external step (block {rerun_block + 1}/{total})",
+                style=_S_DIM,
+            )
+        mark, _word, colour = _FX_STATUS_STYLE.get(outcome.status, _FX_STATUS_STYLE[""])
+        end = Text(f"{_fx_stamp(outcome.finished_at - self._run_start)} ")
+        end.append(f"{mark} ", style="bold " + colour)
+        end.append_text(safe_text(outcome.chain))
+        if outcome.status == FLOW_STATUS_ERROR:
+            index, kind, noun, ref = self._failure_detail(lane, outcome)
+            if noun:
+                end.append(
+                    f" · block {index + 1}/{total} {kind.upper()} — {noun} '{safe_text(ref).plain}' missing",
+                    style=_S_DIM,
+                )
+            else:
+                end.append(f" · block {index + 1}/{total} {kind.upper()} — {ref}", style=_S_DIM)
+            end.append(" · chain halted", style=_S_DIM)
+        elif outcome.status == FLOW_STATUS_PAUSED:
+            index = lane.paused_block if lane.paused_block is not None else 0
+            block = lane.flow.blocks[index]
+            end.append(
+                f" · WAITING FOR A HUMAN — external step (block {index + 1}/{total}) · log "
+                f"'{safe_text(getattr(block, 'log_ref', '?')).plain}' pending",
+                style=_S_DIM,
+            )
+        else:
+            end.append(" · done" if outcome.status == FLOW_STATUS_OK else " · done with notices", style=_S_DIM)
+            if outcome.written_paths:
+                names = ", ".join(path.name for path in outcome.written_paths)
+                end.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
+        return [start, end]
 
     def _failure_detail(
         self, lane: _FxLane, outcome
@@ -2877,6 +3347,14 @@ class FlowExecutionPanel(ScrollableContainer):
             block = lane.flow.blocks[index]
             noun, ref = _block_ref_noun(block)
             if block_result.summary.endswith("unresolved"):
+                # A refused ref names its code (``[MANIFEST-PATH-ESCAPE] …``,
+                # LLR-148.9); a missing file names the ref the lane read — a
+                # bound input, not the template's own ref.
+                coded = next((d for d in block_result.diagnostics if d.startswith("[")), None)
+                if coded is not None:
+                    return index, block.kind, "", safe_text(coded).plain
+                if isinstance(block, SourceBlock):
+                    ref = lane.bindings.get(index, ref)
                 return index, block.kind, noun, ref
             diagnostic = (
                 block_result.diagnostics[-1]
@@ -2886,156 +3364,128 @@ class FlowExecutionPanel(ScrollableContainer):
             return index, block.kind, "", safe_text(diagnostic).plain
         return 0, "?", "", "unknown failure"
 
+    # -- run -----------------------------------------------------------------
+
+    @staticmethod
+    def _take_outcome(lane: _FxLane, outcome) -> None:
+        """Read one outcome into the lane: status, elapsed, outputs, the
+        first error and the first waiting block (``fail_block`` = where the
+        chain stopped), and every block's status for the cables."""
+        lane.last_status = outcome.status
+        lane.last_elapsed = outcome.finished_at - outcome.started_at
+        lane.last_finished = outcome.finished_at
+        lane.last_outputs = list(outcome.written_paths)
+        lane.block_status = {result.index: result.status for result in outcome.block_results}
+        lane.fail_block = next(
+            (result.index for result in outcome.block_results if result.status == BLOCK_STATUS_ERROR),
+            None,
+        )
+        lane.paused_block = next(
+            (result.index for result in outcome.block_results if result.status == BLOCK_STATUS_WAITING),
+            None,
+        )
+        if lane.paused_block is not None:
+            lane.fail_block = lane.paused_block
+
     def render_run(self, record) -> None:
-        """Paint the lanes + the RUN LOG strip from the set run record.
+        """Paint the lanes + the run log from the set run record.
+
+        A new run starts every wait over: each lane's ``confirmed`` is
+        cleared and the attention is re-armed (its dwell restarts after the
+        repaint, I-7 (c)); Run and every Confirm are enabled again after the
+        paint (D14).
 
         Args:
             record (ChainSetRunRecord): The completed run — one outcome per
                 lane in lane order, the captured mode, and the report path.
         """
         self._last_record = record
-        run_start = min(
-            (outcome.started_at for outcome in record.outcomes), default=0.0
-        )
-        log = Text()
-        for lane_index, lane in enumerate(self._lanes):
-            outcome = record.outcomes[lane_index]
-            lane.last_status = outcome.status
-            lane.last_elapsed = outcome.finished_at - outcome.started_at
-            lane.last_outputs = list(outcome.written_paths)
-            lane.fail_block = next(
-                (
-                    block_result.index
-                    for block_result in outcome.block_results
-                    if block_result.status == BLOCK_STATUS_ERROR
-                ),
-                None,
-            )
-            #: prototype v3: a WAITING block result is a PAUSED external step
-            #: — the bar stops there (``fail_block`` is "where the chain
-            #: stopped", the pause seat) and the confirm button mounts.
-            lane.paused_block = next(
-                (
-                    block_result.index
-                    for block_result in outcome.block_results
-                    if block_result.status == BLOCK_STATUS_WAITING
-                ),
-                None,
-            )
-            if lane.paused_block is not None:
-                lane.fail_block = lane.paused_block
-            self._repaint_lane(lane_index)
-            try:
-                self.query_one(
-                    f"#fx_confirm_{lane_index}", Button
-                ).display = lane.paused_block is not None
-            except Exception:
-                pass  # lane widgets not mounted (pre-mount call) — no button
-
-            log.append(f"{_fx_stamp(outcome.started_at - run_start)} ")
-            log.append("▶ ", style=_S_LABEL)
-            log.append(safe_text(outcome.chain))
-            log.append(" · started\n", style=_S_DIM)
-            if outcome.status == FLOW_STATUS_ERROR:
-                index, kind, noun, ref = self._failure_detail(lane, outcome)
-                total = max(1, len(outcome.block_results))
-                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
-                log.append("✗ ", style=_S_ERR)
-                log.append(safe_text(outcome.chain))
-                if noun:
-                    log.append(
-                        f" · block {index + 1}/{total} {kind.upper()} — "
-                        f"{noun} '{safe_text(ref).plain}' missing",
-                        style=_S_DIM,
-                    )
-                else:
-                    log.append(
-                        f" · block {index + 1}/{total} {kind.upper()} — {ref}",
-                        style=_S_DIM,
-                    )
-                log.append(" · chain halted\n", style=_S_DIM)
-            elif outcome.status == FLOW_STATUS_PAUSED:
-                #: The paused chain's inline line — names the block and the
-                #: MANDATORY log still owed (the ✗-line idiom, □ shade).
-                index = lane.paused_block if lane.paused_block is not None else 0
-                total = max(1, len(outcome.block_results))
-                block = lane.flow.blocks[index]
-                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
-                log.append("□ ", style=_S_PAUSE)
-                log.append(safe_text(outcome.chain))
-                log.append(
-                    f" · ESPERANDO HUMANO — paso externo (block "
-                    f"{index + 1}/{total}) · LOG "
-                    f"'{safe_text(getattr(block, 'log_ref', '?')).plain}' "
-                    f"pendiente\n",
-                    style=_S_DIM,
-                )
-            else:
-                glyph, _ = _FX_STATUS_STYLE.get(outcome.status, ("·", _S_DIM))
-                log.append(f"{_fx_stamp(outcome.finished_at - run_start)} ")
-                log.append(f"{glyph} ", style=_S_LABEL)
-                log.append(safe_text(outcome.chain))
-                log.append(" · done", style=_S_DIM)
-                if outcome.written_paths:
-                    names = ", ".join(path.name for path in outcome.written_paths)
-                    log.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
-                log.append("\n")
+        self._run_start = min((outcome.started_at for outcome in record.outcomes), default=0.0)
+        lines: List[Text] = []
+        for index, lane in enumerate(self._lanes):
+            if index >= len(record.outcomes):
+                break
+            outcome = record.outcomes[index]
+            self._take_outcome(lane, outcome)
+            lane.confirmed = ()
+            lines.extend(self._log_lines(lane, outcome))
+            self._repaint_lane(index)
         for diagnostic in record.diagnostics:
-            log.append(safe_text(diagnostic))
-            log.append("\n")
-        self._log_text = log
-        self.query_one("#fx_log", Static).update(log)
+            lines.append(safe_text(diagnostic))
+        self._log = lines
+        self._paint_log()
         if record.outcomes:
             self._mark_dirty()
+        self._rearm_attention(restart=True)
+        self.call_after_refresh(self._enable_runs)
 
-    def apply_confirmed_run(self, lane_index: int, record) -> None:
-        """Paint ONE lane's re-run after an external-step confirmation (v3).
+    def apply_confirmed_run(self, lane_index: int, record) -> Optional[str]:
+        """Paint ONE lane's re-run after an external-step confirmation.
 
-        The lane keeps its identity; only the run outcome is replaced — the
-        confirm button hides again and the run-log strip gains the re-run's
-        start/terminal lines under the paused entry.
+        Derives the lane's state exactly as :meth:`render_run` does (I-7
+        (d)): a lane that waits again at its next external step shows that
+        wait and its Confirm; when the wait sequence ends its ``confirmed``
+        is cleared. The log gains the re-run's start and terminal lines; the
+        attention is re-armed and Run / Confirm are enabled after the paint.
+
+        Returns:
+            Optional[str]: When the re-run failed, one status line —
+            ``<chain> failed at block i/n — <reason>; Run re-runs the set.``
+            (gate fold ux M2) — else ``None``.
         """
         lane = self._lanes[lane_index]
+        confirmed_block = lane.paused_block
         outcome = record.outcomes[0]
-        lane.last_status = outcome.status
-        lane.last_elapsed = outcome.finished_at - outcome.started_at
-        lane.last_outputs = list(outcome.written_paths)
-        lane.fail_block = next(
-            (
-                block_result.index
-                for block_result in outcome.block_results
-                if block_result.status == BLOCK_STATUS_ERROR
-            ),
-            None,
-        )
-        lane.paused_block = None
+        self._take_outcome(lane, outcome)
+        if lane.paused_block is None:
+            lane.confirmed = ()
+        else:
+            lane.confirmed = tuple(b for b in lane.confirmed if b != lane.paused_block)
+        self._log.extend(self._log_lines(lane, outcome, rerun_block=confirmed_block))
+        self._paint_log()
         self._repaint_lane(lane_index)
-        try:
-            self.query_one(f"#fx_confirm_{lane_index}", Button).display = False
-        except Exception:
-            pass
-        log = self._log_text
-        log.append(f"{_fx_stamp(outcome.started_at)} ")
-        log.append("▶ ", style=_S_LABEL)
-        log.append(safe_text(outcome.chain))
-        log.append(" · re-run tras confirmar paso externo\n", style=_S_DIM)
-        glyph, _ = _FX_STATUS_STYLE.get(outcome.status, ("·", _S_DIM))
-        log.append(f"{_fx_stamp(outcome.finished_at)} ")
-        log.append(f"{glyph} ", style=_S_LABEL)
-        log.append(safe_text(outcome.chain))
-        log.append(" · done", style=_S_DIM)
-        if outcome.written_paths:
-            names = ", ".join(path.name for path in outcome.written_paths)
-            log.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
-        log.append("\n")
-        self.query_one("#fx_log", Static).update(log)
+        self._rearm_attention()
+        self.call_after_refresh(self._enable_runs)
+        if outcome.status != FLOW_STATUS_ERROR:
+            return None
+        index, _kind, noun, ref = self._failure_detail(lane, outcome)
+        reason = f"{noun} '{safe_text(ref).plain}' missing" if noun else ref
+        return (
+            f"{safe_text(lane.name).plain} failed at block {index + 1}/{len(lane.flow.blocks)} — "
+            f"{reason}; Run re-runs the set."
+        )
 
     def render_run_error(self, message: str) -> None:
-        """Paint a no-project run refusal into the log strip (the Run idiom)."""
-        log = Text()
-        log.append("✗ ", style=_S_ERR)
-        log.append(safe_text(message))
-        self.query_one("#fx_log", Static).update(log)
+        """Replace the log with one ``✗`` line (a refused or raised set run,
+        LLR-148.9) and enable Run again after the paint (D14)."""
+        line = Text("✗ ", style=_S_ERR)
+        line.append_text(safe_text(message))
+        self._log = [line]
+        self._paint_log()
+        self.call_after_refresh(self._enable_runs)
+
+    def render_confirm_error(self, lane_index: int, line: str) -> None:
+        """A confirm re-run that raised or was refused (D14 (4)): append
+        ``✗ <chain> · confirm re-run failed - <line>`` to the log, leave the
+        lane waiting at the same entry, unconfirmed (it can be confirmed
+        again), re-arm the attention and enable Run / Confirm after the
+        paint."""
+        if 0 <= lane_index < len(self._lanes):
+            lane = self._lanes[lane_index]
+            chain = safe_text(lane.name)
+            if lane.paused_block is not None:
+                lane.confirmed = tuple(b for b in lane.confirmed if b != lane.paused_block)
+            self._repaint_lane(lane_index)
+        else:
+            chain = Text(f"lane {lane_index + 1}")
+        entry = Text("✗ ", style=_S_ERR)
+        entry.append_text(chain)
+        entry.append(" · confirm re-run failed - ", style=_S_DIM)
+        entry.append_text(safe_text(line))
+        self._log.append(entry)
+        self._paint_log()
+        self._rearm_attention()
+        self.call_after_refresh(self._enable_runs)
 
     @property
     def last_run_record(self):
@@ -3047,16 +3497,232 @@ class FlowExecutionPanel(ScrollableContainer):
         return self.query_one("#fx_log", Static).render().plain
 
     def lane_paint_plain(self, lane_index: int) -> str:
-        """One lane's painted text (the C-32 painted oracle seam)."""
-        return self.query_one(f"#fx_lane_{lane_index}_paint", Static).render().plain
+        """One lane's painted text: its head, its pending lines while shown,
+        and its card rows — each card's border with its kind title, its io
+        lines (the SOURCE card: the input's value and ``Bind``) and its status
+        line, the cables between, and ``Confirm`` while displayed (the C-32
+        seam, I-7)."""
+        lane = self._lanes[lane_index]
+        card_w, spare = self._layout
+        inner = card_w - 4
+        height = self._lane_height(lane_index)
+        lines = [self._lane_head_text(lane_index).plain]
+        lines.extend(self._pending_lines(lane_index))
+        columns: List[List[str]] = []
+        blocks = lane.flow.blocks
+        for j, block in enumerate(blocks):
+            title = _fx_kind_title(block).plain
+            top = "╭" + clip_head(f"─ {title} ", card_w - 2).ljust(card_w - 2, "─") + "╮"
+            if isinstance(block, SourceBlock):
+                body = [
+                    clip_tail(safe_text(self._effective_ref(lane, j)).plain, inner),
+                    f"Bind fmt {block.file_type}",
+                ]
+            else:
+                body = [text for text, _style in _fx_card_io(block, inner)]
+            body.append(self._card_status_text(lane_index, j, inner).plain)
+            rows = [top] + ["│ " + clip_head(text, inner).ljust(inner) + " │" for text in body]
+            rows += ["│" + " " * (card_w - 2) + "│"] * (height - 2 - len(body))
+            rows.append("╰" + "─" * (card_w - 2) + "╯")
+            columns.append(rows)
+            if j < len(blocks) - 1:
+                cable_w = CABLE_W + (1 if j < spare else 0)
+                cable = self._cable_text(lane_index, j, cable_w).plain.split("\n")
+                columns.append([(cable[y] if y < len(cable) else "").ljust(cable_w) for y in range(height)])
+        if lane.paused_block is not None:
+            columns.append([" Confirm" if y == _FX_OUT_ROW else "" for y in range(height)])
+        for y in range(height):
+            lines.append("".join(column[y] for column in columns).rstrip())
+        return "\n".join(lines)
+
+    # -- the attention lane (I-7 (b)–(c), PC-21) -----------------------------
+
+    def _rearm_attention(self, restart: bool = False) -> None:
+        """Recompute the attention lane — the first lane, in lane order,
+        waiting at an entry it has not confirmed — and, when it moved, move
+        the ``fx-attention`` class to its Confirm, update the REQUIRED line,
+        bring its waiting card and Confirm into the lanes viewport and stamp
+        the dwell base after the paint. With no lane waiting, the lanes
+        return to horizontal scroll 0 so every head reads from its start
+        (gate fold ux M1), as far as a focused widget inside the lanes
+        allows. ``restart`` (a new set run, :meth:`render_run`) treats the
+        attention as new even when the same lane waits at the same block, so
+        its dwell restarts after the repaint. The only writer of
+        ``_attention``, ``_attention_block`` and ``_attention_since``, directly
+        or through its scheduled :meth:`_stamp_attention` (gate fold,
+        code-reviewer F1, F7)."""
+        if restart:
+            self._attention = None
+            self._attention_block = None
+        target = next(
+            (
+                (index, lane.paused_block)
+                for index, lane in enumerate(self._lanes)
+                if lane.paused_block is not None and lane.paused_block not in lane.confirmed
+            ),
+            None,
+        )
+        current = None if self._attention is None else (self._attention, self._attention_block)
+        if target == current and not restart:
+            return
+        for confirm in self.query(".fx-confirm"):
+            confirm.remove_class("fx-attention")
+        self._attention_since = None
+        required = self.query_one("#fx_required", Static)
+        if target is None:
+            self._attention = None
+            self._attention_block = None
+            required.update("")
+            required.display = False
+            self.call_after_refresh(self._scroll_lanes_home)
+            return
+        lane_index, block = target
+        self._attention, self._attention_block = lane_index, block
+        for confirm in self.query(f"#fx_confirm_{lane_index}"):
+            confirm.add_class("fx-attention")
+        line = Text("log + output file: REQUIRED for ", style="bold " + _S_WAIT)
+        line.append(safe_text(self._lanes[lane_index].name).plain, style="bold " + _S_WAIT)
+        line.append(" · press c to confirm", style="bold " + _S_WAIT)
+        required.update(line)
+        required.display = True
+        self.call_after_refresh(self._bring_attention_into_view, lane_index, block)
+        self.call_after_refresh(self._stamp_attention, lane_index, block)
+
+    def _scroll_lanes_home(self) -> None:
+        """No lane waits: scroll the lanes back to x 0, keeping a focused
+        widget inside the lanes in view (LLR-147.3's retained-focus rule)."""
+        if self._attention is not None:
+            return
+        try:
+            scroll = self.query_one("#fx_lanes_scroll")
+        except NoMatches:
+            return
+        dx = -int(scroll.scroll_x)
+        focused = self.app.focused
+        if focused is not None and scroll in focused.ancestors:
+            view = scroll.scrollable_content_region
+            dx = max(dx, focused.region.right - view.right)
+        if dx:
+            scroll.scroll_to(x=scroll.scroll_x + dx, animate=False, immediate=True)
+
+    def _stamp_attention(self, lane_index: int, block: int) -> None:
+        """The dwell base: taken once the attention class has been painted,
+        and only while ``(lane, block)`` is still the attention (H-X2)."""
+        if (self._attention, self._attention_block) == (lane_index, block) and self._attention_since is None:
+            self._attention_since = _fx_clock()
+
+    @staticmethod
+    def _scroll_delta(low: int, high: int, view_low: int, view_high: int) -> int:
+        """How far to scroll so ``[low, high)`` lies in ``[view_low,
+        view_high)``, never pushing ``low`` out to bring ``high`` in."""
+        if high > view_high:
+            return min(high - view_high, low - view_low)
+        if low < view_low:
+            return low - view_low
+        return 0
+
+    def _bring_attention_into_view(self, lane_index: int, block: int) -> None:
+        """Scroll ``#fx_lanes_scroll`` on both axes so the attention lane's
+        waiting card and its Confirm lie in the viewport; a focused widget
+        inside the lanes stays in view (LLR-147.3). The focus never moves."""
+        if (self._attention, self._attention_block) != (lane_index, block):
+            return
+        try:
+            scroll = self.query_one("#fx_lanes_scroll")
+            card = self.query_one(f"#fx_card_{lane_index}_{block}")
+            confirm = self.query_one(f"#fx_confirm_{lane_index}")
+        except NoMatches:
+            return
+        view = scroll.scrollable_content_region
+        target = card.region.union(confirm.region) if confirm.display else card.region
+        dx = self._scroll_delta(target.x, target.right, view.x, view.right)
+        dy = self._scroll_delta(target.y, target.bottom, view.y, view.bottom)
+        focused = self.app.focused
+        if focused is not None and scroll in focused.ancestors:
+            held = focused.region
+            dx = max(held.right - view.right, min(dx, held.x - view.x))
+            dy = max(held.bottom - view.bottom, min(dy, held.y - view.y))
+        if dx or dy:
+            scroll.scroll_to(scroll.scroll_x + dx, scroll.scroll_y + dy, animate=False, immediate=True)
+
+    def confirm_attention(self) -> str:
+        """The ``c`` key (LLR-147.13): confirm the attention lane's current
+        waiting entry once it has held the attention for ``CONFIRM_DWELL_S``.
+
+        Returns:
+            str: One line for the status line — I-9's three (the confirm line
+            superseded at the gate fold, ux M2: it says what happens next,
+            not an outcome nobody knows yet) plus the in-flight line
+            (code-reviewer F5).
+        """
+        if self._attention is None:
+            return "c: no lane is waiting for confirmation."
+        if self._in_flight:
+            return "c: a run is in progress — wait for it to finish."
+        lane_index = self._attention
+        lane = self._lanes[lane_index]
+        chain = safe_text(lane.name).plain
+        block = lane.paused_block
+        since = self._attention_since
+        if since is None or _fx_clock() - since < CONFIRM_DWELL_S or not self._post_confirm(lane_index):
+            return f"c ignored — {chain} started waiting a moment ago. Press c again to confirm."
+        return f"Confirmed {chain} — re-running from block {block + 1}/{len(lane.flow.blocks)}."
+
+    def _post_confirm(self, lane_index: int) -> bool:
+        """The one confirm path (Confirm button and ``c``): once per waiting
+        entry and never while a run is in flight; records the entry in the
+        lane's ``confirmed``, disables Run and every Confirm (D14 (1)), moves
+        the attention on and posts ``ExternalStepConfirmed``."""
+        if not 0 <= lane_index < len(self._lanes) or self._in_flight:
+            return False
+        lane = self._lanes[lane_index]
+        block = lane.paused_block
+        if block is None or block in lane.confirmed:
+            return False
+        lane.confirmed = lane.confirmed + (block,)
+        self._disable_runs()
+        self._rearm_attention()
+        self.post_message(self.ExternalStepConfirmed(lane_index, block))
+        return True
+
+    # -- one run at a time (D14) ---------------------------------------------
+
+    def _run_controls(self) -> List[Widget]:
+        controls: List[Widget] = [self.query_one("#fx_run")]
+        controls.extend(confirm for confirm in self.query(".fx-confirm") if confirm.display)
+        return controls
+
+    def _disable_runs(self) -> None:
+        """A run starts: Run and every displayed Confirm are disabled, so a
+        press or key queued during the synchronous run reaches a disabled
+        button and does nothing (P-44).
+
+        The flag is set without Textual's ``disabled`` watcher, which would
+        blur a focused button and hand the focus — and the queued key — to
+        its neighbour (Import… or the mode switch); the focus stays where it
+        was (LLR-147.3) and the disabled style is applied by
+        ``update_node_styles``.
+        """
+        self._in_flight = True
+        for control in self._run_controls():
+            control.set_reactive(Widget.disabled, True)
+            control.update_node_styles()
+
+    def _enable_runs(self) -> None:
+        """The run ended or raised: enable Run and every Confirm again."""
+        self._in_flight = False
+        self.query_one("#fx_run").disabled = False
+        for confirm in self.query(".fx-confirm"):
+            confirm.disabled = False
 
     # -- save / load set -----------------------------------------------------
 
     def set_available_sets(self, stems: Sequence[str]) -> None:
-        """Repopulate the set picker (the app's on-entry prefill)."""
-        options = [(f"flowsets/{stem}.json", stem) for stem in stems]
+        """Repopulate the set picker (the app's on-entry prefill); each option
+        renders literally (``safe_text``, LLR-147.6)."""
+        options = [(safe_text(f"flowsets/{stem}.json"), stem) for stem in stems]
         if not options:
-            options = [("(no saved sets)", "")]
+            options = [(Text("(no saved sets)"), "")]
         select = self.query_one("#fx_set_select", Select)
         select.set_options(options)
         select.value = stems[0] if stems else ""
@@ -3069,14 +3735,17 @@ class FlowExecutionPanel(ScrollableContainer):
         caller mounts the restored lanes — mounting into a half-removed tree
         would collide on the lane ids.
         """
-        await self.query_one("#fx_lanes", Horizontal).remove_children(".fx-lane")
+        await self.query_one("#fx_lanes", Vertical).remove_children(".fx-lane")
         self._lanes.clear()
-        empty = self.query_one("#fx_empty", Static)
-        empty.display = True
+        self._lanes_version += 1
+        self.query_one("#fx_empty", Static).display = True
         self._set_name = stem
         self._dirty = False
         self.query_one("#fx_set_name", Input).value = stem
         self._refresh_name_strip()
+        self._refresh_frame_title()
+        self._rearm_attention()
+        self.call_after_refresh(self._apply_layout)
 
     def restore_set(self, stem: str, lanes: int, notices: Sequence[str]) -> None:
         """Finish a successful set reload: identity + notices for what moved."""
@@ -3088,7 +3757,7 @@ class FlowExecutionPanel(ScrollableContainer):
 
     def render_set_refusal(self, stem: str, findings: List[ValidationIssue]) -> None:
         """Paint a rejected set load — the current lanes are untouched."""
-        first = findings[0].message if findings else "unreadable set"
+        first = _coded(findings[0]) if findings else "unreadable set"
         self._show_notice(f"load refused: flowsets/{stem}.json — {first}")
 
     # -- events --------------------------------------------------------------
@@ -3098,13 +3767,12 @@ class FlowExecutionPanel(ScrollableContainer):
         if button_id == "fx_import":
             self.post_message(self.ImportRequested())
         elif button_id == "fx_run":
-            self.post_message(
-                self.RunRequested(
-                    self.lane_specs(),
-                    str(self.query_one("#fx_mode", Select).value),
-                    self._set_name,
-                )
-            )
+            if not self._lanes:
+                self._log = [Text(FX_NO_LANES_RUN, style=_S_DIM)]
+                self._paint_log()
+                return
+            self._disable_runs()
+            self.post_message(self.RunRequested(self.lane_specs(), self.mode, self._set_name))
         elif button_id == "fx_save":
             self.post_message(
                 self.SaveRequested(
@@ -3120,21 +3788,17 @@ class FlowExecutionPanel(ScrollableContainer):
             parts = button_id.removeprefix("fx_bind_").split("_")
             self._rebind(int(parts[0]), int(parts[1]))
         elif button_id.startswith("fx_confirm_"):
-            #: prototype v3: confirm a paused external step — the app re-runs
-            #: that lane with the confirmation in the run context.
-            lane_index = int(button_id.removeprefix("fx_confirm_"))
-            lane = self._lanes[lane_index]
-            if lane.paused_block is None:
-                return
-            self.post_message(
-                self.ExternalStepConfirmed(lane_index, lane.paused_block)
-            )
+            # A press of a visible Confirm is deliberate: no dwell, but the
+            # same once-per-entry refusal and the D14 disable.
+            self._post_confirm(int(button_id.removeprefix("fx_confirm_")))
 
     def _rebind(self, lane_index: int, src_index: int) -> None:
         """Bind one lane's input — exactly that lane's record is written.
 
         LLR-018.1: an edit touches exactly one binding record; rebinding to
-        the same ref is a no-op (the writer does not even mark dirty).
+        the same ref is a no-op (the writer does not even mark dirty). A
+        successful bind clears the lane's confirmed entries (I-7 (c)): an
+        input changed, so the human's earlier outputs no longer apply.
         """
         lane = self._lanes[lane_index]
         value = self.query_one(f"#fx_in_{lane_index}_{src_index}", Input).value.strip()
@@ -3150,9 +3814,17 @@ class FlowExecutionPanel(ScrollableContainer):
         if value == self._effective_ref(lane, src_index):
             return
         lane.bindings[src_index] = value
+        lane.confirmed = ()
         self._repaint_lane(lane_index)
         self._show_notice("")
         self._mark_dirty()
+        self._rearm_attention()
+
+
+def _coded(finding: ValidationIssue) -> str:
+    """A loader finding as one line led by its code: ``[CODE] message``."""
+    code = getattr(finding, "code", "")
+    return f"[{code}] {finding.message}" if code else finding.message
 
 
 def _block_ref_noun(block: FlowBlock) -> Tuple[str, str]:

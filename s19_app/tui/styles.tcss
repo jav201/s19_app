@@ -3261,3 +3261,270 @@ ModalScreen {
     text-wrap: nowrap;
     text-overflow: ellipsis;
 }
+
+/* batch-97 flow_execution — one pipeline per lane (HLR-147, fx_A).
+ *
+ * ONE scoped section (D23): every selector below starts with `#fx_panel`,
+ * so nothing here restyles the Flow Builder; the shared `.flow-name-strip`
+ * stays as shipped and the ribbon's margin and weight are overridden here.
+ * Vertical budget (design §3): the ribbon, the set row and the legend are
+ * single rows with no margin; the run log is `height: auto`, at most
+ * FX_LOG_MAX_ROWS = 8 rows; the REQUIRED line and the notice take a row
+ * only while shown; the lanes frame is the hero (`height: 1fr`) and scrolls
+ * on both axes with a stable 1-cell vertical gutter. Python sizes only the
+ * card and cable widths, the lane row heights and the head / ribbon text
+ * (`lane_layout`, D21 / D24). The waiting colour (`$waiting-human`) paints
+ * only the waiting-human elements: the waiting card's border, the cable into
+ * it, the lane's status word, a waiting lane's Confirm, the REQUIRED line
+ * and the log's `□` mark (LLR-147.7). */
+#fx_panel {
+    padding: 0;
+}
+
+#fx_panel #fx_ribbon {
+    height: 1;
+    padding: 0 1;
+}
+
+#fx_panel #fx_name_strip {
+    width: 1fr;
+    height: 1;
+    margin: 0;
+    padding: 0 1 0 0;
+    text-style: none;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fx_panel #fx_run_row {
+    width: auto;
+    height: 1;
+}
+
+#fx_panel #fx_set_row {
+    height: 1;
+    padding: 0 1;
+}
+
+#fx_panel .fx-field-label {
+    width: auto;
+    height: 1;
+    padding: 0 1 0 0;
+    color: #969aad;                   /* insight_style.DGRAY */
+}
+
+#fx_panel #fx_set_name {
+    width: 1fr;
+    margin-right: 1;
+}
+
+#fx_panel #fx_set_select {
+    width: 2fr;
+    min-width: 16;
+    max-width: 40;
+    margin-right: 1;
+}
+
+#fx_panel Input {
+    background: $odd-row;
+}
+
+#fx_panel Input:focus {
+    background: $rule;
+}
+
+#fx_panel Select > SelectCurrent {
+    background: $odd-row;
+}
+
+/* One state line (LLR-148.9): a long refusal keeps its head — the code. */
+#fx_panel #fx_notice {
+    height: auto;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fx_panel #fx_lanes_scroll {
+    height: 1fr;
+    padding: 0 1;
+    border: round $rule;
+    border-title-color: #969aad;      /* insight_style.DGRAY */
+    overflow-x: auto;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-size-vertical: 1;
+    scrollbar-size-horizontal: 1;
+}
+
+#fx_panel #fx_lanes_scroll:focus {
+    border: round $accent-calm;
+}
+
+/* The lanes' scrollbars are dimmed, as the Patch Editor's (gate fold ux L3):
+ * a DGRAY thumb on the panel surface, not Textual's bright default bar. */
+#fx_panel #fx_lanes_scroll {
+    scrollbar-background: $bg-panel;
+    scrollbar-background-hover: $bg-panel;
+    scrollbar-background-active: $bg-panel;
+    scrollbar-color: #969aad 40%;     /* insight_style.DGRAY */
+    scrollbar-color-hover: #969aad 70%;
+    scrollbar-color-active: #969aad;
+    scrollbar-corner-color: $bg-panel;
+}
+
+#fx_panel #fx_lanes {
+    width: auto;
+    height: auto;
+}
+
+#fx_panel #fx_empty {
+    width: auto;
+    height: 1;
+}
+
+#fx_panel .fx-lane {
+    width: auto;
+    height: auto;
+}
+
+#fx_panel .fx-lane-head {
+    width: auto;
+    height: 1;
+    text-wrap: nowrap;
+}
+
+#fx_panel .fx-lane-pending {
+    width: auto;
+    height: auto;
+    text-wrap: nowrap;
+}
+
+#fx_panel .fx-lane-row {
+    width: auto;
+}
+
+/* A card: a bordered column whose title row carries the kind glyph and
+ * name (it costs no row); its io lines and its status line. */
+#fx_panel .fx-card {
+    border: round $rule;
+    border-title-align: left;
+    padding: 0 1;
+}
+
+#fx_panel .fx-card.fx-waiting {
+    border: round $waiting-human;
+}
+
+#fx_panel .fx-card-body {
+    width: 1fr;
+    height: 2;
+    text-wrap: nowrap;
+}
+
+#fx_panel .fx-card-status {
+    width: 1fr;
+    height: 1;
+    text-wrap: nowrap;
+}
+
+#fx_panel .fx-card-edit {
+    height: 2;
+}
+
+#fx_panel .fx-card Input {
+    width: 1fr;
+}
+
+#fx_panel .fx-bind-row {
+    height: 1;
+}
+
+#fx_panel .fx-card-note {
+    width: auto;
+    height: 1;
+}
+
+#fx_panel .fx-cable {
+    text-wrap: nowrap;
+}
+
+/* One-row chips (LLR-147.4, LLR-147.9): Button's bordered shape collapsed
+ * to one row; a focused chip reverses (LLR-147.11). */
+#fx_panel Button {
+    width: auto;
+    height: 1;
+    min-width: 6;
+    border: none;
+    padding: 0;
+    margin-right: 1;
+    text-style: bold;
+    background: $bg-panel;
+    color: $accent-calm;
+}
+
+#fx_panel Button:focus {
+    text-style: bold reverse;
+}
+
+/* The one filled action besides the lanes (LLR-147.9): Run. */
+#fx_panel Button.fill-accent {
+    background: $accent-calm;
+    color: $bg-base;
+}
+
+#fx_panel Button.fill-accent:focus {
+    background: $fg-base;
+    color: $bg-base;
+    text-style: bold;
+}
+
+/* Confirm (LLR-147.3, LLR-147.9): on the card row's output line, one gap
+ * after the lane's last card; a waiting Confirm is filled with the waiting
+ * colour blended at 40 %, the attention lane's Confirm (`.fx-attention`)
+ * with the waiting colour itself — three painted styles distinct from Run's. */
+#fx_panel .fx-confirm {
+    margin: 2 0 0 1;
+    background: $waiting-human 40%;
+    color: $text;
+    text-style: none;
+}
+
+#fx_panel .fx-confirm.fx-attention {
+    background: $waiting-human;
+    color: $bg-base;
+    text-style: bold;
+}
+
+#fx_panel .fx-confirm:focus {
+    text-style: bold reverse;
+}
+
+/* The mode toggle (D13): the active word in the selection style. */
+#fx_panel ModeToggle > .mode-toggle--active {
+    background: $rule;
+    color: $accent-calm;
+    text-style: bold;
+}
+
+#fx_panel #fx_required {
+    height: 1;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fx_panel #fx_log {
+    height: auto;
+    max-height: 8;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fx_panel #fx_legend {
+    height: 1;
+    padding: 0 1;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+}

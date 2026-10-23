@@ -1,0 +1,4 @@
+start, then ] | focused: rail_item_workspace | section in chain: False | chain: ['rail_item_workspace', 'Vertical', 'activity_rail', 'rail_slot', 'workspace_shell', '_default', 'S19TuiApp']
+focus None, then ] | focused: None | section in chain: False | chain: ['_default', 'S19TuiApp']
+focus #fx_set_name | focused: fx_set_name | section in chain: True | chain: ['fx_set_name', 'fx_set_row', 'fx_panel', 'screen_flow_execution', 'workspace_body', 'workspace_shell', '_default', 'S19TuiApp']
+Input consumes 'c': True

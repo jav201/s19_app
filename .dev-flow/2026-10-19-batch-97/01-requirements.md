@@ -301,7 +301,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-147 — Flow Execution as one pipeline per lane with cable status
 - **Traceability:** US-137
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.32
 - **Statement:** When a flow set runs in Flow Execution, the Flow Execution panel shall paint one pipeline per lane whose cables carry the run status of their blocks from the retained run record. While a run is in flight, the panel shall start no second run. While a lane waits for a human, the panel shall bring the attention lane's waiting card and Confirm into the lanes viewport without moving the focus, offer a scoped key that confirms the attention lane once per waiting entry, paint the waiting-human elements in the waiting colour that no other element on the four screens paints, and name the wait and its chain in English in the run log and the REQUIRED line. Run shall be its one filled action besides the lanes, with each waiting lane's Confirm.
 - **Rationale (informative):** operator verdict fx_A (brief R-4, R-5); the batch-96 waiting-human doctrine is kept. Per-block status and lane order are already in the record (P-15). Colours: operator decision 1 (`#e8ad3d` / `#c9562b`, 23.0°); Confirm is not auto-focused so that a repeated key cannot attest human work (orchestrator decision 6, U2-3).
 - **Validation:** `test`
@@ -789,7 +789,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.3 — The paused lane: waiting style, Confirm in view, focus left alone
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.33
 - **Statement:** While a lane's record holds a `waiting` block, the `FlowExecutionPanel` shall paint that lane's waiting-human elements in the waiting colour, show two red pending lines (log, output file) under the lane header whose leading glyph is not in the LLR-147.1 cable vocabulary, show `#fx_confirm_<i>` inside lane *i*'s region, and show above the run log the line `log + output file: REQUIRED for <chain> · press c to confirm` (NEW), `<chain>` the attention lane's chain name rendered through `safe_text`. When a lane enters the waiting state, the panel shall scroll `#fx_lanes_scroll` on both axes so that the attention lane's (§1.3) waiting card and its Confirm lie inside the viewport, shall give that Confirm the attention class (NEW), whose painted style differs from a waiting Confirm without it and from `#fx_run`'s, and shall leave the focus where it was. If the focus lies inside `#fx_lanes_scroll` when a lane enters the waiting state, then the panel shall keep the focused widget inside the viewport, scrolling only as far as that allows.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-23 — `pytest tests/test_b97_flow_execution.py -k tc_b97_23`; procedure: appendix A.4 TC-B97-23.
@@ -809,7 +809,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.5 — Flow Execution strings and run log in English
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.31
 - **Statement:** The `FlowExecutionPanel`, the module constant `flow_screens.py:235` and the strings of `services/flow_execution_service.py` that the flow screens paint shall be in English.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-25 — `pytest tests/test_b97_flow_execution.py -k tc_b97_25`; procedure: appendix A.4 TC-B97-25.
@@ -859,13 +859,13 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.10 — One run at a time
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3
-- **Statement:** If Run is pressed while a run is in flight, then the `FlowExecutionPanel` shall start no second run. While a run is in flight, `#fx_run` shall be disabled. When the run ends or raises, `#fx_run` shall be enabled again.
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.29, LED-2026-10-19-batch-97.30, LED-2026-10-19-batch-97.34
+- **Statement:** A run is either a run of the set started by `#fx_run` or the re-run of one lane started by a confirm (`#fx_confirm_<i>` or the `c` key, LLR-147.13) (`LED-2026-10-19-batch-97.29`). If Run or a Confirm is pressed, or `c` is pressed, while a run is in flight, then the `FlowExecutionPanel` shall start no second run and confirm nothing more. While a run is in flight, `#fx_run` and every displayed `#fx_confirm_<i>` shall be disabled. When the run ends or raises, they shall be enabled again; a confirm re-run that raises leaves its lane waiting at the same entry, unconfirmed, so that the entry can be confirmed again.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-55 — `pytest tests/test_b97_flow_execution.py -k tc_b97_55`; procedure: appendix A.4 TC-B97-55.
-- **Numeric pass threshold:** 1 call and 1 new report for the 3 presses; disabled inside, enabled after; error arm: enabled after and one English error line (LLR-148.9).
-- **Negative control:** executed on a model of the handler (§2.7 P-44): without the disable, `run calls 2` for both the press and the queued key → RED; the real-tree RED run is recorded by the Flow Execution increment.
-- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: a press right after the run ends starts a run (1 more call); error: a run that raises. Others N/A.
+- **Numeric pass threshold:** 1 call and 1 new report for the 3 presses; disabled inside, enabled after; error arm: enabled after and one English error line (LLR-148.9). Confirm arm (`LED-2026-10-19-batch-97.29`): during a confirm re-run, one more press of the same Confirm and one of `#fx_run` → 1 `run_chain_set` call, 1 new report, 1 `ExternalStepConfirmed` post; `#fx_run` and the Confirm disabled inside the run, enabled after; confirm error arm: the re-run raises → one English line naming the chain in the run log, 0 tracebacks, the lane still waiting at the same block with its Confirm enabled, and one more confirm after the dwell re-runs it.
+- **Negative control:** executed on a model of the handler (§2.7 P-44): without the disable, `run calls 2` for both the press and the queued key → RED; the real-tree RED run is recorded by the Flow Execution increment. Confirm arm: the Confirm left enabled during the re-run (mutation) → 2 confirms, RED; the confirm handler without its `except` (shipped, `app.py:2856`) → the raise escapes the handler, RED.
+- **Boundary catalog:** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: a press right after the run ends starts a run (1 more call); a second press of the same Confirm during its own re-run; error: a run that raises; a confirm re-run that raises. Others N/A.
 
 ### LLR-147.11 — Flow Execution keyboard order
 - **Traceability:** HLR-147
@@ -889,12 +889,12 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-147.13 — A scoped key confirms the attention lane once per waiting entry
 - **Traceability:** HLR-147
-- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5
+- **Ledger:** LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.5, LED-2026-10-19-batch-97.29, LED-2026-10-19-batch-97.30, LED-2026-10-19-batch-97.34, LED-2026-10-19-batch-97.35
 - **Statement:** When the engineer presses `c` on the Flow Execution screen, the `FlowExecutionPanel` shall confirm the attention lane's (§1.3) current waiting entry exactly as a press of its `#fx_confirm_<i>` does, provided the focus lies outside a text input, that entry has not been confirmed already and it has held the attention for at least `CONFIRM_DWELL_S = 0.5` s (NEW); otherwise the key shall confirm nothing, and in a text input it types `c`. The help entry and the REQUIRED line shall name the key. If `enter` is pressed on `#fx_run` while a lane waits, then the panel shall start one new run of the set (LLR-147.10) and confirm nothing.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-64 — `pytest tests/test_b97_flow_execution.py -k tc_b97_64`; procedure: appendix A.4 TC-B97-64.
-- **Numeric pass threshold:** after the dwell, 1 re-run of lane 1 (its waiting block confirmed) per `c`, REQUIRED line count 0 after; `press("c", "c")` with two lanes waiting → 1 confirm, the second lane still waiting; `press("c", "c")` on `flash2_chain` → 1 confirm, the lane waiting at its second EXT-STEP; after `pilot.pause(0.6)` one more `c` confirms the next entry; 0 confirms with the focus in an input (its value gains `c`) or with no waiting lane; a stray `enter` on `#fx_run` while lane 1 waits → 1 more run call, 1 more report, 0 confirms, lane 1 waiting again; `c` named in the help entry and the REQUIRED line.
-- **Negative control:** executed on `main` (§2.7 P-43): `c` is unbound on the screen → 0 re-runs, RED; a paint-only rule without the dwell (mutation) → the burst arms confirm 2, RED — a paint completes between the two keys of `press("c", "c")`, 0.049 s apart (P-60).
+- **Numeric pass threshold:** after the dwell, 1 re-run of lane 1 (its waiting block confirmed) per `c`, REQUIRED line count 0 after; `press("c", "c")` with two lanes waiting → 1 confirm, the second lane still waiting; `press("c", "c")` on `flash2_chain` → 1 confirm, the lane waiting at its second EXT-STEP; after `pilot.pause(0.6)` one more `c` confirms the next entry — that re-run carries the confirmations of both EXT-STEP blocks and the lane ends `ok` with both blocks `ok`, not waiting again at its first EXT-STEP (`LED-2026-10-19-batch-97.29`); arriving on the screen with `]` (the focus left on the rail, and with no focus), `c` after the dwell confirms 1; with the screen hidden or a modal open, `c` confirms 0; 0 confirms with the focus in an input (its value gains `c`) or with no waiting lane; a stray `enter` on `#fx_run` while lane 1 waits → 1 more run call, 1 more report, 0 confirms, lane 1 waiting again; `c` named in the help entry and the REQUIRED line.
+- **Negative control:** executed on `main` (§2.7 P-43): `c` is unbound on the screen → 0 re-runs, RED; a paint-only rule without the dwell (mutation) → the burst arms confirm 2, RED — a paint completes between the two keys of `press("c", "c")`, 0.049 s apart (P-60). Added by `LED-2026-10-19-batch-97.29`: `c` bound on the screen's section instead of the app (the sealed D10) → the `]` arms confirm 0, RED (executed before Inc-6: after `]` the focus stays on `rail_item_workspace` or is `None`, and the binding chain holds no node of `#screen_flow_execution`); the confirm re-run built from the current block's confirmation only (shipped, `app.py:2852-2855`) → the second confirm of `flash2_chain` re-runs with the second EXT-STEP's confirmation only and the lane waits again at its first EXT-STEP (executed on the service before Inc-6 with a two-EXT-STEP chain, blocks 1 and 2 0-based: `{2}` → `paused`, block 1 `waiting`; `{1, 2}` → `ok`), RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: two lanes waiting (only the attention lane confirmed); a chain with two EXT-STEP blocks (one confirm per waiting entry, P-60); invalid: `c` with the focus in an input, `c` with no waiting lane, a stray `enter` on Run. Others N/A.
 
 ### LLR-148.1 — Chip family `flows`
@@ -959,7 +959,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.7 — Closed glyph vocabularies and a legend on every screen
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.12
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.12, LED-2026-10-19-batch-97.31
 - **Statement:** Each renderer of the four panels — the Patch Editor hex strip, the Check Editor marks, the Builder cards and cables, the Execution lanes and pending lines — shall draw its glyphs from a closed vocabulary constant (NEW, one per renderer, each glyph with one meaning). Each panel shall paint a legend of at most two rows (id NEW) naming every status and mark glyph of its vocabularies, the block-kind glyphs being named in the help entry (LLR-148.6), and shall use the word `notices` for every non-blocking finding.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-33 — `pytest tests/test_b97_chips_help.py -k tc_b97_33`; procedure: appendix A.4 TC-B97-33.
@@ -979,7 +979,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.9 — Region states in one English line
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.28
+- **Ledger:** LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.28, LED-2026-10-19-batch-97.34
 - **Statement:** While a region of the table below is in a listed state, the panel shall paint in that region one English line naming the state, and no traceback.
 
 | screen | region | states |

@@ -1,0 +1,22 @@
+# Inc-6 gate-fold RED: the fold's new and changed arms on the PRE-FOLD Inc-6 source (worktree prefold6)
+a2afd60ab61a0da6f44606c80d85decd5cc15c22bd3525b64d11fee424313896 *s19_app/tui/flow_screens.py
+6f32fbaea12f68d865ac71f0162e78c9b91b1131c00786734e2f493f1855402e *s19_app/tui/app.py
+f91bd8698e62046c3203040b682e03513487ce860d0e696447a9c339bc614496 *s19_app/tui/styles.tcss
+303be19ea83453bd36062ee60f10581b8a47c65debcc89d223646c761444757f *s19_app/tui/window_help.py
+# s19_app from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\prefold6\s19_app\__init__.py
+FFFF.F.F                                                                 [100%]
+================================== FAILURES ===================================
+tests\test_b97_flow_execution.py:1713: AssertionError: ["Loaded project 'proj1' -> prg.s19", 'Confirmed flash_chain — the run continues.']
+tests\test_b97_flow_execution.py:1771: AssertionError: c ignored — flash_chain started waiting a moment ago. Press c again to confirm.
+tests\test_b97_flow_execution.py:1808: AssertionError: 14
+tests\test_b97_flow_execution.py:1830: AssertionError: ('◇ patch_chain · done with notices · 0.016s · 4 blocks · wrote fw_app_patched.s19', '00:00.016 ◇ patch_chain · done with notices · wrote fw_app_patched.s19')
+tests\test_b97_flow_execution.py:1477: AssertionError: ['Confirmed flash_chain — the run continues.']
+tests\test_b97_chips_help.py:1767: AssertionError: [' ▓ ok  ░ not run  ✗ error  ◇ notices  □ waiting for a human  ▪ owed before the lane goes on                     ']
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_lanes_return_home_when_no_lane_waits
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_63_lane_head_time_is_on_the_set_clock
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane
+FAILED tests/test_b97_chips_help.py::test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend
+6 failed, 2 passed in 76.81s (0:01:16)

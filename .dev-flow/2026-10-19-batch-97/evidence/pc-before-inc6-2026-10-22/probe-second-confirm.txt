@@ -1,0 +1,5 @@
+S19_APP_FROM C:\Users/jjgh8/Github/s19_app\s19_app\__init__.py
+no confirmation        ('paused', [(0, 'ok'), (1, 'waiting'), (2, 'skipped'), (3, 'skipped')])
+{1} (first confirm)    ('paused', [(0, 'ok'), (1, 'ok'), (2, 'waiting'), (3, 'skipped')])
+{2} (second, as today) ('paused', [(0, 'ok'), (1, 'waiting'), (2, 'skipped'), (3, 'skipped')])
+{1,2} (accumulated)    ('ok', [(0, 'ok'), (1, 'ok'), (2, 'ok'), (3, 'ok')])

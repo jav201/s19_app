@@ -1,0 +1,24 @@
+777c777
+< ===== map-comfortable-80x24 sha256 1eca93ce42447243ecf732a857eeeaf8411a1d5257eec5cde2bf19b4eda86cc4
+---
+> ===== map-comfortable-80x24 sha256 14289098758f948eece2c954881fd5846fda2dd000aa5b6c2ca3c60bb97e3db8
+793c793
+<   Ready.                                                   (none)  |  snap.a2l  
+---
+>   Ready.                                                     (none)  |  (none)  
+858c858
+< ===== patch-comfortable-120x30 sha256 adde21e9c01bc36292c57259f4f10e07ce40fbdfda4e55555d6b1056513f5507
+---
+> ===== patch-comfortable-120x30 sha256 e48c394f65be357d98edd9ead218f160b29c49f56418e60c02104b4c0f6a7bd6
+880c880
+<   Ready.                                                                                           (none)  |  snap.a2l  
+---
+>   Ready.                                                                                             (none)  |  (none)  
+889c889
+< ===== diff-comfortable-120x30 sha256 8b362159f7997ab94816de9e68902f1ebc295251ac125b4c10a42a0fc7895560
+---
+> ===== diff-comfortable-120x30 sha256 94c986e920fa8606355510028eeb6156b770490588cfb0586d10374614d5c422
+911c911
+<   Ready.                                                                                           (none)  |  snap.a2l  
+---
+>   Ready.                                                                                             (none)  |  (none)  

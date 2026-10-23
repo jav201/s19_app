@@ -1,0 +1,10 @@
+# F6 mutation: 'if target == current and not restart:' -> 'if target == current:'
+source before: 8cd027f47b30bb14ccb5333be20fd4afe9022a44243f3c3b2be197cf5f3a3219
+## mutant:
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention
+1 failed in 5.75s
+source restored: 8cd027f47b30bb14ccb5333be20fd4afe9022a44243f3c3b2be197cf5f3a3219
+## restored:
+.                                                                        [100%]
+1 passed in 5.56s
