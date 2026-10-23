@@ -1135,6 +1135,26 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 - **Negative control:** a click implemented as `app.simulate_key(key)` (mutation, the prototype's and the Footer's path, P-66) → `space` reaches the focused tab chip and presses it, `c` and `q` type into the focused input → RED; hit ranges offset by the tag's width (mutation) → the click on `9 Checks` runs the neighbouring token → RED; dimmed tokens clickable (mutation) → the Undo arm RED.
 - **Boundary catalog:** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: the last cell of one token beside the first cell of the next; a click with the focus in a text input, on a tab chip and inside a `WindowSection`; an `owner` entry (`space`, `c`) vs an app entry (`q`, `9`, `?`); invalid: a dimmed token, the tag. Others N/A.
 
+### HLR-151 — The Load project dialog loads the project the engineer picks
+- **Traceability:** R-TUI-013 (batch-01, `Partial` in its trace); CW-U-1 (`.dev-flow/design/AUDIT-codewire-ui-2026-10-23.md`)
+- **Ledger:** LED-2026-10-19-batch-97.42
+- **Statement:** When the engineer highlights a saved project in the Load project dialog and presses Load, the system shall load that project.
+- **Rationale (informative):** out-of-band scope added by the operator 2026-10-23 after the Code-Wire UI audit found that no project ever loaded through the dialog.
+- **Validation:** `test`
+- **Executed verification:** `pytest tests/test_b97_load_project_dialog.py`.
+- **Numeric pass threshold:** with projects `proj_a` and `proj_b`, highlighting `proj_b` and clicking Load gives `app.current_project == "proj_b"` and closes the dialog.
+- **Priority:** high
+
+### LLR-151.1 — The dialog dismisses with the highlighted project's own name
+- **Traceability:** HLR-151
+- **Ledger:** LED-2026-10-19-batch-97.42
+- **Statement:** On Load, `LoadProjectScreen` shall dismiss with the entry of its project list at the ListView's highlighted index, and shall not dismiss when no entry is highlighted.
+- **Validation:** `test (integration)`
+- **Executed verification:** `pytest tests/test_b97_load_project_dialog.py`; mutants `evidence/inc-9/mutate.py`.
+- **Numeric pass threshold:** the handler receives `proj_b`, not `Label()` and not the first entry.
+- **Negative control:** executed on `354857c`: the dialog dismisses `Label()` → `current_project` None, RED (`evidence/inc-9/red.txt`); mutants first-entry and `str(Label)` → RED.
+- **Boundary catalog:** ☐ empty ☐ boundary ☒ invalid ☐ error — invalid: no highlighted entry (no dismiss). Empty N/A: the app never opens the dialog with no projects (`action_load_project`).
+
 ### Information Flow Contract (IFC) — C-54
 
 > Part A — one FLOW block per information flow this batch adds or re-routes; every node has exactly one owner LLR. LLRs that state structure rather than a transform own Part B outputs or are verified on the painted layout instead of owning nodes. Part B — the trigger question is answered **yes**: the four panels and their header chips are components a consumer addresses independently. Component ids are new (V19).

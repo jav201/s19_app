@@ -418,3 +418,11 @@ above this line is ever edited._
   - **Accepted:** the Diff shows 1 hex row at 120x30, where R-1 accepted 2 (`_DIFF_MIN_H` 29, LED-…97.36).
 - **Why:** operator decisions, asked at the Inc-8 gate 2026-10-23 (item 5 and the package).
 - **Evidence:** `test_tc_b97_69_a_dimmed_token_paints_whole_in_one_colour`, `test_tc_b97_70_pack_key_row_dims_and_does_not_hit_disabled`, `test_tc_b97_66_map_help_names_only_keys_that_act_on_the_map` (RED pre-fold, `red-fold.txt`); `png/impl.keybar.patch.png`.
+
+### LED-2026-10-19-batch-97.42 — The Load project dialog loads the picked project (CW-U-1)
+- **Requirement:** HLR-151, LLR-151.1 (refine R-TUI-013, batch-01: pick a saved project from the list and load it)
+- **Supersedes:** nothing — R-TUI-013 is unchanged; the dialog never met it (`Partial` in batch-01's trace)
+- **Date:** 2026-10-23
+- **What changed:** `LoadProjectScreen` dismisses with `self.projects[index]` (the ListView index) instead of `str(Label)`, which Textual 8.2.8 renders as `Label()`. `enter` on the list still does nothing: in Textual 8.2.8 a ListItem click also posts `ListView.Selected`, so loading on `Selected` would load on one click (code-reviewer F2); that choice goes to the Load+projects prototype round. Scope added to batch-97 out of band.
+- **Why:** operator decision 2026-10-23 ("try it in this batch and test it; if it has problems move it to the integrity batch"), after the Code-Wire UI audit (`.dev-flow/design/AUDIT-codewire-ui-2026-10-23.md`, CW-U-1).
+- **Evidence:** `tests/test_b97_load_project_dialog.py` (RED on HEAD `354857c`, `evidence/inc-9/red.txt`: `got None`, the handler received `'Label()'`); `evidence/inc-9/mutations.txt` (2/2 killed).

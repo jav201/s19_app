@@ -722,12 +722,12 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             self.dismiss(None)
             return
         if event.button.id == "project_ok":
-            selected = self.query_one("#project_list", ListView).highlighted_child
-            if selected is None:
+            # The name comes from self.projects by index: Textual's Label has
+            # no .text, and str(Label) is "Label()" (CW-U-1).
+            index = self.query_one("#project_list", ListView).index
+            if index is None or not 0 <= index < len(self.projects):
                 return
-            label_widget = selected.query_one(Label)
-            name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
-            self.dismiss(name)
+            self.dismiss(self.projects[index])
 
 
 class SaveFlowScreen(ModalScreen[Optional[str]]):

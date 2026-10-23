@@ -204,6 +204,11 @@
       "station": "P3",
       "date": "2026-10-23",
       "decision": "P3 increment 008 (two-row key bar) approved: asked at the gate — operator decisions folded (Map min 1 row, Load file/Save project, owned keys dim by window, whole-token dim, 118x53 arms retired); code-reviewer re-read OK to advance (F1 resolved); full suite 8 failed = 6 baseline + 2 load flakes passing isolated. Inc-7 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-23",
+      "decision": "P3 increment 009 (CW-U-1 Load project dialog) approved: asked at the gate — operator added it to batch-97 (try here, test it, move to the integrity batch on problems); RED on 354857c, GREEN 594 passed / 3 baseline, mutants 2/2, code-reviewer OK to advance. Inc-7 is next."
     }
   ],
   "obsidian_synced": false,

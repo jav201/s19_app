@@ -1,0 +1,6 @@
+6345198c88109f57090505255c86b52a18a26f334a31ebb42c6aad078bf8a2ab *s19_app/tui/screens.py
+# pytest tests/test_b97_chips_help.py tests/test_b97_flow_execution.py tests/test_b97_load_project_dialog.py tests/test_loadfilescreen_input.py tests/test_report_progress.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_manifest_save.py tests/test_tui_patch_chips.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py  tests/test_tui_theme.py -q
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+3 failed, 594 passed in 2997.54s (0:49:57)

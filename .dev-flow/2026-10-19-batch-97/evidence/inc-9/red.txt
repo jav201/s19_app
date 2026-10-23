@@ -1,0 +1,16 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_load_project_button_loads_the_picked_project ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24292/test_load_project_button_loads0')
+
+    def test_load_project_button_loads_the_picked_project(tmp_path: Path) -> None:
+        project, screen, status = asyncio.run(_pick_second_project(tmp_path))
+>       assert project == "proj_b", f"Load must open the highlighted project; got {project!r} (status: {status!r})"
+E       AssertionError: Load must open the highlighted project; got None (status: 'Ready.')
+E       assert None == 'proj_b'
+
+tests\test_b97_load_project_dialog.py:62: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_load_project_dialog.py::test_load_project_button_loads_the_picked_project
+1 failed in 5.71s
