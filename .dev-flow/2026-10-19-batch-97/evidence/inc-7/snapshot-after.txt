@@ -1,0 +1,11 @@
+# AFTER the regen, mark retired: the whole snapshot module, two consecutive runs
+## run 1
+.................................                                        [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+33 passed in 104.39s (0:01:44)
+## run 2
+.................................                                        [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+33 passed in 107.40s (0:01:47)

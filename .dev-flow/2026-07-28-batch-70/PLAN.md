@@ -75,7 +75,7 @@ C-43 premise evaluation (**fill `req-template` §2.7 at Phase 1**) · C-44 sessi
 
 ## Out-of-scope / carries
 
-Patch-Editor variant path · FB-P3 CRC sub-flow · PKI extraction (⛔ blocked on operator definition) · the engine-frozen set · **R-3** (P3 — the batch-65 merge-gate docs' *prose* layer; their mechanical layer is verified clean).
+Patch-Editor variant path · FB-P3 CRC sub-flow · memory-region extraction (⛔ blocked on operator definition) · the engine-frozen set · **R-3** (P3 — the batch-65 merge-gate docs' *prose* layer; their mechanical layer is verified clean).
 
 ## Test ledger
 

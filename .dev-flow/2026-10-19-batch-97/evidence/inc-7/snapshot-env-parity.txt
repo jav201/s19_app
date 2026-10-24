@@ -1,0 +1,145 @@
+# Snapshot env parity probe (Inc-7): the 29 tc016s cells run LOCALLY (Windows, s19env, textual 8.2.8, NO_COLOR unset) on a detached worktree of ae0ef4f, the last commit that wrote tests/__snapshots__/
+........................FF...                                            [100%]
+================================== FAILURES ===================================
+_________ test_tc016s_density_layout_snapshot[map-comfortable-80x24] __________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x0000025CDA73A660>
+public_triple = {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')}
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/test_tc016s_density_layout_sna24')
+screen = 'map', density = 'comfortable', size_key = '80x24'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x0000025CDA73A660>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000025CDB737920>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDB737920> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')})
+
+tests\test_tui_snapshot.py:1126: AssertionError
+_________ test_tc016s_density_layout_snapshot[map-comfortable-120x30] _________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x0000025CDCF1D260>
+public_triple = {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')}
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/test_tc016s_density_layout_sna25')
+screen = 'map', density = 'comfortable', size_key = '120x30'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x0000025CDCF1D260>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000025CDAC58A40>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000025CDAC58A40> = _snapshot_run_before('map', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24315/snapshot_public0/snap.s19')})
+
+tests\test_tui_snapshot.py:1126: AssertionError
+--------------------------- snapshot report summary ---------------------------
+2 snapshots failed. 27 snapshots passed.
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m2[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=2427139;file://C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_ae0ef4f\snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2mC:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\[0m[2;93ma8feab43-c248-4ccb-[0m
+[2;93m86cf-122b894659b2[0m[2m\scratchpad\wt_ae0ef4f\snapshot_report.html[0m
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-120x30]
+2 failed, 27 passed, 3 deselected in 74.59s (0:01:14)
+
+# The 2 failing map cells, regenerated locally on the same worktree: the committed ae0ef4f map baselines are GREYSCALE (written with NO_COLOR=1 in the shell); the local no-NO_COLOR render paints the theme colours. Head of the diff:
+ ...ity_layout_snapshot[map-comfortable-120x30].svg | 26 +++++++++++-----------
+ ...sity_layout_snapshot[map-comfortable-80x24].svg | 22 +++++++++---------
+ 2 files changed, 24 insertions(+), 24 deletions(-)
+-.terminal-r3 { fill: #232323 }
+-.terminal-r4 { fill: #0e0e0e;font-weight: bold }
+-.terminal-r5 { fill: #151515 }
++.terminal-r3 { fill: #1b233a }
++.terminal-r4 { fill: #0a0e1b;font-weight: bold }
++.terminal-r5 { fill: #0f1525 }
+-.terminal-r7 { fill: #aaaaaa }
+-.terminal-r8 { fill: #aaaaaa;font-weight: bold }
+-.terminal-r9 { fill: #a2a2a2 }
+-.terminal-r10 { fill: #a9a9a9 }
+-.terminal-r11 { fill: #858585 }
+-.terminal-r12 { fill: #a2a2a2;font-weight: bold }
++.terminal-r7 { fill: #91abec }
++.terminal-r8 { fill: #91abec;font-weight: bold }
++.terminal-r9 { fill: #5fb98a }
++.terminal-r10 { fill: #d9a35b }

@@ -1,0 +1,17 @@
+# Inc-7 fix round RED on the first-round tree (source window_help.py dabdc14b, styles.tcss ddcd55db, unchanged): the new and reworked help nodes
+dabdc14b5907f291
+ddcd55db15927b67
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:622: AssertionError: {'a2l': (True, ['4. Memory segments (when the A2L declares `MEMORY_SEGMENT`) classify addresses as flash/RAM — this is...n after every edit; a change-set that is not 100 % pass should not be exported.', 'k — Legend'], (13, 1, 54, 22)), ...}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:622: AssertionError: {'check_editor': (True, ['10. Size (bytes) — 1 to 8; the Fmt column shows it as u8 / u16 / u32 / u64.', "17. Open chec...record width of that file (32 or 16 bytes per line).', '19. Write file — writes the patched image.'], (18, 1, 81, 52))}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:622: AssertionError: {'flow': (True, ["24. Paste — appends the clipboard's block to the chain, checked against this project.", '25. Variabl...eads the file list of `patches/`.', '26. Validate — checks the document against the loaded image.'], (34, 1, 152, 58))}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:695: AssertionError: {'a2l': (True, 8, {'down': 0.0, 'end': 0.0, 'home': 0.0, 'last_painted': False, ...}, True, True), 'changes_file_notat... True, True), 'checks': (True, 7, {'down': 0.0, 'end': 0.0, 'home': 0.0, 'last_painted': False, ...}, True, True), ...}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:733: AssertionError: {'a2l': (['▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', 'Close', '▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁'], 0), 'changes_file_notation': (['▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', 'Close'...▔▔▔▔▔▔▔▔▔▔▔▔', 'Close', '▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁'], 0), 'checks': (['▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔', 'Close', '▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁'], 0), ...}
+=========================== short test summary info ===========================
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size0]
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size1]
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size2]
+FAILED tests/test_window_usage_help.py::test_help_modal_scrolls_by_key_while_close_keeps_the_focus
+FAILED tests/test_window_usage_help.py::test_help_modal_close_names_its_key_and_the_keys_block_stands_apart
+5 failed, 33 deselected in 166.75s (0:02:46)

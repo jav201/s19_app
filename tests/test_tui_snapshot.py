@@ -185,7 +185,8 @@ def _build_loaded_triple(app: S19TuiApp, triple: dict[str, Path]) -> None:
     Data Flow:
         - ``parse_a2l_file`` / ``S19File`` / ``parse_mac_file`` parse the
           synthetic inputs; ``build_loaded_s19`` fuses them into a
-          ``LoadedFile``; ``_apply_empty_state`` reveals the panes.
+          ``LoadedFile``; ``_apply_empty_state`` reveals the panes;
+          ``update_project_labels`` paints the status-bar context.
 
     Dependencies:
         Uses:
@@ -213,6 +214,11 @@ def _build_loaded_triple(app: S19TuiApp, triple: dict[str, Path]) -> None:
     app.current_a2l_data = a2l_data
     app.current_file = loaded
     app._apply_empty_state()
+    # batch-97 Inc-7 (PC-10): paint the status-bar context here. Without it
+    # the A2L name arrived only through the startup resize's deferred
+    # `update_project_labels`, and a capture painted `(none)` whenever that
+    # callback ran before this install (the long-run cell drift).
+    app.update_project_labels()
 
 
 def _strip_docstrings(source: str) -> str:
@@ -1039,7 +1045,10 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 # measured at this increment's gate run: exactly the 29 cells mismatched,
 # zero XPASS (inc003_suite_snapshot.txt).
 # The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml,
-# pinned textual==8.2.8) — NEVER locally. RETIRE this mark when that regen
+# pinned textual==8.2.8) — NEVER locally. (Superseded at batch-97 Inc-7: that
+# regen ran LOCALLY after a parity probe reproduced the committed baselines on
+# this machine — LED-2026-10-19-batch-97.45, the retirement note below.)
+# RETIRE this mark when that regen
 # lands (refreshing the rail chrome to 12 entries retires BOTH generations);
 # under strict=False a stale mark XPASSes silently and masks
 # regressions (the batch-77 retirement note above is the precedent).
@@ -1052,6 +1061,18 @@ def _batch94_inc001_drift_marks(screen: str, density: str, size_key: str) -> tup
     cell by the check-spec dropdown. Measured against the actual run before
     this mark was written (C-22: predict THEN verify, per cell).
     """
+    # RETIRED (batch-97 Inc-7): the 29 baselines were regenerated on the
+    # batch-97 tree, which carries every drift this mark and its successors
+    # named — the 12-entry rail, the window header rows, the pe_b rework, the
+    # check-spec dropdown and the batch-97 two-row key bar (Inc-8) — and the
+    # harness race that painted `(none)` is fixed (PC-10). The regen ran
+    # locally: Textual 8.2.8 with NO_COLOR unset reproduced 27 of the 27
+    # colour baselines at ae0ef4f byte for byte (`.dev-flow/2026-10-19-batch-97/
+    # evidence/inc-7/snapshot-env-parity.txt`; the two map baselines there were
+    # written greyscale under NO_COLOR). Kept as a no-op for provenance; a live
+    # mark would XPASS silently under strict=False and mask regressions.
+    del screen, density, size_key
+    return ()
     reasons = [
         "batch-94 Inc-001: rail census 10->11 — the Check Editor entry "
         "(after Patch Editor) renders in every cell's rail chrome; "
@@ -1277,6 +1298,43 @@ def test_tc016s_snapshot_setup_loads_only_public_fixtures(
     assert _EXAMPLES_PUBLIC.name == "case_00_public", (
         "the only recorded examples source is the public case_00_public dir"
     )
+
+
+def test_tc016s_harness_paints_the_a2l_context_itself(
+    public_triple: dict[str, Path], tmp_path: Path
+) -> None:
+    """The snapshot harness installs the status-bar context itself (batch-97
+    Inc-7, PC-10 harness race, Inc-6 code-reviewer F2).
+
+    Intent: every baseline paints the A2L name in the status bar's context
+    cell. ``_build_loaded_triple`` sets ``current_a2l_path`` but nothing in the
+    harness repainted the cell: the name arrived only through the startup
+    resize's deferred ``update_project_labels`` (``app.py`` ``on_resize``), so a
+    capture painted ``(none)`` whenever that callback ran BEFORE the triple was
+    installed — the cells that drifted 1-3 at a time in long runs. Here the app
+    is idle before ``run_before`` (the deferred call has already run), which is
+    that race made deterministic.
+
+    RED on HEAD 5cb7618 (executed, ``evidence/inc-7/red.txt``): ``(none)  |
+    (none)`` on all three cells. Mutation: drop the harness's
+    ``update_project_labels()`` call.
+    """
+    a2l_name = public_triple["a2l"].name
+
+    async def _context(cell_id: str) -> str:
+        param = next(p for p in _ALL_SNAPSHOT_CELLS if p.id == cell_id)
+        screen, density, size_key = param.values
+        app = S19TuiApp(base_dir=tmp_path / cell_id)
+        async with app.run_test(size=_SIZES[size_key]) as pilot:
+            for _ in range(10):
+                await pilot.pause()
+            await _snapshot_run_before(screen, density, public_triple)(pilot)
+            await pilot.pause()
+            return str(app.query_one("#status_context").render())
+
+    for cell_id in ("mac-compact-120x30", "workspace-comfortable-80x24", "patch-comfortable-120x30"):
+        context = asyncio.run(_context(cell_id))
+        assert a2l_name in context, (cell_id, context)
 
 
 # ---------------------------------------------------------------------------

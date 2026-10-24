@@ -125,6 +125,6 @@ merge-gate docs' prose layer, P3, untouched here).
 
 ## 9. What this batch did NOT do
 
-It did not touch the Patch-Editor variant path, FB-P3, PKI extraction (still blocked on the
+It did not touch the Patch-Editor variant path, FB-P3, memory-region extraction (still blocked on the
 operator's definition), or the engine-frozen set. It claims no performance number: the bound is
 asserted as a **count of formatting operations**, never as wall-clock or RSS.

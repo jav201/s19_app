@@ -105,7 +105,7 @@ no CRC address-space seam):
 ## Out-of-scope carries (recorded, not built)
 - CRC block (template lib + address-space growth, ADR §7) → **batch-52** ("be very thorough").
 - flow.json save/load + external-file→import + variant reuse → **batch-53**.
-- PKI binary-region extraction · CRC-as-sub-flow · multi-image scope → backlog.
+- memory-region extraction · CRC-as-sub-flow · multi-image scope → backlog.
 
 ## Test ledger
 - Base suite @ `2b285a8`: 1593 passed (per batch-50 close). Post = base − D + A (reconcile each gate).

@@ -17,11 +17,11 @@ Coverage map (test -> TC -> LLR):
   span 1 MiB +/- 1 and fill fraction 0.5 +/- epsilon are tested inputs, both
   sides of each threshold (unit, over ``build_plan``).
   ``test_tc708_guard_two_step_arm_disarm_rearm_confirm``: the demo guard case
-  (3 A2L segments, join=fill) renders the GUARD chip, the first ^E arms only
-  and writes 0 bytes, a state change disarms, re-arm + second ^E writes
+  (3 A2L segments, join=fill) renders the GUARD chip, the first e arms only
+  and writes 0 bytes, a state change disarms, re-arm + second e writes
   exactly the planned file.
   ``test_tc708_below_thresholds_guard_never_fires``: just under both
-  thresholds exports on the FIRST ^E with no arming.
+  thresholds exports on the FIRST e with no arming.
 - TC-709 / HLR-135 (the batch-93 wrap-audit idiom carried) —
   ``test_tc709_wrap_audit_zero_overflows_both_geometries``: every authored
   line of every painted surface fits its widget's measured width at 118x34
@@ -300,9 +300,9 @@ def test_tc708_guard_threshold_boundaries_both_sides() -> None:
 def test_tc708_guard_two_step_arm_disarm_rearm_confirm(tmp_path: Path) -> None:
     """TC-708 (LLR-135.5 executed): on a guard case (join=fill over a span
     just past 1 MiB around a few bytes of data) the GUARD chip renders; the
-    first ^E arms ONLY (0 bytes written) with a warning naming the span and
+    first e arms ONLY (0 bytes written) with a warning naming the span and
     the data size (the toast names the pad percentage too); a state change
-    disarms; re-arm + the second ^E writes exactly the planned file pair.
+    disarms; re-arm + the second e writes exactly the planned file pair.
     The demo-scale 384 MiB case rides on
     ``test_guard_chip_renders_on_the_demo_case`` (chip + arm only — no
     402 MB write in a unit test)."""
@@ -355,13 +355,13 @@ def test_tc708_guard_two_step_arm_disarm_rearm_confirm(tmp_path: Path) -> None:
             }
 
     observed = asyncio.run(_drive())
-    assert observed["armed_after_first"] is True, "the first ^E must arm only"
-    assert observed["wrote_after_first"] == [], "the first ^E writes 0 bytes"
+    assert observed["armed_after_first"] is True, "the first e must arm only"
+    assert observed["wrote_after_first"] == [], "the first e writes 0 bytes"
     assert f"{observed['span'] / (1 << 20):.2f} MiB" in observed["guard_text"], (
         "the chip names the span"
     )
     assert observed["disarmed"] is True, "a state change (format) disarms"
-    assert observed["rearmed"] is True, "the re-asked ^E re-arms"
+    assert observed["rearmed"] is True, "the re-asked e re-arms"
     assert observed["wrote"] == ["toy_joined.addr", "toy_joined.bin"], (
         f"the confirmed export writes exactly the planned pair: {observed['wrote']}"
     )
@@ -373,7 +373,7 @@ def test_guard_chip_renders_on_the_demo_case(tmp_path: Path) -> None:
     """LLR-135.5/HHLR-135: the signed demo guard case — 3 A2L MEMORY_SEGMENT
     rows over prg.s19, join=fill, 0 B of 75,776 B covered — renders the
     GUARD chip naming the 384.01 MiB span from 0 B of data, and the first
-    ^E arms without writing (no confirm: the write would be 402 MB)."""
+    e arms without writing (no confirm: the write would be 402 MB)."""
 
     async def _drive() -> dict:
         app = S19TuiApp(base_dir=tmp_path)
@@ -416,7 +416,7 @@ def test_guard_chip_renders_on_the_demo_case(tmp_path: Path) -> None:
 
 def test_tc708_below_thresholds_guard_never_fires(tmp_path: Path) -> None:
     """TC-708 (LLR-135.5 negative control): just below the thresholds the
-    guard NEVER fires — the export writes on the FIRST ^E with no arming."""
+    guard NEVER fires — the export writes on the FIRST e with no arming."""
 
     async def _drive() -> dict:
         app = S19TuiApp(base_dir=tmp_path)
@@ -441,7 +441,7 @@ def test_tc708_below_thresholds_guard_never_fires(tmp_path: Path) -> None:
     observed = asyncio.run(_drive())
     assert observed["armed"] is False, "below the thresholds no arming happens"
     assert observed["wrote"] == ["toy_joined.s19"], (
-        f"the first ^E writes immediately: {observed['wrote']}"
+        f"the first e writes immediately: {observed['wrote']}"
     )
 
 
@@ -873,7 +873,7 @@ def test_zero_coverage_requires_confirm_then_writes(tmp_path: Path) -> None:
             dest = _splits_dir(app)
             # The TextArea holds focus on the manual tab (a printable key is
             # text there — the export rides the action, the same handler
-            # the ^E binding dispatches).
+            # the e binding dispatches).
             window.action_export()
             await _pause(pilot)
             armed = window._armed
@@ -1170,7 +1170,7 @@ def test_tc710_split_from_each_source_naming(tmp_path: Path) -> None:
             window.action_select_all()
             window._fmt = "bin"
             # The TextArea holds focus here — a printable key would be text,
-            # so the export rides the action (the ^E binding's handler).
+            # so the export rides the action (the e binding's handler).
             window.action_export()
             await _pause(pilot)
             return sorted(p.name for p in _splits_dir(app).iterdir())
@@ -1746,3 +1746,70 @@ def test_visor_four_class_hexes_render_in_the_frame(tmp_path: Path) -> None:
     svg = asyncio.run(_drive())  # export_screenshot() RETURNS the SVG text
     for hex_ in ("#91abec", "#6b7280", "#f6ff8f", "#46557a"):
         assert hex_ in svg, f"the rendered frame must carry {hex_}"
+
+
+# ---------------------------------------------------------------------------
+# batch-97 Inc-7 (Inc-8 operator item 4, option (a)) — every export cue the
+# window paints names the key that runs the export
+# ---------------------------------------------------------------------------
+
+
+def test_export_cues_name_the_bound_export_key(tmp_path: Path, monkeypatch) -> None:
+    """batch-97 Inc-7 (HLR-150's key bar, Inc-8 §For the operator item 4):
+    the window binds the export to ``e`` (``SplitJoinWindow.BINDINGS``) and
+    the key bar says ``e Export``, so the window's own cues must name the
+    same key — the EXPORT button, the ``ready`` cue, the guard line before
+    and after arming, and the arming toast. A cue naming ``^E`` sends the
+    operator to a chord that does nothing.
+
+    RED on HEAD 5cb7618 (executed, ``evidence/inc-7/red.txt``): the button
+    paints ``EXPORT  ^E`` and every cue says ``^E``. Mutation: one cue back
+    to ``^E``."""
+    from tests.b97_probes import painted_rows
+
+    key = next(b.key for b in SplitJoinWindow.BINDINGS if b.action == "export")
+    toasts: List[str] = []
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        monkeypatch.setattr(app, "notify", lambda message, *a, **k: toasts.append(str(message)))
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _pause(pilot)
+            app.current_file = _demo_loaded()
+            await _pause(pilot)
+            window = await _open_window(app, pilot)
+            window.action_select_all()
+            await _pause(pilot)
+            button = painted_rows(app, window.query_one("#sje_export"))
+            ready = str(window.query_one("#sje_stats").render())
+            rows, mem_map, _src = _guard_case(GUARD_SPAN_MIN + 16, 0.9999)
+            app.current_file = _loaded_from(mem_map)
+            await _pause(pilot)
+            window = await _open_window(app, pilot)
+            window._sel["ranges"] = {0, 1}
+            window.action_toggle_mode()
+            window.action_cycle_gap()
+            await _pause(pilot)
+            guard = str(window.query_one("#sje_stats").render())
+            await pilot.press(key)
+            await _pause(pilot)
+            armed = str(window.query_one("#sje_stats").render())
+            return {"button": button, "ready": ready, "guard": guard, "armed": armed, "is_armed": window._armed}
+
+    seen = asyncio.run(_drive())
+    assert key == "e", f"guard: the export binding is {key!r}"
+    assert seen["is_armed"], "guard: the guard case arms on the first press"
+    cues = {
+        "button": " ".join(seen["button"]),
+        "ready": seen["ready"],
+        "guard": seen["guard"],
+        "armed": seen["armed"],
+        "toast": " ".join(t for t in toasts if "confirm" in t),
+    }
+    assert all(cues.values()), f"guard: every cue was captured: {cues}"
+    stale = {name: text for name, text in cues.items() if "^E" in text}
+    assert stale == {}, f"cues still naming ^E: {stale}"
+    assert re.search(r"EXPORT\s+e\b", cues["button"]), cues["button"]
+    assert "ready — e exports" in cues["ready"], cues["ready"]
+    assert "e will ask" in cues["guard"] and "e again to confirm" in cues["armed"], cues
+    assert "press e again to confirm" in cues["toast"], cues["toast"]

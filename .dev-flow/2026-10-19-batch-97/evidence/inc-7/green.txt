@@ -1,0 +1,37 @@
+# Inc-7 GREEN gate: 26 files (.dev-flow/2026-10-19-batch-97/evidence/inc-7/gate-files.txt)
+dabdc14b5907f291f8054cc4b70d0778d2056d726f3f1570448eedfd40bce5ac *s19_app/tui/window_help.py
+ddcd55db15927b67b4e5b172e7397d3d884bdb54d3640a6568cf5fcb1aea09e8 *s19_app/tui/styles.tcss
+d7d9eba470a41d6340bf0978fba03cea08371cfd29b2cad51e5e6908f1d62a91 *s19_app/tui/screens_directionb.py
+910ec87e0f8343ddb5f0739dd6647ca3e935336afb3b90d691c0e904a923c7bf *s19_app/tui/segment_split_view.py
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 24%]
+........................................................................ [ 31%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+..............................F......................................... [ 49%]
+.....................................................................F.. [ 55%]
+...........F...........................................F................ [ 62%]
+........................................................................ [ 68%]
+........................................................................ [ 74%]
+........................................................................ [ 80%]
+........................................................................ [ 87%]
+....................................................F................... [ 93%]
+........................................................................ [ 99%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_id_registry.py:555: AssertionError: the guard scanned 199 test modules, not the declared 198. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:523: AssertionError: the status must show both written report paths; status was 'Compared A.s19 vs B.s19: 1 runs.'
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_diff_screen.py:3912: AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('ctrl+s', 'save_project', 'Save project', True), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('ctrl+s', 'save_project', 'Save', True)]
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+5 failed, 1153 passed in 5384.34s (1:29:44)

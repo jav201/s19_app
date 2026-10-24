@@ -8168,6 +8168,12 @@ class AbDiffPanel(Container):
             # window does not change. AFTER the refresh, because the class is
             # what moves the pane and the new size is not readable until it lands.
             self.call_after_refresh(self._render_run_windows, self._selected_run)
+        if regime != previous:
+            # batch-97 Inc-7: `check_action` gates `f ] [` on the regime class,
+            # and the key bar repaints only on the bindings signal — a
+            # height-only resize moves no focus, so without this the bar keeps
+            # the old regime's lit / dimmed tokens.
+            self.app.refresh_bindings()
         return regime
 
     @classmethod

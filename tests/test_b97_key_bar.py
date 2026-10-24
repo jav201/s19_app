@@ -960,6 +960,62 @@ def test_tc_b97_69_owned_keys_dim_outside_their_window(tmp_path: Path) -> None:
     assert fallback["f Run list"] is True and fallback["esc Close the run list"] is False, fallback
 
 
+#: The Diff panel's owned tokens and the action each one runs (`AbDiffPanel.BINDINGS`).
+DIFF_TOKENS = {"f Run list": "toggle_run_overlay", "] Window page +": "page_window_down", "[ Window page -": "page_window_up"}
+
+
+@pytest.mark.parametrize(
+    "start, end",
+    [((220, 60), (220, 28)), ((130, 60), (130, 28)), ((220, 28), (220, 60)), ((130, 28), (130, 60)),
+     ((220, 60), (130, 60))],
+    ids=["wide-to-notice", "fallback-to-notice", "notice-to-wide", "notice-to-fallback", "width-only-wide-to-fallback"],
+)
+def test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch(tmp_path: Path, start, end) -> None:
+    """TC-B97-69 (Inc-8 code re-read L2, owed to Inc-7): a HEIGHT-only resize
+    that switches the A2B Diff regime (wide / fallback <-> notice at the
+    29-row floor) repaints the panel's owned tokens within the repaint bound:
+    each of ``f ] [`` is lit exactly when ``AbDiffPanel.check_action`` allows
+    its action in the new regime, with the focus left inside the panel. One
+    width-only arm (wide -> fallback, ``f`` lights) rides along: the same
+    regime switch reached through the other axis.
+
+    RED on HEAD 5cb7618 (executed, `evidence/inc-7/red.txt`): no writer calls
+    ``refresh_bindings()`` on a regime switch, so the bar keeps the old state
+    until the next focus change. Mutation: drop the refresh again."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=start) as pilot:
+            await settle(pilot)
+            await show(app, pilot, "diff")
+            panel = app.query_one("#ab_diff_panel")
+            target = next(w for w in panel.query("*") if w.focusable and w.display and w.region.width)
+            target.focus()
+            await settle(pilot, 3)
+            before = sorted(c for c in panel.classes if c.startswith("diff-"))
+            await pilot.resize_terminal(*end)
+            await settled(pilot, lambda: app.size == end, f"terminal at {end}")
+            await settle(pilot, 2)
+            after = sorted(c for c in panel.classes if c.startswith("diff-"))
+            focus_inside = app.focused is not None and panel in app.focused.ancestors_with_self
+            expected = {t: bool(panel.check_action(a, ())) for t, a in DIFF_TOKENS.items()}
+
+            def painted() -> dict:
+                row, region = bar_rows(app)[1], bar_regions(app)[1]
+                return {t: (not _dim(app, row, region, t)) if t in row else None for t in DIFF_TOKENS}
+
+            try:
+                await settled(pilot, lambda: painted() == expected, "the Diff tokens follow the regime", attempts=REPAINT_PAUSES)
+            except AssertionError:
+                pass
+            return before, after, focus_inside, expected, painted()
+
+    before, after, focus_inside, expected, painted = asyncio.run(_drive())
+    assert before != after, f"guard: the resize switches the regime ({before} -> {after})"
+    assert focus_inside, "guard: the focus stays inside the Diff panel"
+    assert painted == expected, (before, after, painted, expected)
+
+
 # --------------------------------------------------------------------------- #
 # TC-B97-70 — LLR-150.5, whole tokens, `? more`
 # --------------------------------------------------------------------------- #

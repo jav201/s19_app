@@ -1,0 +1,8 @@
+d7d9eba470a41d6340bf0978fba03cea08371cfd29b2cad51e5e6908f1d62a91 *s19_app/tui/screens_directionb.py
+910ec87e0f8343ddb5f0739dd6647ca3e935336afb3b90d691c0e904a923c7bf *s19_app/tui/segment_split_view.py
+ddcd55db15927b67b4e5b172e7397d3d884bdb54d3640a6568cf5fcb1aea09e8 *s19_app/tui/styles.tcss
+dabdc14b5907f291f8054cc4b70d0778d2056d726f3f1570448eedfd40bce5ac *s19_app/tui/window_help.py
+# pytest -q -p no:cacheprovider -rf (full suite, Inc-7 tree)
+...............................ss.......s............................... [  1%]
+..........................................................F............. [  3%]
+......................

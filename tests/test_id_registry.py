@@ -135,7 +135,10 @@ from tools.id_registry import (
 # Check Editor increment adds ``tests/test_b97_check_editor.py`` (TC-B97-08..12,
 # 43..46, 61; AT-B97-04/05/18/21) and ``tests/test_b97_width.py`` (TC-B97-34..38,
 # 59, Check arms).
-EXPECTED_SCANNED_TEST_FILES = 198
+# batch-97 Inc-7 (2026-10-23): 198 -> 199, measured (the guard's own count): the
+# out-of-band Inc-9 added ``tests/test_b97_load_project_dialog.py`` (LLR-151.1)
+# without the bump; Inc-7's gate run caught it. Inc-7 adds no module.
+EXPECTED_SCANNED_TEST_FILES = 199
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

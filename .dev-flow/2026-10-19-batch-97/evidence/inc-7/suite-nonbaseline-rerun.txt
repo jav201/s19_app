@@ -1,0 +1,33 @@
+# Inc-7 full-suite non-baseline nodes re-run in isolation (same tree as suite-full.txt)
+## run 1
+    
+        root = Path(__file__).resolve().parent.parent
+        data = census(root)
+        odd = [s for s in data.sites if s.form.startswith("other:")]
+>       assert not odd, (
+            "address arguments outside {literal, name, fstring} appeared: "
+            + ", ".join(f"{s.file}:{s.line} {s.form}" for s in odd[:10])
+        )
+E       AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b97_width.py:1511 other:Subscript
+E       assert not [AddressSite(file='tests/test_b97_width.py', line=1511, api='query_one', form='other:Subscript', shape=None, interp=[], note='')]
+
+tests\test_address_census.py:309: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+1 failed, 4 passed in 52.11s
+## run 2
+            f"the seed must be the SELECTED entry (0x300), got {outcomes['seed_address']!r}"
+        )
+E       AssertionError: the seed must be the SELECTED entry (0x300), got '0x200'
+E       assert '0x200' == '0x300'
+E         
+E         - 0x300
+E         ?   ^
+E         + 0x200
+E         ?   ^
+
+tests\test_tui_patch_editor_v2.py:3956: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+2 failed, 3 passed in 52.92s

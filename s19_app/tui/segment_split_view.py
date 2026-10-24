@@ -6,7 +6,7 @@ V1's cockpit chassis — the segment-source chips, the range table (cursor +
 ``●``/``○`` selection + the coverage column), one control row per setting
 (MODE / GAPS+PAD / FORMAT / DEST / NAMING), and the right PREVIEW pane
 (output label · union visor band · legend · address ruler · stats + guard chip
-· summary · ``EXPORT ^E``) — plus V2's two graft deltas: at the MEASURED width
+· summary · ``EXPORT  e``) — plus V2's two graft deltas: at the MEASURED width
 ``>= 118`` the pane widens to 58 (band 54 cells), and split mode renders the
 per-file gantt under the union map when 1..6 files are selected (hidden at the
 floor and outside the cap). The preview visor is the entry point: one visual
@@ -24,12 +24,12 @@ renderers (run-economical by construction — one styled span per block) and the
 thin export dispatch (``write_split_join_export``). The conflict class renders
 exactly the bytes the engine's ``on_gap_conflict="abort"`` law would refuse
 (present source bytes inside a padded join gap that differ from the pad byte),
-so the band shows the abort before ``^E`` names it.
+so the band shows the abort before ``e`` names it.
 
 The span guard (LLR-135.5): ``join=fill`` with span >= 1 MiB and fill >= 50%
 of span renders the ``⚠ GUARD`` chip and arms a two-step confirm — the first
-``^E`` writes NOTHING; any state change (selection, mode, gap, pad, format,
-destination) disarms; the second ``^E`` while armed exports. Zero-coverage
+``e`` writes NOTHING; any state change (selection, mode, gap, pad, format,
+destination) disarms; the second ``e`` while armed exports. Zero-coverage
 files join the same confirm (LLR-136.6) — one arming naming every reason.
 
 Palette-first, NO rail key (ruling Q6/7a): the ``^K`` palette entry named
@@ -1096,7 +1096,7 @@ class SplitJoinWindow(WindowSection):
                 yield _RulerBar(id="sje_ruler", classes="sje-ruler")
                 yield Static(id="sje_stats")
                 yield Static(id="sje_summary")
-                yield Button("EXPORT  ^E", id="sje_export")
+                yield Button("EXPORT  e", id="sje_export")
 
     def on_mount(self) -> None:
         pane = self.query_one("#sje_right", Vertical)
@@ -1301,7 +1301,7 @@ class SplitJoinWindow(WindowSection):
         if plan.guard:
             t.append(f"⚠ GUARD  {fmtB(plan.span)} span", style=S_WARN_B)
             t.append(
-                " — ^E again to confirm" if self._armed else " — ^E will ask",
+                " — e again to confirm" if self._armed else " — e will ask",
                 style=S_DIM,
             )
             return t, True
@@ -1318,11 +1318,11 @@ class SplitJoinWindow(WindowSection):
                 style=S_WARN_B,
             )
             t.append(
-                " — ^E again to confirm" if self._armed else " — ^E will ask",
+                " — e again to confirm" if self._armed else " — e will ask",
                 style=S_DIM,
             )
             return t, True
-        t.append("ready — ^E exports", style=S_DIM)
+        t.append("ready — e exports", style=S_DIM)
         return t, False
 
     def _stats_text(self, plan: Plan, width: int) -> Text:
@@ -1602,7 +1602,7 @@ class SplitJoinWindow(WindowSection):
             return
         if (plan.guard or plan.empty_files) and not self._armed:
             # The two-step (LLR-135.5 + LLR-136.6): ONE arming naming every
-            # reason; the first ^E writes nothing.
+            # reason; the first e writes nothing.
             self._armed = True
             self._sync()
             reasons = []
@@ -1618,7 +1618,7 @@ class SplitJoinWindow(WindowSection):
                     f"{'s' if plan.empty_files > 1 else ''} — 0 B of source"
                 )
             app.notify(
-                " — ".join(reasons) + " — press ^E again to confirm",
+                " — ".join(reasons) + " — press e again to confirm",
                 severity="warning",
                 markup=False,
             )

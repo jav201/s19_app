@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: d305ff5caf301f66 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 74 requirement files | corpus digest: 0d441228d6d700c2 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -2741,7 +2741,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-150.5` | batches, tests |
 | `LLR-150.6` | batches, tests |
 | `LLR-150.7` | batches, tests |
-| `LLR-151.1` | batches |
+| `LLR-151.1` | batches, tests |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -3127,7 +3127,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-136` | batches |
 | `US-137` | batches, tests |
 | `US-138` | batches, tests |
-| `US-139` | batches |
+| `US-139` | batches, tests |
 | `US-140` | batches, tests |
 | `US-77` | canon |
 | `US-77-1` | batches |
@@ -3335,7 +3335,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-TUI-010` | batches, canon |
 | `R-TUI-011` | batches, canon |
 | `R-TUI-012` | batches, canon, tests |
-| `R-TUI-013` | batches, canon |
+| `R-TUI-013` | batches, canon, tests |
 | `R-TUI-014` | batches, canon |
 | `R-TUI-015` | batches, canon, tests |
 | `R-TUI-016` | batches, canon |
@@ -4130,8 +4130,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B97-12` | batches, tests |
 | `AT-B97-13` | batches, tests |
 | `AT-B97-14` | batches, tests |
-| `AT-B97-15` | batches |
-| `AT-B97-16` | batches |
+| `AT-B97-15` | batches, tests |
+| `AT-B97-16` | batches, tests |
 | `AT-B97-17` | batches, tests |
 | `AT-B97-18` | batches, tests |
 | `AT-B97-19` | batches, tests |
@@ -4139,7 +4139,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B97-21` | batches, tests |
 | `AT-B97-22` | batches, tests |
 | `AT-B97-23` | batches, tests |
-| `AT-B97-24` | batches |
+| `AT-B97-24` | batches, tests |
 | `AT-B97-25` | batches, tests |
 | `AT-B97-26` | batches, tests |
 | `TC-001` | batches, canon, tests |

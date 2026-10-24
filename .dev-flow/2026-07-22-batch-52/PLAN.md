@@ -38,7 +38,7 @@ Engine-frozen set OFF-LIMITS (none of the targets are frozen); ≤5 files/increm
 4. `check_regions` needs a stored value to compare, but the flow CRC block INJECTS (doesn't verify) — use the `computed_crc` from the results for inject; ignore `matched`. Confirm check_regions populates `computed_crc` even when no stored value present (it does — computes unconditionally).
 
 ## Out-of-scope carries
-FB-P1 flow.json persistence (batch-53); FB-P2 PKI extraction (BLOCKED, operator-defining); FB-P3 CRC-as-subflow; multi-image scope. CRC-as-single-block here, not decomposed.
+FB-P1 flow.json persistence (batch-53); FB-P2 memory-region extraction (BLOCKED, operator-defining); FB-P3 CRC-as-subflow; multi-image scope. CRC-as-single-block here, not decomposed.
 
 ## Test ledger
 - Inc-1 (engine): `tests/test_flow_crc_block.py` 12 · Inc-2 (UI): `tests/test_flow_crc_ui.py` 2 · Inc-3 (ribbon/F3/G-1): `tests/test_flow_crc_ribbon.py` 5 = **19 new**, all green. Combined flow+crc suite = 53 green. RED-verified: Inc-1 inject-threading, Inc-3 twin-ribbon. crc.py/crc_config.py diff-vs-main empty (frozen-safe).

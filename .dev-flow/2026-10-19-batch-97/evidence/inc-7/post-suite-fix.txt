@@ -1,0 +1,13 @@
+# Inc-7 post-suite fixes: census name binding (test_b97_width.py _show) + help scroll wait-for-animation-end; 3 help runs in parallel to load the box, then census + help + width _show users
+parallel-2: 5 passed, 33 deselected in 99.58s (0:01:39)
+parallel-1: 5 passed, 33 deselected in 100.55s (0:01:40)
+parallel-3: 5 passed, 33 deselected in 99.21s (0:01:39)
+.....                                                                    [100%]
+5 passed, 56 deselected in 96.53s (0:01:36)
+d24fe32f31e5197d2ab56c40eb72279ff27c654dd586bafff4846a9acbe963ad *tests/test_window_usage_help.py
+40295731ce51321c723940ac7c936df3a0f5a8c2f9371f85086bf68d7c1beeb2 *tests/test_b97_width.py
+# census (deselected above by -k) + test_b97_width.py nodes calling _show
+...........................                                              [100%]
+27 passed, 141 deselected in 200.46s (0:03:20)
+# test_b97_width.py tc_b97_59 (also calls _show)
+12 passed, 133 deselected in 140.58s (0:02:20)

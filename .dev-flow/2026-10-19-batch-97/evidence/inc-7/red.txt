@@ -1,0 +1,29 @@
+# Inc-7 RED on HEAD 5cb7618 (unchanged source; app.py, window_help.py, styles.tcss, segment_split_view.py, screens_directionb.py as committed). New nodes only.
+5cb7618c1ed123349cb40cc89ff8fb4a6304f234
+7212592d4271b88d3c70c9178fb3fa3d055a784242e04157bac68a58dc7d8a83 *s19_app/tui/window_help.py
+4b894b9754edb6a0a064e4bc2f292e4d2ad34b4dd25db6ec669210a6faf8948d *s19_app/tui/styles.tcss
+87833d3412a4061bcad0336c90cc712e6b5bd6c9be3503ffffe23733abd3e175 *s19_app/tui/segment_split_view.py
+edfe50de4efcd7bfca8e463de92db786f03750eeb266b80593f11345a3a9634e *s19_app/tui/screens_directionb.py
+e388bcd22bbfa8ece5bb5efdcf3a50eb4e496bdb6b642f449ce74709552e286f *tests/test_tui_snapshot.py
+FFFFF.FFFF                                                               [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app\tests\test_tui_snapshot.py:1316: AssertionError: ('mac-compact-120x30', '(none)  |  (none)')
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_key_bar.py:1016: AssertionError: (['diff-wide'], ['diff-notice'], {'[ Window page -': True, '] Window page +': True, 'f Run list': False}, {'[ Window page -': False, '] Window page +': False, 'f Run list': False})
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_key_bar.py:1016: AssertionError: (['diff-fallback'], ['diff-notice'], {'[ Window page -': True, '] Window page +': True, 'f Run list': True}, {'[ Window page -': False, '] Window page +': False, 'f Run list': False})
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_key_bar.py:1016: AssertionError: (['diff-notice'], ['diff-wide'], {'[ Window page -': False, '] Window page +': False, 'f Run list': False}, {'[ Window page -': True, '] Window page +': True, 'f Run list': False})
+C:\Users\jjgh8\Github\s19_app\tests\test_b97_key_bar.py:1016: AssertionError: (['diff-notice'], ['diff-fallback'], {'[ Window page -': False, '] Window page +': False, 'f Run list': False}, {'[ Window page -': True, '] Window page +': True, 'f Run list': True})
+C:\Users\jjgh8\Github\s19_app\tests\test_segment_split_window.py:1810: AssertionError: cues still naming ^E: {'button': '  EXPORT  ^E  ', 'guard': 'packed 104 B  ·  span 1.00 MiB  ·  fill 99.99%\n⚠ GUARD  1.00 MiB span — ^E will ask', 'armed': 'packed 104 B  ·  span 1.00 MiB  ·  fill 99.99%\n⚠ GUARD  1.00 MiB span — ^E again to confirm', 'toast': 'span guard: 1.00 MiB span from 104 B of data (99.99% pad) — press ^E again to confirm'}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:616: AssertionError: {'a2l': (False, [], (12, -7, 53, 30)), 'changes_file_notation': (False, ['1. A change-set file is ONE JSON object (UTF...the ledger shows that row's full name and address."], (12, -60, 53, 84)), 'checks': (False, [], (12, -5, 53, 29)), ...}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:616: AssertionError: {'check_editor': (False, ['1. Collect A2L parameters and memory rows into a check spec (`.chk.json`) whose fields ride...N — shows the loaded document as read-only JSON under its stamp, and the editable paste buffer.'], (18, -52, 79, 105))}
+C:\Users\jjgh8\Github\s19_app\tests\test_window_usage_help.py:616: AssertionError: {'flow': (False, ["1. Build a chain of blocks that runs on the loaded image: the pipeline shows each block as a card, ...N — shows the loaded document as read-only JSON under its stamp, and the editable paste buffer.'], (33, -32, 151, 91))}
+=========================== short test summary info ===========================
+FAILED tests/test_tui_snapshot.py::test_tc016s_harness_paints_the_a2l_context_itself
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[wide-to-notice]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[fallback-to-notice]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[notice-to-wide]
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_diff_keys_follow_a_height_only_regime_switch[notice-to-fallback]
+FAILED tests/test_segment_split_window.py::test_export_cues_name_the_bound_export_key
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size0]
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size1]
+FAILED tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key[size2]
+9 failed, 1 passed in 93.49s (0:01:33)

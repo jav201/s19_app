@@ -19,7 +19,7 @@ Define the requirements for running one saved Flow across a project's declared i
 
 **In scope.** The flow layer's variant dimension (`FlowContext` + a fused runner), per-variant isolation, the SOURCE `image_ref` override through the *reused* containment seam, the fused report composer (per-variant sections, rollup, inverted counts), per-variant **producer** bounding, and a UI scope selector.
 
-**Out of scope.** The Patch-Editor variant path, FB-P3 CRC sub-flow, PKI extraction (blocked on operator definition), and every module in the engine-frozen set.
+**Out of scope.** The Patch-Editor variant path, FB-P3 CRC sub-flow, memory-region extraction (blocked on operator definition), and every module in the engine-frozen set.
 
 ### 1.3 Definitions
 

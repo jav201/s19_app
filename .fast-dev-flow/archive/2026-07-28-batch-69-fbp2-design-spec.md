@@ -96,7 +96,7 @@ This project has now spent **three** batches (62, 63, 65) on report producers th
 
 ## 6. Out of scope
 
-The Patch-Editor variant path (unchanged), FB-P3 CRC sub-flow, PKI extraction (still blocked on the operator's definition), and the engine-frozen set.
+The Patch-Editor variant path (unchanged), FB-P3 CRC sub-flow, memory-region extraction (still blocked on the operator's definition), and the engine-frozen set.
 
 ---
 

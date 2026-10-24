@@ -169,7 +169,7 @@ warned image is acceptable — the tool informs, it does not gate (operator's "n
 - **Geometry** (project C-13/C-23/C-29): the ribbon + node columns MUST be pilot-measured in the real
   boxed panel at 80×24 AND wider; do NOT inherit the HTML prototype's width budget (C-16).
 - **OUT of scope:** CRC block (batch-52); `flow.json` save/load + external-file→import + variant reuse
-  (batch-53); PKI binary-region extraction · CRC-as-sub-flow · multi-image scope (backlog).
+  (batch-53); memory-region extraction · CRC-as-sub-flow · multi-image scope (backlog).
 
 ### 2.5 Assumptions and dependencies
 - **A1 (verified):** `build_loaded_s19/hex` return a `LoadedFile` whose `.errors` is the parser's

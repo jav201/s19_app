@@ -1446,3 +1446,340 @@ def test_tc_b97_59_execution_below_the_range_actions_reachable(tmp_path: Path, s
         assert presses < 200 and inside_tab, (size, wid, presses)
         assert pages < 20 and inside_page, (size, wid, pages)
     assert overlaps == [], overlaps
+
+
+# =========================================================================== #
+# Inc-7 — AT-B97-15, AT-B97-16, AT-B97-24 (HLR-149, black-box, the sweep)
+# =========================================================================== #
+#
+# One session holds the four screens with the A.5 "widest values" loaded:
+# the 47-cell parameter name (the demo A2L), a change-set file name wider than
+# the Patch ribbon, a 60-cell change-doc ref on the Builder's chain and on a
+# waiting Flow Execution lane, and a 40-cell set name. Each screen is reached
+# through the rail (``action_show_screen``) and every claim is read off the
+# painted cells or the widget regions the terminal shows, on the two-row key
+# bar layout (Inc-8). The per-screen TC nodes above own the matrices; these
+# nodes are the user's view of HLR-149: the same session, all four screens.
+
+import shutil  # noqa: E402
+
+from rich.cells import cell_len  # noqa: E402
+
+from tests.b97_fixtures import PATCHED_OUTPUT  # noqa: E402
+
+#: LLR-149.3's ten primary actions, per screen (rail key -> panel id, actions).
+AT_SCREENS = {
+    "check_editor": ("#check_editor_panel", ("check_validate_button", "check_write_button")),
+    "patch": ("#patch_editor_panel", PATCH_PRIMARY),
+    "flow": ("#flow_panel", ("flow_run",)),
+    "flow_execution": ("#fx_panel", ("fx_run", "fx_save", "fx_load")),
+}
+AT_CATEGORIES = tuple(dict.fromkeys(CATEGORIES + PATCH_CATEGORIES + FLOW_CATEGORIES + FX_CATEGORIES))
+#: A.5's 40-cell set name.
+WIDE_SET_NAME = "release_candidate_calibration_set_" + "x" * 6
+assert len(WIDE_SET_NAME) == 40
+
+
+async def _at_session(app, pilot, tmp_path: Path, *, run_lanes_too: bool = True) -> None:
+    """Load the widest values into all four screens of one running app."""
+    await settle(pilot)
+    project_dir = fx_project(app)
+    shutil.copyfile(project_dir / "calib_hotfix.json", project_dir / WIDE_REF)
+    blocks = patch_chain_demo()
+    blocks[1] = type(blocks[1])(WIDE_REF)
+    write_flow(project_dir, "wide_chain", blocks)
+    flash = flash_chain_demo(project_dir)
+    flash[1] = type(flash[1])(WIDE_REF)
+    write_flow(project_dir, "wide_flash", flash)
+    patch = await open_patch_editor(app, pilot)
+    changes = write_changeset(tmp_path / LONG_FILE, [_bytes_entry(a, r) for a, r in CALIB_ENTRIES])
+    await load_change_file(app, pilot, patch, changes)
+    await open_check_editor(app, pilot, a2l=DEMO_A2L)
+    builder = await open_flow_builder(app, pilot)
+    await load_flow(app, pilot, "wide_chain")
+    builder.query_one("#flow_palette_external_step").press()
+    await _poll(pilot, lambda: is_displayed(builder.query_one("#flow_ext_log")))
+    fx = await import_lanes(app, pilot, "wide_flash", "patch_chain", "err_chain")
+    fx.query_one("#fx_set_name", Input).value = WIDE_SET_NAME
+    if run_lanes_too:
+        await run_lanes(app, pilot, fx, key=True)
+
+
+async def _show(app, pilot, key: str):
+    """Show ``key`` through the rail and wait for its layout pass."""
+    app.action_show_screen(key)
+    selector = AT_SCREENS[key][0]
+    panel = app.query_one(selector)
+    await _poll(pilot, lambda: panel.region.height > 0 and _laid_out(panel) and _fx_laid_out(panel))
+    await settle(pilot, 3)
+    return panel
+
+
+def _hard_clipped_cells(panel) -> list:
+    """DataTable cells whose text is wider than their column: Textual would
+    cut them with no ellipsis (P-39). Every over-wide value must arrive here
+    already clipped with its class's ``…``."""
+    bad = []
+    for table in panel.query(DataTable):
+        if not is_displayed(table):
+            continue
+        widths = [c.width for c in table.ordered_columns]
+        for r in range(table.row_count):
+            for c, value in enumerate(table.get_row_at(r)):
+                text = value.plain if hasattr(value, "plain") else str(value)
+                if cell_len(text) > widths[c]:
+                    bad.append((table.id, r, c, text))
+    return bad
+
+
+def _wrapped_rows(app, panel) -> list:
+    """No-wrap members (by category class) painting more rows than lines."""
+    wraps = []
+    for cat in AT_CATEGORIES:
+        for w in panel.query(f".{cat}"):
+            if not is_displayed(w) or isinstance(w, DataTable):
+                continue
+            lines = str(w.render()).split("\n")
+            height = w.get_content_height(w.content_region.size, app.size, w.content_region.width)
+            if height != len(lines) or w.region.height < len(lines):
+                wraps.append((cat, w.id, height, len(lines)))
+    return wraps
+
+
+async def _at_15_reading(app, pilot, key: str) -> dict:
+    panel = await _show(app, pilot, key)
+    panel.scroll_home(animate=False)
+    await _poll(pilot, lambda: panel.scroll_y == 0)
+    await settle(pilot, 2)
+    reading = {
+        "overflow": [w.id or type(w).__name__ for w in clipped_overflow(panel)],
+        "population": len(displayed_descendants(panel)),
+        "outside": [i for i in AT_SCREENS[key][1] if not panel.region.contains_region(panel.query_one(f"#{i}").region)],
+        "wraps": _wrapped_rows(app, panel),
+        "hard_clipped": _hard_clipped_cells(panel),
+        "ellipses": sum(r.count("…") for r in painted_rows(app, panel)),
+    }
+    ledger = {"check_editor": "#check_param_table", "patch": "#patch_doc_entries_table"}.get(key)
+    if ledger:
+        table = panel.query_one(ledger, DataTable)
+        rows = await painted_table(app, pilot, table)
+        reading["ledger"] = (table.row_count, len(rows), len(set(rows.values())))
+        reading["ellipses"] += sum(line.count("…") for line in rows.values())
+        reading["longest_whole"] = any(LONGEST_NAME in line for line in rows.values())
+    if key == "flow_execution":
+        lanes = ["\n".join(painted_rows(app, panel.query_one(f"#fx_lane_{i}"))) for i in range(panel.lane_count())]
+        reading["ledger"] = (panel.lane_count(), len(lanes), len(set(lanes)))
+    return reading
+
+
+@pytest.mark.parametrize("size", [(118, 54), (160, 56)])
+def test_at_b97_15_four_screens_with_the_widest_values(tmp_path: Path, size) -> None:
+    """AT-B97-15 (US-139 / HLR-149, black-box; A.5): with the widest real
+    values loaded (the 47-cell parameter name, a change-set file name wider
+    than the ribbon, a 60-cell change-doc ref on the Builder's chain and on a
+    waiting lane, a 40-cell set name), each of the four screens shown through
+    the rail at 118x54 and 160x56 has 0 descendants off the panel on x (over
+    >= 10), its LLR-149.3 actions inside the panel at scroll 0, 0 wrapped
+    no-wrap rows, 0 table cells wider than their column (Textual's hard clip
+    has no ellipsis: every clip is the panel's own, with its ``…``), and its
+    ledger rows (the parameter ledger, the 6-entry change-set, the lanes)
+    pairwise distinct. Guard: the widest values clip somewhere on every
+    screen (``…`` painted).
+
+    RED on ``main`` (P-10, A.5): overflow 1/1/2/7 at 118x54. RED executed on
+    the batch base ``51ee191`` (``evidence/inc-7/red-at.txt``). Mutations:
+    ``evidence/inc-7/mutations.txt``.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _at_session(app, pilot, tmp_path)
+            return {key: await _at_15_reading(app, pilot, key) for key in AT_SCREENS}
+
+    readings = asyncio.run(_drive())
+    for key, r in readings.items():
+        assert r["population"] >= 10, (key, r["population"])
+        assert r["overflow"] == [], (size, key, r["overflow"])
+        assert r["outside"] == [], (size, key, r["outside"])
+        assert r["wraps"] == [], (size, key, r["wraps"])
+        assert r["hard_clipped"] == [], (size, key, r["hard_clipped"][:3])
+        # Guard: the widest values reach the clip path — a painted ``…`` on
+        # every screen, except where the 47-cell name fits whole (the Check
+        # Editor from 134 columns, LLR-145.3) and is read painted in full.
+        assert r["ellipses"] >= 1 or r.get("longest_whole"), f"guard: the widest values clip on {key} at {size}"
+        if "ledger" in r:
+            count, painted, distinct = r["ledger"]
+            assert count >= 3 and painted == count and distinct == count, (key, r["ledger"])
+
+
+async def _at_16_reading(app, pilot, key: str) -> dict:
+    panel = await _show(app, pilot, key)
+    reading = {
+        "overflow": [w.id or type(w).__name__ for w in clipped_overflow(panel)],
+        "painted": painted_rows(app, panel),
+    }
+    if key == "check_editor":
+        table = panel.query_one("#check_param_table", DataTable)
+        void, _header = _header_void(app, table)
+        clipped = [line for line in (await painted_table(app, pilot, table)).values() if "…" in line]
+        table.scroll_to(y=0, animate=False)
+        await settle(pilot, 2)
+        reading.update(width=table.ordered_columns[1].width, void=void, clipped=len(clipped),
+                       blank=blank_panel_rows(app, panel, outside=table))
+    elif key == "patch":
+        table = panel.query_one("#patch_doc_entries_table", DataTable)
+        void, _header = _header_void(app, table)
+        reading.update(width=table.ordered_columns[2].width, void=void, clipped=0,
+                       blank=blank_panel_rows(app, panel, outside=panel.query_one("#patch_main")))
+    elif key == "flow":
+        rows = painted_rows(app, panel.query_one("#flow_pipeline"))
+        content = panel.query_one("#flow_pipeline_scroll").scrollable_content_region
+        separators = sorted(panel.query_one(wid).region.y - 1 for wid in BUILDER_SEPARATED)
+        blank = blank_panel_rows(app, panel, outside=panel.query_one("#flow_result"))
+        reading.update(width=_card_width(app, panel), void=content.width - max(len(r.rstrip()) for r in rows),
+                       clipped=sum(r.count("…") for r in rows), blank=[y for y in blank if y not in separators])
+    else:
+        view = panel.query_one("#fx_lanes_scroll").scrollable_content_region
+        confirm = panel.query_one("#fx_confirm_0").region
+        clipped = sum(r.count("…") for r in painted_rows(app, panel.query_one("#fx_lane_0_row")))
+        reading.update(width=panel.query_one("#fx_card_0_0").region.width, void=view.right - confirm.right,
+                       clipped=clipped, blank=blank_panel_rows(app, panel, outside=panel.query_one("#fx_lanes_scroll")))
+    return reading
+
+
+def test_at_b97_16_in_session_resize_grows_and_returns(tmp_path: Path) -> None:
+    """AT-B97-16 (US-139 / HLR-149, black-box; A.5, PC-19): in ONE session
+    ``resize_terminal`` 118x54 → 220x60 → 260x70 → 118x54 with the widest
+    values loaded; after each step each screen is shown through the rail and
+    read as painted: its adaptive width (the Parameter column, the Patch Value
+    column, the Builder card, the lane card) is non-decreasing and strictly
+    wider at 220 than at 118; at 220x60 and 260x70 the void after each
+    adaptive element is <= 2 cells, or more only with no clipped line in that
+    band (LLR-149.5, read over content regions); 0 blank panel rows outside
+    the growing region (the Builder's 3 named separator rows excepted) and 0
+    descendants off the panel at every step; back at 118x54 each screen
+    paints exactly the rows of its first 118x54 reading.
+
+    RED on ``main`` (P-22, P-32): EXT-STEP inputs 28 at both sizes, Patch 3
+    blank rows. On the batch base ``51ee191`` this node is RED only
+    structurally (no ``#patch_main``, ``evidence/inc-7/red-at.txt``); its
+    clauses are shown RED by mutants M10-M12 (``evidence/inc-7/mutations.txt``).
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        out = []
+        async with app.run_test(size=(118, 54)) as pilot:
+            await _at_session(app, pilot, tmp_path)
+            for size in ((118, 54), (220, 60), (260, 70), (118, 54)):
+                await pilot.resize_terminal(*size)
+                await _poll(pilot, lambda: app.size == size)
+                await settle(pilot, 4)
+                out.append((size, {key: await _at_16_reading(app, pilot, key) for key in AT_SCREENS}))
+        return out
+
+    steps = asyncio.run(_drive())
+    for size, readings in steps:
+        for key, r in readings.items():
+            assert r["overflow"] == [], (size, key, r["overflow"])
+            assert r["blank"] == [], (size, key, r["blank"])
+            if size[0] >= 220:
+                assert r["void"] <= 2 or r["clipped"] == 0, (size, key, r["void"], r["clipped"])
+    for key in AT_SCREENS:
+        widths = [readings[key]["width"] for _size, readings in steps[:3]]
+        assert None not in widths and widths == sorted(widths) and widths[1] > widths[0], (key, widths)
+        assert steps[0][1][key]["painted"] == steps[-1][1][key]["painted"], f"{key}: back at 118x54 it paints as at first"
+
+
+async def _tab_to(app, pilot, panel, key: str, target) -> int:
+    """``tab`` from the window's help chip until ``target`` holds the focus
+    (<= 200 presses); return the presses."""
+    panel.scroll_home(animate=False)
+    app.query_one(f"#window_help_{key}").focus()
+    await settle(pilot, 2)
+    presses = 0
+    while app.focused is not target and presses < 200:
+        await pilot.press("tab")
+        presses += 1
+    await _poll(pilot, lambda: panel.region.contains_region(target.region))
+    return presses
+
+
+async def _reach(app, pilot, panel, key: str, wid: str) -> tuple:
+    """``tab`` from the window's help chip until ``wid`` holds the focus
+    (<= 200), then ``pagedown`` on the panel from scroll 0 (<= 20)."""
+    target = panel.query_one(f"#{wid}")
+    presses = await _tab_to(app, pilot, panel, key, target)
+    by_tab = app.focused is target and panel.region.contains_region(target.region)
+    panel.scroll_home(animate=False)
+    panel.focus()
+    await _poll(pilot, lambda: panel.scroll_y == 0)
+    pages = 0
+    while not panel.region.contains_region(target.region) and pages < 20:
+        await pilot.press("pagedown")
+        await settle(pilot, 1)
+        pages += 1
+    return presses, by_tab, pages, panel.region.contains_region(target.region)
+
+
+def test_at_b97_24_breakpoint_and_below_the_range_by_key(tmp_path: Path) -> None:
+    """AT-B97-24 (US-139 / HLR-149, black-box; A.5): with ``patch_chain``'s
+    widest variant (its change doc a 60-cell ref) in the Builder and the
+    widest values on the other screens, ``resize_terminal`` 119x54 ↔ 120x54
+    flips ``width-narrow`` and leaves 0 descendants off the panel on both
+    sides, on all four screens; then at 80x24 and 220x40 every LLR-149.3
+    action is reached from the keyboard — ``tab`` focuses it inside the panel,
+    ``pagedown`` on the panel brings it inside — and ``enter`` on the focused
+    Run writes ``fw_app_patched.s19`` (absent before).
+
+    RED on ``main`` (P-10): overflow at 118 / 120. On the batch base
+    ``51ee191`` this node is RED only structurally (no help chip on the Check
+    Editor, ``evidence/inc-7/red-at.txt``); its clauses are shown RED by
+    mutants M13, M14 and M16 (``evidence/inc-7/mutations.txt``).
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        out = {"boundary": [], "reach": {}}
+        async with app.run_test(size=(119, 54)) as pilot:
+            await _at_session(app, pilot, tmp_path, run_lanes_too=False)
+            output = app.active_project_dir() / PATCHED_OUTPUT
+            out["absent_before"] = not output.exists()
+            for size in ((119, 54), (120, 54), (119, 54)):
+                await pilot.resize_terminal(*size)
+                await _poll(pilot, lambda: app.size == size)
+                await settle(pilot, 3)
+                narrow = app.query_one("#workspace_body").has_class("width-narrow")
+                for key in AT_SCREENS:
+                    panel = await _show(app, pilot, key)
+                    out["boundary"].append((size, key, narrow, [w.id or type(w).__name__ for w in clipped_overflow(panel)]))
+            for size in ((80, 24), (220, 40)):
+                await pilot.resize_terminal(*size)
+                await _poll(pilot, lambda: app.size == size)
+                await settle(pilot, 3)
+                for key, (_sel, actions) in AT_SCREENS.items():
+                    panel = await _show(app, pilot, key)
+                    for wid in actions:
+                        out["reach"][(size, wid)] = await _reach(app, pilot, panel, key, wid)
+                    if key == "flow" and size == (80, 24):
+                        run = panel.query_one("#flow_run")
+                        await _tab_to(app, pilot, panel, key, run)
+                        out["run_focused"] = app.focused is run
+                        await pilot.press("enter")
+                        await _poll(pilot, lambda: bool(panel.query("#flow_result .flow-banner")))
+                        await settle(pilot, 2)
+                        out["written"] = output.exists()
+        return out
+
+    out = asyncio.run(_drive())
+    assert out["absent_before"], "guard: no output before Run"
+    for size, key, narrow, offenders in out["boundary"]:
+        assert narrow is (size[0] < 120), (size, key, narrow)
+        assert offenders == [], (size, key, offenders)
+    assert len(out["reach"]) == 20, "guard: 10 actions at 2 sizes"
+    for (size, wid), (presses, by_tab, pages, by_page) in out["reach"].items():
+        assert presses < 200 and by_tab, (size, wid, presses)
+        assert pages < 20 and by_page, (size, wid, pages)
+    assert out.get("run_focused"), "guard: Run holds the focus when enter is pressed"
+    assert out.get("written"), "enter on the focused Run writes its output"

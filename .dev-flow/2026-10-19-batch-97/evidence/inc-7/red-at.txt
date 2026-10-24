@@ -1,0 +1,14 @@
+# AT-B97-15 / -16 / -24 RED on the batch base 51ee191 (detached worktree; s19_app and the tests' helper modules imported from it; the AT module + b97 helpers copied in from the Inc-7 tree)
+s19_app from C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_51ee191\s19_app\__init__.py
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_51ee191\tests\test_b97_width.py:1602: AssertionError: ((118, 54), 'check_editor', ['check_apply_ghost'])
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\wt_51ee191\tests\test_b97_width.py:1602: AssertionError: ((160, 56), 'check_editor', ['check_apply_ghost'])
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#patch_main' on PatchEditorPanel(id='patch_editor_panel')
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: textual.css.query.NoMatches: No nodes match '#window_help_check_editor' on Screen(id='_default')
+=========================== short test summary info ===========================
+FAILED tests/test_b97_width.py::test_at_b97_15_four_screens_with_the_widest_values[size0]
+FAILED tests/test_b97_width.py::test_at_b97_15_four_screens_with_the_widest_values[size1]
+FAILED tests/test_b97_width.py::test_at_b97_16_in_session_resize_grows_and_returns
+FAILED tests/test_b97_width.py::test_at_b97_24_breakpoint_and_below_the_range_by_key
+4 failed, 141 deselected in 60.16s (0:01:00)

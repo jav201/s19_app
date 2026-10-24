@@ -1,0 +1,1515 @@
+[
+ {
+  "id": "R-001",
+  "dates": [
+   "2026-07-21",
+   "2026-10-23"
+  ],
+  "times_asked": 2,
+  "area": "UX / status bar",
+  "request": "Long-running actions must show a progress / running indicator so the user can tell progress from a hang.",
+  "quote": "las acciones que llevan mucho tiempo no tienen load bar status, como usuarios es malo no saber si una tarea progresa o sigue colgada",
+  "class": "PARTIAL",
+  "landed_in": "BACKLOG-CODE.md P1 'N5' (marked PARTIAL/DONE 2026-07-23) + 'Routed 2026-10-23 — N5 reopened'",
+  "evidence": "s19_app/tui/app.py:3993 set_progress(15) at report kickoff; set_progress is called only from file load, A2L load, the error reset and the report paths (BACKLOG-CODE N5-reopened entry, measured at 5cb7618)",
+  "open_part": "A running/idle state on the status bar for Flow Execution, CRC compute, patch apply, Split/Join export and project save; after a load the bar stays at a stale 100.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Asked twice; the first closure shipped only report progress and marked the item DONE with carries open.",
+  "sessions": [
+   "cf41480f",
+   "a8feab43"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-002",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 2,
+  "area": "UX / app shell",
+  "request": "Fix the app's starting width/height and the large font scale that hides content (reference: dolphie).",
+  "quote": "maybe later we can fix the starting width , height and the font scale",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'Registered 2026-07-31 — deferrals born OUTSIDE a batch' (P3, app start width/height + font scale): registered 16 days after the ask, by an audit",
+  "evidence": "No initial-size or font control in s19_app/tui/app.py (BACKLOG-CODE 2026-07-31 measurement); Textual cannot set the host terminal font",
+  "open_part": "Decide the framing (document a recommended terminal size, or code); nothing built.",
+  "relevance": "operator-decides",
+  "relevance_reason": "May resolve to documentation only; the operator now scales the terminal by hand (2026-10-20).",
+  "sessions": [
+   "e98a4756",
+   "8f1adcc5"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-003",
+  "dates": [
+   "2026-07-20",
+   "2026-07-21"
+  ],
+  "times_asked": 2,
+  "area": "CRC / Flow Builder",
+  "request": "Model CRC as a configurable flow of blocks (gap fill, ranges, polynomial, endianness as separate blocks).",
+  "quote": "we need to revisit the CRC, because I intend to make this also a flow of operations to craft the CRC with blocks as well",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'Flow Builder — open' FB-P3 (CRC as a configurable SUB-FLOW of blocks)",
+  "evidence": "No sub-flow CRC blocks: s19_app/tui/services/flow_model.py:295 CrcBlock is one template-driven block; the CRC Designer (s19_app/tui/crc_designer_view.py:225) covers parameter configurability",
+  "open_part": "The whole sub-flow design; deferred since 2026-07-21.",
+  "relevance": "operator-decides",
+  "relevance_reason": "The CRC Designer plus the CRC block already give configurability; the sub-flow may no longer be needed.",
+  "sessions": [
+   "b50ee405",
+   "ecff6d5b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-004",
+  "dates": [
+   "2026-10-19",
+   "2026-10-21"
+  ],
+  "times_asked": 2,
+  "area": "UX / flow and editor screens",
+  "request": "The new screens (Patch Editor, Check Editor, Flow Builder, Flow Execution) are not polished; bring them to the quality of the other screens.",
+  "quote": "Tengo la impresión de que no están pulidas lo suficiente",
+  "class": "PARTIAL",
+  "landed_in": "batch-97 (US-134..US-140; prototypes/b94_polish verdict A on all four screens)",
+  "evidence": "On main: 09e44de (Inc-4 Patch Editor), b514b07 (Inc-5 Flow Builder), 9793fcd (Inc-6 Flow Execution), 354857c (Inc-8 key bar), 5cb7618 (Inc-9)",
+  "open_part": "Inc-7 (width sweep 118 + 220, real captures, snapshot regen) not done; batch-97 05-close.md is still the template.",
+  "relevance": "likely-keep",
+  "relevance_reason": "In flight; the 2026-10-21 key-bar verdict note repeated the complaint.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict JSON: Downloads/verdict-keybar.json general_notes (2026-10-21)"
+  ]
+ },
+ {
+  "id": "R-005",
+  "dates": [
+   "2026-10-23"
+  ],
+  "times_asked": 1,
+  "area": "Projects / load",
+  "request": "Load must also open projects; project load is not trusted because some artifacts do not load well.",
+  "quote": "load también debe de hacer load de proyectos, pero no confío mucho en la opción porque algunos artefactos no se cargan bien",
+  "class": "PARTIAL",
+  "landed_in": "BACKLOG-CODE.md 'Routed 2026-10-23 — read/write integrity' operator bullet + 'Code-Wire audits' (CW-U-1, CW-D-13/14); .dev-flow/design/INVESTIGATION-project-roundtrip-2026-10-23.md",
+  "evidence": "CW-U-1 fixed in 5cb7618 (batch-97 Inc-9, LoadProjectScreen at s19_app/tui/screens.py:691); PH-1 still open: action_save_project (s19_app/tui/app.py:6458) copies the file on disk, not the patched image",
+  "open_part": "PH-1..PH-5 (save copies the disk file, P1 artifacts leak into P2, save-back crash), CW-D-13/14, the Workarea-list sibling of CW-U-1, and the R-TUI-012 vs LLR-015.3 requirement conflict.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Data-integrity defects in a core workflow.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-006",
+  "dates": [
+   "2026-10-23"
+  ],
+  "times_asked": 1,
+  "area": "Data integrity",
+  "request": "Investigate the patch-at-0x00020000 error as a possible data-integrity risk and make sure reading and writing of every involved file is correct.",
+  "quote": "busque ese error con 0x00020000 ... Que la investigación asegure la lectura y escritura de información de todos los archivos involucrados",
+  "class": "PARTIAL",
+  "landed_in": "BACKLOG-CODE.md 'Routed 2026-10-23 — read/write integrity investigation (NEXT BATCH, urgent)' H-1..H-10, M-1..M-10, L-1..L-7",
+  "evidence": "Investigation done: .dev-flow/design/INVESTIGATION-read-write-integrity-2026-10-22.md; H-2 live: flow_execution_service.py:487-492 builds the PATCH result as BLOCK_STATUS_OK whatever the dispositions (per backlog, re-confirmed 2026-10-23)",
+  "open_part": "All fixes (10 HIGH) are owed by the integrity batch.",
+  "relevance": "likely-keep",
+  "relevance_reason": "The operator ruled it the next batch, urgent.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-007",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Config files",
+  "request": "A library of templates for every JSON configuration file the tool uses.",
+  "quote": "I am thinking we might need a library of templates for all the configuration files that use json for this tool",
+  "class": "PARTIAL",
+  "landed_in": "Never recorded as its own backlog item (grep 'template library' in BACKLOG-CODE.md: 0 hits); delivered piecemeal",
+  "evidence": "CRC templates: s19_app/tui/workspace.py:58 ensure_template_lib (.s19tool/templates); flow templates with dedup-suffix save (345cb1d, batch-94); no template set for patch (.json) or check (.chk.json) documents",
+  "open_part": "Templates for patch and check documents; seeded starter templates.",
+  "relevance": "operator-decides",
+  "relevance_reason": "Partly covered; the rest was never written down, so nobody owns it.",
+  "sessions": [
+   "ecff6d5b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-008",
+  "dates": [
+   "2026-10-20"
+  ],
+  "times_asked": 1,
+  "area": "UX / layout",
+  "request": "Layouts should use large terminals well: the operator scales the terminal up until density is right (e.g. 220x60).",
+  "quote": "trabajo a escalas más grandes, es mucha información la desplegada",
+  "class": "PARTIAL",
+  "landed_in": "batch-97 220x60 pass (its four screens); BACKLOG-CODE.md 2026-07-31 P2 'raising the 120-column layout cap is an UNMADE operator decision'; rail-breakpoint note (LED-...97.13)",
+  "evidence": "Above 120 columns the side panes are fixed (left 22, right 40) and only the centre grows (BACKLOG-CODE 2026-07-31 entry: app.py narrow = width < 120)",
+  "open_part": "The 120-column fixed-pane regime on the other screens; the 120-133 rail-breakpoint dip.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Matches how the operator actually works; the cap decision is still unmade.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict md: prototypes/b94_polish/veredicto-b94-polish.md (round 2)"
+  ]
+ },
+ {
+  "id": "R-009",
+  "dates": [
+   "2026-10-20"
+  ],
+  "times_asked": 1,
+  "area": "Hex viewers",
+  "request": "Hex viewer rows must never wrap onto two lines (A2L viewer and Hex View) at any scale.",
+  "quote": "las líoneas del visor de HEx en A2L viewer, que no salten a dos líneas dejando espacios en blanco y des alineaciones molestas",
+  "class": "PARTIAL",
+  "landed_in": "batch-97 HLR-149 (its four screens only) + BACKLOG-CODE.md 'Routed 2026-10-20 — batch-97 Phase-2' P2 'hex-viewer rows must never wrap'",
+  "evidence": "Applied only to batch-97's screens; the A2L viewer and Hex View item is open in BACKLOG-CODE.md",
+  "open_part": "Width-derived bytes-per-row for the A2L viewer and Hex View.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Named by the operator with a screenshot; open on exactly the two screens he named.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict md: prototypes/b94_polish/veredicto-b94-polish.md (round 2)"
+  ]
+ },
+ {
+  "id": "R-010",
+  "dates": [
+   "2026-08-06",
+   "2026-10-11"
+  ],
+  "times_asked": 2,
+  "area": "Operations / CRC",
+  "request": "Remove the 'Operations' binding (x), superseded by the CRC Designer, and save the x algorithm as a CRC Designer config so it is reproduced there. (2026-10-11 Cambio6 asked again for the JSON of that algorithm.)",
+  "quote": "the binding for \"operations\" is not necessary since the CRC calculation is now superseded by the CRC Designer",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md batch-78 section 'BATCH-81 CHARTER, Lane 3: operations staged removal S-10...S-13' (chartered 2026-08-07, never run; no batch-81 folder exists)",
+  "evidence": "s19_app/tui/app.py:1409 Binding(\"x\", \"operations_view\", \"Operations\", show=True); s19_app/tui/screens.py:1997 OperationsScreen still present",
+  "open_part": "S-10 encode the CRC-32 as a .crc.json (open decision: multi-region outputs), S-11 Designer execute path, S-12 equivalence test, S-13 delete the modal.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Chartered 2.5 months ago and never scheduled; the operator asked for it directly.",
+  "sessions": [
+   "2628d42b"
+  ],
+  "source": [
+   "transcript",
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio6 (second half: create the JSON for the CRC algorithm described earlier)"
+  ]
+ },
+ {
+  "id": "R-011",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Flow Builder / extraction",
+  "request": "Functions to extract the bytes of specific memory regions (address ranges) of an S19/HEX image into a binary file.",
+  "quote": "put ion the backlog for me to define some functions to extract binaries from specific regions from s19 files",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'Flow Builder — open' FB-P2 memory-region extraction (BLOCKED: awaiting operator definition)",
+  "evidence": "No region-extraction block; batch-95 shipped a BIN emitter + .addr sidecar for Split/Export (s19_app/segment_ops.py:143 emit_bin_from_mem_map) that may cover the extraction half",
+  "open_part": "The operator's definition of the region spec and hand-off; the flow block.",
+  "relevance": "operator-decides",
+  "relevance_reason": "Blocked on the operator since 2026-07-21; Split/Export may already do what is needed.",
+  "sessions": [
+   "ecff6d5b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-012",
+  "dates": [
+   "2026-10-18",
+   "2026-10-23"
+  ],
+  "times_asked": 2,
+  "area": "Load dialog",
+  "request": "Stop duplicating loaded files (2026-10-18: add a hash/content check for same-named files) and give the Load dialog a list of what was loaded before (2026-10-23).",
+  "quote": "la función load sólo es un cuadro de texto, pero no te da las opciones de lo que previamente se ha cargado",
+  "class": "PARTIAL",
+  "landed_in": "BACKLOG-CODE.md 'Routed 2026-10-23 — read/write integrity' operator bullet (Load file is a bare path box), routed to the Load+projects batch; 2026-10-18 half shipped as batch-96 B8 (bd42d8d)",
+  "evidence": "bd42d8d: copy_into_workarea (s19_app/tui/workspace.py:262) reuses the target when bytes are identical; s19_app/tui/screens.py:179 LoadFileScreen is still one Input + Load/Cancel, and a re-load of a changed work copy still writes <name>_<N>",
+  "open_part": "Picker of work-area files and recent sources; open-in-place for work-area files; replication when the work copy differs from the source (prototype round first).",
+  "relevance": "likely-keep",
+  "relevance_reason": "Asked twice in five days; the first fix covered only byte-identical files.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p4 BUG (copies of loaded files; add a hash/content check)"
+  ]
+ },
+ {
+  "id": "R-013",
+  "dates": [
+   "2026-10-23"
+  ],
+  "times_asked": 1,
+  "area": "Test fixtures",
+  "request": "Synthetic files to verify Flow Builder / Flow Execution, including MAC and other-standard files that the demo lacks.",
+  "quote": "faltan casos para verificación del flow builder y executioner, valdría la pena hacer archivos sintéticos",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'Routed 2026-10-23 — synthetic fixture corpus for Flow Builder / Flow Execution'",
+  "evidence": "Measured in the backlog: 0 .hex/.ihex/.srec fixtures under examples/ + tests/; the b94 demo project has no MAC",
+  "open_part": "Generator + manifest per format; new standards (CDFX/DCM/ELF) only if the operator wants new formats.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Needed as the oracle for the integrity batch.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-014",
+  "dates": [
+   "2026-10-22"
+  ],
+  "times_asked": 1,
+  "area": "Reports",
+  "request": "Improve the md and html reports Flow Execution produces, using the new A2L reading and flow-execution data.",
+  "quote": "mejorar el reporte que se genera en md y html aprovechando ahora las últimas actualizaciones sobre leer el A2l y el flow execution",
+  "class": "TRACKED-OPEN",
+  "landed_in": "Only .dev-flow/design/INTAKE-flow-report-2026-10-22.md (future batch-98); BACKLOG-CODE.md mentions 'the flow-report batch' in passing but has NO row for it",
+  "evidence": "Flow reports are Markdown only; HTML exists only for Diff/Before-After (INTAKE section 1, diff_report_service.py:2424); s19_app/tui/services/flow_report_service.py:356 compose_flow_report",
+  "open_part": "Everything; a prototype round is planned first.",
+  "relevance": "likely-keep",
+  "relevance_reason": "At risk of the same loss pattern: it lives in a design file, not in the canonical queue.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-015",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "Issues view",
+  "request": "Issues report filter (name/type) and sort (field-audit N2, relayed in the operator-approved handoff).",
+  "quote": "the remaining items (B1 Issues paging, B3 A2L two-chars, N2 Issues filter/sort, N4 paste-everywhere)",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'P1 — open features' Issues Report v2 (PARKED: operator never picked a tier)",
+  "evidence": "No sort in s19_app/tui/issues_view.py (grep 'sort': 0 hits); only a 3-way severity filter",
+  "open_part": "Filter by name/type + sort; the operator's tier choice.",
+  "relevance": "operator-decides",
+  "relevance_reason": "Parked on an operator decision that was never asked again.",
+  "sessions": [
+   "49736282"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-016",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "A2L view",
+  "request": "A2L address shows two extra characters (field-audit B3, relayed).",
+  "quote": "B3 A2L two-chars",
+  "class": "TRACKED-OPEN",
+  "landed_in": "BACKLOG-CODE.md 'Needs-repro' (A2L address \"two extra chars\")",
+  "evidence": "The >32-bit case is handled by A2L_ADDRESS_EXCEEDS_32BIT (batch-38); any other case needs a repro",
+  "open_part": "A concrete repro (symbol + value).",
+  "relevance": "likely-drop",
+  "relevance_reason": "No repro in three months; probably the >32-bit case already handled.",
+  "sessions": [
+   "49736282"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-017",
+  "dates": [
+   "2026-07-19"
+  ],
+  "times_asked": 1,
+  "area": "Issues / Checks screens",
+  "request": "Check whether the behaviour the assistant had just missed while eyeballing the Issues/Checks screens (rows dumped as 'Blank') also affects other screens.",
+  "quote": "I have the suspicion that this behavior might be on other screens. So please check them all",
+  "class": "DONE",
+  "landed_in": "Session 5e48add6 (batch-49 close): the assistant swept the screens after its own text dump showed check rows as 'Blank' (a dump artifact: a row is a container whose text lives in child cells)",
+  "evidence": "Transcript 5e48add6: the next operator message (2026-07-20, #229) closes it: 'I did not spotted anything, but rather was cautious becuase you pointed out that you missed it somehow.'",
+  "open_part": "",
+  "relevance": "likely-drop",
+  "relevance_reason": "The 'behaviour' was the assistant's text-dump artifact, not a UI defect; the operator closed it the next day.",
+  "sessions": [
+   "5e48add6"
+  ],
+  "source": [
+   "transcript",
+   "session transcript 5e48add6 (assistant turn before the message)"
+  ]
+ },
+ {
+  "id": "R-018",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "Patch Editor",
+  "request": "Patch Editor responsive 3-column layout (PATCH SCRIPT / CHECKS / JSON EDIT), docked buttons always visible.",
+  "quote": "Responsive: three columns gets roomier as the terminal grows",
+  "class": "SUPERSEDED",
+  "landed_in": "Shipped batch-47/48 (fbafb82); replaced by batch-94 pe_b split rework (07102b1) and batch-97 Inc-4 ledger + inspector (09e44de) after the 2026-10-20 verdict",
+  "evidence": "Current layout is batch-97 Inc-4 (commit 09e44de)",
+  "open_part": "",
+  "relevance": "likely-drop",
+  "relevance_reason": "Replaced by the operator's 2026-10-20 choice (Patch Editor A).",
+  "sessions": [
+   "49736282",
+   "8f1adcc5"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-019",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "CRC Designer",
+  "request": "Raise the known-answer verdict and warnings to the top tile row of the CRC Designer to give the JSON viewer more room.",
+  "quote": "the json viewer needs more space. So I think you can better have the known anser veredict and the warnings up",
+  "class": "SUPERSEDED",
+  "landed_in": "The 2026-07-28 ask to drop/redesign the KAT field, then the 2026-07-30 choice of CRC variant B: batch-72 demoted KAT to a Self-test row (R-TUI-100)",
+  "evidence": "s19_app/tui/crc_designer_view.py:351 'Self-test' row",
+  "open_part": "",
+  "relevance": "likely-drop",
+  "relevance_reason": "A later operator decision replaced it.",
+  "sessions": [
+   "cf41480f"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-020",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "Screens",
+  "request": "Screen-upgrade plan: Workspace MID, A2L Explorer MID, MAC View MID, Memory Map BIG, Patch Editor BIG.",
+  "quote": "Workspace: MID A2L Explorer: MID MAC View: MID Memory Map: BIG Patch Editor: BIG",
+  "class": "DONE",
+  "landed_in": "prototypes/screen_upgrades.HANDOFF-PLAN.md -> batch-45/47/48",
+  "evidence": "768f70a (batch-47 insight layer), fbafb82 (batch-48 Patch BIG), 4608953 (batch-45 Map band-bands)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; later screens build on it.",
+  "sessions": [
+   "e98a4756"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-021",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "Memory Map",
+  "request": "Memory map band-bands variant, and retire the entropy pop-up into the map view.",
+  "quote": "Be sure that the current pop up window for the entropy gets eliminated",
+  "class": "DONE",
+  "landed_in": "batch-45 R-TUI-060/061/062",
+  "evidence": "4608953 'Memory-Map entropy Band-Bands view + retire entropy pop-up' (#81); no entropy ModalScreen in s19_app/tui/screens.py",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "8f1adcc5"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-022",
+  "dates": [
+   "2026-08-01",
+   "2026-08-06"
+  ],
+  "times_asked": 2,
+  "area": "Memory Map",
+  "request": "The memory map is still lacking and not cohesive; redesign it together with its legend (k).",
+  "quote": "the implementation currently (already revised twice) is still lacking, the format is not cohesive",
+  "class": "DONE",
+  "landed_in": "batch-77 (Variant A) and batch-93 (cohesion pass, legend A)",
+  "evidence": "244ecf2 (batch-77, #186); ae0ef4f + 4458a7f (batch-93 cockpit + k-legend spec sheet)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Three asks counting 2026-07-15, each shipped: a quality-repeat signal, not a loss.",
+  "sessions": [
+   "854f116b",
+   "2628d42b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-023",
+  "dates": [
+   "2026-07-18"
+  ],
+  "times_asked": 1,
+  "area": "Patch Editor",
+  "request": "The JSON editor should use the free space below instead of a small scrolled box.",
+  "quote": "the json editor has a scroll bar but it coud easily ocuppy more room below",
+  "class": "DONE",
+  "landed_in": "fast fix #90",
+  "evidence": "2f25bef 'JSON editor fills its window height instead of a fixed 8-row cap' (#90)",
+  "open_part": "",
+  "relevance": "likely-drop",
+  "relevance_reason": "Later replaced by the batch-97 live JSON view.",
+  "sessions": [
+   "19091f02"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-024",
+  "dates": [
+   "2026-07-18"
+  ],
+  "times_asked": 1,
+  "area": "A2L",
+  "request": "A2L records without a declared data length must not be flagged as an error.",
+  "quote": "the A2L records not always define the lenght of the data for the label. I think currently we are setting that as an error",
+  "class": "DONE",
+  "landed_in": "#92, #93; batch-54/55/56",
+  "evidence": "f305489 'missing-length record is spec-valid, not a schema ERROR' (#92); s19_app/tui/a2l.py:3203 length-None path",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "19091f02"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-025",
+  "dates": [
+   "2026-07-18"
+  ],
+  "times_asked": 1,
+  "area": "Reports",
+  "request": "Check that the report shows the side-by-side difference against the updated (patched) S19.",
+  "quote": "the side by side display of difference against updated s19 file",
+  "class": "DONE",
+  "landed_in": "BACKLOG.md DONE 'report diff vs patched S19 — VERIFIED-WORKING'",
+  "evidence": "s19_app/tui/app.py:117 imports compose_before_after_report (before_after_service)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Verified working without a code change.",
+  "sessions": [
+   "19091f02"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-026",
+  "dates": [
+   "2026-07-19"
+  ],
+  "times_asked": 1,
+  "area": "Issues / Checks",
+  "request": "Build the Issues report and Checks report upgrades.",
+  "quote": "Do the issues report and checks report, go on autonomously.",
+  "class": "DONE",
+  "landed_in": "batch-49",
+  "evidence": "024dc03 'Issues Report MID insight layer + new dedicated CHECKS rail screen' (#97)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "5e48add6"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-027",
+  "dates": [
+   "2026-07-20",
+   "2026-07-21"
+  ],
+  "times_asked": 2,
+  "area": "CRC Designer",
+  "request": "A new CRC Designer view to tailor CRC variants from basic blocks (ranges, polynomial, XOR, gap fill, endianness, init/final) configurable through JSON; the first build did not match prototype B.",
+  "quote": "a new view for this app that will focus on designing (tailoring) a CRC algorithm",
+  "class": "DONE",
+  "landed_in": "batch-57 keel, batch-58 view, batch-59 fidelity rebuild",
+  "evidence": "84180b4 (#110), 7954652 (#113); s19_app/tui/crc_designer_view.py:225 CrcDesignerPanel",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped after one fidelity rebuild.",
+  "sessions": [
+   "b50ee405",
+   "cf41480f"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-028",
+  "dates": [
+   "2026-07-20"
+  ],
+  "times_asked": 1,
+  "area": "CRC engine",
+  "request": "Review and apply the CRC design observations: refin/refout bit order, gap fill must abort on non-erased memory, check = CRC of '123456789', table-driven performance.",
+  "quote": "El algoritmo industrial debería abortar si detecta que la memoria que prometió saltarse ... no está realmente vacía",
+  "class": "DONE",
+  "landed_in": "batch-57 keel design",
+  "evidence": "s19_app/tui/operations/crc_kernel.py:312 table-driven path (bitwise kept as oracle, batch-57 PLAN.md:40); on_gap_conflict='abort' (s19_app/segment_ops.py:13); kat_ok (crc_designer_view.py:715)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; the 'implementation' JSON selector was not exposed: the LUT is always used, which meets the performance concern.",
+  "sessions": [
+   "b50ee405"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-029",
+  "dates": [
+   "2026-07-20"
+  ],
+  "times_asked": 1,
+  "area": "CRC Designer",
+  "request": "Make it visible on screen how the JSON is loaded/checked (diagram to JSON and back).",
+  "quote": "en los prototipos no veo como es que hace el check o el load del archivo json",
+  "class": "DONE",
+  "landed_in": "batch-58/59 (roomy JSON + template + load/save column)",
+  "evidence": "7954652 (#113) bench column 3; s19_app/tui/workspace.py:58 ensure_template_lib",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "b50ee405"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-030",
+  "dates": [
+   "2026-07-20"
+  ],
+  "times_asked": 1,
+  "area": "Memory Map",
+  "request": "Bug: the memory map said no file loaded although an S19 was loaded (case_01_basic_valid).",
+  "quote": "even though an s19 is loaded, the memory map view states that there is no file loaded",
+  "class": "DONE",
+  "landed_in": "post-55 fast-flow #106",
+  "evidence": "d756201 'carry entropy_windows + source_s0_header through the S19+MAC merge' (#106)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Fixed.",
+  "sessions": [
+   "a51cce5a"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-031",
+  "dates": [
+   "2026-07-20"
+  ],
+  "times_asked": 1,
+  "area": "Workspace",
+  "request": "Add a way to unload the S19, MAC or A2L.",
+  "quote": "there is no option to unload s19, mac or a29l... add that functionality",
+  "class": "DONE",
+  "landed_in": "#107 (Variant B)",
+  "evidence": "ae4aef2 (#107); s19_app/tui/app.py:1221 _unload_a2l, :1261 _unload_mac, :10149 action_unload_all",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; related open defect CW-U-10 (unload-all asks nothing and keeps the project active).",
+  "sessions": [
+   "a51cce5a"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-032",
+  "dates": [
+   "2026-07-21",
+   "2026-07-23"
+  ],
+  "times_asked": 2,
+  "area": "Legend",
+  "request": "Legend per screen (not per file), with per-view example snippets explaining each part.",
+  "quote": "La leyenda está bien pero puede ser mejor al agregar que sea por pantalla; es decir no por archivo",
+  "class": "DONE",
+  "landed_in": "N1 + N8",
+  "evidence": "s19_app/tui/app.py:6886 _SCREEN_LEGEND_SECTIONS; s19_app/tui/legend.py:833 LEGEND_EXAMPLES (a6f2d6ff, #125)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; later reorganized (R-041).",
+  "sessions": [
+   "cf41480f",
+   "0f8dc212"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-033",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Workspace",
+  "request": "The task log at the bottom should use the full width so full file paths are visible.",
+  "quote": "cuando se extiende la venta a apantalla completa serviría que usaramos todo el span",
+  "class": "DONE",
+  "landed_in": "N2",
+  "evidence": "s19_app/tui/app.py:13362 line = trimmed[:cap] (cap from the viewport width)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "cf41480f"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-034",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Logging",
+  "request": "Saved logs omit report generation; log it.",
+  "quote": "Los logs que se guardan están omitiendo la generación de del reporte",
+  "class": "DONE",
+  "landed_in": "N3",
+  "evidence": "s19_app/tui/app.py:529 format_report_log_line",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "cf41480f"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-035",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Memory Map",
+  "request": "Single click shows region details, double click opens hex view; the bands are clickable too.",
+  "quote": "en vez de ir a hex view al hacer click, que sea al hacer doble click",
+  "class": "DONE",
+  "landed_in": "N4 (batch-67)",
+  "evidence": "s19_app/tui/screens_directionb.py:3637 event.chain >= 2; :1499 BandSegment",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped and survived the batch-77/93 redesigns.",
+  "sessions": [
+   "cf41480f"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-036",
+  "dates": [
+   "2026-07-21"
+  ],
+  "times_asked": 1,
+  "area": "Flow Builder",
+  "request": "Flow Builder: load block (validate and notify, never block; external files saved into the project), check block, CRC block with JSON config, savable flows. The 2026-07-19 ask had not been captured in the backlog.",
+  "quote": "Que dice el backlog, porque creo que esto no se capturó",
+  "class": "DONE",
+  "landed_in": "Flow Builder rail-8: batch-44/51/52/53/60/70 (BACKLOG-CODE 'Flow Builder — shipped')",
+  "evidence": "640de1b (#101), fa2c252 (#129); s19_app/tui/services/flow_model.py:273 CheckBlock, :295 CrcBlock; flow_persistence_service.py:976 save_flow_json",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; the original ask was lost for two days until the operator asked again.",
+  "sessions": [
+   "ecff6d5b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-037",
+  "dates": [
+   "2026-07-23"
+  ],
+  "times_asked": 1,
+  "area": "Help",
+  "request": "The help window cannot be hidden once shown; make it a toggle.",
+  "quote": "The help window once is deployed it is impossible to hide it again",
+  "class": "DONE",
+  "landed_in": "N6",
+  "evidence": "s19_app/tui/app.py:7139 action_show_help_panel (toggle)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "0f8dc212"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-038",
+  "dates": [
+   "2026-07-23"
+  ],
+  "times_asked": 1,
+  "area": "Workspace",
+  "request": "The A2L file name is not shown at the top after loading until the user switches view.",
+  "quote": "when the a2l is loaded, the a2l file name is not displayed at the top",
+  "class": "DONE",
+  "landed_in": "N7",
+  "evidence": "s19_app/tui/app.py:8662 self._refresh_loaded_panel() on the A2L load path",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "0f8dc212"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-039",
+  "dates": [
+   "2026-07-24"
+  ],
+  "times_asked": 1,
+  "area": "Flow reports",
+  "request": "Every flow must generate its report; the report block needs no JSON file.",
+  "quote": "cada flow debe generar su reporte",
+  "class": "DONE",
+  "landed_in": "FB-P1b batch-60",
+  "evidence": "5e50365 (#131); s19_app/tui/services/flow_report_service.py:356 compose_flow_report",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; an improvement was asked again as R-014.",
+  "sessions": [
+   "8dab40e4",
+   "66805b38"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-040",
+  "dates": [
+   "2026-07-28",
+   "2026-07-30"
+  ],
+  "times_asked": 2,
+  "area": "CRC Designer",
+  "request": "CRC Designer: switches read as one control and need design guards; the known-value field may not earn its place.",
+  "quote": "hay switches que parecen uno sólo, faltan agregar guardas de diseño",
+  "class": "DONE",
+  "landed_in": "batch-72 (R-TUI-100), CRC variant B chosen 2026-07-30",
+  "evidence": "1abda8e (#166); s19_app/tui/crc_designer_view.py:351 Self-test row; AT-214 separability",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; KAT kept as a demoted Self-test row by the operator's variant-B choice.",
+  "sessions": [
+   "aa4226cd",
+   "2ebb7d4d"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-041",
+  "dates": [
+   "2026-07-28",
+   "2026-07-30"
+  ],
+  "times_asked": 2,
+  "area": "Legend",
+  "request": "Legend pop-ups need reorganization (two panes chosen).",
+  "quote": "pop up screens con la leyenda necesitan mejor reporganización",
+  "class": "DONE",
+  "landed_in": "batch-72 legend two-pane",
+  "evidence": "1abda8e (#166); s19_app/tui/screens.py:1045 LegendScreen",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "aa4226cd",
+   "2ebb7d4d"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-042",
+  "dates": [
+   "2026-08-06"
+  ],
+  "times_asked": 1,
+  "area": "Workspace",
+  "request": "Delete the two barely visible clickable text inputs at the top of the main screen.",
+  "quote": "2 text inputs hidden at the top. they are almost not seen",
+  "class": "DONE",
+  "landed_in": "batch-79 Lane 1 (command-bar deletion)",
+  "evidence": "f198447 (#192); only the workspace search/goto inputs remain (s19_app/tui/app.py:2147-2149), as the operator wanted",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "2628d42b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-043",
+  "dates": [
+   "2026-08-06"
+  ],
+  "times_asked": 1,
+  "area": "A2B diff",
+  "request": "The A2B diff shows small context windows, wastes space, and the changes on the left are not reachable; design for accessibility.",
+  "quote": "the diff displays are showing small windows of context and leave a lot of screen space un used",
+  "class": "DONE",
+  "landed_in": "batch-78 Lane 2 (master-detail)",
+  "evidence": "Selectable run list + windows following the selection; s19_app/tui/screens_directionb.py:7777 _DIFF_MIN_H",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "2628d42b"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-044",
+  "dates": [
+   "2026-10-20"
+  ],
+  "times_asked": 1,
+  "area": "Patch Editor / help",
+  "request": "Patch Editor JSON consultable (not always visible), updated live or by a button, loadable from its folder.",
+  "quote": "Necesito que el archivo JSON sea tal vez no siempre visible pero si consultable",
+  "class": "DONE",
+  "landed_in": "batch-97 Inc-4 + window help",
+  "evidence": "09e44de 'Patch Editor as a ledger + inspector with a live JSON view'; s19_app/tui/window_help.py:69 'patch', :208 'flow', :356 'flow_execution', :429 'check_editor'",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict md: prototypes/b94_polish/veredicto-b94-polish.md"
+  ]
+ },
+ {
+  "id": "R-045",
+  "dates": [
+   "2026-10-12",
+   "2026-10-20"
+  ],
+  "times_asked": 2,
+  "area": "Navigation",
+  "request": "Visible buttons to open the folders where the working files live.",
+  "quote": "debes poner también visibles los botones para abrir las carpetas donde reciden los archivos",
+  "class": "DONE",
+  "landed_in": "batch-95 change 2 (HLR-139) + batch-97 US-138",
+  "evidence": "59ee033; s19_app/tui/app.py:159 OpenFolderChip",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped (also in the 2026-10-12 change list, outside the harvest).",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "Cambios_10_12_2026/Cambios.md Cambio2"
+  ]
+ },
+ {
+  "id": "R-046",
+  "dates": [
+   "2026-10-20"
+  ],
+  "times_asked": 1,
+  "area": "Visual",
+  "request": "Run as the second bright element; CRC cards in burnt orange.",
+  "quote": "Ok, CRC con naranja quemado.",
+  "class": "DONE",
+  "landed_in": "batch-97 colour decisions",
+  "evidence": "s19_app/tui/styles.tcss:32 $crc-family: #c9562b; s19_app/tui/insight_style.py:131",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped (CRC colour verified; Run brightness not separately verified).",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict md: prototypes/b94_polish/veredicto-b94-polish.md (round 2)"
+  ]
+ },
+ {
+  "id": "R-047",
+  "dates": [
+   "2026-10-20",
+   "2026-10-21"
+  ],
+  "times_asked": 2,
+  "area": "Key bar",
+  "request": "Two-row key bar (global row + window row); the window row in a colour that matches the workspace word.",
+  "quote": "Recomendaría un color ligeramente distinto para que haga juego con la palabra workspace",
+  "class": "DONE",
+  "landed_in": "batch-97 Inc-8 (US-140 / HLR-150)",
+  "evidence": "354857c; s19_app/tui/styles.tcss:3541-3567 #key_bar_window accent-calm",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped (colour checked by reading the stylesheet only).",
+  "sessions": [
+   "a8feab43"
+  ],
+  "source": [
+   "transcript",
+   "verdict md: Downloads/veredicto-pdr-b97.md objection (2026-10-20)"
+  ]
+ },
+ {
+  "id": "R-048",
+  "dates": [
+   "2026-07-15"
+  ],
+  "times_asked": 1,
+  "area": "Issues / input",
+  "request": "Field-audit B1 Issues paging and N4 paste everywhere (relayed).",
+  "quote": "B1 Issues paging ... N4 paste-everywhere",
+  "class": "DONE",
+  "landed_in": "#94; batch-67",
+  "evidence": "3287311 (#94); s19_app/tui/app.py:52 OsClipboardInput (16 inputs converted, batch-67)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [
+   "49736282"
+  ],
+  "source": [
+   "transcript"
+  ]
+ },
+ {
+  "id": "R-049",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Rail / navigation",
+  "request": "Split Patch Editor into Patch Editor + Check Editor, and separate the rail windows that only view, that mainly build, and that execute.",
+  "quote": "separar son las ventanas que son sólo para ver, las que son predominantemente para construir y las que son para ejecutar acciones",
+  "class": "PARTIAL",
+  "landed_in": "batch-94 US-001 (narrowed to 'distinct windows'); merged PR #211",
+  "evidence": "Split done: 07102b1, s19_app/tui/screens_directionb.py:6916 CheckEditorPanel. Rail not grouped: s19_app/tui/app.py:230-235 RAIL_ENTRIES_B94 only inserts Check Editor after Patch and Flow Execution after Flow Builder; Checks and CRC Designer stay at the end; s19_app/tui/rail.py has no group/section concept",
+  "open_part": "View / build / execute grouping on the rail (order or headings); never recorded as open after batch-94 narrowed it.",
+  "relevance": "likely-keep",
+  "relevance_reason": "The core of the ask (separation on the rail) was narrowed away silently.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio1 + Ventanas_1.png"
+  ]
+ },
+ {
+  "id": "R-050",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Patch Editor",
+  "request": "Patch Editor rework per the annotated screenshot: larger JSON edit space, Edit JSON + validate into the table, dirty guard on Load, remove the variant selector (variants move to the flows), 'Apply loaded changes', Load beside the path, 'Refresh Files in Folder'.",
+  "quote": "El selector de variantes hay que eliminarlo, Aquí sólo queremos conservar la edición de un sólo archivo",
+  "class": "PARTIAL",
+  "landed_in": "batch-94 US-002 (pe_b) + batch-97 Inc-4",
+  "evidence": "Done: s19_app/tui/screens_directionb.py:5201 'Apply loaded changes'; app.py:3209 Refresh Files in Folder; ConfirmDiscardScreen (screens.py:902); Edit JSON (app.py:3687). Still present: 'Execute over variants' with Scope active / all / per assignment at s19_app/tui/screens_directionb.py:5043-5055 (_SCOPE_LABELS :4547)",
+  "open_part": "Variant execution still lives in the Patch Editor; no backlog item removes it — the batch-97 P3 'Scope / Execute twice' row proposes only a rewording.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Directly contradicts the operator's written instruction (Cambio2 + Cambio7) and is untracked.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio2 + PatchEditor1.png annotations",
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio7 ('ya no queremos referencia a variantes en los builders de patch, check o CRC')"
+  ]
+ },
+ {
+  "id": "R-051",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Check Editor",
+  "request": "Check Editor: a copy of the Patch Editor that only collects A2L parameters / memory locations into a JSON for reports; loadable in the A2B Diff dropdown; write and validate only, no apply.",
+  "quote": "Check Editor debe ser una copia de Patch Editor, con la diferencia de que no se editan cambios",
+  "class": "DONE",
+  "landed_in": "batch-94 US-003 (ce_a) + batch-97 Inc-3",
+  "evidence": "07102b1; s19_app/tui/screens_directionb.py:6916 CheckEditorPanel; s19_app/tui/app.py:1593 _diff_check_spec (A2B check-spec dropdown)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio3"
+  ]
+ },
+ {
+  "id": "R-052",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Issues view",
+  "request": "Issues report: decide whether what is reported as a warning really is one (thousands of warnings on the operator's files); investigate and resolve.",
+  "quote": "que se contemple si lo que se reporta como warnings realmente es un warning",
+  "class": "DONE",
+  "landed_in": "batch-94 US-004 (inc-004 warnings triage)",
+  "evidence": "e2e3096; s19_app/tui/app.py:9333 adjust_counts_for_a2l_triage (curated A2L_UNRECOGNIZED_BLOCK set). Deferred: #ws_stats and the filter chrome still speak raw severity (BACKLOG-CODE batch-94 close, Inc-004 F1/F2)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; two ⏸ DEFER display carries remain.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio4 + Issues_Report1.png"
+  ]
+ },
+ {
+  "id": "R-053",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Flow Builder",
+  "request": "Flow Builder as a block diagram (patch block, CRC block, A2B diff block that compares a flow output with another file), flows saved as templates, plus a separate Flow Execution window; prototype first.",
+  "quote": "Flow builder debe ser una ventana para crear los flujos de cambios. Y debe haber otra ventana de Flow execution.",
+  "class": "DONE",
+  "landed_in": "batch-94 US-005 (fb_a) + batch-97 Inc-5",
+  "evidence": "345cb1d (A2B block, templates with dedup-suffix save); b514b07 (pipeline rail); s19_app/tui/flow_screens.py",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio5"
+  ]
+ },
+ {
+  "id": "R-054",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "CRC Designer",
+  "request": "Explain what the CRC Designer test vector is for; if it checks an expected CRC, add a Run button to test it.",
+  "quote": "en CRC designer hay un apartado de test vector, pero no se de qué sirve exactamente ... Si es así falta un botón de run",
+  "class": "TRACKED-OPEN",
+  "landed_in": "batch-94 US-006 REFINE-parked at P0; BACKLOG-CODE.md 'Routed 2026-10-18 — batch-94 close' row 1 (⏸ DEFER, operator questions pending)",
+  "evidence": "s19_app/tui/crc_designer_view.py:351 Self-test row; only Save/Load buttons (crc_designer_view.py:432-433), no Run",
+  "open_part": "The explanation the operator asked for, then his ruling on the Run button.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Blocked on questions to the operator that nobody has put to him since 2026-10-12.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio6 (first half)"
+  ]
+ },
+ {
+  "id": "R-055",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Flow Execution",
+  "request": "Flow Execution imports Flow Builder templates, runs several chains with different input files (the variant workflow), and saves the chain set with inputs and outputs for reuse.",
+  "quote": "El Flow execution también debe poder guardar el set de cadenas de flujo junto con sus inputs y outputs.",
+  "class": "DONE",
+  "landed_in": "batch-94 US-007 (fx_a) + batch-97 Inc-6",
+  "evidence": "s19_app/tui/app.py:2693 list_chain_sets; 9793fcd (one pipeline per lane); s19_app/tui/flow_screens.py:2641 FlowExecutionPanel",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; the 'no variants in the editors' half is open under R-050.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio7"
+  ]
+ },
+ {
+  "id": "R-056",
+  "dates": [
+   "2026-10-11",
+   "2026-10-18"
+  ],
+  "times_asked": 2,
+  "area": "Flow variables",
+  "request": "Tags / variables declared in the JSON files of patch, check and CRC blocks, replaced by user-entered values before execution, each chain with its own funnel.",
+  "quote": "Make a funnel for declaring beforehand all variables with key names to replace in the JSON files involved in the flows",
+  "class": "PARTIAL",
+  "landed_in": "Funnel: batch-96 B1. BlockTags: BACKLOG-CODE.md batch-94 close row 'US-008 — BlockTags' (P2, still open)",
+  "evidence": "Builder-level funnel shipped: s19_app/tui/flow_screens.py:1178 (FUNNEL table, 'Variables' chip :1285); s19_app/tui/services/flow_execution_service.py:125 _read_change_doc_with_funnel. FlowExecutionPanel (flow_screens.py:2641+) has no funnel/variable inputs",
+  "open_part": "Per-run (per chain / per variant) values entered in Flow Execution; reconcile the stale 'US-008 BlockTags' row with the shipped funnel.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Asked twice; half shipped under a different name, so the backlog row and the code no longer describe the same thing.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio8 (BlockTags)",
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p1 'Change: make a funnel'"
+  ]
+ },
+ {
+  "id": "R-057",
+  "dates": [
+   "2026-10-11"
+  ],
+  "times_asked": 1,
+  "area": "Docs",
+  "request": "The repo README is outdated and has formatting errors; fix, update and expand.",
+  "quote": "El README del repo está desactualizado y tiene errores de formato también.",
+  "class": "TRACKED-OPEN",
+  "landed_in": "batch-94 US-009 OUT → BACKLOG-CODE.md batch-94 close row 'US-009 — the README refresh' (P2)",
+  "evidence": "Last README.md commit 2026-10-11 (batch-91 docs catch-up to the 10-screen app); since then batch-94..97 added Check Editor, Flow Execution, Split/Join/Export and the two-row key bar",
+  "open_part": "README refresh for the current 12-window app.",
+  "relevance": "likely-keep",
+  "relevance_reason": "Cheap, and the README falls further behind every batch.",
+  "sessions": [],
+  "source": [
+   "Refactor_10_11_2026/Refactor, Cambios.md Cambio9"
+  ]
+ },
+ {
+  "id": "R-058",
+  "dates": [
+   "2026-10-12"
+  ],
+  "times_asked": 1,
+  "area": "Projects",
+  "request": "Saving a project gathers every file used (S19/HEX, A2L, MAC, patch/check/CRC/flow JSON) into one folder; without a project they live in common workspace folders.",
+  "quote": "El guardar un proyecto debe de guardar en una carpeta todos los archivos utilizados",
+  "class": "DONE",
+  "landed_in": "batch-95 change 1 (HLR-138)",
+  "evidence": "4d6db31 (project gather, scoped artifact homes; COPY, not move). Related open defect: PH-1 Save project copies the on-disk file, not the patched image (R-005)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; the image half has an open integrity defect tracked under R-005.",
+  "sessions": [],
+  "source": [
+   "Cambios_10_12_2026/Cambios.md Cambio1"
+  ]
+ },
+ {
+  "id": "R-059",
+  "dates": [
+   "2026-10-12",
+   "2026-10-20"
+  ],
+  "times_asked": 2,
+  "area": "Help",
+  "request": "Each window's help gains a section with instructions for using its functions, kept up to date for new and changed windows.",
+  "quote": "necesitamos un apartado con instrucciones para hacer uso de las funciones en cada una de ellas",
+  "class": "DONE",
+  "landed_in": "batch-95 change 3 (HLR-140) + batch-97 US-138 help chip",
+  "evidence": "s19_app/tui/window_help.py:69 'patch', :132 'checks', :208 'flow', :356 'flow_execution', :429 'check_editor'",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [],
+  "source": [
+   "Cambios_10_12_2026/Cambios.md Cambio3",
+   "verdict md: prototypes/b94_polish/veredicto-b94-polish.md ('No olvides las leyendas y ayudas en cada ventana')"
+  ]
+ },
+ {
+  "id": "R-060",
+  "dates": [
+   "2026-10-12"
+  ],
+  "times_asked": 1,
+  "area": "Split / Join / Export",
+  "request": "New window to split a loaded S19/HEX by A2L segments or memory locations and export the pieces as S19, HEX or BIN.",
+  "quote": "poder partirlo según los segmentos que haya desde el A2L ... o por localidades de memoria",
+  "class": "DONE",
+  "landed_in": "batch-95 change 4 (HLR-135..137)",
+  "evidence": "s19_app/tui/segment_split_view.py; s19_app/segment_ops.py:143 emit_bin_from_mem_map (+ .addr sidecar)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped (palette-first, no rail key).",
+  "sessions": [],
+  "source": [
+   "Cambios_10_12_2026/Cambios.md Cambio4"
+  ]
+ },
+ {
+  "id": "R-061",
+  "dates": [
+   "2026-10-13"
+  ],
+  "times_asked": 1,
+  "area": "Split / Join / Export",
+  "request": "Before a join, show a visual preview with colours for segments, fillers and other content.",
+  "quote": "Necesitamos tener una especie de visrode cambios en los joins antes de hacerlo. Una especie de guía visual con colores",
+  "class": "DONE",
+  "landed_in": "batch-95 HLR-135 (five-class visor)",
+  "evidence": "s19_app/tui/segment_split_view.py:116-118 visor classes (data ▓ / fill ░ / conflict ▒ / ctx ·)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; accepted at the 2026-10-13 tui-pass verdict.",
+  "sessions": [],
+  "source": [
+   "verdict JSON: prototypes/cambios_10_12_2026/veredicto-ronda1.json notes (copy: Downloads/taskboard-veredicto-cambios.json)"
+  ]
+ },
+ {
+  "id": "R-062",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "Flow Builder",
+  "request": "Copy and paste of blocks in the flows.",
+  "quote": "This block makes evident the need for a copy and paste function for blocks.",
+  "class": "DONE",
+  "landed_in": "batch-96 B2",
+  "evidence": "s19_app/tui/flow_screens.py:1182 block COPY/PASTE clipboard; :1280 'copy block #'",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; empty-paste feedback is an open P3 (batch-97 Inc-5 gate row).",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p1"
+  ]
+ },
+ {
+  "id": "R-063",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "Flow Builder",
+  "request": "A block that runs terminal commands (proprietary scripts outside the app); the user owns the command text.",
+  "quote": "Make a block for terminal commands execution.",
+  "class": "DONE",
+  "landed_in": "batch-96 features A+B (external-step block, operator-approved prototype)",
+  "evidence": "047ef5e; s19_app/tui/services/flow_model.py:69 BLOCK_EXTERNAL_STEP",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p1"
+  ]
+ },
+ {
+  "id": "R-064",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "Help",
+  "request": "In the help of the windows that edit change files, document the file notation so a user can write the JSON by hand.",
+  "quote": "Add in the help for the windows with file changes the notation of the files",
+  "class": "DONE",
+  "landed_in": "batch-96 pdf-bugs (help)",
+  "evidence": "bd42d8d; s19_app/tui/window_help.py:479 'Changes file notation'",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped.",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p2"
+  ]
+ },
+ {
+  "id": "R-065",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "A2B report",
+  "request": "Bug: the A2B report does not list every modified label, at least for labels with custom data types.",
+  "quote": "A2B Report does not list all labels modified. I see this on labels with custom data types",
+  "class": "DONE",
+  "landed_in": "batch-96 pdf-bugs B6",
+  "evidence": "bd42d8d; s19_app/tui/a2l.py:476 _characteristic_from_tokens salvages extended-kind headers",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Fixed; no fixture of the operator's own A2L, so verify with the synthetic corpus (R-013).",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p2 BUG"
+  ]
+ },
+ {
+  "id": "R-066",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "A2L",
+  "request": "Give the operator a list with examples of every way the app reads information out of the A2L, to check coverage and turn gaps into user stories.",
+  "quote": "Make me a list with examples of the ways you have coded to read info out of the A2L.",
+  "class": "UNCLEAR",
+  "landed_in": "No artifact found in the repo (docs/, .dev-flow/design/, prototypes/) or the vault; it may have been answered in a session outside the harvest",
+  "evidence": "n/a",
+  "open_part": "Ask the operator whether he received it; if not, it is a small documentation deliverable.",
+  "relevance": "operator-decides",
+  "relevance_reason": "Feeds the A2L coverage decisions behind R-065/R-067.",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p3"
+  ]
+ },
+ {
+  "id": "R-067",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "A2L",
+  "request": "Recognise A2L custom data types such as RECORD_LAYOUT with FNC_VALUES … DIRECT, NO_AXIS_PTS_X/Y, especially for patching.",
+  "quote": "A2Ls seem to have custom data types that the app is not recognizing.",
+  "class": "DONE",
+  "landed_in": "batch-96 features C+D (per-component RECORD_LAYOUT walker)",
+  "evidence": "47e0cc9; s19_app/tui/a2l.py:1368 _walk_record_layout_components; NO_AXIS_PTS handled in a2l.py",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Shipped; related open: MOD_COMMON BYTE_ORDER ignored (Code-Wire H-7) and the encoder's endianness (integrity H-5).",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p3"
+  ]
+ },
+ {
+  "id": "R-068",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "A2B diff",
+  "request": "Bug: A2B diff of two files with similar names in the same folder reads only one file; only an app restart helps.",
+  "quote": "S19 A2B diff if files have similar names & are in the same folder it reads only 1 file.",
+  "class": "DONE",
+  "landed_in": "batch-96 pdf-bugs B7 + feature E",
+  "evidence": "bd42d8d (_apply_compare_request refuses same-file compares and names the stale-clipboard cause); 60b6f42 (Tk clipboard root as a process-wide singleton)",
+  "open_part": "",
+  "relevance": "likely-keep",
+  "relevance_reason": "Fixed at the root cause found (stale clipboard paste).",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p4 BUG"
+  ]
+ },
+ {
+  "id": "R-069",
+  "dates": [
+   "2026-10-18"
+  ],
+  "times_asked": 1,
+  "area": "A2L",
+  "request": "A2L parameter description using A2L and S19/HEX data: tables and functions that depict response curves.",
+  "quote": "A2L Parameter description using data from A2L and S19/HEX",
+  "class": "DONE",
+  "landed_in": "batch-96 feature D (curve/map description modal)",
+  "evidence": "s19_app/tui/a2l_describe.py; s19_app/tui/a2l.py:3013 render_curve_description (text tables, no plotted curve)",
+  "open_part": "",
+  "relevance": "operator-decides",
+  "relevance_reason": "Shipped as text tables; a drawn curve was not built — the operator decides whether that is enough.",
+  "sessions": [],
+  "source": [
+   "handwritten scan G:/My Drive/Scan_20261018_153449.pdf p4 ENHANCEMENT"
+  ]
+ }
+]

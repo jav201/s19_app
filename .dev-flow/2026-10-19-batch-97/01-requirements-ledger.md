@@ -426,3 +426,41 @@ above this line is ever edited._
 - **What changed:** `LoadProjectScreen` dismisses with `self.projects[index]` (the ListView index) instead of `str(Label)`, which Textual 8.2.8 renders as `Label()`. `enter` on the list still does nothing: in Textual 8.2.8 a ListItem click also posts `ListView.Selected`, so loading on `Selected` would load on one click (code-reviewer F2); that choice goes to the Load+projects prototype round. Scope added to batch-97 out of band.
 - **Why:** operator decision 2026-10-23 ("try it in this batch and test it; if it has problems move it to the integrity batch"), after the Code-Wire UI audit (`.dev-flow/design/AUDIT-codewire-ui-2026-10-23.md`, CW-U-1).
 - **Evidence:** `tests/test_b97_load_project_dialog.py` (RED on HEAD `354857c`, `evidence/inc-9/red.txt`: `got None`, the handler received `'Label()'`); `evidence/inc-9/mutations.txt` (2/2 killed).
+
+### LED-2026-10-19-batch-97.43 — Split / Join / Export's export cues name `e`, the key that exports (Inc-8 operator item 4, option a)
+- **Requirement:** HLR-150 (the key bar paints `e Export` for this window; the window's own cues now agree with it)
+- **Supersedes:** the `^E` wording of batch-95's HLR-135 (`EXPORT ^E` button), LLR-135.1 (the `EXPORT ^E` button) and LLR-135.5 ("the first ^E shall arm", "the second ^E … shall export") in `REQUIREMENTS.md`; the binding was always plain `e` (`SplitJoinWindow.BINDINGS`), so `^E` named a chord that does nothing. To be synced into `REQUIREMENTS.md` at batch close
+- **Date:** 2026-10-23
+- **What changed:** `segment_split_view.py` paints `EXPORT  e` on the button, `ready — e exports`, `— e will ask` / `— e again to confirm` on the guard line and `press e again to confirm` in the arming toast (and the module docstring's five `^E` mentions). No binding changed.
+- **Why:** operator decision at the Inc-8 gate 2026-10-23 (item 4, option a, routed to Inc-7).
+- **Evidence:** `tests/test_segment_split_window.py::test_export_cues_name_the_bound_export_key` (RED on HEAD `5cb7618`, `evidence/inc-7/red.txt`, `red-rerun.txt`; mutants M2–M4 killed, `mutations.txt`); `evidence/inc-7/png/impl.inc7.split_join.png`.
+
+### LED-2026-10-19-batch-97.44 — A window's help modal scrolls when it is taller than the terminal (Inc-8 ux F3)
+- **Requirement:** LLR-148.6 (the help modal that shows the steps and the generated keys block)
+- **Supersedes:** nothing — the modal's box model gains a scroll container; `section_body_text` and the keys block are unchanged
+- **Date:** 2026-10-23
+- **What changed:** `WindowHelpScreen` puts `#window_help_body` and `#window_help_keys` inside `VerticalScroll#window_help_scroll`; `styles.tcss` appends a `/* batch-97 help modal */` section: the dialog title docks at the top and the scroll is capped at `max-height: 100%`, so the title and Close stay on screen and every line is reachable (`tab` to the body, then `pagedown`). A help that fits keeps its auto height (Map 21 rows, Checks 26 rows at 118x54, as on HEAD). Before: at 118x54 the Patch dialog was 105 rows with its top at row −48; at 80x24 every dialog overflowed.
+- **Why:** Inc-8 ux-review F3, owed to Inc-7 (Inc-8 packet §6 item 4), in the orchestrator's Inc-7 scope.
+- **Evidence:** `tests/test_window_usage_help.py::test_help_modal_fits_and_every_line_is_reachable_by_key` ×3 sizes (RED on HEAD, `red.txt`; M5, M6b, M7 killed, `mutations.txt`, `mutations-fold.txt`); `png/impl.inc7.help-patch*.png`, `impl.inc7.help-map.png`.
+
+### LED-2026-10-19-batch-97.45 — The Inc-7 sweep: how AT-B97-15 / -16 / -24 read A.5, and the snapshot regen run locally
+- **Requirement:** HLR-149 (its three ATs realised as test nodes)
+- **Supersedes:** design D17's "Inc-7 triggers the canonical regen (`snapshot-regen.yml`) after the push" — the regen ran locally, before the push (named deviation)
+- **Date:** 2026-10-23
+- **What changed:**
+  - (AT readings) One session holds the four screens with A.5's widest values. "0 clipped cells without their ellipsis" is read as: no DataTable cell's text is wider than its column (Textual's hard clip has no `…`), plus a guard that a `…` is painted on every screen — except the Check Editor from 134 columns, where the 47-cell name fits and is asserted painted whole. AT-B97-16's void clause runs at 220x60 and 260x70 (HLR-149's threshold); its blank-row clause excepts the Builder's 3 named separator rows (LLR-149.5). AT-B97-24's `tab` arm starts at each window's help chip; `enter` is pressed on Run after a `tab` walk focuses it.
+  - (D17) The 29 tc016s baselines were regenerated locally (Windows, Textual 8.2.8, NO_COLOR unset). Parity probe: at `ae0ef4f` (the last commit that wrote the baselines) the local run reproduced 27 of 29 cells byte for byte; the 2 map cells differ only because they were committed greyscale (written with NO_COLOR=1). The batch-94 `xfail(strict=False)` envelope is retired (`_batch94_inc001_drift_marks` returns `()`), and the snapshot harness repaints the status-bar context itself (PC-10).
+- **Why:** orchestrator instruction for Inc-7 (regenerate and retire the envelope where the cells pass); the parity probe removes the reason D17 deferred the regen to CI (the 2026-05-28 drift came from NO_COLOR / tooling, not from the platform).
+- **Evidence:** `evidence/inc-7/snapshot-env-parity.txt`, `snapshot-before.txt` (29 xfailed), `snapshot-regen.txt`, `snapshot-cells-diff.txt`, `snapshot-reconcile.txt`, `snapshot-after.txt` (33 passed ×2); `red-at.txt` (AT RED on `51ee191`), `mutations.txt` (M9–M16).
+
+### LED-2026-10-19-batch-97.46 — Help modal fix round: the body scrolls from Close, Close names its key, the keys block stands apart (Inc-7 ux review)
+- **Requirement:** LLR-148.6 (the help modal that shows the steps and the generated keys block)
+- **Supersedes:** LED-…97.44's "reachable with `tab` then `pagedown`" — the keys now act without the `tab`
+- **Date:** 2026-10-23
+- **What changed:**
+  - **Scroll keys (UX-F1).** `WindowHelpScreen` gains six `show=False` screen bindings — `up` `down` `pageup` `pagedown` `home` `end` — that scroll `#window_help_scroll` while Close keeps the focus. `enter` still presses Close and `esc` still closes.
+  - **Close names its key (UX-F3).** The button reads `Close  esc`. This follows the `EXPORT  e` form, the app's only existing "label + key" button; no other modal button showed its key.
+  - **Keys block set apart (UX-F4).** `#window_help_keys` has `margin-top: 1`, so one blank row separates the last step from the keys block.
+  - **Focus tint (UX-F2).** `#window_help_scroll:focus` tints the body (`$bg-base`) when a `tab` puts the focus there. UX-F1 already resolves the reachability issue behind UX-F2; the tint is the cheap visible half.
+- **Why:** the ux-reviewer's changes-needed at the Inc-7 gate (UX-F1..F4), relayed by the orchestrator 2026-10-23; team standard: every modal button shows its key.
+- **Evidence:** `tests/test_window_usage_help.py::test_help_modal_scrolls_by_key_while_close_keeps_the_focus` and `::test_help_modal_close_names_its_key_and_the_keys_block_stands_apart` (RED on the first-round tree, `evidence/inc-7/red-r2.txt`; mutants M17–M19 killed, `mutations-r2.txt`); `png/impl.inc7.r2.*.png`.

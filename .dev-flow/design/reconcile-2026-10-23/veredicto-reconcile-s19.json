@@ -1,0 +1,107 @@
+{
+  "page": "s19-reconcile-2026-10-23",
+  "exported": "2026-10-23T22:40:43.743Z",
+  "items": {
+    "R-001": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-002": {
+      "verdict": "decide",
+      "note": ""
+    },
+    "R-003": {
+      "verdict": "keep",
+      "note": "Me parece que podríamos reutilizar la parte de flow builder para construir el algoritmo CRC. Actualmente la ventana es confusa. "
+    },
+    "R-004": {
+      "verdict": "keep",
+      "note": "Si, veo que está en curso y muy buen trabajo."
+    },
+    "R-010": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-012": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-056": {
+      "verdict": "keep",
+      "note": "Esto es super importante, poder cambiar un valor en el patch editor a partir de sus atributos en el A2lL, así también en el check editor poder agregar checks de parametros en el A2L. "
+    },
+    "R-049": {
+      "verdict": "keep",
+      "note": "Además de que creo que la ventana de checks no hace nada... hay qeu revisar para decidir qué hacer con ella."
+    },
+    "R-050": {
+      "verdict": "keep",
+      "note": "Si hay que quitarlas, había comentado que la parte del flow builder reemplaza esta dinámica y se ayuda además del bloque de funnel para controlar la entrada de las cadenas de flujo declaradas. "
+    },
+    "R-005": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-006": {
+      "verdict": "keep",
+      "note": "Aquí también se ha hecho una investigación que hace que localidades de memoria en el A2l aparezcan con caracteres extra (me ha tocado ver incluso un salto de línea \"\\n\" revisa si el fix que se hará prevendría este problema) Yo también investigaré."
+    },
+    "R-007": {
+      "verdict": "keep",
+      "note": "Esto creo que puede eliminarse si la vista de ayuda contiene como armar los archivos JSON para cada propósito y pueden copiarse y pegarse desde ahí las plantillas. "
+    },
+    "R-008": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-009": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-011": {
+      "verdict": "keep",
+      "note": "Definamos el split de manera genérica y exportado en formatos comunes. Agregar controles para especificar características comunes para este tipo de archivos e información"
+    },
+    "R-013": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-014": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-015": {
+      "verdict": "keep",
+      "note": "Si, necesitamos re definirlo"
+    },
+    "R-054": {
+      "verdict": "keep",
+      "note": "Dentro de CRC designer en algún punto hay una descripción de un algoritmo específico de CRC, dede localidades de memoria para calcular, para guardar, el polinomio y el endianess. Quisiera recuperar esa información, no se si existe o está guardada entre toda la documentación."
+    },
+    "R-057": {
+      "verdict": "keep",
+      "note": ""
+    },
+    "R-016": {
+      "verdict": "keep",
+      "note": "Esto lo describí en una pregunta anterior. Seguimos investigando."
+    },
+    "R-018": {
+      "verdict": "drop",
+      "note": ""
+    },
+    "R-019": {
+      "verdict": "drop",
+      "note": ""
+    },
+    "R-066": {
+      "verdict": "decide",
+      "note": ""
+    },
+    "R-069": {
+      "verdict": "keep",
+      "note": "No, las curvas sirven, además entregué un formato de como se pueden ver las definiciones de esto."
+    }
+  },
+  "general_notes": ""
+}

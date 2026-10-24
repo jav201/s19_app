@@ -549,3 +549,193 @@ def test_tc706_seat_census_header_row_and_window_section(tmp_path: Path) -> None
     assert observed["reports"]["bindings"] == [
         ("question_mark", "show_window_usage_help", False)
     ]
+
+
+# ---------------------------------------------------------------------------
+# batch-97 Inc-7 (Inc-8 ux-review F3) — a help modal taller than the terminal
+# scrolls, so every line of its steps and keys block can be read
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("size", [(80, 24), (118, 54), (220, 60)])
+def test_help_modal_fits_and_every_line_is_reachable_by_key(tmp_path: Path, size) -> None:
+    """batch-97 Inc-7 (Inc-8 ux F3, LLR-148.6's help with the generated keys
+    block): on every window's help modal the dialog lies inside the terminal
+    (its title and its Close button on screen), and every non-blank line of
+    the steps and of the keys block is painted at some point while the
+    operator scrolls the body by key — ``pagedown`` (bounded) with the focus
+    left on Close, no ``tab`` first (Inc-7 fix round, ux UX-F1) — so no line
+    is cut off above or below. A line is found by its head (first 20 cells)
+    and by its tail (its last word: a word wrap never splits it, while a
+    fixed 20-cell tail can straddle a wrap), so a wrapped line's end cannot
+    hide (code-reviewer CR-F4).
+
+    RED on HEAD 5cb7618 (executed, ``evidence/inc-7/red.txt``): at 118x54 the
+    Patch Editor dialog is 105 rows with its top at row -48, and the Flow
+    Builder and Flow Execution keys blocks are never painted; at 80x24 every
+    dialog overflows. Mutation: the body unwrapped from its scroll container."""
+    from tests.b97_probes import painted_rows
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        report = {}
+        async with app.run_test(size=size) as pilot:
+            await _pilot_pause(pilot)
+            for key in WINDOW_HELP_SECTIONS:
+                assert open_window_help(app, key)
+                await _pilot_pause(pilot)
+                screen = app.screen
+                dialog = screen.query_one("#window_help_dialog")
+                close = screen.query_one("#window_help_close")
+                inside = all(
+                    r.x >= 0 and r.y >= 0 and r.right <= size[0] and r.bottom <= size[1]
+                    for r in (dialog.region, close.region)
+                )
+                texts = [str(w.render()) for w in screen.query("#window_help_body, #window_help_keys")]
+                lines = [ln.strip() for t in texts for ln in t.split("\n") if ln.strip()]
+                seen = set(painted_rows(app, screen, screen.region))
+                body = screen.query_one("#window_help_body")
+                scroller = next((a for a in body.ancestors if getattr(a, "max_scroll_y", 0) > 0), None)
+                focus_kept = True
+                if scroller is not None:
+                    pages = 0
+                    while scroller.scroll_y < scroller.max_scroll_y and pages < 60:
+                        await pilot.press("pagedown")
+                        # page_down animates: read once the scroll has come to rest
+                        await _scroll_at_rest(app, pilot, scroller)
+                        seen.update(painted_rows(app, screen, screen.region))
+                        pages += 1
+                    focus_kept = app.focused is close
+                painted = "\n".join(seen)
+                missing = [ln for ln in lines if ln[:20] not in painted or ln.split()[-1] not in painted]
+                report[key] = (inside and focus_kept, missing, tuple(dialog.region))
+                await pilot.press("escape")
+                await _pilot_pause(pilot)
+        return report
+
+    report = asyncio.run(_drive())
+    assert set(report) == set(WINDOW_HELP_SECTIONS), "guard: every section was opened"
+    bad = {k: v for k, v in report.items() if not v[0] or v[1]}
+    assert bad == {}, {k: (inside, missing[:3], region) for k, (inside, missing, region) in bad.items()}
+
+
+#: Inc-7 fix round (ux UX-F1): the keys that scroll the help body while Close
+#: keeps the focus, and the scroll each one must cause from the top.
+HELP_SCROLL_KEYS = ("down", "pagedown", "end", "up", "pageup", "home")
+
+
+async def _scroll_at_rest(app, pilot, scroller) -> None:
+    """Wait until ``scroller``'s scroll animation has finished. Comparing two
+    consecutive reads is not enough: under full-suite load two pauses can pass
+    with no animation frame between them (Inc-7 full suite, ``end`` read at
+    92 of 150)."""
+    for _ in range(250):
+        await pilot.pause(0.02)
+        if not app.animator.is_being_animated(scroller, "scroll_y") and scroller.scroll_y == scroller.scroll_target_y:
+            return
+
+
+def test_help_modal_scrolls_by_key_while_close_keeps_the_focus(tmp_path: Path) -> None:
+    """batch-97 Inc-7 fix round (ux UX-F1): a help modal opens with the focus
+    on Close, and the body scrolls from there — ``down`` one row,
+    ``pagedown`` a page, ``end`` to the last row (the last keys line
+    painted), ``up`` / ``pageup`` back, ``home`` to the top — with no ``tab``
+    first. Close keeps the focus throughout, so ``enter`` still closes the
+    modal. One arm ``tab``s into the body first and ``pagedown`` still
+    scrolls there. Run at 80x24, where every section overflows.
+
+    RED on the first-round tree (executed, ``evidence/inc-7/red-r2.txt``):
+    with Close focused every key leaves ``scroll_y`` at 0. Mutation: the
+    screen's scroll bindings removed."""
+    from tests.b97_probes import painted_rows
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        report = {}
+        async with app.run_test(size=(80, 24)) as pilot:
+            await _pilot_pause(pilot)
+            for key in WINDOW_HELP_SECTIONS:
+                assert open_window_help(app, key)
+                await _pilot_pause(pilot)
+                screen = app.screen
+                scroll = screen.query_one("#window_help_scroll")
+                close = screen.query_one("#window_help_close")
+                focused_on_open = app.focused is close
+                ys = {}
+                for name in HELP_SCROLL_KEYS:
+                    await pilot.press(name)
+                    await _scroll_at_rest(app, pilot, scroll)  # scrolls animate: read once at rest
+                    ys[name] = scroll.scroll_y
+                    if name == "end":
+                        last = str(screen.query("#window_help_keys, #window_help_body").last().render()).strip().split("\n")[-1].strip()
+                        ys["last_painted"] = last[:20] in "\n".join(painted_rows(app, screen, screen.region))
+                report[key] = (focused_on_open, scroll.max_scroll_y, ys, app.focused is close)
+                await pilot.press("enter")
+                await _pilot_pause(pilot)
+                report[key] += (not isinstance(app.screen, WindowHelpScreen),)
+            assert open_window_help(app, "patch")
+            await _pilot_pause(pilot)
+            scroll = app.screen.query_one("#window_help_scroll")
+            await pilot.press("tab")
+            await pilot.pause()
+            focused_scroll = app.focused is scroll
+            await pilot.press("pagedown")
+            await _scroll_at_rest(app, pilot, scroll)
+            report["tab-arm"] = (focused_scroll, scroll.scroll_y)
+        return report
+
+    report = asyncio.run(_drive())
+    tab_focus, tab_y = report.pop("tab-arm")
+    assert tab_focus and tab_y > 0, ("after tab, pagedown still scrolls", tab_focus, tab_y)
+    bad = {}
+    for key, (on_open, max_y, ys, still_close, closed) in report.items():
+        ok = (
+            on_open and still_close and closed and max_y > 0
+            and ys["down"] == 1
+            and ys["pagedown"] > ys["down"]
+            and ys["end"] == max_y and ys["last_painted"]
+            and ys["up"] == max_y - 1
+            and ys["pageup"] < ys["up"]
+            and ys["home"] == 0
+        )
+        if not ok:
+            bad[key] = (on_open, max_y, ys, still_close, closed)
+    assert bad == {}, bad
+
+
+def test_help_modal_close_names_its_key_and_the_keys_block_stands_apart(tmp_path: Path) -> None:
+    """batch-97 Inc-7 fix round (ux UX-F3, UX-F4): the Close button paints
+    the key that closes the modal (``Close  esc``, the ``EXPORT  e``
+    form), and the generated keys block starts after one blank row below the
+    last step, so a key line never reads as part of that step.
+
+    RED on the first-round tree (executed, ``evidence/inc-7/red-r2.txt``):
+    the button paints ``Close`` and the keys block's first row sits directly
+    under the last step. Mutations: the key dropped from the label; the
+    keys block's top margin removed."""
+    from tests.b97_probes import painted_rows
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        out = {}
+        async with app.run_test(size=(118, 54)) as pilot:
+            await _pilot_pause(pilot)
+            for key in WINDOW_HELP_SECTIONS:
+                assert open_window_help(app, key)
+                await _pilot_pause(pilot)
+                screen = app.screen
+                label = [t for t in " ".join(painted_rows(app, screen.query_one("#window_help_close"))).split() if t.isalnum()]
+                keys = screen.query("#window_help_keys")
+                gap = None
+                if keys:
+                    body = screen.query_one("#window_help_body")
+                    gap = keys.first().virtual_region.y - body.virtual_region.bottom
+                out[key] = (label, gap)
+                await pilot.press("escape")
+                await _pilot_pause(pilot)
+        return out
+
+    out = asyncio.run(_drive())
+    assert any(gap is not None for _label, gap in out.values()), "guard: some section has a keys block"
+    bad = {k: v for k, v in out.items() if v[0] != ["Close", "esc"] or (v[1] is not None and v[1] < 1)}
+    assert bad == {}, bad

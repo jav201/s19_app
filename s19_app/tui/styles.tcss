@@ -3578,3 +3578,31 @@ ModalScreen {
 #key_bar KeyRow > .key-bar--dim {
     color: $foreground-disabled;
 }
+
+/* batch-97 help modal (Inc-7, Inc-8 ux F3) ----------------------------------
+ * A window's help can be taller than the terminal (the Patch Editor's is 95
+ * rows at 118 wide). The steps and keys block scroll inside
+ * `#window_help_scroll`, so the title and Close stay on screen and every line
+ * is reachable by key. The title is docked like the shared `.modal-buttons`,
+ * so the scroll's 100% cap is the height left between them (measured: the
+ * ModalScreen already bounds the dialog). A help that fits keeps its auto
+ * height. */
+#window_help_dialog .modal-title {
+    dock: top;
+}
+
+#window_help_scroll {
+    height: auto;
+    max-height: 100%;
+}
+
+/* Fix round (ux UX-F4): one blank row between the last step and the
+ * generated keys block, so a key line never reads as part of that step.
+ * (ux UX-F2) The scroll tints when it holds the focus after a `tab`. */
+#window_help_keys {
+    margin-top: 1;
+}
+
+#window_help_scroll:focus {
+    background: $bg-base;
+}

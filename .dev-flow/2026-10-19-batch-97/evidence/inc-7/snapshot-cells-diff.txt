@@ -1,0 +1,1185 @@
+a2l-comfortable-120x30           rows 29->29  changed 24  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 3
+a2l-comfortable-160x40           rows 39->39  changed 34  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 37, 38]  style-rules-delta 1
+a2l-comfortable-80x24            rows 23->23  changed 18  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 1
+a2l-compact-120x30               rows 29->29  changed 25  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28]  style-rules-delta 3
+a2l-compact-160x40               rows 39->39  changed 35  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38]  style-rules-delta 1
+a2l-compact-80x24                rows 23->23  changed 19  [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22]  style-rules-delta 1
+diff-comfortable-120x30          rows 29->29  changed 15  [9, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 2
+issues-comfortable-120x30        rows 29->29  changed 15  [9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 2
+issues-comfortable-160x40        rows 39->39  changed 15  [9, 10, 11, 12, 13, 14, 27, 28, 29, 30, 31, 32, 33, 37, 38]  style-rules-delta 1
+issues-comfortable-80x24         rows 23->23  changed 11  [9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 2
+issues-compact-120x30            rows 29->29  changed 16  [9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28]  style-rules-delta 2
+issues-compact-160x40            rows 39->39  changed 16  [9, 10, 11, 12, 13, 14, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38]  style-rules-delta 1
+issues-compact-80x24             rows 23->23  changed 12  [9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22]  style-rules-delta 2
+mac-comfortable-120x30           rows 29->29  changed 15  [9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 2
+mac-comfortable-160x40           rows 39->39  changed 17  [9, 10, 11, 12, 13, 14, 21, 26, 27, 28, 29, 30, 31, 32, 33, 37, 38]  style-rules-delta 2
+mac-comfortable-80x24            rows 23->23  changed 11  [9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 3
+mac-compact-120x30               rows 29->29  changed 16  [9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28]  style-rules-delta 2
+mac-compact-160x40               rows 39->39  changed 18  [9, 10, 11, 12, 13, 14, 21, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38]  style-rules-delta 2
+mac-compact-80x24                rows 23->23  changed 12  [9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22]  style-rules-delta 3
+map-comfortable-120x30           rows 29->29  changed 18  [2, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 23
+map-comfortable-80x24            rows 23->23  changed 12  [2, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 16
+patch-comfortable-120x30         rows 29->29  changed 23  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 13
+patch-comfortable-80x24          rows 23->23  changed 17  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 7
+workspace-comfortable-120x30     rows 29->29  changed 23  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27, 28]  style-rules-delta 5
+workspace-comfortable-160x40     rows 39->39  changed 33  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 37, 38]  style-rules-delta 1
+workspace-comfortable-80x24      rows 23->23  changed 17  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22]  style-rules-delta 4
+workspace-compact-120x30         rows 29->29  changed 24  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28]  style-rules-delta 4
+workspace-compact-160x40         rows 39->39  changed 34  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38]  style-rules-delta 1
+workspace-compact-80x24          rows 23->23  changed 18  [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22]  style-rules-delta 3
+
+===== a2l-comfortable-120x30
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫  Workspace│▊A2L Tags▎▊▎
+   3 + ▏◫  Workspace│
+   4 - ▏≡  A2L Explorer│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡  A2L Explorer│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉  MAC View│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   5 + ▏◉  MAC View│▊A2L Tags▎▊▎
+   6 - ▏▤  Memory Map│▊▊▎ Field: name  All  Invalid ▎▊byteorder little▎
+   6 + ▏▤  Memory Map│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!  Issues Report│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+   7 + ▏!  Issues Report│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   8 - ▏✎  Patch Editor│▊▎▊──────────────────────────────────────▎
+   8 + ▏✎  Patch Editor│▊▊▎ Field: name  All  Invalid ▎▊byteorder little▎
+   9 - ▏⏚  A2B Diff│▊Tag          Address   LengthSource  RawPhysical▎▊Hex Viewer▎
+   9 + ▏✔  Check Editor│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+  10 - ▏✦  Flow Builder│▊· MEAS_0000000x080050002     assigned▎▊▎
+  10 + ▏⏚  A2B Diff│▊▎▊──────────────────────────────────────▎
+  11 - ▏☑  Checks│▊· MEAS_0000010x080050042assigned▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▎
+  11 + ▏✦  Flow Builder│▊Tag          Address   LengthSource  RawPhysical▎▊Hex Viewer▎
+  12 - ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assigned▎▊▊▎ Find Next ▊▎ Goto▎
+  12 + ▏▶  Flow Execution│▊· MEAS_0000000x080050002     assigned▎▊▎
+  13 - │▊✓ MEAS_0000030x0800000C2assigned▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▎
+  13 + ▏☑  Checks│▊· MEAS_0000010x080050042assigned▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▎
+  14 - │▊✓ MEAS_0000040x080000102assigned▎▊▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assigned▎▊▊▎ Find Next ▊▎ Goto▎
+  15 - │▊✓ MEAS_0000050x080000142assigned▎▊  0x00000000  53 54 52 45 53 53▎
+  15 + │▊✓ MEAS_0000030x0800000C2assigned▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▎
+  16 - │▊· MEAS_0000060x080050182assigned▎▊|STRESS          |▇▇▎
+  16 + │▊▎▎▊▎
+  17 - │▊▎▎▊  0x08000000  C5 D7 14 84 F8 CF 9B▎
+  17 + │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to ▎▊▎
+  18 - │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to ▎▊▎
+  18 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== a2l-comfortable-160x40
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫  Workspace│▊A2L Tags▎▊▎
+   3 + ▏◫  Workspace│
+   4 - ▏≡  A2L Explorer│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡  A2L Explorer│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉  MAC View│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▎▊unit unit▎
+   5 + ▏◉  MAC View│▊A2L Tags▎▊▎
+   6 - ▏▤  Memory Map│▊▊▎ Field: name  All  Invalid  In-Memory ▊▎▊byteorder little▎
+   6 + ▏▤  Memory Map│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!  Issues Report│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▎▊limits 0..65535▎
+   7 + ▏!  Issues Report│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▎▊unit unit▎
+   8 - ▏✎  Patch Editor│▊▎▊───────────────────────────────────────────────────────▎
+   8 + ▏✎  Patch Editor│▊▊▎ Field: name  All  Invalid  In-Memory ▊▎▊byteorder little▎
+   9 - ▏⏚  A2B Diff│▊Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni▎▊Hex Viewer▎
+   9 + ▏✔  Check Editor│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▎▊limits 0..65535▎
+  10 - ▏✦  Flow Builder│▊· MEAS_0000000x080050002     assignedno   unknown0..65535uni▎▊▎
+  10 + ▏⏚  A2B Diff│▊▎▊───────────────────────────────────────────────────────▎
+  11 - ▏☑  Checks│▊· MEAS_0000010x080050042assignednounknown0..65535uni▎▊▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  11 + ▏✦  Flow Builder│▊Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni▎▊Hex Viewer▎
+  12 - ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesunknown0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+  12 + ▏▶  Flow Execution│▊· MEAS_0000000x080050002     assignedno   unknown0..65535uni▎▊▎
+  13 - │▊✓ MEAS_0000030x0800000C2assignedyesunknown0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 + ▏☑  Checks│▊· MEAS_0000010x080050042assignednounknown0..65535uni▎▊▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  14 - │▊✓ MEAS_0000040x080000102assignedyesunknown0..65535uni▎▊▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesunknown0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+  15 - │▊✓ MEAS_0000050x080000142assignedyesunknown0..65535uni▎▊  0x00000000  53 54 52 45 53 53▎
+  15 + │▊✓ MEAS_0000030x0800000C2assignedyesunknown0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  16 - │▊· MEAS_0000060x080050182assignednounknown0..65535uni▎▊|STRESS          |▎
+  16 + │▊✓ MEAS_0000040x080000102assignedyesunknown0..65535uni▎▊▎
+  17 - │▊✓ MEAS_0000070x0800001C2assignedyesunknown0..65535uni▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+  17 + │▊✓ MEAS_0000050x080000142assignedyesunknown0..65535uni▁▁▎▊  0x00000000  53 54 52 45 53 53▎
+  18 - │▊✓ MEAS_0000080x080000202assignedyesunknown0..65535uni▁▁▎▊30 80 4B  |.........oG.G0.K|▎
+  18 + │▊· MEAS_0000060x080050182assignednounknown0..65535uni▎▊|STRESS          |▎
+  19 - │▊✓ MEAS_0000090x080000242assignedyesunknown0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▄▄▎
+  19 + │▊✓ MEAS_0000070x0800001C2assignedyesunknown0..65535uni▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+  20 - │▊· MEAS_0000100x080050282assignednounknown0..65535uni▎▊1F 07 2F  |.2%..3...h...../|▎
+  20 + │▊✓ MEAS_0000080x080000202assignedyesunknown0..65535uni▎▊30 80 4B  |.........oG.G0.K|▅▅▎
+  21 - │▊✓ MEAS_0000110x0800002C2assignedyesunknown0..65535uni▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E▎
+  21 + │▊✓ MEAS_0000090x080000242assignedyesunknown0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▎
+  22 - │▊✓ MEAS_0000120x080000302assignedyesunknown0..65535uni▎▊29 A3 FA  |....|. aqzH..)..|▎
+  22 + │▊· MEAS_0000100x080050282assignednounknown0..65535uni▎▊1F 07 2F  |.2%..3...h...../|▎
+  23 - │▊· MEAS_0000130x080050342assignednounknown0..65535uni▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94▎
+  23 + │▊✓ MEAS_0000110x0800002C2assignedyesunknown0..65535uni▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E▎
+  24 - │▊✓ MEAS_0000140x080000382assignedyesunknown0..65535uni▎▊5E 60 5F  |7..?.h.....{.^`_|▎
+  24 + │▊✓ MEAS_0000120x080000302assignedyesunknown0..65535uni▎▊29 A3 FA  |....|. aqzH..)..|▎
+  25 - │▊✓ MEAS_0000150x0800003C2assignedyesunknown0..65535uni▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E▎
+  25 + │▊· MEAS_0000130x080050342assignednounknown0..65535uni▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94▎
+  26 - │▊· MEAS_0000160x080050402assignednounknown0..65535uni▎▊D6 8C E6  |...#-BL.)..xn...|▎
+  26 + │▊▎▎▊5E 60 5F  |7..?.h.....{.^`_|▎
+  27 - │▊▎▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70▎
+  27 + │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in ▎▊▎
+  28 - │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in ▎▊▎
+  28 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  37 - 
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== a2l-comfortable-80x24
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫│▊A2L Tags▎▊▎
+   3 + ▏◫│
+   4 - ▏≡│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   5 + ▏◉│▊A2L Tags▎▊▎
+   6 - ▏▤│▊▊▎ Field: name  All ▎▊byteorder little▎
+   6 + ▏▤│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+   7 + ▏!│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   8 - ▏✎│▊▎▊────────────────────────────▎
+   8 + ▏✎│▊▊▎ Field: name  All ▎▊byteorder little▎
+   9 - ▏⏚│▊Tag          Address   LengthSource ▎▊Hex Viewer▎
+   9 + ▏✔│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+  10 - ▏✦│▊· MEAS_0000000x080050002     assigne▎▊▎
+  10 + ▏⏚│▊▎▊────────────────────────────▎
+  11 - ▏☑│▊▍▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▎
+  11 + ▏✦│▊▍▎▊▎
+  12 - ▏⊕│▊Page 1/1 | tags 1-32 / 32 (page size ▎▊▎
+  12 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== a2l-compact-120x30
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫  Workspace│▊A2L Tags▎▊▎
+   3 + ▏◫  Workspace│
+   4 - ▏≡  A2L Explorer│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡  A2L Explorer│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉  MAC View│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   5 + ▏◉  MAC View│▊A2L Tags▎▊▎
+   6 - ▏▤  Memory Map│▊▊▎ Field: name  All  Invalid ▎▊byteorder little▎
+   6 + ▏▤  Memory Map│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!  Issues Report│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+   7 + ▏!  Issues Report│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   8 - ▏✎  Patch Editor│▊▎▊──────────────────────────────────────▎
+   8 + ▏✎  Patch Editor│▊▊▎ Field: name  All  Invalid ▎▊byteorder little▎
+   9 - ▏⏚  A2B Diff│▊Tag          Address   LengthSource  RawPhysical▎▊Hex Viewer▎
+   9 + ▏✔  Check Editor│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+  10 - ▏✦  Flow Builder│▊· MEAS_0000000x080050002     assigned▎▊▎
+  10 + ▏⏚  A2B Diff│▊▎▊──────────────────────────────────────▎
+  11 - ▏☑  Checks│▊· MEAS_0000010x080050042assigned▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▎
+  11 + ▏✦  Flow Builder│▊Tag          Address   LengthSource  RawPhysical▎▊Hex Viewer▎
+  12 - ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assigned▎▊▊▎ Find Next ▊▎ Goto▎
+  12 + ▏▶  Flow Execution│▊· MEAS_0000000x080050002     assigned▎▊▎
+  13 - │▊✓ MEAS_0000030x0800000C2assigned▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▎
+  13 + ▏☑  Checks│▊· MEAS_0000010x080050042assigned▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▎
+  14 - │▊✓ MEAS_0000040x080000102assigned▎▊▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assigned▎▊▊▎ Find Next ▊▎ Goto▎
+  15 - │▊✓ MEAS_0000050x080000142assigned▎▊  0x00000000  53 54 52 45 53 53▎
+  15 + │▊✓ MEAS_0000030x0800000C2assigned▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▎
+  16 - │▊· MEAS_0000060x080050182assigned▎▊|STRESS          |▇▇▎
+  16 + │▊▎▎▊▎
+  17 - │▊▎▎▊  0x08000000  C5 D7 14 84 F8 CF 9B▎
+  17 + │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to ▎▊▎
+  18 - │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to ▎▊▎
+  18 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  26 - 
+  26 + Density: compact
+  27 - Density: compact
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== a2l-compact-160x40
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫  Workspace│▊A2L Tags▎▊▎
+   3 + ▏◫  Workspace│
+   4 - ▏≡  A2L Explorer│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡  A2L Explorer│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉  MAC View│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▎▊unit unit▎
+   5 + ▏◉  MAC View│▊A2L Tags▎▊▎
+   6 - ▏▤  Memory Map│▊▊▎ Field: name  All  Invalid  In-Memory ▊▎▊byteorder little▎
+   6 + ▏▤  Memory Map│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!  Issues Report│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▎▊limits 0..65535▎
+   7 + ▏!  Issues Report│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▎▊unit unit▎
+   8 - ▏✎  Patch Editor│▊▎▊───────────────────────────────────────────────────────▎
+   8 + ▏✎  Patch Editor│▊▊▎ Field: name  All  Invalid  In-Memory ▊▎▊byteorder little▎
+   9 - ▏⏚  A2B Diff│▊Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni▎▊Hex Viewer▎
+   9 + ▏✔  Check Editor│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▎▊limits 0..65535▎
+  10 - ▏✦  Flow Builder│▊· MEAS_0000000x080050002     assignedno   unknown0..65535uni▎▊▎
+  10 + ▏⏚  A2B Diff│▊▎▊───────────────────────────────────────────────────────▎
+  11 - ▏☑  Checks│▊· MEAS_0000010x080050042assignednounknown0..65535uni▎▊▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  11 + ▏✦  Flow Builder│▊Tag          Address   LengthSource  RawPhysicalInMemRegion Limits  Uni▎▊Hex Viewer▎
+  12 - ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesunknown0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+  12 + ▏▶  Flow Execution│▊· MEAS_0000000x080050002     assignedno   unknown0..65535uni▎▊▎
+  13 - │▊✓ MEAS_0000030x0800000C2assignedyesunknown0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 + ▏☑  Checks│▊· MEAS_0000010x080050042assignednounknown0..65535uni▎▊▊▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  14 - │▊✓ MEAS_0000040x080000102assignedyesunknown0..65535uni▎▊▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesunknown0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+  15 - │▊✓ MEAS_0000050x080000142assignedyesunknown0..65535uni▎▊  0x00000000  53 54 52 45 53 53▎
+  15 + │▊✓ MEAS_0000030x0800000C2assignedyesunknown0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  16 - │▊· MEAS_0000060x080050182assignednounknown0..65535uni▎▊|STRESS          |▎
+  16 + │▊✓ MEAS_0000040x080000102assignedyesunknown0..65535uni▎▊▎
+  17 - │▊✓ MEAS_0000070x0800001C2assignedyesunknown0..65535uni▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+  17 + │▊✓ MEAS_0000050x080000142assignedyesunknown0..65535uni▁▁▎▊  0x00000000  53 54 52 45 53 53▎
+  18 - │▊✓ MEAS_0000080x080000202assignedyesunknown0..65535uni▁▁▎▊30 80 4B  |.........oG.G0.K|▎
+  18 + │▊· MEAS_0000060x080050182assignednounknown0..65535uni▎▊|STRESS          |▎
+  19 - │▊✓ MEAS_0000090x080000242assignedyesunknown0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▄▄▎
+  19 + │▊✓ MEAS_0000070x0800001C2assignedyesunknown0..65535uni▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+  20 - │▊· MEAS_0000100x080050282assignednounknown0..65535uni▎▊1F 07 2F  |.2%..3...h...../|▎
+  20 + │▊✓ MEAS_0000080x080000202assignedyesunknown0..65535uni▎▊30 80 4B  |.........oG.G0.K|▅▅▎
+  21 - │▊✓ MEAS_0000110x0800002C2assignedyesunknown0..65535uni▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E▎
+  21 + │▊✓ MEAS_0000090x080000242assignedyesunknown0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▎
+  22 - │▊✓ MEAS_0000120x080000302assignedyesunknown0..65535uni▎▊29 A3 FA  |....|. aqzH..)..|▎
+  22 + │▊· MEAS_0000100x080050282assignednounknown0..65535uni▎▊1F 07 2F  |.2%..3...h...../|▎
+  23 - │▊· MEAS_0000130x080050342assignednounknown0..65535uni▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94▎
+  23 + │▊✓ MEAS_0000110x0800002C2assignedyesunknown0..65535uni▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E▎
+  24 - │▊✓ MEAS_0000140x080000382assignedyesunknown0..65535uni▎▊5E 60 5F  |7..?.h.....{.^`_|▎
+  24 + │▊✓ MEAS_0000120x080000302assignedyesunknown0..65535uni▎▊29 A3 FA  |....|. aqzH..)..|▎
+  25 - │▊✓ MEAS_0000150x0800003C2assignedyesunknown0..65535uni▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E▎
+  25 + │▊· MEAS_0000130x080050342assignednounknown0..65535uni▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94▎
+  26 - │▊· MEAS_0000160x080050402assignednounknown0..65535uni▎▊D6 8C E6  |...#-BL.)..xn...|▎
+  26 + │▊▎▎▊5E 60 5F  |7..?.h.....{.^`_|▎
+  27 - │▊▎▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70▎
+  27 + │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in ▎▊▎
+  28 - │▊Page 1/1 | tags 1-32 / 32 (page size 200; +/- to change page)  ·  18 in ▎▊▎
+  28 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  36 - 
+  36 + Density: compact
+  37 - Density: compact
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== a2l-compact-80x24
+   2 - │▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   2 + │A2L Explorer ?
+   3 - ▏◫│▊A2L Tags▎▊▎
+   3 + ▏◫│
+   4 - ▏≡│▊▎▊· MEAS_0000000x08005000▎
+   4 + ▏≡│▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+   5 - ▏◉│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   5 + ▏◉│▊A2L Tags▎▊▎
+   6 - ▏▤│▊▊▎ Field: name  All ▎▊byteorder little▎
+   6 + ▏▤│▊▎▊· MEAS_0000000x08005000▎
+   7 - ▏!│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+   7 + ▏!│▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊unit unit▎
+   8 - ▏✎│▊▎▊────────────────────────────▎
+   8 + ▏✎│▊▊▎ Field: name  All ▎▊byteorder little▎
+   9 - ▏⏚│▊Tag          Address   LengthSource ▎▊Hex Viewer▎
+   9 + ▏✔│▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊limits 0..65535▎
+  10 - ▏✦│▊· MEAS_0000000x080050002     assigne▎▊▎
+  10 + ▏⏚│▊▎▊────────────────────────────▎
+  11 - ▏☑│▊▍▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▎
+  11 + ▏✦│▊▍▎▊▎
+  12 - ▏⊕│▊Page 1/1 | tags 1-32 / 32 (page size ▎▊▎
+  12 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  20 - 
+  20 + Density: compact
+  21 - Density: compact
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  A2L Explorer  / Find  g Go-to  + Page+  - Page-  d Describe tag  k Legend
+===== diff-comfortable-120x30
+   9 - ▏⏚  A2B Diff│ Compare  Report report destination dir (no-project only)
+   9 + ▏✔  Check Editor│ Compare  Report report destination dir (no-project only)
+  10 - ▏✦  Flow Builder│
+  10 + ▏⏚  A2B Diff│
+  11 - ▏☑  Checks│Select two images and press Compare.
+  11 + ▏✦  Flow Builder│Select two images and press Compare.
+  12 - ▏⊕  CRC Designer│
+  12 + ▏▶  Flow Execution│
+  13 - │Image A
+  13 + ▏☑  Checks│Image A
+  14 - │
+  14 + ▏⊕  CRC Designer│
+  15 - │
+  15 + │Image B
+  16 - │Image B
+  16 + │
+  19 - │
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  A2B Diff  k Legend  f Run list  esc Close the run list  ] Window page +  [ Window page -
+===== issues-comfortable-120x30
+   9 - ▏⏚  A2B Diff│╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮
+   9 + ▏✔  Check Editor│╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮
+  10 - ▏✦  Flow Builder│││││
+  10 + ▏⏚  A2B Diff│││││
+  11 - ▏☑  Checks││✗ ERRORS  (3)│││
+  11 + ▏✦  Flow Builder││✗ ERRORS  (3)│││
+  12 - ▏⊕  CRC Designer││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue-│││
+  12 + ▏▶  Flow Execution││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue-▆▆│││
+  13 - ││0│││
+  13 + ▏☑  Checks││0│││
+  14 - ││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue-│││
+  14 + ▏⊕  CRC Designer││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue-│││
+  17 - ││6│││
+  17 + │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯
+  18 - │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯
+  18 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  19 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== issues-comfortable-160x40
+   9 - ▏⏚  A2B Diff│╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮
+   9 + ▏✔  Check Editor│╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮
+  10 - ▏✦  Flow Builder│││││
+  10 + ▏⏚  A2B Diff│││││
+  11 - ▏☑  Checks││✗ ERRORS  (3)│││
+  11 + ▏✦  Flow Builder││✗ ERRORS  (3)│││
+  12 - ▏⊕  CRC Designer││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue 0-│││
+  12 + ▏▶  Flow Execution││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue 0-│││
+  13 - ││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue 3-│││
+  13 + ▏☑  Checks││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue 3-│││
+  14 - ││SNAP_CODE_6SNAP_SYM_6  0x08000006  synthetic issue 6-│││
+  14 + ▏⊕  CRC Designer││SNAP_CODE_6SNAP_SYM_6  0x08000006  synthetic issue 6-│││
+  27 - │││││
+  27 + │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯
+  28 - │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯
+  28 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  29 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  37 - 
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== issues-comfortable-80x24
+   9 - ▏⏚│╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮
+   9 + ▏✔│╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮
+  10 - ▏✦│││││
+  10 + ▏⏚│││││
+  11 - ▏☑││✗ ERRORS  (3)│││
+  11 + ▏✦│╰───────────────────────────────────── grouped ─╯╰───────────────────────╯
+  12 - ▏⊕│╰───────────────────────────────────── grouped ─╯╰───────────────────────╯
+  12 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9
+  13 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== issues-compact-120x30
+   9 - ▏⏚  A2B Diff│╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮
+   9 + ▏✔  Check Editor│╭─ Issues ─────────────────────────────────────────────────────╮╭─ Hex Peek ───────────────────╮
+  10 - ▏✦  Flow Builder│││││
+  10 + ▏⏚  A2B Diff│││││
+  11 - ▏☑  Checks││✗ ERRORS  (3)│││
+  11 + ▏✦  Flow Builder││✗ ERRORS  (3)│││
+  12 - ▏⊕  CRC Designer││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue-│││
+  12 + ▏▶  Flow Execution││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue-▆▆│││
+  13 - ││0│││
+  13 + ▏☑  Checks││0│││
+  14 - ││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue-│││
+  14 + ▏⊕  CRC Designer││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue-│││
+  17 - ││6│││
+  17 + │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯
+  18 - │╰──────────────────────────────────────────────────── grouped ─╯╰──────────────────────────────╯
+  18 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  19 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  26 - 
+  26 + Density: compact
+  27 - Density: compact
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== issues-compact-160x40
+   9 - ▏⏚  A2B Diff│╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮
+   9 + ▏✔  Check Editor│╭─ Issues ───────────────────────────────────────────────────────────────────────────────╮╭─ Hex Peek ─────────────────────────────────╮
+  10 - ▏✦  Flow Builder│││││
+  10 + ▏⏚  A2B Diff│││││
+  11 - ▏☑  Checks││✗ ERRORS  (3)│││
+  11 + ▏✦  Flow Builder││✗ ERRORS  (3)│││
+  12 - ▏⊕  CRC Designer││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue 0-│││
+  12 + ▏▶  Flow Execution││SNAP_CODE_0SNAP_SYM_0  0x08000000  synthetic issue 0-│││
+  13 - ││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue 3-│││
+  13 + ▏☑  Checks││SNAP_CODE_3SNAP_SYM_3  0x08000003  synthetic issue 3-│││
+  14 - ││SNAP_CODE_6SNAP_SYM_6  0x08000006  synthetic issue 6-│││
+  14 + ▏⊕  CRC Designer││SNAP_CODE_6SNAP_SYM_6  0x08000006  synthetic issue 6-│││
+  27 - │││││
+  27 + │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯
+  28 - │╰────────────────────────────────────────────────────────────────────────────── grouped ─╯╰────────────────────────────────────────────╯
+  28 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  29 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9/9
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  36 - 
+  36 + Density: compact
+  37 - Density: compact
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== issues-compact-80x24
+   9 - ▏⏚│╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮
+   9 + ▏✔│╭─ Issues ──────────────────────────────────────╮╭─ Hex Peek ────────────╮
+  10 - ▏✦│││││
+  10 + ▏⏚│││││
+  11 - ▏☑││✗ ERRORS  (3)│││
+  11 + ▏✦│╰───────────────────────────────────── grouped ─╯╰───────────────────────╯
+  12 - ▏⊕│╰───────────────────────────────────── grouped ─╯╰───────────────────────╯
+  12 + │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9
+  13 - │total=9 | errors=3 | warnings=6 | info=0 | filter=all | page 1/1 rows 1-9
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  20 - 
+  20 + Density: compact
+  21 - Density: compact
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Issues Report  pgdn Page+  pgup Page-  k Legend
+===== mac-comfortable-120x30
+   9 - ▏⏚  A2B Diff│▊A2L↔MAC 5▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+   9 + ▏✔  Check Editor│▊A2L↔MAC 5▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+  10 - ▏✦  Flow Builder│▊matches▎▊|▄▄▎
+  10 + ▏⏚  A2B Diff│▊matches▎▊|▅▅▎
+  11 - ▏☑  Checks│▊ Tag    ▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  11 + ▏✦  Flow Builder│▊ Tag    ▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  12 - ▏⊕  CRC Designer│▊ ✓ MAC_T▎▊|.........oG.G0.K|▎
+  12 + ▏▶  Flow Execution│▊ ✓ MAC_T▎▊|.........oG.G0.K|▎
+  13 - │▊✗ BADHE▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▎
+  13 + ▏☑  Checks│▊✗ BADHE▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▎
+  14 - │▊✓ MEAS_▎▊|.2%..3...h...../|▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_▆▆▎▊|.2%..3...h...../|▎
+  17 - │▊✓ MAC_T▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F▎
+  17 + │▊▎▊▎
+  18 - │▊▎▊▎
+  18 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== mac-comfortable-160x40
+   9 - ▏⏚  A2B Diff│▊✗ BADHEX_1n/anon/aERR▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+   9 + ▏✔  Check Editor│▊✗ BADHEX_1n/anon/aERR▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+  10 - ▏✦  Flow Builder│▊✓ MEAS_0000020x08000008yesyesOK▎▊|▎
+  10 + ▏⏚  A2B Diff│▊✓ MEAS_0000020x08000008yesyesOK▎▊|▎
+  11 - ▏☑  Checks│▊✓ MAC_TAG_0000030x08000018noyesNOT▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  11 + ▏✦  Flow Builder│▊✓ MAC_TAG_0000030x08000018noyesNOT▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  12 - ▏⊕  CRC Designer│▊✓ MAC_TAG_0000040x08000020noyesNOT▎▊|.........oG.G0.K|▎
+  12 + ▏▶  Flow Execution│▊✓ MAC_TAG_0000040x08000020noyesNOT▎▊|.........oG.G0.K|▎
+  13 - │▊✓ MAC_TAG_0000050x08000028noyesNOT▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▄▄▎
+  13 + ▏☑  Checks│▊✓ MAC_TAG_0000050x08000028noyesNOT▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▇▇▎
+  14 - │▊✓ MEAS_0000060x08000018yesyesA2L▎▊|.2%..3...h...../|▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000060x08000018yesyesA2L▎▊|.2%..3...h...../|▎
+  21 - │▊✗ BADHEX_13n/anon/aERR▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA▎
+  21 + │▊✗ BADHEX_13n/anon/aERR▄▄▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA▎
+  26 - │▊✓ MAC_TAG_0000180x08000090noyesNOT▎▊|.c^?.k...3.#q$..|▎
+  26 + │▊▎▊|.c^?.k...3.#q$..|▎
+  27 - │▊▎▊  0x08000080  DF 5C 1F EF 14 33 C8 66 85 B7 F0 56 68 1D 51 52▎
+  27 + │▊▎▊▎
+  28 - │▊▎▊▎
+  28 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  37 - 
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== mac-comfortable-80x24
+   9 - ▏⏚│▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE
+   9 + ▏✔│▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE
+  10 - ▏✦│▊▎▊|
+  10 + ▏⏚│▊▎▊|
+  11 - ▏☑│▊▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B
+  11 + ▏✦│▊▎▊
+  12 - ▏⊕│▊▎▊
+  12 + │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+  13 - │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== mac-compact-120x30
+   9 - ▏⏚  A2B Diff│▊A2L↔MAC 5▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+   9 + ▏✔  Check Editor│▊A2L↔MAC 5▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+  10 - ▏✦  Flow Builder│▊matches▎▊|▄▄▎
+  10 + ▏⏚  A2B Diff│▊matches▎▊|▅▅▎
+  11 - ▏☑  Checks│▊ Tag    ▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  11 + ▏✦  Flow Builder│▊ Tag    ▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  12 - ▏⊕  CRC Designer│▊ ✓ MAC_T▎▊|.........oG.G0.K|▎
+  12 + ▏▶  Flow Execution│▊ ✓ MAC_T▎▊|.........oG.G0.K|▎
+  13 - │▊✗ BADHE▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▎
+  13 + ▏☑  Checks│▊✗ BADHE▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▎
+  14 - │▊✓ MEAS_▎▊|.2%..3...h...../|▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_▆▆▎▊|.2%..3...h...../|▎
+  17 - │▊✓ MAC_T▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F▎
+  17 + │▊▎▊▎
+  18 - │▊▎▊▎
+  18 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  26 - 
+  26 + Density: compact
+  27 - Density: compact
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== mac-compact-160x40
+   9 - ▏⏚  A2B Diff│▊✗ BADHEX_1n/anon/aERR▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+   9 + ▏✔  Check Editor│▊✗ BADHEX_1n/anon/aERR▎▊  0x00000000  53 54 52 45 53 53                                |STRESS▎
+  10 - ▏✦  Flow Builder│▊✓ MEAS_0000020x08000008yesyesOK▎▊|▎
+  10 + ▏⏚  A2B Diff│▊✓ MEAS_0000020x08000008yesyesOK▎▊|▎
+  11 - ▏☑  Checks│▊✓ MAC_TAG_0000030x08000018noyesNOT▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  11 + ▏✦  Flow Builder│▊✓ MAC_TAG_0000030x08000018noyesNOT▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B▎
+  12 - ▏⊕  CRC Designer│▊✓ MAC_TAG_0000040x08000020noyesNOT▎▊|.........oG.G0.K|▎
+  12 + ▏▶  Flow Execution│▊✓ MAC_TAG_0000040x08000020noyesNOT▎▊|.........oG.G0.K|▎
+  13 - │▊✓ MAC_TAG_0000050x08000028noyesNOT▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▄▄▎
+  13 + ▏☑  Checks│▊✓ MAC_TAG_0000050x08000028noyesNOT▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F▇▇▎
+  14 - │▊✓ MEAS_0000060x08000018yesyesA2L▎▊|.2%..3...h...../|▎
+  14 + ▏⊕  CRC Designer│▊✓ MEAS_0000060x08000018yesyesA2L▎▊|.2%..3...h...../|▎
+  21 - │▊✗ BADHEX_13n/anon/aERR▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA▎
+  21 + │▊✗ BADHEX_13n/anon/aERR▄▄▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA▎
+  26 - │▊✓ MAC_TAG_0000180x08000090noyesNOT▎▊|.c^?.k...3.#q$..|▎
+  26 + │▊▎▊|.c^?.k...3.#q$..|▎
+  27 - │▊▎▊  0x08000080  DF 5C 1F EF 14 33 C8 66 85 B7 F0 56 68 1D 51 52▎
+  27 + │▊▎▊▎
+  28 - │▊▎▊▎
+  28 + │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  36 - 
+  36 + Density: compact
+  37 - Density: compact
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== mac-compact-80x24
+   9 - ▏⏚│▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE
+   9 + ▏✔│▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE
+  10 - ▏✦│▊▎▊|
+  10 + ▏⏚│▊▎▊|
+  11 - ▏☑│▊▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B
+  11 + ▏✦│▊▎▊
+  12 - ▏⊕│▊▎▊
+  12 + │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+  13 - │▊▁▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  20 - 
+  20 + Density: compact
+  21 - Density: compact
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  MAC View  / Find  g Go-to  + Page+  - Page-  k Legend
+===== map-comfortable-120x30
+   2 - │Memory Map
+   2 + │Memory Map ?
+   9 - ▏⏚  A2B Diff││▊░╱▒▒▒▒▒▒▒▒▒╱▒▒▒▒▒▒▒▒▒╱▓▓▓▓▓▓▓▓▓╱▒▒▒▒▒▒▒▒▒▎▊Status   VALID▎│
+   9 + ▏✔  Check Editor││▊░╱▒▒▒▒▒▒▒▒▒╱▒▒▒▒▒▒▒▒▒╱▓▓▓▓▓▓▓▓▓╱▒▒▒▒▒▒▒▒▒▎▊Status   VALID▎│
+  10 - ▏✦  Flow Builder││▊000000000800020008000400080006FF▎▊Region   0x00000000-0x00000005▎│
+  10 + ▏⏚  A2B Diff││▊000000000800020008000400080006FF▎▊Region   0x00000000-0x00000005▎│
+  11 - ▏☑  Checks││▊░ 1 1%▒ 3 75%▓ 1 25%▎▊Size     6 B▎│
+  11 + ▏✦  Flow Builder││▊░ 1 1%▒ 3 75%▓ 1 25%▎▊Size     6 B▅▅▎│
+  12 - ▏⊕  CRC Designer││▊ ░ 0x00000000     6 B  0 low      ↵▎▊Band     ░ low▃▃▎│
+  12 + ▏▶  Flow Execution││▊ ░ 0x00000000     6 B  0 low      ↵▎▊Band     ░ low▎│
+  13 - ││▊ ▒ 0x08000000   256 B 18 medium   ↵▎▊Symbols  0▎│
+  13 + ▏☑  Checks││▊▎▊▎│
+  14 - ││▊▎▊▎│
+  14 + ▏⊕  CRC Designer││▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ 5 regions · ░▒▓ k ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ↑↓ · ↵ hex ▁▎│
+  15 - ││▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ 5 regions · ░▒▓ k ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ↑↓ · ↵ hex ▁▎│
+  15 + │││
+  16 - │││
+  16 + ││ Mapped 1.0 KiB / 128.0 MiB span (0.0008%) · 5 ranges (5 valid) · 4 gaps · 60 issues│
+  17 - ││ Mapped 1.0 KiB / 128.0 MiB span (0.0008%) · 5 ranges (5 valid) · 4 gaps · 60 issues│
+  17 + │││
+  18 - │││
+  18 + │╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+  19 - │╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Memory Map  k Legend
+===== map-comfortable-80x24
+   2 - │Memory Map
+   2 + │Memory Map ?
+   9 - ▏⏚││▊░░╱▒▒▒▒▒▒▒▒▒▒▒▒▒▒╱▒▒▒▒▒▒▒▒▒▒▒▒▒▒╱▓▓▓▓▓▓▓▓▓▓▓▓▓▓╱▒▒▒▒▒▒▒▒▒▒▒▒▒▒▎│
+   9 + ▏✔│││
+  10 - ▏✦│││
+  10 + ▏⏚││Mapped 1.0 KiB / 128.0 MiB 0.0008% · 5 rng (5 ok) · 4 gaps · 60 iss│
+  11 - ▏☑││Mapped 1.0 KiB / 128.0 MiB 0.0008% · 5 rng (5 ok) · 4 gaps · 60 iss│
+  11 + ▏✦│││
+  12 - ▏⊕│││
+  12 + │╰────────────────────────────────────────────────────────────────────────╯
+  13 - │╰────────────────────────────────────────────────────────────────────────╯
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Memory Map  k Legend
+===== patch-comfortable-120x30
+   2 - │Patch Editor
+   2 + │Patch Editor ?  📂 Open patches/
+   4 - ▏≡  A2L Explorer│
+   4 + ▏≡  A2L Explorer│draft · change
+   5 - ▏◉  MAC View│╭─ ¹PATCH SCRIPT ──────────────────────────╮╭─ ²CHECKS ──────────╮╭─ ³JSON EDIT ────────╮
+   5 + ▏◉  MAC View│╭─ PATCH SCRIPT ────────────────────────────────╮╭─ INSPECTOR ───────────────────────────────╮
+   6 - ▏▤  Memory Map││Change document (JSON)││││Paste change-set (│
+   6 + ▏▤  Memory Map││No entries yet: Add one, paste a change-set …││ Inspector  JSON  Checks │
+   7 - ▏!  Issues Report││││││0.3K / 64.0K│
+   7 + ▏!  Issues Report││││─BEFORE → AFTER─────────────────────────│
+   8 - ▏✎  Patch Editor││No change entries yet - type an▁▁││││▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎│
+   8 + ▏✎  Patch Editor││││No entry yet: Add one or Load a file.│
+   9 - ▏⏚  A2B Diff││address (0x...) plus a string value││Checks││▊{            ▎│
+   9 + ▏✔  Check Editor│││││
+  10 - ▏✦  Flow Builder││or a run of hex bytes and press Add,││ Run checks ││▊"format":  ▄▄▎│
+  10 + ▏⏚  A2B Diff││││Address0x100│
+  11 - ▏☑  Checks││or load a v2 change-set JSON file.││Checks: runs▅▅││▊"s19app-chan▎│
+  11 + ▏✦  Flow Builder│││││
+  12 - ▏⊕  CRC Designer││││the loaded││▊geset",      ▎│
+  12 + ▏▶  Flow Execution││││Stringtext (document encoding)│
+  13 - ││││change││▊▎│
+  13 + ▏☑  Checks││││▂│
+  14 - ││──────────────────────────────────────││document's││▊"version":   ▎│
+  14 + ▏⊕  CRC Designer││││BytesDE AD BE EF│
+  15 - ││Select an entry row to preview its││checks against││▊"2.0",       ▎│
+  15 + ││││ Add  Edit  Remove  Edit JSON │
+  16 - ││bytes.││the loaded││▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎│
+  16 + │╰─────────────────────────────────── 0 entries ─╯╰───────────────────────────────────────────╯
+  17 - ││││image. Needs││ Parse  Edit │
+  17 + │FileChange files in▼or type a path to the same change-set JSON  Load  Refresh
+  18 - │╰────────────────────────────── 0 entries ─╯╰─────── no run yet ─╯╰───────── v2 schema ─╯
+  18 + │ Validate  Apply loaded changes  Save ▇▇
+  19 - │
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  · go = Check Editor  9 Checks
+===== patch-comfortable-80x24
+   2 - │Patch Editor
+   2 + │Patch Editor ?  📂 Open patches/
+   4 - ▏≡│
+   4 + ▏≡│draft · change
+   5 - ▏◉│╭─ ¹PATCH SCRIPT ──────────────────────────────────────────────────╮
+   5 + ▏◉│╭─ PATCH SCRIPT ──────────╮╭─ INSPECTOR ───────────────────────────────╮
+   6 - ▏▤││Change document (JSON)│
+   6 + ▏▤││No entries yet: Add on…││ Inspector  JSON  Checks │
+   7 - ▏!│││
+   7 + ▏!││││─BEFORE → AFTER─────────────────────────│
+   8 - ▏✎││No change entries yet - type an address (0x...) plus a string│
+   8 + ▏✎││││No entry yet: Add one or Load a file.│
+   9 - ▏⏚││value or a run of hex bytes and press Add, or load a v2│
+   9 + ▏✔│││││▇▇
+  10 - ▏✦││change-set JSON file.│
+  10 + ▏⏚││││Address0x100│
+  11 - ▏☑│││
+  11 + ▏✦│││││
+  12 - ▏⊕│││
+  12 + ││││Stringtext (document encoding)│
+  13 - │
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Patch Editor  ^z Undo  ^y Redo  v Select variant  k Legend  ? more
+===== workspace-comfortable-120x30
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   2 + │Workspace ?
+   4 - ▏≡  A2L Explorer│Loaded
+   4 + ▏≡  A2L Explorer│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   5 - ▏◉  MAC View│PROJ(none)
+   5 + ▏◉  MAC View│
+   6 - ▏▤  Memory Map│S19snap.s19  1.0 KiB · 5 rng [u]
+   6 + ▏▤  Memory Map│Loaded
+   7 - ▏!  Issues Report│MACsnap.mac  24 records [u]
+   7 + ▏!  Issues Report│PROJ(none)
+   8 - ▏✎  Patch Editor│A2Lsnap.a2l  32 tags [u]
+   8 + ▏✎  Patch Editor│S19snap.s19  1.0 KiB · 5 rng [u]
+   9 - ▏⏚  A2B Diff│unload all [U]
+   9 + ▏✔  Check Editor│MACsnap.mac  24 records [u]
+  10 - ▏✦  Flow Builder│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  10 + ▏⏚  A2B Diff│A2Lsnap.a2l  32 tags [u]
+  11 - ▏☑  Checks│▊▎▊▎▊▎
+  11 + ▏✦  Flow Builder│unload all [U]
+  12 - ▏⊕  CRC Designer│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  12 + ▏▶  Flow Execution│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  13 - │▊Workarea Files▎▊▎▊▎
+  13 + ▏☑  Checks│▊▎▊▎▊▎
+  14 - │▊▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▎▊Coverage: 0.00%▎
+  14 + ▏⊕  CRC Designer│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  15 - │▊Data Sections▎▊▊▎ Find Next ▊▎▎▊Ranges: 5▎
+  15 + │▊Workarea Files▎▊▎▊▎
+  16 - │▊▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▎▊Errors: 0▎
+  16 + │▊▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▎▊Coverage: 0.00%▎
+  17 - │▊✓ 0x00000000▎▊▎▊Warnings: 0▎
+  17 + │▊▎▊▎▊▎
+  18 - │▊▎▊▎▊▎
+  18 + │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  27 - 
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  ? more
+===== workspace-comfortable-160x40
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   2 + │Workspace ?
+   4 - ▏≡  A2L Explorer│Loaded
+   4 + ▏≡  A2L Explorer│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   5 - ▏◉  MAC View│PROJ(none)
+   5 + ▏◉  MAC View│
+   6 - ▏▤  Memory Map│S19snap.s19  1.0 KiB · 5 rng [u]
+   6 + ▏▤  Memory Map│Loaded
+   7 - ▏!  Issues Report│MACsnap.mac  24 records [u]
+   7 + ▏!  Issues Report│PROJ(none)
+   8 - ▏✎  Patch Editor│A2Lsnap.a2l  32 tags [u]
+   8 + ▏✎  Patch Editor│S19snap.s19  1.0 KiB · 5 rng [u]
+   9 - ▏⏚  A2B Diff│unload all [U]
+   9 + ▏✔  Check Editor│MACsnap.mac  24 records [u]
+  10 - ▏✦  Flow Builder│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  10 + ▏⏚  A2B Diff│A2Lsnap.a2l  32 tags [u]
+  11 - ▏☑  Checks│▊▎▊▎▊▎
+  11 + ▏✦  Flow Builder│unload all [U]
+  12 - ▏⊕  CRC Designer│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  12 + ▏▶  Flow Execution│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  13 - │▊Workarea Files▎▊▎▊▎
+  13 + ▏☑  Checks│▊▎▊▎▊▎
+  14 - │▊▎▊▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊Coverage: 0.00%▎
+  14 + ▏⊕  CRC Designer│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  15 - │▊▎▊▊Search ASCII ▎ Find Next ▊Goto 0xADDR▎ Goto ▎▊Ranges: 5▎
+  15 + │▊Workarea Files▎▊▎▊▎
+  16 - │▊▎▊▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊Errors: 0▎
+  16 + │▊▎▊▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊Coverage: 0.00%▎
+  17 - │▊▎▊▎▊Warnings: 0▎
+  17 + │▊▎▊▊Search ASCII ▎ Find Next ▊Goto 0xADDR▎ Goto ▎▊Ranges: 5▎
+  18 - │▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE▎▊Loader 0 err · ⚠0 OOO · Entry▎
+  18 + │▊▎▊▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊Errors: 0▎
+  19 - │▊▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....▎▊0x00000000▎
+  19 + │▊▎▊▎▊Warnings: 0▎
+  20 - │▊Data Sections▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.▎▊▎
+  20 + │▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE▎▊Loader 0 err · ⚠0 OOO · Entry▎
+  21 - │▊▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....▄▄▎▊Context▎
+  21 + │▊Data Sections▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....▎▊0x00000000▎
+  22 - │▊✓ 0x00000000▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?▎▊▎
+  22 + │▊▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.▆▆▎▊▎
+  23 - │▊– 0x00000005  ▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#▎▊A2L summary lines 1-71 / 71▎
+  23 + │▊✓ 0x00000000▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....▎▊Context▎
+  24 - │▊█░░░░░░░▄▄▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.▎▊---------------------------▎
+  24 + │▊– 0x00000005  ▇▇▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?▎▊▎
+  25 - │▊✓ 0x08000000▎▊  0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12  |..3J▎▊A2L Sections:▎
+  25 + │▊█░░░░░░░▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#▎▊A2L summary lines 1-71 / 71▎
+  26 - │▊– 0x080000FF  ▎▊  0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3  |.c^?▎▊- PROJECT StressProject (lines▎
+  26 + │▊✓ 0x08000000▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.▎▊---------------------------▎
+  27 - │▊████████▎▊  0x08000080  DF 5C 1F EF 14 33 C8 66 85 B7 F0 56 68 1D 51 52  |.\..▎▊2-259)▎
+  27 + │▊▎▊▎▊▎
+  28 - │▊▎▊▎▊▎
+  28 + │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  37 - 
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  U Unload all
+===== workspace-comfortable-80x24
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱
+   2 + │Workspace ?
+   4 - ▏≡│PROJ(none)
+   4 + ▏≡│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱
+   5 - ▏◉│S19snap.s19  1.0 KiB · 5 rng [u]
+   5 + ▏◉│
+   6 - ▏▤│▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎
+   6 + ▏▤│PROJ(none)
+   7 - ▏!│▊▎▊▎▊▎
+   7 + ▏!│S19snap.s19  1.0 KiB · 5 rng [u]
+   8 - ▏✎│▊ Load ▎▊Hex View▎▊Coverage Stats▎
+   8 + ▏✎│▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎
+   9 - ▏⏚│▊Workarea▎▊▎▊▎
+   9 + ▏✔│▊▎▊▎▊▎
+  10 - ▏✦│▊Files▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▎▊Coverage: 0.00%▎
+  10 + ▏⏚│▊ Load ▎▊Hex View▎▊Coverage Stats▎
+  11 - ▏☑│▊▎▊▊▎ Find Next ▊▎▎▊Ranges: 5▎
+  11 + ▏✦│▊▎▊▎▊▎
+  12 - ▏⊕│▊▎▊▎▊▎
+  12 + │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  13 - │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  21 - 
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  ? more
+===== workspace-compact-120x30
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   2 + │Workspace ?
+   4 - ▏≡  A2L Explorer│Loaded
+   4 + ▏≡  A2L Explorer│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   5 - ▏◉  MAC View│PROJ(none)
+   5 + ▏◉  MAC View│
+   6 - ▏▤  Memory Map│S19snap.s19  1.0 KiB · 5 rng [u]
+   6 + ▏▤  Memory Map│Loaded
+   7 - ▏!  Issues Report│MACsnap.mac  24 records [u]
+   7 + ▏!  Issues Report│PROJ(none)
+   8 - ▏✎  Patch Editor│A2Lsnap.a2l  32 tags [u]
+   8 + ▏✎  Patch Editor│S19snap.s19  1.0 KiB · 5 rng [u]
+   9 - ▏⏚  A2B Diff│unload all [U]
+   9 + ▏✔  Check Editor│MACsnap.mac  24 records [u]
+  10 - ▏✦  Flow Builder│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  10 + ▏⏚  A2B Diff│A2Lsnap.a2l  32 tags [u]
+  11 - ▏☑  Checks│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  11 + ▏✦  Flow Builder│unload all [U]
+  12 - ▏⊕  CRC Designer│▊Workarea Files▎▊▎▊▎
+  12 + ▏▶  Flow Execution│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  13 - │▊▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▎▊Coverage: 0.00%▎
+  13 + ▏☑  Checks│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  14 - │▊▎▊▊▎ Find Next ▊▎▎▊Ranges: 5▎
+  14 + ▏⊕  CRC Designer│▊Workarea Files▎▊▎▊▎
+  15 - │▊Data Sections▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▎▊Errors: 0▎
+  15 + │▊▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▎▊Coverage: 0.00%▎
+  16 - │▊▎▊▎▊Warnings: 0▎
+  16 + │▊▎▊▊▎ Find Next ▊▎▎▊Ranges: 5▎
+  17 - │▊✓ 0x00000000▎▊  0x00000000  53 54 52 45 53▎▊Loader 0 err · ⚠0 OOO · Entry▎
+  17 + │▊Data Sections▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▎▊Errors: 0▎
+  18 - │▊– 0x00000005  ▎▊  0x08000000  C5 D7 14 84 F8▎▊0x00000000▎
+  18 + │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  19 - │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  19 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  20 + Ready.(none)  |  snap.a2l
+  21 - Ready.(none)  |  snap.a2l
+  21 + 
+  22 - 
+  22 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  23 + 
+  26 - 
+  26 + Density: compact
+  27 - Density: compact
+  27 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  28 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page▏^p palette
+  28 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  ? more
+===== workspace-compact-160x40
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   2 + │Workspace ?
+   4 - ▏≡  A2L Explorer│Loaded
+   4 + ▏≡  A2L Explorer│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱▒
+   5 - ▏◉  MAC View│PROJ(none)
+   5 + ▏◉  MAC View│
+   6 - ▏▤  Memory Map│S19snap.s19  1.0 KiB · 5 rng [u]
+   6 + ▏▤  Memory Map│Loaded
+   7 - ▏!  Issues Report│MACsnap.mac  24 records [u]
+   7 + ▏!  Issues Report│PROJ(none)
+   8 - ▏✎  Patch Editor│A2Lsnap.a2l  32 tags [u]
+   8 + ▏✎  Patch Editor│S19snap.s19  1.0 KiB · 5 rng [u]
+   9 - ▏⏚  A2B Diff│unload all [U]
+   9 + ▏✔  Check Editor│MACsnap.mac  24 records [u]
+  10 - ▏✦  Flow Builder│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  10 + ▏⏚  A2B Diff│A2Lsnap.a2l  32 tags [u]
+  11 - ▏☑  Checks│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  11 + ▏✦  Flow Builder│unload all [U]
+  12 - ▏⊕  CRC Designer│▊Workarea Files▎▊▎▊▎
+  12 + ▏▶  Flow Execution│▊▔ Workspace ▔▔▔▔▔▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎
+  13 - │▊▎▊▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊Coverage: 0.00%▎
+  13 + ▏☑  Checks│▊ Load project (p) ▎▊Hex View▎▊Coverage Stats▎
+  14 - │▊▎▊▊Search ASCII ▎ Find Next ▊Goto 0xADDR▎ Goto ▎▊Ranges: 5▎
+  14 + ▏⊕  CRC Designer│▊Workarea Files▎▊▎▊▎
+  15 - │▊▎▊▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊Errors: 0▎
+  15 + │▊▎▊▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊Coverage: 0.00%▎
+  16 - │▊▎▊▎▊Warnings: 0▎
+  16 + │▊▎▊▊Search ASCII ▎ Find Next ▊Goto 0xADDR▎ Goto ▎▊Ranges: 5▎
+  17 - │▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE▎▊Loader 0 err · ⚠0 OOO · Entry▎
+  17 + │▊▎▊▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎▊Errors: 0▎
+  18 - │▊▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....▎▊0x00000000▎
+  18 + │▊▎▊▎▊Warnings: 0▎
+  19 - │▊▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.▎▊▎
+  19 + │▊▎▊  0x00000000  53 54 52 45 53 53                                |STRE▎▊Loader 0 err · ⚠0 OOO · Entry▎
+  20 - │▊Data Sections▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....▎▊Context▎
+  20 + │▊▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47 30 80 4B  |....▎▊0x00000000▎
+  21 - │▊▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?▄▄▎▊▎
+  21 + │▊Data Sections▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85 1F 07 2F  |.2%.▎▊▎
+  22 - │▊✓ 0x00000000▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#▎▊A2L summary lines 1-71 / 71▎
+  22 + │▊▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E 29 A3 FA  |....▎▊Context▎
+  23 - │▊– 0x00000005  ▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.▎▊---------------------------▎
+  23 + │▊✓ 0x00000000▎▊  0x08000030  37 9A 95 3F AA 68 93 E3 2E C5 A2 7B 94 5E 60 5F  |7..?▎▊▎
+  24 - │▊█░░░░░░░▎▊  0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12  |..3J▎▊A2L Sections:▎
+  24 + │▊– 0x00000005  ▂▂▎▊  0x08000040  10 85 F3 23 2D 42 4C 13 29 C8 8D 78 6E D6 8C E6  |...#▎▊A2L summary lines 1-71 / 71▎
+  25 - │▊✓ 0x08000000▅▅▎▊  0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3  |.c^?▎▊- PROJECT StressProject (lines▎
+  25 + │▊█░░░░░░░▎▊  0x08000050  FC B6 2A A6 3B F9 AB 61 7C 08 8A 3B 70 BE 57 AA  |..*.▎▊---------------------------▎
+  26 - │▊– 0x080000FF  ▎▊  0x08000080  DF 5C 1F EF 14 33 C8 66 85 B7 F0 56 68 1D 51 52  |.\..▎▊2-259)▎
+  26 + │▊✓ 0x08000000▎▊  0x08000060  DA 1F 33 4A 70 17 25 0D 3F 60 3D C8 2E BD 3B 12  |..3J▎▊A2L Sections:▎
+  27 - │▊████████▎▊  0x08000090  AF 80 3C E2 59 06 F1 D1 9F B6 C6 80 4E 06 EA 28  |..<.▎▊  - MODULE StressModule (lines▎
+  27 + │▊– 0x080000FF  ▎▊  0x08000070  0B 63 5E 3F F5 6B 1F 0B D9 33 85 23 71 24 9A B3  |.c^?▎▊- PROJECT StressProject (lines▎
+  28 - │▊✓ 0x08000200▎▊  0x080000A0  AB 17 8F 45 7A F6 B4 93 B7 43 9E C6 D4 29 00 62  |...E▎▊3-258)▎
+  28 + │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  29 - │▊▁▁▁▁▁▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  29 + ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 - ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  30 + Ready.(none)  |  snap.a2l
+  31 - Ready.(none)  |  snap.a2l
+  31 + 
+  32 - 
+  32 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  33 + 
+  36 - 
+  36 + Density: compact
+  37 - Density: compact
+  37 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help  q Quit  ^p palette
+  38 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit  x Operations  k Legend  ? Help  + Page+  - Page-  , Hex-  period Hex+ ▏^p palette
+  38 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  o Open workarea  r Refresh workarea  U Unload all
+===== workspace-compact-80x24
+   2 - │░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱
+   2 + │Workspace ?
+   4 - ▏≡│PROJ(none)
+   4 + ▏≡│░╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱
+   5 - ▏◉│S19snap.s19  1.0 KiB · 5 rng [u]
+   5 + ▏◉│
+   6 - ▏▤│▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎
+   6 + ▏▤│PROJ(none)
+   7 - ▏!│▊ Load ▎▊Hex View▎▊Coverage Stats▎
+   7 + ▏!│S19snap.s19  1.0 KiB · 5 rng [u]
+   8 - ▏✎│▊Workarea▎▊▎▊▎
+   8 + ▏✎│▊▔ Workspace ▔▔▔▎▊▔ Hex View ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▎▊▔ Context ▔▔▔▔▔▔▔▔▔▔▎
+   9 - ▏⏚│▊Files▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▎▊Coverage: 0.00%▎
+   9 + ▏✔│▊ Load ▎▊Hex View▎▊Coverage Stats▎
+  10 - ▏✦│▊▎▊▊▎ Find Next ▊▎▎▊Ranges: 5▎
+  10 + ▏⏚│▊Workarea▎▊▎▊▎
+  11 - ▏☑│▊▎▊▊▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▎▁▁▁▎▊Errors: 0▎
+  11 + ▏✦│▊Files▎▊▊▔▔▔▔▎▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▊▔▔▔▔▎▔▔▔▎▊Coverage: 0.00%▎
+  12 - ▏⊕│▊Data▎▊▎▊Warnings: 0▎
+  12 + │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  13 - │▊▁▁▁▁ sections ▁▎▊▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ bytes ▁▎▊▁▁▁▁▁▁▁▁▁ coverage ▁▎
+  13 + ──────────────────────────────────────────────────────────────────────────────
+  14 - ──────────────────────────────────────────────────────────────────────────────
+  14 + Ready.(none)  |  snap.a2l
+  15 - Ready.(none)  |  snap.a2l
+  15 + 
+  16 - 
+  16 + ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 - ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━0%--:--:--
+  17 + 
+  20 - 
+  20 + Density: compact
+  21 - Density: compact
+  21 +  ^k Palette  ^d Density  ^l Load file  ^s Save project  x Operations  ? Help
+  22 -  ^k Palette  ^d Density  ^l Load  ^s Save  / Find  g Go-to  q Quit▏^p palette
+  22 +  Workspace  / Find  g Go-to  , Hex-  . Hex+  k Legend  p Load project  ? more

@@ -305,7 +305,7 @@ def test_tc685_gap_conflict_aborts_naming_the_offending_span() -> None:
     assert "0x00001010" in reason  # the offending address is named
     assert "abort" in reason
     # The refusal fires at PLAN time — the emit entry is never reached, so
-    # the export writes 0 bytes (the screen's ^E rides plan-then-emit).
+    # the export writes 0 bytes (the screen's e rides plan-then-emit).
 
 
 def test_tc685_gap_bytes_equal_to_pad_are_not_a_conflict() -> None:

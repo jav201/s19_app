@@ -333,7 +333,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-149 — Width-adaptive layouts, no wrapped rows
 - **Traceability:** US-139
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.45
 - **Statement:** While the Patch Editor, Check Editor, Flow Builder or Flow Execution screen is displayed at any terminal size of at least 118 columns by 54 rows, on either side of the 120-column `width-narrow` breakpoint, the system shall derive that screen's column widths, panel splits and region heights from the available size at mount and on every resize, so that no element overflows horizontally, the primary actions stay inside the panel viewport, no row of the no-wrap set wraps and the remaining space goes to the screen's growing region. While such a screen is displayed at a width below 118 or a height below 54, down to 80x24, the system shall keep it reachable under scroll.
 - **Rationale (informative):** the operator's variable-size rule and the 220x60 pass (brief R-8). Every screen overflows today at both sizes (P-10) and the EXT-STEP inputs keep the same width at both sizes (P-22). The 80x24 floor is kept (ruling 1 in LED-…97.2).
 - **Validation:** `test`
@@ -349,7 +349,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### HLR-150 — Two-row key bar scoped to the active window
 - **Traceability:** US-140
-- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10, LED-2026-10-19-batch-97.37, LED-2026-10-19-batch-97.38, LED-2026-10-19-batch-97.41
+- **Ledger:** LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.10, LED-2026-10-19-batch-97.37, LED-2026-10-19-batch-97.38, LED-2026-10-19-batch-97.41, LED-2026-10-19-batch-97.43
 - **Statement:** While any window of the app is displayed, the system shall paint a two-row key bar at the bottom of the terminal: the first row the global keys, the same on every window and always including `? Help`; the second row the active window's name tag, then that window's own keys, then its go keys. The key bar shall paint no key the active window does not handle, shall dim a key the window handles that cannot act in the current state, and shall paint whole tokens only, ending an overflowing row with `? more`. When the engineer clicks an enabled token, the system shall run that token's binding action in the binding's own namespace, whatever widget holds the focus.
 - **Rationale (informative):** the operator's PDR objection (PC-22: "necesitamos dos líneas en el fondo de la pantalla … las teclas de interés para la pantalla") and the key-bar prototype round, verdict **A · Two rows** accepted and preferred with no per-screen objection (`evidence/operator-keybar-verdict-2026-10-20.json`), including the operator's colour amendment (the window tag in the `.db-screen-title` pair). Today the one-row `Footer` lists 14 app bindings on every window (P-69), clips at 118 columns (`perio▏`, P-65, P-67), shows `Page±` / `Hex±` where they do nothing and `,` / `.` page a hidden view there (P-63), and drops `? Help` whenever a window holds the focus (P-61). Routed into the batch as Inc-8 (LED-…97.9); backlog U-17. Row 1 is the rendered and accepted one (Find / Go-to are window keys, not global: they own an input only on Workspace, A2L and MAC, `app.py:6794`).
 - **Validation:** `test`
@@ -949,7 +949,7 @@ Probes executed 2026-10-20 on `9c7beaf` and on `0f21e00` (`git diff --stat 9c7be
 
 ### LLR-148.6 — Help entries name every control, input, tab, key and glyph as `label — effect`
 - **Traceability:** HLR-148
-- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.16, LED-2026-10-19-batch-97.20, LED-2026-10-19-batch-97.41
+- **Ledger:** LED-2026-10-19-batch-97.1, LED-2026-10-19-batch-97.2, LED-2026-10-19-batch-97.3, LED-2026-10-19-batch-97.4, LED-2026-10-19-batch-97.9, LED-2026-10-19-batch-97.16, LED-2026-10-19-batch-97.20, LED-2026-10-19-batch-97.41, LED-2026-10-19-batch-97.44, LED-2026-10-19-batch-97.46
 - **Statement:** The `window_help` module shall carry an entry for each of the four screens — `patch` and `flow` rewritten, a Check Editor key and a Flow Execution key added (NEW) to `WINDOW_HELP_SECTIONS` and `SHIPPED_WINDOW_KEYS` (`window_help.py:57`, `:270`) — whose body holds one `label — effect` line, with a non-empty effect, for every button label, input or select label, tab label, key binding and glyph its screen renders in any of its states, block-kind glyphs included. From Inc-8 on, the key-binding lines of a window are its generated keys block (LLR-150.1), shown in the same help modal beneath the steps, and no key is described twice.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B97-32 — `pytest tests/test_b97_chips_help.py -k tc_b97_32`; procedure: appendix A.4 TC-B97-32.

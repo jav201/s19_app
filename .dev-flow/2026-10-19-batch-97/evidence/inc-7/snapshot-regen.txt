@@ -1,0 +1,5 @@
+# REGEN: pytest --snapshot-update over the 29 tc016s cells (local, Windows, s19env, textual 8.2.8, NO_COLOR unset)
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                            [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots updated.
+4 deselected, 29 xpassed in 90.68s (0:01:30)

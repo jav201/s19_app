@@ -209,6 +209,11 @@
       "station": "P3",
       "date": "2026-10-23",
       "decision": "P3 increment 009 (CW-U-1 Load project dialog) approved: asked at the gate — operator added it to batch-97 (try here, test it, move to the integrity batch on problems); RED on 354857c, GREEN 594 passed / 3 baseline, mutants 2/2, code-reviewer OK to advance. Inc-7 is next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-23",
+      "decision": "P3 increment 007 approved under the batch's standing authorization (autonomous with exceptions; no HIGH): snapshot harness race, 29-SVG regen, width sweep, Inc-8 leftovers, help modal scroll/fit plus fix round (UX-F1..F4, CR-F1..F4); code-reviewer OK, ux-reviewer OK after re-walk; full suite classified against baseline, two test-only failures of this increment fixed (post-suite-fix.txt). Batch close (P4/P5) is next."
     }
   ],
   "obsidian_synced": false,

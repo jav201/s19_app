@@ -40,7 +40,7 @@ from textual import events
 from textual.actions import parse as parse_action
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Vertical
+from textual.containers import Container, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label, Static
 
@@ -592,7 +592,8 @@ class WindowHelpScreen(ModalScreen[None]):
     Data Flow:
         - ``compose`` builds a ``.modal-dialog`` with the section title,
           the ``#window_help_body`` ``Static`` seeded from
-          :func:`section_body_text`, and a Close button.
+          :func:`section_body_text` (and the generated keys block) inside the
+          ``#window_help_scroll`` container, and a Close button.
         - ``on_button_pressed`` dismisses with ``None`` on Close.
 
     Dependencies:
@@ -607,6 +608,14 @@ class WindowHelpScreen(ModalScreen[None]):
 
     BINDINGS = [
         Binding("escape", "close_window_help", "Close", show=False),
+        # batch-97 Inc-7 fix round (ux UX-F1): the body scrolls while Close
+        # keeps the focus, so these keys work the moment the modal opens.
+        Binding("up", "scroll_help('scroll_up')", "Scroll up", show=False),
+        Binding("down", "scroll_help('scroll_down')", "Scroll down", show=False),
+        Binding("pageup", "scroll_help('page_up')", "Page up", show=False),
+        Binding("pagedown", "scroll_help('page_down')", "Page down", show=False),
+        Binding("home", "scroll_help('scroll_home')", "Top", show=False),
+        Binding("end", "scroll_help('scroll_end')", "Bottom", show=False),
     ]
 
     def __init__(self, section_key: str) -> None:
@@ -630,10 +639,13 @@ class WindowHelpScreen(ModalScreen[None]):
             body.append(Static(keys_text, id="window_help_keys", markup=False))
         yield Container(
             Label(str(section["title"]), classes="modal-title"),
-            *body,
+            # batch-97 Inc-7: the steps and keys scroll inside the dialog, so a
+            # section taller than the terminal keeps its title and Close on
+            # screen and every line reachable by key.
+            VerticalScroll(*body, id="window_help_scroll"),
             Container(
                 Button(
-                    "Close",
+                    "Close  esc",
                     id="window_help_close",
                     classes="modal-confirm",
                 ),
@@ -646,6 +658,10 @@ class WindowHelpScreen(ModalScreen[None]):
 
     def on_mount(self) -> None:
         self.query_one("#window_help_close", Button).focus()
+
+    def action_scroll_help(self, action: str) -> None:
+        """Run one of the help body's own scroll actions (``action_<name>``)."""
+        getattr(self.query_one("#window_help_scroll", VerticalScroll), f"action_{action}")()
 
     def action_close_window_help(self) -> None:
         logger.info("WindowHelpScreen dismissed by escape.")

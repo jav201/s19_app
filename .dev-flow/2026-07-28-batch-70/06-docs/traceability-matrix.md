@@ -4,7 +4,7 @@
 **Purpose:** show that both traceability chains close, and name what is *not* covered.
 
 **Scope:** FB-P2 — multi-image flow runs + report fusion. The Patch-Editor variant path, FB-P3's CRC
-sub-flow, PKI extraction and the engine-frozen set are explicitly **out** and are not covered here.
+sub-flow, memory-region extraction and the engine-frozen set are explicitly **out** and are not covered here.
 
 **Shipped as** `b457ef8` — squash-merge of **PR #159**, parent `f1f3987`, 2026-07-29. ✅ **This is the
 only commit an auditor can check out to reproduce this matrix.**

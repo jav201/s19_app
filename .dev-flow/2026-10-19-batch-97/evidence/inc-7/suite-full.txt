@@ -1,0 +1,957 @@
+# full suite, source HEAD 5cb7618 + Inc-7 working tree; digests:
+92a7ad970ed714a01a75facd991a44b7e828de4a084e29aed1df7d8f5b5af28b *s19_app/tui/window_help.py
+525d940a15c139102b30fcef3c5394f4ee7d11b72d4b69e8ae26568efcccd461 *s19_app/tui/styles.tcss
+d7d9eba470a41d6340bf0978fba03cea08371cfd29b2cad51e5e6908f1d62a91 *s19_app/tui/screens_directionb.py
+910ec87e0f8343ddb5f0739dd6647ca3e935336afb3b90d691c0e904a923c7bf *s19_app/tui/segment_split_view.py
+...............................ss.......s............................... [  1%]
+..........................................................F............. [  3%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........F............................................................... [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+...............................................x........................ [ 65%]
+...................................................F.................... [ 67%]
+...................................................F.................... [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+.........F.....F................................F...F................... [ 87%]
+........................................x...............F............... [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+..............................................F......................... [ 95%]
+........................................................................ [ 97%]
+.....x.................................................................. [ 99%]
+....................F.............                                       [100%]
+================================== FAILURES ===================================
+______________ test_at_b83_08_tree_holds_no_assembled_selectors _______________
+
+    def test_at_b83_08_tree_holds_no_assembled_selectors() -> None:
+        """The premise that makes the detector cheap: no flow tracking is needed.
+    
+        Meaningful only because the fixture above proves detection works. If this ever goes
+        red, 'recognise the site' has stopped being sufficient and the design needs revisiting
+        -- which is the point of the guard.
+        """
+        from pathlib import Path
+        from tools.address_census import census
+    
+        root = Path(__file__).resolve().parent.parent
+        data = census(root)
+        odd = [s for s in data.sites if s.form.startswith("other:")]
+>       assert not odd, (
+            "address arguments outside {literal, name, fstring} appeared: "
+            + ", ".join(f"{s.file}:{s.line} {s.form}" for s in odd[:10])
+        )
+E       AssertionError: address arguments outside {literal, name, fstring} appeared: tests/test_b97_width.py:1511 other:Subscript
+E       assert not [AddressSite(file='tests/test_b97_width.py', line=1511, api='query_one', form='other:Subscript', shape=None, interp=[], note='')]
+
+tests\test_address_census.py:309: AssertionError
+____ test_at_061a_persistent_control_survives_then_writes_pair_and_clears _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at_061a_persistent_contro0')
+
+    def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back reveals a persistent report control that survives an unrelated
+        action, writes the same report pair on activation, and hides on a new load.
+    
+        Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+        surface. After a successful save-back (the path that today fires only the
+        transient ``notify``), a persistent, queryable control
+        (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+        is shown. Activating it routes to the EXISTING ``action_before_after_report``
+        writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+        produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+        diff heading + the provenance header), not merely "a file was written" (C-10).
+    
+        Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+        a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+        an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+        This proxy asserts widget durability, NOT the notify wall-clock TTL.
+    
+        Activation mechanism: the control is activated through the real button-press
+        dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+        → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+        ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+        ``action_before_after_report``; the message routing is exercised end-to-end.
+    
+        Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+        is re-hidden — a stale "report ready" offer must not persist once the editing
+        context (``last_summary``) has cleared.
+    
+        Counterfactual (RED, C-20): pre-implementation there is no
+        ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+        the transient-only notify cannot satisfy this node.
+        """
+        from textual.css.query import NoMatches
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _drive_apply(app, pilot)
+    
+                # Before the save-back the persistent control must be hidden.
+                row = panel.query_one("#patch_before_after_row")
+                outcomes["hidden_before_saveback"] = row.has_class("hidden")
+    
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["revealed_after_saveback"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Persistence proxy: an unrelated action + re-render must NOT drop
+                # the control (a notify Toast would be gone).
+                _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                button = panel.query_one("#patch_before_after_button", Button)
+                outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+    
+                # Activate through the real button-press dispatch (not a proxy call).
+                statuses = _statuses(app)
+                before = _report_names(reports_dir)
+                button.press()
+                await pilot.pause()
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+    
+                # Clear-on-context boundary: a new load re-hides the control.
+                (tmp_path / "changes.json").write_text(
+                    '{"version": 2, "changes": []}', encoding="utf-8"
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(
+                    tmp_path / "changes.json"
+                )
+                panel.request_action("load_doc")
+                await pilot.pause()
+                try:
+                    outcomes["hidden_after_new_load"] = panel.query_one(
+                        "#patch_before_after_row"
+                    ).has_class("hidden")
+                except NoMatches:  # pragma: no cover - row must persist as a widget
+                    outcomes["hidden_after_new_load"] = True
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["hidden_before_saveback"], (
+            "AT-061a: the report control must be hidden before any save-back"
+        )
+        assert outcomes["revealed_after_saveback"], (
+            "AT-061a: a successful save-back must reveal the persistent control"
+        )
+        assert outcomes["queryable_after_unrelated_action"], (
+            "AT-061a: the control must survive an unrelated action (persistence "
+            "proxy) — a transient notify would be gone"
+        )
+    
+        new_files = outcomes["new_files"]
+        md_new = [n for n in new_files if n.endswith(".md")]
+        html_new = [n for n in new_files if n.endswith(".html")]
+        assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+            f"AT-061a: activating the control must write one md + one html pair, "
+            f"got {new_files}; statuses: {outcomes['statuses']}"
+        )
+        assert _MD_NAME.match(md_new[0]) and _HTML_NAME.match(html_new[0])
+    
+        written = [
+            s for s in outcomes["statuses"] if "Before/after report written" in s
+        ]
+>       assert len(written) == 1, (
+            f"AT-061a: exactly one surfaced written-status line expected, "
+            f"got {outcomes['statuses']}"
+        )
+E       AssertionError: AT-061a: exactly one surfaced written-status line expected, got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_before_after_report.py:1202: AssertionError
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2704: AssertionError
+_______________ test_at_b78_32_app_bindings_block_is_untouched ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at_b78_32_app_bindings_bl0')
+
+    def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+        """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+    
+        RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+    
+        The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+        ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+        MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+        and **eight** entries sit BELOW it and outside the range --
+        ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+        ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+        from batch-40 S2. An entry added or removed among those eight leaves the
+        range-based predicate GREEN, so the guard would report "untouched" for a
+        block that was touched. It fails in the safe-looking direction.
+    
+        ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+        SIXTH merge gate measured it.** Both were wrong, and the second followed from
+        the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+        so believing the boundary sat there silently dropped ``plus``/``minus`` from
+        the inventory. The figure came in from Phase 0's premise table and was
+        carried through two rewrites of this very paragraph without being
+        re-executed -- including one whose stated purpose was removing false
+        references from it. *A figure inherited inside a sentence you are editing is
+        still an inherited figure.* The paragraph's THESIS is unaffected: the range
+        does stop mid-block, entries do escape the predicate, and the node's
+        assertions never depended on the count.
+    
+        It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+        batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+        written and survived three Phase-2 rounds -- because a line range looks like
+        a measurement. A code comment in ``screens_directionb.py`` carried the
+        CORRECT extent, so the two artifacts disagreed and the code was right.
+    
+        **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+        took three commits to get there.** Numbers still appear below, and they are
+        NARRATION -- the record of which ranges were claimed and how each was wrong.
+        Read none of them as an address. (Two earlier drafts got this wrong in
+        opposite directions: the first claimed "EVERY line number is now gone" while
+        five remained, and the fifth gate then noted that one of the survivors,
+        ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+        which is exactly what makes narration read as a pointer. The wording above
+        is scoped to POINTERS for that reason.)
+        The first pass cited
+        ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+        ``:6822``. The second pass removed that one and left the block's own range
+        ``1338-1392`` in place -- and the very next commit added an import at the
+        top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+        been "corrected" was **also wrong on arrival**.
+    
+        So the docstring arguing that a line range is "one insertion away from
+        failing the same silent way" demonstrated the claim three times on itself.
+        Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
+        go stale is the whole point of the node below.
+    
+        A corrected range would not fix this, and this batch proved it twice: any
+        edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+        within days -- one of them wrong the moment it was written. This
+        resolves the block from the CLASS instead, which no line movement can blind,
+        and pins two independent projections of it.
+        """
+        rows = _b79_app_binding_rows()
+    
+        # The FULL row set, frozen. The node pinned only a count plus a key-only
+        # projection of the shown bindings until the independent review measured the
+        # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+        # and description were certified by the count alone. Executed, all three of
+        # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+        # key changed, and one hidden removed while another was added. The shown
+        # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+        # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+        #
+        # The spec's line-range predicate would have caught every one of those. The
+        # re-authoring is still right about range fragility, but it was not the
+        # strict improvement the Inc-6 record claimed: its counterfactual was an
+        # ADDITION, the one class a count can see. A frozen row set is a superset of
+        # both old projections and no line movement blinds it.
+>       assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+            "the App BINDINGS block must be byte-for-byte the committed set. "
+            f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+            f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+        )
+E       AssertionError: the App BINDINGS block must be byte-for-byte the committed set. Added: [('c', 'confirm_attention', 'Confirm', False), ('ctrl+l', 'load_file', 'Load file', True), ('ctrl+s', 'save_project', 'Save project', True), ('d', 'a2l_describe_tag', 'Describe tag', False)]; removed: [('ctrl+l', 'load_file', 'Load', True), ('ctrl+s', 'save_project', 'Save', True)]
+E       assert frozenset({('... False), ...}) == frozenset({('... False), ...})
+E         
+E         Extra items in the left set:
+E         ('ctrl+l', 'load_file', 'Load file', True)
+E         ('ctrl+s', 'save_project', 'Save project', True)
+E         ('d', 'a2l_describe_tag', 'Describe tag', False)
+E         ('c', 'confirm_attention', 'Confirm', False)
+E         Extra items in the right set:...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests\test_tui_diff_screen.py:3912: AssertionError
+_________________ test_verify_quiet_pass_on_faithful_hex_save _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_verify_quiet_pass_on_fait0')
+
+    def test_verify_quiet_pass_on_faithful_hex_save(tmp_path: Path) -> None:
+        """A faithful HEX save-back surfaces one "saved + verified" status line
+        and raises NO error notification.
+    
+        Intent: LLR-004.1 (HLR-004 hybrid) — a clean verify is quiet: a single
+        concise status line, no modal/notice. The real emitter + real
+        verify_written_image round-trip cleanly here, so the status comes from
+        a genuine ``verified`` VerifyResult riding ``last_summary``.
+        """
+        from textual.widgets import Button
+    
+        hex_path = _make_hex_image(tmp_path)
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        async def _drive() -> tuple[list[str], int, object]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_hex_image(app, hex_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                await _apply_one_entry(app, pilot, panel)
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                error_notices = [
+                    n
+                    for n in app._notifications
+                    if getattr(n, "severity", None) == "error"
+                ]
+                return (
+                    list(app.log_lines),
+                    len(error_notices),
+                    app._change_service.last_summary.verify_result,
+                )
+    
+        log_lines, error_count, verify_result = asyncio.run(_drive())
+    
+>       assert verify_result is not None
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:929: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+_________ test_at068b_per_entry_json_popup_edits_only_selected_entry __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at068b_per_entry_json_pop0')
+
+    def test_at068b_per_entry_json_popup_edits_only_selected_entry(
+        tmp_path: Path,
+    ) -> None:
+        """Per-entry JSON popup opens for the selected entry; confirm edits it only (AT-068b).
+    
+        Intent (AT-068b, US-068b / LLR-068b.1/.2/.3, C-16 real click, C-10
+        content): with a paste-authored 3-entry change-set the operator selects the
+        MIDDLE entry (index 1, i != 0 to prove scoping), a REAL ``pilot.click`` on
+        the NEW ``#patch_entry_edit_json_button`` (distinct from the whole-set
+        ``#patch_edit_json_button`` and the field-populate
+        ``#patch_entry_edit_button``) opens the per-entry popup SEEDED WITH A
+        SINGLE ENTRY (entry 1's JSON only — no ``entries`` array, distinguishing it
+        from batch-37's whole-set popup), the operator edits + Confirms, and the
+        entries table (the CONSUMER the real handler produced) shows ONLY entry 1
+        changed while entries 0 and 2 are byte-identical.
+        """
+        from textual.widgets import Button, DataTable, TextArea
+    
+        from s19_app.tui.screens import EntryJsonScreen
+    
+        paste = _changeset_text(
+            [
+                {"type": "string", "address": "0x200", "value": "REV_A"},
+                {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+                {"type": "string", "address": "0x400", "value": "REV_C"},
+            ]
+        )
+    
+        async def _click_entry_json(pilot: object, app: S19TuiApp) -> None:
+            """Drive a REAL pointer click on the per-entry Edit-JSON button (C-16).
+    
+            batch-46: the per-entry buttons row is docked below the PATCH SCRIPT
+            window body. Scroll the WINDOW (``#patch_win_script`` — the scroll
+            container that reveals the docked rows) to its end, then ``pilot.click``
+            delivers a genuine mouse event (no ``.focus()`` / no direct call).
+            """
+            app.query_one("#patch_win_script").scroll_end(animate=False)
+            await pilot.pause()
+            await pilot.click("#patch_entry_edit_json_button")
+            await pilot.pause()
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 50)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["before"] = _entry_addr_values(app)
+    
+                # Select the MIDDLE entry (index 1 -> 0x300); i != 0 proves scoping.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                table.move_cursor(row=1)
+                await pilot.pause()
+    
+                # REAL click -> the per-entry popup (C-16).
+                await _click_entry_json(pilot, app)
+                outcomes["is_entry_popup"] = isinstance(app.screen, EntryJsonScreen)
+                seed = app.screen.query_one("#entry_json_text", TextArea).text
+                parsed = json.loads(seed)
+                outcomes["seed_is_single_entry"] = (
+                    isinstance(parsed, dict) and "entries" not in parsed
+                )
+                outcomes["seed_address"] = parsed.get("address")
+    
+                # Edit entry 1's JSON (DE AD -> BE EF) and Confirm.
+                app.screen.query_one(
+                    "#entry_json_text", TextArea
+                ).text = json.dumps(
+                    {"type": "bytes", "address": "0x300", "bytes": "BE EF"}
+                )
+                app.screen.query_one("#entry_json_confirm", Button).press()
+                await pilot.pause()
+                outcomes["after"] = _entry_addr_values(app)
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["is_entry_popup"], (
+            "the per-entry control must open EntryJsonScreen (not the whole-set popup)"
+        )
+        assert outcomes["seed_is_single_entry"], (
+            "the popup must be seeded with a SINGLE entry (no 'entries' array), "
+            "distinct from batch-37's whole-set ChangeSetJsonScreen"
+        )
+>       assert outcomes["seed_address"] == "0x300", (
+            f"the seed must be the SELECTED entry (0x300), got {outcomes['seed_address']!r}"
+        )
+E       AssertionError: the seed must be the SELECTED entry (0x300), got '0x200'
+E       assert '0x200' == '0x300'
+E         
+E         - 0x300
+E         ?   ^
+E         + 0x200
+E         ?   ^
+
+tests\test_tui_patch_editor_v2.py:3956: AssertionError
+________________________ test_at077c_stale_provenance _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at077c_stale_provenance0')
+
+    def test_at077c_stale_provenance(tmp_path: Path) -> None:
+        """Mutating the document reverts every glyph to ``·`` — three ways.
+    
+        Intent (AT-077c ★, LLR-077.2, GATE-BLOCKING — the wrong-answer class):
+        ``last_check_result`` is NOT reset by document mutation (only by undo/redo),
+        so without the provenance stamp a mutated document is index-aligned onto a
+        stale result and rows are labelled with verdicts belonging to entries that
+        no longer exist at that index. There is no error path — the table simply
+        lies.
+    
+        Three arms, each through a REAL button:
+    
+          (a) ``#patch_entry_add_button``    — count grows
+          (b) ``#patch_entry_remove_button`` — count shrinks
+          (c) ``#patch_entry_edit_button``   — **count UNCHANGED**, bytes replaced
+    
+        Arm (c) is the counterfactual that makes this AT non-vacuous: a
+        count-equality guard passes (a) and (b) and silently mislabels (c). Measured
+        (M-3): weakening the signature to ``len(entries)`` fails arm (c) ALONE.
+    
+        The **non-invalidation** arm is asserted first and is equally load-bearing:
+        without it, an implementation that renders ``·`` unconditionally passes
+        every other assertion here.
+        """
+        image = _write_image(tmp_path / "image.s19", _BRANCH_IMAGE)
+    
+        def _drive(mutate) -> list[str]:
+            async def _run() -> list[str]:
+                doc = _write_check_document(
+                    tmp_path / f"checks-{id(mutate)}.json", list(_BRANCH_ENTRIES)
+                )
+                app = S19TuiApp(base_dir=tmp_path)
+                async with app.run_test(size=(120, 30)) as pilot:
+                    await pilot.pause()
+                    app.load_selected_file(image)
+                    await pilot.pause()
+                    _open_patch(app, doc)
+                    await pilot.pause()
+                    _run_checks(app)
+                    await pilot.pause()
+                    assert _glyphs(app) != [GLYPH_NO_RESULT] * 3, (
+                        "PRECONDITION: the run must render real verdicts before the "
+                        "mutation, or the post-mutation assertion is vacuous"
+                    )
+                    mutate(app)
+                    await pilot.pause()
+                    return _glyphs(app)
+    
+            return asyncio.run(_run())
+    
+        def _no_mutation(app: S19TuiApp) -> None:
+            pass
+    
+        def _add(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x200"
+            app.query_one("#patch_entry_value_input", Input).value = "added"
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+            app.query_one("#patch_entry_add_button", Button).press()
+    
+        def _remove(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x110"
+            app.query_one("#patch_entry_remove_button", Button).press()
+    
+        def _edit_in_place(app: S19TuiApp) -> None:
+            # Same address, NEW bytes -> the entry count is IDENTICAL.
+            app.query_one("#patch_entry_address_input", Input).value = "0x100"
+            app.query_one("#patch_entry_value_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = "DE AD"
+            app.query_one("#patch_entry_edit_button", Button).press()
+    
+        # Non-invalidation FIRST — the anti-vacuity arm.
+        unchanged = _drive(_no_mutation)
+        assert unchanged == [GLYPH_PASS, GLYPH_FAIL, GLYPH_UNCHECKABLE], (
+            "with NO mutation the stamp must still match and the glyphs must "
+            f"render; got {unchanged!r}. If this reads all-'·' the implementation "
+            "refuses unconditionally and every arm below is vacuous."
+        )
+    
+        for arm, mutate, expected_rows in (
+            ("(a) add_entry", _add, 4),
+            ("(b) remove_entry", _remove, 2),
+            ("(c) in-place edit, COUNT UNCHANGED", _edit_in_place, 3),
+        ):
+>           glyphs = _drive(mutate)
+                     ^^^^^^^^^^^^^^
+
+tests\test_tui_patch_glyphs.py:399: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_tui_patch_glyphs.py:364: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_tui_patch_glyphs.py:348: in _run
+    async with app.run_test(size=(120, 30)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:829: in _on_message
+    await invoke(method, message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:3166: in on_patch_editor_panel_action_requested
+    panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+selector = '#patch_editor_panel'
+expect_type = <class 's19_app.tui.screens_directionb.PatchEditorPanel'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002701B2C9150>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+_________ test_help_modal_scrolls_by_key_while_close_keeps_the_focus __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-24380/test_help_modal_scrolls_by_key0')
+
+    def test_help_modal_scrolls_by_key_while_close_keeps_the_focus(tmp_path: Path) -> None:
+        """batch-97 Inc-7 fix round (ux UX-F1): a help modal opens with the focus
+        on Close, and the body scrolls from there — ``down`` one row,
+        ``pagedown`` a page, ``end`` to the last row (the last keys line
+        painted), ``up`` / ``pageup`` back, ``home`` to the top — with no ``tab``
+        first. Close keeps the focus throughout, so ``enter`` still closes the
+        modal. One arm ``tab``s into the body first and ``pagedown`` still
+        scrolls there. Run at 80x24, where every section overflows.
+    
+        RED on the first-round tree (executed, ``evidence/inc-7/red-r2.txt``):
+        with Close focused every key leaves ``scroll_y`` at 0. Mutation: the
+        screen's scroll bindings removed."""
+        from tests.b97_probes import painted_rows
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            report = {}
+            async with app.run_test(size=(80, 24)) as pilot:
+                await _pilot_pause(pilot)
+                for key in WINDOW_HELP_SECTIONS:
+                    assert open_window_help(app, key)
+                    await _pilot_pause(pilot)
+                    screen = app.screen
+                    scroll = screen.query_one("#window_help_scroll")
+                    close = screen.query_one("#window_help_close")
+                    focused_on_open = app.focused is close
+                    ys = {}
+                    for name in HELP_SCROLL_KEYS:
+                        await pilot.press(name)
+                        last = None
+                        for _ in range(30):  # scrolls animate: read once at rest
+                            await pilot.pause()
+                            if scroll.scroll_y == last:
+                                break
+                            last = scroll.scroll_y
+                        ys[name] = scroll.scroll_y
+                        if name == "end":
+                            last = str(screen.query("#window_help_keys, #window_help_body").last().render()).strip().split("\n")[-1].strip()
+                            ys["last_painted"] = last[:20] in "\n".join(painted_rows(app, screen, screen.region))
+                    report[key] = (focused_on_open, scroll.max_scroll_y, ys, app.focused is close)
+                    await pilot.press("enter")
+                    await _pilot_pause(pilot)
+                    report[key] += (not isinstance(app.screen, WindowHelpScreen),)
+                assert open_window_help(app, "patch")
+                await _pilot_pause(pilot)
+                scroll = app.screen.query_one("#window_help_scroll")
+                await pilot.press("tab")
+                await pilot.pause()
+                focused_scroll = app.focused is scroll
+                await pilot.press("pagedown")
+                for _ in range(10):
+                    await pilot.pause()
+                report["tab-arm"] = (focused_scroll, scroll.scroll_y)
+            return report
+    
+        report = asyncio.run(_drive())
+        tab_focus, tab_y = report.pop("tab-arm")
+        assert tab_focus and tab_y > 0, ("after tab, pagedown still scrolls", tab_focus, tab_y)
+        bad = {}
+        for key, (on_open, max_y, ys, still_close, closed) in report.items():
+            ok = (
+                on_open and still_close and closed and max_y > 0
+                and ys["down"] == 1
+                and ys["pagedown"] > ys["down"]
+                and ys["end"] == max_y and ys["last_painted"]
+                and ys["up"] == max_y - 1
+                and ys["pageup"] < ys["up"]
+                and ys["home"] == 0
+            )
+            if not ok:
+                bad[key] = (on_open, max_y, ys, still_close, closed)
+>       assert bad == {}, bad
+E       AssertionError: {'flow': (True, 150, {'down': 1, 'end': 91.96882420206704, 'home': 0, 'last_painted': False, ...}, True, True), 'workspace': (True, 16, {'down': 1, 'end': 15.784098683433117, 'home': 0, 'last_painted': True, ...}, True, True)}
+E       assert {'flow': (Tru..., True, True)} == {}
+E         
+E         Left contains 2 more items:
+E         {'flow': (True,
+E                   150,
+E                   {'down': 1,
+E                    'end': 91.96882420206704,
+E                    'home': 0,...
+E         
+E         ...Full output truncated (18 lines hidden), use '-vv' to show
+
+tests\test_window_usage_help.py:703: AssertionError
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_quiet_pass_on_faithful_hex_save
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - textual...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_window_usage_help.py::test_help_modal_scrolls_by_key_while_close_keeps_the_focus
+11 failed, 3617 passed, 3 skipped, 3 xfailed in 8334.41s (2:18:54)

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos pendientes s19</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--dim:#5f6670;--line:#dcd9d0;--acc:#2f6fb5;--keep:#2e7d4f;--drop:#b0413e;--chg:#b7791f;--tag:#eceae3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--keep:#5fbf86;--drop:#e07a76;--chg:#e0b25c;--tag:#2a2e33}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--keep:#5fbf86;--drop:#e07a76;--chg:#e0b25c;--tag:#2a2e33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:1.5rem;margin:0 0 4px}h2{font-size:1.1rem;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.lead{color:var(--dim);margin:0 0 16px}
+.bluf{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);padding:12px 14px;border-radius:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0}
+.head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.id{font-family:ui-monospace,Consolas,monospace;font-weight:600}
+.tag{background:var(--tag);border-radius:4px;padding:0 6px;font-size:.8rem;color:var(--dim)}
+.x2{background:var(--chg);color:#fff;border-radius:4px;padding:0 6px;font-size:.8rem}
+.t{font-weight:600}
+.row{margin:6px 0 0;font-size:.93rem}.row b{color:var(--dim);font-weight:600}
+.rec{font-size:.9rem;color:var(--dim);margin-top:4px}
+.opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.opts label{border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:.9rem}
+.opts input{margin-right:4px}
+.opts label:has(input:checked){border-color:var(--acc);outline:1px solid var(--acc)}
+textarea{width:100%;min-height:42px;margin-top:6px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;font:inherit}
+.bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 16px;font:inherit;cursor:pointer}
+#gen{min-height:90px}
+small{color:var(--dim)}
+</style>
+</head>
+<body>
+<main>
+<h1>Pedidos pendientes de s19_app</h1>
+<p class="lead">Reconciliación del 2026-10-23 · 69 pedidos encontrados en conversaciones, <code>Cambios.md</code>, veredictos y el escaneo del 18-oct · aquí solo los 25 que piden tu decisión.</p>
+<div class="bluf"><b>Resumen:</b> 45 hechos (verificados en código), 11 a medias, 10 abiertos en backlog, 2 reemplazados, 1 sin claridad, 0 perdidos del todo. Lo grave: dos instrucciones escritas tuyas se recortaron al implementar y no quedaron en ningún lado (R-049, R-050), y varios pendientes esperan una decisión que nadie te volvió a preguntar. Cada tarjeta trae mi recomendación preseleccionada; <b>cambia solo lo que objetes</b> y exporta.</div>
+
+<div id="list"></div>
+
+<h2>Notas generales / pedidos nuevos</h2>
+<textarea id="gen" placeholder="Cualquier cosa que falte, pedidos nuevos, orden de prioridad..."></textarea>
+<p><small>El reporte completo (en inglés) con evidencia por pedido: <code>.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md</code></small></p>
+</main>
+<div class="bar"><span id="cnt"></span><button id="exp">Exportar veredicto (JSON)</button></div>
+<script>
+const G=[
+["Repetidos y a medias (los pediste 2+ veces)",[
+["R-001",2,"Barra de progreso en acciones largas","A medias: solo cargar archivo/A2L y reportes la mueven. Flow Execution, CRC, parches, export y guardar no; además se queda en 100 tras cargar.","Mantener: va con ronda de prototipos (estado en ejecución/inactiva).","keep"],
+["R-002",2,"Tamaño de arranque y escala de fuente","Nada construido; falta decidir si es documentación (tamaño recomendado) o código.","Tú decides: hoy escalas la terminal a mano; podría bastar con documentarlo.","decide"],
+["R-003",2,"CRC como flujo de bloques (relleno, rangos, polinomio, endianness)","Diferido desde julio.","Descartar probable: CRC Designer + bloque CRC ya dan esa configuración.","drop"],
+["R-004",2,"Pulir las cuatro pantallas nuevas","En curso: falta el incremento 7 y el cierre del batch 97.","Mantener (ya en curso).","keep"],
+["R-010",2,"Quitar Operations (tecla x) y guardar su algoritmo como config del CRC Designer","Plan escrito desde el 7-ago, nunca programado. La tecla x sigue.","Mantener y programar.","keep"],
+["R-012",2,"Load: no duplicar archivos y mostrar lista de lo cargado","A medias: el hash evita copias idénticas; si la copia cambió, sigue duplicando; no hay lista.","Mantener: batch Load+proyectos con prototipos.","keep"],
+["R-056",2,"Variables/tags en los JSON, con valores por ejecución","A medias: la tabla de variables del Builder existe; en Flow Execution no se pueden capturar valores por corrida. La fila del backlog está desactualizada.","Mantener y corregir la fila del backlog.","keep"]]],
+["Instrucciones tuyas recortadas al implementar (no están en ningún lado)",[
+["R-049",1,"Rail agrupado en ver / construir / ejecutar","Se separó Patch/Check Editor, pero el rail no se agrupó; el batch 94 lo recortó sin registrarlo.","Mantener: agregar al backlog.","keep"],
+["R-050",1,"Quitar variantes del Patch Editor","«Execute over variants» sigue en el Patch Editor, contra tu Cambio2 y Cambio7. Nada lo quita; solo hay una propuesta de cambiar el texto.","Mantener: agregar al backlog para quitarlo.","keep"]]],
+["Abiertos, a medias o sin dueño",[
+["R-005",1,"Load abre proyectos y la carga es confiable","Arreglado el diálogo (Inc-9); quedan 5 fallos HIGH de guardar/cargar proyecto y un conflicto entre requisitos.","Mantener: batch Load+proyectos.","keep"],
+["R-006",1,"Integridad de lectura/escritura (error del parche en 0x00020000)","Investigación hecha; los 10 arreglos HIGH van al batch de integridad.","Mantener (siguiente batch).","keep"],
+["R-007",1,"Biblioteca de plantillas para todos los JSON de configuración","Hay plantillas de CRC y flujos; faltan las de parches y checks. Nunca entró al backlog.","Tú decides: registrarlo o descartarlo.","decide"],
+["R-008",1,"Usar bien terminales grandes (~220x60)","Faltan las otras pantallas (tope de 120 columnas) y el bache de 120–133.","Mantener.","keep"],
+["R-009",1,"Filas hex que nunca se parten","Hecho en las pantallas del 97; falta el visor A2L y Hex View.","Mantener.","keep"],
+["R-011",1,"Extracción de regiones de memoria a binario","Bloqueado esperando tu formato de rangos desde julio; el export BIN de Split/Join podría ya cubrirlo.","Tú decides: ¿basta Split/Export o hace falta el bloque de flujo?","decide"],
+["R-013",1,"Archivos sintéticos (incluye MAC, Intel HEX)","En backlog de hoy.","Mantener: oráculo del batch de integridad.","keep"],
+["R-014",1,"Mejor reporte md/html de Flow Execution","Solo vive en un documento de diseño, sin fila en el backlog.","Mantener: agregar fila al backlog (batch 98).","keep"],
+["R-015",1,"Filtro y orden en Issues","Esperando que elijas una opción desde julio.","Tú decides: ¿lo quieres todavía?","decide"],
+["R-054",1,"Explicar el test vector del CRC Designer y agregar botón Run","Preguntas pendientes desde el 12-oct; no hay botón.","Mantener: te traigo la explicación y decides el botón.","keep"],
+["R-057",1,"README desactualizado","Última actualización 11-oct, antes de las pantallas nuevas.","Mantener (barato).","keep"]]],
+["Probablemente ya no se necesitan",[
+["R-016",1,"Dirección A2L con dos caracteres de más","Sin caso reproducible en tres meses.","Descartar.","drop"],
+["R-018",1,"Patch Editor en 3 columnas","Reemplazado por tu elección del 20-oct (Patch Editor A).","Descartar.","drop"],
+["R-019",1,"Veredicto del CRC Designer en la fila superior","Reemplazado por una decisión posterior.","Descartar.","drop"]]],
+["Necesito un dato tuyo",[
+["R-066",1,"Lista de todas las formas en que la app lee el A2L, con ejemplos","No encontré el entregable en repo, vault ni docs.","Tú decides: ¿lo recibiste? Si no, lo hago (documento corto).","decide"],
+["R-069",1,"Descripción de parámetros A2L con curvas","Hecho como tablas de texto; no hay curvas dibujadas.","Tú decides: ¿bastan las tablas?","decide"]]]
+];
+const L={keep:"Mantener",drop:"Descartar",decide:"Decidir después",change:"Cambiar (ver nota)"};
+const list=document.getElementById("list");
+G.forEach(([title,items])=>{const h=document.createElement("h2");h.textContent=title;list.appendChild(h);
+items.forEach(([id,n,t,st,rec,def])=>{const c=document.createElement("div");c.className="card";
+c.innerHTML=`<div class="head"><span class="id">${id}</span>${n>1?`<span class="x2">pedido ${n} veces</span>`:""}<span class="t">${t}</span></div>
+<div class="row"><b>Estado:</b> ${st}</div><div class="rec">Recomendación: ${rec}</div>
+<div class="opts">${Object.keys(L).map(k=>`<label><input type="radio" name="${id}" value="${k}" ${k===def?"checked":""}>${L[k]}</label>`).join("")}</div>
+<textarea data-id="${id}" placeholder="Nota (opcional)"></textarea>`;list.appendChild(c);});});
+function upd(){const v=[...document.querySelectorAll("input[type=radio]:checked")];const c={};v.forEach(x=>c[x.value]=(c[x.value]||0)+1);
+document.getElementById("cnt").textContent=Object.entries(c).map(([k,n])=>L[k]+": "+n).join(" · ");}
+document.addEventListener("change",upd);upd();
+document.getElementById("exp").onclick=()=>{const out={page:"s19-reconcile-2026-10-23",exported:new Date().toISOString(),items:{},general_notes:document.getElementById("gen").value};
+document.querySelectorAll("input[type=radio]:checked").forEach(x=>{out.items[x.name]={verdict:x.value,note:document.querySelector(`textarea[data-id="${x.name}"]`).value}});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download="veredicto-reconcile-s19.json";a.click();};
+</script>
+</body>
+</html>
