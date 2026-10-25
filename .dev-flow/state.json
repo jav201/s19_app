@@ -36,8 +36,8 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "P5",
-  "phase_status": "closed",
+  "current_station": "P6",
+  "phase_status": "awaiting-sync",
   "stations_active": [
     "P0",
     "ARQ",
@@ -229,6 +229,11 @@
       "station": "P5",
       "date": "2026-10-25",
       "decision": "P5 closed under the batch's standing authorization and the operator's decision of 2026-10-25 (batch-97: close now) -- 05-close.md co-authored from the architect and qa-reviewer returns: canon folded 81 ids, 0 refused; carries routed to BACKLOG-CODE.md section Routed 2026-10-25 (stale ^E comment, AT-B97-16/24 optional mutants, two help-modal ux LOWs, four flaky nodes, D17 local snapshot regen with one CI snapshot-regen.yml run recommended, review page not rebuilt, DC-1..DC-5); 1 condition outstanding (PC-26, operator decision); next per Decided 2026-10-25: integrity batch, Load+projects, waiting-lane scroll prototype, batch-98 flow report."
+    },
+    {
+      "station": "P6",
+      "date": "2026-10-25",
+      "decision": "P6 documentation approved under the batch's standing authorization (Autonomo con excepciones; no HIGH) -- 06-docs/ written: traceability-matrix.md (73 LLR rows to TC-B97-01..72 and file:line on c899113, 26 AT rows; gaps = the seven P4 minor gaps, HLR-151 with no US/AT/TC id carried to the integrity batch), functionality.md, three mermaid diagrams (architecture, attention-confirm, folder-chip) by docs-writer; executive-summary.md by presentation-builder (spawned sub-agent). Not recorded in the sources: target dates for the next steps, business metrics. State awaiting-sync: the operator reviews at commit, pushes and runs /dev-flow-sync."
     }
   ],
   "obsidian_synced": false,
