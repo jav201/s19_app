@@ -61,7 +61,7 @@ The progress bar (N5) goes to the Load+projects prototype round. No new file for
 
 ### 1.5 Document overview
 §2 holds the stories, the premise re-run and the fork verdict. §3 has one HLR per story, §4 the LLRs
-and §5 the validation strategy. Ids: US-141..US-151, HLR-152..HLR-162, AT-B99-NN, TC-B99-NN.
+and §5 the validation strategy. Ids: US-141..US-152, HLR-152..HLR-162, AT-B99-NN, TC-B99-NN.
 
 ---
 
@@ -115,8 +115,9 @@ the decisions page (§1.4). A story that depends on one is `REFINE` until it is 
 | US-144 | As the engineer running chain sets and saving patched images, I want every write to land in its own file, placed atomically, so that parallel lanes never write each other's image, and a save-back under the image's own name neither deletes the work copy nor crashes Save project. | H-3, PH-3 | READY (D7 and D9 refine two sub-clauses) |
 | US-145 | As the engineer running flows, I want the PATCH step and every run record (lane status, chain-set report, flow report) to show each entry that was not applied and each refusal, and the run to stop before writing when the patch applied nothing, so that no `ok` or `CLEAN` hides a dropped write. | H-2, H-10 | REFINE — D5 |
 | US-146 | As the calibration engineer using the Patch Editor, I want the image I save to always equal the source plus the entries currently in my document, so that an undone or removed entry never reaches the file. | H-4 | READY |
-| US-147 | As the calibration engineer entering physical values from the A2L, I want them encoded in the module's byte order and in the conversion direction ASAM defines, and refused when the table cannot represent them, so that the raw bytes written mean the value I typed. | H-5, H-6, CW-D-10 | REFINE — D2, D3, D4 |
-| US-148 | As the engineer running a CRC step, I want a CRC over a region that holds no image bytes to fail, and a partly covered region to say how much was absent, so that a meaningless CRC is never written over live bytes. | H-7 | READY |
+| US-147 | As the calibration engineer reading A2L values in the A2L window, I want each raw value decoded in the module's byte order and in the conversion direction ASAM defines, so that the physical value I read is the one the bytes mean. | H-5 (decode side, backlog H-7), CW-D-10 | REFINE — D2, D3 |
+| US-152 | As the maintainer of the A2L codec, I want the physical→raw encoder to use the same byte order and conversion direction as the decoder, and to refuse a COMPU_TAB value the table cannot represent, so that any surface that later enters symbol values writes the bytes the value means. | H-5, H-6, CW-D-10 (encode side; P-22: no shipped surface calls the encoder today) | REFINE — D2, D3, D4 |
+| US-148 | As the engineer running a CRC step, I want a CRC over a region that holds no image bytes to fail and stop the flow before anything is written, and a partly covered region to say how much was absent, so that a meaningless CRC is never written over live bytes. | H-7 | READY |
 | US-149 | As the engineer exporting memory segments, I want every exported file to stay inside the chosen destination whatever the A2L segment is called, and a MAC-only export to write the header-only file its confirm promises, so that an export never writes outside the work area or invents a byte. | H-9, CW-D-7 | READY (D8 refines the overwrite clause) |
 | US-150 | As the calibration engineer typing or pasting a hex dump into the Patch Editor Bytes field, I want every token read in one base, so that `11 22` is written as `11 22`. | CW-D-4 | REFINE — D1 |
 | US-151 | As the engineer opening a saved project, I want the Load project dialog and the Workarea Files list to load the item I picked, by name, and the project list to show only projects, so that the CW-U-1 fix holds whichever way I pick. | CW-U-1 (batch-97 Inc-9); its `_load_from_item` sibling; the `patches` folder listed as a project; CW-U-3 (the Workarea Files list reads a folder loads never write to, so the sibling cannot be observed without it) | READY |
@@ -201,16 +202,24 @@ the decisions page (§1.4). A story that depends on one is `REFINE` until it is 
 - **Open questions:** none. The observable rule is fixed; the mechanism is a design choice recorded at PDR.
 - **Classification:** `READY`.
 
-**US-147 — A2L physical→raw encoding**
+**US-147 — A2L values decode as the A2L declares (the engineer's view)**
+- **INVEST:** I ✓ · N ✓ · V ✓ · E ✓ · S ✓ · T ✓
+- **Functionality:** outcome = the A2L window shows physical values decoded big-endian for MSB_FIRST modules and RAT_FUNC solved as INT = f(PHYS); why = raw 300 shows `3000.0` where the file means 30 (CW-D-10). Surface: the A2L window.
+- **Evaluability:** when the corpus A2L and S19 are loaded, the A2L window shows 30 for the RAT_FUNC symbol whose raw bytes are 300, and 4113 for the MSB_FIRST 2-byte symbol whose bytes are `10 11`.
+- **Open questions:** **D2**: the RAT_FUNC direction. **D3**: the byte-order default.
+- **Classification:** `REFINE` — D2, D3.
+
+**US-152 — the encoder matches the decoder (the maintainer's view)**
 - **INVEST:** I ✓ · N ✓ · V ✓ · E ✓ · S ✓ · T ✓
 - **Functionality:**
-  - outcome = big-endian modules encode and decode big-endian; RAT_FUNC follows INT = f(PHYS); a COMPU_TAB value that does not round-trip is refused (or flagged);
+  - user = the maintainer of the A2L codec; surface = the codec API `encode_physical_to_raw_bytes` (`tui/a2l.py`), as US-141's surface is the generator CLI, because no TUI path calls the encoder (P-22);
+  - outcome = big-endian modules encode big-endian; RAT_FUNC follows INT = f(PHYS); a COMPU_TAB value the table cannot represent is refused (or flagged);
   - why = byte-swapped entries, values converted in the wrong direction, and a silent nearest-value or clamp;
   - out of scope = other COMPU_METHOD kinds.
 - **Feasibility:** path = `tui/a2l.py` (`effective_byte_order`, the encode pack, `_apply_compu_method`, `_invert_rat_func`, the COMPU_TAB inversion); fits one batch = yes.
-- **Evaluability:** when the user enters 30 km/h for `RAT_FUNC_DIV_10`, the entry reads `2C 01`; under `MSB_FIRST`, physical 4113 on a 2-byte value reads `10 11`.
+- **Evaluability:** when the maintainer calls the codec API with 30 for the corpus `RAT_FUNC_DIV_10` symbol, it returns raw 300; under `MSB_FIRST`, physical 4113 on the 2-byte symbol returns `10 11`; 500 on the `TAB_INTP` symbol returns an error naming the range.
 - **Open questions:** **D2**: the RAT_FUNC direction. **D3**: the source of the byte-order default, and whether decode changes with encode. **D4**: COMPU_TAB — refuse or flag.
-- **Classification:** `REFINE` — D2, D3, D4.
+- **Classification:** `REFINE` — D2, D3, D4. A symbol-entry surface is a backlog feature (`BACKLOG-CODE.md` §*batch-99 Phase-2 out-of-scope findings*).
 
 **US-148 — CRC over an empty region fails**
 - **INVEST:** I ✓ · N ✓ · V ✓ · E ✓ · S ✓ · T ✓
@@ -219,7 +228,7 @@ the decisions page (§1.4). A story that depends on one is `REFINE` until it is 
   - why = `00000000` is written over live bytes, with `ok`;
   - out of scope = CRC Designer template writes.
 - **Feasibility:** path = the coverage check in `crc.py` and the flow CRC arm; fits one batch = yes.
-- **Evaluability:** when a flow CRC step covers `0x20000–0x30000` of `prg.s19`, the user sees the step fail and the output bytes unchanged.
+- **Evaluability:** when a flow CRC step covers `0x20000–0x30000` of `prg.s19`, the user sees the step fail and no output file written.
 - **Open questions:** none.
 - **Classification:** `READY`.
 
@@ -286,13 +295,16 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 | P-20 | `list_projects` lists every work-area folder except `temp`, so `patches` (and any other reserved home) shows as a project. | premise | ✅ TRUE | `app.py:8314-8319`: `if item.is_dir() and item.name != WORKAREA_TEMP` | RED side of LLR-162.2 |
 | P-21 | There are 0 Intel HEX fixtures in `examples/` and `tests/`. | premise | ✅ TRUE | backlog §*synthetic fixture corpus* count re-run: `16 .s19, 34 .a2l, 14 .mac, 0 .hex/.ihex/.srec` | HLR-152 |
 
-- **Premise evaluation:** 21 premises · ✅ 21 TRUE · ❌ 0 FALSE · ❓ 0 UNDECIDABLE. Every finding the batch closes reproduces on its base.
+| P-22 | No shipped TUI path calls the physical→raw encoder: `encode_physical_to_raw_bytes` is called only from `change_service.py:540` (`resolve_symbol_entry`), whose caller `ChangeService.add_symbol_entry` (`:1086`) has no caller in `s19_app/`; the Patch Editor entry form has Address / String / Bytes inputs only. | premise | ✅ TRUE | `grep -rn "encode_physical_to_raw_bytes\|add_symbol_entry" s19_app` → `a2l.py:2093` (def), `change_service.py:45, 540, 1086` only (P2 finding Q-1, re-run by the orchestrator) | HLR-158 encode limbs are TC-only under a recorded exception; AT-B99-09 observes the decode |
+| P-23 | Patch Editor save-back is offered only after an apply with ≥1 applied entry. | premise | ✅ TRUE | `app.py:3238-3241` (`counts["applied"] > 0`; P2 finding Q-4) | AT-B99-02 drives one applied in-image entry |
+
+- **Premise evaluation:** 23 premises · ✅ 23 TRUE · ❌ 0 FALSE · ❓ 0 UNDECIDABLE. Every finding the batch closes reproduces on its base.
 
 ### 2.8 Fork preconditions (C-52) — MANDATORY, and the declared empty when the batch does not fork
 
 | # | Condition (`C-52`) | Discharged? | The executed evidence |
 |---|---|---|---|
-| 1 | **Frozen contract** — no shared interface is touched inside a lane; one that must change returns to the trunk (trigger A3) | ✅ | n/a — one lane: B99-I1..I9 (`docs/ARCHITECTURE.md` §11, *Batch-99 interface amendments*) are changed by this trunk batch in sequence |
+| 1 | **Frozen contract** — no shared interface is touched inside a lane; one that must change returns to the trunk (trigger A3) | ✅ | n/a — one lane: B99-I1..I12 (`docs/ARCHITECTURE.md` §11, *Batch-99 interface amendments*) are changed by this trunk batch in sequence |
 | 2 | **Disjoint FILE sets**, not just modules — two lanes may not edit the same file, not even different regions | ✅ | n/a — one lane. ARQ's matrix (`design/ARQ-batch-99.md` §3) finds four sharing pairs: 2∩9 `core.py`, 3∩7 `app.py`, 4∩11 `change_service.py`, 5∩8 `flow_execution_service.py`. That is why the batch does not fork |
 | 3 | **Crossed reverse census** — family B run per lane and **shared before starting**; the trunk's act, impossible from inside a lane | ✅ | n/a — one lane; the reverse census runs per increment |
 | 4 | **One owner of the trunk** — requirements, traceability, backlog and spec are never written from a lane | ✅ | the orchestrator owns the trunk; Kimi works one increment at a time in a throwaway worktree and never commits |
@@ -310,7 +322,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 > - painted text (status line, lane cells, the issues panel, dialog text);
 > - report files under the work area.
 >
-> It never observes an internal attribute or a wrapped service. Test paths and `-k` selectors are
+> It never observes an internal attribute or a wrapped service. One exception is declared, for the maintainer story US-152: its surface is the codec API `encode_physical_to_raw_bytes(tag, physical, compu_methods, compu_tabs, record_layouts)` (`tui/a2l.py`), and AT-B99-14 observes only that call's return value `(raw_bytes, error, flags)` (P-22: no TUI path calls the encoder). Test paths and `-k` selectors are
 > provisional until Phase 3 and are reconciled from the real tree at Phase 4.
 >
 > **Provisional derivations.** HLR-154, HLR-156, HLR-158, HLR-161 and the D7, D8, D9 clauses of
@@ -336,15 +348,15 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-153 — An S19 image holds only its data records
 - **Traceability:** US-142
-- **Ledger:** none
-- **Statement:** When an S19 file is loaded, the system shall build the image, its ranges and every count derived from them from `S1`, `S2` and `S3` records only. When an image loaded from an S19 is written, the system shall emit its S0 header as a header record and emit no data record at any address the source did not declare in a data record.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** When an S19 file is loaded, the system shall build the image, its ranges, its record lookup, its overlap map, its validity map and every count derived from them from `S1`, `S2` and `S3` records only. When an image loaded from an S19 is written as S19, the system shall emit its S0 header as a header record; written as S19 or Intel HEX, it shall emit no data at any address the source did not declare in a data record.
 - **Rationale (informative):** 15 of 16 example S19 files gain 6–18 bytes at `0x0` on a round-trip (P-1), and a patch at `0x0` lands on header text (P-2).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_s0.py`
 - **Numeric pass threshold:** over every S0-bearing corpus S19 and `examples/**/*.s19`: written data bytes == source data bytes (independent reader), 0 extra addresses; a patch at `0x0` of `case_01` → disposition `skipped-outside`, 0 bytes written at `0x0`.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** after loading `examples/case_01_basic_valid/firmware.s19` and saving it back unchanged from the Patch Editor, the written file read by the independent reader has no byte at `0x0..0xB`. The Memory Map lists no range starting at `0x0`. A patch entry at `0x0` is reported as skipped in the status line.
+  - **Observable outcome:** after loading `examples/case_01_basic_valid/firmware.s19`, adding one entry that rewrites the bytes already at a data address, applying and saving back (save-back is offered only after an applied entry, P-23), the written file read by the independent reader has no byte at `0x0..0xB` and differs from the source nowhere. The Memory Map lists no range starting at `0x0`. A document whose only entry is at `0x0` reports that entry as skipped in the status line.
   - **Shipped surface:** Load file (`l`) → Patch Editor (`p`) save-back (`#patch_saveback_*`), and the Memory Map window.
   - **Acceptance test(s):** AT-B99-02
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: an S0-only file loads as an empty image; boundary: an S0 whose payload length equals a data record's. Invalid/error: N/A — no parse change.
@@ -352,97 +364,120 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-154 — Truncated and inconsistent images are reported *(provisional: D6 = `flujo_para`)*
 - **Traceability:** US-143
-- **Ledger:** none
-- **Statement:** When an S19 file has no terminator, an `S5` count different from its number of data records, or any record after its terminator, the system shall attach a load notice naming the defect. When an Intel HEX file has no EOF record, or any record after its first EOF, it shall attach a load notice naming the defect and the count of records ignored. While a flow's SOURCE image carries such a notice, the flow shall end the SOURCE step with status `error` and write no file.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** When an S19 file has no terminator, an `S5` or `S6` count different from its number of data records, or any record after its terminator, the system shall attach a load notice naming the defect. When an Intel HEX file has no EOF record, or any record after its first EOF, it shall attach a load notice naming the defect. Before the terminator or EOF, a record is a line starting with `S` (S19) or `:` (HEX); after it, every non-empty line counts as a trailing record, is never parsed, and never enters the image, and the notice states how many there were. While a flow's SOURCE image carries such a notice, the flow shall end the SOURCE step with status `error` and write no file.
 - **Rationale (informative):** a cut transfer loads as `ok` with its tail missing (P-10).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_truncation.py`
-- **Numeric pass threshold:** 5 defect corpus files → 5 notices whose text names the defect; 5 flow runs → SOURCE `error`, 0 files written; 2 well-formed controls → 0 notices.
+- **Numeric pass threshold:** 5 defect corpus files → 5 notices whose code names the defect; 5 flow runs → SOURCE `error`, 0 files written; controls: every `examples/**/*.s19` and every well-formed corpus file → 0 notices.
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** loading a corpus S19 with no terminator shows a notice naming the missing terminator. A flow over it shows the SOURCE step failed and writes nothing.
-  - **Shipped surface:** Load file (`l`), the issues panel; Flow Execution run (`#flow_run_*`).
+  - **Shipped surface:** Load file (`l`), the issues panel; Flow Execution run (`#fx_run`).
   - **Acceptance test(s):** AT-B99-03
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: a file whose last line is the terminator (control, no notice); invalid: the five defect files. Empty/error: N/A — an empty file is already refused (`EMPTY`).
+  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: a file whose last line is the terminator (control, no notice), trailing blank lines after the terminator (no notice), an image of more than 65 535 data records counted by `S6` (no notice); invalid: the five defect files. Empty/error: N/A — an empty file is already refused (`EMPTY`).
   - **Negative control:** executed on `307065f` (P-10): `s19_truncated_no_terminator run=ok source=ok notices=0` → RED today.
 
 ### HLR-155 — Every write lands in its own file, placed atomically
 - **Traceability:** US-144
-- **Ledger:** none
-- **Statement:** When the system writes an image, it shall fill a staging file whose name no other write can share, and place it under the final name so that the final file always holds exactly the bytes of the write that reports it. It shall never delete a file it did not create. When Save project finds a source file missing, the system shall report a notice naming the file and keep running. *(D7, provisional `rechazar`:)* When a chain set is started with two or more lanes naming the same output file, the system shall refuse to start and name those lanes. *(D9, provisional `si`:)* When a flow WRITE-OUT step has written a file, the system shall read it back and end the step with status `error` if its bytes differ from the image.
-- **Rationale (informative):** 35 lane/file mismatches in 5×8 parallel runs (P-5); the app exits with code 1 after a same-name save-back (P-15).
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** When the system places a file through `copy_into_workarea` or `save_patched_image` — image save-backs, flow WRITE-OUT, the CRC write, and every other caller of `copy_into_workarea` (reports, manifests, check specs) — it shall:
+  - fill a private staging file that no other write can share;
+  - place it under the requested name, or under the next free `_<N>` name when the requested one is taken, so that the final file always holds exactly the bytes of the write that reports it;
+  - never rename, move or delete the source it copies from;
+  - delete only the staging artefacts it created.
+
+  When placement fails, it shall raise a containment-class refusal naming the file (`WorkareaPlacementError`) and leave no zero-byte file behind. When Save project finds a source file missing, the system shall report a notice naming the file and keep running. *(D7, provisional `rechazar`:)* When a chain set is started with two or more lanes naming the same output file, the system shall refuse to start and name those lanes. *(D9, provisional `si`:)* When a flow WRITE-OUT step has written a file, the system shall read it back and end the step with status `error` if its bytes differ from the image.
+- **Rationale (informative):** 35 lane/file mismatches in 5×8 parallel runs (P-5); the app exits with code 1 after a same-name save-back (P-15). ARQ R19 sets the staging as a private per-write directory, so the placed file keeps the requested name.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_staging.py`
-- **Numeric pass threshold:** 8 parallel lanes × 20 trials → 0 lanes whose reported file holds another lane's marker; after a same-name save-back: work copy present and byte-equal to its pre-save content, Save project → app running, return code unset; duplicate-name set → refused, 0 files written; corrupted write → WRITE-OUT `error`.
+- **Numeric pass threshold:**
+  - 8 concurrent writers requesting ONE name × 20 trials → 0 reported files holding another writer's marker;
+  - after a same-name save-back: the work copy is present and byte-equal to its pre-save content; Save project → app running;
+  - a duplicate-name set → refused, 0 files written;
+  - a corrupted write → WRITE-OUT `error`;
+  - after every placement, the source's bytes and mtime are unchanged;
+  - a forced `PermissionError` → `WorkareaPlacementError` naming the file, 0 zero-byte files; Save project reports it as a notice and the app keeps running.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** a chain set of 8 lanes with distinct output names, run in parallel, writes 8 files, each holding its own lane's marker. A set with two lanes named `same.s19` is refused with both lane names shown. After loading `firmware.s19`, applying a patch and saving back as `firmware.s19`, Save project completes, the app keeps running and the project folder holds the image.
-  - **Shipped surface:** Flow Execution (chain set run, parallel mode); Patch Editor save-back; Save project dialog (`SaveProjectScreen`).
+  - **Observable outcome:**
+    - a chain set with two lanes named `same.s19` is refused, with both lane names shown, and writes nothing;
+    - a chain set of 8 lanes with distinct output names, run in parallel, writes 8 files, each holding its own lane's marker (regression guard; no RED claim);
+    - after loading `firmware.s19`, applying a patch and saving back as `firmware.s19`, Save project completes, the app keeps running and the project folder holds the image.
+  - **Shipped surface:** Flow Execution (chain set run, parallel mode); Patch Editor save-back; the Save project dialog (`SaveProjectScreen`).
   - **Acceptance test(s):** AT-B99-04, AT-B99-05
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☒ error — boundary: 1 lane (no contention) and 8 lanes; invalid: duplicate output names; error: a missing source at Save project.
-  - **Negative control:** executed on `307065f`: P-5 (`parallel mismatches: 35`) and P-15 (`return_code: 1`) → both ATs RED today.
+  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☒ error — boundary: 1 writer and 8 writers; invalid: duplicate output names; error: a missing source at Save project, a locked target.
+  - **Negative control:** executed on `307065f`: P-15 (`return_code: 1`) → AT-B99-05 RED today. AT-B99-04's duplicate-name arm writes `same.s19` today (P-5's set) → RED under D7. The same-name concurrency RED lives in TC-B99-12 (P-5's mechanism: `parallel mismatches: 35`). D9's clause is TC-only (TC-B99-16): no surface can corrupt a file between write and read-back except a test hook.
 
 ### HLR-156 — PATCH status and run records say what was not applied *(provisional: D5 = `mixta`)*
 - **Traceability:** US-145
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** When a flow PATCH step finishes, the system shall set its status from the step's dispositions and refusals:
-  - `error` when the document could not be read, carries an ERROR refusal, is blocked, or applied 0 of at least 1 entry;
-  - `notices` when at least one entry was skipped or blocked and at least one applied;
-  - `ok` only when every entry was applied.
+  - `error` when the document could not be read, carries a document-level ERROR refusal (every entry `blocked`), or applied 0 of at least 1 entry;
+  - `notices` when at least one entry was not applied (`skipped-*` or an entry-level `blocked`) and at least one was applied;
+  - `ok` otherwise; the first matching rule wins.
 
-  A PATCH `error` shall stop the flow before any later WRITE-OUT. Every run record — the Flow Execution lane, the chain-set report and the flow report — shall list each non-applied entry (address and disposition) and each refusal (code and message). The chain-set report shall list the files each lane wrote. No report shall say `CLEAN` for a run that holds a non-applied entry or a refusal.
+  A PATCH `error` shall stop the flow before any later WRITE-OUT. Every run record — the Flow Execution lane, the chain-set report and the flow report — shall list each non-applied entry (address and disposition) and each refusal (code and message). The chain-set report shall list the files each lane wrote. No report shall say `CLEAN` for a run that holds a non-applied entry or a refusal. File-derived text in these records shall render literally: lane cells through `safe_text`, reports through `md_safe` / `md_code`, notifications with `markup=False`.
 - **Rationale (informative):** PATCH has reported `ok` for every outcome since batch-44 (P-4); the outcome and both reports drop dispositions (P-14).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_patch_truth.py`, plus the re-pinned TC-714 in `tests/test_changes_symbol_entries.py`.
-- **Numeric pass threshold:** the 7-case matrix of `rw-p01` / `p06b` → statuses `error, error, notices, error, error, error, error` (outside, straddle, one-in-one-out, blocked, v1, malformed, unresolved symbol); 0 WRITE-OUT files for `error` cases; reports name 100 % of the non-applied addresses and refusal codes; 0 `CLEAN` headers on those runs.
+- **Numeric pass threshold:** the 8-case matrix of `rw-p01` / `p06b` → statuses `error, error, notices, error, error, error, error, ok` (outside, straddle, one-in-one-out, wrong-kind document, v1, malformed, two good entries + one unresolved symbol (document blocked, as `p06b` shows), all applied); 0 WRITE-OUT files for `error` cases; reports name 100 % of the non-applied addresses and refusal codes; 0 `CLEAN` headers on the non-`ok` runs; a hostile symbol name renders literally (0 markup spans from the payload).
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** running a flow whose patch lies entirely outside the image shows the PATCH cell failed, writes no output file, and the flow report names the skipped address and `skipped-outside`. A flow with one applied and one skipped entry shows notices, writes a file that holds only the applied entry, and its report names the skipped address. A flow with a malformed change document shows an error and a report that names `MF-JSON-PARSE`.
-  - **Shipped surface:** Flow Execution (`FlowExecutionPanel`, lane cells), the flow report and the chain-set report under the work area.
+  - **Shipped surface:** Flow Execution (`FlowExecutionPanel`, lane cells, `#fx_run`), the flow report (the AT's flow fixture carries a REPORT block, without which no flow report is written) and the chain-set report under the work area.
   - **Acceptance test(s):** AT-B99-06, AT-B99-07
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a document with 0 entries (status `ok`, nothing applied, nothing to report); boundary: 1 applied + 1 skipped; invalid: v1 and wrong-kind documents; error: malformed JSON.
   - **Negative control:** executed on `307065f` (P-4): `outside_0x20000 run=ok patch=ok:'applied 0 entries'` → RED today.
 
 ### HLR-157 — The Patch Editor's image is the source plus the current document
 - **Traceability:** US-146
-- **Ledger:** none
-- **Statement:** While a change document is open in the Patch Editor, the system shall keep the image equal to the pristine source image plus the current document's applied entries. When an applied entry is undone, removed or edited, its bytes shall return to the source's bytes before any later save. A save-back shall write that image, and its summary shall list exactly the entries the image holds.
-- **Rationale (informative):** after apply → undo → apply → save, the undone write reaches the file and verify says `verified` (P-6).
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** While a change document is open in the Patch Editor, the system shall keep the image equal to the source image plus the effect of the document's entries. When an applied entry is undone, removed or edited, its bytes shall return to the source's bytes at the next apply or save. A save-back shall write the source plus every entry currently in the document, and its status shall name any entry that had not been applied before the save. Its summary shall list exactly the entries the written image holds.
+- **Rationale (informative):** after apply → undo → apply → save, the undone write reaches the file and verify says `verified` (P-6). The save re-derives from all current entries (ARQ §2.3 rule 2, B99-I7).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_editor_image.py`
-- **Numeric pass threshold:** the p05 sequence → file at `0xEB10..0xEB13` == source bytes (`20417070`), file at `0xEB40..0xEB41` == `01 02`, summary lists 1 entry; remove-after-apply and edit-after-apply arms → 0 stale bytes.
+- **Numeric pass threshold:** the p05 sequence → file at `0xEB10..0xEB13` == source bytes (`20417070`), file at `0xEB40..0xEB41` == `01 02`, summary lists 1 entry; remove-after-apply and edit-after-apply arms → 0 stale bytes; add-after-apply → save arm → the added entry is written and named as not applied before the save.
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** in the Patch Editor the engineer adds `0xEB10 DE AD BE EF`, applies, undoes, adds `0xEB40 01 02`, applies and saves back. The written file read by the independent reader holds the source bytes at `0xEB10` and `01 02` at `0xEB40`, and the status names one applied entry.
   - **Shipped surface:** Patch Editor (`PatchEditorPanel`) Add / Apply / Undo / Save-back controls.
   - **Acceptance test(s):** AT-B99-08
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: undo of every entry → saved file == source; boundary: an undone entry overlapping a kept one. Invalid/error: N/A — no new input.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: every entry undone → the image equals the source (TC-B99-21; no save-back is offered with 0 applied entries, P-23); boundary: an undone entry overlapping a kept one. Invalid/error: N/A — no new input.
   - **Negative control:** executed on `307065f` (P-6): `file @0xEB10 = deadbeef` → RED today.
 
 ### HLR-158 — A2L physical values encode and decode as the A2L declares *(provisional: D2 = `asam`, D3 = `modulo`, D4 = `rechazar`)*
-- **Traceability:** US-147
-- **Ledger:** none
-- **Statement:** When the system converts between a physical value and raw bytes for an A2L symbol, it shall use the symbol's byte order, else its RECORD_LAYOUT's, else the module's `MOD_COMMON BYTE_ORDER`, and only then little-endian. It shall apply a RAT_FUNC as INT = f(PHYS) when encoding and as its inverse when decoding. When a physical value encoded through a COMPU_TAB does not decode back to itself within the method's tolerance, it shall refuse the value with a message naming the nearest representable physical values.
-- **Rationale (informative):** byte-swapped entries under MSB_FIRST (P-7), silent nearest/clamp (P-8), RAT_FUNC in the wrong direction (P-17).
+- **Traceability:** US-147 (decode), US-152 (encode)
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3
+- **Statement:** When the system converts between a physical value and raw bytes for an A2L symbol, it shall use the symbol's byte order, else its RECORD_LAYOUT's, else the module's `MOD_COMMON BYTE_ORDER`, and only then little-endian. It shall apply a RAT_FUNC as INT = f(PHYS) when encoding and solve it for PHYS when decoding. When the A2L window cannot decode a value, it shall show `n/a` with the reason instead of a number. When a physical value is encoded through a COMPU_TAB, the encoder shall:
+  - for `TAB_NOINTP`, refuse a value that is not exactly one of the table's physical values, naming the two nearest table values;
+  - for `TAB_INTP`, refuse a value outside the table's physical range, naming the range; inside it, encode the nearest raw value and, when that raw value decodes to a physical value different from the typed one, return a flag stating the physical value that will be written.
+- **Rationale (informative):** byte-swapped values under MSB_FIRST (P-7), silent nearest / clamp (P-8), RAT_FUNC in the wrong direction (P-17). The encoder has no shipped TUI caller (P-22), so its story US-152 names the codec API as its surface; the decode is observed through the A2L window (US-147).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_a2l_encode.py`
-- **Numeric pass threshold:** MSB_FIRST 2-byte: encode 4113 → `10 11`, decode `10 11` → 4113; `RAT_FUNC_DIV_10`: 30 → `2C 01`, 25 → `FA 00`, raw 300 → 30.0; COMPU_TAB: 500 and 13.0 refused, 10.0 accepted; LINEAR control unchanged (30 → `0F 00`).
+- **Numeric pass threshold:**
+  - MSB_FIRST 2-byte: encode 4113 → `10 11`; decode `10 11` → 4113;
+  - `RAT_FUNC_DIV_10`: 30 → raw 300 (`2C 01` little-endian layout / `01 2C` MSB_FIRST); 25 → raw 250; raw 300 → 30.0;
+  - COMPU_TAB: `TAB_NOINTP` 13.0 refused naming 10.0 and the next entry, table values accepted; `TAB_INTP` 500.0 and −50.0 refused naming the range, an in-range off-grid value accepted with a flag naming the written physical value, a grid value accepted with no flag;
+  - LINEAR control unchanged (30 → `0F 00`).
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** through the Patch Editor's symbol entry, with the corpus A2L, 30 km/h on the RAT_FUNC symbol becomes an entry reading `2C 01`; 500 on the COMPU_TAB symbol is refused with the nearest values shown; 4113 on the MSB_FIRST 2-byte symbol becomes `10 11`. The A2L window shows 30 for the symbol whose raw bytes are 300.
-  - **Shipped surface:** Patch Editor symbol entry (`#patch_symbol_*`); the A2L window.
-  - **Acceptance test(s):** AT-B99-09
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: a table endpoint value (accepted) and a value just outside it (refused); invalid: a non-integral RAT_FUNC result (refused, existing). Empty/error: N/A.
-  - **Negative control:** executed on `307065f`: P-7 (`little`), P-8 (`err=None flags=[]`), P-17 (30 → `03 00`) → RED today.
+  - **Observable outcome:**
+    - (US-147) with the corpus A2L and S19 loaded, the A2L window shows 30 for the RAT_FUNC symbol whose raw bytes are 300, and 4113 for the MSB_FIRST 2-byte symbol whose bytes are `10 11`;
+    - (US-152) through the codec API, the corpus A2L's symbols encode 30 → raw 300, 4113 → `10 11`, and 500 on the `TAB_INTP` symbol is refused naming the range.
+  - **Shipped surface:** the A2L window (physical column) for US-147; the codec API `encode_physical_to_raw_bytes` (`tui/a2l.py`) for US-152.
+  - **Acceptance test(s):** AT-B99-09 (US-147), AT-B99-14 (US-152)
+  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☐ error — boundary: table endpoint values (accepted) and values just outside the range (refused); invalid: a RAT_FUNC with no real inverse for a raw value (shown `n/a`). Empty/error: N/A.
+  - **Negative control:** executed on `307065f`: P-7 (`little`) and P-17 (raw 300 → `3000.0`) → AT-B99-09 RED today; P-17 (30 → `03 00`) and P-8 (`err=None flags=[]`) → AT-B99-14 RED today.
 
 ### HLR-159 — A CRC never covers an empty region
 - **Traceability:** US-148
-- **Ledger:** none
-- **Statement:** When a CRC operation's region holds no image byte, the system shall end the operation with status `error` and write nothing. When the region holds some image bytes but not all, it shall end with status `notices` naming the number of absent bytes, for every region form, including legacy regions on the flow CRC arm. The CRC operation's own file write shall use the private staging of HLR-155.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** When a CRC operation's region holds no image byte, the system shall end the operation with status `error`, inject nothing, and stop the flow before any later WRITE-OUT, so no file is written. When the region holds some image bytes but not all, it shall end with status `notices` naming the number of absent bytes, for every region form, including legacy regions on the flow CRC arm. The CRC operation's own file write is placed by HLR-155 (LLR-155.8).
 - **Rationale (informative):** `00000000` is written over live bytes with `ok` (P-9).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_crc_region.py`
-- **Numeric pass threshold:** empty region → `error`, output slot bytes == source slot bytes; region over a gap → `notices` with the exact absent count; fully covered region → `ok`, CRC equal to an independent CRC computation.
+- **Numeric pass threshold:** empty region → `error`, 0 files written by the flow; region over a gap → `notices` with the exact absent count; fully covered region → `ok`, CRC equal to an independent CRC computation.
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** a flow whose CRC step covers `0x20000–0x30000` of `prg.s19` shows the CRC cell failed and writes nothing. A step over a gap shows notices naming how many bytes were absent.
@@ -453,28 +488,29 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-160 — Exports stay inside their destination and invent no byte
 - **Traceability:** US-149
-- **Ledger:** none
-- **Statement:** When Split/Join/Export writes a file, the system shall:
-  - build the file name from a sanitised segment name;
-  - refuse, writing nothing, any path that does not resolve under the destination directory;
-  - write only image bytes the source declared.
-
-  In a MAC-only session it shall write a header-only S19/HEX file. *(D8, provisional `reemplazar`:)* When an export's final name already exists, it shall replace that file atomically and say `replaced` in the status.
-- **Rationale (informative):** a `../` segment name escapes the work area (P-11); a MAC placeholder byte is written as data (P-18).
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** When Split/Join/Export plans an export, the system shall build every file name, BIN `.addr` sidecars included, from one sanitiser. Before any byte is written, it shall refuse the export, naming the segments, when two final names collide (compared case-folded) or a name is refused. It shall refuse, writing nothing, when the destination or any final path does not resolve inside the work-area root, and it shall never write through an existing link or reparse point. It shall write only image bytes the source declared; in a MAC-only session that is a header-only S19/HEX file. *(D8, provisional `sufijo`:)* When a final name already exists with different bytes, it shall place the file under the next free `_<N>` name through HLR-155's placement; a BIN and its `.addr` sidecar are placed as a pair under the same `_<N>`, both names claimed before either is written. When the existing file (or pair) holds identical bytes, it is reused. The status names the files actually written or reused.
+- **Rationale (informative):** a `../` segment name escapes the work area (P-11); a MAC placeholder byte is written as data (P-18). P2 (S-1..S-4) found that the two sanitisers in the tree disagree, that a junction destination passes a destination-rooted check, and that sanitising is many-to-one.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_export.py`
-- **Numeric pass threshold:** hostile names (`../`, `..\`, absolute, drive-letter, reserved device names) → 0 files outside the destination; MAC-only export → 0 data records (independent reader); second export → the destination holds 1 file with the second export's bytes.
+- **Numeric pass threshold:**
+  - the hostile set (`../`, `..\`, absolute POSIX and Windows paths, `C:x`, UNC `\\host\share`, `seg:stream`, `seg::$DATA`, `<>|?*"`, NUL, U+202E, `CON`, `NUL`, `COM1`, `COM¹`, `LPT²`, `CONIN$`, `CONOUT$`, trailing dot and space, a 300-character name) → 0 files outside the destination, every name inside the allowlist;
+  - a colliding pair (`SegA` / `sega`) → refused before any write, 0 files;
+  - a junction destination → refused;
+  - MAC-only export → 0 data records (independent reader);
+  - second export with changed bytes → `<name>_1` (BIN and `.addr` as `<name>_1.bin` + `<name>_1.addr`), the first files intact; second export with identical bytes → reused, the status says so;
+  - a 250-character loaded-file stem → every basename, `_<N>` and extension included, ≤ 200 characters.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** with an A2L whose segment is named `x/../../../ESCAPED`, the export writes its file inside the destination under a sanitised name, and nothing appears outside it. A MAC-only export writes a file holding no data record.
+  - **Observable outcome:** with an A2L whose segment is named `x/../../../ESCAPED`, the export writes its file inside the destination under a sanitised name, and nothing appears outside it. A MAC-only export writes a file holding no data record. A second export after a patch writes `<name>_1`, the status names it, and the first file is intact.
   - **Shipped surface:** the Split / Join / Export window (`SegmentSplitView`) export action.
   - **Acceptance test(s):** AT-B99-11
-  - **Boundary catalog (QC-3):** ☒ empty ☐ boundary ☒ invalid ☒ error — empty: the MAC-only session; invalid: the hostile names; error: the containment refusal. Boundary: N/A — no numeric limit is involved.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: the MAC-only session; boundary: a 100-character segment name (kept) and a longer one (capped); invalid: the hostile names; error: the containment and collision refusals.
   - **Negative control:** executed on `307065f` (P-11): `inside dest: False` → RED today.
 
 ### HLR-161 — The Bytes field reads one base *(provisional: D1 = `hex`)*
 - **Traceability:** US-150
-- **Ledger:** none — amends batch-07 LLR-001.2 (decimals in the TUI byte grammar) once the verdict lands; that amendment will be ledger entry LED-2026-10-25-batch-99.1.
+- **Ledger:** none — amends batch-07 LLR-001.2 (decimals in the TUI byte grammar) once the verdict lands; that amendment will be the next ledger entry after the verdict.
 - **Statement:** When the Patch Editor reads the Bytes field, it shall read every token as hexadecimal, with or without a `0x` prefix, and refuse any token that is not 1–2 hex digits, with a message naming the token. The field's placeholder and the window help shall say that tokens are hex.
 - **Rationale (informative):** digit-only tokens are read as decimal inside a hex dump (P-16).
 - **Validation:** `test`
@@ -490,8 +526,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-162 — Project and work-area pickers load by name
 - **Traceability:** US-151
-- **Ledger:** none
-- **Statement:** When the operator picks a project in the Load project dialog, by keyboard or by mouse, and confirms, the system shall load the project of that name. When the operator picks an item in the Workarea Files list, it shall load the file of that name from the folder the list reads. The project list shall hold no reserved work-area home (`temp`, `patches` and the other reserved homes). The Workarea Files list shall list the folder that loads write into (CW-U-3).
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** When the operator picks a project in the Load project dialog, by keyboard or by mouse, and confirms, the system shall load the project of that name. When the operator picks an item in the Workarea Files list, it shall load the file of that name from the folder the list reads. The project list shall hold no reserved work-area home (the closed set `RESERVED_WORKAREA_HOMES`, LLR-162.2). The Workarea Files list shall list the folder that loads write into (CW-U-3), and shall show no staging artefact.
 - **Rationale (informative):** Inc-9 fixed the dialog without a test per pick path; `_load_from_item` keeps the `Label()` pattern (P-19); reserved homes are listed as projects (P-20); the Workarea Files list reads a folder that loads never write to, so the sibling cannot be observed (CW-U-3).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_load_project.py`
@@ -501,7 +537,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
   - **Observable outcome:** with projects `P1`, `P2` and a `patches` folder, the dialog lists `P1` and `P2` only. Picking `P2` either way and pressing Load shows the status naming `P2`. After a file load, the Workarea Files list shows that file, and picking it loads it.
   - **Shipped surface:** `LoadProjectScreen` (`#project_ok`), the Workarea Files list.
   - **Acceptance test(s):** AT-B99-13
-  - **Boundary catalog (QC-3):** ☒ empty ☐ boundary ☒ invalid ☐ error — empty: no project (empty-state, OK disabled or a notice); invalid: only reserved folders present. Boundary/error: N/A.
+  - **Boundary catalog (QC-3):** ☒ empty ☐ boundary ☒ invalid ☐ error — empty: no project → pressing Load loads nothing and the current file stays loaded; invalid: only reserved folders present. Boundary/error: N/A.
   - **Negative control:** a mutant restoring `str(label_widget)` in `_load_from_item` → the Workarea pick loads nothing → RED (C-40, Phase 3).
 
 ---
@@ -522,13 +558,13 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-152.2 — Coverage classes
 - **Traceability:** HLR-152
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** The manifest shall contain at least one file for each class:
   - S19 with `S1`, with `S2` and with `S3` data; with an S0 header; with an `S5` count; with `S7`, `S8` and `S9` terminators carrying a non-zero entry point;
   - Intel HEX with record types 00, 01, 02, 04 and 05, including a record ending exactly at a 64 KiB boundary;
   - a MAC paired to an S19;
   - an A2L paired to an S19, declaring `MOD_COMMON BYTE_ORDER MSB_FIRST` with a 2-byte symbol, a RAT_FUNC symbol, a COMPU_TAB (`TAB_INTP` and `TAB_NOINTP`) symbol and a LINEAR control;
-  - defect cases: S19 without a terminator, S19 with a wrong `S5`, S19 with data after the terminator, HEX without EOF, HEX with data after EOF, an S19 overlap with differing bytes.
+  - defect cases: S19 without a terminator, S19 with a wrong `S5`, S19 with data after the terminator, HEX without EOF, HEX with data after EOF, an S19 overlap with differing bytes (oracle-only: no requirement of this batch consumes it; its manifest records last-wins bytes, matching the loader; M-2 stays in the backlog).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-02 — `pytest tests/test_b99_corpus.py -k tc_b99_02`
 - **Numeric pass threshold:** 0 classes without a file.
@@ -545,30 +581,30 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** make the reader copy S0 payload into the map (mutation) → mismatches on every S0-bearing file, RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — width edges; defect files parse to the manifest's partial bytes.
 
-### LLR-153.1 — `S19File` maps and ranges exclude S0
+### LLR-153.1 — One data-record predicate feeds every S19 record walk
 - **Traceability:** HLR-153
-- **Ledger:** none
-- **Statement:** `S19File.get_memory_map` and `S19File.get_memory_ranges` (`s19_app/core.py`) shall include bytes of `S1`/`S2`/`S3` records only. *(Crosses the frozen engine layer, `docs/ARCHITECTURE.md` §7. That rule allows it when the crossing is named; this is the naming, and B99-I3 records the contract change.)*
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** *(Crosses the frozen engine layer, `docs/ARCHITECTURE.md` §7. That rule allows it when the crossing is named; this is the naming, and B99-I1 records the contract change.)* `S19File.get_memory_map`, `get_memory_ranges`, `get_record_for_address` and `_build_overlap_map` (`s19_app/core.py`) shall walk only the records a single shared data-record predicate admits (`S1`/`S2`/`S3`; ARCHITECTURE R18).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-04 — `pytest tests/test_b99_s0.py -k tc_b99_04`
-- **Numeric pass threshold:** for every S0-bearing corpus S19: map keys == manifest data addresses; 0 range starting at the S0 address unless a data record declares it.
-- **Negative control:** re-admit S0 in the record filter (mutation) → extra keys, RED.
+- **Numeric pass threshold:** for every S0-bearing corpus S19: map keys == manifest data addresses; 0 ranges starting at the S0 address unless a data record declares it; `get_record_for_address(0x0)` on `case_01` → no record; the overlap map holds no S0 address.
+- **Negative control:** re-admit S0 in the predicate (mutation) → extra keys and a record at `0x0`, RED.
 - **Boundary catalog:** ☒ empty ☒ boundary — S0-only file → empty map; an S0 alongside data at `0x0` (data kept, header not).
 
-### LLR-153.2 — `build_mem_map_s19` excludes S0
+### LLR-153.2 — The hex-view builders use the same predicate
 - **Traceability:** HLR-153
-- **Ledger:** none
-- **Statement:** `build_mem_map_s19` (`s19_app/render/hexview.py`) shall build its map from `S1`/`S2`/`S3` records only.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `build_mem_map_s19` and `build_range_validity_s19` (`s19_app/render/hexview.py`) shall build their maps from the records the LLR-153.1 predicate admits.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-05 — `pytest tests/test_b99_s0.py -k tc_b99_05`
-- **Numeric pass threshold:** map == `S19File.get_memory_map()` == manifest bytes for every corpus S19.
+- **Numeric pass threshold:** map == `S19File.get_memory_map()` == manifest bytes for every corpus S19; the validity map has no key at an S0-only address.
 - **Negative control:** mutation as LLR-153.1 → RED.
 - **Boundary catalog:** ☒ empty — S0-only file.
 
 ### LLR-153.3 — Written images carry S0 as header only
 - **Traceability:** HLR-153
-- **Ledger:** none
-- **Statement:** An image loaded from an S19 and written by `save_patched_image` or the flow WRITE-OUT step shall carry the source's S0 as an `S0` record and no data record that the source lacked.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** An image loaded from an S19 and written as S19 by `save_patched_image` or the flow WRITE-OUT step shall carry the source's S0 as an `S0` record. Written as S19 or Intel HEX, it shall carry no data at an address the source lacked.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-06 — `pytest tests/test_b99_s0.py -k tc_b99_06` (independent reader).
 - **Numeric pass threshold:** written S0 text == source S0 text; written data bytes == source data bytes.
@@ -587,53 +623,57 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-154.1 — S19 terminator and count checks *(provisional, D6)*
 - **Traceability:** HLR-154
-- **Ledger:** none
-- **Statement:** *(Crosses the frozen engine layer, `docs/ARCHITECTURE.md` §7; named here.)* The S19 loader (`s19_app/core.py` `_load`) shall attach a notice when the file has no `S7`/`S8`/`S9` record, when an `S5`/`S6` count differs from the number of data records, and when any record follows the terminator. Each notice shall name its defect.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** *(Crosses the frozen engine layer, `docs/ARCHITECTURE.md` §7; named here.)* The S19 loader (`s19_app/core.py` `_load`) shall attach a notice with code `S19-NO-TERMINATOR` when the file has no `S7`/`S8`/`S9` record, `S19-COUNT-MISMATCH` when an `S5` count (compared only when the data-record count is ≤ 0xFFFF) or an `S6` count (≤ 0xFFFFFF) differs from the number of data records, and `S19-AFTER-TERMINATOR` when any record follows the terminator. After the terminator it shall count non-empty lines only — no parse, no per-line issue, no image write — and emit one notice per defect kind.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-08 — `pytest tests/test_b99_truncation.py -k tc_b99_08`
-- **Numeric pass threshold:** 3 defect files → 3 notices with the defect named; well-formed corpus S19 → 0 notices.
+- **Numeric pass threshold:** 3 defect files → 3 notices with the codes above; every `examples/**/*.s19` → 0 notices; a 100 000-line junk tail → 1 notice, 0 image bytes from the tail.
 - **Negative control:** drop the terminator check (mutation) → 0 notices on the cut file, RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — terminator as the last line (control); the three defects.
+- **Boundary catalog:** ☒ boundary ☒ invalid — terminator as the last line; trailing blank lines; `S6` past 65 535 records; the three defects.
 
 ### LLR-154.2 — HEX EOF checks *(provisional, D6)*
 - **Traceability:** HLR-154
-- **Ledger:** none
-- **Statement:** *(Crosses the frozen engine layer, §7; named here.)* The HEX loader (`s19_app/hexfile.py` `_load`) shall attach a notice when the file has no type-01 record, and a notice naming the count of records ignored after the first EOF.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** *(Crosses the frozen engine layer, §7; named here.)* The HEX loader (`s19_app/hexfile.py` `_load`) shall attach a notice with code `HEX-NO-EOF` when the file has no type-01 record, and `HEX-AFTER-EOF`, stating the count, when records follow the first EOF. After the EOF it shall count non-empty lines only and emit one notice.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-09 — `pytest tests/test_b99_truncation.py -k tc_b99_09`
-- **Numeric pass threshold:** 2 defect files → 2 notices; the after-EOF notice states the ignored record count.
+- **Numeric pass threshold:** 2 defect files → 2 notices; the after-EOF notice states the exact count of non-empty trailing lines; a 100 000-line junk tail → 1 notice, 0 image bytes from the tail.
 - **Negative control:** drop the EOF check (mutation) → 0 notices, RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — EOF as the last line; the two defects.
 
 ### LLR-154.3 — SOURCE fails on an integrity notice *(provisional, D6)*
 - **Traceability:** HLR-154
-- **Ledger:** none
-- **Statement:** The flow SOURCE step (`flow_execution_service.py`) shall end with status `error` when the loaded image carries a notice of LLR-154.1 or LLR-154.2, and the flow shall write no file.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** The flow SOURCE step (`flow_execution_service.py`) shall end with status `error` when the loaded image carries a notice whose code is one of the five of LLR-154.1/154.2 (other load notices keep today's `notices` mapping), and the flow shall write no file.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-10 — `pytest tests/test_b99_truncation.py -k tc_b99_10`
 - **Numeric pass threshold:** 5 defect sources → 5 SOURCE `error`, 0 files written.
 - **Negative control:** map the notice to `notices` (mutation) → a file is written, RED.
 - **Boundary catalog:** ☒ error — the refusal itself.
 
-### LLR-155.1 — Private staging file
+### LLR-155.1 — Private staging directory
 - **Traceability:** HLR-155
-- **Ledger:** none
-- **Statement:** `save_patched_image` (`tui/changes/apply.py`) shall stage each write in a file created exclusively under `<workarea>/temp/` with a unique generated name, never `temp/<user name>`, and shall remove only that staging file.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** `save_patched_image` (`tui/changes/apply.py`) and `copy_into_workarea` (`tui/workspace.py`) shall stage each write in a private directory created with `tempfile.mkdtemp` under `<workarea>/temp/.staging/`, holding a file with the requested (sanitised) name. They shall check that `<workarea>/temp` and `<workarea>/temp/.staging` are not reparse points (`lstat`) before staging, and shall remove only that directory, tracked by an ownership flag and never by re-deriving a name.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-11 — `pytest tests/test_b99_staging.py -k tc_b99_11`
-- **Numeric pass threshold:** a same-name save-back → the loaded work copy exists and is byte-equal to its pre-save bytes; 0 leftover staging files.
+- **Numeric pass threshold:** a same-name save-back → the loaded work copy exists and is byte-equal to its pre-save bytes; 0 leftover staging directories after success and after a forced failure; the placed name equals the requested name when it is free.
 - **Negative control:** executed on `307065f` (P-15): `work copy exists after save-back: False` → RED.
-- **Boundary catalog:** ☒ boundary — the user name equal to the work copy's name.
+- **Boundary catalog:** ☒ boundary ☒ error — the user name equal to the work copy's name; a forced failure mid-placement.
 
-### LLR-155.2 — Atomic, non-shared placement
+### LLR-155.2 — Exclusive, atomic placement that never moves the source
 - **Traceability:** HLR-155
-- **Ledger:** none
-- **Statement:** The final placement (`save_patched_image` with `copy_into_workarea`, `tui/workspace.py`) shall reserve the final name with an exclusive create and fill it by atomic replace from the private staging file, so that concurrent writers never share a target.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** `copy_into_workarea` shall:
+  1. claim the final name with an exclusive create (`O_EXCL`), taking the next free `_<N>` name when the requested one exists and the bytes differ (B8 reuse stays, LLR-155.3);
+  2. close the claim handle;
+  3. `os.replace` the staging file onto it, retrying up to 5 times within 1 s on `PermissionError`, then removing its own claimed placeholder and raising `WorkareaPlacementError`, a subclass of `WorkareaContainmentError` naming the file, so every caller that already handles a containment refusal reports it with no edit (the return contract stays `Path`; ARCHITECTURE R19);
+  4. never rename, move or delete `source`: a cross-device `OSError` fails the write and never falls back to a move or to copy-then-delete.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B99-12 — `pytest tests/test_b99_staging.py -k tc_b99_12` (8 threads × 20 trials, distinct markers, independent reader).
-- **Numeric pass threshold:** 0 files whose bytes differ from the writer that reported them; 0 exceptions.
+- **Executed verification:** TC-B99-12 — `pytest tests/test_b99_staging.py -k tc_b99_12` (8 threads requesting ONE name × 20 trials, distinct markers, independent reader; forced `PermissionError` arm; source bytes and mtime arm).
+- **Numeric pass threshold:** 0 files whose bytes differ from the writer that reported them; 0 exceptions other than `WorkareaPlacementError` on the forced failure; 0 zero-byte files after it; the source unchanged after every placement. The increment packet lists, for each of the 13 callers, whether it handles `WorkareaContainmentError`.
 - **Negative control:** executed on `307065f` (P-5): `parallel mismatches: 35` → RED.
-- **Boundary catalog:** ☒ boundary — 1 writer and 8 writers.
+- **Boundary catalog:** ☒ boundary ☒ error — 1 writer and 8 writers; the locked target.
 
 ### LLR-155.3 — Byte-identical reuse stays race-free
 - **Traceability:** HLR-155
@@ -657,8 +697,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-155.5 — Duplicate output names are refused at start *(provisional, D7)*
 - **Traceability:** HLR-155
-- **Ledger:** none
-- **Statement:** `run_chain_set` shall refuse to start when two or more lanes resolve to the same WRITE-OUT file name, returning an error that names those lanes, and shall write nothing.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `run_chain_set` shall refuse to start when two or more lanes resolve to the same WRITE-OUT file name (compared case-folded), returning a refusal that names those lanes and that its callers (`app.py` chain-set run handlers) show in the status line, and shall write nothing.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-15 — `pytest tests/test_b99_staging.py -k tc_b99_15`
 - **Numeric pass threshold:** 2 lanes named `same.s19` → refused, both lane names in the message, 0 files.
@@ -675,20 +715,41 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** skip the verify call (mutation) → `ok` on the corrupted write, RED.
 - **Boundary catalog:** ☒ error — the mismatch.
 
+### LLR-155.7 — The touched writers delete only their own staging
+- **Traceability:** HLR-155
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3
+- **Statement:** In `save_patched_image`, `copy_into_workarea`, the flow WRITE-OUT arm and the CRC write, every `unlink`, `rmtree` or `os.remove` call shall delete an expression that is a name bound in the same function either to a `tempfile.mkdtemp` result or to the path passed as the first argument of an `os.open(..., O_EXCL)` claim, inside a branch guarded by a boolean assigned in that function immediately after that creation.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B99-39 — `pytest tests/test_b99_staging.py -k tc_b99_39` (AST census of delete calls in the four writers, each tied to its creating call).
+- **Numeric pass threshold:** 0 delete calls failing the predicate; the RED site at HEAD is `apply.py:776-778` (`finally: staged.unlink()`, a path rebuilt from the user's name).
+- **Negative control:** executed at HEAD: `apply.py:776` deletes a path rebuilt from the user's name → RED.
+- **Boundary catalog:** none — a static census.
+
+### LLR-155.8 — The CRC write stages privately
+- **Traceability:** HLR-155
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** The CRC operation's write of `<stem>-crc.s19` (`tui/operations/crc.py`, `EMITTED_NAME_SUFFIX`) shall place its file through LLR-155.1/155.2, never through a shared `temp/<name>` staging path.
+- **Rationale (informative):** it lands in Inc 5 with the CRC coverage work (ARQ RC-5).
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B99-38 — `pytest tests/test_b99_crc_region.py -k tc_b99_38` (two concurrent CRC writes of the same stem; each file checked by the independent reader against its own CRC).
+- **Numeric pass threshold:** 0 files whose CRC slot differs from the write that reported them, over 20 trials.
+- **Negative control:** restore the shared `temp/<name>` staging (mutation) → mismatches, RED.
+- **Boundary catalog:** ☒ boundary — 1 writer and 2 writers.
+
 ### LLR-156.1 — PATCH status from dispositions *(provisional, D5)*
 - **Traceability:** HLR-156
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
 - **Statement:** The flow PATCH arm (`flow_execution_service.py`) shall derive its status as HLR-156 states. Its summary shall name each non-applied address with its disposition and each refusal code. A PATCH `error` shall stop the flow before any later WRITE-OUT step.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B99-17 — `pytest tests/test_b99_patch_truth.py -k tc_b99_17` (the 7-case matrix).
+- **Executed verification:** TC-B99-17 — `pytest tests/test_b99_patch_truth.py -k tc_b99_17` (the 8-case matrix).
 - **Numeric pass threshold:** statuses as HLR-156's threshold; 0 WRITE-OUT files after `error`.
 - **Negative control:** executed on `307065f` (P-4): every case `ok` → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid ☒ error — as HLR-156.
 
 ### LLR-156.2 — The chain outcome carries dispositions
 - **Traceability:** HLR-156
-- **Ledger:** none
-- **Statement:** `ChainRunOutcome` shall carry the run's `change_records` and `refusals`, and the Flow Execution lane shall paint each lane's PATCH cell from its block status, so that `notices` and `error` are visible.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `ChainRunOutcome` shall carry the run's `change_records`, `refusals` and `image_ranges`, and the Flow Execution lane shall paint each lane's PATCH cell from its block status, so that `notices` and `error` are visible; any file-derived text it paints goes through `safe_text`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-18 — `pytest tests/test_b99_patch_truth.py -k tc_b99_18`
 - **Numeric pass threshold:** malformed-doc lane → outcome holds `MF-JSON-PARSE` in `refusals`; lane cell glyph is the error glyph.
@@ -697,8 +758,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-156.3 — The chain-set report lists what was not applied
 - **Traceability:** HLR-156
-- **Ledger:** none
-- **Statement:** `compose_chain_set_report` shall list, per lane, the written file paths, each non-applied entry (address and disposition) and each refusal (code and message).
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `compose_chain_set_report` shall list, per lane, the written file paths, each non-applied entry (address and disposition) and each refusal (code and message), every file-derived field through `md_safe` / `md_code`.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-19 — `pytest tests/test_b99_patch_truth.py -k tc_b99_19`
 - **Numeric pass threshold:** 100 % of non-applied addresses, refusal codes and written paths of the fixture set appear in the report text.
@@ -707,43 +768,45 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-156.4 — The flow report lists what was not applied
 - **Traceability:** HLR-156
-- **Ledger:** none
-- **Statement:** The flow report (`flow_report_service.py`) shall list each non-applied record and each refusal, and shall not say `CLEAN` when either list is non-empty.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** The flow report (`flow_report_service.py`) shall always carry a not-applied section and a refusals section, each reading `none` when empty, shall list each non-applied record and each refusal through `md_safe` / `md_code`, and shall not say `CLEAN` when either list is non-empty.
+- **Rationale (informative):** the always-present sections drift `tests/goldens/batch71/ac6-unscoped-flow-report.md`; Inc 8 rebaselines it (C-24).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-20 — `pytest tests/test_b99_patch_truth.py -k tc_b99_20`
 - **Numeric pass threshold:** `mix.json` → the report names `0x20000` and `skipped-outside`; `bad.json` → names `MF-JSON-PARSE`; neither says `CLEAN`.
 - **Negative control:** executed on `307065f` (`rw-p09`): `Status: CLEAN` → RED.
 - **Boundary catalog:** ☒ empty ☒ error — clean run (still `CLEAN`); malformed.
 
-### LLR-157.1 — Pristine snapshot plus current document
+### LLR-157.1 — Source plus current document, restored in place
 - **Traceability:** HLR-157
-- **Ledger:** none
-- **Statement:** `ChangeService.apply` (`tui/services/change_service.py`) shall leave the image equal to the source bytes plus the current document's entries. Before it applies, it shall restore to their source values the bytes that an earlier apply wrote for entries the document no longer holds. ARQ recommends a journal of original bytes kept in `ChangeService` (`design/ARQ-batch-99.md` §2); PDR fixes the mechanism.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** `ChangeService.apply` (`tui/services/change_service.py`) shall leave the image equal to the source bytes plus the current document's entries. Before it applies, it shall restore to their source values, **in place in the same dict object** (aliases hold it, `app.py:9894`, `:9946`), the bytes that an earlier apply wrote.
+- **Rationale (informative):** ARQ recommends a journal of original bytes kept in `ChangeService` (`design/ARQ-batch-99.md` §2); the design proposal §3 adopts it.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-21 — `pytest tests/test_b99_editor_image.py -k tc_b99_21`
-- **Numeric pass threshold:** the p05 sequence → image at `0xEB10` == source; 1 entry in the summary.
+- **Numeric pass threshold:** the p05 sequence → image at `0xEB10` == source; 1 entry in the summary; the same bytes seen through an aliased holder; all entries undone + apply → image == source.
 - **Negative control:** executed on `307065f` (P-6): `deadbeef` → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary — all entries undone; overlapping entries.
 
 ### LLR-157.2 — Undo, remove and edit revert applied bytes
 - **Traceability:** HLR-157
-- **Ledger:** none
-- **Statement:** When `undo`, `redo`, `remove_entry` or `edit_entry` changes an applied entry, `ChangeService` shall re-derive the image per LLR-157.1 before the next save, and the save summary shall list exactly the entries the image holds.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** When `undo`, `redo`, `remove_entry` or `edit_entry` changes an applied entry, `ChangeService` shall re-derive the image per LLR-157.1 before the next save. `save_patched` shall re-derive from every entry currently in the document before emitting, name in its status each entry not applied before the save, and list in its summary exactly the entries the image holds.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-22 — `pytest tests/test_b99_editor_image.py -k tc_b99_22`
-- **Numeric pass threshold:** remove-after-apply and edit-after-apply arms → 0 stale bytes; summary count == entries in the image.
+- **Numeric pass threshold:** remove-after-apply and edit-after-apply arms → 0 stale bytes; add-after-apply → save → the entry is written and named; summary count == entries in the image.
 - **Negative control:** skip the re-derive on remove (mutation) → stale bytes, RED.
 - **Boundary catalog:** ☒ boundary — redo after undo.
 
-### LLR-157.3 — The change engine is the only in-place writer of the editor image
+### LLR-157.4 — `before_bytes` means the source byte
 - **Traceability:** HLR-157
-- **Ledger:** none
-- **Statement:** No code path other than the change engine's apply (`tui/changes/apply.py`, reached through `ChangeService.apply`) shall write `LoadedFile.mem_map` in place. Every other writer (the CRC inject, flow and variant runs) shall write a copy. ARQ's census at `307065f` finds exactly that one in-place site (`apply.py:337`), so restoring from source loses no mutation (`design/ARQ-batch-99.md` §2).
-- **Validation:** `test (unit)`
-- **Executed verification:** TC-B99-37 — `pytest tests/test_b99_editor_image.py -k tc_b99_37` (AST census of subscript or `update` writes to a `mem_map` attribute of a `LoadedFile`-typed name across `s19_app/`).
-- **Numeric pass threshold:** exactly 1 in-place write site, in `tui/changes/apply.py`.
-- **Negative control:** add `self.current_file.mem_map[0] = 0` in a scratch copy of `app.py` (mutation) → 2 sites, RED.
-- **Boundary catalog:** none — a static census with no input.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** After apply → apply on the same entry, each change record's `before_bytes` (`tui/changes/apply.py`) shall equal the source image's bytes at that address. Its readers — `report_service.py`, `diff_report_service.py`, `flow_report_service.py` and the Patch Editor's before/after strip — shall show the source byte.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B99-40 — `pytest tests/test_b99_editor_image.py -k tc_b99_40` (the before/after strip text and a before/after report after a repeated apply).
+- **Numeric pass threshold:** `0xEB10` after apply → apply → the strip and the report show `20 41 70 70` as before.
+- **Negative control:** keep the image byte as `before_bytes` (mutation) → `DE AD BE EF` shown as before, RED.
+- **Boundary catalog:** ☒ boundary — a first apply (source byte trivially).
 
 ### LLR-158.1 — Byte-order fallback reads `MOD_COMMON` *(provisional, D3)*
 - **Traceability:** HLR-158
@@ -757,31 +820,31 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-158.2 — RAT_FUNC direction *(provisional, D2)*
 - **Traceability:** HLR-158
-- **Ledger:** none
-- **Statement:** `_apply_compu_method` shall decode a RAT_FUNC by solving INT = f(PHYS) for PHYS, and the encoder shall compute INT = f(PHYS) directly.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `_apply_compu_method` shall decode a RAT_FUNC by solving INT = f(PHYS) for PHYS, taking the root inside the tag's declared physical limits when exactly one is, else the smaller-magnitude root, and returning a decode failure (shown `n/a` with the reason) when no real root exists. The encoder shall compute INT = f(PHYS) directly.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-24 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_24`
-- **Numeric pass threshold:** `RAT_FUNC_DIV_10`: 30 → raw 300; 25 → raw 250; raw 300 → 30.0; LINEAR control unchanged.
+- **Numeric pass threshold:** `RAT_FUNC_DIV_10`: 30 → raw 300; 25 → raw 250; raw 300 → 30.0; a quadratic coefficient set → the root inside the limits; a no-real-root raw value → decode failure; LINEAR control unchanged.
 - **Negative control:** executed on `307065f` (P-17): 30 → `03 00` → RED.
 - **Boundary catalog:** ☒ invalid — a coefficient set with no inverse is refused (existing message kept).
 
 ### LLR-158.3 — COMPU_TAB values that do not round-trip are refused *(provisional, D4)*
 - **Traceability:** HLR-158
-- **Ledger:** none
-- **Statement:** The COMPU_TAB inversion shall refuse a physical value whose encoded raw value decodes to a different physical value, beyond the method's tolerance, returning an error that names the nearest representable physical values.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** The COMPU_TAB inversion shall refuse a `TAB_NOINTP` value that is not a table value (naming the two nearest) and a `TAB_INTP` value outside the table range (naming the range). For an in-range `TAB_INTP` value it shall return the nearest raw value with a flag naming the written physical value whenever that value differs from the typed one.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-25 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_25`
-- **Numeric pass threshold:** `TAB_NOINTP` 13.0 refused (names 10.0 and the next entry); `TAB_INTP` 500.0 and -50.0 refused; table values accepted.
+- **Numeric pass threshold:** `TAB_NOINTP` 13.0 refused (names 10.0 and the next entry); `TAB_INTP` 500.0 and −50.0 refused (names the range); an in-range off-grid value accepted with a flag naming the written physical value; table values accepted with no flag.
 - **Negative control:** executed on `307065f` (P-8): `err=None` → RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — table endpoints; out-of-table values.
 
 ### LLR-159.1 — Empty region is an error
 - **Traceability:** HLR-159
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** The CRC operation (`tui/operations/crc.py`) shall return an error and no injection when its region holds 0 image bytes.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-26 — `pytest tests/test_b99_crc_region.py -k tc_b99_26`
-- **Numeric pass threshold:** `0x20000–0x30000` on `prg.s19` → error; slot bytes unchanged.
+- **Numeric pass threshold:** `0x20000–0x30000` on `prg.s19` → error; the image's slot bytes unchanged; the flow writes 0 files.
 - **Negative control:** executed on `307065f` (P-9): `slot_bytes=00000000` → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary — 0 and 1 present byte.
 
@@ -795,35 +858,37 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-9): `region_over_gap run=ok … findings=[]` → RED.
 - **Boundary catalog:** ☒ boundary — full coverage (control `ok`).
 
-### LLR-159.3 — The CRC write stages privately
-- **Traceability:** HLR-159
-- **Ledger:** none
-- **Statement:** The CRC operation's write of `<stem>-crc.s19` (`tui/operations/crc.py`, `EMITTED_NAME_SUFFIX`) shall go through the private staging and atomic placement of LLR-155.1/155.2, never through a shared `temp/<name>` staging path.
-- **Validation:** `test (integration)`
-- **Executed verification:** TC-B99-38 — `pytest tests/test_b99_crc_region.py -k tc_b99_38` (two concurrent CRC writes of the same stem, each file checked by the independent reader against its own CRC).
-- **Numeric pass threshold:** 0 files whose CRC slot differs from the write that reported them, over 20 trials.
-- **Negative control:** restore the shared `temp/<name>` staging (mutation) → mismatches, RED.
-- **Boundary catalog:** ☒ boundary — 1 writer and 2 writers.
 
-### LLR-160.1 — Sanitised segment names
+
+### LLR-160.1 — One sanitiser for export names
 - **Traceability:** HLR-160
-- **Ledger:** none
-- **Statement:** `SegmentSplitView` shall build export file names from segment names passed through the work area's file-name sanitiser (the grammar `sanitize_project_name` / `_sanitize_s19_filename` use).
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** `SegmentSplitView` shall build each export name as `<stem>_<segment>` with the segment part passed through one sanitiser. The sanitiser keeps ASCII `[A-Za-z0-9_-]` only, maps every other character to `_`, prefixes `_` to a Windows reserved device name (`CON`, `PRN`, `AUX`, `NUL`, `COM0`–`COM9`, `LPT0`–`LPT9` including superscript digits, `CONIN$`, `CONOUT$`; compared case-insensitively, before any extension), caps the segment part at 100 characters, clips the stem so that the final basename (`_<N>` and extension included) stays ≤ 200 characters, and uses `segment_<index>` for an empty result. The same name builds the BIN `.addr` sidecar.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-28 — `pytest tests/test_b99_export.py -k tc_b99_28`
-- **Numeric pass threshold:** hostile names → names free of `/`, `\`, `..`, `:` and reserved device names.
+- **Numeric pass threshold:** every member of HLR-160's hostile set → a name matching `^[A-Za-z0-9_-]{1,100}$` for the segment part, and never equal to a reserved device name.
 - **Negative control:** bypass the sanitiser (mutation) → a separator survives, RED.
-- **Boundary catalog:** ☒ invalid — the hostile set of HLR-160.
+- **Boundary catalog:** ☒ boundary ☒ invalid — 100 and 101 characters; the hostile set.
 
-### LLR-160.2 — Containment check before writing
+### LLR-160.2 — Containment anchored to the work-area root
 - **Traceability:** HLR-160
-- **Ledger:** none
-- **Statement:** The export writer (`segment_split_view.py` `_write`, `s19_app/segment_ops.py`) shall resolve each final path and refuse to write when it is not inside the resolved destination directory.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** Before creating any folder or file, the export writer (`segment_split_view.py` `_write` and `write_split_join_export`, `s19_app/segment_ops.py`) shall pass the destination home through the shipped containment guard (`_check_home_contained`: resolve, then `is_relative_to` the work-area root) and resolve each final path, sidecar included, inside it. It shall refuse a final path that is an existing link or reparse point. The refusal message renders the segment name literally (`safe_text`, `markup=False`), clipped to 80 characters, next to the sanitised name.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-29 — `pytest tests/test_b99_export.py -k tc_b99_29`
-- **Numeric pass threshold:** 0 files outside the destination for the hostile set; refusal message names the segment.
+- **Numeric pass threshold:** 0 files or folders outside the work-area root for the hostile set; a junction destination → refused; an existing symlink at the final name → refused, its target unchanged.
 - **Negative control:** executed on `307065f` (P-11): `inside dest: False` → RED.
-- **Boundary catalog:** ☒ error — the refusal.
+- **Boundary catalog:** ☒ error — the refusals.
+
+### LLR-160.5 — Plan-time collision and refusal pass
+- **Traceability:** HLR-160
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Statement:** The export plan shall compute every final name (sidecars included) before writing, compare them case-folded, check each full path's length against the platform limit, and refuse the whole export, naming the colliding segments or the refused name, before any byte is written. When a write still fails part-way, the status names the files already written.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B99-41 — `pytest tests/test_b99_export.py -k tc_b99_41`
+- **Numeric pass threshold:** `SegA` / `sega` → refused, 0 files; a set with one refused name → 0 files; a set whose one full path exceeds the platform limit → refused at plan time, 0 files.
+- **Negative control:** check collisions inside the write loop (mutation) → the first file is written, RED.
+- **Boundary catalog:** ☒ invalid — the colliding pair.
 
 ### LLR-160.3 — MAC-only export is header-only
 - **Traceability:** HLR-160
@@ -835,15 +900,15 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed (P-18): `S306800000000079` written → RED.
 - **Boundary catalog:** ☒ empty — the MAC-only session.
 
-### LLR-160.4 — A second export replaces atomically *(provisional, D8)*
+### LLR-160.4 — A second export takes the next free name *(provisional, D8)*
 - **Traceability:** HLR-160
-- **Ledger:** none
-- **Statement:** When an export's final name exists, the writer shall write a private staging file and `os.replace` it onto the final name, and the status shall say `replaced`.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3
+- **Statement:** When an export's final name exists with different bytes, the writer shall place the file through HLR-155's placement (LLR-155.1/155.2), taking the next free `_<N>`; a BIN and its `.addr` sidecar shall be placed by one call of a group-placement function in `tui/workspace.py` (`place_group_into_workarea`, NEW, B99-I2a) that claims one `_<N>` for every name of the group before writing any, then fills each by `os.replace` from the same private staging directory. Identical bytes are reused; a BIN/`.addr` pair is reused only when both files are identical. The status shall name the files actually written or reused.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-31 — `pytest tests/test_b99_export.py -k tc_b99_31`
-- **Numeric pass threshold:** 1 file holding the second export's bytes; status contains `replaced`.
-- **Negative control:** write in place (mutation) with an interrupted write → truncated file, RED.
-- **Boundary catalog:** ☒ boundary — first export (no `replaced`).
+- **Numeric pass threshold:** changed bytes → `<name>_1` (and `<name>_1.bin` + `<name>_1.addr` for BIN, never a mixed pair), the first files' bytes unchanged, the status names `<name>_1`; identical bytes → the existing file reused, 1 file.
+- **Negative control:** executed on `307065f` (P-11): `first content survived: False` → RED.
+- **Boundary catalog:** ☒ boundary — the first export (no suffix).
 
 ### LLR-161.1 — Hex-only token grammar *(provisional, D1)*
 - **Traceability:** HLR-161
@@ -867,8 +932,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-162.1 — `_load_from_item` reads the item's name
 - **Traceability:** HLR-162
-- **Ledger:** none
-- **Statement:** `_load_from_item` (`tui/app.py`) shall obtain the file name from the item's stored name (as the Inc-9 dialog fix does), never from `str(Label)`.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `refresh_files` (`tui/app.py`) shall store each item's file name on the `ListItem` (as the Inc-9 dialog fix does), and `_load_from_item` shall read that stored name, never `str(Label)`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-34 — `pytest tests/test_b99_load_project.py -k tc_b99_34`
 - **Numeric pass threshold:** picking `a.s19` loads `a.s19`.
@@ -877,18 +942,18 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-162.2 — Reserved homes are not projects
 - **Traceability:** HLR-162
-- **Ledger:** none
-- **Statement:** `list_projects` shall omit every reserved work-area home (`temp`, `patches` and each other home the work area creates).
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** `list_projects` shall omit every folder named in one constant tuple `RESERVED_WORKAREA_HOMES` (`tui/workspace.py`) holding the homes the code creates under the work area: `temp`, `patches`, `templates`, `logs`, `crc`, `flows`, `flowsets`, `splits`, `reports`. ARCHITECTURE B99-I9 is aligned to this rule.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-35 — `pytest tests/test_b99_load_project.py -k tc_b99_35`
-- **Numeric pass threshold:** 0 reserved homes listed; every user project listed.
+- **Numeric pass threshold:** 0 of the tuple's names listed (the test imports the tuple); every user project listed.
 - **Negative control:** executed (P-20): `patches` listed → RED.
 - **Boundary catalog:** ☒ empty — only reserved homes present.
 
 ### LLR-162.3 — The Workarea Files list reads the load folder (CW-U-3)
 - **Traceability:** HLR-162
-- **Ledger:** none
-- **Statement:** The Workarea Files list shall list the folder that file loads copy into, and `_load_from_item` shall resolve picked names against that same folder.
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Statement:** The Workarea Files list (`refresh_files`) shall list the regular files of the folder that file loads copy into, never its staging subfolder, and `_load_from_item` shall resolve picked names against that same folder.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-36 — `pytest tests/test_b99_load_project.py -k tc_b99_36`
 - **Numeric pass threshold:** after one file load, the list holds that file; picking it loads it.
@@ -903,14 +968,18 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 FLOW: s19_file_to_written_image
   SOURCE : an S19 file on disk (corpus or examples/)
   NODES  :
-    - fn    : S19File._load / get_memory_map / get_memory_ranges (core.py)
+    - fn    : S19File get_memory_map / get_memory_ranges / get_record_for_address / _build_overlap_map over the R18 predicate (core.py)
       owner : LLR-153.1
       in    : the file's records
       out   : address → byte map of S1/S2/S3 data, S0 kept as header text
-    - fn    : build_mem_map_s19 (render/hexview.py)
+    - fn    : build_mem_map_s19 / build_range_validity_s19 (render/hexview.py)
       owner : LLR-153.2
       in    : S19File
       out   : the same map
+    - fn    : change-entry classification at an S0-only address (changes/apply.py; behaviour follows the map)
+      owner : LLR-153.4
+      in    : an entry + the map
+      out   : disposition skipped-outside
     - fn    : save_patched_image / flow WRITE-OUT emit (changes/apply.py, flow_execution_service.py)
       owner : LLR-153.3
       in    : image + S0 header text
@@ -941,10 +1010,10 @@ FLOW: loader_integrity_notice_to_flow_status
 FLOW: image_to_final_file
   SOURCE : an image to write (Patch Editor save-back, flow WRITE-OUT, chain-set lanes)
   NODES  :
-    - fn    : save_patched_image staging (changes/apply.py)
+    - fn    : private staging directory (changes/apply.py save_patched_image, workspace.py copy_into_workarea)
       owner : LLR-155.1
       in    : image bytes + the requested name
-      out   : a private staging file under temp/
+      out   : temp/.staging/<mkdtemp>/<requested name>
     - fn    : exclusive reservation + atomic replace (workspace.py copy_into_workarea)
       owner : LLR-155.2
       in    : the staging file
@@ -953,6 +1022,18 @@ FLOW: image_to_final_file
       owner : LLR-155.3
       in    : the staging file + an existing target
       out   : the reused path or a new name
+    - fn    : delete-only-owned census over the four writers
+      owner : LLR-155.7
+      in    : the writers' source
+      out   : delete calls tied to their creators
+    - fn    : Save project missing-source handling (app.py _handle_save_dialog)
+      owner : LLR-155.4
+      in    : a missing source path
+      out   : a notice; the app keeps running
+    - fn    : chain-set start check (flow_execution_service.py run_chain_set)
+      owner : LLR-155.5
+      in    : the lanes' output names
+      out   : a refusal naming duplicates, or the run
     - fn    : WRITE-OUT verify (flow_execution_service.py)
       owner : LLR-155.6
       in    : the final file + the image
@@ -964,8 +1045,8 @@ FLOW: image_to_final_file
 FLOW: change_dispositions_to_run_records
   SOURCE : a change document applied by a flow PATCH step
   NODES  :
-    - fn    : apply_change_document (changes/apply.py; unchanged, P-13)
-      owner : LLR-156.1
+    - fn    : apply_change_document (changes/apply.py; unchanged pass-through, P-13)
+      owner : LLR-156.1 (reads its output; places no requirement on it)
       in    : document + image
       out   : ChangeSummary with per-entry dispositions + refusals
     - fn    : flow PATCH arm status (flow_execution_service.py)
@@ -999,16 +1080,16 @@ FLOW: editor_document_to_saved_image
       owner : LLR-157.2
       in    : the document change
       out   : the re-derived image
-    - fn    : in-place writer census (every `mem_map` write in s19_app/)
-      owner : LLR-157.3
-      in    : the source tree
-      out   : exactly one in-place site
+    - fn    : change-record before_bytes (changes/apply.py) and its readers
+      owner : LLR-157.4
+      in    : the source map
+      out   : before_bytes = source bytes
   SINK   : the save-back file and its summary
 ```
 
 ```
 FLOW: physical_value_to_raw_bytes
-  SOURCE : a physical value typed for an A2L symbol in the Patch Editor
+  SOURCE : a physical value passed to the codec API (US-152), or raw bytes decoded for the A2L window (US-147)
   NODES  :
     - fn    : effective byte order (a2l.py)
       owner : LLR-158.1
@@ -1038,7 +1119,7 @@ FLOW: crc_region_to_slot
       in    : coverage
       out   : status ok / notices (absent count) / error
     - fn    : CRC output write (operations/crc.py, `<stem>-crc.s19`)
-      owner : LLR-159.3
+      owner : LLR-155.8
       in    : the injected image
       out   : the written file, privately staged
   SINK   : the slot bytes in the written image and the lane cell
@@ -1060,10 +1141,14 @@ FLOW: segment_name_to_export_file
       owner : LLR-160.3
       in    : declared ranges
       out   : the bytes written (none for MAC-only)
-    - fn    : atomic replace (segment_split_view.py)
+    - fn    : plan-time collision pass (segment_split_view.py)
+      owner : LLR-160.5
+      in    : every planned final name
+      out   : the plan or a refusal before any write
+    - fn    : placement under the next free name (workspace.py via HLR-155)
       owner : LLR-160.4
-      in    : staging file + existing target
-      out   : the replaced file
+      in    : staging file + an existing name
+      out   : the file under `_<N>`
   SINK   : the export file on disk
 ```
 
@@ -1120,7 +1205,73 @@ FLOW: corpus_to_manifest
   SINK   : `generate.py --check` exit code
 ```
 
-- **Part B — boundary decomposition:** no — the batch changes no component a consumer addresses independently; every flow above ends at a file on disk or a painted cell.
+- **Part B — boundary decomposition:** yes — the TUI has addressable panels, and this batch reworks the output of four (consumers measured with `grep -rl <id> s19_app tests` at `a293213`). The parents `workspace_shell`, `load_project_dialog`, `flow_execution_panel` and `pe_ledger_inspector` are declared in earlier batches' contracts (batch-87, batch-97), not in this one: **V12 could not test parent existence from this contract alone**, which is the batch-87/94/97 precedent.
+
+```
+COMPONENT: workarea_files_list
+  PARENT : workspace_shell
+  SURFACE: Workarea Files list
+  INPUTS : the load folder's regular files
+  OUTPUTS:
+    - id          : files_list
+      value       : one item per file, its name stored on the item
+      address     : query("#files_list"), INDEXED POSITIONALLY
+      cardinality : number of regular files in the load folder
+      consumers   : s19_app/tui/app.py
+                    s19_app/tui/styles.tcss
+                    tests/test_tui_directionb.py
+                    tests/test_tui_snapshot.py
+```
+
+```
+COMPONENT: load_project_list
+  PARENT : load_project_dialog
+  SURFACE: Load project dialog
+  INPUTS : work-area folders minus RESERVED_WORKAREA_HOMES
+  OUTPUTS:
+    - id          : project_list
+      value       : one item per project
+      address     : query("#project_list"), INDEXED POSITIONALLY; confirmed by query("#project_ok")
+      cardinality : number of projects
+      consumers   : s19_app/tui/screens.py
+                    s19_app/tui/styles.tcss
+                    tests/test_b97_load_project_dialog.py
+```
+
+```
+COMPONENT: fx_lane_patch_cell
+  PARENT : flow_execution_panel
+  SURFACE: Flow Execution lane cables
+  INPUTS : ChainRunOutcome.block_results, change_records, refusals
+  OUTPUTS:
+    - id          : lane PATCH cell
+      value       : the block status glyph (ok / notices / error) per lane
+      address     : COMPUTED — the PATCH position in each lane's pipeline row (no query id), the run started by query("#fx_run")
+      cardinality : one per lane
+      consumers   : s19_app/tui/flow_screens.py
+                    s19_app/tui/app.py
+                    tests/test_b97_flow_execution.py
+                    tests/test_tui_flow_execution_b94.py
+                    tests/b97_fixtures.py
+```
+
+```
+COMPONENT: patch_bytes_input
+  PARENT : pe_ledger_inspector
+  SURFACE: Patch Editor entry form
+  INPUTS : typed or pasted text
+  OUTPUTS:
+    - id          : patch_entry_bytes_input
+      value       : the Bytes field; its placeholder states that tokens are hex
+      address     : query("#patch_entry_bytes_input")
+      cardinality : 1
+      consumers   : s19_app/tui/screens_directionb.py
+                    s19_app/tui/styles.tcss
+                    tests/test_b97_patch_editor.py
+                    tests/test_tui_patch_editor_v2.py
+                    tests/test_tui_patch_editor_b94.py
+                    tests/test_tui_memory_patch.py
+```
 
 ---
 
@@ -1128,15 +1279,15 @@ FLOW: corpus_to_manifest
 
 ### 5.1 Methods
 
-- **Layer A — white-box / functional:** TC-B99-01..38 (`test (unit)` / `test (integration)`), each named in its LLR, with a mutation run at Phase 3 (C-40) for every LLR that declares one.
-- **Layer B — black-box acceptance:** AT-B99-01..13. Each one drives the shipped surface and observes files through the independent reader, painted text or report files. AT drivers live beside the TCs in `tests/test_b99_*.py` and are marked `at_b99_NN`.
+- **Layer A — white-box / functional:** TC-B99-01..41 except TC-B99-37 (retired with LLR-157.3 in LED-2026-10-25-batch-99.2) (`test (unit)` / `test (integration)`), each named in its LLR, with a mutation run at Phase 3 (C-40) for every LLR that declares one.
+- **Layer B — black-box acceptance:** AT-B99-01..14. Two maintainer stories name a developer surface rather than a TUI one: US-141 (the generator CLI: its exit code and printed line) and US-152 (the codec API `encode_physical_to_raw_bytes`: its returned `(raw_bytes, error, flags)` tuple only, because no TUI path calls the encoder, P-22). Each one drives the shipped surface and observes files through the independent reader, painted text or report files. AT drivers live beside the TCs in `tests/test_b99_*.py` and are marked `at_b99_NN`.
 - **Oracle:** every byte comparison uses the corpus manifest or the independent reader, never `s19_app`'s loader (P-3).
-- **Regression:** the full suite once per increment cut, against `evidence/baseline-pytest-51ee191.txt` (10 failed, 3101 passed) plus batch-97's additions (3617 passed). Existing tests that assert today's wrong behaviour (e.g. TC-714, range counts on S0-bearing fixtures) are re-pinned in the increment that changes the behaviour, each named in that packet's reverse census.
+- **Regression:** the full suite once per increment cut, against this batch's own baseline `evidence/baseline-pytest-a293213.txt`: one full run at `a293213`, which differs from `base_ref` `307065f` in batch records only. Its counts and failing node ids are cited in PLAN's test ledger. Existing tests that assert today's wrong behaviour (e.g. TC-714, range counts on S0-bearing fixtures) are re-pinned in the increment that changes the behaviour, each named in that packet's reverse census.
 
 ### 5.2 Batch acceptance criteria
 - 100 % of LLRs covered by at least one passing TC; every declared mutation goes RED.
 - Every story has at least one passing AT-B99 observing its outcome through the shipped surface, with its boundary and negative evidence.
-- Every premise probe of §2.7 that served as a RED side is re-run at Phase 4 and its decisive line has flipped (e.g. `parallel mismatches: 0`, `inside dest: True`).
+- Every premise probe of §2.7 that served as a RED side is re-run at Phase 4 and its decisive line has flipped. Examples: `rw-p02` → the shared-name set is refused with 0 files (D7); TC-B99-12's same-name concurrency → 0 mismatches; `rw-p10` → `inside dest: True`.
 - 0 blocker findings open at Phase 4; full suite with no new failure against the baseline.
 
 ---
@@ -1151,7 +1302,7 @@ FLOW: corpus_to_manifest
 - **Input surface (C6).** The batch changes four parsers of untrusted files: the S19 loader, the HEX loader, the A2L codec and the change-document Bytes grammar. It also changes one path built from file content (the A2L `MEMORY_SEGMENT` name → export file name, H-9). Every new check refuses or notices; none widens what is accepted, except D1 option `prefijo`, which adds one syntax. H-9 is a path-containment fix on a local writer: LLR-160.1/160.2 sanitise the name and check the resolved path before writing. The `security-reviewer` at P2 reviews the hostile-name set and the containment test.
 - **"token" / "session" / "form"** here mean a byte token in the Bytes field, a TUI editing session and a dialog form. No authentication, credential, network or secret is involved.
 - **File-derived text in painted cells (C8).** HLR-156 paints refusal messages and addresses into lane cells and reports. Those messages can echo file content (e.g. a symbol name), so they render through the existing markup-safe path (`safe_text` / literal rendering, batch-97 LLR-144.7). The AT for HLR-156 adds a hostile-name arm.
-- **Atomic writes (H-3).** Staging files are created exclusively under `<workarea>/temp/` with generated names, so no user-chosen name reaches the staging path.
+- **Atomic writes (H-3).** Each write stages in a private `mkdtemp` directory under `<workarea>/temp/.staging/` (both levels checked for reparse points), holding the requested sanitised name; the final name is claimed with `O_EXCL` and filled by `os.replace`, and only owned staging is deleted (HLR-155).
 
 **Other risks:**
 - Re-pinning tests that assert today's wrong behaviour (S0 ranges, TC-714) could hide a real regression. Mitigation: each re-pin is named in the increment's reverse census with the old value, the new value and the requirement that changes it.

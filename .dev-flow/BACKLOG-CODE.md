@@ -1461,6 +1461,13 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 - **R-057** README refresh: kept.
 - **R-069** A2L parameter curves: kept — **open question to the operator:** the note "No, las curvas sirven" reads either as "tables are not enough, drawn curves are useful" or as "the text curves work"; confirm before scoping (still unanswered in the 2026-10-25 decisions export; nothing scoped until the operator answers). The format is page 3 of the operator's 2026-10-18 scan (RECORD_LAYOUT `FNC_VALUES <n> <type> <ROW_DIR|COL_DIR> DIRECT`, `NO_AXIS_PTS_X/Y`); the layout walker handles it (`a2l.py:1368`) and `d` shows a text description with an x→y table and sparkline for curves; 2-axis maps are still a flat list (`a2l.py:2938-2942`, batch-96 follow-up). Open: 2-D map grid view; drawn curves only if the operator confirms (prototype round). Follow-ups answered in `.dev-flow/design/reconcile-2026-10-23/followups-2026-10-23.md`.
 
+### 🆕 Routed 2026-10-25 — batch-99 Phase-2 out-of-scope findings (batch open)
+
+- **▸ (P2, origin batch-99 P2 S-8c) `safe_text` strips C0/C1 control characters but not Unicode format characters** (U+202E right-to-left override, U+200B zero-width space), so a file-derived name can still reorder or hide text in a painted cell. **What closes it:** strip or escape Unicode category `Cf` in `safe_text`, with a hostile-name test arm.
+- **▸ (P3, origin batch-99 P2 S-9) Loader line length is unbounded** (`for line in f` in `core.py` / `hexfile.py`), and every parse error stores the whole line (`core.py:255-271`). Pre-existing, not worsened by batch-99. **What closes it:** cap the stored line excerpt and refuse lines above a stated length.
+- **▸ (feature, origin batch-99 P2 Q-1) No TUI surface enters an A2L symbol by physical value.** `ChangeService.add_symbol_entry` / `resolve_symbol_entry` / `encode_physical_to_raw_bytes` have no app caller (batch-99 P-22), so batch-99 fixes the encoder (HLR-158) and verifies it at service level only. **What closes it:** a symbol-entry control in the Patch Editor. It is a UI change, so it needs a prototype round first.
+- **▸ (P3, origin batch-99 ARQ) The module map's file name differs in case between the index and the working tree:** the index tracks `docs/architecture.md`, while the working tree shows `docs/ARCHITECTURE.md`. It is harmless on Windows; a Linux checkout gets the index's name. **What closes it:** `git mv` to one spelling and update the references.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

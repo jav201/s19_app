@@ -85,7 +85,7 @@ Son <b>11 incrementos</b>. Los <b>7 primeros no dependen de ti</b> y arrancan ya
 <tr><td>3</td><td>Cada escritura va a su propio archivo temporal y se coloca de forma atómica. Los lanes en paralelo ya no se pisan, y guardar el parche con el mismo nombre ya no borra la copia de trabajo ni tumba Save project.</td><td>H-3, PH-3</td><td>apply, workspace, app</td><td><span class="pill free">libre</span> (D7, D9)</td></tr>
 <tr><td>4</td><td>Lo que guarda el Patch Editor siempre es el original más las entradas que hoy tiene el documento. Deshacer ya no deja bytes escritos.</td><td>H-4</td><td>change_service (+ models)</td><td><span class="pill free">libre</span></td></tr>
 <tr><td>5</td><td>Un CRC sobre una región sin bytes falla y no escribe nada. Si la cobertura es parcial, avisa cuántos bytes faltan.</td><td>H-7</td><td>crc, flow_execution_service</td><td><span class="pill free">libre</span></td></tr>
-<tr><td>6</td><td>Exportar nunca escribe fuera del destino, sin importar cómo se llame el segmento del A2L. Una sesión con solo MAC exporta un archivo con solo encabezado.</td><td>H-9, CW-D-7</td><td>segment_split_view, segment_ops</td><td><span class="pill free">libre</span> (D8)</td></tr>
+<tr><td>6</td><td>Exportar nunca escribe fuera del destino, sin importar cómo se llame el segmento del A2L. Una sesión con solo MAC exporta un archivo con solo encabezado.</td><td>H-9, CW-D-7</td><td>segment_split_view, segment_ops</td><td><span class="pill free">libre</span> (D8, recomendación cambiada)</td></tr>
 <tr><td>7</td><td>Pruebas que presionan Load en el diálogo de proyectos de todas las formas posibles. La lista Workarea Files carga por nombre, y la carpeta <code>patches</code> ya no aparece como proyecto.</td><td>CW-U-1 + hermano</td><td>app (+ workspace)</td><td><span class="pill free">libre</span> (D10)</td></tr>
 <tr><td>8</td><td>PATCH reporta lo que no aplicó y se detiene antes de escribir según la regla que elijas. El lane, el reporte del chain set y el reporte del flujo listan lo no aplicado y los rechazos.</td><td>H-2, H-10</td><td>flow_execution_service, flow_report_service, flow_screens</td><td><span class="pill gated">D5</span></td></tr>
 <tr><td>9</td><td>Un archivo cortado (sin terminador ni EOF, con S5 que no cuadra o con datos después del final) avisa al cargar.</td><td>H-8</td><td>core, hexfile, flow_execution_service</td><td><span class="pill gated">D6</span></td></tr>
@@ -170,10 +170,10 @@ const Q=[
     ["rechazar","Rechazar escribir valores multibyte cuando el orden no está declarado en la etiqueta ni en el RECORD_LAYOUT","Nunca escribe un orden equivocado, pero bloquea la escritura en módulos que sí lo declaran en MOD_COMMON. La lectura queda igual que hoy."],
     ["solo_escribir","Usar MOD_COMMON solo al escribir","La escritura queda bien, pero la tabla A2L sigue mostrando el valor al revés; lo que ves y lo que escribes no coinciden."]]},
 {id:"D4",t:"D4 · COMPU_TAB: valor que la tabla no puede representar (incremento 10)",
- ctx:"Hoy, si pides 500 en una tabla interpolada, se escribe el extremo (20.0) sin avisar; con 13 en una tabla sin interpolar, se escribe el más cercano (10.0).",
+ ctx:"Hoy, si pides 500 en una tabla interpolada, se escribe el extremo (20.0) sin avisar; con 13 en una tabla sin interpolar, se escribe el más cercano (10.0). <b>Precisé la opción recomendada</b> tras la revisión: en una tabla interpolada, casi cualquier valor dentro del rango cae entre dos crudos enteros, así que rechazarlos todos haría inutilizable la tabla.",
  rec:"rechazar",
- o:[["rechazar","Rechazar el valor y mostrar los valores representables más cercanos","Nunca se escribe algo distinto de lo que tecleaste. Tienes que elegir uno de los valores que la tabla sí admite."],
-    ["marcar","Permitirlo, con una marca visible antes de agregar la entrada","Más rápido, pero la entrada queda con un valor distinto del pedido; la marca se puede pasar por alto."]]},
+ o:[["rechazar","Rechazar lo que la tabla no puede representar: fuera del rango (y, en tablas sin interpolar, cualquier valor que no sea de la tabla). Dentro del rango de una interpolada, escribir el crudo más cercano y avisar qué valor físico queda","Nunca se escribe en silencio un valor distinto: o se rechaza, o el aviso te dice exactamente qué valor físico quedará."],
+    ["marcar","Permitir todo, con una marca visible antes de agregar la entrada","Más rápido, pero un valor fuera de rango queda recortado al extremo de la tabla; la marca se puede pasar por alto."]]},
 {id:"D5",t:"D5 · Regla de estado del paso PATCH en un flujo (incremento 8)",
  ctx:"Hoy PATCH dice <code>ok</code> siempre: con entradas fuera de la imagen, con un documento bloqueado y hasta con JSON roto. Después WRITE-OUT escribe la imagen sin parchar y todo sale <code>ok</code> / <code>CLEAN</code>.",
  rec:"mixta",
@@ -192,10 +192,10 @@ const Q=[
  o:[["rechazar","Rechazar al iniciar la corrida, nombrando los lanes en conflicto","Nunca hay dos archivos que compitan por el mismo nombre. Tienes que darle un nombre de salida distinto a cada lane."],
     ["sufijo","Cada lane escribe su propio <code>_&lt;N&gt;</code> y su reporte lo nombra","La corrida no se detiene, pero un programador configurado para <code>same.s19</code> toma el del primer lane."]]},
 {id:"D8",t:"D8 · Exportar dos veces con el mismo nombre (incremento 6)",
- ctx:"Hoy la segunda exportación sobrescribe en el mismo lugar, sin escritura atómica.",
- rec:"reemplazar",
- o:[["reemplazar","Reemplazar de forma atómica; el estado dice «replaced»","Re-exportar refresca el archivo, como esperarías. Si se interrumpe, no queda un archivo a medias."],
-    ["sufijo","Escribir <code>_&lt;N&gt;</code>","Nunca se pierde una exportación anterior, pero la carpeta se llena de copias y el nombre esperado conserva el contenido viejo."]]},
+ ctx:"Hoy la segunda exportación sobrescribe en el mismo lugar, sin escritura atómica, y la carpeta <code>splits/</code> es común a todos los proyectos. <b>Cambié la recomendación</b> después de la revisión: dos revisores (architect y security) señalaron que «reemplazar» va contra el cierre de H-9, contradice la regla de no borrar archivos ajenos y deja que un proyecto pise las exportaciones de otro.",
+ rec:"sufijo",
+ o:[["sufijo","Escribir <code>_&lt;N&gt;</code>; el estado nombra el archivo que realmente se escribió","Nunca se pierde ni se pisa una exportación, tampoco la de otro proyecto. La carpeta junta copias: limpiarla queda en tus manos."],
+    ["reemplazar","Reemplazar de forma atómica, pidiendo confirmación antes de sobrescribir","Re-exportar refresca el archivo, pero hay un diálogo más y sigue el riesgo de pisar la exportación de otro proyecto con el mismo nombre."]]},
 {id:"D9",t:"D9 · Verificar lo que escribe WRITE-OUT en un flujo (incremento 3)",
  ctx:"El guardado del editor relee y compara lo escrito; WRITE-OUT de un flujo no lo hace (pendiente L-4 / M-4). Esa verificación habría detectado la carrera entre lanes.",
  rec:"si",

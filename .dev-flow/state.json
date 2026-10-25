@@ -42,7 +42,7 @@
       "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
     }
   ],
-  "current_station": "P2",
+  "current_station": "PDR",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -59,7 +59,7 @@
   "iterations_per_station": {
     "P0": 0,
     "ARQ": 0,
-    "P1": 0,
+    "P1": 2,
     "P2": 0,
     "PDR": 0,
     "P3": 0,
@@ -130,6 +130,31 @@
       "station": "P1",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P1 requirements drafted and self-approved for review: HLR-152..162, 38 LLRs (TC-B99-01..38), AT-B99-01..13, 21 premises TRUE on 307065f, IFC 11 flows; REFINE stories derived provisionally on the recommended options and gated at P3. P2 cross-agent review is next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 round 1 gate: iterate-to-refine (1 blocker Q-1, 20 majors, 29 minors; 02-review.md). All P1-routed findings folded in LED-2026-10-25-batch-99.1; round 2 re-review next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P1 amendment LED-2026-10-25-batch-99.1 complete (41 LLRs, TC-B99-01..41, P-22/P-23 added, B99-I10..I12 in the map); P2 round 2 next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 round 2 gate: iterate-to-refine (1 blocker Q-1 text, 6 majors, 13 minors). Folded in LED-2026-10-25-batch-99.2; round 3 re-review next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P1 amendment LED-2026-10-25-batch-99.2 complete (US-152 added, LLR-157.3 retired, 40 LLRs, AT-B99-01..14); P2 round 3 next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 approved at round 3 (qa approve, security approve; architect A3-1/A3-2 folded in LED-2026-10-25-batch-99.3, open with PDR as owner). PDR next: design/design-proposal-b99.md reviewed by architect, qa-reviewer, ux-reviewer."
     }
   ],
   "obsidian_synced": false,
