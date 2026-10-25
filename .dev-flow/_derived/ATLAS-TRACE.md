@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1736 unique id(s)
+## family US/HLR/LLR — 1741 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1720,6 +1720,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-133` | batches, canon, tests |
 | `HLR-134` | batches, canon, tests |
 | `HLR-135` | batches, canon, tests |
+| `HLR-135..137` | batches |
 | `HLR-135..140` | batches |
 | `HLR-135..143` | batches |
 | `HLR-136` | batches, canon, tests |
@@ -1735,18 +1736,20 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-143` | batches, canon, tests |
 | `HLR-143.1` | batches |
 | `HLR-143.2` | batches |
-| `HLR-144` | batches, tests |
+| `HLR-144` | batches, canon, tests |
 | `HLR-144..147` | batches |
 | `HLR-144..148` | batches |
 | `HLR-144..149` | batches |
+| `HLR-144..150` | batches |
 | `HLR-144..HLR-149` | batches |
-| `HLR-145` | batches, tests |
-| `HLR-146` | batches, tests |
-| `HLR-147` | batches, tests |
-| `HLR-148` | batches, tests |
-| `HLR-149` | batches, tests |
-| `HLR-150` | batches, tests |
-| `HLR-151` | batches |
+| `HLR-144..HLR-151` | batches |
+| `HLR-145` | batches, canon, tests |
+| `HLR-146` | batches, canon, tests |
+| `HLR-147` | batches, canon, tests |
+| `HLR-148` | batches, canon, tests |
+| `HLR-149` | batches, canon, tests |
+| `HLR-150` | batches, canon, tests |
+| `HLR-151` | batches, canon |
 | `HLR-6` | batches |
 | `HLR-64` | batches |
 | `HLR-85.1` | batches, canon |
@@ -2662,86 +2665,86 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-142.2` | batches, canon, tests |
 | `LLR-143.1` | batches, canon, tests |
 | `LLR-143.2` | batches, canon, tests |
-| `LLR-144.1` | batches, tests |
+| `LLR-144.1` | batches, canon, tests |
 | `LLR-144.1..144.12` | tests |
-| `LLR-144.10` | batches, tests |
-| `LLR-144.11` | batches, tests |
-| `LLR-144.12` | batches, tests |
-| `LLR-144.2` | batches, tests |
-| `LLR-144.3` | batches, tests |
-| `LLR-144.4` | batches, tests |
-| `LLR-144.5` | batches, tests |
-| `LLR-144.6` | batches, tests |
-| `LLR-144.7` | batches, tests |
-| `LLR-144.8` | batches, tests |
-| `LLR-144.9` | batches, tests |
+| `LLR-144.10` | batches, canon, tests |
+| `LLR-144.11` | batches, canon, tests |
+| `LLR-144.12` | batches, canon, tests |
+| `LLR-144.2` | batches, canon, tests |
+| `LLR-144.3` | batches, canon, tests |
+| `LLR-144.4` | batches, canon, tests |
+| `LLR-144.5` | batches, canon, tests |
+| `LLR-144.6` | batches, canon, tests |
+| `LLR-144.7` | batches, canon, tests |
+| `LLR-144.8` | batches, canon, tests |
+| `LLR-144.9` | batches, canon, tests |
 | `LLR-145` | batches |
-| `LLR-145.1` | batches, tests |
+| `LLR-145.1` | batches, canon, tests |
 | `LLR-145.1..145.10` | tests |
-| `LLR-145.10` | batches, tests |
-| `LLR-145.2` | batches, tests |
-| `LLR-145.3` | batches, tests |
-| `LLR-145.4` | batches, tests |
-| `LLR-145.5` | batches, tests |
-| `LLR-145.6` | batches, tests |
-| `LLR-145.7` | batches, tests |
-| `LLR-145.8` | batches, tests |
-| `LLR-145.9` | batches, tests |
-| `LLR-146.1` | batches, tests |
-| `LLR-146.10` | batches, tests |
-| `LLR-146.11` | batches, tests |
-| `LLR-146.12` | batches, tests |
-| `LLR-146.13` | batches, tests |
-| `LLR-146.14` | batches, tests |
-| `LLR-146.2` | batches, tests |
-| `LLR-146.3` | batches, tests |
-| `LLR-146.4` | batches, tests |
-| `LLR-146.5` | batches, tests |
-| `LLR-146.6` | batches, tests |
-| `LLR-146.7` | batches, tests |
-| `LLR-146.8` | batches, tests |
-| `LLR-146.9` | batches, tests |
-| `LLR-147.1` | batches, tests |
-| `LLR-147.10` | batches, tests |
-| `LLR-147.11` | batches, tests |
-| `LLR-147.12` | batches, tests |
-| `LLR-147.13` | batches, tests |
-| `LLR-147.2` | batches, tests |
-| `LLR-147.3` | batches, tests |
-| `LLR-147.4` | batches, tests |
-| `LLR-147.5` | batches, tests |
-| `LLR-147.6` | batches, tests |
-| `LLR-147.7` | batches, tests |
-| `LLR-147.8` | batches, tests |
-| `LLR-147.9` | batches, tests |
-| `LLR-148.1` | batches, tests |
+| `LLR-145.10` | batches, canon, tests |
+| `LLR-145.2` | batches, canon, tests |
+| `LLR-145.3` | batches, canon, tests |
+| `LLR-145.4` | batches, canon, tests |
+| `LLR-145.5` | batches, canon, tests |
+| `LLR-145.6` | batches, canon, tests |
+| `LLR-145.7` | batches, canon, tests |
+| `LLR-145.8` | batches, canon, tests |
+| `LLR-145.9` | batches, canon, tests |
+| `LLR-146.1` | batches, canon, tests |
+| `LLR-146.10` | batches, canon, tests |
+| `LLR-146.11` | batches, canon, tests |
+| `LLR-146.12` | batches, canon, tests |
+| `LLR-146.13` | batches, canon, tests |
+| `LLR-146.14` | batches, canon, tests |
+| `LLR-146.2` | batches, canon, tests |
+| `LLR-146.3` | batches, canon, tests |
+| `LLR-146.4` | batches, canon, tests |
+| `LLR-146.5` | batches, canon, tests |
+| `LLR-146.6` | batches, canon, tests |
+| `LLR-146.7` | batches, canon, tests |
+| `LLR-146.8` | batches, canon, tests |
+| `LLR-146.9` | batches, canon, tests |
+| `LLR-147.1` | batches, canon, tests |
+| `LLR-147.10` | batches, canon, tests |
+| `LLR-147.11` | batches, canon, tests |
+| `LLR-147.12` | batches, canon, tests |
+| `LLR-147.13` | batches, canon, tests |
+| `LLR-147.2` | batches, canon, tests |
+| `LLR-147.3` | batches, canon, tests |
+| `LLR-147.4` | batches, canon, tests |
+| `LLR-147.5` | batches, canon, tests |
+| `LLR-147.6` | batches, canon, tests |
+| `LLR-147.7` | batches, canon, tests |
+| `LLR-147.8` | batches, canon, tests |
+| `LLR-147.9` | batches, canon, tests |
+| `LLR-148.1` | batches, canon, tests |
 | `LLR-148.1..148.3` | batches |
-| `LLR-148.10` | batches, tests |
-| `LLR-148.2` | batches, tests |
-| `LLR-148.3` | batches, tests |
-| `LLR-148.4` | batches, tests |
-| `LLR-148.5` | batches, tests |
-| `LLR-148.6` | batches, tests |
-| `LLR-148.7` | batches, tests |
-| `LLR-148.8` | batches, tests |
-| `LLR-148.9` | batches, tests |
-| `LLR-149.1` | batches, tests |
+| `LLR-148.10` | batches, canon, tests |
+| `LLR-148.2` | batches, canon, tests |
+| `LLR-148.3` | batches, canon, tests |
+| `LLR-148.4` | batches, canon, tests |
+| `LLR-148.5` | batches, canon, tests |
+| `LLR-148.6` | batches, canon, tests |
+| `LLR-148.7` | batches, canon, tests |
+| `LLR-148.8` | batches, canon, tests |
+| `LLR-148.9` | batches, canon, tests |
+| `LLR-149.1` | batches, canon, tests |
 | `LLR-149.1-149.3` | batches |
-| `LLR-149.2` | batches, tests |
-| `LLR-149.3` | batches, tests |
-| `LLR-149.4` | batches, tests |
-| `LLR-149.5` | batches, tests |
-| `LLR-149.6` | batches, tests |
+| `LLR-149.2` | batches, canon, tests |
+| `LLR-149.3` | batches, canon, tests |
+| `LLR-149.4` | batches, canon, tests |
+| `LLR-149.5` | batches, canon, tests |
+| `LLR-149.6` | batches, canon, tests |
 | `LLR-150` | batches |
-| `LLR-150.1` | batches, tests |
+| `LLR-150.1` | batches, canon, tests |
 | `LLR-150.1..150.7` | batches, tests |
-| `LLR-150.2` | batches, tests |
-| `LLR-150.3` | batches, tests |
-| `LLR-150.4` | batches, tests |
-| `LLR-150.5` | batches, tests |
-| `LLR-150.6` | batches, tests |
-| `LLR-150.7` | batches, tests |
-| `LLR-151.1` | batches, tests |
+| `LLR-150.2` | batches, canon, tests |
+| `LLR-150.3` | batches, canon, tests |
+| `LLR-150.4` | batches, canon, tests |
+| `LLR-150.5` | batches, canon, tests |
+| `LLR-150.6` | batches, canon, tests |
+| `LLR-150.7` | batches, canon, tests |
+| `LLR-151.1` | batches, canon, tests |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -3122,7 +3125,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `US-133` | batches |
 | `US-134` | batches |
 | `US-134..137` | batches |
+| `US-134..140` | batches |
 | `US-134..US-139` | batches |
+| `US-134..US-140` | batches |
 | `US-135` | batches |
 | `US-136` | batches |
 | `US-137` | batches, tests |
@@ -3438,7 +3443,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1828 unique id(s)
+## family AT/TC — 1831 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3809,6 +3814,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-139` | batches |
 | `AT-14` | batches |
 | `AT-140` | batches |
+| `AT-15` | batches |
 | `AT-150` | batches |
 | `AT-151` | batches |
 | `AT-152` | batches |
@@ -3819,6 +3825,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-157` | batches, canon, tests |
 | `AT-158` | batches, canon, tests |
 | `AT-159` | batches, canon, tests |
+| `AT-16` | batches |
 | `AT-160` | batches, canon, tests |
 | `AT-161` | batches, canon, tests |
 | `AT-162` | batches, canon, tests |
@@ -3906,6 +3913,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-23` | batches |
 | `AT-231` | batches |
 | `AT-232` | batches |
+| `AT-24` | batches |
 | `AT-240` | batches, tests |
 | `AT-241` | batches, tests |
 | `AT-241b` | batches, canon, tests |

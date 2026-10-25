@@ -93,6 +93,8 @@ Gate fold (2026-10-22). **Five source files**: the four Inc-5 files plus `s19_ap
 | `AT-TC-REGISTRY.jsonl` | config | LLR-146.12 | TC-642 drops the 3 retired node ids (G2 guard) |
 | `prototypes/b94_polish/run_real.py` | doc | | untracked harness: `flow-builder-run` scenario; session dir set for the real tree |
 | `.dev-flow/…/evidence/inc-5/*` | doc | | evidence (§4) |
+| `tests/test_flow_builder_render.py` | test | HLR-146 | named supersessions LED-2026-10-19-batch-97.25 / .27 (`NOTICES` banner, one-row written-path line); close-time row (2026-10-25): the file was in this increment's commit but no §2 row named it on its own |
+| `tests/test_tui_flow_persistence_ui.py` | test | HLR-146 | named supersession LED-2026-10-19-batch-97.26 (`· saved` / `· unsaved` word replaces the glyph); close-time row (2026-10-25): the file was in this increment's commit but no §2 row named it on its own |
 
 | Count | Value |
 |---|---|

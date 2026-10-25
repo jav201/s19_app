@@ -29,6 +29,11 @@
 - Tests (new): `tests/test_b97_load_project_dialog.py`.
 - Records: `01-requirements-ledger.md` (LED-…97.42), `.dev-flow/BACKLOG-CODE.md` (CW-U-1 status, sibling defects), this packet, `evidence/inc-9/`.
 
+| File | Kind | Traces to | Change |
+|---|---|---|---|
+| `s19_app/tui/screens.py` | source | HLR-151, LLR-151.1 | `LoadProjectScreen` Load handler: the name comes from `self.projects` by the ListView index (CW-U-1); close-time table (2026-10-25), the packet listed its files as bullets only |
+| `tests/test_b97_load_project_dialog.py` | test | HLR-151, LLR-151.1 | NEW `test_load_project_button_loads_the_picked_project`; close-time table (2026-10-25) |
+
 ## 3 · How to test
 - `pytest tests/test_b97_load_project_dialog.py` — creates `proj_a` and `proj_b` in a temp work area, opens the dialog, highlights `proj_b` (not the first entry, since `patches` and `proj_a` sort before it), clicks Load, and checks `app.current_project == "proj_b"` and that the dialog closed.
 - Manual: save two projects, press `p`, move to the second one, press Load: the status says `Loaded project '<name>' -> …`.

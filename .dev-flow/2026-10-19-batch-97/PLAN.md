@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-19-batch-97 |
 | Objective | b94 polish: port the operator-approved prototype round (prototypes/b94_polish, verdict A on all four screens) into the four batch-94 screens -- Patch Editor = ledger + inspector with a consultable JSON tab (live or explicit Update, Load keeps populating), Check Editor = ledger + inspector, Flow Builder = pipeline rail, Flow Execution = pipeline rail; Run as the second bright element; CRC accent burnt orange (amber only for waiting-human); folder-open chip + window help on every one of the four screens (new chip families flows + session); width-adaptive layouts (118x54 minimum, ~220x60 large reference), no wrapped rows; English UI strings. Input: .dev-flow/design/HANDOFF-b94-polish-2026-10-20.md |
-| Last updated | P3 · 2026-10-20 (Inc-1 closed `d5d0ff9`, Inc-2 in progress; the operator's key-bar scope addition folded as Inc-8, LED-…97.9) |
+| Last updated | P5 · 2026-10-25 (batch closed by the operator's decision "close now": DDR approved with conditions, P4 PASS-WITH-NOTES, close record `05-close.md`; all 9 increments on `main`, `origin/main` = `432ecf0`; the close files are uncommitted for the operator's commit) |
 | Standing authorization | Asked at the P0 gate, answered by the operator 2026-10-20 (kickoff questions put in Spanish, answers quoted as chosen). **Gates** — "Autónomo con excepciones": the agent self-approves the gates and records each one in this plan and in `state.json`, but STOPS at PDR (design) and on any HIGH finding. **Git** — "Commit y push en cada cierre": the agent commits and pushes to `main` at each close, no PR (as batch-95); a HIGH finding still blocks and returns to the operator. **DoR** — "Las seis": US-134..US-139 proceed. Commission: "Using /dev-flow vamos desde aquí: C:\Users\jjgh8\Github\s19_app\.dev-flow\design\HANDOFF-b94-polish-2026-10-20.md" |
 | First gate | Exit 0 at P0 after the rollover (0 block · 462 notice · 44 n/a). `V7`: "bundle identical to the manifest it ships, BOTH DIRECTIONS (57 declared file(s) unmoved, 0 undeclared) at `2026-10-12-rev102`". The pre-rollover run exited 1 (298 block) on the closed batch-94 record — see §Gate notices. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin` run 2026-10-19; `origin/main` tip = `ad10fb5ce6228a2a3823e472fd8e46c09122141d`; merge-base(HEAD, origin/main) = the same commit, so no rebase was owed. Local `main` is one commit ahead (`51ee191`, the docs-only backlog routing of the Code-Wire findings, not yet pushed); `base_ref` = `51ee1914f20d1f031dbced129ce66bda750dbde9`. RC-1 (b): each story's outcome grepped on `origin/main` — 0 hits for the inspector/JSON tab, the report-fields card, the pipeline rails, the `flows`/`session` chip families and the burnt-orange token; the shipped gaps the stories close are present (`patch_win_json` 9 hits, `titled_header("Flow Execution")` with no chip 1, the Check Editor's bare `Label` 1, `_CANVAS_COLS =` 1) — no story is SATISFIED-EXTERNALLY. RC-2: `git ls-remote --exit-code --heads origin` answered (refs served); newest `origin/main` commit 2026-10-19 16:57 -0600. |
@@ -52,10 +52,7 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 
 ## Where we are
 
-P0 closed 2026-10-20: the operator passed all six stories (US-134..US-139) through the Definition of
-Ready and answered the kickoff (autonomous gates with stops at PDR and on HIGH; commit + push at each
-close). The batch was opened by rollover from the closed `2026-10-12-batch-94` (decisions_log
-archived, 20 entries). Now: ARQ (A2/A3 fired) -- the module-map update -- before P1 derives anything.
+Closed 2026-10-25 by the operator's decision ("batch-97: close now", `.dev-flow/BACKLOG-CODE.md` §*Decided 2026-10-25*). All nine increments are on `main` and pushed (`origin/main` = `432ecf0`). The DDR was walked by the architect (approved with conditions), P4 evaluated by the qa-reviewer (PASS-WITH-NOTES, no HIGH) and the close written in `05-close.md`. What comes next is the operator's routing: the integrity batch → the Load+projects batch (progress bar in its prototype round) → the waiting-lane scroll prototype → the batch-98 flow report. The close files are uncommitted; the operator commits, pushes and syncs.
 
 ## Objective
 
@@ -86,8 +83,11 @@ the rest of the app at both 118x54 and ~220x60.
 | P2 verification (scoped) | approve 2026-10-20 | all four lenses; fold LED-.5 for two one-line contradictions |
 | PDR | awaiting the operator | proposal `7d823a7`; 3 reviewers approved with conditions (0 blockers); Code-Wire annex (4 majors); 21 conditions PC-1..PC-21; review page `prototypes/b94_polish/pdr-review.html` |
 | PDR | approved with conditions 2026-10-20 (`070429f`) | PC-1..PC-22; delta 2026-10-20 on the key bar: PC-22 re-routed into the batch, PC-23..PC-26 |
-| P3 | in progress | Inc-1 closed (`d5d0ff9`); Inc-2 in progress; then Inc-3 → 4 → 5 → 6 → 8 → 7 |
-| DDR · P4 · P5 · P6 | not started | — |
+| P3 | closed 2026-10-23 | Inc-1 `d5d0ff9` · Inc-2 `f93dadc` · Inc-3 `98f3c84` · Inc-4 `09e44de` · Inc-5 `b514b07` · Inc-6 `9793fcd` · Inc-8 `354857c` · Inc-9 `5cb7618` (Load project dialog, added by the operator 2026-10-23) · Inc-7 `432ecf0` |
+| DDR | approved with conditions 2026-10-25 | architect re-read; PC-1..PC-25 discharged, PC-26 outstanding (operator decision); DC-1..DC-5 routed to `BACKLOG-CODE.md` — `design/DDR-2026-10-19-batch-97.md` |
+| P4 | PASS-WITH-NOTES 2026-10-25 | qa-reviewer; gate run = the orchestrator's Inc-7 full suite (`evidence/inc-7/suite-full.txt`, source digest-equal to `432ecf0`); 0 HIGH, 7 minor gaps — `04-validation.md` |
+| P5 | closed 2026-10-25 | `05-close.md` (architect + qa-reviewer co-authored); canon folded 81 ids; carries in `BACKLOG-CODE.md` §*Routed 2026-10-25 — batch-97 (the b94 polish) close* |
+| P6 | not started | the `06-docs/` traceability layer; not part of the operator's close request |
 
 ## Roadmap + increment plan
 
@@ -161,6 +161,16 @@ gates' reviews are independent, not self-executed.
 - `V27` — the decisions_log is empty at P0; the first gate entry fills it.
 - `V30` — bundle subset (above).
 
+**Close gate run (2026-10-25, after the canon fold and `--atlas --write`): exit 0, 0 block · 494 notice · 51 n/a.** By rule:
+- `V9`, `V13`, `V23`, `V12`, `V42`, `V53`, `V8` — the same corpus notices over closed batches' records as at P0; `V23` also names six citation tokens in this batch's packets, PDR and design proposal (`increment-002.md:15`, `increment-004.md:15`, the sealed PDR record's lines 180 and 182, `design-proposal.md:18` and `:464`) — sealed or narrative text, not re-anchored; the DDR's §D rows bind the same decisions in the declared grammar.
+- `V22` — unowned-LLR questions (this batch's included, a question per id, never a gate) and the canon seeding backlog of earlier batches; this batch's 81 ids are folded (`canon: REQUIREMENTS.md -- 81 folded, 0 kept, 0 refused`).
+- `V26` — the contract is 232 010 characters against the 54 000 budget (A3-8, carried).
+- `V31`, `V32`, `V37`, `V38`, `V41`, `V43`, `V44` on `increment-009.md` and `V33`–`V35` on HLR-151 — Inc-9 ran a light packet with no AT id; routed as DDR DC-1 (integrity batch).
+- `V41`, `V56` on `increment-001.md` / `increment-002.md` — their evidence rows cite bare file names, not repo-relative paths under the evidence home; the files exist under `evidence/inc-1/`, `evidence/inc-2/`. Sealed packets, not re-anchored.
+- `V30` — bundle subset, as at P0. `V15`, `V16`, `V17` — `not-run` from a bundle.
+- `V59` (diff limb, close gate) — the first run with `Gated tree` filled BLOCKed 369 times: 333 untracked files under `prototypes/b94_polish/`, `prototypes/keybar/`, `prototypes/external-step-block/` (never staged, by the operator's rule) → excluded locally in `.git/info/exclude` per step 5's remedy, as at the batch-95 close; 36 committed files no packet row named on its own (29 snapshot SVGs behind a `*.svg` glob row, `tests/test_tui_patch_variant.py` in a combined cell, two Inc-5 supersession test files, Inc-9's `s19_app/tui/screens.py` and its test with no §2 table, two `.fast-dev-flow/archive/` wording fixes) → one row each added to the packets of Inc-4, Inc-5, Inc-7 and Inc-9 (§2), each marked as a close-time row. The rule's own hint (re-stamp `base_ref` to `432ecf0`) was not taken: these files are this batch's own commits, pushed to `main`, not an upstream range. The added rows document changes already reviewed in their increments; no code changed.
+- `V47`–`V51`, `V54` — cleared by filling `04-validation.md` and `05-close.md`. `V57` — the `Gated tree` row names `432ecf0` with the close files dirty, the declared norm at a close gate; after the operator's close commit it reads `record predates this tree`.
+
 **Pre-rollover run: exit 1, 298 block** — `V59` 292 (the closed batch-94's `base_ref` diff charged batch-96 commits and the untracked prototype folders to it; cleared by re-stamping `base_ref` at the rollover), `V10` 2 + `V14` 3 (batch-95 contract, repaired — Key decisions), `V20` 1 (stale `_derived/` atlas, regenerated).
 
 ## Test ledger
@@ -168,4 +178,6 @@ gates' reviews are independent, not self-executed.
 | Suite / command | Last run | Result |
 |---|---|---|
 | `devflow-validate.py --brief` (P0) | 2026-10-19 | exit 0 — 0 block · 462 notice · 44 n/a |
+| `devflow-validate.py --brief` (close) | 2026-10-25 | exit 0 — 0 block · 494 notice · 51 n/a |
+| `pytest -q -p no:cacheprovider` (full suite, the P4 gate run, orchestrator, source digest-equal to `432ecf0`) | 2026-10-23 | **11 failed, 3617 passed, 3 skipped, 3 xfailed in 2:18:54** — `evidence/inc-7/suite-full.txt`; 6 baseline, 2 test-only fixes re-run green (`post-suite-fix.txt`), 3 pre-existing flakes (`suite-nonbaseline-rerun.txt`); 4 baseline nodes now pass. Classification and ledger in `04-validation.md` |
 | `pytest -q -p no:cacheprovider` (full suite, baseline at `51ee191`, code = `ad10fb5`) | 2026-10-20 | **10 failed, 3101 passed, 3 skipped, 32 xfailed in 1:09:58** — transcript `evidence/baseline-pytest-51ee191.txt`. The 10 failures pre-date the batch (found before the batch, on shipped `main`): `test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact`, `test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched`, `test_tui_patch_editor_v2.py::{test_at031b_two_saves_are_distinct_no_clobber, test_at057b_regroup_wiring_and_binding_regression, test_at_batch41_escape_cancels_changeset_json_popup, test_at064c_edit_json_disabled_for_file_backed_document}`, `test_tui_patch_glyphs.py::test_at077c_stale_provenance`, `test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection`, `test_undo_redo_ux.py::test_ac1_checks_panel_clears_after_undo_and_redo`, `test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed`. Four sit on the Patch Editor this batch rebuilds; each increment's run compares against this list, and a failure outside it is a regression. Root cause not investigated here (batch-96 shipped on `main` without a gate). |

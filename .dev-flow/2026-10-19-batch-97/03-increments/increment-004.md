@@ -95,6 +95,7 @@ No ledger entry: no requirement text changes (LLR-144.8 says nothing about a cap
 | `prototypes/b94_polish/run_real.py` | doc | | throwaway harness, untracked: `patch-editor-json` scenario |
 | `.dev-flow/BACKLOG-CODE.md` | doc | | fold: 4 ux items routed (batch-97 section) |
 | `01-requirements.md` · `01-requirements-appendix.md` · `01-requirements-ledger.md` · `design/design-proposal.md` | doc | | fold: LLR-144.6 amended; A.4 TC-B97-06/39/40; LED-…97.18–.21 appended; D5 (e), D5 rationale, D25, §3 tree / budget / JSON-tab paragraph |
+| `tests/test_tui_patch_variant.py` | test | LLR-144.12 | the geometry node opens the JSON tab first (named supersession, HLR-144); close-time row (2026-10-25): the file was in this increment's commit but no §2 row named it on its own (it shared a combined cell above) |
 
 | Count | Value |
 |---|---|

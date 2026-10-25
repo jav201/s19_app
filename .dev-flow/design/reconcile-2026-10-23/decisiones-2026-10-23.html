@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decisiones s19 pendientes</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--dim:#5f6670;--line:#dcd9d0;--acc:#2f6fb5;--ok:#2e7d4f;--warn:#b0413e;--tag:#eceae3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--tag:#2a2e33}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--tag:#2a2e33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:920px;margin:0 auto;padding:24px 16px 90px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.lead{color:var(--dim);margin:0 0 16px}
+.bluf{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);padding:12px 14px;border-radius:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:16px 0}
+.q h2{font-size:1.05rem;margin:0 0 4px}
+.ctx{color:var(--dim);font-size:.93rem;margin:0 0 10px}
+.opt{display:block;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.opt:has(input:checked){border-color:var(--acc);outline:1px solid var(--acc)}
+.opt b{display:block}
+.opt .c{font-size:.9rem;color:var(--dim);display:block;margin-top:2px}
+.rec{font-size:.75rem;background:var(--ok);color:#fff;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:middle}
+.risk{font-size:.75rem;background:var(--warn);color:#fff;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:middle}
+code{background:var(--tag);border-radius:3px;padding:0 4px;font-size:.88em}
+textarea{width:100%;min-height:42px;margin-top:6px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;font:inherit}
+#gen{min-height:90px}
+.bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 16px;font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<h1>Decisiones pendientes de s19_app</h1>
+<p class="lead">2026-10-23 · después de cerrar el incremento 7 del batch 97 (commit <code>432ecf0</code>).</p>
+<div class="bluf"><b>Resumen:</b> seis decisiones. Cada una muestra qué pasa con cada opción. Donde tengo una recomendación ya viene marcada, así que <b>cambia solo lo que objetes</b>. La pregunta 2 no viene marcada porque es sobre lo que tú quisiste decir. Al final hay un campo para notas o pedidos nuevos. Luego pulsa «Exportar».</div>
+
+<div id="qs"></div>
+
+<div class="q">
+<h2>Notas generales / pedidos nuevos</h2>
+<textarea id="gen" placeholder="Cualquier cosa que falte, pedidos nuevos, cambios de prioridad..."></textarea>
+</div>
+</main>
+<div class="bar"><span id="cnt"></span><button id="exp">Exportar veredicto (JSON)</button></div>
+<script>
+const Q=[
+{id:"checks",t:"1 · La ventana Checks (tecla 9) parece no hacer nada",
+ ctx:"Hoy solo muestra el resultado de la última corrida de checks. Esa corrida solo se lanza desde un botón escondido en la pestaña Checks del Patch Editor, y únicamente si hay un archivo de checks cargado. En una sesión normal dice «No check run yet». Tu Cambio3 pedía que esa ventana se convirtiera en el Check Editor; el batch 94 agregó el editor y dejó la ventana vieja.",
+ rec:"B",
+ o:[["A","Quitarla del rail","Una pantalla menos y nada que confunda. Ver resultados de checks queda solo dentro del Patch Editor (escondido) y del Check Editor. Trabajo pequeño, un incremento."],
+    ["B","Convertirla en la ventana que corre archivos de checks (con prototipo)","Eliges un .chk.json y lo corres sobre la imagen cargada: ves pasa/falla por check, sin entrar al Patch Editor. Va con ronda de prototipos y tu veredicto antes de implementarse. Se junta bien con R-056 (checks desde atributos A2L). Más trabajo: un batch o medio."],
+    ["C","Dejarla igual, con mejor texto cuando está vacía","Solo explica de dónde vienen los resultados («corre checks desde Patch Editor → Checks»). Barato, pero sigue siendo una pantalla casi muerta."]]},
+{id:"r069",t:"2 · Tu nota sobre las curvas A2L: «No, las curvas sirven»",
+ ctx:"Te pregunté si bastaban las tablas de texto para describir parámetros tipo curva. Hoy la tecla d muestra una tabla x→y con una mini-gráfica de texto (sparkline). Los mapas de 2 ejes todavía salen como una lista plana; eso falta en cualquier caso.",
+ rec:null,
+ o:[["dibujar","Quise decir: las tablas no bastan, las curvas dibujadas sí sirven","Se abre una ronda de prototipos para dibujar curvas (y mapas 2-D en rejilla) dentro de la terminal, con capturas reales para que elijas. Después se implementa."],
+    ["texto","Quise decir: lo que hay (texto y sparkline) ya sirve","No se dibuja nada más. Solo queda pendiente la vista en rejilla para los mapas de 2 ejes."]]},
+{id:"history",t:"3 · Menciones viejas en el historial público del repo",
+ ctx:"Ya limpié los archivos actuales: esa función se describe solo como extracción de regiones de memoria. Pero los commits viejos del repo público todavía contienen el texto anterior, y cualquiera que navegue el historial en GitHub puede verlo.",
+ rec:"dejar",
+ o:[["dejar","Dejar el historial como está","No se rompe nada. Los archivos actuales ya están limpios, pero el texto viejo sigue visible en commits anteriores para quien lo busque."],
+    ["reescribir","Reescribir el historial y forzar el push a main","Sustituye el texto en todos los commits. Cambian todos los identificadores de commit (SHA): cualquier clon o rama local queda desfasado, las referencias de PRs viejos apuntan a commits que ya no están en main, y GitHub puede seguir mostrando los commits viejos por su SHA durante un tiempo. Es destructivo e irreversible; lo hago solo con esta aprobación explícita."],
+    ["privado","Hacer el repo privado","El historial deja de ser visible para terceros sin reescribir nada. Pierdes la visibilidad pública (portafolio, enlaces compartidos) y el CI de GitHub para repos privados usa minutos de tu cuenta."]]},
+{id:"close",t:"4 · Cierre del batch 97",
+ ctx:"Los 9 incrementos ya están en main. El cierre escribe la validación (04-validation) y el registro de cierre (05-close). También arregla tres pendientes: el comentario ^E en styles.tcss (exige actualizar dos pruebas que lo comparan byte a byte), dos pruebas opcionales, y dos detalles menores de UX en las ayudas: a 80x24 se ven unas 5 líneas, y las teclas de desplazamiento no aparecen escritas.",
+ rec:"ya",
+ o:[["ya","Cerrar ahora","Cierro el batch, hago commit y push, y lo copio al vault. Después arranca el batch de integridad."],
+    ["esperar","Esperar","El batch queda abierto. No arranca nada nuevo hasta que lo pidas."]]},
+{id:"orden",t:"5 · Orden después de integridad y Load+proyectos",
+ ctx:"Ya decidiste: primero el batch de integridad de lectura y escritura, y después Load+proyectos. Falta el orden entre los dos siguientes.",
+ rec:"scroll",
+ o:[["scroll","Primero el prototipo del scroll del carril en espera, luego el reporte (batch 98)","El arreglo del scroll es chico y de diseño: es una ronda de prototipos rápida. El reporte de Flow Execution es más grande y conviene que llegue con la lectura del A2L ya integrada."],
+    ["reporte","Primero el reporte de Flow Execution (batch 98), luego el scroll","Tienes antes el reporte md/html mejorado. La cabecera del carril en espera se sigue cortando con el scroll lateral mientras tanto."]]},
+{id:"barra",t:"6 · Barra de progreso que refleje tareas en ejecución (N5 reabierto)",
+ ctx:"Hoy solo se mueve al cargar archivos o A2L y al generar reportes. Flow Execution, CRC, parches, exportar y guardar no la mueven, y después de cargar se queda en 100. Por la regla de diseño necesita una ronda de prototipos antes de implementarse.",
+ rec:"loadproj",
+ o:[["loadproj","Junto a la ronda de prototipos de Load+proyectos","Se aprovecha esa misma ronda de prototipos. Load es lo primero que usa la barra."],
+    ["propio","Batch propio, justo después de integridad","Llega antes, pero abre una ronda de prototipos aparte y retrasa Load+proyectos."],
+    ["final","Al final de la lista","No compite con nada; sigues un tiempo sin saber si una tarea larga está corriendo."]]}
+];
+const box=document.getElementById("qs");
+Q.forEach(q=>{const d=document.createElement("div");d.className="q";
+d.innerHTML=`<h2>${q.t}</h2><p class="ctx">${q.ctx}</p>`+q.o.map(([v,l,c])=>`<label class="opt"><input type="radio" name="${q.id}" value="${v}" ${v===q.rec?"checked":""}> <b style="display:inline">${l}</b>${v===q.rec?'<span class="rec">recomendada</span>':""}${v==="reescribir"?'<span class="risk">destructiva</span>':""}<span class="c">${c}</span></label>`).join("")+`<textarea data-id="${q.id}" placeholder="Nota (opcional)"></textarea>`;
+box.appendChild(d);});
+function upd(){const n=Q.filter(q=>document.querySelector(`input[name="${q.id}"]:checked`)).length;document.getElementById("cnt").textContent=`${n} de ${Q.length} respondidas`;}
+document.addEventListener("change",upd);upd();
+document.getElementById("exp").onclick=()=>{const out={page:"s19-decisiones-2026-10-23",exported:new Date().toISOString(),items:{},general_notes:document.getElementById("gen").value};
+Q.forEach(q=>{const c=document.querySelector(`input[name="${q.id}"]:checked`);out.items[q.id]={verdict:c?c.value:null,note:document.querySelector(`textarea[data-id="${q.id}"]`).value};});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download="veredicto-decisiones-s19.json";a.click();};
+</script>
+</body>
+</html>

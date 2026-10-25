@@ -36,8 +36,8 @@
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
     }
   ],
-  "current_station": "P3",
-  "phase_status": "in-progress",
+  "current_station": "P5",
+  "phase_status": "closed",
   "stations_active": [
     "P0",
     "ARQ",
@@ -214,6 +214,21 @@
       "station": "P3",
       "date": "2026-10-23",
       "decision": "P3 increment 007 approved under the batch's standing authorization (autonomous with exceptions; no HIGH): snapshot harness race, 29-SVG regen, width sweep, Inc-8 leftovers, help modal scroll/fit plus fix round (UX-F1..F4, CR-F1..F4); code-reviewer OK, ux-reviewer OK after re-walk; full suite classified against baseline, two test-only failures of this increment fixed (post-suite-fix.txt). Batch close (P4/P5) is next."
+    },
+    {
+      "station": "DDR",
+      "date": "2026-10-25",
+      "decision": "DDR approved with conditions under the batch's standing authorization (Autonomo con excepciones; no HIGH): the architect, spawned with agents/architect.md, re-read every row -- frozen interfaces intact or changed with a ledger entry, source budget kept (Inc-5 approved overage), sequential so no lane checks; PDR conditions PC-1..PC-25 discharged by re-reading, PC-26 (key-bar review page) outstanding as an operator decision; conditions DC-1..DC-5 routed to BACKLOG-CODE.md (design/DDR-2026-10-19-batch-97.md). P4 is next."
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-25",
+      "decision": "P4 gate PASSED under the batch's standing authorization -- verdict PASS-WITH-NOTES (qa-reviewer, spawned with agents/qa-reviewer.md, 04-validation.md): the gate run is the orchestrator's Inc-7 full suite (evidence/inc-7/suite-full.txt, 11 failed / 3617 passed, source digest-equal to 432ecf0; 6 baseline, 2 test-only fixes re-run green, 3 pre-existing flakes); 81/81 requirements, 26/26 ATs on one node each, ledger 3146 - 3 + 491 = 3634 by collection; 0 HIGH, 7 minor gaps routed. P5 is next."
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-25",
+      "decision": "P5 closed under the batch's standing authorization and the operator's decision of 2026-10-25 (batch-97: close now) -- 05-close.md co-authored from the architect and qa-reviewer returns: canon folded 81 ids, 0 refused; carries routed to BACKLOG-CODE.md section Routed 2026-10-25 (stale ^E comment, AT-B97-16/24 optional mutants, two help-modal ux LOWs, four flaky nodes, D17 local snapshot regen with one CI snapshot-regen.yml run recommended, review page not rebuilt, DC-1..DC-5); 1 condition outstanding (PC-26, operator decision); next per Decided 2026-10-25: integrity batch, Load+projects, waiting-lane scroll prototype, batch-98 flow report."
     }
   ],
   "obsidian_synced": false,
