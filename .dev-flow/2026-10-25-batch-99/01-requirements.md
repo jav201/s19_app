@@ -828,7 +828,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-17): 30 → `03 00` → RED.
 - **Boundary catalog:** ☒ invalid — a coefficient set with no inverse is refused (existing message kept).
 
-### LLR-158.3 — COMPU_TAB values that do not round-trip are refused *(provisional, D4)*
+### LLR-158.3 — COMPU_TAB values outside the table are refused, in-range values are flagged *(provisional, D4)*
 - **Traceability:** HLR-158
 - **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
 - **Statement:** The COMPU_TAB inversion shall refuse a `TAB_NOINTP` value that is not a table value (naming the two nearest) and a `TAB_INTP` value outside the table range (naming the range). For an in-range `TAB_INTP` value it shall return the nearest raw value with a flag naming the written physical value whenever that value differs from the typed one.

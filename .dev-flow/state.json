@@ -42,7 +42,7 @@
       "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
     }
   ],
-  "current_station": "PDR",
+  "current_station": "P3",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -155,6 +155,11 @@
       "station": "P2",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P2 approved at round 3 (qa approve, security approve; architect A3-1/A3-2 folded in LED-2026-10-25-batch-99.3, open with PDR as owner). PDR next: design/design-proposal-b99.md reviewed by architect, qa-reviewer, ux-reviewer."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. PDR approved with conditions (architect, qa-reviewer, ux-reviewer; design/PDR-2026-10-25-batch-99.md): C2/C4/C5/C6/C7 discharged now, the rest owned by named increments; no prototype round owed (ux §4). P3 increment 001 (US-141 corpus) next, implemented by Kimi K2.8."
     }
   ],
   "obsidian_synced": false,

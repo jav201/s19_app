@@ -6,7 +6,7 @@
 | Field | Value |
 |---|---|
 | Id | `PDR-2026-10-25-batch-99` |
-| Requirements covered | HLR-152..HLR-162 with their LLRs (41), as of LED-2026-10-25-batch-99.3 (40 LLRs; stories US-141..US-152) |
+| Requirements covered | HLR-152..HLR-162 with their LLRs (40), as of LED-2026-10-25-batch-99.3 (40 LLRs; stories US-141..US-152) |
 | Modules touched (from `docs/ARCHITECTURE.md` §10 batch-99 declarations) | engine (`core.py`, `hexfile.py`, `tui/a2l.py` — frozen §7, crossings named), render (`render/hexview.py`), changes (`tui/changes/apply.py`), workspace (`tui/workspace.py`), services (`change_service.py`, `flow_execution_service.py`, `flow_report_service.py`), operations (`operations/crc.py`), screens (`app.py`, `flow_screens.py`, `screens_directionb.py`, `window_help.py`), split/join (`segment_split_view.py`, `s19_app/segment_ops.py`); tests (`tests/support/`, `tests/fixtures/synth/`) |
 | Triggers that fired | A2 · A3 · B1 · B3 · B4 · C6 · C8 · D1 · E1 · E2 |
 | Author / reviewers | orchestrator (author) · `architect` · `qa-reviewer` · `ux-reviewer` (D1 fired) |
@@ -36,10 +36,10 @@ Close H-1..H-10, PH-3, CW-D-4/7/10 and the CW-U-1 test gap so that every written
 
 ```
 caller ──► copy_into_workarea(source, dest)
-             │ 1. temp is a real dir?  (reparse point → refusal)
+             │ 1. temp and temp/.staging are real dirs?  (reparse point → refusal)
              │ 2. stage_dir = mkdtemp(temp/.staging/)   owned=True
              │ 3. copy2(source → stage_dir/<name>)       source never moved
-             │ 4. B8: dest/<name> exists and bytes equal? → reuse (race-free compare)
+             │ 4. B8: dest/<name> exists, non-empty, bytes equal? → reuse (a 0-byte target may be another writer's claim: never reused)
              │ 5. claim dest/<name> with O_EXCL; taken → <stem>_<N><ext>; close handle
              │ 6. os.replace(stage file → claimed name); PermissionError → retry ≤5 in ≤1 s
              │        └─ still failing → remove own claim, raise WorkareaPlacementError
@@ -73,21 +73,21 @@ before_bytes(a) = J[a] (source byte), even on a repeated apply
 
 ## 4 · Interfaces that change — and which ones FREEZE
 
-| Interface | Current | After | Consumers | **Frozen for the fork?** |
-|---|---|---|---|---|
-| B99-I1 S19 memory-map contract | every record type walked | R18 data-record predicate only | 32 test files calling a builder (ARQ §3); hexview; validation | n/a — no fork |
-| B99-I2 placement | `temp/<name>` stage, check-then-copy | staging dir + exclusive claim + `os.replace`; `WorkareaPlacementError` on exhausted retries |
-| B99-I2a group placement (NEW) | none | `place_group_into_workarea`: one staging dir, one `_<N>` claimed for every name of a group before any write; reuse only when the whole group is identical | `segment_split_view.py`, `segment_ops.write_bin_with_sidecar` | n/a | 13 `copy_into_workarea` callers; `save_patched_image` callers | n/a |
-| B99-I3 `ChainRunOutcome` | status, block_results, written_paths… | + `change_records`, `refusals`, `image_ranges` (default factories) | `flow_screens.py`; chain-set report | n/a |
-| B99-I4 A2L codec | tag → layout → endian → little; RAT_FUNC phys = f(raw) | + `MOD_COMMON`; RAT_FUNC INT = f(PHYS); `TAB_NOINTP` exact, `TAB_INTP` range-checked with a written-value flag | A2L window; `resolve_symbol_entry` | n/a |
-| B99-I5 CRC coverage | empty region → CRC of empty stream | error; partial → notices count | flow CRC arm; CRC write | n/a |
-| B99-I6 export writer | `dest_dir/f"{stem}_{name}"` | sanitiser + plan pass + work-area containment + placement; BIN and `.addr` claim one `_<N>` | `SegmentSplitView` | n/a |
-| B99-I7 editor image | in-place mutation, no revert | journal restore in place; save re-derives | `app.py` aliases (`:9894`, `:9946`), reports | n/a |
-| B99-I8 Bytes grammar | base 0 then 16 | per D1 (provisional: hex only) | `add_entry` / `edit_entry` | n/a |
-| B99-I9 project and files lists | every folder but `temp`; root listing | minus `RESERVED_WORKAREA_HOMES`; load folder; stored names | Load project dialog, `_load_from_item` | n/a |
-| B99-I10 loader notice codes | none | five stable codes | SOURCE arm, issues panel | n/a |
-| B99-I11 chain-set start check | none | refusal on duplicate names (D7) | `app.py:2800`, `:2890` | n/a |
-| B99-I12 WRITE-OUT verify | none | `verify_written_image` after placement (D9) | lane cell, flow report | n/a |
+| Interface | Current | After | Consumers | LLR | **Frozen for the fork?** |
+|---|---|---|---|---|---|
+| B99-I1 S19 memory-map contract | every record type walked | R18 data-record predicate only | 32 test files calling a builder (ARQ §3); hexview; validation | 153.1, 153.2 | n/a — no fork |
+| B99-I2 placement | `temp/<name>` stage, check-then-copy | `temp/.staging/<mkdtemp>/` + `O_EXCL` claim + `os.replace`; `WorkareaPlacementError` on exhausted retries; B8 reuse never of a 0-byte target | 14 paths: 13 `copy_into_workarea` callers + `changes/io.py:1586` (converted in Inc 3a, PDR C2) | 155.1, 155.2, 155.3, 155.7 | n/a |
+| B99-I2a group placement (NEW) | none | `place_group_into_workarea(sources: Sequence[Path], destination: Path, *, max_size_bytes: int \| None = None) -> list[Path]` in `tui/workspace.py`: one staging dir, one `_<N>` claimed for every name before any write, `os.replace` per file, reuse only when the whole group is identical, rollback of every own claim and placed file on any failure; built in Inc 6; `segment_ops` writes into the staging dir and never imports `tui.workspace` (`segment_split_view` calls the function) | `segment_split_view.py` export writer | 160.4, 155.7 | n/a |
+| B99-I3 `ChainRunOutcome` | status, block_results, written_paths… | + `change_records`, `refusals`, `image_ranges` (default factories) | `flow_screens.py`; chain-set report | 156.2, 156.3 | n/a |
+| B99-I4 A2L codec | tag → layout → endian → little; RAT_FUNC phys = f(raw) | + `MOD_COMMON`; RAT_FUNC INT = f(PHYS); `TAB_NOINTP` exact, `TAB_INTP` range-checked with a written-value flag | A2L window; `resolve_symbol_entry` | 158.1, 158.2, 158.3 | n/a |
+| B99-I5 CRC coverage | empty region → CRC of empty stream | error; partial → notices count, carried on the CRC region result (ARCH R23 confirmed at PDR, condition C5), read by the flow arm, `write_crc_image` and the operation path | flow CRC arm; CRC write | 159.1, 159.2, 155.8 | n/a |
+| B99-I6 export writer | `dest_dir/f"{stem}_{name}"` | sanitiser + plan pass + work-area containment + B99-I2 / I2a placement | `SegmentSplitView` | 160.1, 160.2, 160.4, 160.5 | n/a |
+| B99-I7 editor image | in-place mutation, no revert | journal restore in place; save re-derives; `before_bytes` = source byte | `app.py` aliases (`:9894`, `:9946`), reports | 157.1, 157.2, 157.4 | n/a |
+| B99-I8 Bytes grammar | base 0 then 16 | per D1 (provisional: hex only) | `add_entry` / `edit_entry` | 161.1, 161.2 | n/a |
+| B99-I9 project and files lists | every folder but `temp`; root listing | minus `RESERVED_WORKAREA_HOMES`; load folder; stored names | Load project dialog, `_load_from_item` | 162.1, 162.2, 162.3 | n/a |
+| B99-I10 loader notice codes | none | five stable codes | SOURCE arm, issues panel | 154.1, 154.2, 154.3 | n/a |
+| B99-I11 chain-set start check | none | refusal on duplicate names (D7) | `app.py:2800`, `:2890` | 155.5 | n/a |
+| B99-I12 WRITE-OUT verify | none | `verify_written_image` after placement (D9) | lane cell, flow report | 155.6 | n/a |
 
 ## 5 · Proposed test cases
 
