@@ -1,0 +1,7 @@
+prg.s19 ranges: [('0x17e0', '0x17e1'), ('0x17e8', '0x17ea'), ('0x17f0', '0x17fa'), ('0xeb00', '0xeb02'), ('0xeb04', '0xeb07'), ('0xeb08', '0xfa2e'), ('0xfcb0', '0xfcec'), ('0xfcf8', '0xfd00'), ('0xffbd', '0xffbe'), ('0xffbf', '0xffc0'), ('0xfffe', '0x10000')]
+outside_0x20000          run=ok                     patch=ok:'applied 0 entries' dispositions=['skipped-outside'] refusals=[] wrote=['out_outside_0x20000.s19']
+straddle_end             run=ok                     patch=ok:'applied 0 entries' dispositions=['skipped-partial'] refusals=[] wrote=['out_straddle_end.s19']
+one_in_one_out           run=ok                     patch=ok:'applied 1 entry' dispositions=['applied', 'skipped-outside'] refusals=[] wrote=['out_one_in_one_out.s19']
+kind_check_not_change    run=ok                     patch=ok:'applied 0 entries' dispositions=['blocked'] refusals=[] wrote=['out_kind_check_not_change.s19']
+v1_legacy                run=ok                     patch=ok:'applied 0 entries' dispositions=[] refusals=['CHG-V1-FORMAT'] wrote=['out_v1_legacy.s19']
+malformed_json           run=ok                     patch=ok:'applied 0 entries' dispositions=[] refusals=['MF-JSON-PARSE'] wrote=['out_malformed_json.s19']

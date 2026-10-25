@@ -1,8 +1,8 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-10-19-batch-97",
-  "batch_objective": "b94 polish: port the operator-approved prototype round (prototypes/b94_polish, verdict A on all four screens) into the four batch-94 screens -- Patch Editor = ledger + inspector with a consultable JSON tab (live or explicit Update, Load keeps populating), Check Editor = ledger + inspector, Flow Builder = pipeline rail, Flow Execution = pipeline rail; Run as the second bright element; CRC accent burnt orange (amber only for waiting-human); folder-open chip + window help on every one of the four screens (new chip families flows + session); width-adaptive layouts (118x54 minimum, ~220x60 large reference), no wrapped rows; English UI strings. Input: .dev-flow/design/HANDOFF-b94-polish-2026-10-20.md",
+  "batch_id": "2026-10-25-batch-99",
+  "batch_objective": "The read/write integrity batch: every written image, report and run record says what was and was not applied. Scope: the ten HIGH findings of INVESTIGATION-read-write-integrity-2026-10-22 (H-1 S0 as image data, H-2 PATCH always ok, H-3 shared staging race, H-4 editor undo vs image, H-5 A2L encode byte order, H-6 COMPU_TAB nearest/clamp, H-7 CRC over an empty region, H-8 truncated images load ok, H-9 export path containment, H-10 run records drop dispositions); project round-trip PH-3 (save-back deletes the work copy, Save project crashes); the Code-Wire data HIGHs CW-D-4 (Bytes field decimal tokens), CW-D-7 (MAC-only export phantom byte), CW-D-10 (RAT_FUNC direction); deeper tests of the CW-U-1 fix (Load project dialog) and its sibling; and a generated synthetic fixture corpus with an independent reader as the oracle.",
   "mode": "full",
   "mode_history": [
     {
@@ -34,10 +34,16 @@
       "to": "full",
       "date": "2026-10-19",
       "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-25",
+      "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
     }
   ],
-  "current_station": "P6",
-  "phase_status": "awaiting-sync",
+  "current_station": "P2",
+  "phase_status": "in-progress",
   "stations_active": [
     "P0",
     "ARQ",
@@ -52,198 +58,82 @@
   ],
   "iterations_per_station": {
     "P0": 0,
-    "P1": 3,
+    "ARQ": 0,
+    "P1": 0,
     "P2": 0,
+    "PDR": 0,
     "P3": 0,
+    "DDR": 0,
     "P4": 0,
     "P5": 0,
-    "P6": 0,
-    "ARQ": 0,
-    "DDR": 0,
-    "PDR": 0
+    "P6": 0
   },
   "triggers": {
-    "evaluated_at": "2026-10-19",
+    "evaluated_at": "2026-10-25T14:05:40",
     "fired": [
       "A2",
       "A3",
       "B1",
       "B3",
+      "B4",
+      "C6",
       "C8",
       "D1",
-      "E1"
+      "E1",
+      "E2"
     ],
     "not_fired": [
       "A1",
       "A4",
       "B2",
-      "B4",
       "C1",
       "C2",
       "C3",
       "C4",
       "C5",
-      "C6",
       "C7",
       "D2",
-      "E2",
       "E3",
       "F1",
       "F2"
     ],
-    "record": ".dev-flow/2026-10-19-batch-97/PLAN.md#triggers"
+    "record": ".dev-flow/2026-10-25-batch-99/PLAN.md#triggers"
   },
   "artifact_homes": {
-    "requirements": "repo:.dev-flow/2026-10-19-batch-97/01-requirements.md",
-    "requirements_ledger": "repo:.dev-flow/2026-10-19-batch-97/01-requirements-ledger.md",
-    "traceability": "repo:.dev-flow/2026-10-19-batch-97/06-docs/traceability-matrix.md",
+    "requirements": "repo:.dev-flow/2026-10-25-batch-99/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-25-batch-99/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-25-batch-99/06-docs/traceability-matrix.md",
     "tests": "repo:tests/",
     "module_map": "repo:docs/ARCHITECTURE.md",
-    "increments": "repo:.dev-flow/2026-10-19-batch-97/03-increments/",
-    "evidence": "repo:.dev-flow/2026-10-19-batch-97/evidence/",
+    "increments": "repo:.dev-flow/2026-10-25-batch-99/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-25-batch-99/evidence/",
     "backlog": "repo:.dev-flow/BACKLOG.md",
-    "design_pdr": "vault:s19_app/design/PDR-2026-10-19-batch-97.md",
-    "design_ddr": "vault:s19_app/design/DDR-2026-10-19-batch-97.md",
-    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-19-batch-97/",
-    "metrics": "vault:s19_app/dev-flow-batches/2026-10-19-batch-97/README.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-25-batch-99.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-25-batch-99.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-25-batch-99/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-25-batch-99/README.md",
     "requirements_canon": "repo:REQUIREMENTS.md"
   },
   "artifacts": {},
   "decisions_log": [
     {
       "station": "P0",
-      "date": "2026-10-20",
-      "decision": "P0 Definition of Ready closed, asked at the gate -- the operator passed all six READY stories (US-134..US-139, answer: Las seis) and answered the kickoff: gates autonomous with stops at PDR and on any HIGH finding (Autonomo con excepciones); Git: commit and push to main at each close, no PR. ARQ is next (A2, A3 fired)."
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25 (PLAN header). P0 intake approved: 11 stories US-141..US-151; READY US-141, 142, 144, 146, 148, 149, 151; REFINE US-143 (D6), 145 (D5), 147 (D2-D4), 150 (D1), pending the operator's verdict on design/plan-b99.html; RC-1/RC-2 recorded; ARQ is next."
     },
     {
       "station": "ARQ",
-      "date": "2026-10-20",
-      "decision": "ARQ approved under the standing authorization (Autonomo con excepciones, PLAN.md header) -- docs/architecture.md batch-97 section: no module created, no boundary moved (A1 evidence), four interface deltas I-1..I-4 with measured consumers, one new edge folder_open_service -> flow_persistence_service, sequential increments; R13-R17; four questions routed to PDR (Check Editor chip id clash, creatable families, refresh_entries call shape, CRC vs waiting hue). P1 is next."
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. ARQ approved: docs/ARCHITECTURE.md batch-99 declarations (R18-R23) and interface amendments B99-I1..I9; no boundary move; frozen-engine crossings (core.py, hexfile.py, a2l.py) named in LLR-153.1, 154.1, 154.2, 158.1; mem_map census: one in-place writer (LLR-157.3); parallelisation verdict sequential, no fork (A4 stays not fired); CRC staging joins HLR-159 as LLR-159.3. P1 is next."
     },
     {
       "station": "P1",
-      "date": "2026-10-20",
-      "decision": "P1 approved under the standing authorization (Autonomo con excepciones, PLAN.md header) -- 01-requirements.md: 6 stories, HLR-144..149, 38 LLRs, AT-B97-01..16, TC-B97-01..38, IFC 10 flows + 5 components, 26 premises TRUE with executed evidence, fork preconditions declared empty, ledger LED-2026-10-19-batch-97.1; scan security_required true, routed to the P2 security lens; ten design decisions deferred to PDR; handoff corrections recorded (E-1, F-5, R-5.1, CRC fixture, 34 Spanish strings, set-row overflow at 220, R-2.2). The qa-reviewer's P1 validation-method pass is folded into the independent P2 qa lens (declared). P2 is next."
-    },
-    {
-      "station": "P2",
-      "date": "2026-10-20",
-      "decision": "P2 round 1 gate: iterate-to-refine (forced by blocker Q-1; all four lenses -- architect, qa-reviewer, security-reviewer, ux-reviewer -- returned iterate-to-refine; 1 blocker, 33 major, 31 minor in 02-review.md). Under the standing authorization the run chose for the requirement-defect majors: amend P1, then a full second P2 review. Rulings taken for the amendment: Q-5 the 80x24 floor is kept (below 118 the four screens stay reachable under scroll; no supersession); Q-2 the seven Spanish strings in flow_execution_service.py come into scope; A-2/Q-8 the underived story elements are derived, not dropped. Colour (A-4/U-2), primary action per screen (U-9), card growth at 220 (U-5) and the JSON refresh stay operator decisions at PDR. Routed out: A-15, S-6, U-17 to BACKLOG-CODE.md; Q-13 to security at the Flow Builder increment."
-    },
-    {
-      "station": "P1",
-      "date": "2026-10-20",
-      "decision": "P1 iteration 1 approved under the standing authorization (Autonomo con excepciones) -- the contract amended against every P2 round-1 finding routed to P1 (ledger LED-2026-10-19-batch-97.2): 59 LLRs (21 new), AT-B97-01..24, TC-B97-01..59, premises P-1..P-35 all TRUE, hostile payload split into a filename-legal subset and file content (Q-1), per-AT fixture table, keyboard-order LLRs, region states, renderer-derived glyph and colour sets; 16 decisions listed for PDR (operator: hue pair, primary action per editor, card growth). Three assumed flags left, each measured in its increment's RED run. P2 round 2 is next."
-    },
-    {
-      "station": "P2",
-      "date": "2026-10-20",
-      "decision": "P2 round 2 gate: iterate-to-refine (forced by blocker Q2-1 -- four ATs observe internal symbols; all four lenses returned iterate-to-refine; 1 blocker, 17 major, 27 minor in 02-review.md round 2). Root cause of the second loop, named per the iteration-cap rule: several requirement gaps hinge on design choices still open (hue pair, primary action per editor, card growth, JSON refresh, multi-variant runs, Confirm focus). Those operator choices are asked BEFORE the round-3 amendment so it can be final. S2-2 (NUL crash) ruled into this batch at the Flow Builder increment."
-    },
-    {
-      "station": "P1",
-      "date": "2026-10-20",
-      "decision": "P1 iteration 2 approved under the standing authorization (Autonomo con excepciones) -- LED-2026-10-19-batch-97.3: every round-2 row routed to P1 resolved; operator decisions written as decided (hue pair #e8ad3d/#c9562b, notices #f6ff8f kept with the operator's reservation; Save/Write primary actions; one Builder chain per variant, LLR-104.6 retired for the Builder; JSON tab live with stamp); orchestrator decisions 5-10 marked revisable at PDR; 65 LLRs, 24 ATs, 65 TCs, 49 premises, 0 assumed flags; evidence moved to 01-requirements-appendix.md (non-normative). P2 round 3 is next."
-    },
-    {
-      "station": "P2",
-      "date": "2026-10-20",
-      "decision": "P2 round 3 gate: iterate-to-refine forced by blocker Q3-1 (1 blocker, 11 major, 15 minor; security approved, LOW). Returning to P1 would be its third iteration -- the soft cap: STOPPED and surfaced to the operator (root cause named in PLAN.md) before any further amendment. Findings converge 33 -> 17 -> 11 majors, all bounded edits, no operator decision reopened."
-    },
-    {
-      "station": "P2",
-      "date": "2026-10-20",
-      "decision": "Iteration cap asked at the gate -- operator answer 2026-10-20: 'Ultima enmienda + verificacion acotada' -- P1 iteration 3 fixes blocker Q3-1 and the 11 round-3 majors (plus minors where cheap); then each lens verifies ONLY its own round-3 findings, no open-ended new-defect hunt; if closed, P2 approves and the batch moves to PDR."
-    },
-    {
-      "station": "P1",
-      "date": "2026-10-20",
-      "decision": "P1 iteration 3 approved under the standing authorization -- LED-2026-10-19-batch-97.4 fixes all 27 round-3 rows (blocker Q3-1 by the nul_bind surface arm; A3-1 stamp on dirty-flag writers; A3-2 clipped-region overflow; U3-1 c on the attention lane once per entry with CONFIRM_DWELL_S 0.5 s; U3-2 type-and-id focus reference; U3-3 lanes scroll by key), executed predicates in P-50..P-60; ids unchanged (65 LLR, 24 AT, 65 TC). New orchestrator calls revisable at PDR listed in 6.2. Scoped P2 verification is next (operator's cap ruling)."
-    },
-    {
-      "station": "P2",
-      "date": "2026-10-20",
-      "decision": "P2 approved under the standing authorization after the operator's scoped verification -- all four lenses approve: every round-3 blocker/major closed (Q3-1 executed RED on HEAD; A3-2 probe re-run; U3-1/U3-3 closed after the one-line fold LED-2026-10-19-batch-97.5, re-checked by the same ux-reviewer); risk LOW, 0 HIGH. Carried with owners in 02-review.md (A3-8 size, S2-2 stat widening at the Flow Builder increment, Q-14, Q-18, U2-15). PDR is next -- an operator stop."
-    },
-    {
-      "station": "PDR",
-      "date": "2026-10-20",
-      "decision": "asked at the gate — operator PDR verdict 2026-10-20: approved with conditions; decision 1 A (pe_A grid strip), decision 2 A (single meaning of the check mark, frozen c texts), decision 3 A (click selects a word, enter/space toggle), remaining voids at 220x60 accepted. Objection: a two-row bottom key bar (global row + active-screen row) — analysed as app-wide, routed to its own prototype-first batch (backlog U-17 widened) with hedge PC-22 here. Conditions PC-1..PC-22 in the PDR record; P3 opens with PC-12 and PC-20 due before Inc-1."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-20",
-      "decision": "P3 increment 001 (chips: flows/session families, real-directory guard, folder labels) approved under the standing authorization: code-reviewer approve after F1/F2 fold (LED-.7), security LOW 0 HIGH, gate set 50 passed, full suite no regression vs baseline (4 timing flakes re-run green). Inc-2 flow foundations is next."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-20",
-      "decision": "P3 increment 002 approved under the standing authorization (autonomous gates, stop at PDR and on HIGH): code-reviewer approve (F1-F3 LOW folded), security-reviewer LOW 0 HIGH, full suite node by node vs baseline: no regression (3 non-baseline nodes pass in isolation). Operator verdict 2026-10-20 on the key bar: variant A, folded as Inc-8 executed after Inc-6 and before Inc-7; QA review of that delta found H-1 (click routes the key to the focused widget), operator chose: a click runs the binding's action in its namespace."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-21",
-      "decision": "P3 increment 003 approved under the standing authorization after the operator decided the gate's HIGH-adjacent items (asked at the gate 2026-10-21: glyph ◆ LED-.12, 120-133 degraded band LED-.13, memory form now LED-.14): code-reviewer OK to advance after F1 HIGH re-read; ux-reviewer approve with conditions, discharged by the fold; full suite node by node vs baseline: no regression (5 non-baseline nodes are flakes, save_back_prompt intermittent on clean HEAD)."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-21",
-      "decision": "P3 increment 004 approved under the standing authorization after the operator decided the gate items (asked at the gate 2026-10-21: teal strip LED-.18, spaced form LED-.19, help-draft decoupling LED-.20); code-reviewer OK to advance (no HIGH); ux-reviewer approve on re-read (H1 HIGH stamp saved after Parse pasted, folded LED-.21, re-walked); full suite node by node vs baseline: no regression; at068a single-pause race made frequent by the heavier paste refresh hardened with the _settled poll (10/10)."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-22",
-      "decision": "P3 increment 005 (Flow Builder) approved under the batch's standing authorization (autonomous with exceptions: stop at PDR and on any HIGH): code-reviewer F1/F2 HIGH folded and approved on re-read, ux-reviewer approved on re-read, operator decisions LED-.24..28 asked at the Inc-5 gate; full suite 10 failed vs baseline 10, non-baseline nodes pre-existing flakes; commit and push to main."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-22",
-      "decision": "P3 increment 006 (Flow Execution) approved under the batch's standing authorization (autonomous with exceptions: stop at PDR and on any HIGH): architect HIGH (second confirm bounced) asked at the gate and fixed in Inc-6; code-reviewer OK and ux-reviewer approve on re-read of the gate fold; operator answers asked at the gate: M3 head cut accepted with a next-batch prototype (LED-.33), new confirm wording kept (LED-.34); full suite found two TC-012 failures from a sixth sev-* class, renamed fx-waiting with F6 (LED-.35), affected modules 262 passed; commit and push to main."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-23",
-      "decision": "P3 increment 008 (two-row key bar) approved: asked at the gate — operator decisions folded (Map min 1 row, Load file/Save project, owned keys dim by window, whole-token dim, 118x53 arms retired); code-reviewer re-read OK to advance (F1 resolved); full suite 8 failed = 6 baseline + 2 load flakes passing isolated. Inc-7 is next."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-23",
-      "decision": "P3 increment 009 (CW-U-1 Load project dialog) approved: asked at the gate — operator added it to batch-97 (try here, test it, move to the integrity batch on problems); RED on 354857c, GREEN 594 passed / 3 baseline, mutants 2/2, code-reviewer OK to advance. Inc-7 is next."
-    },
-    {
-      "station": "P3",
-      "date": "2026-10-23",
-      "decision": "P3 increment 007 approved under the batch's standing authorization (autonomous with exceptions; no HIGH): snapshot harness race, 29-SVG regen, width sweep, Inc-8 leftovers, help modal scroll/fit plus fix round (UX-F1..F4, CR-F1..F4); code-reviewer OK, ux-reviewer OK after re-walk; full suite classified against baseline, two test-only failures of this increment fixed (post-suite-fix.txt). Batch close (P4/P5) is next."
-    },
-    {
-      "station": "DDR",
       "date": "2026-10-25",
-      "decision": "DDR approved with conditions under the batch's standing authorization (Autonomo con excepciones; no HIGH): the architect, spawned with agents/architect.md, re-read every row -- frozen interfaces intact or changed with a ledger entry, source budget kept (Inc-5 approved overage), sequential so no lane checks; PDR conditions PC-1..PC-25 discharged by re-reading, PC-26 (key-bar review page) outstanding as an operator decision; conditions DC-1..DC-5 routed to BACKLOG-CODE.md (design/DDR-2026-10-19-batch-97.md). P4 is next."
-    },
-    {
-      "station": "P4",
-      "date": "2026-10-25",
-      "decision": "P4 gate PASSED under the batch's standing authorization -- verdict PASS-WITH-NOTES (qa-reviewer, spawned with agents/qa-reviewer.md, 04-validation.md): the gate run is the orchestrator's Inc-7 full suite (evidence/inc-7/suite-full.txt, 11 failed / 3617 passed, source digest-equal to 432ecf0; 6 baseline, 2 test-only fixes re-run green, 3 pre-existing flakes); 81/81 requirements, 26/26 ATs on one node each, ledger 3146 - 3 + 491 = 3634 by collection; 0 HIGH, 7 minor gaps routed. P5 is next."
-    },
-    {
-      "station": "P5",
-      "date": "2026-10-25",
-      "decision": "P5 closed under the batch's standing authorization and the operator's decision of 2026-10-25 (batch-97: close now) -- 05-close.md co-authored from the architect and qa-reviewer returns: canon folded 81 ids, 0 refused; carries routed to BACKLOG-CODE.md section Routed 2026-10-25 (stale ^E comment, AT-B97-16/24 optional mutants, two help-modal ux LOWs, four flaky nodes, D17 local snapshot regen with one CI snapshot-regen.yml run recommended, review page not rebuilt, DC-1..DC-5); 1 condition outstanding (PC-26, operator decision); next per Decided 2026-10-25: integrity batch, Load+projects, waiting-lane scroll prototype, batch-98 flow report."
-    },
-    {
-      "station": "P6",
-      "date": "2026-10-25",
-      "decision": "P6 documentation approved under the batch's standing authorization (Autonomo con excepciones; no HIGH) -- 06-docs/ written: traceability-matrix.md (73 LLR rows to TC-B97-01..72 and file:line on c899113, 26 AT rows; gaps = the seven P4 minor gaps, HLR-151 with no US/AT/TC id carried to the integrity batch), functionality.md, three mermaid diagrams (architecture, attention-confirm, folder-chip) by docs-writer; executive-summary.md by presentation-builder (spawned sub-agent). Not recorded in the sources: target dates for the next steps, business metrics. State awaiting-sync: the operator reviews at commit, pushes and runs /dev-flow-sync."
-    },
-    {
-      "station": "P6",
-      "date": "2026-10-25",
-      "decision": "synced-to-obsidian",
-      "notes": "vault:01 - Proyectos/s19_app/dev-flow-batches/2026-10-19-batch-97/"
+      "decision": "standing authorization — operator commission 2026-10-25. P1 requirements drafted and self-approved for review: HLR-152..162, 38 LLRs (TC-B99-01..38), AT-B99-01..13, 21 premises TRUE on 307065f, IFC 11 flows; REFINE stories derived provisionally on the recommended options and gated at P3. P2 cross-agent review is next."
     }
   ],
-  "obsidian_synced": true,
-  "created_at": "2026-10-19T22:58:36.986852",
+  "obsidian_synced": false,
+  "created_at": "2026-10-25T13:49:22.011408",
   "owner": "C:/Users/jjgh8/Github/s19_app",
-  "base_ref": "51ee1914f20d1f031dbced129ce66bda750dbde9"
+  "base_ref": "307065f4b626459c04ca77736132e9e5ee444253"
 }

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan batch 99</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--dim:#5f6670;--line:#dcd9d0;--acc:#2f6fb5;--ok:#2e7d4f;--warn:#b0413e;--amb:#a86a12;--tag:#eceae3;--l1:#e3eefa;--l2:#fbeedd;--l3:#e6f3ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--amb:#e0a650;--tag:#2a2e33;--l1:#1f2c3b;--l2:#3a2e1f;--l3:#1f3326}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--amb:#e0a650;--tag:#2a2e33;--l1:#1f2c3b;--l2:#3a2e1f;--l3:#1f3326}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 90px}
+h1{font-size:1.5rem;margin:0 0 4px} h2{font-size:1.2rem;margin:28px 0 8px} h3{font-size:1.02rem;margin:0 0 4px}
+.lead{color:var(--dim);margin:0 0 16px}
+.bluf{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);padding:12px 14px;border-radius:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0}
+.ctx{color:var(--dim);font-size:.93rem;margin:0 0 10px}
+.opt{display:block;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.opt:has(input:checked){border-color:var(--acc);outline:1px solid var(--acc)}
+.opt .c{font-size:.9rem;color:var(--dim);display:block;margin-top:2px}
+.rec{font-size:.75rem;background:var(--ok);color:#fff;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:middle}
+code{background:var(--tag);border-radius:3px;padding:0 4px;font-size:.88em}
+textarea{width:100%;min-height:40px;margin-top:6px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;font:inherit}
+#gen{min-height:90px}
+table{width:100%;border-collapse:collapse;font-size:.9rem;background:var(--card)}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--tag)}
+.wrap{overflow-x:auto}
+.pill{display:inline-block;font-size:.75rem;border-radius:4px;padding:0 6px;background:var(--tag)}
+.free{background:var(--ok);color:#fff} .gated{background:var(--amb);color:#fff}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--ink);font:12px system-ui,Segoe UI,sans-serif}
+svg .dim{fill:var(--dim)}
+.bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 16px;font:inherit;cursor:pointer}
+ol li,ul li{margin:3px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Plan del batch 99 — integridad de lectura y escritura</h1>
+<p class="lead">2026-10-25 · base <code>307065f</code> · dev-flow full · implementación delegada a Kimi K2.8 (<code>kimi-code/kimi-for-coding</code>), con revisión independiente después de cada incremento.</p>
+
+<div class="bluf"><b>Resumen.</b> Este batch arregla los errores por los que la herramienta escribe un archivo distinto del que reporta. Son 10 hallazgos graves de lectura y escritura, el choque de nombres al guardar un proyecto (PH-3) y tres errores de datos de Code-Wire. Volví a correr cada sonda sobre el HEAD actual y <b>todos siguen reproduciéndose</b>. El caso más claro: 8 lanes en paralelo dieron <b>35 discrepancias</b>, donde un lane decía <code>ok</code> y su archivo contenía los bytes de otro lane.<br>
+Son <b>11 incrementos</b>. Los <b>7 primeros no dependen de ti</b> y arrancan ya. Los <b>4 últimos</b> esperan tus <b>10 decisiones</b>, que vienen abajo con la opción que recomiendo ya marcada. <b>Cambia solo lo que objetes</b> y pulsa «Exportar».</div>
+
+<h2 id="fig">1 · Cómo se ordena el trabajo</h2>
+<svg viewBox="0 0 960 300" role="img" aria-label="Increments 1 to 7 run without operator decisions; 8 to 11 wait for decisions D1 to D9">
+ <rect x="0" y="0" width="960" height="300" fill="none"/>
+ <text x="10" y="22" font-weight="600">Sin decisiones tuyas (arrancan ya)</text>
+ <g>
+  <rect x="10" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="18" y="54">1 · Corpus +</text><text x="18" y="70">lector independiente</text><text x="18" y="84" class="dim">US-141 · tests</text>
+  <rect x="146" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="154" y="54">2 · S0 no es dato</text><text x="154" y="70">H-1</text><text x="154" y="84" class="dim">core · hexview</text>
+  <rect x="282" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="290" y="54">3 · Escritura aislada</text><text x="290" y="70">H-3 + PH-3</text><text x="290" y="84" class="dim">apply · workspace · app</text>
+  <rect x="418" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="426" y="54">4 · Editor = fuente</text><text x="426" y="70">+ documento · H-4</text><text x="426" y="84" class="dim">change_service</text>
+  <rect x="554" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="562" y="54">5 · CRC región</text><text x="562" y="70">vacía falla · H-7</text><text x="562" y="84" class="dim">crc · flow</text>
+  <rect x="690" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="698" y="54">6 · Export contenido</text><text x="698" y="70">H-9 + CW-D-7</text><text x="698" y="84" class="dim">segment_*</text>
+  <rect x="826" y="34" width="122" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="834" y="54">7 · Load project</text><text x="834" y="70">pruebas CW-U-1</text><text x="834" y="84" class="dim">app · tests</text>
+ </g>
+ <text x="10" y="132" font-weight="600">Esperan tu veredicto</text>
+ <g>
+  <rect x="10" y="144" width="220" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="18" y="164">8 · PATCH y reportes veraces</text><text x="18" y="180">H-2 + H-10 · necesita D5</text><text x="18" y="194" class="dim">flow · report · lanes</text>
+  <rect x="246" y="144" width="220" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="254" y="164">9 · Archivo truncado avisa</text><text x="254" y="180">H-8 · necesita D6</text><text x="254" y="194" class="dim">core · hexfile · flow</text>
+  <rect x="482" y="144" width="220" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="490" y="164">10 · Codificación A2L</text><text x="490" y="180">H-5 H-6 CW-D-10 · D2 D3 D4</text><text x="490" y="194" class="dim">a2l</text>
+  <rect x="718" y="144" width="230" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="726" y="164">11 · Campo Bytes en una base</text><text x="726" y="180">CW-D-4 · necesita D1</text><text x="726" y="194" class="dim">change_service · editor</text>
+ </g>
+ <text x="10" y="236" font-weight="600">Estaciones</text>
+ <g>
+  <rect x="10" y="246" width="938" height="40" rx="6" fill="var(--l1)" stroke="var(--line)"/>
+  <text x="20" y="271">P0 intake ✓ → ARQ mapa → P1 requisitos → P2 revisión (architect · qa · security) → PDR → P3 incrementos (Kimi + revisión) → DDR → P4 validación → P5 cierre → P6 docs</text>
+ </g>
+</svg>
+<p class="ctx">D7, D8 y D9 solo afinan una cláusula de los incrementos 3, 6 y 3, en ese orden. Si no respondes antes, esos incrementos arrancan sin esa cláusula y la sumo después con una enmienda registrada.</p>
+
+<h2 id="dec">2 · Decisiones (10)</h2>
+<div id="qs"></div>
+<div class="q"><h3>Notas generales / pedidos nuevos</h3><textarea id="gen" placeholder="Cualquier cosa que falte, pedidos nuevos, cambios de prioridad..."></textarea></div>
+
+<h2 id="inc">3 · Incrementos</h2>
+<div class="wrap"><table>
+<tr><th>#</th><th>Qué cambia para ti</th><th>Hallazgos</th><th>Archivos fuente (≤4)</th><th>Estado</th></tr>
+<tr><td>1</td><td>Archivos sintéticos S19 (S1/S2/S3, S0, S5, S7–S9), HEX (00/01/02/04/05), MAC y A2L, cada uno con sus bytes esperados, más un lector que no comparte código con la app. Todas las pruebas siguientes comparan contra ellos.</td><td>corpus</td><td>0 (solo tests)</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>2</td><td>El texto del encabezado S0 deja de aparecer como bytes en <code>0x0</code> en lo que cargas y escribes.</td><td>H-1</td><td>core, hexview</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>3</td><td>Cada escritura va a su propio archivo temporal y se coloca de forma atómica. Los lanes en paralelo ya no se pisan, y guardar el parche con el mismo nombre ya no borra la copia de trabajo ni tumba Save project.</td><td>H-3, PH-3</td><td>apply, workspace, app</td><td><span class="pill free">libre</span> (D7, D9)</td></tr>
+<tr><td>4</td><td>Lo que guarda el Patch Editor siempre es el original más las entradas que hoy tiene el documento. Deshacer ya no deja bytes escritos.</td><td>H-4</td><td>change_service (+ models)</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>5</td><td>Un CRC sobre una región sin bytes falla y no escribe nada. Si la cobertura es parcial, avisa cuántos bytes faltan.</td><td>H-7</td><td>crc, flow_execution_service</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>6</td><td>Exportar nunca escribe fuera del destino, sin importar cómo se llame el segmento del A2L. Una sesión con solo MAC exporta un archivo con solo encabezado.</td><td>H-9, CW-D-7</td><td>segment_split_view, segment_ops</td><td><span class="pill free">libre</span> (D8)</td></tr>
+<tr><td>7</td><td>Pruebas que presionan Load en el diálogo de proyectos de todas las formas posibles. La lista Workarea Files carga por nombre, y la carpeta <code>patches</code> ya no aparece como proyecto.</td><td>CW-U-1 + hermano</td><td>app (+ workspace)</td><td><span class="pill free">libre</span> (D10)</td></tr>
+<tr><td>8</td><td>PATCH reporta lo que no aplicó y se detiene antes de escribir según la regla que elijas. El lane, el reporte del chain set y el reporte del flujo listan lo no aplicado y los rechazos.</td><td>H-2, H-10</td><td>flow_execution_service, flow_report_service, flow_screens</td><td><span class="pill gated">D5</span></td></tr>
+<tr><td>9</td><td>Un archivo cortado (sin terminador ni EOF, con S5 que no cuadra o con datos después del final) avisa al cargar.</td><td>H-8</td><td>core, hexfile, flow_execution_service</td><td><span class="pill gated">D6</span></td></tr>
+<tr><td>10</td><td>Los valores físicos del A2L se escriben con el orden de bytes del módulo y con la dirección correcta de RAT_FUNC. Un valor que la tabla no puede representar se rechaza.</td><td>H-5, H-6, CW-D-10</td><td>a2l</td><td><span class="pill gated">D2 D3 D4</span></td></tr>
+<tr><td>11</td><td>En el campo Bytes, <code>11 22</code> se escribe como <code>11 22</code>.</td><td>CW-D-4</td><td>change_service, screens_directionb</td><td><span class="pill gated">D1</span></td></tr>
+</table></div>
+<p class="ctx">Cada incremento: Kimi K2.8 implementa en un worktree aislado, con <code>PYTHONPATH</code> apuntando al worktree para que las pruebas no importen el checkout principal. Después lo revisa code-reviewer (y qa-reviewer o security-reviewer cuando aplica). Yo vuelvo a correr las cifras clave, y luego hago commit y push a main.</p>
+
+<h2 id="bl">4 · Backlog abierto, en orden</h2>
+<ol>
+<li><b>Este batch (99)</b>: integridad de lectura y escritura.</li>
+<li><b>Load + proyectos</b>, con ronda de prototipos:
+ <ul>
+ <li>PH-1: Save project guarda el archivo en disco, no la imagen parchada.</li>
+ <li>PH-2: abrir un proyecto encima de otro conserva el A2L, el MAC y el documento del anterior.</li>
+ <li>PH-4: después de guardar, Load abre el original sin parche.</li>
+ <li>PH-5: Load no revisa el manifiesto.</li>
+ <li>Selector de archivos y fuentes recientes en Load, y Load que también abre proyectos.</li>
+ <li>CW-U-2: el foco salta a la tabla oculta de Split/Join.</li>
+ <li>CW-U-3/5/10/12/13 y CW-D-13/14.</li>
+ <li>La barra de progreso (N5).</li>
+ </ul></li>
+<li><b>Prototipo del scroll del carril en espera.</b></li>
+<li><b>Batch 98: reporte de Flow Execution</b> (R-014).</li>
+<li><b>Ventana Checks como ejecutora de archivos de checks</b> (R-049, tu decisión B), con ronda de prototipos que falta agendar.</li>
+<li><b>Abiertos que esperan tu respuesta:</b> la pregunta de las curvas A2L (R-069) y la página de revisión de la barra de teclas (PC-26).</li>
+<li><b>Pendientes medianos y bajos de la investigación</b> que no entran aquí:
+ <ul>
+ <li>M-1: el terminador se reescribe a 0.</li>
+ <li>M-2: los traslapes se resuelven sin avisar.</li>
+ <li>M-3: una carga con pérdidas igual escribe.</li>
+ <li>M-5 a M-10.</li>
+ <li>L-1 a L-7.</li>
+ </ul></li>
+<li><b>Code-Wire, medianos y bajos:</b> CW-U-6..11, CW-D-2/6/8/9/12/16. Los del piloto: referencias A2L en forma de bloque, marca de traslape, doble lectura del S19 y doble pasada de validación.</li>
+<li><b>Resto del batch 97:</b>
+ <ul>
+ <li>el comentario <code>^E</code> en styles.tcss;</li>
+ <li>los mutantes de AT-16/24;</li>
+ <li>los 2 detalles de UX de la ayuda;</li>
+ <li>4 pruebas inestables;</li>
+ <li>la regeneración de capturas de referencia en CI;</li>
+ <li>la página de revisión de b94.</li>
+ </ul></li>
+<li><b>Dos paletas de comandos</b> con nombres casi iguales (P3).</li>
+</ol>
+
+<h2 id="ev">5 · Evidencia de partida (re-corrida en <code>307065f</code>)</h2>
+<div class="wrap"><table>
+<tr><th>Hallazgo</th><th>Lo que imprimió la sonda hoy</th></tr>
+<tr><td>H-1</td><td><code>case_01 … extra=12@0x0..0xb</code>. 15 de 16 S19 de ejemplo ganan bytes en <code>0x0</code>.</td></tr>
+<tr><td>H-2</td><td><code>outside_0x20000 run=ok patch=ok:'applied 0 entries'</code>; <code>malformed_json run=ok … refusals=['MF-JSON-PARSE'] wrote=[…]</code></td></tr>
+<tr><td>H-3</td><td><code>parallel mismatches: 35</code> (5 corridas × 8 lanes)</td></tr>
+<tr><td>H-4</td><td><code>verify: verified</code>, pero <code>file @0xEB10 = deadbeef (source: 20417070)</code></td></tr>
+<tr><td>H-5 / H-6</td><td><code>effective_byte_order = little</code> con MSB_FIRST; <code>TAB_INTP physical 500.0 -&gt; raw 02 (decodes back to 20.0) err=None</code></td></tr>
+<tr><td>H-7</td><td><code>region_no_bytes run=ok crc=ok … slot_bytes=00000000</code></td></tr>
+<tr><td>H-8</td><td><code>s19_truncated_no_terminator run=ok source=ok notices=0</code>; <code>hex_data_after_eof … out_bytes=32</code> (se perdieron 16 bytes)</td></tr>
+<tr><td>H-9</td><td><code>resolved: …\.s19tool\ESCAPED.s19 | inside dest: False</code></td></tr>
+<tr><td>H-10</td><td><code>outcome status: ok … ('patch','ok','applied 0 entries')</code></td></tr>
+<tr><td>PH-3</td><td><code>work copy exists after save-back: False</code>; <code>app running? False | return_code: 1</code></td></tr>
+</table></div>
+<p class="ctx">Transcripciones: <code>.dev-flow/2026-10-25-batch-99/evidence/p0-premises/</code>.</p>
+</main>
+<div class="bar"><span id="cnt"></span><button id="exp">Exportar veredicto (JSON)</button></div>
+<script>
+const Q=[
+{id:"D1",t:"D1 · Campo Bytes del Patch Editor: ¿cómo se lee un número sin prefijo? (incremento 11)",
+ ctx:"El campo muestra <code>DE AD BE EF</code> como ejemplo, pero hoy un token formado solo por dígitos se lee en decimal: <code>0F 10 1F 20</code> se guarda como <code>0F 0A 1F 14</code> y el guardado dice «Saved + verified». La regla vieja del batch 7 (LLR-001.2) permitía decimales sin decir cómo se lee <code>10</code>.",
+ rec:"hex",
+ o:[["hex","Siempre hexadecimal; no se aceptan decimales en Bytes","<code>11 22</code> se escribe <code>11 22</code> y pegar un volcado hex funciona tal cual. Quien quiera escribir un valor en unidades físicas usa el selector de símbolos A2L, que ya convierte. Cambia la regla del batch 7."],
+    ["prefijo","Hexadecimal por defecto; decimal solo con prefijo <code>#</code> (por ejemplo <code>#255</code>)","Igual que la anterior, más una forma explícita de meter decimales. Hay una sintaxis más que documentar en la ayuda."],
+    ["aviso","Mantener el decimal y avisar cuando un volcado mezcle bases","Nada cambia para quien ya escribe decimales, pero <code>10</code> sigue significando diez. El aviso puede pasar desapercibido y el error de fondo queda."]]},
+{id:"D2",t:"D2 · Dirección de RAT_FUNC en el A2L (incremento 10)",
+ ctx:"ASAM MCD-2 MC define RAT_FUNC como INT = f(PHYS): del valor físico al crudo. El código lo aplica al revés, y el A2L de ejemplo lo contradice en su propio texto («impl = f(phys) = phys * 10»). Hoy 30 km/h se escribe <code>03 00</code> (debería ser <code>2C 01</code>) y el crudo 300 se muestra como 3000.0 (debería ser 30).",
+ rec:"asam",
+ o:[["asam","Seguir ASAM: INT = f(PHYS) al escribir y su inversa al mostrar","30 km/h se escribe <code>2C 01</code> y el crudo 300 se muestra como 30. Si alguien ya guardó parches con valores RAT_FUNC hechos con la regla vieja, esos valores estaban mal y ahora se ven distintos."],
+    ["dejar","Dejar la dirección actual","No cambia lo que se ve hoy, pero contradice el estándar y el propio archivo de ejemplo. Los valores escritos siguen siendo diez veces menores."]]},
+{id:"D3",t:"D3 · Orden de bytes cuando el A2L dice BYTE_ORDER MSB_FIRST en MOD_COMMON (incremento 10)",
+ ctx:"Hoy el orden se toma de la etiqueta, luego del RECORD_LAYOUT y si no, little-endian. Nunca se lee MOD_COMMON. En un módulo big-endian, el valor 4113 de 2 bytes se escribe <code>11 10</code> en lugar de <code>10 11</code>, y al leer pasa lo mismo al revés. Los ejemplos del repo usan valores de 1 byte, por eso no se nota.",
+ rec:"modulo",
+ o:[["modulo","Usar el BYTE_ORDER de MOD_COMMON como valor por defecto del módulo, al escribir y al leer","Lo escrito y lo mostrado salen en el orden que declara el A2L. También cierra el pendiente viejo del lado de lectura (H-7 del piloto)."],
+    ["rechazar","Rechazar escribir valores multibyte cuando el orden no está declarado en la etiqueta ni en el RECORD_LAYOUT","Nunca escribe un orden equivocado, pero bloquea la escritura en módulos que sí lo declaran en MOD_COMMON. La lectura queda igual que hoy."],
+    ["solo_escribir","Usar MOD_COMMON solo al escribir","La escritura queda bien, pero la tabla A2L sigue mostrando el valor al revés; lo que ves y lo que escribes no coinciden."]]},
+{id:"D4",t:"D4 · COMPU_TAB: valor que la tabla no puede representar (incremento 10)",
+ ctx:"Hoy, si pides 500 en una tabla interpolada, se escribe el extremo (20.0) sin avisar; con 13 en una tabla sin interpolar, se escribe el más cercano (10.0).",
+ rec:"rechazar",
+ o:[["rechazar","Rechazar el valor y mostrar los valores representables más cercanos","Nunca se escribe algo distinto de lo que tecleaste. Tienes que elegir uno de los valores que la tabla sí admite."],
+    ["marcar","Permitirlo, con una marca visible antes de agregar la entrada","Más rápido, pero la entrada queda con un valor distinto del pedido; la marca se puede pasar por alto."]]},
+{id:"D5",t:"D5 · Regla de estado del paso PATCH en un flujo (incremento 8)",
+ ctx:"Hoy PATCH dice <code>ok</code> siempre: con entradas fuera de la imagen, con un documento bloqueado y hasta con JSON roto. Después WRITE-OUT escribe la imagen sin parchar y todo sale <code>ok</code> / <code>CLEAN</code>.",
+ rec:"mixta",
+ o:[["mixta","Parcial: aviso y se sigue escribiendo. Si nada se aplicó, el documento está bloqueado o no se puede leer: error y se detiene antes de WRITE-OUT","El caso típico (una entrada de diez fuera de rango) no frena tu flujo, pero el lane y los reportes nombran la dirección. Lo grave nunca llega a escribirse."],
+    ["estricta","Cualquier entrada no aplicada es error y detiene antes de escribir","Ningún archivo sale con un parche incompleto. Un flujo con una sola entrada fuera de rango se detiene entero hasta que corrijas el documento."],
+    ["avisos","Solo avisos; nunca se detiene","Siempre escribe, pero con el estado y los reportes diciendo la verdad. Un archivo sin parche puede llegar a programarse si nadie lee el aviso."]]},
+{id:"D6",t:"D6 · Archivo truncado o inconsistente (incremento 9)",
+ ctx:"Hoy un S19 sin terminador, un HEX sin EOF, un S5 que no cuadra o datos después del final cargan como <code>ok</code>. Un HEX con datos después del EOF pierde esos bytes sin avisar.",
+ rec:"flujo_para",
+ o:[["flujo_para","Aviso al cargar. En un flujo, el paso SOURCE da error y no se llega a escribir. En el editor, el archivo abre con el aviso visible","Puedes inspeccionar un archivo dañado, pero un flujo no programa un archivo cortado."],
+    ["aviso","Solo aviso, en todos lados","Nada se bloquea. El aviso queda en el reporte, pero un flujo puede escribir un archivo incompleto."],
+    ["rechazar","Rechazar la carga","Ningún archivo dañado entra a la herramienta, pero tampoco puedes abrirlo para ver qué tiene."]]},
+{id:"D7",t:"D7 · Dos lanes de un chain set con el mismo nombre de salida (incremento 3)",
+ ctx:"Con la escritura aislada, los lanes ya no se pisan. Falta decidir qué pasa cuando dos lanes piden el mismo nombre.",
+ rec:"rechazar",
+ o:[["rechazar","Rechazar al iniciar la corrida, nombrando los lanes en conflicto","Nunca hay dos archivos que compitan por el mismo nombre. Tienes que darle un nombre de salida distinto a cada lane."],
+    ["sufijo","Cada lane escribe su propio <code>_&lt;N&gt;</code> y su reporte lo nombra","La corrida no se detiene, pero un programador configurado para <code>same.s19</code> toma el del primer lane."]]},
+{id:"D8",t:"D8 · Exportar dos veces con el mismo nombre (incremento 6)",
+ ctx:"Hoy la segunda exportación sobrescribe en el mismo lugar, sin escritura atómica.",
+ rec:"reemplazar",
+ o:[["reemplazar","Reemplazar de forma atómica; el estado dice «replaced»","Re-exportar refresca el archivo, como esperarías. Si se interrumpe, no queda un archivo a medias."],
+    ["sufijo","Escribir <code>_&lt;N&gt;</code>","Nunca se pierde una exportación anterior, pero la carpeta se llena de copias y el nombre esperado conserva el contenido viejo."]]},
+{id:"D9",t:"D9 · Verificar lo que escribe WRITE-OUT en un flujo (incremento 3)",
+ ctx:"El guardado del editor relee y compara lo escrito; WRITE-OUT de un flujo no lo hace (pendiente L-4 / M-4). Esa verificación habría detectado la carrera entre lanes.",
+ rec:"si",
+ o:[["si","Sí, en este batch: releer y comparar; si no coincide, error","Una red más contra escrituras equivocadas. Agrega una relectura por cada archivo escrito."],
+    ["no","Dejarlo en el backlog","Menos alcance ahora; la carrera queda arreglada, pero sin red si aparece otra."]]},
+{id:"D10",t:"D10 · Cargar con Enter o con clic en el diálogo de proyectos",
+ ctx:"Textual emite la selección con un solo clic, así que «Enter carga» implica también «clic carga», salvo que se maneje la tecla aparte. El incremento 7 solo agrega pruebas del arreglo ya hecho.",
+ rec:"diferir",
+ o:[["diferir","Decidirlo en la ronda de prototipos de Load + proyectos","Se diseña junto con el selector nuevo y con tus capturas. Hoy funciona con el botón Load."],
+    ["ahora","Decidir ahora: Enter carga y el clic solo resalta","Llega antes, pero podría cambiar otra vez cuando se rediseñe el diálogo."]]}
+];
+const box=document.getElementById("qs");
+Q.forEach(q=>{const d=document.createElement("div");d.className="q";
+d.innerHTML=`<h3>${q.t}</h3><p class="ctx">${q.ctx}</p>`+q.o.map(([v,l,c])=>`<label class="opt"><input type="radio" name="${q.id}" value="${v}" ${v===q.rec?"checked":""}> <b>${l}</b>${v===q.rec?'<span class="rec">recomendada</span>':""}<span class="c">${c}</span></label>`).join("")+`<textarea data-id="${q.id}" placeholder="Nota (opcional)"></textarea>`;
+box.appendChild(d);});
+function upd(){const n=Q.filter(q=>document.querySelector(`input[name="${q.id}"]:checked`)).length;document.getElementById("cnt").textContent=`${n} de ${Q.length} respondidas`;}
+document.addEventListener("change",upd);upd();
+document.getElementById("exp").onclick=()=>{const out={page:"s19-plan-b99",exported:new Date().toISOString(),items:{},general_notes:document.getElementById("gen").value};
+Q.forEach(q=>{const c=document.querySelector(`input[name="${q.id}"]:checked`);out.items[q.id]={verdict:c?c.value:null,note:document.querySelector(`textarea[data-id="${q.id}"]`).value};});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download="veredicto-b99.json";a.click();};
+</script>
+</body>
+</html>

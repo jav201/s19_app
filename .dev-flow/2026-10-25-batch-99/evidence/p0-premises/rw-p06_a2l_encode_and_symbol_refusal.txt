@@ -1,0 +1,8 @@
+OVER_A: datatype/length/effective_byte_order = None 2 little
+resolve_symbol_entry signature: (symbol_text: 'str', value_text: 'str', a2l_data: 'Optional[dict]', *, value_mode: 'str' = 'text') -> 'SymbolPickResult'
+encode physical 4113 (0x1011) -> 1110 issues: [] | expected MSB_FIRST bytes: 1011
+mixed doc: run = ok | patch = ok applied 0 entries | dispositions = ['blocked', 'blocked'] | refusals = ['CHG-SYMBOL-UNRESOLVED'] | file changed bytes = 0
+TAB_NOINTP physical   13.0 -> raw 01 (decodes back to 10.0) err=None flags=[]
+TAB_NOINTP physical   10.0 -> raw 01 (decodes back to 10.0) err=None flags=[]
+TAB_INTP physical  500.0 -> raw 02 (decodes back to 20.0) err=None flags=[]
+TAB_INTP physical  -50.0 -> raw 00 (decodes back to 0.0) err=None flags=[]

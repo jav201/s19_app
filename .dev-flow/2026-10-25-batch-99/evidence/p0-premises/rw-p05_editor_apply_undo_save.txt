@@ -1,0 +1,8 @@
+apply#1 counts: {'applied': 1}
+after undo: entries = 0 | last_summary = None
+apply#2 counts: {'applied': 1} entries: ['0xeb40']
+save: True Patched image saved as edited.s19 | verify: verified
+file @0xEB10 = deadbeef (source: 20417070 ) — summary of the saved apply lists only ['0xeb40']
+straddle/gap counts: {'skipped-partial': 2}
+editor save fw: verify = verified | extra data bytes in file: 12 ['0x0', '0x1', '0x2'] = b'CASE01_BASIC'
+loaded.mem_map has 0x0..: True | ranges[0] = ['0x0', '0xc']

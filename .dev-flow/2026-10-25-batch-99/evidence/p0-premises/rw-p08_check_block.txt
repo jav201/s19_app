@@ -1,0 +1,4 @@
+outside.chk.json       run=ok                     check=ok:'passed=0 failed=0 uncheckable=1' findings=[] diag=[]
+mismatch.chk.json      run=completed-with-issues  check=notices:'passed=0 failed=1 uncheckable=0' findings=['1 check entry failed'] diag=[]
+bad.chk.json           run=ok                     check=ok:'passed=0 failed=0 uncheckable=0' findings=[] diag=[]
+change_as_check.json   run=ok                     check=ok:'passed=0 failed=0 uncheckable=1' findings=[] diag=[]

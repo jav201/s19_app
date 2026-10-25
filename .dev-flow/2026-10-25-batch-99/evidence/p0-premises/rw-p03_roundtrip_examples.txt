@@ -1,0 +1,32 @@
+OK  case_00_public\prg.s19                           s19 run=ok                     src_bytes=3968 out_bytes=3968 extra=0 missing=0 changed=0 out_errs=[] src_term=('S9', 0) out_term=('S9', 0)
+OK  case_00_public\prg.s19                           hex run=ok                     src_bytes=3968 out_bytes=3968 extra=0 missing=0 changed=0 out_errs=[]
+BAD case_00_public\s19_sample.s19                    s19 run=ok                     src_bytes=242 out_bytes=260 extra=18@0x0..0x11 missing=0 changed=0 out_errs=[] src_term=('S9', 65535) out_term=('S9', 0)
+BAD case_00_public\s19_sample.s19                    hex run=ok                     src_bytes=242 out_bytes=260 extra=18@0x0..0x11 missing=0 changed=0 out_errs=[]
+BAD case_01_basic_valid\firmware.s19                 s19 run=ok                     src_bytes=97 out_bytes=109 extra=12@0x0..0xb missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_01_basic_valid\firmware.s19                 hex run=ok                     src_bytes=97 out_bytes=109 extra=12@0x0..0xb missing=0 changed=0 out_errs=[]
+BAD case_02_gaps_and_patch_targets\firmware.s19      s19 run=ok                     src_bytes=82 out_bytes=93 extra=11@0x0..0xa missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_02_gaps_and_patch_targets\firmware.s19      hex run=ok                     src_bytes=82 out_bytes=93 extra=11@0x0..0xa missing=0 changed=0 out_errs=[]
+BAD case_03_overlapping_records\firmware.s19         s19 run=ok                     src_bytes=24 out_bytes=38 extra=14@0x0..0xd missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_03_overlapping_records\firmware.s19         hex run=ok                     src_bytes=24 out_bytes=38 extra=14@0x0..0xd missing=0 changed=0 out_errs=[]
+BAD case_04_bad_checksums\firmware.s19               s19 run=completed-with-issues  src_bytes=48 out_bytes=61 extra=13@0x0..0xc missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_04_bad_checksums\firmware.s19               hex run=completed-with-issues  src_bytes=48 out_bytes=61 extra=13@0x0..0xc missing=0 changed=0 out_errs=[]
+BAD case_05_dense_mixed_content\firmware.s19         s19 run=ok                     src_bytes=156 out_bytes=168 extra=12@0x0..0xb missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_05_dense_mixed_content\firmware.s19         hex run=ok                     src_bytes=156 out_bytes=168 extra=12@0x0..0xb missing=0 changed=0 out_errs=[]
+BAD case_06_large_nested_a2l\firmware.s19            s19 run=ok                     src_bytes=1105 out_bytes=1120 extra=15@0x0..0xe missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD case_06_large_nested_a2l\firmware.s19            hex run=ok                     src_bytes=1105 out_bytes=1120 extra=15@0x0..0xe missing=0 changed=0 out_errs=[]
+BAD case_07_stress_smoke\firmware.s19                s19 run=ok                     src_bytes=1024 out_bytes=1030 extra=6@0x0..0x5 missing=0 changed=0 out_errs=[] src_term=('S7', 0) out_term=('S7', 0)
+BAD case_07_stress_smoke\firmware.s19                hex run=ok                     src_bytes=1024 out_bytes=1030 extra=6@0x0..0x5 missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_01_baseline_valid\firmware.s19 s19 run=ok                     src_bytes=122 out_bytes=137 extra=15@0x0..0xe missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_01_baseline_valid\firmware.s19 hex run=ok                     src_bytes=122 out_bytes=137 extra=15@0x0..0xe missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_02_patch_targets_and_gaps\firmware.s19 s19 run=ok                     src_bytes=146 out_bytes=158 extra=12@0x0..0xb missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_02_patch_targets_and_gaps\firmware.s19 hex run=ok                     src_bytes=146 out_bytes=158 extra=12@0x0..0xb missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_03_overlapping_records\firmware.s19 s19 run=ok                     src_bytes=56 out_bytes=70 extra=14@0x0..0xd missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_03_overlapping_records\firmware.s19 hex run=ok                     src_bytes=56 out_bytes=70 extra=14@0x0..0xd missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_04_bad_checksums\firmware.s19 s19 run=completed-with-issues  src_bytes=80 out_bytes=93 extra=13@0x0..0xc missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_04_bad_checksums\firmware.s19 hex run=completed-with-issues  src_bytes=80 out_bytes=93 extra=13@0x0..0xc missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_05_out_of_order_and_mixed\firmware.s19 s19 run=ok                     src_bytes=102 out_bytes=112 extra=10@0x0..0x9 missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_05_out_of_order_and_mixed\firmware.s19 hex run=ok                     src_bytes=102 out_bytes=112 extra=10@0x0..0x9 missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_07_cross_reference_inconsistencies\firmware.s19 s19 run=ok                     src_bytes=77 out_bytes=88 extra=11@0x0..0xa missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_07_cross_reference_inconsistencies\firmware.s19 hex run=ok                     src_bytes=77 out_bytes=88 extra=11@0x0..0xa missing=0 changed=0 out_errs=[]
+BAD professional_validation\case_08_heavy_fragmentation\firmware.s19 s19 run=ok                     src_bytes=3200 out_bytes=3211 extra=11@0x0..0xa missing=0 changed=0 out_errs=[] src_term=('S7', 2147483648) out_term=('S7', 0)
+BAD professional_validation\case_08_heavy_fragmentation\firmware.s19 hex run=ok                     src_bytes=3200 out_bytes=3211 extra=11@0x0..0xa missing=0 changed=0 out_errs=[]

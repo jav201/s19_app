@@ -1,0 +1,3 @@
+run: ok [('source', 'ok', 'loaded fw.s19 (3 ranges)'), ('patch', 'ok', 'applied 1 entry'), ('write_out', 'ok', 'wrote z.s19')] ['applied']
+written file: S0 = b'CASE01_BASIC' | data record at 0x0..0xB = b'\xaa\xbbSE01_BASIC'
+source file has data at 0x0? False

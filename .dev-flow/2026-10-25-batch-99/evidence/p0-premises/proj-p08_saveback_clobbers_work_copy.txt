@@ -1,0 +1,80 @@
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\app.py:7985 in _handle_save_dialog 
+│                                                                              
+│    7982 │   │   saved_primary_name: Optional[str] = None                     
+│    7983 │   │   try:                                                         
+│    7984 │   │   │   if self.current_file:                                    
+│ ❱  7985 │   │   │   │   saved = copy_into_workarea(self.current_file.path, p 
+│    7986 │   │   │   │   self.logger.info("Project saved. name=%s file=%s", c 
+│    7987 │   │   │   │   if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTE 
+│    7988 │   │   │   │   │   saved_primary_name = saved.name                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │          a2l_files = []                                                  │ 
+│ │            cleaned = 'P'                                                 │ 
+│ │         data_files = []                                                  │ 
+│ │              error = None                                                │ 
+│ │  existing_suffixes = set()                                               │ 
+│ │    parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pro… │ 
+│ │            payload = SaveProjectPayload(                                 │ 
+│ │                      │                                                   │ 
+│ │                      parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\T… │ 
+│ │                      │   project_name='P',                               │ 
+│ │                      │   batch=(),                                       │ 
+│ │                      │   assignments={}                                  │ 
+│ │                      )                                                   │ 
+│ │        project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pro… │ 
+│ │ saved_primary_name = None                                                │ 
+│ │   saved_variant_id = None                                                │ 
+│ │               self = S19TuiApp(                                          │ 
+│ │                      │   title='Hex Edit Tool',                          │ 
+│ │                      │   classes={'-dark-mode'},                         │ 
+│ │                      │   pseudo_classes={'dark', 'focus'}                │ 
+│ │                      )                                                   │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app\s19_app\tui\workspace.py:342 in                
+│ copy_into_workarea                                                           
+│                                                                              
+│   339 │   │   │   f"Refusing to copy: destination traverses a symbolic link  
+│   340 │   │   )                                                              
+│   341 │                                                                      
+│ ❱ 342 │   size = resolved_source.stat().st_size                              
+│   343 │   if size > max_size_bytes:                                          
+│   344 │   │   raise WorkareaContainmentError(                                
+│   345 │   │   │   f"Refusing to copy: source size {size} bytes exceeds cap { 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │          destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │       max_size_bytes = 268435456                                         │ 
+│ │ resolved_destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │      resolved_source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │               source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │        workarea_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│                                                                              
+│   1010 │   │   Return the result of the stat() system call on this path, lik 
+│   1011 │   │   os.stat() does.                                               
+│   1012 │   │   """                                                           
+│ ❱ 1013 │   │   return os.stat(self, follow_symlinks=follow_symlinks)         
+│   1014 │                                                                     
+│   1015 │   def owner(self):                                                  
+│   1016 │   │   """                                                           
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ follow_symlinks = True                                                   │ 
+│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/projpr… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 
+'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea
+\temp\\firmware.s19'
+work copy: temp/firmware.s19 exists: True
+save-back status: ['Patched image saved as firmware.s19', 'Saved + verified: firmware.s19']
+work copy exists after save-back: False | app still holds: temp/firmware.s19
+workarea files: ['firmware.s19']
+after Save-project dismiss: app running? False | return_code: 1
+run_test outcome: EXCEPTION FileNotFoundError: [WinError 2] The system cannot find the file specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_8kvqy9ag\\.s19tool\\workarea\\temp\\firmware.s19' | app.return_code: 1
+P folder left behind: []
