@@ -234,9 +234,15 @@
       "station": "P6",
       "date": "2026-10-25",
       "decision": "P6 documentation approved under the batch's standing authorization (Autonomo con excepciones; no HIGH) -- 06-docs/ written: traceability-matrix.md (73 LLR rows to TC-B97-01..72 and file:line on c899113, 26 AT rows; gaps = the seven P4 minor gaps, HLR-151 with no US/AT/TC id carried to the integrity batch), functionality.md, three mermaid diagrams (architecture, attention-confirm, folder-chip) by docs-writer; executive-summary.md by presentation-builder (spawned sub-agent). Not recorded in the sources: target dates for the next steps, business metrics. State awaiting-sync: the operator reviews at commit, pushes and runs /dev-flow-sync."
+    },
+    {
+      "station": "P6",
+      "date": "2026-10-25",
+      "decision": "synced-to-obsidian",
+      "notes": "vault:01 - Proyectos/s19_app/dev-flow-batches/2026-10-19-batch-97/"
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-10-19T22:58:36.986852",
   "owner": "C:/Users/jjgh8/Github/s19_app",
   "base_ref": "51ee1914f20d1f031dbced129ce66bda750dbde9"
