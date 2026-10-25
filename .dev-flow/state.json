@@ -160,6 +160,11 @@
       "station": "PDR",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. PDR approved with conditions (architect, qa-reviewer, ux-reviewer; design/PDR-2026-10-25-batch-99.md): C2/C4/C5/C6/C7 discharged now, the rest owned by named increments; no prototype round owed (ux §4). P3 increment 001 (US-141 corpus) next, implemented by Kimi K2.8."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 001 (US-141 / HLR-152, synthetic corpus + independent reader, 0 SOURCE files) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH LSB_FIRST token, traced to the contract, LED-2026-10-25-batch-99.4), round 2 OK to advance; orchestrator re-ran 5 passed and --check (16 files). Full suite not re-run for this cut: tests-only, no existing test touched; the batch baseline run is in progress."
     }
   ],
   "obsidian_synced": false,

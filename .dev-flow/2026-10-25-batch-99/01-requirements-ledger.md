@@ -58,3 +58,10 @@ above this line is ever edited._
   - **Q-23, Q-24** (US-147/US-152 evaluability, the codec-API AT surface in §3 and §5.1) and **S-16, S-17** (pair reuse only when both files are identical; a plan-time path-length arm) were folded as text fixes. They belong to the HLR-158, LLR-160.4 and LLR-160.5 blocks.
 - **Why:** P2 round 3 — qa `approve` (2 minors), security `approve` (2 minors), architect 2 majors and 2 minors. The orchestrator folds the majors here and approves P2, naming PDR (architect + qa + ux) as the station that confirms A3-1 and A3-2 against the design proposal, under the standing authorization.
 - **Evidence:** the round-3 sections of `design/P2-architect.md`, `design/P2-qa.md` and `design/P2-security.md`; `segment_ops.py:218` (sidecar derived from the BIN name).
+
+### LED-2026-10-25-batch-99.4 — Inc-1 review: the little-endian control uses the ASAM token `MSB_LAST`
+- **Requirement:** LLR-158.1
+- **Date:** 2026-10-25
+- **What changed:** LLR-158.1's threshold named an `LSB_FIRST` control. ASAM MCD-2 MC's BYTE_ORDER tokens are `MSB_FIRST`, `MSB_LAST`, `BIG_ENDIAN` and `LITTLE_ENDIAN`; the app's `_normalize_byte_order` (`tui/a2l.py:280-286`) returns `None` for `LSB_FIRST`. The control now declares `MSB_LAST` on the symbol's RECORD_LAYOUT or tag, and keeps little-endian under a `MSB_FIRST` module. PDR condition PQ-4 item (5) carried the same token; it is read as `MSB_LAST` from now on (the PDR record is sealed and not edited).
+- **Why:** code-reviewer, Inc-1 review, finding F1 (HIGH): with `LSB_FIRST` the control passes at HEAD only because MOD_COMMON is ignored, and it turns RED once LLR-158.1 is implemented.
+- **Evidence:** `s19_app/tui/a2l.py:280-286`; the Inc-1 review verdict recorded in `03-increments/increment-001.md` §4b.

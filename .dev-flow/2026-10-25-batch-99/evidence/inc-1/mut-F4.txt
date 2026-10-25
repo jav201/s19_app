@@ -1,0 +1,78 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc1
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items / 3 deselected / 2 selected
+
+tests/test_b99_corpus.py::test_tc_b99_03_reader_independence_and_exact FAILED [ 50%]
+tests/test_b99_corpus.py::test_tc_b99_04_hex_extents_literal FAILED      [100%]
+
+================================== FAILURES ===================================
+________________ test_tc_b99_03_reader_independence_and_exact _________________
+
+    def test_tc_b99_03_reader_independence_and_exact():
+        """The reader imports nothing from s19_app and matches every manifest byte."""
+        tree = ast.parse(READER.read_text(encoding="utf-8"))
+        roots = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    roots.add(alias.name.split(".")[0])
+            elif isinstance(node, ast.ImportFrom):
+                roots.add((node.module or "").split(".")[0])
+        assert "s19_app" not in roots
+    
+        manifest = _load_manifest()
+        checked = 0
+        for entry in manifest["files"]:
+            path = CORPUS / entry["name"]
+            if entry["format"] == "s19":
+                image = read_s19(path)
+            elif entry["format"] == "hex":
+                image = read_hex(path)
+            else:
+                continue
+            checked += 1
+            expected_header = (
+                bytes.fromhex(entry["header"]) if entry["header"] is not None else None
+            )
+            expected_term = tuple(entry["terminator"]) if entry["terminator"] is not None else None
+>           assert image.data == _expand_runs(entry["data"]), entry["name"]
+E           AssertionError: synth_hex_seg.hex
+E           assert {131056: 98, ...059: 203, ...} == {65536: 69, 6...5539: 46, ...}
+E             
+E             Omitting 16 identical items, use -vv to show
+E             Left contains 16 more items:
+E             {131072: 69,
+E              131073: 4,
+E              131074: 119,
+E              131075: 46,...
+E             
+E             ...Full output truncated (81 lines hidden), use '-vv' to show
+
+tests\test_b99_corpus.py:141: AssertionError
+_____________________ test_tc_b99_04_hex_extents_literal ______________________
+
+    def test_tc_b99_04_hex_extents_literal():
+        """HEX extents pinned literally from the spec (LLR-152.3 hardening, F4)."""
+        for name, expected in LITERAL_HEX_EXTENTS.items():
+>           assert _extents(read_hex(CORPUS / name)) == expected, name
+E           AssertionError: synth_hex_seg.hex
+E           assert [(131056, 131088)] == [(65536, 6555...1056, 131072)]
+E             
+E             At index 0 diff: (131056, 131088) != (65536, 65552)
+E             Right contains one more item: (131056, 131072)
+E             
+E             Full diff:
+E               [
+E                   (...
+E             
+E             ...Full output truncated (11 lines hidden), use '-vv' to show
+
+tests\test_b99_corpus.py:187: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_corpus.py::test_tc_b99_03_reader_independence_and_exact
+FAILED tests/test_b99_corpus.py::test_tc_b99_04_hex_extents_literal - Asserti...
+======================= 2 failed, 3 deselected in 0.16s =======================

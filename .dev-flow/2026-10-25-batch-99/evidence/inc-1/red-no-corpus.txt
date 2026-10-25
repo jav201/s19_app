@@ -1,0 +1,115 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+________________________ test_tc_b99_01_deterministic _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25554/test_tc_b99_01_deterministic0')
+
+    def test_tc_b99_01_deterministic(tmp_path):
+        """Two ``--out`` runs write byte-identical corpora (LLR-152.1)."""
+        d1 = tmp_path / "run1"
+        d2 = tmp_path / "run2"
+        for out in (d1, d2):
+            result = _run_generator("--out", str(out))
+>           assert result.returncode == 0, result.stderr
+E           AssertionError: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe: can't open file 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc1\\tests\\fixtures\\synth\\generate.py': [Errno 2] No such file or directory
+E             
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['C:\\Users\\jjgh8\\anaconda3\\envs\\s19env\\python.exe', 'C:\\Users\\jjgh8\\Github\\s19_app-b99...h8\\\\Github\\\\s19_app-b99-inc1\\\\tests\\\\fixtures\\\\synth\\\\generate.py': [Errno 2] No such file or directory\n").returncode
+
+tests\test_b99_corpus.py:89: AssertionError
+_______________________ test_tc_b99_02_coverage_classes _______________________
+
+    def test_tc_b99_02_coverage_classes():
+        """Every LLR-152.2 coverage class names at least one manifest file."""
+>       manifest = _load_manifest()
+                   ^^^^^^^^^^^^^^^^
+
+tests\test_b99_corpus.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_corpus.py:67: in _load_manifest
+    return json.loads((CORPUS / "manifest.json").read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-inc1/tests/fixtures/synth/manifest.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc1\\tests\\fixtures\\synth\\manifest.json'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
+________________ test_tc_b99_03_reader_independence_and_exact _________________
+
+    def test_tc_b99_03_reader_independence_and_exact():
+        """The reader imports nothing from s19_app and matches every manifest byte."""
+        tree = ast.parse(READER.read_text(encoding="utf-8"))
+        roots = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    roots.add(alias.name.split(".")[0])
+            elif isinstance(node, ast.ImportFrom):
+                roots.add((node.module or "").split(".")[0])
+        assert "s19_app" not in roots
+    
+>       manifest = _load_manifest()
+                   ^^^^^^^^^^^^^^^^
+
+tests\test_b99_corpus.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_corpus.py:67: in _load_manifest
+    return json.loads((CORPUS / "manifest.json").read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/Github/s19_app-b99-inc1/tests/fixtures/synth/manifest.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc1\\tests\\fixtures\\synth\\manifest.json'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
+__________________________ test_at_b99_01_check_mode __________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25554/test_at_b99_01_check_mode0')
+
+    def test_at_b99_01_check_mode(tmp_path):
+        """``--check`` passes on the committed corpus and names a tampered file."""
+        ok = _run_generator("--check")
+>       assert ok.returncode == 0, ok.stdout + ok.stderr
+E       AssertionError: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe: can't open file 'C:\\Users\\jjgh8\\Github\\s19_app-b99-inc1\\tests\\fixtures\\synth\\generate.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\jjgh8\\anaconda3\\envs\\s19env\\python.exe', 'C:\\Users\\jjgh8\\Github\\s19_app-b99...h8\\\\Github\\\\s19_app-b99-inc1\\\\tests\\\\fixtures\\\\synth\\\\generate.py': [Errno 2] No such file or directory\n").returncode
+
+tests\test_b99_corpus.py:145: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_corpus.py::test_tc_b99_01_deterministic - AssertionErro...
+FAILED tests/test_b99_corpus.py::test_tc_b99_02_coverage_classes - FileNotFou...
+FAILED tests/test_b99_corpus.py::test_tc_b99_03_reader_independence_and_exact
+FAILED tests/test_b99_corpus.py::test_at_b99_01_check_mode - AssertionError: ...
+4 failed in 0.38s

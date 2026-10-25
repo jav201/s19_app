@@ -1,0 +1,43 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc1
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items / 4 deselected / 1 selected
+
+tests/test_b99_corpus.py::test_tc_b99_01_deterministic FAILED            [100%]
+
+================================== FAILURES ===================================
+________________________ test_tc_b99_01_deterministic _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25662/test_tc_b99_01_deterministic0')
+
+    def test_tc_b99_01_deterministic(tmp_path):
+        """Two ``--out`` runs write byte-identical corpora (LLR-152.1)."""
+        d1 = tmp_path / "run1"
+        d2 = tmp_path / "run2"
+        for out in (d1, d2):
+            result = _run_generator("--out", str(out))
+            assert result.returncode == 0, result.stderr
+        b1 = _dir_bytes(d1)
+        b2 = _dir_bytes(d2)
+        assert len(b1) >= 15
+        assert b1.keys() == b2.keys()
+        differing = sorted(name for name in b1 if b1[name] != b2[name])
+>       assert differing == []
+E       AssertionError: assert ['manifest.js...synth_s3.s19'] == []
+E         
+E         Left contains 5 more items, first extra item: 'manifest.json'
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     'manifest.json',...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests\test_b99_corpus.py:99: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_corpus.py::test_tc_b99_01_deterministic - AssertionErro...
+======================= 1 failed, 4 deselected in 0.51s =======================

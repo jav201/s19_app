@@ -1,0 +1,2 @@
+synth_s1.s19
+exit=1

@@ -1,0 +1,114 @@
+/begin PROJECT SYNTH_B99 "Synthetic corpus project for batch-99"
+  /begin HEADER
+    VERSION "1.0"
+    PROJECT_NO 99
+  /end HEADER
+
+  /begin MODULE SYNTH_B99_MOD "Synthetic ECU module"
+    /begin MOD_COMMON ""
+      BYTE_ORDER MSB_FIRST
+      ALIGNMENT_BYTE 1
+      ALIGNMENT_WORD 2
+      ALIGNMENT_LONG 4
+      ALIGNMENT_FLOAT32_IEEE 4
+    /end MOD_COMMON
+
+    /begin MOD_PAR ""
+      EPK "S19TOOL_SYNTH_B99"
+    /end MOD_PAR
+
+    /begin RECORD_LAYOUT RL_U16_NO_BO
+      FNC_VALUES 1 UWORD COLUMN_DIR DIRECT
+    /end RECORD_LAYOUT
+
+    /begin COMPU_METHOD CM_IDENT "%6.2" IDENTICAL "%6.2" ""
+      COEFFS 0 1 0 0 0 1
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD RAT_FUNC_DIV_10 "%6.2" RAT_FUNC "%6.2" ""
+      COEFFS 0 10 0 0 0 1
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_LINEAR_MUL_2 "%6.2" LINEAR "%6.2" ""
+      COEFFS_LINEAR 2.0 0.0
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_TAB_INTP "%6.2" TAB_INTP "%6.2" ""
+      COMPU_TAB_REF TAB_INTP_TBL
+    /end COMPU_METHOD
+
+    /begin COMPU_METHOD CM_TAB_NOINTP "%6.2" TAB_NOINTP "%6.2" ""
+      COMPU_TAB_REF TAB_NOINTP_TBL
+    /end COMPU_METHOD
+
+    /begin COMPU_TAB TAB_INTP_TBL
+      "intp table, 2.5 PHYS per raw step"
+      TAB_INTP
+      26
+      0 0.0
+      1 2.5
+      2 5.0
+      3 7.5
+      4 10.0
+      5 12.5
+      6 15.0
+      7 17.5
+      8 20.0
+      9 22.5
+      10 25.0
+      11 27.5
+      12 30.0
+      13 32.5
+      14 35.0
+      15 37.5
+      16 40.0
+      17 42.5
+      18 45.0
+      19 47.5
+      20 50.0
+      21 52.5
+      22 55.0
+      23 57.5
+      24 60.0
+      25 62.5
+      DEFAULT_VALUE "0"
+    /end COMPU_TAB
+
+    /begin COMPU_TAB TAB_NOINTP_TBL
+      "nointp table, entries 10 15 20"
+      TAB_NOINTP
+      3
+      0 10.0
+      1 15.0
+      2 20.0
+      DEFAULT_VALUE "0"
+    /end COMPU_TAB
+
+    /begin CHARACTERISTIC SYM_U16_MSB "2-byte MSB symbol, no BYTE_ORDER of its own"
+      VALUE 0x2000 RL_U16_NO_BO 0 CM_IDENT 0 65535
+    /end CHARACTERISTIC
+    /begin CHARACTERISTIC RAT_FUNC_SYM "RAT_FUNC INT equals 10 times PHYS"
+      VALUE 0x2002 RL_U16_NO_BO 0 RAT_FUNC_DIV_10 0 100
+    /end CHARACTERISTIC
+    /begin CHARACTERISTIC TAB_INTP_SYM "TAB_INTP symbol, 2.5 PHYS per raw"
+      VALUE 0x2004 RL_U16_NO_BO 0 CM_TAB_INTP -10 100
+    /end CHARACTERISTIC
+    /begin CHARACTERISTIC TAB_NOINTP_SYM "TAB_NOINTP symbol, entries 10 15 20"
+      VALUE 0x2006 RL_U16_NO_BO 0 CM_TAB_NOINTP 0 30
+    /end CHARACTERISTIC
+    /begin CHARACTERISTIC LINEAR_MUL_2 "LINEAR PHYS equals 2 times RAW, MSB_LAST"
+      VALUE 0x2008 RL_U16_NO_BO 0 CM_LINEAR_MUL_2 0 100
+      BYTE_ORDER MSB_LAST
+    /end CHARACTERISTIC
+
+    /begin GROUP GRP_SYNTH_B99 "GRP_SYNTH_B99 group"
+      /begin REF_CHARACTERISTIC
+      SYM_U16_MSB
+      RAT_FUNC_SYM
+      TAB_INTP_SYM
+      TAB_NOINTP_SYM
+      LINEAR_MUL_2
+      /end REF_CHARACTERISTIC
+    /end GROUP
+  /end MODULE
+/end PROJECT

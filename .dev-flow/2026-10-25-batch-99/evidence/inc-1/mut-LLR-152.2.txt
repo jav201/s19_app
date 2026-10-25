@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc1
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items / 4 deselected / 1 selected
+
+tests/test_b99_corpus.py::test_tc_b99_02_coverage_classes FAILED         [100%]
+
+================================== FAILURES ===================================
+_______________________ test_tc_b99_02_coverage_classes _______________________
+
+    def test_tc_b99_02_coverage_classes():
+        """Every LLR-152.2 coverage class names at least one manifest file."""
+        manifest = _load_manifest()
+        present = set()
+        for entry in manifest["files"]:
+            present.update(entry["class"])
+        missing = sorted(REQUIRED_CLASSES - present)
+>       assert missing == []
+E       AssertionError: assert ['mac.pair'] == []
+E         
+E         Left contains one more item: 'mac.pair'
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     'mac.pair',
+E         + ]
+
+tests\test_b99_corpus.py:109: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_corpus.py::test_tc_b99_02_coverage_classes - AssertionE...
+======================= 1 failed, 4 deselected in 0.14s =======================

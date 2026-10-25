@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc1
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items
+
+tests/test_b99_corpus.py::test_tc_b99_01_deterministic PASSED            [ 20%]
+tests/test_b99_corpus.py::test_tc_b99_02_coverage_classes PASSED         [ 40%]
+tests/test_b99_corpus.py::test_tc_b99_03_reader_independence_and_exact PASSED [ 60%]
+tests/test_b99_corpus.py::test_tc_b99_04_hex_extents_literal PASSED      [ 80%]
+tests/test_b99_corpus.py::test_at_b99_01_check_mode PASSED               [100%]
+
+============================== 5 passed in 0.54s ==============================

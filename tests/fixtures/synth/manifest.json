@@ -1,0 +1,387 @@
+{
+  "files": [
+    {
+      "name": "synth_s1.s19",
+      "format": "s19",
+      "class": [
+        "s19.s1",
+        "s19.s5",
+        "s19.term.s9"
+      ],
+      "sha256": "f55323d31faf53c04732601442722e1962c671f62f375950a24238921d845963",
+      "data": {
+        "0xfff0": "03B7957A44F330F32CB0583A139FB3F3"
+      },
+      "verdict": "ok",
+      "header": "53594E54482D4239392D5331",
+      "terminator": [
+        "S9",
+        65520
+      ],
+      "s5_count": 2,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_s2.s19",
+      "format": "s19",
+      "class": [
+        "s19.s2",
+        "s19.s5",
+        "s19.term.s8"
+      ],
+      "sha256": "1392d1c7e745c452679a78d8af4a2fb4c5e9a82ca50eaebe0b50f48e5b72c389",
+      "data": {
+        "0xffffe0": "585FCAEE7A8A100F2C101C35F324E3DEB7C28A001DAE94D6ECC5124921ACB580"
+      },
+      "verdict": "ok",
+      "header": "53594E54482D4239392D5332",
+      "terminator": [
+        "S8",
+        65536
+      ],
+      "s5_count": 2,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_s3.s19",
+      "format": "s19",
+      "class": [
+        "s19.s3",
+        "s19.s0",
+        "s19.s5",
+        "s19.term.s7"
+      ],
+      "sha256": "324d236e68f92c005727acb4747d148140bd9ba8202c22ecf1ad069011cbf755",
+      "data": {
+        "0x80001000": "59DE7C1A650B739C4FA0671025D1DC61"
+      },
+      "verdict": "ok",
+      "header": "53594E54482D4239392D5333",
+      "terminator": [
+        "S7",
+        2147487744
+      ],
+      "s5_count": 1,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_s0_only.s19",
+      "format": "s19",
+      "class": [
+        "s19.s0_only"
+      ],
+      "sha256": "5e92533201e38fcff0e7d290ee90280075e57506e5f601747fd433b62deff9e9",
+      "data": {},
+      "verdict": "ok",
+      "header": "53594E54482D4239392D53302D4F4E4C59",
+      "terminator": [
+        "S9",
+        0
+      ],
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_mac.s19",
+      "format": "s19",
+      "class": [
+        "s19.s1",
+        "s19.term.s9"
+      ],
+      "sha256": "9d05bc7bac990d690ab934d4a03f257ea2c76272bfd24e8ca2d22d81c06902c1",
+      "data": {
+        "0x1000": "1B8D69130335A4FD6A6865FD0C21A596"
+      },
+      "verdict": "ok",
+      "header": null,
+      "terminator": [
+        "S9",
+        4096
+      ],
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 0,
+      "paired": "synth_mac.mac"
+    },
+    {
+      "name": "synth_mac.mac",
+      "format": "mac",
+      "class": [
+        "mac.pair"
+      ],
+      "sha256": "5b491cec58369b69c94c41488ca392583ef4341cd7e972d9eddefdf8965b8027",
+      "verdict": "ok",
+      "paired": "synth_mac.s19"
+    },
+    {
+      "name": "synth_a2l.s19",
+      "format": "s19",
+      "class": [
+        "s19.s3"
+      ],
+      "sha256": "28145caf1761e849e82f840bd8c58f6058bbc96572d36741f2d4ffe9a5ef733b",
+      "data": {
+        "0x2000": "1011012C000200010F00"
+      },
+      "verdict": "ok",
+      "header": null,
+      "terminator": [
+        "S9",
+        8192
+      ],
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 0,
+      "paired": "synth_a2l.a2l",
+      "a2l_expect": {
+        "byte_order": "MSB_FIRST",
+        "symbols": {
+          "SYM_U16_MSB": {
+            "address": "0x2000",
+            "bytes": "1011",
+            "raw": 4113,
+            "physical": 4113.0,
+            "encode": [
+              {
+                "physical": 4113,
+                "bytes": "1011"
+              }
+            ]
+          },
+          "RAT_FUNC_SYM": {
+            "address": "0x2002",
+            "bytes": "012C",
+            "raw": 300,
+            "physical": 30.0,
+            "encode": [
+              {
+                "physical": 30,
+                "raw": 300
+              },
+              {
+                "physical": 25,
+                "raw": 250
+              }
+            ]
+          },
+          "TAB_INTP_SYM": {
+            "address": "0x2004",
+            "bytes": "0002",
+            "raw": 2,
+            "physical": 5.0,
+            "grid": {
+              "typed": 5.0,
+              "expected_raw": 2,
+              "written_physical": 5.0
+            },
+            "off_grid": {
+              "typed": 3.4,
+              "expected_raw": 1,
+              "written_physical": 2.5,
+              "flag_names": "2.5"
+            },
+            "refused": [
+              -50.0,
+              500.0
+            ]
+          },
+          "TAB_NOINTP_SYM": {
+            "address": "0x2006",
+            "bytes": "0001",
+            "raw": 1,
+            "physical": 15.0,
+            "typed_refused": 13.0,
+            "named_nearest": [
+              10.0,
+              15.0
+            ]
+          },
+          "LINEAR_MUL_2": {
+            "address": "0x2008",
+            "bytes": "0F00",
+            "raw": 15,
+            "physical": 30.0,
+            "byte_order": "MSB_LAST",
+            "encode": [
+              {
+                "physical": 30,
+                "bytes": "0F00"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "synth_a2l.a2l",
+      "format": "a2l",
+      "class": [
+        "a2l.pair"
+      ],
+      "sha256": "9a8a56708265465b7ef8e59adce4f1193649076f485c1c08a5ce7c474ded2b3c",
+      "verdict": "ok",
+      "paired": "synth_a2l.s19"
+    },
+    {
+      "name": "synth_overlap.s19",
+      "format": "s19",
+      "class": [
+        "defect.s19_overlap_diff"
+      ],
+      "sha256": "d9aab4d75901cd169aaaaca93cb7ab49c2ec98bc8fe7591079b9fa62b0b408af",
+      "data": {
+        "0x3000": "998624256ADF3224771013B52AE089B0"
+      },
+      "verdict": "defect:overlap",
+      "header": null,
+      "terminator": [
+        "S9",
+        12288
+      ],
+      "s5_count": 2,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_no_terminator.s19",
+      "format": "s19",
+      "class": [
+        "defect.s19_no_terminator"
+      ],
+      "sha256": "a650e0239432eb378aebf310b42404692e8bc97ed7958d963a284c674eaf3904",
+      "data": {
+        "0x4000": "B0DE83BC06CDB9366E81006B97C71D2A"
+      },
+      "verdict": "defect:s19_no_terminator",
+      "header": null,
+      "terminator": null,
+      "s5_count": null,
+      "eof_seen": false,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_wrong_s5.s19",
+      "format": "s19",
+      "class": [
+        "defect.s19_wrong_s5"
+      ],
+      "sha256": "577f3f3c92c3c59d7c3d29680dd82742bbb700025408386f797d3cd093cb2fce",
+      "data": {
+        "0x5000": "B4F779D9924ABFEBE4534148E7AA63093C9B70CC6D10D71A"
+      },
+      "verdict": "defect:s19_wrong_s5",
+      "header": null,
+      "terminator": [
+        "S9",
+        20480
+      ],
+      "s5_count": 3,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_after_terminator.s19",
+      "format": "s19",
+      "class": [
+        "defect.s19_after_terminator"
+      ],
+      "sha256": "e67f7f6e37ee2ddd1f6d9cc07b16fcff1a49e0c743ccce111efe0cae4d17ac8f",
+      "data": {
+        "0x6000": "AA3B4BB0E2DE86E4"
+      },
+      "verdict": "defect:s19_after_terminator",
+      "header": null,
+      "terminator": [
+        "S9",
+        24576
+      ],
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 1
+    },
+    {
+      "name": "synth_hex_basic.hex",
+      "format": "hex",
+      "class": [
+        "hex.t00",
+        "hex.t01",
+        "hex.t04",
+        "hex.t05",
+        "hex.64k_boundary"
+      ],
+      "sha256": "6c0be134ef71e5d87bfd005777e9983bf3d0a46efd38495e51f8c723e17e5dba",
+      "data": {
+        "0x10000": "5B96952DCED3C434BA86CE5822E4A233",
+        "0x1ff00": "1269E47B9511F19119C8EA5A100A7B923BFCE71D9260CE090AC716EED546E5C2563BFAC5E228244308EADF11181D58DEF134C35A670D9AE86BF989BF246471D7C6F1EC8F0DA7E7F496DDB8A1DBA256F08C93D2D6C58FDFB6D645EEDD565668C7CF4F4E53504B77AE5754B289FBDA78A0B3607E5F37526E4890AE4EC47D4C3C62A7B981BC6202005B73785C2F4DB8B2A8BAA9427E6767B7CC81DF214C6B799168ECD6349DD57DDFB328E7E1AED9D60AFAD94B39D6978E2002F13120539BACBC78F8CAD7D3258E030A638AEB655EC1C9BD4383A241BBA6974E78012BAB02643520607B4C67AED326368263BA16420D4B51F5817D639911DB4F577C50D74A5647DA"
+      },
+      "verdict": "ok",
+      "header": null,
+      "terminator": [
+        "HEX05",
+        65536
+      ],
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_hex_seg.hex",
+      "format": "hex",
+      "class": [
+        "hex.t00",
+        "hex.t01",
+        "hex.t02",
+        "hex.wrap"
+      ],
+      "sha256": "a3a046861d6cbc74c37e0107b06b5df39575fffbb7023de87cb08315582ee7d7",
+      "data": {
+        "0x10000": "4504772EB184D9A12E075F46EC956442",
+        "0x1fff0": "624039CB5D302273BC817EBC0F754F39"
+      },
+      "verdict": "ok",
+      "header": null,
+      "terminator": null,
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_hex_no_eof.hex",
+      "format": "hex",
+      "class": [
+        "defect.hex_no_eof"
+      ],
+      "sha256": "d5a8c9d6bb96cf03472aabaa85a64f8b5ee9d942445f999154d8c5cc5bb8a4e6",
+      "data": {
+        "0x100": "B04EBCC383BBA1CE6A390B30BE67895A"
+      },
+      "verdict": "defect:hex_no_eof",
+      "header": null,
+      "terminator": null,
+      "s5_count": null,
+      "eof_seen": false,
+      "records_after_end": 0
+    },
+    {
+      "name": "synth_hex_after_eof.hex",
+      "format": "hex",
+      "class": [
+        "defect.hex_after_eof"
+      ],
+      "sha256": "57ad6e84716b87ef4d0bca5c1567dafa6e16c953d4b219a4768c140e3c341cb0",
+      "data": {
+        "0x200": "9D187F5FB9B80190"
+      },
+      "verdict": "defect:hex_after_eof",
+      "header": null,
+      "terminator": null,
+      "s5_count": null,
+      "eof_seen": true,
+      "records_after_end": 1
+    }
+  ]
+}

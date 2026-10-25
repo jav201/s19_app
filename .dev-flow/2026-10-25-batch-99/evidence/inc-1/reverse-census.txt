@@ -1,0 +1,14 @@
+== B1/B4: who references the new modules and corpus ==
+tests/fixtures/synth/generate.py
+tests/support/independent_reader.py
+tests/test_b99_corpus.py
+---
+tests/fixtures/synth/generate.py
+tests/fixtures/synth/manifest.json
+tests/test_b99_corpus.py
+== B3: goldens referencing the corpus ==
+tests/goldens/batch64/addendum-below-bound.md
+== A3: no s19_app symbol changed (no source edits) ==
+ M .gitattributes
+ M .gitattributes
+B3 hit re-validated: 'synthetic message' prose in a batch-64 golden, unrelated to this corpus — no re-pin

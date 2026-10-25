@@ -810,11 +810,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-158.1 — Byte-order fallback reads `MOD_COMMON` *(provisional, D3)*
 - **Traceability:** HLR-158
-- **Ledger:** none
+- **Ledger:** none, LED-2026-10-25-batch-99.4
 - **Statement:** *(LLR-158.1..158.3 cross the frozen engine layer — `tui/a2l.py`, `docs/ARCHITECTURE.md` §7; named here.)* The effective byte order (`tui/a2l.py`) shall fall back tag → RECORD_LAYOUT → tag endian → `MOD_COMMON BYTE_ORDER` → `little`, and `encode_physical_to_raw_bytes` and the decode path shall both use it.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-23 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_23`
-- **Numeric pass threshold:** MSB_FIRST 2-byte: encode 4113 → `10 11`; decode `10 11` → 4113; LSB_FIRST control unchanged.
+- **Numeric pass threshold:** MSB_FIRST 2-byte: encode 4113 → `10 11`; decode `10 11` → 4113; a symbol whose RECORD_LAYOUT or tag declares `MSB_LAST` (the ASAM little-endian token; `LSB_FIRST` is not an ASAM token) keeps little-endian under a `MSB_FIRST` module.
 - **Negative control:** executed on `307065f` (P-7): `little` → RED.
 - **Boundary catalog:** ☒ boundary — 1-byte value (order irrelevant), 2- and 4-byte values.
 

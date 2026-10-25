@@ -1,0 +1,20 @@
+== positive control: same AST census on a file that DOES import s19_app ==
+census roots: ['__future__', 'asyncio', 'pathlib', 'pytest', 're', 'rich', 's19_app', 'shutil', 'tests', 'textual']
+s19_app present: True
+
+== emitted A2L pins (PQ-4) in tests/fixtures/synth/synth_a2l.a2l ==
+9:      BYTE_ORDER MSB_FIRST
+25:      COEFFS 0 1 0 0 0 1
+29:      COEFFS 0 10 0 0 0 1
+33:      COEFFS_LINEAR 2.0 0.0
+37:      COMPU_TAB_REF TAB_INTP_TBL
+41:      COMPU_TAB_REF TAB_NOINTP_TBL
+74:      DEFAULT_VALUE "0"
+84:      DEFAULT_VALUE "0"
+87:    /begin CHARACTERISTIC SYM_U16_MSB "2-byte MSB symbol, no BYTE_ORDER of its own"
+88:      VALUE 0x2000 RL_U16_NO_BO 0 CM_IDENT 0 65535
+91:      VALUE 0x2002 RL_U16_NO_BO 0 RAT_FUNC_DIV_10 0 100
+94:      VALUE 0x2004 RL_U16_NO_BO 0 CM_TAB_INTP -10 100
+97:      VALUE 0x2006 RL_U16_NO_BO 0 CM_TAB_NOINTP 0 30
+100:      VALUE 0x2008 RL_U16_NO_BO 0 CM_LINEAR_MUL_2 0 100
+101:      BYTE_ORDER MSB_LAST

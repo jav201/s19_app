@@ -1,0 +1,3 @@
+9bcdc26d145fd177d50092eb13f6f3699d89b5cdfa78e648b9d7a26e66b7f059 tests/fixtures/synth/generate.py
+f5fa3eb77d9d05348c1c323dab4c9fbfa89212b32e4a03e617739206cf2ecd7f tests/fixtures/synth/manifest.json
+b9a172e21a3e215b9e455515fb7b2d61fc4326d8705f2f87797ddd40970ccb76 tests/support/independent_reader.py
