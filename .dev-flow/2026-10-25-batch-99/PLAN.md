@@ -99,6 +99,7 @@ Each increment runs the same way:
 | 2026-10-25 | The ten operator decisions D1–D10 go on one page (`design/plan-b99.html`), with the recommended option preselected | the commission's rule "stop on an operator decision"; review by consequences |
 | 2026-10-25 | REFINE stories are derived provisionally on the recommended option and gated at P3 | P2 can review the whole contract once; a differing verdict becomes a ledger amendment plus a targeted P2 re-review |
 | 2026-10-25 | CW-U-3 joins US-151 | without it the `_load_from_item` sibling fix cannot be observed through the surface (the list is always empty) |
+| 2026-10-25 | Operator verdict D1–D10: the recommended option on all ten (`design/veredicto-b99.json`); applied in LED-2026-10-25-batch-99.5 | unblocks Inc 3b, 8, 9, 10, 11 |
 | 2026-10-25 | Every byte oracle is the independent reader or the manifest | the repo's verify and diff share the S0 defect (P-3) |
 
 ## Risks / watch-items
@@ -140,4 +141,4 @@ Each increment runs the same way:
 | Suite / command | Last run | Result |
 |---|---|---|
 | investigation probes `rw-p01..p14`, `proj-p08` at `307065f` | 2026-10-25 | all exit 0; every finding reproduces (01-requirements §2.7) |
-| full suite baseline | 2026-10-25 (batch-97 close) | 3617 passed; non-baseline failures accounted for in batch-97 inc-7 |
+| full suite baseline at `a293213` (`evidence/baseline-pytest-a293213.txt`) | 2026-10-25 | **11 failed, 3617 passed, 3 skipped, 3 xfailed** in 1:54:17. Failing ids: `test_changes_file_notation_help::test_tc1802_…`, `test_tui_commandbar::test_at_b78_03_…`, `test_tui_diff_screen::test_tc024_…`, `test_tui_diff_screen::test_at_b78_32_…`, `test_tui_patch_editor_v2::test_at031b_…`, `test_tui_patch_editor_v2::test_tc328_…`, `test_tui_patch_layout::test_at063c_…`, `test_tui_report_filter_surface::test_at_056e_…`, `test_unified_write::test_tc018_existing_name_is_dedup_suffixed`, `test_window_usage_help::test_tc707_copy_matches_help_sections_md_verbatim`, `test_window_usage_help::test_tc707_numbering_generated_sequential` — every later full run is compared against this set |

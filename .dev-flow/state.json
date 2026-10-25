@@ -165,6 +165,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 001 (US-141 / HLR-152, synthetic corpus + independent reader, 0 SOURCE files) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH LSB_FIRST token, traced to the contract, LED-2026-10-25-batch-99.4), round 2 OK to advance; orchestrator re-ran 5 passed and --check (16 files). Full suite not re-run for this cut: tests-only, no existing test touched; the batch baseline run is in progress."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "asked at the gate — operator verdict 2026-10-25 on D1-D10 (design/veredicto-b99.json): recommended option on all ten; applied in LED-2026-10-25-batch-99.5; US-143/145/147/150/152 READY; increments 3b, 8, 9, 10, 11 unblocked."
     }
   ],
   "obsidian_synced": false,

@@ -111,15 +111,15 @@ the decisions page (§1.4). A story that depends on one is `REFINE` until it is 
 |----|------------|--------|------------|
 | US-141 | As the maintainer of the read/write paths, I want a generated synthetic corpus of S19, Intel HEX, MAC and A2L files, each with a manifest of its expected bytes and verdict, checked by a reader that shares no code with the tool, so that every integrity test compares the tool with data that holds its own oracle. | backlog §*synthetic fixture corpus*; spec-gap audit 2026-10-23 | READY |
 | US-142 | As the calibration engineer, I want a loaded S19 image to hold only the bytes of its data records, never the S0 header text, so that what I patch and flash is exactly what the file declares. | H-1 | READY |
-| US-143 | As the calibration engineer, I want to be told when an image file is truncated or inconsistent (no terminator or EOF, an S5 count that disagrees, records after the terminator or EOF), so that a failed transfer is never patched and written as `ok`. | H-8 | REFINE — D6 |
-| US-144 | As the engineer running chain sets and saving patched images, I want every write to land in its own file, placed atomically, so that parallel lanes never write each other's image, and a save-back under the image's own name neither deletes the work copy nor crashes Save project. | H-3, PH-3 | READY (D7 and D9 refine two sub-clauses) |
-| US-145 | As the engineer running flows, I want the PATCH step and every run record (lane status, chain-set report, flow report) to show each entry that was not applied and each refusal, and the run to stop before writing when the patch applied nothing, so that no `ok` or `CLEAN` hides a dropped write. | H-2, H-10 | REFINE — D5 |
+| US-143 | As the calibration engineer, I want to be told when an image file is truncated or inconsistent (no terminator or EOF, an S5 count that disagrees, records after the terminator or EOF), so that a failed transfer is never patched and written as `ok`. | H-8 | READY (operator verdict 2026-10-25) |
+| US-144 | As the engineer running chain sets and saving patched images, I want every write to land in its own file, placed atomically, so that parallel lanes never write each other's image, and a save-back under the image's own name neither deletes the work copy nor crashes Save project. | H-3, PH-3 | READY (D7 = `rechazar`, D9 = `si`) |
+| US-145 | As the engineer running flows, I want the PATCH step and every run record (lane status, chain-set report, flow report) to show each entry that was not applied and each refusal, and the run to stop before writing when the patch applied nothing, so that no `ok` or `CLEAN` hides a dropped write. | H-2, H-10 | READY (operator verdict 2026-10-25) |
 | US-146 | As the calibration engineer using the Patch Editor, I want the image I save to always equal the source plus the entries currently in my document, so that an undone or removed entry never reaches the file. | H-4 | READY |
-| US-147 | As the calibration engineer reading A2L values in the A2L window, I want each raw value decoded in the module's byte order and in the conversion direction ASAM defines, so that the physical value I read is the one the bytes mean. | H-5 (decode side, backlog H-7), CW-D-10 | REFINE — D2, D3 |
-| US-152 | As the maintainer of the A2L codec, I want the physical→raw encoder to use the same byte order and conversion direction as the decoder, and to refuse a COMPU_TAB value the table cannot represent, so that any surface that later enters symbol values writes the bytes the value means. | H-5, H-6, CW-D-10 (encode side; P-22: no shipped surface calls the encoder today) | REFINE — D2, D3, D4 |
+| US-147 | As the calibration engineer reading A2L values in the A2L window, I want each raw value decoded in the module's byte order and in the conversion direction ASAM defines, so that the physical value I read is the one the bytes mean. | H-5 (decode side, backlog H-7), CW-D-10 | READY (operator verdict 2026-10-25) |
+| US-152 | As the maintainer of the A2L codec, I want the physical→raw encoder to use the same byte order and conversion direction as the decoder, and to refuse a COMPU_TAB value the table cannot represent, so that any surface that later enters symbol values writes the bytes the value means. | H-5, H-6, CW-D-10 (encode side; P-22: no shipped surface calls the encoder today) | READY (operator verdict 2026-10-25) |
 | US-148 | As the engineer running a CRC step, I want a CRC over a region that holds no image bytes to fail and stop the flow before anything is written, and a partly covered region to say how much was absent, so that a meaningless CRC is never written over live bytes. | H-7 | READY |
-| US-149 | As the engineer exporting memory segments, I want every exported file to stay inside the chosen destination whatever the A2L segment is called, and a MAC-only export to write the header-only file its confirm promises, so that an export never writes outside the work area or invents a byte. | H-9, CW-D-7 | READY (D8 refines the overwrite clause) |
-| US-150 | As the calibration engineer typing or pasting a hex dump into the Patch Editor Bytes field, I want every token read in one base, so that `11 22` is written as `11 22`. | CW-D-4 | REFINE — D1 |
+| US-149 | As the engineer exporting memory segments, I want every exported file to stay inside the chosen destination whatever the A2L segment is called, and a MAC-only export to write the header-only file its confirm promises, so that an export never writes outside the work area or invents a byte. | H-9, CW-D-7 | READY (D8 = `sufijo`) |
+| US-150 | As the calibration engineer typing or pasting a hex dump into the Patch Editor Bytes field, I want every token read in one base, so that `11 22` is written as `11 22`. | CW-D-4 | READY (operator verdict 2026-10-25) |
 | US-151 | As the engineer opening a saved project, I want the Load project dialog and the Workarea Files list to load the item I picked, by name, and the project list to show only projects, so that the CW-U-1 fix holds whichever way I pick. | CW-U-1 (batch-97 Inc-9); its `_load_from_item` sibling; the `patches` folder listed as a project; CW-U-3 (the Workarea Files list reads a folder loads never write to, so the sibling cannot be observed without it) | READY |
 
 **Ledger pairing:** stories live in this table. Ledger entries name the HLR or LLR they amend.
@@ -325,10 +325,10 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 > It never observes an internal attribute or a wrapped service. One exception is declared, for the maintainer story US-152: its surface is the codec API `encode_physical_to_raw_bytes(tag, physical, compu_methods, compu_tabs, record_layouts)` (`tui/a2l.py`), and AT-B99-14 observes only that call's return value `(raw_bytes, error, flags)` (P-22: no TUI path calls the encoder). Test paths and `-k` selectors are
 > provisional until Phase 3 and are reconciled from the real tree at Phase 4.
 >
-> **Provisional derivations.** HLR-154, HLR-156, HLR-158, HLR-161 and the D7, D8, D9 clauses of
-> HLR-155 and HLR-160 are derived on the option the decisions page recommends (`plan-b99.html` §2).
-> They enter Phase 3 only after the operator's verdict. A verdict that differs is written as a ledger
-> amendment and re-reviewed at P2 for the clauses it touches.
+> **Operator decisions.** The verdict of 2026-10-25 (`design/veredicto-b99.json`) chose the
+> recommended option on all ten decisions D1–D10. The clauses derived from them (HLR-154, HLR-156,
+> HLR-158, HLR-161 and the D7, D8, D9 clauses of HLR-155 and HLR-160) are therefore final
+> (LED-2026-10-25-batch-99.5).
 
 ### HLR-152 — Synthetic corpus with an independent oracle
 - **Traceability:** US-141
@@ -362,10 +362,10 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: an S0-only file loads as an empty image; boundary: an S0 whose payload length equals a data record's. Invalid/error: N/A — no parse change.
   - **Negative control:** executed on `307065f` (P-1): `extra=12@0x0..0xb` → AT-B99-02 is RED today.
 
-### HLR-154 — Truncated and inconsistent images are reported *(provisional: D6 = `flujo_para`)*
+### HLR-154 — Truncated and inconsistent images are reported
 - **Traceability:** US-143
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
-- **Statement:** When an S19 file has no terminator, an `S5` or `S6` count different from its number of data records, or any record after its terminator, the system shall attach a load notice naming the defect. When an Intel HEX file has no EOF record, or any record after its first EOF, it shall attach a load notice naming the defect. Before the terminator or EOF, a record is a line starting with `S` (S19) or `:` (HEX); after it, every non-empty line counts as a trailing record, is never parsed, and never enters the image, and the notice states how many there were. While a flow's SOURCE image carries such a notice, the flow shall end the SOURCE step with status `error` and write no file.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.5
+- **Statement:** When an S19 file has no terminator, an `S5` or `S6` count different from its number of data records, or any record after its terminator, the system shall attach a load notice naming the defect. When an Intel HEX file has no EOF record, or any record after its first EOF, it shall attach a load notice naming the defect. Before the terminator or EOF, a record is a line starting with `S` (S19) or `:` (HEX); after it, every non-empty line counts as a trailing record, is never parsed, and never enters the image, and the notice states how many there were. When such a file is loaded interactively, the status line shall lead with the defect (e.g. `Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR`), never a plain `Loaded <name>`. While a flow's SOURCE image carries such a notice, the flow shall end the SOURCE step with status `error` and write no file.
 - **Rationale (informative):** a cut transfer loads as `ok` with its tail missing (P-10).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_truncation.py`
@@ -380,14 +380,14 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-155 — Every write lands in its own file, placed atomically
 - **Traceability:** US-144
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.5
 - **Statement:** When the system places a file through `copy_into_workarea` or `save_patched_image` — image save-backs, flow WRITE-OUT, the CRC write, and every other caller of `copy_into_workarea` (reports, manifests, check specs) — it shall:
   - fill a private staging file that no other write can share;
   - place it under the requested name, or under the next free `_<N>` name when the requested one is taken, so that the final file always holds exactly the bytes of the write that reports it;
   - never rename, move or delete the source it copies from;
   - delete only the staging artefacts it created.
 
-  When placement fails, it shall raise a containment-class refusal naming the file (`WorkareaPlacementError`) and leave no zero-byte file behind. When Save project finds a source file missing, the system shall report a notice naming the file and keep running. *(D7, provisional `rechazar`:)* When a chain set is started with two or more lanes naming the same output file, the system shall refuse to start and name those lanes. *(D9, provisional `si`:)* When a flow WRITE-OUT step has written a file, the system shall read it back and end the step with status `error` if its bytes differ from the image.
+  When placement fails, it shall raise a containment-class refusal naming the file (`WorkareaPlacementError`) and leave no zero-byte file behind. When Save project finds a source file missing, the system shall report a notice naming the file and keep running. *(D7 = `rechazar`, operator verdict 2026-10-25:)* When a chain set is started with two or more lanes naming the same output file, the system shall refuse to start and name those lanes. *(D9 = `si`, operator verdict 2026-10-25:)* When a flow WRITE-OUT step has written a file, the system shall read it back and end the step with status `error` if its bytes differ from the image.
 - **Rationale (informative):** 35 lane/file mismatches in 5×8 parallel runs (P-5); the app exits with code 1 after a same-name save-back (P-15). ARQ R19 sets the staging as a private per-write directory, so the placed file keeps the requested name.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_staging.py`
@@ -409,9 +409,9 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
   - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☒ invalid ☒ error — boundary: 1 writer and 8 writers; invalid: duplicate output names; error: a missing source at Save project, a locked target.
   - **Negative control:** executed on `307065f`: P-15 (`return_code: 1`) → AT-B99-05 RED today. AT-B99-04's duplicate-name arm writes `same.s19` today (P-5's set) → RED under D7. The same-name concurrency RED lives in TC-B99-12 (P-5's mechanism: `parallel mismatches: 35`). D9's clause is TC-only (TC-B99-16): no surface can corrupt a file between write and read-back except a test hook.
 
-### HLR-156 — PATCH status and run records say what was not applied *(provisional: D5 = `mixta`)*
+### HLR-156 — PATCH status and run records say what was not applied
 - **Traceability:** US-145
-- **Ledger:** LED-2026-10-25-batch-99.1
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.5
 - **Statement:** When a flow PATCH step finishes, the system shall set its status from the step's dispositions and refusals:
   - `error` when the document could not be read, carries a document-level ERROR refusal (every entry `blocked`), or applied 0 of at least 1 entry;
   - `notices` when at least one entry was not applied (`skipped-*` or an entry-level `blocked`) and at least one was applied;
@@ -446,9 +446,9 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: every entry undone → the image equals the source (TC-B99-21; no save-back is offered with 0 applied entries, P-23); boundary: an undone entry overlapping a kept one. Invalid/error: N/A — no new input.
   - **Negative control:** executed on `307065f` (P-6): `file @0xEB10 = deadbeef` → RED today.
 
-### HLR-158 — A2L physical values encode and decode as the A2L declares *(provisional: D2 = `asam`, D3 = `modulo`, D4 = `rechazar`)*
+### HLR-158 — A2L physical values encode and decode as the A2L declares
 - **Traceability:** US-147 (decode), US-152 (encode)
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3, LED-2026-10-25-batch-99.5
 - **Statement:** When the system converts between a physical value and raw bytes for an A2L symbol, it shall use the symbol's byte order, else its RECORD_LAYOUT's, else the module's `MOD_COMMON BYTE_ORDER`, and only then little-endian. It shall apply a RAT_FUNC as INT = f(PHYS) when encoding and solve it for PHYS when decoding. When the A2L window cannot decode a value, it shall show `n/a` with the reason instead of a number. When a physical value is encoded through a COMPU_TAB, the encoder shall:
   - for `TAB_NOINTP`, refuse a value that is not exactly one of the table's physical values, naming the two nearest table values;
   - for `TAB_INTP`, refuse a value outside the table's physical range, naming the range; inside it, encode the nearest raw value and, when that raw value decodes to a physical value different from the typed one, return a flag stating the physical value that will be written.
@@ -488,8 +488,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### HLR-160 — Exports stay inside their destination and invent no byte
 - **Traceability:** US-149
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
-- **Statement:** When Split/Join/Export plans an export, the system shall build every file name, BIN `.addr` sidecars included, from one sanitiser. Before any byte is written, it shall refuse the export, naming the segments, when two final names collide (compared case-folded) or a name is refused. It shall refuse, writing nothing, when the destination or any final path does not resolve inside the work-area root, and it shall never write through an existing link or reparse point. It shall write only image bytes the source declared; in a MAC-only session that is a header-only S19/HEX file. *(D8, provisional `sufijo`:)* When a final name already exists with different bytes, it shall place the file under the next free `_<N>` name through HLR-155's placement; a BIN and its `.addr` sidecar are placed as a pair under the same `_<N>`, both names claimed before either is written. When the existing file (or pair) holds identical bytes, it is reused. The status names the files actually written or reused.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.5
+- **Statement:** When Split/Join/Export plans an export, the system shall build every file name, BIN `.addr` sidecars included, from one sanitiser. Before any byte is written, it shall refuse the export, naming the segments, when two final names collide (compared case-folded) or a name is refused. It shall refuse, writing nothing, when the destination or any final path does not resolve inside the work-area root, and it shall never write through an existing link or reparse point. It shall write only image bytes the source declared; in a MAC-only session that is a header-only S19/HEX file. *(D8 = `sufijo`, operator verdict 2026-10-25:)* When a final name already exists with different bytes, it shall place the file under the next free `_<N>` name through HLR-155's placement; a BIN and its `.addr` sidecar are placed as a pair under the same `_<N>`, both names claimed before either is written. When the existing file (or pair) holds identical bytes, it is reused. The status names the files actually written or reused.
 - **Rationale (informative):** a `../` segment name escapes the work area (P-11); a MAC placeholder byte is written as data (P-18). P2 (S-1..S-4) found that the two sanitisers in the tree disagree, that a junction destination passes a destination-rooted check, and that sanitising is many-to-one.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_export.py`
@@ -508,10 +508,10 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: the MAC-only session; boundary: a 100-character segment name (kept) and a longer one (capped); invalid: the hostile names; error: the containment and collision refusals.
   - **Negative control:** executed on `307065f` (P-11): `inside dest: False` → RED today.
 
-### HLR-161 — The Bytes field reads one base *(provisional: D1 = `hex`)*
+### HLR-161 — The Bytes field reads one base
 - **Traceability:** US-150
-- **Ledger:** none — amends batch-07 LLR-001.2 (decimals in the TUI byte grammar) once the verdict lands; that amendment will be the next ledger entry after the verdict.
-- **Statement:** When the Patch Editor reads the Bytes field, it shall read every token as hexadecimal, with or without a `0x` prefix, and refuse any token that is not 1–2 hex digits, with a message naming the token. The field's placeholder and the window help shall say that tokens are hex.
+- **Ledger:** LED-2026-10-25-batch-99.5 (amends batch-07 LLR-001.2: decimals in the TUI byte grammar)
+- **Statement:** When the Patch Editor reads the Bytes field, it shall read every token as hexadecimal, with or without a `0x` prefix, and refuse any token that is not 1–2 hex digits, with a message naming the token. The field's placeholder and the window help shall say that tokens are hex. String (value) entries are unchanged: they are encoded with the document's `encoding` (utf-8 for a new document), as the operator confirmed with the D1 verdict.
 - **Rationale (informative):** digit-only tokens are read as decimal inside a hex dump (P-16).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b99_bytes_field.py`
@@ -621,7 +621,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-2): `applied 1 entry` → RED.
 - **Boundary catalog:** ☒ boundary — the last S0 payload address.
 
-### LLR-154.1 — S19 terminator and count checks *(provisional, D6)*
+### LLR-154.1 — S19 terminator and count checks
 - **Traceability:** HLR-154
 - **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** *(Crosses the frozen engine layer, `docs/ARCHITECTURE.md` §7; named here.)* The S19 loader (`s19_app/core.py` `_load`) shall attach a notice with code `S19-NO-TERMINATOR` when the file has no `S7`/`S8`/`S9` record, `S19-COUNT-MISMATCH` when an `S5` count (compared only when the data-record count is ≤ 0xFFFF) or an `S6` count (≤ 0xFFFFFF) differs from the number of data records, and `S19-AFTER-TERMINATOR` when any record follows the terminator. After the terminator it shall count non-empty lines only — no parse, no per-line issue, no image write — and emit one notice per defect kind.
@@ -631,7 +631,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** drop the terminator check (mutation) → 0 notices on the cut file, RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — terminator as the last line; trailing blank lines; `S6` past 65 535 records; the three defects.
 
-### LLR-154.2 — HEX EOF checks *(provisional, D6)*
+### LLR-154.2 — HEX EOF checks
 - **Traceability:** HLR-154
 - **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
 - **Statement:** *(Crosses the frozen engine layer, §7; named here.)* The HEX loader (`s19_app/hexfile.py` `_load`) shall attach a notice with code `HEX-NO-EOF` when the file has no type-01 record, and `HEX-AFTER-EOF`, stating the count, when records follow the first EOF. After the EOF it shall count non-empty lines only and emit one notice.
@@ -641,7 +641,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** drop the EOF check (mutation) → 0 notices, RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — EOF as the last line; the two defects.
 
-### LLR-154.3 — SOURCE fails on an integrity notice *(provisional, D6)*
+### LLR-154.3 — SOURCE fails on an integrity notice
 - **Traceability:** HLR-154
 - **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** The flow SOURCE step (`flow_execution_service.py`) shall end with status `error` when the loaded image carries a notice whose code is one of the five of LLR-154.1/154.2 (other load notices keep today's `notices` mapping), and the flow shall write no file.
@@ -695,7 +695,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-15): `return_code: 1` → RED.
 - **Boundary catalog:** ☒ error — the missing file.
 
-### LLR-155.5 — Duplicate output names are refused at start *(provisional, D7)*
+### LLR-155.5 — Duplicate output names are refused at start
 - **Traceability:** HLR-155
 - **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** `run_chain_set` shall refuse to start when two or more lanes resolve to the same WRITE-OUT file name (compared case-folded), returning a refusal that names those lanes and that its callers (`app.py` chain-set run handlers) show in the status line, and shall write nothing.
@@ -705,7 +705,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** remove the check (mutation) → files written, RED.
 - **Boundary catalog:** ☒ invalid — duplicate names; distinct names (control).
 
-### LLR-155.6 — WRITE-OUT verifies what it wrote *(provisional, D9)*
+### LLR-155.6 — WRITE-OUT verifies what it wrote
 - **Traceability:** HLR-155
 - **Ledger:** none
 - **Statement:** The flow WRITE-OUT step shall call `verify_written_image` on the written file and end with status `error`, naming the first differing address, when it reports a mismatch.
@@ -736,7 +736,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** restore the shared `temp/<name>` staging (mutation) → mismatches, RED.
 - **Boundary catalog:** ☒ boundary — 1 writer and 2 writers.
 
-### LLR-156.1 — PATCH status from dispositions *(provisional, D5)*
+### LLR-156.1 — PATCH status from dispositions
 - **Traceability:** HLR-156
 - **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
 - **Statement:** The flow PATCH arm (`flow_execution_service.py`) shall derive its status as HLR-156 states. Its summary shall name each non-applied address with its disposition and each refusal code. A PATCH `error` shall stop the flow before any later WRITE-OUT step.
@@ -748,8 +748,8 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-156.2 — The chain outcome carries dispositions
 - **Traceability:** HLR-156
-- **Ledger:** LED-2026-10-25-batch-99.1
-- **Statement:** `ChainRunOutcome` shall carry the run's `change_records`, `refusals` and `image_ranges`, and the Flow Execution lane shall paint each lane's PATCH cell from its block status, so that `notices` and `error` are visible; any file-derived text it paints goes through `safe_text`.
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.5
+- **Statement:** `ChainRunOutcome` shall carry the run's `change_records`, `refusals` and `image_ranges`, and the Flow Execution lane shall paint each lane's PATCH cell from its block status, so that `notices` and `error` are visible. When a lane's PATCH ends `notices` or `error`, the lane's terminal run-log line shall name the PATCH block, the count of entries not applied, and the first address with its disposition (e.g. `PATCH: 1 of 2 entries not applied (0x00020000 skipped-outside)`), or the first refusal code. Any file-derived text it paints goes through `safe_text`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-18 — `pytest tests/test_b99_patch_truth.py -k tc_b99_18`
 - **Numeric pass threshold:** malformed-doc lane → outcome holds `MF-JSON-PARSE` in `refusals`; lane cell glyph is the error glyph.
@@ -808,7 +808,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** keep the image byte as `before_bytes` (mutation) → `DE AD BE EF` shown as before, RED.
 - **Boundary catalog:** ☒ boundary — a first apply (source byte trivially).
 
-### LLR-158.1 — Byte-order fallback reads `MOD_COMMON` *(provisional, D3)*
+### LLR-158.1 — Byte-order fallback reads `MOD_COMMON`
 - **Traceability:** HLR-158
 - **Ledger:** none, LED-2026-10-25-batch-99.4
 - **Statement:** *(LLR-158.1..158.3 cross the frozen engine layer — `tui/a2l.py`, `docs/ARCHITECTURE.md` §7; named here.)* The effective byte order (`tui/a2l.py`) shall fall back tag → RECORD_LAYOUT → tag endian → `MOD_COMMON BYTE_ORDER` → `little`, and `encode_physical_to_raw_bytes` and the decode path shall both use it.
@@ -818,7 +818,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-7): `little` → RED.
 - **Boundary catalog:** ☒ boundary — 1-byte value (order irrelevant), 2- and 4-byte values.
 
-### LLR-158.2 — RAT_FUNC direction *(provisional, D2)*
+### LLR-158.2 — RAT_FUNC direction
 - **Traceability:** HLR-158
 - **Ledger:** LED-2026-10-25-batch-99.1
 - **Statement:** `_apply_compu_method` shall decode a RAT_FUNC by solving INT = f(PHYS) for PHYS, taking the root inside the tag's declared physical limits when exactly one is, else the smaller-magnitude root, and returning a decode failure (shown `n/a` with the reason) when no real root exists. The encoder shall compute INT = f(PHYS) directly.
@@ -828,7 +828,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-17): 30 → `03 00` → RED.
 - **Boundary catalog:** ☒ invalid — a coefficient set with no inverse is refused (existing message kept).
 
-### LLR-158.3 — COMPU_TAB values outside the table are refused, in-range values are flagged *(provisional, D4)*
+### LLR-158.3 — COMPU_TAB values outside the table are refused, in-range values are flagged
 - **Traceability:** HLR-158
 - **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
 - **Statement:** The COMPU_TAB inversion shall refuse a `TAB_NOINTP` value that is not a table value (naming the two nearest) and a `TAB_INTP` value outside the table range (naming the range). For an in-range `TAB_INTP` value it shall return the nearest raw value with a flag naming the written physical value whenever that value differs from the typed one.
@@ -900,7 +900,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed (P-18): `S306800000000079` written → RED.
 - **Boundary catalog:** ☒ empty — the MAC-only session.
 
-### LLR-160.4 — A second export takes the next free name *(provisional, D8)*
+### LLR-160.4 — A second export takes the next free name
 - **Traceability:** HLR-160
 - **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.3
 - **Statement:** When an export's final name exists with different bytes, the writer shall place the file through HLR-155's placement (LLR-155.1/155.2), taking the next free `_<N>`; a BIN and its `.addr` sidecar shall be placed by one call of a group-placement function in `tui/workspace.py` (`place_group_into_workarea`, NEW, B99-I2a) that claims one `_<N>` for every name of the group before writing any, then fills each by `os.replace` from the same private staging directory. Identical bytes are reused; a BIN/`.addr` pair is reused only when both files are identical. The status shall name the files actually written or reused.
@@ -910,7 +910,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed on `307065f` (P-11): `first content survived: False` → RED.
 - **Boundary catalog:** ☒ boundary — the first export (no suffix).
 
-### LLR-161.1 — Hex-only token grammar *(provisional, D1)*
+### LLR-161.1 — Hex-only token grammar
 - **Traceability:** HLR-161
 - **Ledger:** none
 - **Statement:** `parse_new_bytes` (`tui/services/change_service.py`) shall read each token as base 16 with an optional `0x` prefix, accept 1–2 hex digits, and raise a `ValueError` naming any other token.
@@ -920,7 +920,7 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Negative control:** executed (P-16): `0F 10 1F 20` → `0F 0A 1F 14` → RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — `00`, `FF`; `100`, `G1`.
 
-### LLR-161.2 — The field says it is hex *(provisional, D1)*
+### LLR-161.2 — The field says it is hex
 - **Traceability:** HLR-161
 - **Ledger:** none
 - **Statement:** The Bytes field's placeholder and the Patch Editor's window help entry shall state that tokens are hex.

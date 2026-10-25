@@ -65,3 +65,15 @@ above this line is ever edited._
 - **What changed:** LLR-158.1's threshold named an `LSB_FIRST` control. ASAM MCD-2 MC's BYTE_ORDER tokens are `MSB_FIRST`, `MSB_LAST`, `BIG_ENDIAN` and `LITTLE_ENDIAN`; the app's `_normalize_byte_order` (`tui/a2l.py:280-286`) returns `None` for `LSB_FIRST`. The control now declares `MSB_LAST` on the symbol's RECORD_LAYOUT or tag, and keeps little-endian under a `MSB_FIRST` module. PDR condition PQ-4 item (5) carried the same token; it is read as `MSB_LAST` from now on (the PDR record is sealed and not edited).
 - **Why:** code-reviewer, Inc-1 review, finding F1 (HIGH): with `LSB_FIRST` the control passes at HEAD only because MOD_COMMON is ignored, and it turns RED once LLR-158.1 is implemented.
 - **Evidence:** `s19_app/tui/a2l.py:280-286`; the Inc-1 review verdict recorded in `03-increments/increment-001.md` §4b.
+
+### LED-2026-10-25-batch-99.5 — Operator verdict on D1–D10 applied; UX-C1 and UX-C7 folded
+- **Requirement:** HLR-154, HLR-155, HLR-156, HLR-158, HLR-160, HLR-161
+- **Requirement:** LLR-156.2
+- **Date:** 2026-10-25
+- **What changed:**
+  - The operator's verdict (`design/veredicto-b99.json`, exported 2026-10-25T22:32Z) chose the recommended option on every decision: D1 `hex`, D2 `asam`, D3 `modulo`, D4 `rechazar`, D5 `mixta`, D6 `flujo_para`, D7 `rechazar`, D8 `sufijo`, D9 `si`, D10 `diferir`. The 16 "provisional" markers are removed. US-143, US-145, US-147, US-150 and US-152 move to READY.
+  - HLR-161 amends batch-07 LLR-001.2: a bare token in the Bytes field is always hex, and decimals are no longer accepted there. Answering the operator's D1 note: String (value) entries are unchanged and keep the document's `encoding` (utf-8 for a new document, `change_service.py:775`).
+  - PDR condition **UX-C1** (owned by Inc 8 with the D5 verdict) is folded into LLR-156.2: the lane's terminal run-log line names the PATCH block, the not-applied count and the first address with its disposition.
+  - PDR condition **UX-C7** (owned by Inc 9 with the D6 verdict) is folded into HLR-154: an interactive load of a file with an integrity notice leads its status with the defect, never a plain `Loaded <name>`.
+- **Why:** the operator verdict of 2026-10-25 and the PDR conditions that waited for it (`design/PDR-2026-10-25-batch-99.md`).
+- **Evidence:** `design/veredicto-b99.json`; `design/PDR-ux.md` UX-C1, UX-C7.
