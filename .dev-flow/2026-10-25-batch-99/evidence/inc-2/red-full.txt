@@ -1,0 +1,40 @@
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#load_path' on Screen(id='_default')
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_04_predicate_feeds_every_walk - Asse...
+FAILED tests/test_b99_s0.py::test_tc_b99_04_boundary_s0_alongside_data_at_zero
+FAILED tests/test_b99_s0.py::test_tc_b99_05_hexview_builders_use_same_predicate
+FAILED tests/test_b99_s0.py::test_tc_b99_06_written_images_carry_s0_as_header_only
+FAILED tests/test_b99_s0.py::test_tc_b99_07_patch_at_s0_address_is_outside - ...
+FAILED tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0 - textual.c...
+============================== 6 failed in 2.91s ==============================

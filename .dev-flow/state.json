@@ -170,6 +170,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "asked at the gate — operator verdict 2026-10-25 on D1-D10 (design/veredicto-b99.json): recommended option on all ten; applied in LED-2026-10-25-batch-99.5; US-143/145/147/150/152 READY; increments 3b, 8, 9, 10, 11 unblocked."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 002 (US-142 / HLR-153, S0 is not image data; core.py + render/hexview.py, frozen-engine crossing named in LLR-153.1) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH vacuous Memory Map assertion in AT-B99-02, F2-F6 MEDIUM incl. a sealed batch-92 evidence file rewritten -> restored), round 2 OK to advance; orchestrator fixed a modal-compose flake (8/8). Full suite runs on the merged main."
     }
   ],
   "obsidian_synced": false,

@@ -19,8 +19,8 @@ from s19_app.render.hexview import (
 def test_build_mem_map_s19_flattens_record_bytes():
     s19 = SimpleNamespace(
         records=[
-            SimpleNamespace(address=0x1000, data=[0x41, 0x42]),
-            SimpleNamespace(address=0x1002, data=[0x43]),
+            SimpleNamespace(type="S1", address=0x1000, data=[0x41, 0x42]),
+            SimpleNamespace(type="S1", address=0x1002, data=[0x43]),
         ]
     )
 
@@ -30,8 +30,8 @@ def test_build_mem_map_s19_flattens_record_bytes():
 def test_build_range_validity_s19_marks_invalid_ranges():
     s19 = SimpleNamespace(
         records=[
-            SimpleNamespace(address=0x1000, data=[0xAA, 0xBB], valid=True),
-            SimpleNamespace(address=0x1002, data=[0xCC], valid=False),
+            SimpleNamespace(type="S1", address=0x1000, data=[0xAA, 0xBB], valid=True),
+            SimpleNamespace(type="S1", address=0x1002, data=[0xCC], valid=False),
         ]
     )
 

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diff report</title>
+<style>body{font-family:monospace;background:#fdf6e3;color:#073642;}table{border-collapse:collapse;}th,td{border:1px solid #93a1a1;padding:2px 6px;text-align:left;}pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}</style>
+</head>
+<body>
+<h1>Diff report</h1>
+<ul>
+<li>Generated (UTC): 2026-07-10T12:00:00+00:00</li>
+<li>Tool version: 0.1.0</li>
+<li>Image A: img.s19 [external] path=<code><RUN-ROOT>/img.s19</code> parse-errors=0</li>
+<li>Image B: img-patched.s19 [external] path=<code><RUN-ROOT>/.s19tool/workarea/proj/img-patched.s19</code> parse-errors=0</li>
+<li>Image A artifacts: summary=none; a2l=absent; mac=absent</li>
+<li>Image B artifacts: summary=none; a2l=absent; mac=absent</li>
+</ul>
+<h2>Before/after provenance</h2>
+<ul>
+<li>Original image (before): <code><RUN-ROOT>/img.s19</code></li>
+<li>Saved patched image (after): <code><RUN-ROOT>/.s19tool/workarea/proj/img-patched.s19</code></li>
+<li>Applied (UTC): 2026-07-10T12:00:00+00:00</li>
+<li>Change document: (in-memory document)</li>
+</ul>
+<h2>Change-entry linkage</h2>
+<table>
+<tr><th>#</th><th>Type</th><th>Start</th><th>End</th><th>Disposition</th><th>Linkage</th><th>Symbol</th><th>Before</th><th>After</th></tr>
+<tr><td>1</td><td>bytes</td><td>0x00000100</td><td>0x00000102</td><td>applied</td><td>standalone</td><td>-</td><td>00 00 |..|</td><td>AA BB |..|</td></tr>
+</table>
+<h2>Statistics</h2>
+<table>
+<tr><th>Classification</th><th>Runs</th><th>Bytes</th></tr>
+<tr><td style="color:#b58900">changed</td><td>1</td><td>2</td></tr>
+<tr><td style="color:#dc322f">only in A</td><td>0</td><td>0</td></tr>
+<tr><td style="color:#268bd2">only in B</td><td>1</td><td>15</td></tr>
+</table>
+<h2>Runs</h2>
+<table>
+<tr><th>Start</th><th>End</th><th>Length</th><th>Classification</th><th>Symbols</th></tr>
+<tr><td>0x00000000</td><td>0x0000000F</td><td>15</td><td style="color:#268bd2">only in B</td><td>-</td></tr>
+<tr><td>0x00000100</td><td>0x00000102</td><td>2</td><td style="color:#b58900">changed</td><td>-</td></tr>
+</table>
+<h2>Hex windows</h2>
+<h3 style="color:#268bd2">Run 0x00000000-0x0000000F (only in B)</h3>
+<p>Image A window 0x00000000-0x00000050:</p>
+<pre style="color:#268bd2">0x00000000                                                   |................|
+0x00000010                                                   |................|
+0x00000020                                                   |................|
+0x00000030                                                   |................|
+0x00000040                                                   |................|</pre>
+<p>Image B window 0x00000000-0x00000050:</p>
+<pre style="color:#268bd2">0x00000000  69 6D 67 2D 70 61 74 63 68 65 64 2E 73 31 39     |img-patched.s19.|
+0x00000010                                                   |................|
+0x00000020                                                   |................|
+0x00000030                                                   |................|
+0x00000040                                                   |................|</pre>
+<h3 style="color:#b58900">Run 0x00000100-0x00000102 (changed)</h3>
+<p>Window 0x000000C0-0x00000110 (changed bytes highlighted):</p>
+<table style="width:100%;border-collapse:collapse"><tr>
+<td style="vertical-align:top;width:50%;padding-right:8px"><strong>Before (A)</strong><pre>0x000000C0                                                   |                |
+0x000000D0                                                   |                |
+0x000000E0                                                   |                |
+0x000000F0                                                   |                |
+0x00000100  <span style="background:#ffd54d;color:#000;font-weight:bold">00</span> <span style="background:#ffd54d;color:#000;font-weight:bold">00</span> 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |<span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span>..............|</pre></td>
+<td style="vertical-align:top;width:50%"><strong>After (B)</strong><pre>0x000000C0                                                   |                |
+0x000000D0                                                   |                |
+0x000000E0                                                   |                |
+0x000000F0                                                   |                |
+0x00000100  <span style="background:#ffd54d;color:#000;font-weight:bold">AA</span> <span style="background:#ffd54d;color:#000;font-weight:bold">BB</span> 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |<span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span>..............|</pre></td>
+</tr></table>
+</body>
+</html>

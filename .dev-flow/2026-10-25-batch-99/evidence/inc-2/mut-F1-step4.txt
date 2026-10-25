@@ -1,0 +1,32 @@
+=== CONTROL: AT-B99-02 with steps 3 and 5 temporarily commented out, tree UNMUTATED ===
+.                                                                        [100%]
+1 passed in 12.38s
+
+=== MUTANT: S0 re-admitted in _is_data_record (return record.type in {"S0","S1","S2","S3"}),
+=== same trimmed drive (step 4 alone) — expect RED at the F1 Memory-Map assertion ===
+                for _ in range(100):
+                    await pilot.pause()
+                    rows = [
+                        str(r.render()).strip()
+                        for r in app.query(".map-region-row")
+                    ]
+                    if rows:
+                        break
+                assert rows, "Memory Map lists no regions"
+>               assert not any(
+                    re.search(r"\b0x00000000\b", r) for r in rows
+                ), rows
+E               AssertionError: ['░ 0x00000000    12 B  0 low      ↵', '░ 0x80000000    33 B  0 low      ↵', '▒ 0x80000040    64 B  0 medium   ↵']
+E               assert not True
+E                +  where True = any(<generator object test_at_b99_02_save_back_excludes_s0.<locals>._drive.<locals>.<genexpr> at 0x0000021E74EC34C0>)
+
+tests\test_b99_s0.py:499: AssertionError
+=========================== short test summary info ==========================
+FAILED tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0 - Assertion...
+1 failed in 10.18s
+
+The mutated walk paints the S0 header as an image row '░ 0x00000000    12 B ...'
+— exactly the row the OLD startswith("0x00000000") probe could never fire on
+(every row starts with the band glyph). Mutation reverted afterwards:
+s19_app/core.py sha256 6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683,
+tests/test_b99_s0.py restored byte-identical to its pre-run state.

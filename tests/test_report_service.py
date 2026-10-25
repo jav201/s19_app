@@ -1658,11 +1658,17 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
 
 #: The pinned pre-move capture of the AT-288 report — the batch's sole
 #: byte-identity oracle for the hexview move (PDR §1 enabler protocol).
+#: Batch-99 Inc 2 (HLR-153) re-pinned the capture bytes (the only diff is
+#: the disappeared low-confidence S0-header entropy window at 0x0) and the
+#: pin now lives under ``tests/goldens/batch99/`` — the batch-92 evidence
+#: file is a sealed record and was restored to its batch-92 bytes (review
+#: finding F6); its pre-batch-99 bytes are backed up at
+#: ``.dev-flow/2026-10-25-batch-99/evidence/inc-2/at288-pre-move-report.bin.pre-b99-inc2``.
 _AT288_CAPTURE = (
     Path(__file__).resolve().parent.parent
-    / ".dev-flow"
-    / "2026-10-11-batch-92"
-    / "evidence"
+    / "tests"
+    / "goldens"
+    / "batch99"
     / "at288-pre-move-report.bin"
 )
 

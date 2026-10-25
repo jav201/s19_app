@@ -1,0 +1,217 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 1 item
+
+tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0 FAILED        [100%]
+
+================================== FAILURES ===================================
+____________________ test_at_b99_02_save_back_excludes_s0 _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25658/test_at_b99_02_save_back_exclu0')
+
+    def test_at_b99_02_save_back_excludes_s0(tmp_path):
+        """Load case_01 through the dialog, rewrite in-image bytes, save back:
+        the independent reader sees no byte at 0x0..0xB and identical data;
+        the Memory Map lists no range starting at 0x0; a document whose only
+        entry is at 0x0 shows that entry as skipped in the status line."""
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        src = tmp_path / "firmware.s19"
+        shutil.copy(CASE01, src)
+        oracle = read_s19(src)
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive():
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                # The dialog is a pushed screen: query within ``app.screen``
+                # (App.query_one searches the base screen only).
+                app.screen.query_one("#load_path", Input).value = str(src)
+                app.screen.query_one("#load_ok", Button).press()
+                await _wait_for(pilot, lambda: app.current_file is not None, "load")
+    
+                # 2. Patch Editor (rail key ``6``): one entry rewriting the two
+                #    bytes already at the first data address (identity rewrite).
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                addr = min(oracle.data)
+                rewritten = [oracle.data[addr], oracle.data[addr + 1]]
+                app.query_one("#patch_entry_address_input", Input).value = f"0x{addr:X}"
+                app.query_one("#patch_entry_bytes_input", Input).value = " ".join(
+                    f"{b:02X}" for b in rewritten
+                )
+                app.query_one("#patch_entry_add_button", Button).press()
+                await pilot.pause()
+                app.query_one("#patch_doc_apply_button", Button).press()
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "apply status line",
+                )
+                assert "1 applied, 0 skipped, 0 blocked" in _status_text(app)
+    
+                # 3. Save-back (offered after the applied entry, premise P-23).
+                row = app.query_one("#patch_saveback_row", Container)
+                assert not row.has_class("hidden")
+                app.query_one("#patch_saveback_name_input", Input).value = (
+                    "at_b99_02.s19"
+                )
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                target = None
+                for _ in range(100):
+                    candidates = sorted(tmp_path.rglob("at_b99_02.s19"))
+                    if candidates:
+                        target = candidates[0]
+                        break
+                    await pilot.pause(0.05)
+                assert target is not None, "save-back wrote no file"
+    
+                written = read_s19(target)
+                assert not any(a <= 0xB for a in written.data), (
+                    f"bytes at 0x0..0xB: {sorted(a for a in written.data if a <= 0xB)}"
+                )
+                assert written.data == oracle.data
+                assert written.header == oracle.header
+    
+                # 4. Memory Map (rail key ``4``): no range starting at 0x0.
+                await pilot.press("4")
+                await pilot.pause()
+                app.update_memory_map()
+                rows = []
+                for _ in range(100):
+                    await pilot.pause()
+                    rows = [
+                        str(r.render()).strip()
+                        for r in app.query(".map-region-row")
+                    ]
+                    if rows:
+                        break
+                assert rows, "Memory Map lists no regions"
+                assert all(not r.startswith("0x00000000") for r in rows), rows
+    
+                # 5. A document whose only entry is at 0x0: skipped in the
+                #    status line.  Reload the Patch Editor and replace the
+                #    document with the 0x0-only one through the doc-load path.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                doc_path = tmp_path / "only_s0_entry.json"
+                doc_path.write_text(
+                    json.dumps(
+                        {
+                            "format": "s19app-changeset",
+                            "version": "2.0",
+                            "kind": "change",
+                            "encoding": "utf-8",
+                            "value_mode": "text",
+                            "entries": [
+                                {
+                                    "type": "bytes",
+                                    "address": "0x0",
+                                    "bytes": "AA BB",
+                                }
+                            ],
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                app.query_one("#patch_doc_path_input", Input).value = str(doc_path)
+                app.query_one("#patch_doc_load_button", Button).press()
+                await pilot.pause()
+                app.query_one("#patch_doc_apply_button", Button).press()
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "second apply status line",
+                )
+                status = _status_text(app)
+                assert "0 applied, 1 skipped, 0 blocked" in status, status
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_s0.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive():
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            # 1. Load through the Load file dialog (rail key ``l``).
+            await pilot.press("l")
+            for _ in range(6):
+                await pilot.pause()
+            # The dialog is a pushed screen: query within ``app.screen``
+            # (App.query_one searches the base screen only).
+            app.screen.query_one("#load_path", Input).value = str(src)
+            app.screen.query_one("#load_ok", Button).press()
+            await _wait_for(pilot, lambda: app.current_file is not None, "load")
+    
+            # 2. Patch Editor (rail key ``6``): one entry rewriting the two
+            #    bytes already at the first data address (identity rewrite).
+            await pilot.press("6")
+            for _ in range(6):
+                await pilot.pause()
+            addr = min(oracle.data)
+            rewritten = [oracle.data[addr], oracle.data[addr + 1]]
+            app.query_one("#patch_entry_address_input", Input).value = f"0x{addr:X}"
+            app.query_one("#patch_entry_bytes_input", Input).value = " ".join(
+                f"{b:02X}" for b in rewritten
+            )
+            app.query_one("#patch_entry_add_button", Button).press()
+            await pilot.pause()
+            app.query_one("#patch_doc_apply_button", Button).press()
+            await _wait_for(
+                pilot,
+                lambda: "Apply:" in _status_text(app),
+                "apply status line",
+            )
+            assert "1 applied, 0 skipped, 0 blocked" in _status_text(app)
+    
+            # 3. Save-back (offered after the applied entry, premise P-23).
+            row = app.query_one("#patch_saveback_row", Container)
+            assert not row.has_class("hidden")
+            app.query_one("#patch_saveback_name_input", Input).value = (
+                "at_b99_02.s19"
+            )
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            target = None
+            for _ in range(100):
+                candidates = sorted(tmp_path.rglob("at_b99_02.s19"))
+                if candidates:
+                    target = candidates[0]
+                    break
+                await pilot.pause(0.05)
+            assert target is not None, "save-back wrote no file"
+    
+            written = read_s19(target)
+>           assert not any(a <= 0xB for a in written.data), (
+                f"bytes at 0x0..0xB: {sorted(a for a in written.data if a <= 0xB)}"
+            )
+E           AssertionError: bytes at 0x0..0xB: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+E           assert not True
+E            +  where True = any(<generator object test_at_b99_02_save_back_excludes_s0.<locals>._drive.<locals>.<genexpr> at 0x0000023BEDBA4E10>)
+
+tests\test_b99_s0.py:348: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_at_b99_02_save_back_excludes_s0 - Assertion...
+============================== 1 failed in 3.88s ==============================

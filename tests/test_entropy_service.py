@@ -281,13 +281,14 @@ def test_llr035_5_entropy_window_frozen_shape() -> None:
 # Stress guard — large_s19 window COUNT (not exact H), completes fast (LLR-035.2)
 # ---------------------------------------------------------------------------
 def test_stress_guard_large_s19_window_count(large_s19: Path) -> None:
-    """Stress guard (LLR-035.2): the large_s19 fixture parses to 201 contiguous
+    """Stress guard (LLR-035.2): the large_s19 fixture parses to 200 contiguous
     ranges — 200 data ranges of 4096 B (each exactly 16 full 256-B windows →
-    3200 windows) PLUS the 6-byte S0 header record mapped at address 0 (one
-    short window). So the window count derives from the ACTUAL ranges via
-    Σ ceil(len/256), asserted against the count computed from the same ranges —
-    proving the walk is per-range and gap-safe on a real image, and that it
-    completes fast. (Window COUNT, not exact H — large_s19 is random-fill.)"""
+    3200 windows). The S0 header record is not image data (HLR-153), so it
+    contributes no range and no window. So the window count derives from the
+    ACTUAL ranges via Σ ceil(len/256), asserted against the count computed
+    from the same ranges — proving the walk is per-range and gap-safe on a
+    real image, and that it completes fast. (Window COUNT, not exact H —
+    large_s19 is random-fill.)"""
     mem_map = S19File(str(large_s19)).get_memory_map()
     windows = compute_entropy(mem_map)
 
@@ -296,11 +297,10 @@ def test_stress_guard_large_s19_window_count(large_s19: Path) -> None:
     expected = sum(-(-(end - start) // ENTROPY_WINDOW_BYTES) for start, end in ranges)
     assert len(windows) == expected
 
-    # The fixture is 200 data ranges (16 windows each) + the 6-byte S0 header.
-    assert len(ranges) == 201
-    assert len(windows) == 200 * 16 + 1  # 3201
-    # The 6-byte header window is < 64 B → low-confidence; the 4096-B data
-    # windows are all full → not low-confidence.
+    # The fixture is 200 data ranges (16 windows each); the S0 header is
+    # header-only since HLR-153 (batch-99 Inc 2).
+    assert len(ranges) == 200
+    assert len(windows) == 200 * 16  # 3200
+    # Every window is a full 4096-B data window → none low-confidence.
     low_conf = [w for w in windows if w.low_confidence]
-    assert len(low_conf) == 1
-    assert low_conf[0].sample_count == 6
+    assert low_conf == []

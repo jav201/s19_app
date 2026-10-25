@@ -1,0 +1,69 @@
+........................................................................ [ 39%]
+....................................................................FF.. [ 78%]
+........................................                                 [100%]
+================================== FAILURES ===================================
+_______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25812/test_tc031_engine_modules_have0')
+
+    def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
+        """The engine / data-processing modules show zero diff vs ``main``.
+    
+        Intent: LLR-014.1 / C-1 — the parse/validate engine is frozen for this
+        view-only batch. ``git diff --stat main`` over ``core.py``,
+        ``hexfile.py``, ``range_index.py``, ``validation/``, ``tui/a2l.py``,
+        ``tui/mac.py`` and ``tui/color_policy.py`` must be empty. An empty diff
+        is the strongest possible verdict for the cosmetic-only rubric (Q-11):
+        there are zero changed lines, so there is trivially no logic, constant
+        or signature change.
+    
+        If a future increment touches an engine module — even cosmetically —
+        this test fails and forces the change to be classified by hand against
+        the rubric (whitespace/comment/import-order = cosmetic; logic/constant/
+        signature = a violation) rather than slipping through silently.
+        """
+        diff_stat = _git("diff", "--stat", "main", "--", *_ENGINE_PATHS)
+>       assert diff_stat.strip() == "", (
+            "the engine / data-processing modules must be byte-identical to "
+            f"the batch start (main); git diff --stat reported:\n{diff_stat}"
+        )
+E       AssertionError: the engine / data-processing modules must be byte-identical to the batch start (main); git diff --stat reported:
+E          s19_app/core.py | 24 ++++++++++++++++++++++++
+E          1 file changed, 24 insertions(+)
+E         
+E       assert 's19_app/core...insertions(+)' == ''
+E         
+E         + s19_app/core.py | 24 ++++++++++++++++++++++++
+E         +  1 file changed, 24 insertions(+)
+
+tests\test_tui_directionb.py:7051: AssertionError
+__________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25812/test_tc031_engine_modules_have1')
+
+    def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
+        """No engine module file appears in ``git diff --name-only main``.
+    
+        Intent: LLR-014.1 — a second, independent check that no file under the
+        frozen engine surface was modified, added or deleted relative to the
+        batch start. ``--stat`` (the test above) and ``--name-only`` (here)
+        cross-check each other so a formatting quirk in one cannot mask a real
+        change.
+        """
+        names = _git("diff", "--name-only", "main", "--", *_ENGINE_PATHS)
+        changed = [line for line in names.splitlines() if line.strip()]
+>       assert changed == [], (
+            f"engine / data-processing files changed vs the batch start: "
+            f"{changed} — C-1 / LLR-014.1 freezes these modules"
+        )
+E       AssertionError: engine / data-processing files changed vs the batch start: ['s19_app/core.py'] — C-1 / LLR-014.1 freezes these modules
+E       assert ['s19_app/core.py'] == []
+E         
+E         Left contains one more item: 's19_app/core.py'
+E         Use -v to get more diff
+
+tests\test_tui_directionb.py:7068: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+2 failed, 182 passed in 390.01s (0:06:30)

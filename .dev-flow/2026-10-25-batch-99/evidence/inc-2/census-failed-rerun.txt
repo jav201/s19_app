@@ -1,0 +1,536 @@
+FFFFFFFFFFF.                                                             [100%]
+================================== FAILURES ===================================
+__________________ test_stress_guard_large_s19_window_count ___________________
+
+large_s19 = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_stress_guard_large_s19_wi0/stress.s19')
+
+    def test_stress_guard_large_s19_window_count(large_s19: Path) -> None:
+        """Stress guard (LLR-035.2): the large_s19 fixture parses to 201 contiguous
+        ranges — 200 data ranges of 4096 B (each exactly 16 full 256-B windows →
+        3200 windows) PLUS the 6-byte S0 header record mapped at address 0 (one
+        short window). So the window count derives from the ACTUAL ranges via
+        Σ ceil(len/256), asserted against the count computed from the same ranges —
+        proving the walk is per-range and gap-safe on a real image, and that it
+        completes fast. (Window COUNT, not exact H — large_s19 is random-fill.)"""
+        mem_map = S19File(str(large_s19)).get_memory_map()
+        windows = compute_entropy(mem_map)
+    
+        # Expected count = Σ ceil(len(range)/256) over the ranges the parser built.
+        ranges = _derive_ranges(mem_map)
+        expected = sum(-(-(end - start) // ENTROPY_WINDOW_BYTES) for start, end in ranges)
+        assert len(windows) == expected
+    
+        # The fixture is 200 data ranges (16 windows each) + the 6-byte S0 header.
+>       assert len(ranges) == 201
+E       assert 200 == 201
+E        +  where 200 = len([(134217728, 134221824), (134222080, 134226176), (134226432, 134230528), (134230784, 134234880), (134235136, 134239232), (134239488, 134243584), ...])
+
+tests\test_entropy_service.py:300: AssertionError
+_____________ test_at288_report_hex_sections_identical_after_move _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at288_report_hex_sections0')
+large_s19 = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at288_report_hex_sections0/stress.s19')
+
+    def test_at288_report_hex_sections_identical_after_move(
+        tmp_path: Path, large_s19: Path
+    ) -> None:
+        """AT-288 — report hex sections byte-identical across the hexview move.
+    
+        Intent: HLR-001 acceptance — the report service end-to-end over the
+        ``large_s19`` fixture (200 ranges x 4 KB, ``make_large_s19``), driving
+        non-default parameters through the surface per F-QA-5 as re-chartered by
+        QA-PDR-1 (LED-…92.13): a modified region at the tail of fixture range 0
+        with a non-default ``context_bytes`` (0x200, default 0x40) so the emitted
+        ``row_bases`` window spans the fixture gap into disjoint fixture range 1.
+        The report path calls the plain ``render_hex_view`` (report_service:590
+        verifies the Text-variant parameters are NOT driveable), so the oracle
+        exercises the moved functions ``build_mem_map_s19`` (via
+        ``load_service.build_loaded_s19``), ``build_row_bases`` and
+        ``render_hex_view`` themselves. Protocol (PDR §1): on the base tree the
+        capture is ABSENT and the node stores the emitted bytes; after the move
+        the capture EXISTS and the node asserts byte-equality with it.
+        """
+        from s19_app.core import S19File as _Parser
+        from s19_app.tui.services.load_service import build_loaded_s19
+    
+        # Fixture geometry (conftest.make_large_s19 defaults): range i is
+        # [BASE + i*STRIDE, BASE + i*STRIDE + RANGE_LEN); the ranges are disjoint
+        # with a 0x100-byte unmapped gap between them.
+        base = 0x0800_0000
+        range_len = 0x1000
+        gap = 0x100
+        stride = range_len + gap
+        range0_end = base + range_len  # 0x08001000 (exclusive)
+        range1_start = base + stride  # 0x08001100 (inclusive)
+    
+        context_bytes = 0x200  # non-default (REPORT_CONTEXT_BYTES_DEFAULT == 64)
+        region_start = range0_end - 16  # tail 16 bytes of fixture range 0
+    
+        loaded = build_loaded_s19(large_s19, _Parser(str(large_s19)), None, None)
+        entries = [_applied_entry(region_start, (0x00, 0x00), (0xAA, 0xBB))]
+        # LLR-007.8: ``mem_map`` rides the result as the POST-change map.
+        post_change_map = dict(loaded.mem_map)
+        post_change_map[region_start] = 0xAA
+        post_change_map[region_start + 1] = 0xBB
+        result = VariantExecutionResult(
+            variant_id="stress",
+            status="ok",
+            change_summaries=[_summary(entries)],
+            mem_map=post_change_map,
+        )
+        path = generate_project_report(
+            tmp_path,
+            [result],
+            ReportOptions(context_bytes=context_bytes),
+            variant_set=_variant_set("stress"),
+            now_fn=_fixed_clock,
+        )
+        emitted = path.read_bytes()
+    
+        # --- driveable non-default parameters asserted on the EMITTED form ---
+        low = (region_start - context_bytes) // 16 * 16
+        high = (range0_end + context_bytes + 15) // 16 * 16
+        text = emitted.decode("utf-8")
+        window_header = f"Window 0x{low:08X}-0x{high:08X}:"
+        assert window_header in text, (
+            f"AT-288: the emitted window header {window_header!r} must be present"
+        )
+        assert "- Context bytes: 512" in text  # non-default context drove through
+        # The window must span >=2 disjoint fixture ranges: it ends past the end
+        # of range 0 and reaches into range 1 across the unmapped gap.
+        assert low < range0_end < range1_start < high, (
+            "AT-288: the row_bases window must span the gap between two disjoint "
+            "fixture ranges"
+        )
+        gap_row = f"0x{range0_end:08X}"
+        assert gap_row in text, "AT-288: the unmapped gap row must be emitted"
+        gap_line = next(ln for ln in text.splitlines() if ln.startswith(gap_row))
+        assert gap_line.endswith("|................|"), (
+            "AT-288: the gap row renders 16 unmapped byte cells"
+        )
+        range1_row = f"0x{range1_start:08X}"
+        assert range1_row in text, (
+            "AT-288: mapped rows of disjoint fixture range 1 must be emitted"
+        )
+        # The patched bytes of the region itself are in the dump.
+        region_row = f"0x{region_start:08X}"
+        assert region_row in text
+        region_line = next(ln for ln in text.splitlines() if ln.startswith(region_row))
+        assert "AA BB" in region_line
+    
+        # --- the pinned byte-identity oracle ---
+        if _AT288_CAPTURE.exists():
+            pinned = _AT288_CAPTURE.read_bytes()
+>           assert emitted == pinned, (
+                "AT-288: post-move report bytes differ from the pinned pre-move "
+                "capture — the hexview move is NOT byte-identical"
+            )
+E           AssertionError: AT-288: post-move report bytes differ from the pinned pre-move capture — the hexview move is NOT byte-identical
+E           assert b'# Project r...4 window(s)\n' == b'# Project r...4 window(s)\n'
+E             
+E             At index 7639 diff: b'm' != b'l'
+E             Use -v to get more diff
+
+tests\test_report_service.py:1760: AssertionError
+_____________ test_tc041_8_coverage_stats_exact_case_02_literals ______________
+
+    def test_tc041_8_coverage_stats_exact_case_02_literals() -> None:
+        """Coverage stats equal the hand-computed case_02 literals (TC-041.8 /
+        LLR-041.8).
+    
+        Intent: the strip's numbers are pure arithmetic on the parsed ranges, so
+        every metric must equal an EXACT hand-computed literal (NOT ``> 0``) — a
+        coverage-math regression (double-count, off-by-one gap, wrong span) fails
+        a specific number, not just a sign check. Coverage % is strictly < 100.
+        """
+        from s19_app.core import S19File
+        from s19_app.tui.screens_directionb import coverage_stats
+        from s19_app.tui.services.load_service import build_loaded_s19
+    
+        s19 = S19File(str(_CASE_02_S19))
+        loaded = build_loaded_s19(_CASE_02_S19, s19, a2l_path=None, a2l_data=None)
+    
+        stats = coverage_stats(loaded.ranges, loaded.range_validity, [])
+    
+>       assert stats.image_span == _CASE_02_IMAGE_SPAN, "span literal"
+E       AssertionError: span literal
+E       assert 320 == 2147549504
+E        +  where 320 = CoverageStats(image_span=320, covered_bytes=82, coverage_pct=25.624999999999996, valid_count=3, invalid_count=0, gap_count=2, largest_gap=144, total_issues=0).image_span
+
+tests\test_tui_directionb.py:3795: AssertionError
+_______________ test_at037_stats_strip_matches_case_02_coverage _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at037_stats_strip_matches0')
+
+    def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
+        """Black-box: the `#map_stats` strip shows the seven case_02 metrics as
+        ONE line (AT-037 / US-037).
+    
+        **AMENDED batch-93 (HLR-129 / LLR-129.1, amending HLR-113):** the retired
+        multi-line label form (``Coverage:`` / ``Bytes covered:`` / …) is gone —
+        the strip is now the single line `` Mapped {covered} / {span} span
+        ({pct:.4f}%) · {N} ranges ({V} valid) · {G} gaps · {I} issues `` (compact
+        form below 84 columns; 120x30 renders the full form). The seven statistics
+        and their order are UNCHANGED; only the wording moved. ``Largest gap:``
+        retired entirely — it is no longer one of the seven.
+    
+        Intent: load case_02, show the map, read `#map_stats`, and assert the
+        seven statistics appear IN ORDER on one line — the coverage %% equals
+        TC-041.8's hand-computed number, and the total-issue count equals
+        ``len(app._validation_issues)`` (the single canonical source).
+        """
+    
+        async def _drive() -> tuple[str, int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                _install_case_02_loaded_file(app)
+                app.action_show_screen("map")
+                app.update_memory_map()
+                await pilot.pause()
+                strip = str(app.query_one("#map_stats_body").render())
+                return strip, len(app._validation_issues)
+    
+        strip, issue_count = asyncio.run(_drive())
+    
+        # The strip is ONE line (batch-93 HLR-129 — the multi-line form retired).
+        assert "\n" not in strip, (
+            f"the stats strip must render as one line; got {strip!r}"
+        )
+        # All seven statistics, in the contract's field order, on the one line.
+        expected = (
+            f"Mapped {human_bytes(_CASE_02_COVERED_BYTES)} / "
+            f"{human_bytes(_CASE_02_IMAGE_SPAN)} span "
+            f"({_CASE_02_COVERAGE_PCT:.4f}%) · "
+            f"{_CASE_02_VALID_COUNT + _CASE_02_INVALID_COUNT} ranges "
+            f"({_CASE_02_VALID_COUNT} valid) · "
+            f"{_CASE_02_GAP_COUNT} gaps · {issue_count} issues"
+        )
+>       assert expected in strip, (
+            f"the seven statistics must render in order; got {strip!r}"
+        )
+E       AssertionError: the seven statistics must render in order; got ' Mapped 82 B / 320 B span (25.6250%) · 3 ranges (3 valid) · 2 gaps · 0 issues'
+E       assert 'Mapped 93 B / 2.0 GiB span (0.0000%) · 4 ranges (4 valid) · 3 gaps · 0 issues' in ' Mapped 82 B / 320 B span (25.6250%) · 3 ranges (3 valid) · 2 gaps · 0 issues'
+
+tests\test_tui_directionb.py:4020: AssertionError
+_______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_tc031_engine_modules_have0')
+
+    def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
+        """The engine / data-processing modules show zero diff vs ``main``.
+    
+        Intent: LLR-014.1 / C-1 — the parse/validate engine is frozen for this
+        view-only batch. ``git diff --stat main`` over ``core.py``,
+        ``hexfile.py``, ``range_index.py``, ``validation/``, ``tui/a2l.py``,
+        ``tui/mac.py`` and ``tui/color_policy.py`` must be empty. An empty diff
+        is the strongest possible verdict for the cosmetic-only rubric (Q-11):
+        there are zero changed lines, so there is trivially no logic, constant
+        or signature change.
+    
+        If a future increment touches an engine module — even cosmetically —
+        this test fails and forces the change to be classified by hand against
+        the rubric (whitespace/comment/import-order = cosmetic; logic/constant/
+        signature = a violation) rather than slipping through silently.
+        """
+        diff_stat = _git("diff", "--stat", "main", "--", *_ENGINE_PATHS)
+>       assert diff_stat.strip() == "", (
+            "the engine / data-processing modules must be byte-identical to "
+            f"the batch start (main); git diff --stat reported:\n{diff_stat}"
+        )
+E       AssertionError: the engine / data-processing modules must be byte-identical to the batch start (main); git diff --stat reported:
+E          s19_app/core.py | 24 ++++++++++++++++++++++++
+E          1 file changed, 24 insertions(+)
+E         
+E       assert 's19_app/core...insertions(+)' == ''
+E         
+E         + s19_app/core.py | 24 ++++++++++++++++++++++++
+E         +  1 file changed, 24 insertions(+)
+
+tests\test_tui_directionb.py:7050: AssertionError
+__________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_tc031_engine_modules_have1')
+
+    def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
+        """No engine module file appears in ``git diff --name-only main``.
+    
+        Intent: LLR-014.1 — a second, independent check that no file under the
+        frozen engine surface was modified, added or deleted relative to the
+        batch start. ``--stat`` (the test above) and ``--name-only`` (here)
+        cross-check each other so a formatting quirk in one cannot mask a real
+        change.
+        """
+        names = _git("diff", "--name-only", "main", "--", *_ENGINE_PATHS)
+        changed = [line for line in names.splitlines() if line.strip()]
+>       assert changed == [], (
+            f"engine / data-processing files changed vs the batch start: "
+            f"{changed} — C-1 / LLR-014.1 freezes these modules"
+        )
+E       AssertionError: engine / data-processing files changed vs the batch start: ['s19_app/core.py'] — C-1 / LLR-014.1 freezes these modules
+E       assert ['s19_app/core.py'] == []
+E         
+E         Left contains one more item: 's19_app/core.py'
+E         Use -v to get more diff
+
+tests\test_tui_directionb.py:7067: AssertionError
+______________ test_at040a_per_range_micro_bar_colour_and_width _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at040a_per_range_micro_ba0')
+
+    def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
+        """AT-040a / LLR-042.7 (black-box, C-10b): each range row renders a micro-bar;
+        its width ∝ range size (largest → widest, per-branch), and its colour class
+        tracks validity (valid → sev-ok ≠ invalid → sev-error).
+    
+        Intent: observe the shipped `#sections_list` render, not a proxy. Width is
+        proven over case_02 (four all-valid ranges of differing sizes); the colour
+        branch is proven over case_04 (one valid + one INVALID range) so the
+        valid≠invalid discriminator is actually exercised. The small-range branch
+        drives a 64 B range beside a 512 KiB range — the normal firmware shape, whose
+        ratio (0.012%) rounds to 0 cells without the fill floor. case_02 structurally
+        cannot catch that: its four ranges are all 32-100% of the largest.
+        """
+    
+        async def _drive_width() -> list[tuple[tuple[int, int], str, object]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                _install_case_02_loaded_file(app)
+                app.update_sections()
+                await pilot.pause()
+                return _section_bar_lines(app)
+    
+        async def _drive_small_range() -> list[tuple[tuple[int, int], str, object]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                loaded = _install_case_02_loaded_file(app)
+                # A 64 B vector table beside a 512 KiB image: frac = 64/524288 =
+                # 0.000122 → round(0.000122 * 8) == 0 filled cells without the floor.
+                loaded.ranges = [(0x00000000, 0x00000040), (0x80000000, 0x80080000)]
+                loaded.range_validity = [True, True]
+                loaded.entropy_windows = []
+                app.update_sections()
+                await pilot.pause()
+                return _section_bar_lines(app)
+    
+        async def _drive_colour() -> list[tuple[tuple[int, int], str, object]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                _install_case_04_loaded_file(app)
+                app.update_sections()
+                await pilot.pause()
+                return _section_bar_lines(app)
+    
+        # --- width branch (case_02, all valid) ---
+        width_rows = asyncio.run(_drive_width())
+>       assert len(width_rows) == 4, "case_02 has four ranges"
+E       AssertionError: case_02 has four ranges
+E       assert 3 == 4
+E        +  where 3 = len([((2147549184, 2147549218), '████████', frozenset({'sev-ok'})), ((2147549312, 2147549328), '████░░░░', frozenset({'sev-ok'})), ((2147549472, 2147549504), '████████', frozenset({'sev-ok'}))])
+
+tests\test_tui_directionb.py:8484: AssertionError
+________________ test_build_mem_map_s19_flattens_record_bytes _________________
+
+    def test_build_mem_map_s19_flattens_record_bytes():
+        s19 = SimpleNamespace(
+            records=[
+                SimpleNamespace(address=0x1000, data=[0x41, 0x42]),
+                SimpleNamespace(address=0x1002, data=[0x43]),
+            ]
+        )
+    
+>       assert build_mem_map_s19(s19) == {0x1000: 0x41, 0x1001: 0x42, 0x1002: 0x43}
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_tui_hexview.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\render\hexview.py:64: in build_mem_map_s19
+    if not _is_data_record(record):
+           ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+record = namespace(address=4096, data=[65, 66])
+
+    def _is_data_record(record: "SRecord") -> bool:
+        """
+        Summary:
+            Return True only for records that carry memory-region data
+            (``S1``/``S2``/``S3``) — the single data-record predicate every
+            image walk filters through (ARCHITECTURE R18, HLR-153). The ``S0``
+            header text, ``S5``/``S6`` counts and ``S7``/``S8``/``S9``
+            terminators never enter the image.
+    
+        Args:
+            record (SRecord): The record to classify.
+    
+        Returns:
+            bool: True for ``S1``/``S2``/``S3`` records only.
+        """
+>       return record.type in {"S1", "S2", "S3"}
+               ^^^^^^^^^^^
+E       AttributeError: 'types.SimpleNamespace' object has no attribute 'type'
+
+s19_app\core.py:233: AttributeError
+_____________ test_build_range_validity_s19_marks_invalid_ranges ______________
+
+    def test_build_range_validity_s19_marks_invalid_ranges():
+        s19 = SimpleNamespace(
+            records=[
+                SimpleNamespace(address=0x1000, data=[0xAA, 0xBB], valid=True),
+                SimpleNamespace(address=0x1002, data=[0xCC], valid=False),
+            ]
+        )
+    
+>       validity = build_range_validity_s19(s19, [(0x1000, 0x1002), (0x1002, 0x1003), (0x2000, 0x2001)])
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_tui_hexview.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\render\hexview.py:75: in build_range_validity_s19
+    if not _is_data_record(record):
+           ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+record = namespace(address=4096, data=[170, 187], valid=True)
+
+    def _is_data_record(record: "SRecord") -> bool:
+        """
+        Summary:
+            Return True only for records that carry memory-region data
+            (``S1``/``S2``/``S3``) — the single data-record predicate every
+            image walk filters through (ARCHITECTURE R18, HLR-153). The ``S0``
+            header text, ``S5``/``S6`` counts and ``S7``/``S8``/``S9``
+            terminators never enter the image.
+    
+        Args:
+            record (SRecord): The record to classify.
+    
+        Returns:
+            bool: True for ``S1``/``S2``/``S3`` records only.
+        """
+>       return record.type in {"S1", "S2", "S3"}
+               ^^^^^^^^^^^
+E       AttributeError: 'types.SimpleNamespace' object has no attribute 'type'
+
+s19_app\core.py:233: AttributeError
+______ test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at_054b_no_filter_bkey_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000126800A80D0>
+
+    def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-054b / LLR-054.4 (HLR-054): with NO filter selected, the shipped
+        ``b``-key flow writes an MD+HTML pair byte-identical to the goldens
+        captured at the batch base revision ``79699a5`` under the declared
+        environment pin.
+    
+        Intent: the batch-35 guard golden — every later increment must keep the
+        unfiltered before/after output byte-for-byte untouched; any generator
+        byte drift flips this equality RED.
+    
+        Environment pin (test-side monkeypatch on SERVICE module attributes,
+        never a shipped-path change):
+        - ``s19_app.tui.services.diff_report_service._default_now`` -> fixed
+          2026-07-10T12:00:00Z — the default-clock seam BOTH generators resolve
+          when the handler passes no ``now_fn`` (``app.py`` passes none;
+          ``before_after_service`` forwards ``now_fn=None`` untouched).
+        - ``s19_app.tui.changes.apply.datetime`` -> :class:`_FixedApplyDatetime`
+          — the apply-stamp clock (inline default at ``apply.py:313-314``, no
+          ``_default_now`` symbol exists there) whose stamp is printed as the
+          ``Applied (UTC)`` report line.
+        Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
+        per-run tmp-root tokenization); all other bytes are compared exact.
+        Goldens: ``tests/goldens/batch35/at054b-before-after-report.{md,html}``.
+        Double-proof (batch-24 control): a one-byte golden perturbation makes
+        this AT RED — captured in increment-000.md.
+        """
+        written = _drive_bkey_report_pair(tmp_path, monkeypatch)
+    
+        md_name = "20260710T120000Z-before-after-report.md"
+        html_name = "20260710T120000Z-before-after-report.html"
+        assert sorted(written) == [html_name, md_name], (
+            f"AT-054b: expected exactly the pinned-clock MD+HTML pair, "
+            f"got {sorted(written)}"
+        )
+    
+        for label, name, golden_path in (
+            ("md", md_name, _AT054B_MD_GOLDEN),
+            ("html", html_name, _AT054B_HTML_GOLDEN),
+        ):
+            assert golden_path.is_file(), (
+                f"AT-054b: golden fixture missing: {golden_path} (captured in "
+                f"batch-35 increment-000 at base revision 79699a5)"
+            )
+            observed = canonical_report_bytes(written[name], tmp_path)
+            golden = canonical_report_bytes(golden_path.read_bytes())
+>           assert observed == golden, (
+                f"AT-054b: unfiltered {label} report bytes drifted from golden "
+                f"{golden_path.name} (LLR-054.4 byte-identity, canonical form)"
+            )
+E           AssertionError: AT-054b: unfiltered md report bytes drifted from golden at054b-before-after-report.md (LLR-054.4 byte-identity, canonical form)
+E           assert b'# Diff repo........|\n```\n' == b'# Diff repo........|\n```\n'
+E             
+E             At index 980 diff: b'0' != b'1'
+E             Use -v to get more diff
+
+tests\test_before_after_report.py:899: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25695/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_entropy_service.py::test_stress_guard_large_s19_window_count
+FAILED tests/test_report_service.py::test_at288_report_hex_sections_identical_after_move
+FAILED tests/test_tui_directionb.py::test_tc041_8_coverage_stats_exact_case_02_literals
+FAILED tests/test_tui_directionb.py::test_at037_stats_strip_matches_case_02_coverage
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_at040a_per_range_micro_bar_colour_and_width
+FAILED tests/test_tui_hexview.py::test_build_mem_map_s19_flattens_record_bytes
+FAILED tests/test_tui_hexview.py::test_build_range_validity_s19_marks_invalid_ranges
+FAILED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+11 failed, 1 passed in 13.66s

@@ -1,0 +1,15 @@
+# Baseline and mutation-cycle hashes — batch-99 increment 2
+# algorithm: sha256sum over file bytes (git show HEAD:<path> for the pre-increment tree)
+#
+# Pre-increment (git HEAD, commit e4c4324):
+3ece50e92585d2175f8a1e86179be13df81730900db02b44276b7ff8fd2b886f  HEAD:s19_app/core.py
+fe6921c79b8f44776e2350db317b8f01150f341b9280f36f26b25ac4a2185f3b  HEAD:s19_app/render/hexview.py
+#
+# Post-implementation (working tree, before the mutation cycle):
+6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683  s19_app/core.py
+9d0f8ecdb1c87e7a4897dd7218742e3eb6fb5fe65ef68f7359cc82ce177dd7c8  s19_app/render/hexview.py
+#
+# Mutation cycle on s19_app/core.py (_is_data_record re-admitting S0):
+#   before mutation : 6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683
+#   after revert    : 6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683  (== pre-mutation)
+# s19_app/render/hexview.py was never mutated.

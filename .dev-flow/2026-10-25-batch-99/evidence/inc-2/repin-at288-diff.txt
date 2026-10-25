@@ -1,0 +1,25 @@
+AT-288 re-pin — batch-99 increment 2 (HLR-153)
+Capture: .dev-flow/2026-10-11-batch-92/evidence/at288-pre-move-report.bin
+Pre-pin bytes:  061ee94c07bbed51f5cb99962ba3ed4acbc0c7c6a4461168d1f596d5cdfa4c39 (7697 -> stored 7739 bytes)
+Back up:        evidence/inc-2/at288-pre-move-report.bin.pre-b99-inc2 (identical sha256)
+
+Unified diff (pinned pre-fix bytes -> emitted post-fix bytes), produced by
+driving generate_project_report over the make_large_s19 fixture exactly as
+tests/test_report_service.py::test_at288_report_hex_sections_identical_after_move:
+
+--- pinned
++++ emitted
+@@ -139,3 +139,2 @@
+
+-- **low**: 1 window(s) (1 low-confidence)
+ - **medium**: 2226 window(s)
+
+The ONLY change: the entropy band summary loses its `low` line — that line
+counted the 6-byte S0 header mapped at address 0x0 (one short low-confidence
+window). HLR-153 makes the S0 header header-only, so the window no longer
+exists. The `medium` window count is unchanged; every emitted-form assertion
+in the node (window header, context bytes, gap row, region row) still passes.
+
+Record: tests/test_report_service.py::test_at288_report_hex_sections_identical_after_move
+        — pinned capture kept ONE low-confidence window (the S0 phantom at 0x0)
+        — LLR-153.1

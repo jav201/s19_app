@@ -1,0 +1,49 @@
+=== MUTANT (S0 re-admitted), TC-B99-06 restricted to the two checksum-defective files (B99_DEFECT_ONLY=1): expect RED on those files ===
+                defective = _defective_record_addresses(src)
+>               assert set(written.data) - set(oracle.data) <= defective, (
+                    src.name
+                )
+E               AssertionError: firmware.s19
+E               assert {0, 1, 2, 3, 4, 5, ...} <= {2147680272, ...47680277, ...}
+E                 
+E                 Extra items in the left set:
+E                 0
+E                 1
+E                 2
+E                 3
+E                 4...
+E                 
+E                 ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests\test_b99_s0.py:263: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_06_written_images_carry_s0_as_header_only
+1 failed in 0.42s
+
+=== second arm: same mutant, defective-only list reversed so the professional_validation copy is exercised first ===
+E                 
+E                 Extra items in the left set:
+E                 0
+E                 1
+E                 2
+E                 3
+E                 4...
+E                 
+E                 ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests\test_b99_s0.py:263: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_06_written_images_carry_s0_as_header_only
+1 failed in 0.45s
+
+Both checksum-defective copies of case_04 are exercised and both go RED under
+the S0 re-admission mutation. The two files share the basename firmware.s19,
+so the failing src.name looks identical in both arms; the arms are the two
+real files by corpus order (EXAMPLE_S19 is sorted):
+  arm 1 (natural order):  examples/case_04_bad_checksums/firmware.s19
+  arm 2 (reversed order): examples/professional_validation/case_04_bad_checksums/firmware.s19
+In both arms the extra written addresses are 0..11 (0x0..0xB, the re-admitted
+S0 payload) — outside the defective records' addresses, which is exactly what
+the F5 bound asserts. Mutation reverted afterwards (core.py sha256
+6821f378a150290e42d20f17b2c5865a423d99f5fd752fa31a0ce75c3148f683) and the
+test file restored byte-identical to its pre-run state.

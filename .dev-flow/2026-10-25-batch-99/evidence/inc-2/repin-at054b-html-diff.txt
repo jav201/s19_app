@@ -1,0 +1,32 @@
+AT-054b re-pin — batch-99 increment 2 (HLR-153). The ONLY change: the
+diff region at 0x0-0xF disappears — it was the save-back S0 header text
+(img-patched.s19.) mapped at 0x0 by the old loader (the S0 phantom).
+Backups: at054b-before-after-report.{md,html}.pre-b99-inc2 (identical bytes).
+
+--- golden-html
++++ observed-html
+@@ -34,3 +34,3 @@
+ <tr><td style="color:#dc322f">only in A</td><td>0</td><td>0</td></tr>
+-<tr><td style="color:#268bd2">only in B</td><td>1</td><td>15</td></tr>
++<tr><td style="color:#268bd2">only in B</td><td>0</td><td>0</td></tr>
+ </table>
+@@ -39,3 +39,2 @@
+ <tr><th>Start</th><th>End</th><th>Length</th><th>Classification</th><th>Symbols</th></tr>
+-<tr><td>0x00000000</td><td>0x0000000F</td><td>15</td><td style="color:#268bd2">only in B</td><td>-</td></tr>
+ <tr><td>0x00000100</td><td>0x00000102</td><td>2</td><td style="color:#b58900">changed</td><td>-</td></tr>
+@@ -43,15 +42,2 @@
+ <h2>Hex windows</h2>
+-<h3 style="color:#268bd2">Run 0x00000000-0x0000000F (only in B)</h3>
+-<p>Image A window 0x00000000-0x00000050:</p>
+-<pre style="color:#268bd2">0x00000000                                                   |................|
+-0x00000010                                                   |................|
+-0x00000020                                                   |................|
+-0x00000030                                                   |................|
+-0x00000040                                                   |................|</pre>
+-<p>Image B window 0x00000000-0x00000050:</p>
+-<pre style="color:#268bd2">0x00000000  69 6D 67 2D 70 61 74 63 68 65 64 2E 73 31 39     |img-patched.s19.|
+-0x00000010                                                   |................|
+-0x00000020                                                   |................|
+-0x00000030                                                   |................|
+-0x00000040                                                   |................|</pre>
+ <h3 style="color:#b58900">Run 0x00000100-0x00000102 (changed)</h3>

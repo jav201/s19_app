@@ -1,0 +1,41 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 6 items / 5 deselected / 1 selected
+
+tests/test_b99_s0.py::test_tc_b99_07_patch_at_s0_address_is_outside FAILED [100%]
+
+================================== FAILURES ===================================
+________________ test_tc_b99_07_patch_at_s0_address_is_outside ________________
+
+    def test_tc_b99_07_patch_at_s0_address_is_outside():
+        """case_01: an entry at 0x0 (and at the last S0 payload address) is
+        ``skipped-outside`` and writes nothing at 0x0."""
+        s19 = S19File(str(CASE01))
+        header = _s0_record(s19)
+        assert header is not None and header.address == 0x0
+    
+        for address in (0x0, header.address + len(header.data) - 1):
+            mem_map = s19.get_memory_map()
+            ranges = s19.get_memory_ranges()
+            summary = apply_change_document(
+                _one_entry_document(address, (0xAA, 0xBB)),
+                mem_map,
+                ranges,
+                None,
+                None,
+            )
+>           assert summary.entries[0].disposition == "skipped-outside", hex(address)
+E           AssertionError: 0x0
+E           assert 'applied' == 'skipped-outside'
+E             
+E             - skipped-outside
+E             + applied
+
+tests\test_b99_s0.py:257: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_07_patch_at_s0_address_is_outside - ...
+======================= 1 failed, 5 deselected in 0.55s =======================

@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 from rich.text import Text
 
-from ..core import S19File
+from ..core import S19File, _is_data_record
 from ..hexfile import IntelHexFile
 from ..range_index import (
     RangeIndex,
@@ -61,6 +61,8 @@ def build_mem_map_s19(s19: S19File) -> Dict[int, int]:
     """Build an address->byte map from S19 data records."""
     mem_map: Dict[int, int] = {}
     for record in s19.records:
+        if not _is_data_record(record):
+            continue
         for offset, value in enumerate(record.data):
             mem_map[record.address + offset] = value
     return mem_map
@@ -70,6 +72,8 @@ def build_range_validity_s19(s19: S19File, ranges: List[Tuple[int, int]]) -> Lis
     """Mark each address range as valid/invalid based on record validity."""
     address_valid: Dict[int, bool] = {}
     for record in s19.records:
+        if not _is_data_record(record):
+            continue
         for offset in range(len(record.data)):
             addr = record.address + offset
             current = address_valid.get(addr, True)

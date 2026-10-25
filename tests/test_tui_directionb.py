@@ -3760,16 +3760,17 @@ def test_tc041_4d_hostile_issue_symbol_rendered_literally(tmp_path: Path) -> Non
 # regime; AT-037 is the black-box Pilot proof over `#map_stats`.
 # ---------------------------------------------------------------------------
 
-# The public ``case_02`` image's ranges are four disjoint spans over a ~2 GiB
-# address window. Its EXACT coverage arithmetic (verified against the built
-# LoadedFile): span 0x0..0x80010140 = 2_147_549_504 bytes; covered = 11 + 34 +
-# 16 + 32 = 93 bytes; 3 gaps (2_147_549_173 / 94 / 144), largest 2_147_549_173;
-# all four ranges valid → 0 invalid; coverage = 93 / 2_147_549_504 * 100.
-_CASE_02_IMAGE_SPAN = 0x80010140
-_CASE_02_COVERED_BYTES = 93
-_CASE_02_GAP_COUNT = 3
-_CASE_02_LARGEST_GAP = 2_147_549_173
-_CASE_02_VALID_COUNT = 4
+# The public ``case_02`` image's ranges are three disjoint data spans over a
+# 320-byte address window (the S0 header is header-only since HLR-153, batch-99
+# Inc 2 — it is no longer an image range). Its EXACT coverage arithmetic
+# (verified against the built LoadedFile): span 0x80010000..0x80010140 = 320
+# bytes; covered = 34 + 16 + 32 = 82 bytes; 2 gaps (94 / 144), largest 144;
+# all three ranges valid → 0 invalid; coverage = 82 / 320 * 100 = 25.625%.
+_CASE_02_IMAGE_SPAN = 320
+_CASE_02_COVERED_BYTES = 82
+_CASE_02_GAP_COUNT = 2
+_CASE_02_LARGEST_GAP = 144
+_CASE_02_VALID_COUNT = 3
 _CASE_02_INVALID_COUNT = 0
 _CASE_02_COVERAGE_PCT = _CASE_02_COVERED_BYTES / _CASE_02_IMAGE_SPAN * 100
 
@@ -8439,12 +8440,15 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
     tracks validity (valid → sev-ok ≠ invalid → sev-error).
 
     Intent: observe the shipped `#sections_list` render, not a proxy. Width is
-    proven over case_02 (four all-valid ranges of differing sizes); the colour
-    branch is proven over case_04 (one valid + one INVALID range) so the
-    valid≠invalid discriminator is actually exercised. The small-range branch
+    proven over case_02 (three all-valid data ranges of differing sizes; the
+    S0 header is header-only since HLR-153 and renders no row); the colour
+    branch is proven over a crafted file with two real ranges separated by a
+    gap (one valid block + one checksum-invalid block, split and validated by
+    the loader itself — review finding F4) so the valid≠invalid discriminator
+    is actually exercised. The small-range branch
     drives a 64 B range beside a 512 KiB range — the normal firmware shape, whose
     ratio (0.012%) rounds to 0 cells without the fill floor. case_02 structurally
-    cannot catch that: its four ranges are all 32-100% of the largest.
+    cannot catch that: its three ranges are all 32-100% of the largest.
     """
 
     async def _drive_width() -> list[tuple[tuple[int, int], str, object]]:
@@ -8471,17 +8475,59 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
             return _section_bar_lines(app)
 
     async def _drive_colour() -> list[tuple[tuple[int, int], str, object]]:
+        from s19_app.core import S19File
+        from s19_app.tui.services.load_service import build_loaded_s19
+
+        def s19_line(
+            record_type: str, address: int, data: bytes, *, bad: bool = False
+        ) -> str:
+            addr_len = {"S0": 2, "S1": 2, "S2": 3, "S3": 4, "S9": 2}[record_type]
+            count = addr_len + len(data) + 1
+            body = count.to_bytes(1, "big") + address.to_bytes(addr_len, "big") + data
+            checksum = (~sum(body)) & 0xFF
+            if bad:
+                checksum ^= 0xFF  # parseable record, failing checksum
+            return record_type + (body + checksum.to_bytes(1, "big")).hex().upper()
+
         app = S19TuiApp(base_dir=tmp_path)
+        # Two REAL ranges (review finding F4): a valid block, a GAP, then a
+        # checksum-invalid block — the range split and the per-range validity
+        # are the loader's own computation over the parsed records, not a
+        # hand-split of case_04's single invalid range with made-up extents.
+        fixture = tmp_path / "colour_valid_gap_invalid.s19"
+        fixture.write_text(
+            "\n".join(
+                [
+                    s19_line("S0", 0, b"HDR"),
+                    s19_line("S3", 0x80030000, bytes(range(16))),
+                    s19_line("S3", 0x80030020, bytes(range(32)), bad=True),
+                    s19_line("S9", 0, b""),
+                ]
+            )
+            + "\n",
+            encoding="ascii",
+        )
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _install_case_04_loaded_file(app)
+            s19 = S19File(str(fixture))
+            loaded = build_loaded_s19(fixture, s19, a2l_path=None, a2l_data=None)
+            app.current_file = loaded
+            app._apply_empty_state()
+            # The loader's own derivation pins the scenario before the AT
+            # observes the painted bars: a 16 B valid range, a gap, then a
+            # 32 B range the bad checksum invalidates.
+            assert loaded.ranges == [
+                (0x80030000, 0x80030010),
+                (0x80030020, 0x80030040),
+            ], loaded.ranges
+            assert loaded.range_validity == [True, False], loaded.range_validity
             app.update_sections()
             await pilot.pause()
             return _section_bar_lines(app)
 
     # --- width branch (case_02, all valid) ---
     width_rows = asyncio.run(_drive_width())
-    assert len(width_rows) == 4, "case_02 has four ranges"
+    assert len(width_rows) == 3, "case_02 has three data ranges"
     for data, bar_line, _classes in width_rows:
         assert "█" in bar_line, (
             f"each range row must render a micro-bar (filled glyphs); "
@@ -8509,11 +8555,13 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
         f"render a visible micro-bar (>=1 filled cell); bar was {small_bar!r}"
     )
 
-    # --- colour branch (case_04, valid + invalid) ---
+    # --- colour branch (crafted file: valid block, gap, invalid block) ---
     colour_rows = asyncio.run(_drive_colour())
-    assert len(colour_rows) == 2, "case_04 has a valid and an invalid range"
-    valid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 13]
-    invalid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 48]
+    assert len(colour_rows) == 2, (
+        "the crafted file has a valid and an invalid range"
+    )
+    valid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 16]
+    invalid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 32]
     assert valid_classes and valid_classes[0].__contains__("sev-ok"), (
         f"the valid range row's bar must carry sev-ok; got {valid_classes!r}"
     )

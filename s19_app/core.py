@@ -215,6 +215,24 @@ class SRecord:
         return f"{self.type}{byte_count:02X}{address_str}{data_str}{checksum:02X}"
 
 
+def _is_data_record(record: "SRecord") -> bool:
+    """
+    Summary:
+        Return True only for records that carry memory-region data
+        (``S1``/``S2``/``S3``) — the single data-record predicate every
+        image walk filters through (ARCHITECTURE R18, HLR-153). The ``S0``
+        header text, ``S5``/``S6`` counts and ``S7``/``S8``/``S9``
+        terminators never enter the image.
+
+    Args:
+        record (SRecord): The record to classify.
+
+    Returns:
+        bool: True for ``S1``/``S2``/``S3`` records only.
+    """
+    return record.type in {"S1", "S2", "S3"}
+
+
 class S19File:
     """
     Represents an entire S19 file, including logging, loading, validation,
@@ -442,6 +460,8 @@ class S19File:
         :raises ValueError: if no record contains the given address
         """
         for record in self.records:
+            if not _is_data_record(record):
+                continue
             start = record.address
             end = start + len(record.data)
             if start <= address < end:
@@ -456,6 +476,8 @@ class S19File:
         """
         addr_map = {}
         for record in self.records:
+            if not _is_data_record(record):
+                continue
             for i, byte in enumerate(record.data):
                 addr = record.address + i
                 addr_map.setdefault(addr, []).append(record)
@@ -488,6 +510,8 @@ class S19File:
         """
         mem_map: Dict[int, int] = {}
         for record in self.records:
+            if not _is_data_record(record):
+                continue
             addr = record.address
             for offset, byte in enumerate(record.data):
                 mem_map[addr + offset] = byte

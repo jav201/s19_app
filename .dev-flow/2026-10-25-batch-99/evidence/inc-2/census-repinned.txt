@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 39 items
+
+tests\test_entropy_service.py .                                          [  2%]
+tests\test_report_service.py .                                           [  5%]
+tests\test_tui_directionb.py ...                                         [ 12%]
+tests\test_tui_hexview.py ..                                             [ 17%]
+tests\test_before_after_report.py .                                      [ 20%]
+tests\test_tui_patch_editor_v2.py ....                                   [ 30%]
+tests\test_address_census.py .......................                     [ 89%]
+tests\test_b99_corpus.py ....                                            [100%]
+
+============================= 39 passed in 46.34s =============================

@@ -1,0 +1,41 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 6 items / 5 deselected / 1 selected
+
+tests/test_b99_s0.py::test_tc_b99_05_hexview_builders_use_same_predicate FAILED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b99_05_hexview_builders_use_same_predicate ______________
+
+    def test_tc_b99_05_hexview_builders_use_same_predicate():
+        """build_mem_map_s19 == get_memory_map == manifest bytes; S0-only excluded."""
+        manifest = _manifest()
+        checked = 0
+        for entry in manifest["files"]:
+            if entry["format"] != "s19":
+                continue
+            expected = _expand_runs(entry["data"])
+            s19 = S19File(str(CORPUS / entry["name"]))
+>           assert build_mem_map_s19(s19) == s19.get_memory_map() == expected, (
+                entry["name"]
+            )
+E           AssertionError: synth_s1.s19
+E           assert {0: 83, 1: 89...8, 3: 84, ...} == {65520: 3, 65...523: 122, ...}
+E             
+E             Omitting 16 identical items, use -vv to show
+E             Left contains 12 more items:
+E             {0: 83,
+E              1: 89,
+E              2: 78,
+E              3: 84,...
+E             
+E             ...Full output truncated (40 lines hidden), use '-vv' to show
+
+tests\test_b99_s0.py:147: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_05_hexview_builders_use_same_predicate
+======================= 1 failed, 5 deselected in 0.59s =======================

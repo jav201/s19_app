@@ -1,0 +1,46 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 6 items / 5 deselected / 1 selected
+
+tests/test_b99_s0.py::test_tc_b99_04_predicate_feeds_every_walk FAILED   [100%]
+
+================================== FAILURES ===================================
+__________________ test_tc_b99_04_predicate_feeds_every_walk __________________
+
+    def test_tc_b99_04_predicate_feeds_every_walk():
+        """Every S0-bearing corpus S19: maps/ranges/lookup/overlap see S1/S2/S3 only."""
+        manifest = _manifest()
+        checked = 0
+        for entry in manifest["files"]:
+            if entry["format"] != "s19" or entry["header"] is None:
+                continue
+            expected = _expand_runs(entry["data"])
+            s19 = S19File(str(CORPUS / entry["name"]))
+            header = _s0_record(s19)
+            assert header is not None, entry["name"]
+            s0_only = {
+                header.address + i for i in range(len(header.data))
+            } - set(expected)
+    
+            mem_map = s19.get_memory_map()
+>           assert mem_map == expected, entry["name"]
+E           AssertionError: synth_s1.s19
+E           assert {0: 83, 1: 89...8, 3: 84, ...} == {65520: 3, 65...523: 122, ...}
+E             
+E             Omitting 16 identical items, use -vv to show
+E             Left contains 12 more items:
+E             {0: 83,
+E              1: 89,
+E              2: 78,
+E              3: 84,...
+E             
+E             ...Full output truncated (40 lines hidden), use '-vv' to show
+
+tests\test_b99_s0.py:91: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_04_predicate_feeds_every_walk - Asse...
+======================= 1 failed, 5 deselected in 0.62s =======================

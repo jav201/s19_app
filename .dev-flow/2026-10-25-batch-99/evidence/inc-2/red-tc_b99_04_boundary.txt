@@ -1,0 +1,46 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 6 items / 5 deselected / 1 selected
+
+tests/test_b99_s0.py::test_tc_b99_04_boundary_s0_alongside_data_at_zero FAILED [100%]
+
+================================== FAILURES ===================================
+______________ test_tc_b99_04_boundary_s0_alongside_data_at_zero ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25660/test_tc_b99_04_boundary_s0_alo0')
+
+    def test_tc_b99_04_boundary_s0_alongside_data_at_zero(tmp_path):
+        """An S0 at 0x0 beside a data record at 0x0: data kept, header not."""
+        path = tmp_path / "s0_and_data_at_zero.s19"
+        path.write_text(
+            "\n".join(
+                [
+                    _s19_line("S0", 0x0, b"HEADER-TEXT"),
+                    _s19_line("S1", 0x0, b"\x01\x02\x03\x04"),
+>                   _s19_line("S9", 0x0, b""),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+                ]
+            )
+            + "\n",
+            encoding="ascii",
+        )
+
+tests\test_b99_s0.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+record_type = 'S9', address = 0, data = b''
+
+    def _s19_line(record_type: str, address: int, data: bytes) -> str:
+        """One S-record line, checksum included (test-local fixture writer)."""
+>       addr_len = {"S0": 2, "S1": 2, "S2": 3, "S3": 4}[record_type]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'S9'
+
+tests\test_b99_s0.py:63: KeyError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_s0.py::test_tc_b99_04_boundary_s0_alongside_data_at_zero
+======================= 1 failed, 5 deselected in 0.55s =======================
