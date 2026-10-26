@@ -1,0 +1,7 @@
+cmd: python -m pytest -q -p no:cacheprovider <reverse-census chunk 1b: remaining chunk-1 files>
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (post-change)
+
+........................................................................ [ 52%]
+..................................................................       [100%]
+138 passed in 125.08s (0:02:05)
+exit: 0

@@ -1,0 +1,26 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k variant_append_root  (RED: place_into_workarea ignores workarea_root)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-07
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_62_variant_append_root_refuses_another_workarea _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27264/test_tc_b100_62_variant_append0')
+
+    def test_tc_b100_62_variant_append_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), SEC-1 — the variant-append route:
+        ``_sync_loaded_file_to_project`` places through ``place_into_workarea``
+        with ``workarea_root=self.workarea``; a destination textually inside
+        ANOTHER work area is refused by the resolved-pair comparison, 0 bytes
+        outside this work area.  Dropping the root from the placement accepts
+        the destination (RED, transcript ``red-07-routes.txt``)."""
+        this_root, destination, victim_home = _other_workarea_home(tmp_path, "P")
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:808: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_variant_append_root_refuses_another_workarea
+1 failed, 35 deselected in 0.46s

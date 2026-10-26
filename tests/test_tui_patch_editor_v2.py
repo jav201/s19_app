@@ -1302,14 +1302,15 @@ def test_at031a_save_doc_lands_in_patches_folder(tmp_path: Path) -> None:
 
 
 def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
-    """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    """AT-031b (idempotent boundary) — re-pinned at batch-100 Inc 1 (G-005 /
+    LLR-163.3).
 
-    Intent: HLR-031 no-clobber — saving the same change document twice must
-    produce two on-disk files with DIFFERING names (dedup-suffixed by
-    ``copy_into_workarea``), never one clobbered file and never an error. This
-    pins the no-clobber contract by exact count + name distinctness rather than
-    merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
-    guard makes the second save clobber or raise → this goes RED.
+    Two saves of an UNCHANGED document reuse the one on-disk file
+    (byte-identical content dedup) — a repeated save leaves exactly one file.
+    A save after an ADDED entry holds different bytes and must keep both
+    files under distinct ``_<N>``-suffixed names — never one clobbered file
+    and never an error. Counterfactual: dropping the dedup/excl guard makes
+    the differing save clobber or raise → this goes RED.
     """
     patches = tmp_path / ".s19tool" / "workarea" / "patches"
 
@@ -1324,8 +1325,18 @@ def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
             _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
             panel.request_action("add_entry")
             await pilot.pause()
-
             panel.request_action("save_doc")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+            unchanged = list(patches.glob("*.json"))
+            assert len(unchanged) == 1, (
+                f"two saves of an unchanged document reuse one file, found {unchanged}"
+            )
+
+            _set_entry_inputs(app, address="0x200", bytes_text="CC DD")
+            panel.request_action("add_entry")
             await pilot.pause()
             panel.request_action("save_doc")
             await pilot.pause()
@@ -1333,7 +1344,7 @@ def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
     asyncio.run(_drive())
 
     saved = list(patches.glob("*.json"))
-    assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+    assert len(saved) == 2, f"the added entry must add one file, found {saved}"
     names = {p.name for p in saved}
     assert len(names) == 2, f"the two saved files must differ, got {names}"
 

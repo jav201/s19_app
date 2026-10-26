@@ -1,0 +1,8 @@
+GUARDS fix-pass-3 — tree: C:\Users\jjgh8\Github\s19_app-b100-inc1
+cmd: python -m pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 135.70s (0:02:15)

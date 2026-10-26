@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_copy_into_workarea_content_dedup.py tests/test_segment_split_window.py tests/test_tui_workspace.py (fix pass 1 — reverse-census files: the copy seam, the export window, the workspace surface)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1
+
+........................................................................ [ 78%]
+....................                                                     [100%]
+92 passed in 124.08s (0:02:04)

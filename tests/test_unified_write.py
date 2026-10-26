@@ -370,22 +370,36 @@ def test_tc018_name_without_json_suffix_gets_one(tmp_path: Path) -> None:
 
 
 def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
-    """TC-018 — a save onto an existing filename is dedup-suffixed.
+    """TC-018 — re-pinned at batch-100 Inc 1 (G-005 / LLR-163.3).
 
-    A silent clobber is forbidden: a second save under the same name must
-    produce a distinct ``_<N>``-suffixed file. This asserts the second write
-    lands at ``cs_1.json`` and both files survive on disk.
+    Two saves of the SAME document reuse the one file (byte-identical
+    content dedup): the second save returns the same path and only one file
+    exists. A save of a DIFFERENT document under the same name is
+    dedup-suffixed, never a silent clobber: it lands at ``cs_1.json`` and
+    both files survive on disk.
     """
-    document = change_document_factory()
+    patches = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "patches"
 
+    document = change_document_factory()
     first, _ = write_change_document(document, tmp_path, "cs.json")
     second, _ = write_change_document(document, tmp_path, "cs.json")
 
     assert first is not None and second is not None
-    assert first != second, "the second save silently clobbered the first"
+    assert first == second, (
+        f"identical bytes must reuse the first file, got {first} and {second}"
+    )
     assert first.name == "cs.json"
-    assert second.name == "cs_1.json"
-    assert first.exists() and second.exists()
+    identical_saves = sorted(p.name for p in patches.glob("*.json"))
+    assert identical_saves == ["cs.json"], identical_saves
+
+    other = change_document_factory("partial")
+    third, _ = write_change_document(other, tmp_path, "cs.json")
+
+    assert third is not None
+    assert third.name == "cs_1.json", third.name
+    both = sorted(p.name for p in patches.glob("*.json"))
+    assert both == ["cs.json", "cs_1.json"], both
+    assert first.exists() and third.exists()
 
 
 def test_tc018_no_temp_file_is_left_behind_after_a_clean_write(

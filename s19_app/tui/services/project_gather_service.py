@@ -69,8 +69,7 @@ from typing import Optional, Sequence
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     WorkareaContainmentError,
-    _find_workarea_root,
-    _path_traverses_reparse_point,
+    _guarded_destination,
     copy_into_workarea,
 )
 from .variant_execution_service import MANIFEST_ARTIFACT
@@ -203,52 +202,49 @@ def read_document_kind(path: Path) -> str:
     return "change"
 
 
-def _check_home_contained(home: Path) -> Path:
+def _check_home_contained(home: Path, workarea_root: Optional[Path] = None) -> Path:
     """
     Summary:
-        Re-run ``copy_into_workarea``'s containment CHECKS against a project
-        home directory: locate its ``.s19tool/workarea`` root, confirm the
-        resolved path stays inside it, and confirm no parent up to the
-        workarea root traverses a symlink / NTFS junction — the exact checks
-        the shipped copy seam runs before placing a file
-        (``manifest_writer._check_destination_contained`` idiom, reused).
+        Run the ONE shared workspace destination guard
+        (:func:`workspace._guarded_destination`, LLR-171.4 as amended by
+        LED .49, review finding F1) against a project home directory: the
+        work-area root is taken from the home AS GIVEN, before any
+        resolution — the nearest ``.s19tool/workarea`` ancestor of the
+        unresolved path — the reparse walk runs on the unresolved path, and
+        only then are the two sides resolved and compared.  A caller that
+        pre-resolved the home would hide the junctions the guard exists to
+        refuse (the executed S-02 probe wrote into another work area that
+        way).
 
     Args:
         home (Path): The intended project home directory
-            (``<project>/<home-name>/``).
+            (``<project>/<home-name>/``), passed UNRESOLVED.
+        workarea_root (Optional[Path]): An explicit work-area root the
+            app-level caller passes (B100-I14, security finding SEC-1,
+            LED .50) — the containment authority for the resolved pair.
+            None derives the root from ``home``'s own textual path.
 
     Returns:
         Path: The resolved home, when contained.
 
     Raises:
         WorkareaContainmentError: When the home has no
-            ``.s19tool/workarea`` ancestor, escapes that root, or traverses
-            a reparse point.
+            ``.s19tool/workarea`` ancestor, escapes that root after
+            resolution, or traverses a reparse point.
 
     Data Flow:
-        - Resolve, then apply ``_find_workarea_root`` +
-          ``is_relative_to`` + ``_path_traverses_reparse_point`` (the
-          ``workspace.py`` containment seam).
+        - ``_guarded_destination(home, workarea_root)`` — the same guard
+          both placement kinds run (LLR-163.1, LED .49/.50), on the
+          unresolved home.
 
     Dependencies:
         Uses:
-            - _find_workarea_root / _path_traverses_reparse_point
+            - _guarded_destination (the one destination guard, LLR-171.4)
         Used by:
             - _gather_copy
             - scoped_home
     """
-    resolved = home.resolve()
-    workarea_root = _find_workarea_root(resolved)
-    if workarea_root is None or not resolved.is_relative_to(workarea_root):
-        raise WorkareaContainmentError(
-            "Refusing to gather: project home is not contained inside a "
-            f".s19tool/workarea/ root: {resolved}"
-        )
-    if _path_traverses_reparse_point(resolved, stop_at=workarea_root.parent):
-        raise WorkareaContainmentError(
-            "Refusing to gather: project home traverses a symbolic link "
-            f"or reparse point: {resolved}"
-        )
+    resolved, _root = _guarded_destination(home, workarea_root)
     return resolved
 
 
@@ -288,7 +284,9 @@ def _same_artifact_name(source_name: str, candidate_name: str) -> bool:
     ].isdigit()
 
 
-def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
+def _gather_copy(
+    source: Path, home: Path, workarea_root: Optional[Path] = None
+) -> tuple[bool, Path]:
     """
     Summary:
         Copy one used artifact into its contained project home with the
@@ -306,8 +304,14 @@ def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
         source (Path): The artifact's current on-disk path (the COMMON
             original or an arbitrary origin — the COPY ruling leaves the
             source untouched).
-        home (Path): The destination project home directory. Must resolve
-            under ``.s19tool/workarea/``.
+        home (Path): The destination project home directory, passed
+            UNRESOLVED (LLR-171.4, LED .49): the guard reads the work-area
+            root off its textual path before any resolution. Must land
+            inside ``.s19tool/workarea/`` after resolution.
+        workarea_root (Optional[Path]): An explicit work-area root the
+            app-level caller passes (B100-I14, security finding SEC-1,
+            LED .50) — threaded to the guard and the placement. None
+            derives the root from ``home``'s own textual path.
 
     Returns:
         tuple[bool, Path]: ``(copied, destination)`` — ``copied`` is
@@ -324,12 +328,14 @@ def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
         FileNotFoundError: When ``source`` does not exist.
 
     Data Flow:
-        - ``_check_home_contained(home)`` first — no byte moves before the
-          containment verdict.
+        - ``_check_home_contained(home, workarea_root)`` first — no byte
+          moves before the containment verdict; the guard sees the home
+          UNRESOLVED.
         - Byte-compare against the requested name and every ``_<N>``
-          sibling; on drift, ``copy_into_workarea`` stages privately and
-          claims the next free name — never an ``unlink``/recopy onto the
-          existing final name.
+          sibling; on drift, ``copy_into_workarea`` receives the
+          UNRESOLVED home and the SAME explicit root, and stages privately
+          and claims the next free name — never an ``unlink``/recopy onto
+          the existing final name.
 
     Dependencies:
         Uses:
@@ -339,7 +345,7 @@ def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
         Used by:
             - gather_project_artifacts
     """
-    resolved_home = _check_home_contained(home)
+    resolved_home = _check_home_contained(home, workarea_root)
     source_bytes = source.read_bytes()
     destination = resolved_home / source.name
     # LLR-138.4 (review finding F1): the byte-compare must run against
@@ -361,7 +367,7 @@ def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
                 continue  # an unreadable sibling is not trusted, so the
                 # scan keeps looking and the placement takes the next
                 # free name
-    placed = copy_into_workarea(source, resolved_home)
+    placed = copy_into_workarea(source, home, workarea_root=workarea_root)
     return True, placed
 
 
@@ -406,6 +412,7 @@ def gather_project_artifacts(
     active_template: Optional[Path] = None,
     common_patches_dir: Path,
     common_templates_dir: Path,
+    workarea_root: Path,
 ) -> GatherOutcome:
     """
     Summary:
@@ -436,6 +443,19 @@ def gather_project_artifacts(
             fallback resolution root.
         common_templates_dir (Path): The COMMON CRC template library
             (``<base>/.s19tool/templates/``).
+        workarea_root (Path): An explicit work-area root the app-level
+            caller passes (B100-I14, security finding SEC-1, LED .50) —
+            REQUIRED, keyword-only, no default: it is threaded to every
+            :func:`_gather_copy` so each placement's containment authority
+            is THIS app's work area.  The gather never derives the root
+            from a home's own textual path — review finding R3-3: that
+            default let a junctioned project folder escape into another
+            work area (probe ``r3_gather_projjunction.py``); omitting the
+            root is a ``TypeError`` at the boundary.  The private seams
+            (``_check_home_contained`` / ``_gather_copy``) keep their
+            ``None`` derivation for the scoped-home callers that predate
+            the root threading (``scoped_home``, itself routed to the
+            LED .50 backlog with SEC-3).
 
     Returns:
         GatherOutcome: The ``gathered`` manifest rows + collected
@@ -472,6 +492,7 @@ def gather_project_artifacts(
         ...     project_dir, composition_names=["boost.json"],
         ...     common_patches_dir=workarea / "patches",
         ...     common_templates_dir=base / ".s19tool" / "templates",
+        ...     workarea_root=workarea,
         ... )
     """
     outcome = GatherOutcome()
@@ -546,7 +567,9 @@ def gather_project_artifacts(
     gathered_rows: dict[str, list[str]] = {}
     for resolved_source, home in sorted(pending.items(), key=lambda item: str(item[0])):
         try:
-            _copied, destination = _gather_copy(resolved_source, resolved_project / home)
+            _copied, destination = _gather_copy(
+                resolved_source, resolved_project / home, workarea_root
+            )
         except (WorkareaContainmentError, OSError) as exc:
             outcome.issues.append(
                 _gather_issue(

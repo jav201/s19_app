@@ -1,0 +1,77 @@
+mutation: llr-163-5b on s19_app/tui/app.py
+hash before: 0dedd7841fd1805790aaca9c601a8722cf021b3f87be6635f361e9c4ae5b623e
+hash mutated: b771cc17bb0fbb34fe5de1b908536a60f843df55aac1c8e340feadc8ee89c249
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_03
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_tc_b100_03_reused_variant_is_named_not_added ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27188/test_tc_b100_03_reused_variant0')
+
+    def test_tc_b100_03_reused_variant_is_named_not_added(tmp_path: Path) -> None:
+        """A first load appends and reports the added variant; a repeated load
+        of identical bytes names the existing variant with no added-variant
+        status, and the project folder keeps one file per distinct image."""
+        project_files = {"base.s19": _S19_A}
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = app.workarea / "proj"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            for name, content in project_files.items():
+                (project_dir / name).write_text(content, encoding="ascii")
+            statuses: list[str] = []
+            original = app.set_status
+            app.set_status = lambda message: (
+                statuses.append(message),
+                original(message),
+            )[1]
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app._handle_load_project("proj")
+                for _ in range(12):
+                    await pilot.pause()
+                app.load_from_path(CASE02)
+                await app.workers.wait_for_complete()
+                for _ in range(12):
+                    await pilot.pause()
+                app.load_from_path(CASE02)
+                await app.workers.wait_for_complete()
+                for _ in range(12):
+                    await pilot.pause()
+                on_disk = sorted(p.name for p in project_dir.glob("*.s19"))
+                return on_disk, statuses
+    
+        on_disk, statuses = asyncio.run(_drive())
+        assert on_disk == ["base.s19", "firmware.s19"], on_disk
+        added = [s for s in statuses if s.startswith("Added variant")]
+        named = [
+            s for s in statuses
+            if "'firmware' already in project" in s
+        ]
+        assert len(added) == 1, f"exactly the first load is an add; got {statuses}"
+        assert added[0] == "Added variant 'firmware' to project 'proj'", added
+        assert len(named) == 1, (
+            f"the repeated load names the existing variant; got {statuses}"
+        )
+        assert named[0] == "Variant 'firmware' already in project 'proj'", named
+        # The order is the oracle: the added status belongs to the FIRST load
+        # and the existing-variant status to the REPEATED one — a swapped
+        # branch produces both messages in reverse and must not pass.
+>       assert statuses.index(added[0]) < statuses.index(named[0]), statuses
+E       AssertionError: ["Loaded project 'proj' -> base.s19", 'Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "Variant 'firmware' already in project 'proj'", 'Copying into workarea temp...', ...]
+E       assert 8 < 4
+E        +  where 8 = <built-in method index of list object at 0x00000154C707BCC0>("Added variant 'firmware' to project 'proj'")
+E        +    where <built-in method index of list object at 0x00000154C707BCC0> = ["Loaded project 'proj' -> base.s19", 'Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "Variant 'firmware' already in project 'proj'", 'Copying into workarea temp...', ...].index
+E        +  and   4 = <built-in method index of list object at 0x00000154C707BCC0>("Variant 'firmware' already in project 'proj'")
+E        +    where <built-in method index of list object at 0x00000154C707BCC0> = ["Loaded project 'proj' -> base.s19", 'Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "Variant 'firmware' already in project 'proj'", 'Copying into workarea temp...', ...].index
+
+tests\test_b100_reuse.py:303: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_03_reused_variant_is_named_not_added
+1 failed, 13 deselected in 4.87s
+exit: 1
+restore: 0dedd7841fd1805790aaca9c601a8722cf021b3f87be6635f361e9c4ae5b623e
+RESTORE OK

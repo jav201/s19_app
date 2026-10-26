@@ -1,0 +1,61 @@
+cmd: python -m pytest -q -p no:cacheprovider <re-pinned nodes>
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (detached main, pre-change)
+
+..F.                                                                     [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_31_changed_bytes_take_the_next_free_name _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27156/test_tc_b99_31_changed_bytes_t0')
+
+    def test_tc_b99_31_changed_bytes_take_the_next_free_name(tmp_path: Path) -> None:
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        rows = [SegRow("isle", "manual", 0x1000, 8)]
+        first = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+        assert [p.path.name for p in first] == ["t_isle.s19"]
+        assert read_s19(first[0].path).data == _island_map()
+    
+        # Identical bytes at the requested name: REUSED, no new name appears.
+        again = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+        assert [p.path.name for p in again] == ["t_isle.s19"]
+        assert all(p.action == "reused" for p in again)
+        assert sorted(p.name for p in home.iterdir()) == ["t_isle.s19"]
+    
+        # Changed bytes: the next free `_<N>`; the first file is intact.
+        changed = {0x1000 + i: 0xFF for i in range(8)}
+        snapshot = first[0].path.read_bytes()
+        second = ssv.write_split_join_export(
+            changed, rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+        assert [p.path.name for p in second] == ["t_isle_1.s19"]
+        assert all(p.action == "wrote" for p in second)
+        # The first file is intact (its bytes never moved).
+        assert first[0].path.read_bytes() == snapshot
+        assert read_s19(second[0].path).data == changed
+    
+        # A further export of the SAME changed bytes is byte-identical to
+        # t_isle_1: the widened B100-I6 reuse (batch-100 Inc 1, LLR-163.4)
+        # REUSES it — no third file appears, and the export reports the reuse.
+        third = ssv.write_split_join_export(
+            changed, rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+>       assert [p.path.name for p in third] == ["t_isle_1.s19"]
+E       AssertionError: assert ['t_isle_2.s19'] == ['t_isle_1.s19']
+E         
+E         At index 0 diff: 't_isle_2.s19' != 't_isle_1.s19'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:416: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name
+1 failed, 3 passed in 3.03s
+exit: 1

@@ -1,0 +1,20 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (detached main, pre-change)
+
+
+=================================== ERRORS ====================================
+__________________ ERROR collecting tests/test_b100_reuse.py __________________
+ImportError while importing test module 'C:\Users\jjgh8\Github\s19_app-b100-inc1\tests\test_b100_reuse.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\anaconda3\envs\s19env\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b100_reuse.py:40: in <module>
+    from s19_app.tui.workspace import (
+E   ImportError: cannot import name 'contained_in_workarea' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b100-inc1\s19_app\tui\workspace.py)
+=========================== short test summary info ===========================
+ERROR tests/test_b100_reuse.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.13s
+exit: 2

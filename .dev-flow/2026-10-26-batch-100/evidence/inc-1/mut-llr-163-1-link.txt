@@ -1,0 +1,33 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_link_candidate_is_never_reused (MUTANT link: the reparse skip removed in _match_identical and the candidate followed with os.stat instead of os.lstat)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b100_01_link_candidate_is_never_reused ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27239/test_tc_b100_01_link_candidate0')
+
+    def test_tc_b100_01_link_candidate_is_never_reused(tmp_path: Path) -> None:
+        """Boundary catalog (LLR-163.1): a link sitting at a ``_<N>`` candidate
+        name is never reused (its bytes live outside the work area, S-F4) and
+        never written through — the placement claims the next free name.  The
+        link-accepting mutant (reparse skip and regular-file requirement removed
+        from the candidate walk) turns it RED."""
+        destination = _destination(tmp_path)
+        _write(destination, "staged.s19", _S19_A)  # requested name, other bytes
+        target = _write(tmp_path / "target", "staged_1.s19", _S19_B)
+        try:
+            os.symlink(target, destination / "staged_1.s19")
+        except (OSError, NotImplementedError):
+            pytest.skip("file symlinks need privilege on this platform (PDR C-QA-6)")
+        source = _write(tmp_path / "src", "staged.s19", _S19_B)
+    
+        result = place_into_workarea(source, destination)
+>       assert not result.reused
+E       AssertionError: assert not True
+E        +  where True = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27239/test_tc_b100_01_link_candidate0/.s19tool/workarea/target/staged_1.s19'), reused=True).reused
+
+tests\test_b100_reuse.py:293: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_link_candidate_is_never_reused
+1 failed in 0.49s

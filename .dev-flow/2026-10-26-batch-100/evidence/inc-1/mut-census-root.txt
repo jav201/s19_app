@@ -1,0 +1,43 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k app_placements_name  (MUTANT: one app.py call drops workarea_root)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-census
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________
+
+    def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), security finding SEC-1 — the AST
+        census: EVERY placement call in ``app.py`` names ``workarea_root``
+        explicitly, so the guard's containment authority is always THIS app's
+        work area (B100-I14), never one the destination's own text names.
+        Dropping the root from any single call turns this RED (transcript
+        ``mut-census-root.txt``)."""
+        source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        placements = (
+            "place_into_workarea",
+            "copy_into_workarea",
+            "place_group_into_workarea",
+        )
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in placements
+        ]
+        assert len(calls) == 9, (
+            f"expected the 9 app.py placement calls (LED .50), found {len(calls)}"
+        )
+        for call in calls:
+>           assert any(keyword.arg == "workarea_root" for keyword in call.keywords), (
+                f"app.py call {call.func.id} at line {call.lineno} must pass "
+                "workarea_root explicitly (LED .50, SEC-1)"
+            )
+E           AssertionError: app.py call copy_into_workarea at line 8706 must pass workarea_root explicitly (LED .50, SEC-1)
+E           assert False
+E            +  where False = any(<generator object test_tc_b100_01_app_placements_name_the_workarea_root.<locals>.<genexpr> at 0x000002249CC44450>)
+
+tests\test_b100_reuse.py:791: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+1 failed, 35 deselected in 0.61s

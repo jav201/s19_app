@@ -1,0 +1,57 @@
+mutation: llr-163-2 on s19_app/tui/workspace.py
+hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+hash mutated: 937c65e1ade27615219809b043c12b4d092290a4e5ea436c31f6645972858ee9
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_02
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_02_size_check_runs_before_any_candidate_read __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B802537810>
+
+    def test_tc_b100_02_size_check_runs_before_any_candidate_read(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Five candidates, one with the staged size: at most that one is read.
+        Boundary: the same-size candidate with differing bytes is read and NOT
+        reused."""
+        destination = _destination(tmp_path)
+        staged = _write(tmp_path, "staged.s19", _S19_B)
+        sized = _write(destination, "staged_2.s19", _S19_B)
+        _write(destination, "staged.s19", _S19_SMALL)  # requested name, other size
+        _write(destination, "staged_1.s19", _S19_SMALL)
+        _write(destination, "staged_3.s19", _S19_SMALL)
+        _write(destination, "staged_4.s19", _S19_SMALL)
+        assert len(_S19_B) != len(_S19_SMALL)
+    
+        real_hash = workspace_mod._hash_file
+        candidate_reads: list[Path] = []
+    
+        def counting_hash(path: Path) -> str:
+            if Path(path) != staged:
+                candidate_reads.append(Path(path))
+            return real_hash(path)
+    
+        monkeypatch.setattr(workspace_mod, "_hash_file", counting_hash)
+    
+        found = find_identical(destination, "staged.s19", staged)
+        assert found == sized, found
+>       assert candidate_reads == [sized], (
+            f"only the same-size candidate may be read, got {candidate_reads}"
+        )
+E       AssertionError: only the same-size candidate may be read, got [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged.s19'), WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged_1.s19'), WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged_2.s19')]
+E       assert [WindowsPath(...taged_2.s19')] == [WindowsPath(...taged_2.s19')]
+E         
+E         At index 0 diff: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged.s19') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged_2.s19')
+E         Left contains 2 more items, first extra item: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27182/test_tc_b100_02_size_check_run0/.s19tool/workarea/target/staged_1.s19')
+E         Use -v to get more diff
+
+tests\test_b100_reuse.py:235: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_02_size_check_runs_before_any_candidate_read
+1 failed, 13 deselected in 0.47s
+exit: 1
+restore: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+RESTORE OK

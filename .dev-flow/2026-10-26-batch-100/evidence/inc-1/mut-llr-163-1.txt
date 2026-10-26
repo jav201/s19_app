@@ -1,0 +1,48 @@
+mutation: llr-163-1 on s19_app/tui/workspace.py
+hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+hash mutated: e520f396d21b0555d589d63ce25add6a3ac1b289ba0dc2713cd9f28f8ae0dfc0
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_01
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F..                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_01_s7_sequence_reuses_identical_files ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27181/test_tc_b100_01_s7_sequence_re0')
+
+    def test_tc_b100_01_s7_sequence_reuses_identical_files(tmp_path: Path) -> None:
+        """The S7 sequence (case_01, case_02, case_02, case_01, case_02): names
+        ``firmware.s19``, ``firmware_1.s19``, ``firmware_1.s19`` (reused),
+        ``firmware.s19`` (reused), ``firmware_1.s19`` (reused); two files stay
+        in the destination and the wrapper still returns a ``Path``."""
+        destination = _destination(tmp_path)
+        expected_names = [
+            "firmware.s19",
+            "firmware_1.s19",
+            "firmware_1.s19",
+            "firmware.s19",
+            "firmware_1.s19",
+        ]
+        expected_reused = [False, False, True, True, True]
+        sequence = [CASE01, CASE02, CASE02, CASE01, CASE02]
+    
+        returned = []
+        for source in sequence:
+            result = place_into_workarea(source, destination)
+            assert isinstance(result.path, Path)
+            returned.append((result.path.name, result.reused))
+    
+>       assert returned == list(zip(expected_names, expected_reused)), returned
+E       AssertionError: [('firmware.s19', False), ('firmware_1.s19', False), ('firmware_2.s19', False), ('firmware.s19', True), ('firmware_3.s19', False)]
+E       assert [('firmware.s....s19', False)] == [('firmware.s...1.s19', True)]
+E         
+E         At index 2 diff: ('firmware_2.s19', False) != ('firmware_1.s19', True)
+E         Use -v to get more diff
+
+tests\test_b100_reuse.py:138: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_s7_sequence_reuses_identical_files
+1 failed, 2 passed, 11 deselected in 0.48s
+exit: 1
+restore: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+RESTORE OK

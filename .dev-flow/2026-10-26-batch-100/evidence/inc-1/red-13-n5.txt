@@ -1,0 +1,54 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k group_word_compares  (RED: casefold removed)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-13
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b100_57_group_word_compares_case_folded _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0')
+
+    def test_tc_b100_57_group_word_compares_case_folded(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.6 (review finding N5, the F5 acceptance condition): the
+        group's ``reused``/``wrote`` word compares the returned names against
+        the pre-listing CASE-FOLDED on Windows — a reused group whose on-disk
+        names differ only in case from the requested spelling reads as
+        ``reused``, never a false ``wrote``.  Windows-only arm (case-insensitive
+        reuse naming); the case-exact comparison turns it RED (transcript
+        ``red-13-n5.txt``)."""
+        if sys.platform != "win32":
+            pytest.skip("case-folded group word is a Windows arm (PDR C-QA-6)")
+        home = _export_home(tmp_path)
+    
+        def _bin_export():
+            return write_split_join_export(
+                _ISLAND_MAP,
+                _ISLAND_ROWS,
+                mode="split",
+                gap="skip",
+                pad_byte=0,
+                fmt="bin",
+                stem="t",
+                dest_dir=home,
+            )
+    
+        first = _bin_export()
+        assert all(p.action == "wrote" for p in first), first
+        # The same bytes, re-exported after a case-only rename on disk: the
+        # group is reused, and the word must say so.
+        for placed in first:
+            placed.path.rename(placed.path.with_name(placed.path.name.upper()))
+    
+        again = _bin_export()
+        assert sorted(p.path.name for p in again) == ["t_isle.addr", "t_isle.bin"], again
+>       assert all(p.action == "reused" for p in again), (
+            f"a case-only rename must not read as 'wrote': {again}"
+        )
+E       AssertionError: a case-only rename must not read as 'wrote': [PlacedExport(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.bin'), action='wrote'), PlacedExport(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27284/test_tc_b100_57_group_word_com0/.s19tool/workarea/splits/t_isle.addr'), action='wrote')]
+E       assert False
+E        +  where False = all(<generator object test_tc_b100_57_group_word_compares_case_folded.<locals>.<genexpr> at 0x000001EC53D94450>)
+
+tests\test_b100_reuse.py:1050: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_57_group_word_compares_case_folded
+1 failed, 35 deselected in 0.53s

@@ -195,6 +195,7 @@ from .workspace import (
     build_variant_set,
     copy_into_workarea,
     ensure_workarea,
+    place_into_workarea,
     resolve_input_path,
     sanitize_project_name,
     setup_logging,
@@ -1888,11 +1889,16 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Optional[Path]: Resolved project folder, or ``None`` when no project is active.
+            Optional[Path]: The project folder (as stored — see
+            ``current_project_dir``, which LED .50 keeps UNRESOLVED so
+            downstream placement guards see every junction), or ``None``
+            when no project is active.
 
         Data Flow:
-            - Prefer ``current_project_dir`` when set (external or explicit path).
-            - Fall back to ``workarea / current_project`` for workarea-only projects.
+            - Prefer ``current_project_dir`` when set (external or explicit
+              path — stored unresolved, under the work area).
+            - Fall back to ``workarea / current_project`` for
+              workarea-only projects.
 
         Dependencies:
             Used by:
@@ -1902,7 +1908,12 @@ class S19TuiApp(App):
         if self.current_project_dir is not None:
             return self.current_project_dir
         if self.current_project:
-            return (self.workarea / self.current_project).resolve()
+            # LED .50 (review finding R3-2): app paths stay UNRESOLVED —
+            # the placement guards take the root textually and resolve both
+            # sides at the comparison point, so the fallback returns the
+            # same unresolved spelling the Save/load write paths store
+            # (``current_project_dir``, ``:8224`` / ``:8529``).
+            return self.workarea / self.current_project
         return None
 
     def active_project_dir(self) -> Optional[Path]:
@@ -8131,7 +8142,11 @@ class S19TuiApp(App):
             )
             self.logger.warning("Save project refused: %s", missing_sources[0])
             return
-        project_dir = (parent_resolved / cleaned).resolve()
+        # LED .50 / security finding SEC-1: the target stays UNRESOLVED —
+        # the placement guard reads the work-area root off the textual path
+        # (or the explicit root every app placement passes), so any junction
+        # under the parent is seen instead of resolved away.
+        project_dir = parent_resolved / cleaned
         # Review findings F6(a)/S-F5: remember whether THIS call creates the
         # folder, so a later placement failure can remove exactly what it
         # created — a pre-existing project folder is never touched. The
@@ -8170,15 +8185,24 @@ class S19TuiApp(App):
         saved_primary_name: Optional[str] = None
         try:
             if self.current_file:
-                saved = copy_into_workarea(self.current_file.path, project_dir)
+                saved = copy_into_workarea(
+                    self.current_file.path, project_dir,
+                    workarea_root=self.workarea,
+                )
                 self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
                 if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
                     saved_primary_name = saved.name
                 if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
-                    saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
+                    saved_mac = copy_into_workarea(
+                        self.current_file.mac_path, project_dir,
+                        workarea_root=self.workarea,
+                    )
                     self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
             if self.current_a2l_path:
-                saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
+                saved_a2l = copy_into_workarea(
+                    self.current_a2l_path, project_dir,
+                    workarea_root=self.workarea,
+                )
                 self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
         except WorkareaPlacementError as exc:
             # HLR-155: the locked-target refusal. The exception text already
@@ -8256,6 +8280,7 @@ class S19TuiApp(App):
             active_template=self._last_template_path,
             common_patches_dir=self.workarea / WORKAREA_PATCHES,
             common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
+            workarea_root=self.workarea,
         )
         for issue in gather_outcome.issues:
             self.logger.warning("Project gather: %s", issue.message)
@@ -8502,7 +8527,11 @@ class S19TuiApp(App):
             self.logger.warning("No loadable data file in project: %s", name)
             return
         self.current_project = name
-        self.current_project_dir = project_dir.resolve()
+        # LED .50 / security finding SEC-1: stored UNRESOLVED — the path
+        # under this app's work area, never the resolved form — so any
+        # junction under the work area stays visible to every placement
+        # guard downstream.
+        self.current_project_dir = project_dir
         self._variant_set = variant_set
         self._pending_variant_id = (
             active_variant.variant_id if active_variant else None
@@ -8540,16 +8569,18 @@ class S19TuiApp(App):
             - Bail when no file or no active project directory exists.
             - Primary (S19/HEX) loads: skip when ``current_file.variant_id``
               already names a variant in ``_variant_set`` (a variant
-              activation reload); otherwise copy the file in, rebuild the
-              variant set with the new file active, stamp
-              ``current_file.variant_id``, and report the appended variant in
-              the status line.
+              activation reload); otherwise place the file in through
+              ``place_into_workarea``, rebuild the variant set with the new
+              file active, stamp ``current_file.variant_id``, and report
+              the outcome in the status line — an added variant is reported
+              as added; a reused file (identical bytes) names the existing
+              variant instead (LLR-163.5).
             - MAC loads keep the pre-batch single-MAC sync rules.
 
         Dependencies:
             Uses:
                 - ``validate_project_files`` / ``build_variant_set`` /
-                  ``copy_into_workarea``
+                  ``place_into_workarea`` (LLR-163.5)
                 - ``update_project_labels`` / ``set_status``
             Used by:
                 - ``_start_load_worker`` (via ``call_from_thread``, after
@@ -8588,7 +8619,15 @@ class S19TuiApp(App):
                         project_dir,
                     )
                 else:
-                    saved = copy_into_workarea(self.current_file.path, project_dir)
+                    # LLR-163.5: place through the one placement function; a
+                    # reused file (byte-identical variant already in the
+                    # project) names the EXISTING variant — never an
+                    # added-variant status.
+                    placement = place_into_workarea(
+                        self.current_file.path, project_dir,
+                        workarea_root=self.workarea,
+                    )
+                    saved = placement.path
                     project_name = self.current_project or project_dir.name
                     appended_id = saved.stem
                     synced_files, _synced_a2l, sync_error = validate_project_files(project_dir)
@@ -8612,14 +8651,31 @@ class S19TuiApp(App):
                         self.logger.warning(
                             "Variant set not rebuilt during sync: %s", sync_error
                         )
-                    self.set_status(
-                        f"Added variant '{appended_id}' to project '{project_name}'"
-                    )
-                    self.logger.info(
-                        "Appended variant '%s' into project: %s", appended_id, project_dir
-                    )
+                    if placement.reused:
+                        self.set_status(
+                            f"Variant '{appended_id}' already in project "
+                            f"'{project_name}'"
+                        )
+                        self.logger.info(
+                            "Reused variant '%s' already in project: %s",
+                            appended_id,
+                            project_dir,
+                        )
+                    else:
+                        self.set_status(
+                            f"Added variant '{appended_id}' to project "
+                            f"'{project_name}'"
+                        )
+                        self.logger.info(
+                            "Appended variant '%s' into project: %s",
+                            appended_id,
+                            project_dir,
+                        )
             elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
-                copy_into_workarea(self.current_file.path, project_dir)
+                copy_into_workarea(
+                    self.current_file.path, project_dir,
+                    workarea_root=self.workarea,
+                )
                 self.logger.info("Synced MAC data file into project: %s", project_dir)
             if (
                 self.current_file.mac_path
@@ -8627,7 +8683,10 @@ class S19TuiApp(App):
                 and self.current_file.mac_path.suffix.lower() in MAC_EXTENSIONS
                 and ".mac" not in existing_suffixes
             ):
-                copy_into_workarea(self.current_file.mac_path, project_dir)
+                copy_into_workarea(
+                    self.current_file.mac_path, project_dir,
+                    workarea_root=self.workarea,
+                )
                 self.logger.info("Synced attached MAC file into project: %s", project_dir)
         except WorkareaContainmentError as exc:
             self.set_status(f"Project sync rejected: {exc}")
@@ -8649,7 +8708,7 @@ class S19TuiApp(App):
             self.logger.info("Project already has A2L file, skipping sync: %s", project_dir)
             return
         try:
-            copy_into_workarea(self.current_a2l_path, project_dir)
+            copy_into_workarea(self.current_a2l_path, project_dir, workarea_root=self.workarea)
             self.logger.info("Synced A2L file into project: %s", project_dir)
         except WorkareaContainmentError as exc:
             self.set_status(f"A2L sync rejected: {exc}")
@@ -8752,7 +8811,7 @@ class S19TuiApp(App):
         self._flush_logger()
         copy_started = time.perf_counter()
         try:
-            copied = copy_into_workarea(normalized, temp_dir)
+            copied = copy_into_workarea(normalized, temp_dir, workarea_root=self.workarea)
         except WorkareaContainmentError as exc:
             self._pending_variant_id = None
             self.set_progress(0, "")
@@ -8823,7 +8882,7 @@ class S19TuiApp(App):
         self.set_progress(10, "Copying A2L into workarea temp...")
         copy_started = time.perf_counter()
         try:
-            copied = copy_into_workarea(normalized, temp_dir)
+            copied = copy_into_workarea(normalized, temp_dir, workarea_root=self.workarea)
         except WorkareaContainmentError as exc:
             self.set_progress(0, "")
             self.set_status(f"Cannot load A2L: {exc}")

@@ -1,0 +1,62 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k invalid_path_spelling  (RED: SEC-2 wrap removed)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-11
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_62_invalid_path_spelling_is_a_containment_refusal ________
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
+mode = 511, parents = True, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: FileNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0')
+
+    def test_tc_b100_62_invalid_path_spelling_is_a_containment_refusal(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 (security finding SEC-2): a destination with an invalid
+        path spelling (``"`` is illegal in a Windows path) raises the
+        containment refusal — ``WorkareaContainmentError``, message leading
+        with the outcome — never a bare ``OSError`` (WinError 123) past callers
+        that only catch the containment class.  Windows-only arm; removing the
+        SEC-2 wraps turns it RED (transcript ``red-11-sec2.txt``)."""
+        if sys.platform != "win32":
+            pytest.skip("WinError 123 invalid-spelling arm is Windows-only (PDR C-QA-6)")
+        destination = _workarea(tmp_path / "base") / 'bad"name'
+    
+        with pytest.raises(WorkareaContainmentError) as excinfo:
+>           place_into_workarea(CASE01, destination)
+
+tests\test_b100_reuse.py:961: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\workspace.py:1079: in place_into_workarea
+    resolved_destination.mkdir(parents=True, exist_ok=True)
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1121: in mkdir
+    self.mkdir(mode, parents=False, exist_ok=exist_ok)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27277/test_tc_b100_62_invalid_path_s0/base/.s19tool/workarea/bad"name')
+mode = 511, parents = False, exist_ok = True
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27277\\test_tc_b100_62_invalid_path_s0\\base\\.s19tool\\workarea\\bad"name'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1116: OSError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_invalid_path_spelling_is_a_containment_refusal
+1 failed, 35 deselected in 0.53s

@@ -406,18 +406,18 @@ def test_tc_b99_31_changed_bytes_take_the_next_free_name(tmp_path: Path) -> None
     assert first[0].path.read_bytes() == snapshot
     assert read_s19(second[0].path).data == changed
 
-    # A further changed export takes the NEXT free name (reuse compares
-    # against the requested name only, matching B8 / PDR C3(e)).
+    # A further export of the SAME changed bytes is byte-identical to
+    # t_isle_1: the widened B100-I6 reuse (batch-100 Inc 1, LLR-163.4)
+    # REUSES it — no third file appears, and the export reports the reuse.
     third = ssv.write_split_join_export(
         changed, rows, mode="split", gap="skip", pad_byte=0,
         fmt="s19", stem="t", dest_dir=home,
     )
-    assert [p.path.name for p in third] == ["t_isle_2.s19"]
-    assert all(p.action == "wrote" for p in third)
+    assert [p.path.name for p in third] == ["t_isle_1.s19"]
+    assert all(p.action == "reused" for p in third)
     assert sorted(p.name for p in home.iterdir()) == [
         "t_isle.s19",
         "t_isle_1.s19",
-        "t_isle_2.s19",
     ]
 
 

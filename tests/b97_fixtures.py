@@ -149,7 +149,9 @@ def make_project(app, name: str = "proj1") -> Path:
     """Create ``<workarea>/<name>/`` holding a copy of the tracked ``prg.s19``.
 
     The project is not loaded here; :func:`load_project` opens it through the
-    app's own load so ``current_project_dir`` is the resolved directory (P-58).
+    app's own load so ``current_project_dir`` is the directory the app holds
+    (stored UNRESOLVED per LED .50 — on these tmp bases the spelling is
+    identical either way).
     """
     project_dir = app.workarea / name
     project_dir.mkdir(parents=True, exist_ok=True)

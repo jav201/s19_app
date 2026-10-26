@@ -1,0 +1,422 @@
+cmd: pytest -q -p no:cacheprovider tests/test_unified_write.py tests/test_tui_patch_editor_v2.py tests/test_tui_variants.py tests/test_manifest_writer.py tests/test_open_folder_chips.py tests/test_crc_designer_view.py  (fix pass 2 — remaining reverse-census files)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
+........................F..................F..............F........F.... [ 47%]
+........................................................................ [ 95%]
+.......                                                                  [100%]
+================================== FAILURES ===================================
+____________________________ test_save_back_prompt ____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_save_back_prompt0')
+
+    def test_save_back_prompt(tmp_path: Path) -> None:
+        """The post-apply prompt offers an editable suggestion; decline writes
+        nothing; adversarial typed names are contained or refused.
+    
+        Intent: LLR-002.7 UI half (F-Q-10) — after an apply with ≥1 applied
+        entry on an S19 image the prompt appears pre-filled with
+        ``<variant_id>-patched.s19``; declining leaves ``saved_path`` ``None``
+        and writes no file; the operator-typed name passes the F-S-01
+        sanitizer — a traversal name and an absolute path are neutralised into
+        the work area, a reserved device name is refused (3 adversarial cases —
+        the v2 replacement for the retired batch-04 containment tests).
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            workarea = tmp_path / ".s19tool" / "workarea"
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                async def _apply() -> None:
+                    panel.request_action("apply_doc")
+                    await pilot.pause()
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+    
+                # Stage 1 — prompt appears with the pre-filled suggestion.
+                await _apply()
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["suggestion"] = name_input.value
+    
+                # Stage 2 — decline: nothing written, saved_path stays None.
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await pilot.pause()
+                outcomes["prompt_hidden_after_decline"] = prompt.has_class(
+                    "hidden"
+                )
+                outcomes["declined_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["s19_after_decline"] = sorted(
+                    p.name for p in workarea.rglob("*.s19")
+                )
+    
+                # Stage 3 — the suggestion is editable; adversarial names.
+                async def _confirm_with(name: str) -> None:
+                    await _apply()
+                    name_input.value = name
+                    app.query_one(
+                        "#patch_saveback_confirm_button", Button
+                    ).press()
+                    await pilot.pause()
+    
+                await _confirm_with("..\\escape.s19")
+                outcomes["traversal_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["traversal_escaped"] = (
+                    (tmp_path / "escape.s19").exists()
+                    or (tmp_path.parent / "escape.s19").exists()
+                )
+    
+                await _confirm_with("C:\\evil\\abs.s19")
+                outcomes["absolute_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+    
+                await _confirm_with("CON.s19")
+                outcomes["reserved_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["reserved_files"] = sorted(
+                    p.name for p in workarea.rglob("CON*")
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        assert outcomes["prompt_shown"] is True
+        assert outcomes["suggestion"] == "img-patched.s19"
+>       assert outcomes["prompt_hidden_after_decline"] is True
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:623: AssertionError
+______________ test_at032b_clarity_added_action_wiring_unchanged ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at032b_clarity_added_acti0')
+
+    def test_at032b_clarity_added_action_wiring_unchanged(tmp_path: Path) -> None:
+        """AT-032b (regression) — clarity added; the run_checks wiring unchanged.
+    
+        Intent: HLR-032 — the clarity fix is label/description ONLY, behavior
+        unchanged. Assert two things through the composed tree: (a) the Checks
+        affordance is no longer JUST a bare unqualified "Run checks" — the enriched
+        ``#patch_checks_help`` element is present with the token span; AND (b) the
+        action wiring is intact — ``#patch_checks_run_button`` still exists with its
+        ``run_checks`` action, and driving that action still routes (the check-run
+        status line appears). This pins "clarity added, behavior unchanged".
+    
+        Note: the action wiring lives in a local dict inside the panel's
+        ``on_button_pressed`` handler (not a queryable method), so (b) is pinned by
+        the observable effect (pressing the button posts the "Checks:" status line)
+        per the spec's "drive run_checks and confirm it still routes" option, plus
+        the button label staying short. Counterfactual: leaving the bare button with
+        no help makes (a) fail; renaming the id makes the button query / the routed
+        action fail.
+        """
+        from textual.widgets import Button, Label
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                # (a) the enriched clarity element is present, with the token span.
+                help_labels = list(app.query("#patch_checks_help").results(Label))
+                outcomes["help_present"] = len(help_labels) == 1
+                outcomes["help_text"] = str(
+                    app.query_one("#patch_checks_help", Label).render()
+                )
+    
+                # (b) the Checks button id is unchanged and still a SHORT label
+                # (not made verbose); pressing it routes the run_checks action.
+                checks_button = app.query_one("#patch_checks_run_button", Button)
+                outcomes["button_present"] = True
+                outcomes["button_label"] = str(checks_button.label)
+    
+                # Driving the action still routes (behavior unchanged): a
+                # kind=change doc with no image posts the "Checks:" status line.
+                _set_entry_inputs(app, address="0x100", bytes_text="AA")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                checks_button.press()
+                await pilot.pause()
+                outcomes["checks_line"] = any(
+                    line.startswith("Checks:") for line in app.log_lines
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["button_present"] is True, "the Checks button must still exist"
+        assert outcomes["help_present"] is True, (
+            "the enriched Checks clarity element must be present (not bare)"
+        )
+        assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
+            f"the Checks affordance must be qualified, got {outcomes['help_text']!r}"
+        )
+        # The button stays a SHORT label (clarity went into its own row, not a
+        # verbose button that risks the 5-button controls row overflowing at 80).
+        assert outcomes["button_label"] == "Run checks", (
+            f"the Checks button label must stay short, got "
+            f"{outcomes['button_label']!r}"
+        )
+>       assert outcomes["checks_line"] is True, (
+            "pressing the Checks button must still route run_checks (behavior "
+            "unchanged)"
+        )
+E       AssertionError: pressing the Checks button must still route run_checks (behavior unchanged)
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:1898: AssertionError
+_____________ test_at_batch41_escape_cancels_changeset_json_popup _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at_batch41_escape_cancels0')
+
+    def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -> None:
+        """Escape dismisses the ChangeSetJsonScreen popup as a Cancel (batch-41).
+    
+        Intent (AC-5.1, batch-37 fold): the full-size JSON popup previously
+        exposed only a Cancel BUTTON — ``Escape`` was unbound, so it could not
+        close the modal the way every sibling modal does. With the new
+        ``BINDINGS = [Binding("escape", "cancel", ...)]`` on
+        :class:`ChangeSetJsonScreen`, pressing ``Escape`` after editing the
+        TextArea pops the modal and leaves the change document UNCHANGED (a
+        Cancel, never an apply). Pre-fix RED: ``Escape`` is unbound → the modal
+        stays on screen (still a ``ChangeSetJsonScreen``).
+        """
+        from textual.widgets import Button, TextArea
+    
+        from s19_app.tui.screens import ChangeSetJsonScreen
+    
+        seed = _changeset_text(
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+        )
+        edited = _changeset_text(
+            [
+                {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+                {"type": "string", "address": "0x777", "value": "VIAPOPUP"},
+            ]
+        )
+    
+        async def _escape() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                _seed_via_paste(app, seed)
+                await pilot.pause()
+    
+                app.query_one("#patch_edit_json_button", Button).press()
+                await pilot.pause()
+                outcomes["popup_open_before_escape"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                # Edit the JSON, then press Escape instead of clicking Cancel.
+                app.screen.query_one("#changeset_json_text", TextArea).text = edited
+                await pilot.press("escape")
+                await pilot.pause()
+                await pilot.pause()
+                outcomes["popup_still_open"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                outcomes["after"] = _entry_addresses(app)
+            return outcomes
+    
+>       result = asyncio.run(_escape())
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_tui_patch_editor_v2.py:3281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_tui_patch_editor_v2.py:3271: in _escape
+    app.screen.query_one("#changeset_json_text", TextArea).text = edited
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = ChangeSetJsonScreen(), selector = '#changeset_json_text'
+expect_type = <class 'textual.widgets._text_area.TextArea'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#changeset_json_text' on ChangeSetJsonScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+_________ test_at068b_per_entry_json_popup_edits_only_selected_entry __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27310/test_at068b_per_entry_json_pop0')
+
+    def test_at068b_per_entry_json_popup_edits_only_selected_entry(
+        tmp_path: Path,
+    ) -> None:
+        """Per-entry JSON popup opens for the selected entry; confirm edits it only (AT-068b).
+    
+        Intent (AT-068b, US-068b / LLR-068b.1/.2/.3, C-16 real click, C-10
+        content): with a paste-authored 3-entry change-set the operator selects the
+        MIDDLE entry (index 1, i != 0 to prove scoping), a REAL ``pilot.click`` on
+        the NEW ``#patch_entry_edit_json_button`` (distinct from the whole-set
+        ``#patch_edit_json_button`` and the field-populate
+        ``#patch_entry_edit_button``) opens the per-entry popup SEEDED WITH A
+        SINGLE ENTRY (entry 1's JSON only — no ``entries`` array, distinguishing it
+        from batch-37's whole-set popup), the operator edits + Confirms, and the
+        entries table (the CONSUMER the real handler produced) shows ONLY entry 1
+        changed while entries 0 and 2 are byte-identical.
+        """
+        from textual.widgets import Button, DataTable, TextArea
+    
+        from s19_app.tui.screens import EntryJsonScreen
+    
+        paste = _changeset_text(
+            [
+                {"type": "string", "address": "0x200", "value": "REV_A"},
+                {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+                {"type": "string", "address": "0x400", "value": "REV_C"},
+            ]
+        )
+    
+        async def _click_entry_json(pilot: object, app: S19TuiApp) -> None:
+            """Drive a REAL pointer click on the per-entry Edit-JSON button (C-16).
+    
+            batch-46: the per-entry buttons row is docked below the PATCH SCRIPT
+            window body. Scroll the WINDOW (``#patch_win_script`` — the scroll
+            container that reveals the docked rows) to its end, then ``pilot.click``
+            delivers a genuine mouse event (no ``.focus()`` / no direct call).
+            """
+            app.query_one("#patch_win_script").scroll_end(animate=False)
+            await pilot.pause()
+            await pilot.click("#patch_entry_edit_json_button")
+            await pilot.pause()
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 50)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["before"] = _entry_addr_values(app)
+    
+                # Select the MIDDLE entry (index 1 -> 0x300); i != 0 proves scoping.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                table.move_cursor(row=1)
+                await pilot.pause()
+    
+                # REAL click -> the per-entry popup (C-16).
+                await _click_entry_json(pilot, app)
+                outcomes["is_entry_popup"] = isinstance(app.screen, EntryJsonScreen)
+                seed = app.screen.query_one("#entry_json_text", TextArea).text
+                parsed = json.loads(seed)
+                outcomes["seed_is_single_entry"] = (
+                    isinstance(parsed, dict) and "entries" not in parsed
+                )
+                outcomes["seed_address"] = parsed.get("address")
+    
+                # Edit entry 1's JSON (DE AD -> BE EF) and Confirm.
+                app.screen.query_one(
+                    "#entry_json_text", TextArea
+                ).text = json.dumps(
+                    {"type": "bytes", "address": "0x300", "bytes": "BE EF"}
+                )
+                app.screen.query_one("#entry_json_confirm", Button).press()
+                await pilot.pause()
+                outcomes["after"] = _entry_addr_values(app)
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["is_entry_popup"], (
+            "the per-entry control must open EntryJsonScreen (not the whole-set popup)"
+        )
+        assert outcomes["seed_is_single_entry"], (
+            "the popup must be seeded with a SINGLE entry (no 'entries' array), "
+            "distinct from batch-37's whole-set ChangeSetJsonScreen"
+        )
+>       assert outcomes["seed_address"] == "0x300", (
+            f"the seed must be the SELECTED entry (0x300), got {outcomes['seed_address']!r}"
+        )
+E       AssertionError: the seed must be the SELECTED entry (0x300), got '0x200'
+E       assert '0x200' == '0x300'
+E         
+E         - 0x300
+E         ?   ^
+E         + 0x200
+E         ?   ^
+
+tests\test_tui_patch_editor_v2.py:3967: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert Fals...
+FAILED tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged
+FAILED tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+4 failed, 147 passed in 286.63s (0:04:46)

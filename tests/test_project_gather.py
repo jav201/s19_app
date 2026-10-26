@@ -233,6 +233,7 @@ def test_tc699_assignments_referenced_documents_are_gathered(tmp_path: Path) -> 
         composition_names=["per-variant.json"],  # the flattened batch+assignments union
         common_patches_dir=patches,
         common_templates_dir=base / WORKAREA_DIRNAME / "templates",
+        workarea_root=workarea,
     )
     assert outcome.gathered == {PROJECT_PATCHES_DIR: ["patches/per-variant.json"]}
     assert outcome.issues == []
@@ -634,6 +635,7 @@ def test_gather_containment_escape_refuses_without_writing(tmp_path: Path) -> No
         composition_names=["boost.json"],
         common_patches_dir=patches,
         common_templates_dir=base / WORKAREA_DIRNAME / "templates",
+        workarea_root=base / WORKAREA_DIRNAME / WORKAREA_SUBDIR,
     )
     assert outcome.gathered == {}, "an escape attempt must gather nothing"
     assert [i.code for i in outcome.issues] == [GATHER_CONTAINMENT], (

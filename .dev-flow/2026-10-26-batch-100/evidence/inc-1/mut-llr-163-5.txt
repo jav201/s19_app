@@ -1,0 +1,11 @@
+mutation: llr-163-5 on s19_app/tui/app.py
+hash before: 0dedd7841fd1805790aaca9c601a8722cf021b3f87be6635f361e9c4ae5b623e
+hash mutated: b771cc17bb0fbb34fe5de1b908536a60f843df55aac1c8e340feadc8ee89c249
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_03
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+.                                                                        [100%]
+1 passed, 13 deselected in 4.83s
+exit: 0
+restore: 0dedd7841fd1805790aaca9c601a8722cf021b3f87be6635f361e9c4ae5b623e
+RESTORE OK

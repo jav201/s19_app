@@ -1,0 +1,132 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k short_name_anchor  (RED: short-name fallback removed)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-12
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_62_short_name_anchor_is_accepted_on_windows ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27281/test_tc_b100_62_short_name_anc0')
+
+    def test_tc_b100_62_short_name_anchor_is_accepted_on_windows(
+        tmp_path: Path,
+    ) -> None:
+        """Review finding F8/N4: the 8.3 short-name fallback accepts a
+        destination whose anchor survives only in a non-canonical spelling
+        (``S19TOO~1\\WORKAR~1``) — reparse-checked per component BEFORE any
+        resolution, so the non-canonical form cannot hide a junction.  Removing
+        the fallback turns this RED (transcript ``red-12-shortname.txt``).
+        Windows-only arm; skips with a named reason where the volume carries no
+        8.3 names (PDR C-QA-6)."""
+        if sys.platform != "win32":
+            pytest.skip("8.3 short-name anchors are a Windows arm (PDR C-QA-6)")
+        long_anchor = _workarea(tmp_path / "base")
+        destination = _destination(tmp_path / "base")
+        short_anchor = b100_links.short_path_name(long_anchor)
+        if short_anchor is None:
+            pytest.skip("this volume carries no 8.3 short names (PDR C-QA-6)")
+        short_destination = short_anchor / "target"
+    
+>       result = place_into_workarea(CASE01, short_destination)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_reuse.py:1006: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\workspace.py:1069: in place_into_workarea
+    resolved_destination, resolved_root = _guarded_destination(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/PYTEST~1/PY6FD9~1/TEST_T~1/base/S19TOO~1/workarea/target')
+workarea_root = None
+
+    def _guarded_destination(
+        destination: Path,
+        workarea_root: Optional[Path] = None,
+    ) -> tuple[Path, Path]:
+        """
+        Summary:
+            The ONE destination guard both placement kinds run (LLR-163.1 as
+            amended by LED .49/.50, LLR-171.4, review findings F1/N1): the
+            work-area root is taken from the destination AS GIVEN, before any
+            resolution — the OUTERMOST ``.s19tool/workarea`` ancestor of the
+            unresolved path (compared case-insensitively on Windows, with an 8.3
+            short-name fallback for non-canonical anchor spellings), or the
+            explicit root an app-level caller passes when it knows THIS app's
+            work area (B100-I14) — and only THEN are the two sides resolved and
+            compared, so a junction or link anywhere in the destination is
+            caught.  Every caller passes its destination UNRESOLVED.
+    
+        Args:
+            destination (Path): The UNRESOLVED destination directory, exactly
+                as the caller's path names it.  A pre-resolved destination
+                hides the junctions this guard exists to refuse (the executed
+                S-02 probe).
+            workarea_root (Optional[Path]): An explicit work-area root an
+                app-level caller passes.  None derives the root from the
+                destination's own textual path.
+    
+        Returns:
+            tuple[Path, Path]: ``(resolved_destination, resolved_root)`` — the
+                resolved pair the placement stages and claims under.
+    
+        Raises:
+            WorkareaContainmentError: When no ``.s19tool/workarea`` anchor
+                exists, when the destination or any traversed parent of it is
+                a symbolic link or NTFS reparse point, when the resolved
+                destination is not contained inside the resolved root, or when
+                the destination cannot be resolved at all (an invalid path
+                spelling raises THIS class, never a bare ``OSError`` — security
+                finding SEC-2; every caller already catches the class).
+    
+        Data Flow:
+            - Normalise textually (``normpath``/``abspath`` collapse ``..``
+              without following a single link); locate the anchor on the
+              UNRESOLVED path.
+            - Walk every parent of the destination from the anchor downwards on
+              the textual path, BEFORE resolving — ``Path.resolve`` silently
+              follows reparse points (security finding S-N01), so a junction
+              anywhere in the chain must be flagged explicitly via
+              ``os.lstat`` + ``FILE_ATTRIBUTE_REPARSE_POINT``.  The walk stops
+              BELOW the OUTERMOST ``.s19tool`` component (review finding N1,
+              LED .50): a junction between this work area and a NESTED anchor
+              lies inside the outer work area and must be checked, not skipped;
+              that seam itself is checked next (a junction there is the
+              executed S-02 shape — the whole work area silently resolving into
+              another one).
+            - Resolve BOTH sides only now and require
+              :func:`contained_in_workarea` for the pair (LLR-171.4): the
+              resolved bytes must land inside THIS work area.  With an
+              explicit root this comparison — not the textual walk — is what
+              refuses a destination that resolves into another work area
+              (review finding F2).
+    
+        Dependencies:
+            Uses:
+                - _find_workarea_root / _find_workarea_root_shortname
+                - _path_traverses_reparse_point / _is_reparse_point
+                - contained_in_workarea (LLR-171.4)
+            Used by:
+                - place_into_workarea (LLR-163.1)
+                - place_group_into_workarea (LLR-163.1, the second kind)
+                - s19_app.tui.segment_split_view.write_split_join_export
+                  (LLR-160.2, passes its dest_dir UNRESOLVED)
+                - s19_app.tui.services.project_gather_service._check_home_contained
+                  (LLR-171.4, the Save-project gather)
+        """
+        textual_destination = Path(os.path.normpath(os.path.abspath(destination)))
+        if workarea_root is None:
+            root = _find_workarea_root(textual_destination)
+            if root is None:
+                # F8's 8.3 short-name fallback: accept the non-canonical anchor
+                # spellings the base accepted, per-component reparse-checked so
+                # they cannot escape.
+                root = None  # RED-12: short-name fallback removed
+            if root is None:
+>               raise WorkareaContainmentError(
+                    "Refusing to place: destination is not contained inside "
+                    f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {textual_destination}"
+                )
+E               s19_app.tui.workspace.WorkareaContainmentError: Refusing to place: destination is not contained inside <base>/.s19tool/workarea/: C:\Users\jjgh8\AppData\Local\Temp\PYTEST~1\PY6FD9~1\TEST_T~1\base\S19TOO~1\workarea\target
+
+s19_app\tui\workspace.py:644: WorkareaContainmentError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_short_name_anchor_is_accepted_on_windows
+1 failed, 35 deselected in 0.50s

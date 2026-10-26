@@ -1,0 +1,47 @@
+mutation: llr-163-6 on s19_app/tui/segment_split_view.py
+hash before: 6dacb71d11718a5256c8b1378ef91218c4c3d6ccf8749fcc015a0af5d7fe324b
+hash mutated: 3cbf238758156664d9f7bf729270c86044ce6b35c536514a415bbf971daf278e
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_57
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27185/test_tc_b100_57_identical_reex0')
+
+    def test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused(
+        tmp_path: Path,
+    ) -> None:
+        """An identical re-export that matches an existing ``_<N>`` file reports
+        ``reused`` and writes nothing new; changed bytes still report ``wrote``
+        under the lowest free name."""
+        home = _export_home(tmp_path)
+    
+        first = _export(_ISLAND_MAP, home)
+        assert [p.path.name for p in first] == ["t_isle.s19"]
+        assert all(p.action == "wrote" for p in first)
+    
+        again = _export(_ISLAND_MAP, home)
+        assert [p.path.name for p in again] == ["t_isle.s19"]
+        assert all(p.action == "reused" for p in again)
+    
+        changed = _export(_ISLAND_CHANGED, home)
+        assert [p.path.name for p in changed] == ["t_isle_1.s19"]
+        assert all(p.action == "wrote" for p in changed)
+    
+        # The widened reuse: the changed bytes exported again match t_isle_1 —
+        # reused, zero new files, the home still holds exactly two files.
+        rechanged = _export(_ISLAND_CHANGED, home)
+        assert [p.path.name for p in rechanged] == ["t_isle_1.s19"], rechanged
+>       assert all(p.action == "reused" for p in rechanged)
+E       assert False
+E        +  where False = all(<generator object test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused.<locals>.<genexpr> at 0x000001FBA2395CB0>)
+
+tests\test_b100_reuse.py:355: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_57_identical_reexport_to_existing_suffix_is_reused
+1 failed, 1 passed, 12 deselected in 0.92s
+exit: 1
+restore: 6dacb71d11718a5256c8b1378ef91218c4c3d6ccf8749fcc015a0af5d7fe324b
+RESTORE OK

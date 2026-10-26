@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_staging.py (fix pass 1 — F10 allow-list tightened: copy_into_workarea off the LLR-155.3 allow-list)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1
+
+...............................                                          [100%]
+31 passed in 99.10s (0:01:39)
