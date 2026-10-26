@@ -392,3 +392,105 @@ above this line is ever edited._
 - **Closes:** B-06, B-07, QA-R2-04, QA-R2-07, QA-R2-11, QA-R2-14.
 - **Why:** dispositions r2 (the B-06, B-07, QA R2-04, QA R2-11 and MINOR rows) and the coordinator's alignment points 6 and 7.
 - **Evidence:** `design/ARQ-batch-100.md` §8, §8.1; `docs/ARCHITECTURE.md` §11 rows B100-I13..I22; `grep -rl --include=*.py _handle_save_dialog tests` → 7.
+
+### LED-2026-10-26-batch-100.24 — PDR: UX-22, the `no data or A2L file` refusal is painted
+- **Requirement:** LLR-171.2
+- **Date:** 2026-10-26
+- **What changed:** LLR-171.2 now answers a project folder whose `project.json` records no missing file and that holds no data and no A2L file with the `no data or A2L file` / `load a file and Save project` tokens. TC-B100-32 gets that arm. A folder with neither and no `project.json` keeps the `no project.json` tokens.
+- **Closes:** UX-22 (carried as a PDR condition, `design/P2-ux-r3.md` C-3).
+- **Why:** the token row existed in the §3 table, but no requirement obliged anyone to paint it.
+- **Evidence:** `design/P2-ux-r3.md` (UX-22 row); `design/design-proposal-b100.md` §9.
+
+### LED-2026-10-26-batch-100.25 — PDR: UX C-1, the panel's button label matches its key
+- **Requirement:** LLR-178.3
+- **Date:** 2026-10-26
+- **What changed:** `#result_ok` is labelled "Close (esc)". `escape` dismisses the panel from anywhere; `enter` dismisses it only when the button has the focus. TC-B100-67 presses the shown key `esc` from the list.
+- **Closes:** UX C-1.
+- **Why:** with the focus starting on the list, the label "OK (enter)" named a key that does nothing in the opening state, which breaks the §3 rule that every shown key works.
+- **Evidence:** `design/P2-ux-r3.md` C-1.
+
+### LED-2026-10-26-batch-100.26 — PDR: UX C-2, where the Save dialog's digests run and their budget
+- **Requirement:** LLR-167.6, LLR-175.4
+- **Date:** 2026-10-26
+- **What changed:** the Save dialog paints its first frame before any digest is computed. The emitted image's digest and the copied files' digests are computed once per open, on a worker. Until they arrive, the summary shows those rows as `computing…`, and an `alt+s` pressed before then waits under the busy indicator. Budget: with the case_06 project (37.7 MB A2L), the digests complete within 2 s on the CI host. This figure is assumed; it is measured at Inc 11 and recorded in the packet.
+- **Closes:** UX C-2.
+- **Why:** hashing a large project on the main thread at dialog open would bring back the freeze class that UX-02 removed.
+- **Evidence:** `design/P2-ux-r3.md` C-2; P-33 (case_06 size).
+
+### LED-2026-10-26-batch-100.27 — PDR: ARCH C-4 and C-5; ARCH C-1..C-3 listed
+- **Requirement:** LLR-174.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **ARCH C-4:** LLR-174.4 now names the real method `_handle_load_project`; it previously said `_handle_project_load`.
+  - **ARCH C-5:** §5.5 gives Inc 10 as 4 files with no bracket, because the public dirty-flag reader in `screens_directionb.py` is required by LLR-174.1.
+  - **ARCH C-1..C-3:** no contract change. The map rows B100-I15 (`rederive_for_save` / `emit_and_verify`), B100-I22 (`predict_placement(digest_or_bytes, size, destination, name)`) and B100-I16 (name, SHA-256 and byte count) take the contract's forms. The architect updates the map at PDR (`design/design-proposal-b100.md` §4).
+- **Closes:** ARCH C-4, ARCH C-5; ARCH C-1, C-2 and C-3 are routed to the architect's map update.
+- **Why:** `design/P2-architect-r3.md` C-1..C-5.
+- **Evidence:** `app.py:8444` (`def _handle_load_project`); `screens_directionb.py:4808` (P-43).
+
+### LED-2026-10-26-batch-100.28 — PDR: SEC PDR-C1, the manifest seam calls `contained_in_workarea`
+- **Requirement:** LLR-171.4
+- **Date:** 2026-10-26
+- **What changed:** LLR-171.4 no longer counts the manifest seam among the writers covered by construction, because the seam replaces `project.json` rather than placing it. `write_project_manifest`'s `_check_destination_contained` (`manifest_writer.py:366`) now calls `contained_in_workarea` with this app's work area. The Inc 8b arm adds the seam as an 8th writer, with 0 bytes written outside `self.workarea`.
+- **Closes:** SEC PDR-C1.
+- **Why:** `design/P2-security-r3.md` PDR-C1. The architecture row B100-I14 already listed the seam separately; only the LLR wording was off.
+- **Evidence:** `manifest_writer.py:13-15`, `:366`, `:431` (the security reviewer's read).
+
+### LED-2026-10-26-batch-100.29 — PDR: SEC PDR-C2, `assignments` is capped in total and by key count
+- **Requirement:** HLR-169
+- **Requirement:** LLR-169.4
+- **Date:** 2026-10-26
+- **What changed:** `assignments` is capped at 1 000 entries in total across all its lists, and at 1 000 keys; the other arrays keep their 1 000-entry cap each. New arm: 75 keys × 1 000 entries → 1 issue, read under 1 s.
+- **Closes:** SEC PDR-C2.
+- **Why:** a per-list reading of the cap allowed 75 × 1 000 entries inside 1 MiB, which took 14.80 s to read.
+- **Evidence:** `design/P2-security-r3.md` PDR-C2 (executed: `read=14.80s`).
+
+### LED-2026-10-26-batch-100.30 — PDR: SEC PDR-C3, the recent store moves to `%LOCALAPPDATA%` (orchestrator ruling)
+- **Requirement:** HLR-172
+- **Requirement:** LLR-172.1
+- **Date:** 2026-10-26
+- **What changed:** `recent_store_path()` now returns `%LOCALAPPDATA%\s19_app\recent_sources.json`, read from the `LOCALAPPDATA` environment variable. The arms point `LOCALAPPDATA` at a temporary folder, and with it unset nothing is written. §1.3 and §6.3 follow.
+- **Closes:** SEC PDR-C3.
+- **Why:** the orchestrator ruling recorded in `02-review.md` Round 3. `%APPDATA%` roams: on a domain with roaming profiles, the absolute local paths would be copied to a profile server, against the operator's S-16 choice ("Por usuario … las rutas nunca viajan con el proyecto"). `%LOCALAPPDATA%` is per user and per machine.
+- **Evidence:** `design/P2-security-r3.md` PDR-C3; `02-review.md` Round 3 ruling.
+
+### LED-2026-10-26-batch-100.31 — PDR: PDR-QA-1, the save-plan accessor is immutable and read after `alt+s`
+- **Requirement:** HLR-175
+- **Requirement:** LLR-175.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - `SaveProjectScreen.plan` returns an immutable value (a frozen dataclass).
+  - AT-B100-21 reads it only after `alt+s` has been pressed by key, and never calls the planner or drives the save through it.
+  - At 220 columns, each painted row that is not cut is compared with its plan row by landing name and action.
+  - The §3 preface's exception text says all three.
+- **Closes:** PDR-QA-1.
+- **Why:** `design/P2-qa-r3.md` (*The AT-21 exception*, conditions a–c).
+- **Evidence:** `design/P2-qa-r3.md` PDR-QA-1.
+
+### LED-2026-10-26-batch-100.32 — PDR: PDR-QA-2 and B100-I5, the pre-check is only a fast path into the data comparison (orchestrator ruling)
+- **Requirement:** LLR-167.1
+- **Date:** 2026-10-26
+- **What changed:** `image_differs_from_source` stays only as a fast path into the data comparison: when it is true, the re-derive and the comparison start at once. It never decides copy by itself: a false result still runs the comparison whenever the document holds a change entry. TC-B100-14 has two new arms:
+  - unapplied change entries only: pre-check false, comparison run → emit;
+  - save-back, then Save project: pre-check true, comparison run → emit.
+
+  §6.3's open PDR item is closed.
+- **Closes:** PDR-QA-2; the B100-I5 question left to PDR.
+- **Why:** the orchestrator ruling in the PDR brief; `design/P2-qa-r3.md` PDR-QA-2. A pre-check that decided copy could copy the unpatched source after a save-back (A-08).
+- **Evidence:** `design/P2-qa-r3.md` (QA's `emit_rule_r3.py`: check doc → copy; same bytes → copy; real change → emit).
+
+### LED-2026-10-26-batch-100.33 — PDR: `derived_from` belongs to the B100-I1 envelope (orchestrator ruling)
+- **Requirement:** LLR-168.4, LLR-169.3
+- **Date:** 2026-10-26
+- **What changed:** LLR-168.4 states that `derived_from` is emitted as part of the B100-I1 envelope. LLR-169.3 adds `derived_from` to `verify_written_manifest`'s drift domain, with an arm where a changed byte count → 1 mismatch.
+- **Closes:** the PDR question "`derived_from` in the B100-I1 envelope".
+- **Why:** the orchestrator ruling in the PDR brief. A key written by the envelope's writer belongs in what that writer verifies.
+- **Evidence:** `docs/ARCHITECTURE.md` §11 B100-I1 and B100-I16.
+
+### LED-2026-10-26-batch-100.34 — PDR: `choose_install_set` lives in `app.py`
+- **Requirement:** LLR-173.6
+- **Date:** 2026-10-26
+- **What changed:** `choose_install_set` is a pure module-level function in `app.py`. It lands at Inc 7 with the fallback rule of LLR-169.6, and the Inc 9b preview reuses it. §5.5 consequences: Inc 7 stays at 3 files (the plan's `files` row takes its key list from `app.py`, so `project_gather_service.py` is not touched), and Inc 9b is 3 files.
+- **Closes:** the PDR question about `choose_install_set`'s home.
+- **Why:** both of its callers, `_handle_load_project` and the dialog through the app, already sit in `app.py`. Placing it in `variant_execution_service.py` would make Inc 9b 4 files for no reader's benefit.
+- **Evidence:** `design/design-proposal-b100.md` §2 and §9.
