@@ -1,0 +1,35 @@
+{
+  "page": "s19-plan-b100",
+  "exported": "2026-10-26T12:55:00.710Z",
+  "items": {
+    "D1": {
+      "verdict": "imagen",
+      "note": ""
+    },
+    "D2": {
+      "verdict": "ultima",
+      "note": "Busca la manera de que esto se avise al usuario, que el cambio no apse desapercibido."
+    },
+    "D3": {
+      "verdict": "abre_y_reporta",
+      "note": ""
+    },
+    "D4": {
+      "verdict": "reabrir",
+      "note": ""
+    },
+    "D5": {
+      "verdict": "copiar",
+      "note": ""
+    },
+    "D6": {
+      "verdict": "abrir",
+      "note": ""
+    },
+    "D7": {
+      "verdict": "solo_workarea",
+      "note": ""
+    }
+  },
+  "general_notes": ""
+}

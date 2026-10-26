@@ -48,7 +48,7 @@
       "reason": "batch 2026-10-26-batch-100 opened by rollover from 2026-10-25-batch-99 (closed at P6, synced); mode full, as batch-99, by the operator's kickoff answers of 2026-10-26"
     }
   ],
-  "current_station": "P0",
+  "current_station": "ARQ",
   "phase_status": "not-started",
   "stations_active": [
     "P0",
@@ -75,10 +75,35 @@
     "P6": 0
   },
   "triggers": {
-    "evaluated_at": null,
-    "fired": [],
-    "not_fired": [],
-    "record": "NOT EVALUATED. /dev-flow evaluates the triggers at P0 and rewrites this block with the timestamp of THAT evaluation. An empty `fired` list here is an absence, not a verdict that nothing fired."
+    "evaluated_at": "2026-10-26T06:56:41",
+    "fired": [
+      "A2",
+      "A3",
+      "B1",
+      "B4",
+      "C6",
+      "C8",
+      "D1",
+      "E1",
+      "E2"
+    ],
+    "not_fired": [
+      "A1",
+      "A4",
+      "B2",
+      "B3",
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C7",
+      "D2",
+      "E3",
+      "F1",
+      "F2"
+    ],
+    "record": ".dev-flow/2026-10-26-batch-100/PLAN.md#triggers"
   },
   "artifact_homes": {
     "requirements": "repo:.dev-flow/2026-10-26-batch-100/01-requirements.md",
@@ -96,7 +121,13 @@
     "requirements_canon": "repo:REQUIREMENTS.md"
   },
   "artifacts": {},
-  "decisions_log": [],
+  "decisions_log": [
+    {
+      "station": "P0",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — operator verdict on design/plan-b100.html (design/veredicto-b100.json, exported 2026-10-26): D1 imagen, D2 ultima, D3 abre_y_reporta, D4 reabrir, D5 copiar, D6 abrir, D7 solo_workarea, every recommended option. D2 note: the switch to the latest saved image must be announced so it does not pass unnoticed; routed to the prototype round as surface P-E (Load project result: which variant opened and why, plus the D3 problem list). Triggers evaluated (PLAN.md#triggers). P0 intake closed; ARQ is next, and the prototype round is built in parallel."
+    }
+  ],
   "obsidian_synced": false,
   "created_at": "2026-10-26T06:42:43.235979",
   "owner": "C:/Users/jjgh8/Github/s19_app",

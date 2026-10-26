@@ -32,7 +32,24 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 
 | Id | Verdict | Probe output |
 |---|---|---|
-| <A1 / B1 / …> | <fired / not fired> | <the probe run and what it printed> |
+| A1 | not fired | judged — the Load picker, the confirmations and the progress indicator are planned as screens/widgets inside the existing `screens.py` / `app.py`; no module is created and no boundary moves. Re-evaluated at ARQ if the recent-sources store needs a module |
+| A2 | fired | judged — the increments touch `app.py`, `workspace.py`, `screens.py`, `services/change_service.py`, `services/manifest_writer.py`, `services/variant_execution_service.py`: ≥2 modules |
+| A3 | fired | probe `grep -rln "project.json\|read_project_manifest" s19_app` → `app.py`, `screens.py`, `flow_persistence_service.py`, `manifest_writer.py`, `report_addendum.py`, `report_service.py`, `variant_execution_service.py`. D3 (per-file digests), D2 (active variant after save-back) and D4 (active document) add `project.json` keys that these readers consume |
+| A4 | not fired | judged — increments are planned sequential, one worktree each, merged in order (batch-99 lesson: parallel lanes conflicted on the test-id registry) |
+| B1 | fired | probe `grep -rl "LoadFileScreen\|SaveProjectScreen\|LoadProjectScreen\|copy_into_workarea\|_handle_load_project\|_handle_save_dialog" tests` → 116 files; G-005 re-pins `test_unified_write::test_tc018…` and `test_tui_patch_editor_v2::test_at031b…`, owned by older batches |
+| B2 | not fired | judged — no file changes location; D7 narrows where a project may be saved, it moves nothing |
+| B3 | not fired | probe `grep -rl <source> tests/goldens` for `workspace.py`, `manifest_writer`, `variant_execution_service`, `screens.py`, `app.py`, `change_service` → 0 files each (snapshot SVG cells are named in B1/D1, not goldens) |
+| B4 | fired | `project.json` is written by Save project and read by Load project, the reports and flow persistence (A3 probe) — output-then-consume ATs owed |
+| C1–C5, C7 | not fired | judged — no auth, secrets, external integration, sensitive data, database or network surface |
+| C6 | fired | judged — typed paths, project names and manifest contents are untrusted input (names sanitised, paths contained, `project.json` parsed) |
+| C8 | fired | judged — file and project names from disk are rendered in Textual widgets (markup injection in the picker and the result notice) |
+| D1 | fired | judged — the Load dialog, Save project dialog, confirmations, focus and progress change what the user sees and touches |
+| D2 | not fired | judged — the prototype round runs in the real Textual app (copy of the tree), the target technology |
+| E1 | fired | judged — 12 planned increments |
+| E2 | fired | judged — the defects lose or contaminate saved work silently (PH-1, PH-2, PH-4, PH-5) |
+| E3 | not fired | judged — internal tool, not a client deliverable |
+| F1 | not fired | `V7`: bundle identical to its manifest at `2026-10-12-rev102` |
+| F2 | not fired | judged — `BACKLOG-CODE.md` refreshed at batch-99's close (2026-10-26) and on this batch's opening (F6 routing) |
 
 ## Where we are
 
