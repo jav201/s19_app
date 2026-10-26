@@ -43,7 +43,7 @@
     }
   ],
   "current_station": "P6",
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-sync",
   "stations_active": [
     "P0",
     "ARQ",
@@ -257,6 +257,11 @@
       "station": "P5",
       "date": "2026-10-26",
       "decision": "standing authorization — operator commission 2026-10-25. P5 close gate: post-mortem written by architect + qa-reviewer (05-postmortem.md, bf3917d); backlog reconciled (BACKLOG-CODE §Routed 2026-10-26, BACKLOG-PROCESS §Registered by batch-99's close); canon folded (51 folded); 05-close.md written. No HIGH; G-005 (dedup suffix vs byte-identical reuse) carried as an operator decision."
+    },
+    {
+      "station": "P6",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P6 docs gate: 06-docs written (docs-writer, presentation-builder) and updated with the confirmation result; closing validator run exit 0, 0 block (after repairing 99 record BLOCKs); close stamped on 79d8810. Awaiting /dev-flow-sync."
     }
   ],
   "obsidian_synced": false,
