@@ -226,3 +226,54 @@ Behaviour that did **not** change in the sweep: manifest relative paths, report 
 - Orchestrator: route R3-3 and R3-4 into the LED .50 / SEC-3 backlog entry; confirm Inc 5 owns `_gather_copy`'s rule (N3).
 - `qa-reviewer`: the 3 stale frozen-artifact failures at base (`at_b78_03`, `at_b78_32`, `at_056e`) and the 2 order-dependent nodes; none of them is from this batch.
 - `security-reviewer`: none new from my lane. R3-3 is your SEC-3 family (a default-unsafe API).
+
+---
+
+# Round 4 — bounded re-read of corrective pass 3 (R3-1, R3-2, R3-3 only)
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer; I did not write the fix |
+| Scope | **bounded by the operator at the iteration cap**: R3-1, R3-2 and R3-3 only. Inputs: `HANDOFF.md` §"Fix pass 3", `kimi/BRIEF-inc-1-fix3.md`, packet |
+| **Verdict** | **approve — PASS-WITH-NOTES.** **R3-1 (HIGH) is discharged** by this re-read, with my probe re-run. R3-2 and R3-3 are closed. **Nothing new** surfaced within the bounded scope, so no guard redesign is triggered. |
+
+## What I executed in round 4 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| R3-1 probe `probe/r3_export_junctioned_base.py` (base folder reached through a junction) | export with no root → **WROTE** `t_isle.s19`; export with the app root → **WROTE** `t_isle.s19`; direct placement → writes. The arm `test_tc_b100_62_export_junctioned_base_app_root_writes` asserts exactly 1 file at the **real** work area, a byte-oracle match, and the stage directory removed |
+| Escape probes re-run (`s02_export.py`, `s02_gather.py`, `r2_guard.py`) | export s19/bin **REFUSED**, group **REFUSED**, gather **REFUSED** (victim `[]`); nested anchor (d) **REFUSED**; short-name and upper-case junction forms **REFUSED**; legitimate upper-case form writes |
+| Affected files: `test_b100_reuse.py`, `test_project_gather.py`, `test_b99_staging.py`, `test_b99_export.py`, `test_segment_split_window.py` | **163 passed**, 0 failed |
+| Source cap / CRLF / evidence | 4 source files (fix pass 3 touches 3 of them); 0 bare LF in the edited files; `devflow-evidence.py --check` over all evidence → 0 mismatches other than "not staged" |
+
+## Closure
+
+| id | Status | Evidence |
+|---|---|---|
+| **R3-1** (HIGH) | **CLOSED — discharged** | `segment_split_view.py`: `home, resolved_root = _guarded_destination(dest_dir, workarea_root)`. `resolved_root` feeds only the staging (`stage_worst`, `_private_stage_dir`); both placements get the unresolved `dest_dir` with the **caller's** `workarea_root`. The probe writes, the arm is RED-first (`red-14-r3-1-junctioned-base.txt`), and every escape probe still refuses. |
+| R3-2 (MINOR) | **CLOSED** | `app.py` `_active_project_dir` fallback returns `self.workarea / self.current_project`, unresolved, matching `:8224` and `:8529` (LED .50). |
+| R3-3 (MINOR) | **CLOSED; the deviation is ACCEPTED** | `gather_project_artifacts(…, *, workarea_root: Path)` is keyword-only with no default; leaving it out raises `TypeError` (arm `test_tc_b100_62_gather_requires_workarea_root`). **Kimi's deviation:** the private `_gather_copy` / `_check_home_contained` keep `None`. I grepped `s19_app/`. `_gather_copy` has one caller, `project_gather_service.py:570` inside the public function, which passes the root. `_check_home_contained` has two: `:348` inside `_gather_copy` (root passed), and `:640` inside `scoped_home`, with no root. Every `scoped_home` caller passes the app's **unresolved** `active_project_dir()`: `app.py:5204`, `crc_designer_view.py:1249`, `segment_split_view.py:1623`, `folder_open_service.py:464`. So the derived-root walk runs on the textual path, and a junction in the project or sub-folder is refused there. **Accepted.** Observation for the SEC-3 backlog entry, not a new finding: a caller can still pass `workarea_root=None` explicitly. The type hint says `Path`, but nothing checks it at runtime, and the `r3_gather_projjunction.py` "no root" limb (an explicit `None`) still escapes. Threading the root through `scoped_home` belongs in the same entry. |
+| Re-pinned callers (item 4) | **CORRECT** | `test_project_gather.py:236` (`workarea_root=workarea`, the work area holding `proj`); `:638` (`base/.s19tool/workarea` for the escape test, which keeps its intent: the outside project is still refused, now by the resolved-pair check); `test_b99_staging.py`, two `_gather()` helpers passing `root`, which is that test's `.s19tool/workarea`. Each names the work area the project lives in. |
+| R3-4 (MINOR) | **not in scope**: routed to the backlog by the orchestrator, untouched as instructed |
+
+## Item 5 — the `_guarded_destination` hardening Kimi left out
+
+**This is a backlog improvement, not a defect needed now.**
+- The walk-past-the-root behaviour can only cause a **false refusal**, never an escape. That happens when an **unresolved** destination with a junctioned ancestor meets a **resolved** explicit root.
+- After the R3-1 fix, no caller builds that pair. The app passes an unresolved root with unresolved destinations; the gather and `scoped_home` hand on resolved destinations, which have no reparse ancestors to trip on. The export now keeps the caller's root.
+- It belongs with SEC-3 / R3-4 in the LED .50 backlog entry, as a defensive guard against a future caller recreating R3-1.
+
+## Verdict
+
+**approve — PASS-WITH-NOTES.** 0 HIGH, 0 MAJOR open in my lane. Notes that remain, all routed to the LED .50 / SEC-3 backlog:
+- R3-4;
+- the explicit `workarea_root=None` observation and threading the root through `scoped_home`;
+- the `_guarded_destination` hardening.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH, 0 MAJOR open; backlog notes R3-4, explicit-`None` root and `scoped_home` threading, `_guarded_destination` hardening) · Every HIGH resolved and re-read on the diff:
+- **F1 (round 1, S-02 escape via export/group/gather):** one shared destination guard on unresolved destinations; escape probes refused, caller-revert REDs `red-04/05/06`.
+- **R3-1 (round 3, export refused under a junctioned base):** the caller's root is kept for both placements and the resolved root is used only for staging. Probe `r3_export_junctioned_base.py` writes 1 file in the real work area; RED-first arm `red-14`; all escape probes still refuse.
+
+N1–N5, F2–F11, R3-2 and R3-3 are closed. The R3-3 private-seam deviation is accepted after a grep of `s19_app/` (every `scoped_home` caller passes the unresolved app project dir). 163 passed across the affected files (`review-increment-001.md` §Round 4).

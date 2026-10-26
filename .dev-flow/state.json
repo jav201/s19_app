@@ -161,6 +161,11 @@
       "station": "P3",
       "date": "2026-10-26",
       "decision": "asked at the gate — Inc 1 reached the P3 iteration cap (3 corrective passes) and was surfaced to the operator. Root cause: each pass closed one junction-escape route, but the guard mixed resolved and unresolved spellings across callers. Status: security PASS-WITH-NOTES (SEC-1 closed); code-reviewer round 3 BLOCK-UNTIL R3-1 (HIGH regression: the export refuses under a junctioned base). Operator chose \"Pasada 3 acotada\": fix only R3-1 + test, R3-2/SEC-6 (drop .resolve() in _active_project_dir), R3-3 (workarea_root required in gather_project_artifacts); code-reviewer re-reads only that; anything new beyond it stops the increment for a redesign. Routed: SEC-4 to Inc 5 (changes/apply.py staging), SEC-5 to Inc 8b (flow_persistence writers), R3-4 to backlog."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); bounded pass per the operator at the P3 iteration cap. P3 increment 001 (US-153 / HLR-163 + LLR-171.4 guard; workspace.py, segment_split_view.py, app.py, project_gather_service.py — 4 SOURCE at cap, LED .49) approved and merged (37827ce): implemented by Kimi K2.8 in four sessions (implementation + 3 corrective passes); code-reviewer round 1 BLOCK-UNTIL F1 HIGH (S-02 escape via export/group/gather) -> round 2 PASS-WITH-NOTES -> round 3 BLOCK-UNTIL R3-1 HIGH regression -> round 4 PASS-WITH-NOTES; security-reviewer round 1 BLOCK-UNTIL SEC-1 HIGH (resolved app paths) -> round 2 PASS-WITH-NOTES; orchestrator re-run 124 passed + guards 75/29 snapshots + census 84 (evidence/inc-1/orchestrator-gate.txt). Rulings LED .49, .50. Routed: SEC-4 to Inc 5, SEC-5 to Inc 8b, R3-4 and hardening notes to backlog."
     }
   ],
   "obsidian_synced": false,

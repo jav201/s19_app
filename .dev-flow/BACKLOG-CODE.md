@@ -1471,6 +1471,11 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   - **Why still route it:** an explicit root removes the dependence on how a caller spells its path.
   - **What closes it:** each caller takes and passes the app's work-area root; the AST census covers the whole package.
 - **▸ (code-reviewer MINOR, R3-4, batch-100 Inc 1 gate) With the outermost-anchor walk, an app whose base sits inside ANOTHER work area makes the four out-of-cap callers that pass no root stage temp files in the outer work area.** Closes together with the explicit-root threading item above: once each of those callers passes the app's root, the outer anchor no longer matters.
+- **▸ (code-reviewer notes, batch-100 Inc 1 round 4) Three hardening items:**
+  - An explicit `workarea_root=None` still falls back to the derived root, and nothing checks for it at run time.
+  - `scoped_home` callers (`app.py:5204`, `crc_designer_view.py:1249`, `segment_split_view.py:1623`, `folder_open_service.py:464`) pass no root. They are safe today because they hand over the app's unresolved `active_project_dir()`.
+  - `_guarded_destination` could compare the resolved root with the textual destination instead of walking past a textually unmatched destination. This is false-refusal only, never an escape.
+  - **What closes it:** these close with the explicit-root threading item above.
 - **▸ (security MINOR, SEC-3, not run) The 8.3 short-name fallback reparse-checks every component from the drive root.**
   - **Effect:** a legitimate work area whose base sits under a junction is refused on that route.
   - **What closes it:** limit the walk to the anchor and below, plus a test arm with a base under a junction.

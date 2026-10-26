@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1990 unique id(s)
+## family US/HLR/LLR — 1991 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1764,7 +1764,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-160` | batches, canon, tests |
 | `HLR-161` | batches, canon, tests |
 | `HLR-162` | batches, canon, tests |
-| `HLR-163` | batches |
+| `HLR-163` | batches, tests |
 | `HLR-163..178` | batches |
 | `HLR-164` | batches |
 | `HLR-165` | batches |
@@ -2884,14 +2884,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-162.3.txt` | batches |
 | `LLR-162.x` | batches |
 | `LLR-163` | batches |
-| `LLR-163.1` | batches |
+| `LLR-163.1` | batches, tests |
+| `LLR-163.1-163.7` | tests |
 | `LLR-163.1..163.7` | batches |
-| `LLR-163.2` | batches |
-| `LLR-163.3` | batches |
-| `LLR-163.4` | batches |
-| `LLR-163.5` | batches |
-| `LLR-163.6` | batches |
-| `LLR-163.7` | batches |
+| `LLR-163.2` | batches, tests |
+| `LLR-163.3` | batches, tests |
+| `LLR-163.4` | batches, tests |
+| `LLR-163.5` | batches, tests |
+| `LLR-163.6` | batches, tests |
+| `LLR-163.7` | batches, tests |
 | `LLR-164.1` | batches |
 | `LLR-164.2` | batches |
 | `LLR-164.3` | batches |
@@ -2930,7 +2931,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-171.1` | batches |
 | `LLR-171.2` | batches |
 | `LLR-171.3` | batches |
-| `LLR-171.4` | batches |
+| `LLR-171.4` | batches, tests |
 | `LLR-172.1` | batches |
 | `LLR-172.2` | batches |
 | `LLR-172.3` | batches |
@@ -4230,7 +4231,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-65b` | batches, tests |
 | `AT-80` | batches, tests |
 | `AT-88` | batches, tests |
-| `AT-B100-01` | batches |
+| `AT-B100-01` | batches, tests |
 | `AT-B100-02` | batches |
 | `AT-B100-03` | batches |
 | `AT-B100-04` | batches |
@@ -5341,9 +5342,9 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79b` | batches, tests |
 | `TC-79c` | batches, tests |
 | `TC-79d` | batches, tests |
-| `TC-B100-01` | batches |
-| `TC-B100-02` | batches |
-| `TC-B100-03` | batches |
+| `TC-B100-01` | batches, tests |
+| `TC-B100-02` | batches, tests |
+| `TC-B100-03` | batches, tests |
 | `TC-B100-04` | batches |
 | `TC-B100-05` | batches |
 | `TC-B100-06` | batches |
@@ -5397,18 +5398,18 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-54` | batches |
 | `TC-B100-55` | batches |
 | `TC-B100-56` | batches |
-| `TC-B100-57` | batches |
+| `TC-B100-57` | batches, tests |
 | `TC-B100-58` | batches |
 | `TC-B100-59` | batches |
 | `TC-B100-60` | batches |
 | `TC-B100-61` | batches |
-| `TC-B100-62` | batches |
+| `TC-B100-62` | batches, tests |
 | `TC-B100-63` | batches |
 | `TC-B100-64` | batches |
 | `TC-B100-65` | batches |
 | `TC-B100-66` | batches |
 | `TC-B100-67` | batches |
-| `TC-B100-68` | batches |
+| `TC-B100-68` | batches, tests |
 | `TC-B100-69` | batches |
 | `TC-B100-70` | batches |
 | `TC-B100-71` | batches |
