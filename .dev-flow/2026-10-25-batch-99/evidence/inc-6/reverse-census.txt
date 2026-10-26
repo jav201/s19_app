@@ -1,0 +1,34 @@
+### reverse census: segment_split_view|write_split_join_export|write_bin_with_sidecar|segment_ops|splits
+tests/test_b97_key_bar.py
+tests/test_b99_export.py
+tests/test_b99_truncation.py
+tests/test_crc_engine.py
+tests/test_diff_report_service.py
+tests/test_engine_unchanged.py
+tests/test_id_registry.py
+tests/test_legend_two_pane.py
+tests/test_map_click_chain.py
+tests/test_report_addendum_bound.py
+tests/test_report_field_census.py
+tests/test_segment_ops.py
+tests/test_segment_split_window.py
+tests/test_tui_commandbar.py
+tests/test_tui_crc_surface.py
+tests/test_tui_diff_screen.py
+tests/test_tui_directionb.py
+tests/test_tui_issues_triage_b94.py
+tests/test_tui_map_big.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_patch_json.py
+tests/test_tui_patch_layout.py
+tests/test_window_usage_help.py
+
+### place_group_into_workarea consumers
+tests/test_b99_export.py
+tests/test_b99_staging.py
+s19_app/tui/segment_split_view.py
+s19_app/tui/workspace.py
+
+### sanitize_export_segment / build_export_basename consumers
+tests/test_b99_export.py
+s19_app/tui/segment_split_view.py

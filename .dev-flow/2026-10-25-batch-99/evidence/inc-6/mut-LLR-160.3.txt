@@ -1,0 +1,44 @@
+F
+================================== FAILURES ===================================
+____________ test_tc_b99_30_mac_only_export_writes_no_data_record _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26728/test_tc_b99_30_mac_only_export0')
+
+    def test_tc_b99_30_mac_only_export_writes_no_data_record(tmp_path: Path) -> None:
+        """The writer takes its bytes from the image's DECLARED ranges: a MAC
+        placeholder byte is never data, so the session's export is header-only.
+        RED at HEAD: the placeholder is written as a data record (P-18)."""
+        from s19_app.tui import segment_split_view as ssv
+    
+        # A MAC-only session's image: ONE placeholder byte, NO declared ranges.
+        placeholder = {0x80000000: 0x00}
+        rows = [SegRow("locality_00", "manual", 0x80000000, 0x10)]
+    
+        home = _home(tmp_path)
+        written = ssv.write_split_join_export(
+            placeholder,
+            rows,
+            mode="split",
+            gap="skip",
+            pad_byte=0,
+            fmt="s19",
+            stem="mac",
+            dest_dir=home,
+            zero_coverage_empty=True,
+            declared_ranges=[],
+        )
+        assert [p.name for p in written] == ["mac_locality_00.s19"]
+        image = read_s19(written[0])
+>       assert image.data == {}, f"MAC placeholder bytes became data: {image.data}"
+E       AssertionError: MAC placeholder bytes became data: {2147483648: 0}
+E       assert {2147483648: 0} == {}
+E         
+E         Left contains 1 more item:
+E         {2147483648: 0}
+E         Use -v to get more diff
+
+tests\test_b99_export.py:328: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_30_mac_only_export_writes_no_data_record
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 16 deselected in 0.67s

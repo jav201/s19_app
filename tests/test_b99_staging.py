@@ -50,9 +50,10 @@ Layer A (engine, direct calls):
   ``write_change_document`` path stages in a private ``mkdtemp`` directory
   under the reparse-checked ``temp/.staging`` home (never directly under
   ``temp/``) and places correctly; a junction at ``temp`` is refused.
-- **TC-B99-39** (LLR-155.7) — AST census of the delete calls in the five
+- **TC-B99-39** (LLR-155.7) — AST census of the delete calls in the six
   placement writers (``save_patched_image``, ``write_change_document``,
-  ``copy_into_workarea``, the flow
+  ``copy_into_workarea``, ``place_group_into_workarea`` (B99-I2a, added by
+  batch-99 Inc 6, PQ-3), the flow
   WRITE-OUT arm in ``run_flow``, the CRC write in ``write_crc_image``):
   every ``unlink`` / ``rmtree`` / ``os.remove`` deletes a name bound in the
   same function to a ``tempfile.mkdtemp`` result (or to
@@ -952,6 +953,7 @@ _CENSUS_TARGETS = [
     (Path("s19_app/tui/changes/apply.py"), "save_patched_image"),
     (Path("s19_app/tui/changes/io.py"), "write_change_document"),
     (Path("s19_app/tui/workspace.py"), "copy_into_workarea"),
+    (Path("s19_app/tui/workspace.py"), "place_group_into_workarea"),
     (Path("s19_app/tui/services/flow_execution_service.py"), "run_flow"),
     (Path("s19_app/tui/operations/crc.py"), "write_crc_image"),
 ]
@@ -1873,14 +1875,17 @@ def test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate(
 #: semantics). The CRC designer's same-name template save moved to the
 #: declared exceptions below (review round 2).
 _FINAL_NAME_ALLOWLIST = {
+    # Inc 6 added the group placement (B99-I2a) beside the single-file one.
     "s19_app/tui/workspace.py": frozenset(
-        {"copy_into_workarea", "_private_stage_dir"}
+        {"copy_into_workarea", "_private_stage_dir", "place_group_into_workarea"}
     ),
     "s19_app/tui/app.py": frozenset({"action_dump_a2l_json"}),
     "s19_app/tui/changes/apply.py": frozenset({"save_patched_image"}),
     "s19_app/tui/changes/io.py": frozenset({"write_change_document"}),
     "s19_app/tui/operations/crc.py": frozenset({"write_crc_image"}),
-    "s19_app/tui/segment_split_view.py": frozenset({"_write"}),
+    # Inc 6: the export writes its bytes into the private staging dir, then
+    # places them through place_group_into_workarea / copy_into_workarea.
+    "s19_app/tui/segment_split_view.py": frozenset({"_write", "write_split_join_export"}),
     "s19_app/tui/services/manifest_writer.py": frozenset(
         {"write_project_manifest"}
     ),

@@ -1,0 +1,31 @@
+                    ^^^^^^
+E           AttributeError: 'PlacedExport' object has no attribute 'path'
+
+tests\test_b99_export.py:262: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 3 passed, 5 deselected in 0.75s
+
+=== direct probe: the F1 crash on 3.12 (subclass __init__ skips super) ===
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\anaconda3\envs\mapperenv\Lib\pathlib.py", line 572, in _tail
+    return self._tail_cached
+           ^^^^^^^^^^^^^^^^^
+AttributeError: 'PlacedExport' object has no attribute '_tail_cached'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+  File "C:\Users\jjgh8\anaconda3\envs\mapperenv\Lib\pathlib.py", line 586, in name
+    tail = self._tail
+           ^^^^^^^^^^
+  File "C:\Users\jjgh8\anaconda3\envs\mapperenv\Lib\pathlib.py", line 574, in _tail
+    self._load_parts()
+  File "C:\Users\jjgh8\anaconda3\envs\mapperenv\Lib\pathlib.py", line 408, in _load_parts
+    paths = self._raw_paths
+            ^^^^^^^^^^^^^^^
+AttributeError: 'PlacedExport' object has no attribute '_raw_paths'
+action ok: wrote
+probe rc=1

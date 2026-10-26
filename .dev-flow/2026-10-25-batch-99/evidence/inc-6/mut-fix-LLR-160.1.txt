@@ -1,0 +1,6 @@
+E             + ../
+
+tests\test_b99_export.py:141: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_28_sanitiser_hostile_set_and_boundaries
+1 failed in 0.48s

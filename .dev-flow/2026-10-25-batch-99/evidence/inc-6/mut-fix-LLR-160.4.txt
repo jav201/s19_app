@@ -1,0 +1,6 @@
+tests\test_b99_export.py:519: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_31_bin_pair_placed_under_one_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair
+3 failed, 3 passed, 18 deselected in 0.81s

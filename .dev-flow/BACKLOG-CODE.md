@@ -1496,6 +1496,13 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   **What closes it:** route these writers through `copy_into_workarea`, or record that replacing a library entry is their intended behaviour (with a requirement), then drop them from the declared exceptions in `tests/test_b99_staging.py`.
 - **▸ (flake, observed batch-99) `test_b97_flow_execution::test_tc_b97_64_a_new_set_run_restarts_the_dwell`** fails under parallel load and passes alone (3/3 on main). It joins the batch-97 flake list.
 
+- **▸ (P3, origin batch-99 Inc-6 reviews) Export message and limits:**
+  - the status reads "Export failed: Export stopped: … Nothing written.. Already written: X", with a doubled prefix and a seam text that clashes;
+  - `_<N>` with N ≥ 100 passes the 200-character basename cap;
+  - `_refusal_text` adds `reason` unscrubbed: safe today, unsafe for a future caller that passes raw text.
+  **What closes it:** one outcome-first message; reserve the width for three suffix digits; scrub `reason` in `_refusal_text`.
+- **▸ (CI, origin batch-99 Inc-6) CI runs only Python 3.11** while `requires-python >= 3.11`. A `Path`-subclass crash on 3.12 passed every 3.11 test. **What closes it:** add 3.12 to the CI matrix.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

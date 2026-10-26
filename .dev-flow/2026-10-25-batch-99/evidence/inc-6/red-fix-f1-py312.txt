@@ -1,0 +1,25 @@
+            )
+>           assert {p.name for p in written} == {p.name for p in created}
+                    ^^^^^^
+
+tests\test_b99_export.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\mapperenv\Lib\pathlib.py:586: in name
+    tail = self._tail
+           ^^^^^^^^^^
+..\..\anaconda3\envs\mapperenv\Lib\pathlib.py:574: in _tail
+    self._load_parts()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[AttributeError("'_PlacedExportPath' object has no attribute '_raw_paths'") raised in repr()] _PlacedExportPath object at 0x213ff161c50>
+
+    def _load_parts(self):
+>       paths = self._raw_paths
+                ^^^^^^^^^^^^^^^
+E       AttributeError: '_PlacedExportPath' object has no attribute '_raw_paths'
+
+..\..\anaconda3\envs\mapperenv\Lib\pathlib.py:408: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 3 passed in 0.88s

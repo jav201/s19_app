@@ -182,6 +182,16 @@ def _splits_dir(app: S19TuiApp) -> Path:
     return Path(app.workarea) / "splits"
 
 
+def _export_home(tmp_path: Path) -> Path:
+    """A work-area-contained scratch destination for direct writer calls.
+
+    Batch-99 HLR-160 (LLR-160.2) refuses export destinations outside a
+    ``.s19tool/workarea`` root; the direct-call tests below re-pin their
+    scratch destination to that shape (their byte assertions are unchanged).
+    """
+    return tmp_path / ".s19tool" / "workarea" / "splits"
+
+
 def _reparsed_s19_map(path: Path) -> Dict[int, int]:
     """Re-parse written S19 through the shipped oracle (must be error-free)."""
     reread = S19File(str(path))
@@ -563,9 +573,9 @@ def test_split_skip_writes_only_the_covered_sub_ranges(tmp_path: Path) -> None:
     written = write_split_join_export(
         SPARSE_MAP, [SegRow("isle", "manual", 0x1000, 0x28)],
         mode="split", gap="skip", pad_byte=0x00, fmt="bin", stem="t",
-        dest_dir=tmp_path,
+        dest_dir=_export_home(tmp_path),
     )
-    assert written[0].read_bytes() == bytes(
+    assert written[0].path.read_bytes() == bytes(
         list(ISLAND_A.values()) + list(ISLAND_B.values())
     )
 
@@ -583,19 +593,26 @@ def test_split_fill_pads_only_inside_the_files_own_span(tmp_path: Path) -> None:
 
     written = write_split_join_export(
         SPARSE_MAP, rows, mode="split", gap="fill", pad_byte=0x5A, fmt="bin",
-        stem="t", dest_dir=tmp_path,
+        stem="t", dest_dir=_export_home(tmp_path),
     )
-    assert [p.name for p in written] == ["t_a.bin", "t_b.bin"]
-    blob = (tmp_path / "t_a.bin").read_bytes()
+    # HLR-160: each BIN export places the pair — bytes + the .addr sidecar.
+    assert sorted(p.path.name for p in written) == [
+        "t_a.addr",
+        "t_a.bin",
+        "t_b.addr",
+        "t_b.bin",
+    ]
+    home = _export_home(tmp_path)
+    blob = (home / "t_a.bin").read_bytes()
     assert len(blob) == 0x28, "fill: the file is exactly its span"
     assert blob[:8] == bytes(ISLAND_A.values())
     assert blob[8:0x20] == b"\x5A" * 0x18, "the intra-gap is all pad byte"
     assert blob[0x20:] == bytes(ISLAND_B.values())
     # The second file: 8 pad bytes, no byte of file a's data leaked in.
-    assert (tmp_path / "t_b.bin").read_bytes() == b"\x5A" * 8
+    assert (home / "t_b.bin").read_bytes() == b"\x5A" * 8
     # And the sidecar base is each file's own declared base.
-    assert (tmp_path / "t_a.addr").read_text(encoding="ascii") == "0x00001000\n"
-    assert (tmp_path / "t_b.addr").read_text(encoding="ascii") == "0x00002000\n"
+    assert (home / "t_a.addr").read_text(encoding="ascii") == "0x00001000\n"
+    assert (home / "t_b.addr").read_text(encoding="ascii") == "0x00002000\n"
 
 
 def test_split_fill_per_file_pad_counts_match_the_bands() -> None:
@@ -637,11 +654,11 @@ def test_join_concat_packs_ascending_from_the_lowest_base(tmp_path: Path) -> Non
 
     written = write_split_join_export(
         mem_map, rows, mode="join", gap="concat", pad_byte=0x00, fmt="bin",
-        stem="t", dest_dir=tmp_path,
+        stem="t", dest_dir=_export_home(tmp_path),
     )
-    assert written[0].name == "t_joined.bin"
-    assert written[0].read_bytes() == bytes([0x10, 0x11, 0x12, 0x13, 0x30, 0x31, 0x32, 0x33])
-    assert (tmp_path / "t_joined.addr").read_text(encoding="ascii") == "0x00001000\n", (
+    assert written[0].path.name == "t_joined.bin"
+    assert written[0].path.read_bytes() == bytes([0x10, 0x11, 0x12, 0x13, 0x30, 0x31, 0x32, 0x33])
+    assert (_export_home(tmp_path) / "t_joined.addr").read_text(encoding="ascii") == "0x00001000\n", (
         "the concat base is the FIRST/LOWEST range's base (ruling Q2)"
     )
     packed_map, packed_ranges = join_concat(mem_map, [(0x3000, 0x3004), (0x1000, 0x1004)])
@@ -677,9 +694,9 @@ def test_join_fill_keeps_original_offsets_and_ctx_cells(tmp_path: Path) -> None:
 
     written = write_split_join_export(
         mem_map, rows, mode="join", gap="fill", pad_byte=0x00, fmt="bin",
-        stem="t", dest_dir=tmp_path,
+        stem="t", dest_dir=_export_home(tmp_path),
     )
-    blob = written[0].read_bytes()
+    blob = written[0].path.read_bytes()
     assert len(blob) == 0x28, "the written span is the SELECTED span only"
     assert blob[:8] == bytes(ISLAND_A.values())
     assert blob[8:0x20] == b"\x00" * 24, "the intra-span gap pads with the default 0x00"
@@ -797,17 +814,17 @@ def test_pad_byte_defaults_to_zero_and_is_configurable(tmp_path: Path) -> None:
     written = write_split_join_export(
         SPARSE_MAP, [SegRow("isle", "manual", 0x1000, 0x28)],
         mode="split", gap="fill", pad_byte=DEFAULT_PAD_BYTE, fmt="bin",
-        stem="t", dest_dir=tmp_path,
+        stem="t", dest_dir=_export_home(tmp_path),
     )
-    blob = written[0].read_bytes()
+    blob = written[0].path.read_bytes()
     assert blob[8] == 0x00 and blob[0x1F] == 0x00, "default pad is 0x00"
 
     written = write_split_join_export(
         SPARSE_MAP, [SegRow("isle", "manual", 0x1000, 0x28)],
         mode="split", gap="fill", pad_byte=0xFF, fmt="bin",
-        stem="t", dest_dir=tmp_path / "ff",
+        stem="t", dest_dir=_export_home(tmp_path / "ff"),
     )
-    assert written[0].read_bytes()[8] == 0xFF, "the pad byte is configurable"
+    assert written[0].path.read_bytes()[8] == 0xFF, "the pad byte is configurable"
 
     async def _drive() -> str:
         app = S19TuiApp(base_dir=tmp_path / "ui")
@@ -1089,43 +1106,53 @@ def test_export_formats_split_byte_level(tmp_path: Path, fmt: str) -> None:
     rows = [SegRow("isle", "manual", 0x1000, 0x28)]
     written = write_split_join_export(
         SPARSE_MAP, rows, mode="split", gap="fill", pad_byte=0x5A,
-        fmt=fmt, stem="t", dest_dir=tmp_path,
+        fmt=fmt, stem="t", dest_dir=_export_home(tmp_path),
     )
-    assert len(written) == 1
     if fmt == "bin":
-        assert written[0].read_bytes()[:8] == bytes(ISLAND_A.values())
-        assert (tmp_path / "t_isle.addr").read_text(encoding="ascii") == "0x00001000\n"
+        # HLR-160: a BIN export writes the pair — the flat bytes AND the
+        # .addr sidecar are both placed (and both named in the status).
+        assert sorted(p.path.name for p in written) == ["t_isle.addr", "t_isle.bin"]
+        assert written[0].path.read_bytes()[:8] == bytes(ISLAND_A.values())
+        assert (_export_home(tmp_path) / "t_isle.addr").read_text(encoding="ascii") == "0x00001000\n"
         return
     expected = {a: 0x5A for a in range(0x1000, 0x1028)}
     expected.update(SPARSE_MAP)
+    assert len(written) == 1
     oracle = _reparsed_s19_map if fmt == "s19" else _reparsed_hex_map
-    assert oracle(written[0]) == expected
+    assert oracle(written[0].path) == expected
 
 
 @pytest.mark.parametrize("fmt", ["s19", "hex", "bin"])
 @pytest.mark.parametrize("gap", ["concat", "fill"])
 def test_export_formats_join_byte_level(tmp_path: Path, fmt: str, gap: str) -> None:
-    """Join writes ONE ``‹stem›_joined.‹ext›`` in both gap policies; the
-    bytes re-parse to the engine's own output for the same plan (0 drift —
-    the view rides the engine)."""
+    """Join writes ONE ``‹stem›_joined.‹ext›`` stem in both gap policies —
+    for BIN the stem is the pair (flat bytes + the ``.addr`` sidecar,
+    HLR-160); the bytes re-parse to the engine's own output for the same
+    plan (0 drift — the view rides the engine)."""
     rows = [SegRow("a", "manual", 0x1000, 8), SegRow("b", "manual", 0x1020, 8)]
     written = write_split_join_export(
         SPARSE_MAP, rows, mode="join", gap=gap, pad_byte=0x00,
-        fmt=fmt, stem="t", dest_dir=tmp_path,
+        fmt=fmt, stem="t", dest_dir=_export_home(tmp_path),
     )
-    assert [p.name for p in written] == [f"t_joined.{fmt}"]
+    if fmt == "bin":
+        # HLR-160: a BIN export writes the pair — the flat bytes AND the
+        # .addr sidecar are both placed (and both named in the status).
+        assert sorted(p.path.name for p in written) == ["t_joined.addr", "t_joined.bin"]
+    else:
+        assert [p.path.name for p in written] == [f"t_joined.{fmt}"]
     if gap == "concat":
         engine_map, engine_ranges = join_concat(SPARSE_MAP, [(0x1000, 0x1008), (0x1020, 0x1028)])
     else:
         engine_map, engine_ranges = join_fill(SPARSE_MAP, [(0x1000, 0x1008), (0x1020, 0x1028)], 0x00)
     if fmt == "bin":
-        assert written[0].read_bytes() == bytes(
+        assert sorted(p.path.name for p in written) == ["t_joined.addr", "t_joined.bin"]
+        assert written[0].path.read_bytes() == bytes(
             engine_map[a] for a in range(engine_ranges[0][0], engine_ranges[0][1])
         )
-        assert (tmp_path / "t_joined.addr").read_text(encoding="ascii") == "0x00001000\n"
+        assert (_export_home(tmp_path) / "t_joined.addr").read_text(encoding="ascii") == "0x00001000\n"
         return
     oracle = _reparsed_s19_map if fmt == "s19" else _reparsed_hex_map
-    assert oracle(written[0]) == engine_map
+    assert oracle(written[0].path) == engine_map
 
 
 # ---------------------------------------------------------------------------
@@ -1220,9 +1247,10 @@ def test_tc710_split_from_each_source_naming(tmp_path: Path) -> None:
         "prg_locality_01.addr",
         "prg_locality_01.bin",
     ], dest_by_source["manual"]
-    # The A2L row name carries the quoted long identifier verbatim (the
-    # hardened extractor's block_name).
-    assert dest_by_source["a2l"] == ["prg_'PrgCode'.addr", "prg_'PrgCode'.bin"], (
+    # The A2L row name rides through HLR-160's one sanitiser like every
+    # other segment part: the quoted long identifier's apostrophes map to
+    # "_" (`'PrgCode'` → `_PrgCode_`).
+    assert dest_by_source["a2l"] == ["prg__PrgCode_.addr", "prg__PrgCode_.bin"], (
         dest_by_source["a2l"]
     )
 

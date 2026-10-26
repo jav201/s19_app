@@ -1,0 +1,2 @@
+a7559269a96e8d418be8dce449589903a703d932854520f987c03d1a78b69114 *s19_app/tui/segment_split_view.py
+de7564027c8a4d09ef2319f95751f5fb4de5cd7ae584e2d2e3c46bd847bbf5d7 *s19_app/tui/workspace.py

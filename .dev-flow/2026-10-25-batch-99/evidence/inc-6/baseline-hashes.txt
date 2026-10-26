@@ -1,0 +1,3 @@
+# pre-mutation baseline hashes (working tree, 2026-10-25 inc-6)
+6e278ace359fed298090ebf0cc210403fb76e03f21cf828a8ca55741e54552c6 *s19_app/tui/segment_split_view.py
+51df7a4548b8b857724f5aad3f614611a3705713d6d3f0af75835097e1e76dce *s19_app/tui/workspace.py

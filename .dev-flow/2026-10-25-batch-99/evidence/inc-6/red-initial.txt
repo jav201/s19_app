@@ -1,0 +1,16 @@
+F
+================================== FAILURES ===================================
+_____________ test_tc_b99_28_sanitiser_hostile_set_and_boundaries _____________
+
+    def test_tc_b99_28_sanitiser_hostile_set_and_boundaries() -> None:
+>       from s19_app.tui.segment_split_view import (
+            build_export_basename,
+            sanitize_export_segment,
+        )
+E       ImportError: cannot import name 'build_export_basename' from 's19_app.tui.segment_split_view' (C:\Users\jjgh8\Github\s19_app-b99-inc6\s19_app\tui\segment_split_view.py)
+
+tests\test_b99_export.py:134: ImportError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_28_sanitiser_hostile_set_and_boundaries
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 1.06s

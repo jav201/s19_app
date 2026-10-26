@@ -1,0 +1,10 @@
+        # 300-character name, and the ESC byte is scrubbed by safe_text.
+>       assert f'(segment {"A" * 80})' in reason, reason
+E       AssertionError: "t_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.s19" collides case-folded
+E       assert '(segment AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)' in '"t_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.s19" collides case-folded'
+
+tests\test_b99_export.py:758: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_41_case_folded_collision_refuses_before_any_write
+FAILED tests/test_b99_export.py::test_tc_b99_41_collision_reason_is_scrubbed_clipped_and_indexed
+2 failed in 0.49s

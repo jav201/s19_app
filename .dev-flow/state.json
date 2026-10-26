@@ -215,6 +215,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 003b (US-144 / HLR-155 D7 rechazar + D9 si + the LLR-155.3 immutability invariant; flow_execution_service.py, project_gather_service.py, app.py) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH gather re-save duplicate regression) fixed, round 2 F3 hashes and a census reclassification done by the orchestrator; 40+ re-pins audited as intent-preserving; merged main 195 passed + 1 known dwell flake (passes alone 3/3)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 006 (US-149 / HLR-160, export containment + B99-I2a group placement, D8 sufijo; segment_split_view.py, workspace.py) approved: implemented by Kimi K2.8 (one session timed out after implementation; a resume session finished it); code-reviewer and security-reviewer round 1 F1 HIGH (Path subclass crash on Python 3.12+) fixed, round 2 approve on 3.11 and 3.12; orchestrator added an in-range ESC arm (mutation-checked) and extended the LLR-155.3 census allow-list for the group placement after merging with Inc 3b."
     }
   ],
   "obsidian_synced": false,

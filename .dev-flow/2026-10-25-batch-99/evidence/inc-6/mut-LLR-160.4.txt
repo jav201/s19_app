@@ -1,0 +1,112 @@
+.FFF.                                                                    [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b99_31_bin_pair_placed_under_one_suffix _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_bin_pair_placed0')
+
+    def test_tc_b99_31_bin_pair_placed_under_one_suffix(tmp_path: Path) -> None:
+        """The BIN and its .addr sidecar are placed as ONE group: the second
+        export takes `<name>_1` for BOTH, never a mixed pair."""
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        rows = [SegRow("isle", "manual", 0x1000, 8)]
+        first = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="bin", stem="t", dest_dir=home,
+        )
+        assert sorted(p.name for p in first) == ["t_isle.addr", "t_isle.bin"]
+        # Identical re-export: the whole pair at the requested names is reused.
+        again = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="bin", stem="t", dest_dir=home,
+        )
+        assert sorted(p.name for p in again) == ["t_isle.addr", "t_isle.bin"]
+        assert all(getattr(p, "action", None) == "reused" for p in again)
+        # Changed bytes: the pair takes `<name>_1` for BOTH, never a mixed pair.
+        changed = {0x1000 + i: 0x5A for i in range(8)}
+        second = ssv.write_split_join_export(
+            changed, rows, mode="split", gap="skip", pad_byte=0,
+            fmt="bin", stem="t", dest_dir=home,
+        )
+>       assert sorted(p.name for p in second) == ["t_isle_1.addr", "t_isle_1.bin"]
+E       AssertionError: assert ['t_isle.addr...t_isle_1.bin'] == ['t_isle_1.ad...t_isle_1.bin']
+E         
+E         At index 0 diff: 't_isle.addr' != 't_isle_1.addr'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:444: AssertionError
+____________ test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_orphan_sidecar_0')
+
+    def test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix(tmp_path: Path) -> None:
+        """PQ-2(a): `<name>.bin`/`.addr` exist with different bytes AND an orphan
+        `<name>_1.addr` sits on disk — the pair takes `_2` for BOTH names. (The
+        per-file `_<N>` mutant would split the pair: `_1.bin` + `_2.addr`.)"""
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        home.mkdir(parents=True)
+        # A diverging pair already present (reuse must not fire) ...
+        (home / "t_isle.bin").write_bytes(b"\xEE" * 8)
+        (home / "t_isle.addr").write_text("0x00009999\n", encoding="ascii")
+        # ... plus the orphan half-pair.
+        (home / "t_isle_1.addr").write_text("0xDEADBEEF\n", encoding="ascii")
+    
+        written = ssv.write_split_join_export(
+            _island_map(),
+            [SegRow("isle", "manual", 0x1000, 8)],
+            mode="split",
+            gap="skip",
+            pad_byte=0,
+            fmt="bin",
+            stem="t",
+            dest_dir=home,
+        )
+>       assert sorted(p.name for p in written) == ["t_isle_2.addr", "t_isle_2.bin"], (
+            f"the pair must share ONE fresh suffix: {sorted(p.name for p in written)}"
+        )
+E       AssertionError: the pair must share ONE fresh suffix: ['t_isle_1.bin', 't_isle_2.addr']
+E       assert ['t_isle_1.bi..._isle_2.addr'] == ['t_isle_2.ad...t_isle_2.bin']
+E         
+E         At index 0 diff: 't_isle_1.bin' != 't_isle_2.addr'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:482: AssertionError
+___________ test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26729/test_tc_b99_31_mismatched_side0')
+
+    def test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair(tmp_path: Path) -> None:
+        """PQ-2(b): the BIN is byte-identical but the .addr carries another base
+        — the pair is NOT reused; a fresh `_1` pair is claimed, never a reused
+        `.bin` beside a `_1.addr`."""
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        rows = [SegRow("isle", "manual", 0x1000, 8)]
+        first = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="bin", stem="t", dest_dir=home,
+        )
+        bin_bytes = (home / "t_isle.bin").read_bytes()
+    
+        # Drift the sidecar: same BIN, different base.
+        (home / "t_isle.addr").write_text("0x00002000\n", encoding="ascii")
+        again = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="bin", stem="t", dest_dir=home,
+        )
+>       assert sorted(p.name for p in again) == ["t_isle_1.addr", "t_isle_1.bin"]
+E       AssertionError: assert ['t_isle.bin'..._isle_1.addr'] == ['t_isle_1.ad...t_isle_1.bin']
+E         
+E         At index 0 diff: 't_isle.bin' != 't_isle_1.addr'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:517: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_31_bin_pair_placed_under_one_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair
+3 failed, 2 passed, 12 deselected in 1.04s

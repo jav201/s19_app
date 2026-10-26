@@ -1,0 +1,34 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_tc_b99_41_case_folded_collision_refuses_before_any_write ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26730/test_tc_b99_41_case_folded_col0')
+
+    def test_tc_b99_41_case_folded_collision_refuses_before_any_write(
+        tmp_path: Path,
+    ) -> None:
+        """`SegA` / `sega` sanitise to distinct names that collide case-folded:
+        the whole export refuses, naming the segments, BEFORE any byte — the
+        destination folder is never even created."""
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        rows = [
+            SegRow("SegA", "manual", 0x1000, 8),
+            SegRow("sega", "manual", 0x1000, 8),
+        ]
+        raised = _export_capture(ssv, _island_map(), rows, home)
+        assert isinstance(raised, ssv.ExportRefusedError), raised
+        message = str(raised)
+        assert "SegA" in message and "sega" in message, message
+        assert "t_SegA.s19" in message and "t_sega.s19" in message, message
+>       assert not home.exists(), "the refusal happened before the mkdir"
+E       AssertionError: the refusal happened before the mkdir
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26730/test_tc_b99_41_case_folded_col0/.s19tool/workarea/splits').exists
+
+tests\test_b99_export.py:616: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_41_case_folded_collision_refuses_before_any_write
+1 failed, 16 deselected in 0.75s

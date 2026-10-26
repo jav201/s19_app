@@ -1,0 +1,34 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b99_41_collision_reason_scrubs_an_in_range_esc ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26844/test_tc_b99_41_collision_reaso1')
+
+    def test_tc_b99_41_collision_reason_scrubs_an_in_range_esc(
+        tmp_path: Path,
+    ) -> None:
+        """Review round 2 (MEDIUM): an ESC byte INSIDE the 80-character clip
+        must still be scrubbed. ``ab`` sanitises to ``a_b`` and collides
+        case-folded with ``A_B``; the refusal reason and the painted refusal
+        text carry no ESC. Without ``safe_text`` on the raw name this arm goes
+        RED (the earlier arm hid its ESC past the clip)."""
+        from s19_app.tui import segment_split_view as ssv
+    
+        rows = [
+            SegRow("ab", "manual", 0x1000, 8),
+            SegRow("A_B", "manual", 0x1000, 8),
+        ]
+        raised = _export_capture(ssv, _island_map(), rows, _home(tmp_path))
+        assert isinstance(raised, ssv.ExportRefusedError), raised
+>       assert "" not in str(raised), repr(str(raised))
+E       AssertionError: 'export names collide (compared case-folded): "t_a_b.s19" (segment a\x1bb) and "t_A_B.s19" (segment A_B)'
+E       assert '\x1b' not in 'export name...segment A_B)'
+E         
+E         '\x1b' is contained here:
+E           (segment ab) and "t_A_B.s19" (segment A_B)
+E         ?           +
+
+tests\test_b99_export.py:794: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_41_collision_reason_scrubs_an_in_range_esc
+1 failed, 1 passed, 23 deselected in 0.48s

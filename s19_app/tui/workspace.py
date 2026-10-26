@@ -692,6 +692,339 @@ def copy_into_workarea(
             shutil.rmtree(stage_dir, ignore_errors=True)
 
 
+def place_group_into_workarea(
+    sources: Sequence[Path],
+    destination: Path,
+    *,
+    max_size_bytes: Optional[int] = None,
+) -> list[Path]:
+    """
+    Summary:
+        Place a GROUP of files that must share ONE ``_<N>`` suffix — a BIN
+        and its ``.addr`` sidecar (B99-I2a, LLR-160.4) — into a
+        workarea-contained ``destination``, enforcing the
+        :func:`copy_into_workarea` containment, reparse-point and size
+        guards on every member. One private staging directory hosts the
+        copies; one ``_<N>`` is claimed for EVERY name of the group with
+        ``O_EXCL`` before any member is written; each claim is then filled
+        by ``os.replace``. Per-file placement cannot be used here: two
+        independent claims can land on different suffixes and split the
+        pair (a mixed ``_<N>`` BIN/``.addr`` pair), which this call refuses
+        by construction.
+
+    Args:
+        sources (Sequence[Path]): The group's source files, in order. Each
+            must be a real file (not a symlink/junction) within the size
+            cap; the final name of each member is its own file name.
+        destination (Path): Target directory. Must resolve under
+            ``<base>/.s19tool/workarea/`` and must not traverse a symlink
+            or NTFS junction.
+        max_size_bytes (Optional[int]): Maximum permitted size per member,
+            in bytes. ``None`` (the default) applies
+            :data:`DEFAULT_COPY_SIZE_CAP_BYTES`, matching
+            :func:`copy_into_workarea`.
+
+    Returns:
+        list[Path]: The placed paths, aligned with ``sources``. When every
+            requested name already holds a non-empty byte-identical file,
+            the whole group is REUSED and the existing paths are returned —
+            reuse never fires per member (a half-identical group claims a
+            fresh shared suffix).
+
+    Raises:
+        WorkareaContainmentError: When ``destination`` is not contained
+            inside a ``.s19tool/workarea/`` root, when any member source or
+            any traversed parent of ``destination`` is a symbolic link or
+            NTFS reparse point, or when a member exceeds the size cap.
+        FileNotFoundError: When a member source does not exist.
+        WorkareaPlacementError: On any failure after staging — a duplicate
+            member name, a staging copy failure (security finding S-F6), a
+            claim that cannot be verified as a regular file (security
+            finding S-F1), a fill that stays locked after 5 retries within
+            1 s, or any other fill ``OSError``. Every own claim and placed
+            file is rolled back first: no orphan member, no 0-byte claim,
+            and the message leads with the outcome (LLR-160.5's part-way
+            contract; PDR C3(c)).
+
+    Data Flow:
+        - Resolve ``destination``, locate its workarea root, and run the
+          reparse-point walk — the exact checks ``copy_into_workarea``
+          runs (LLR-155's seam, C3(e)).
+        - Validate every member (reparse + size), reject duplicate member
+          names, and create the destination on demand.
+        - Stage privately (LLR-155.1) via :func:`_private_stage_dir` —
+          the sources are only read, never moved, renamed or deleted.
+        - Group reuse (bug B8 at the requested names only): every target
+          must exist, be non-empty (PDR C1(a) — a 0-byte target may be
+          another writer's claim placeholder) and byte-identical; a link
+          or reparse target is never reused (security finding S-F4).
+        - Otherwise claim the smallest ``_<N>`` whose candidate names are
+          ALL free (an lstat first — security finding S-F1: ANY existing
+          entry counts as taken), releasing a partially claimed suffix
+          before trying the next one; verify each claim with lstat as a
+          regular file and no reparse point.
+        - Fill each claim with ``os.replace``, retrying a
+          ``PermissionError`` up to 5 times within 1 s; on any failure
+          roll back EVERY own claim (placed or still an empty claim) and
+          raise :class:`WorkareaPlacementError`.
+        - Remove the own staging directory in a ``finally`` tracked by an
+          ownership flag set right after ``_private_stage_dir``.
+
+    Dependencies:
+        Uses:
+            - shutil.copy2 / shutil.rmtree
+            - tempfile (via _private_stage_dir)
+            - os.open / os.replace / os.unlink / os.lstat
+            - _is_reparse_point / _path_traverses_reparse_point
+            - _find_workarea_root / _private_stage_dir
+        Used by:
+            - s19_app.tui.segment_split_view.write_split_join_export
+              (the BIN/``.addr`` pair; single files ride
+              :func:`copy_into_workarea`)
+    """
+    resolved_destination = destination.resolve()
+    workarea_root = _find_workarea_root(resolved_destination)
+    if workarea_root is None or not resolved_destination.is_relative_to(workarea_root):
+        raise WorkareaContainmentError(
+            "Refusing to place: destination is not contained inside "
+            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
+        )
+    if _path_traverses_reparse_point(resolved_destination, stop_at=workarea_root.parent):
+        raise WorkareaContainmentError(
+            "Refusing to place: destination traverses a symbolic link or reparse point: "
+            f"{resolved_destination}"
+        )
+
+    cap = DEFAULT_COPY_SIZE_CAP_BYTES if max_size_bytes is None else max_size_bytes
+    resolved_sources: list[Path] = []
+    for source in sources:
+        source = Path(source)
+        if _is_reparse_point(source):
+            raise WorkareaContainmentError(
+                "Refusing to place: source is a symbolic link or reparse point: "
+                f"{source}"
+            )
+        resolved_source = source.resolve()
+        if _is_reparse_point(resolved_source):
+            raise WorkareaContainmentError(
+                "Refusing to place: resolved source is a symbolic link or reparse "
+                f"point: {resolved_source}"
+            )
+        size = resolved_source.stat().st_size
+        if size > cap:
+            raise WorkareaContainmentError(
+                f"Refusing to place: source size {size} bytes exceeds cap "
+                f"{cap} bytes: {resolved_source}"
+            )
+        resolved_sources.append(resolved_source)
+
+    if len({src.name for src in resolved_sources}) != len(resolved_sources):
+        raise WorkareaPlacementError(
+            "Not saved: the group carries a duplicate file name — the members "
+            "would claim one final name. Nothing written."
+        )
+
+    resolved_destination.mkdir(parents=True, exist_ok=True)
+
+    # Private staging (LLR-155.1): the same reparse-checked staging home
+    # copy_into_workarea stages under.
+    stage_dir = _private_stage_dir(workarea_root)
+    staging_owned = True
+    try:
+        staged: list[tuple[Path, bytes]] = []
+        for resolved_source in resolved_sources:
+            staged_file = stage_dir / resolved_source.name
+            try:
+                shutil.copy2(resolved_source, staged_file)
+            except OSError as exc:
+                # security finding S-F6: an OSError from the copy — e.g. the
+                # source vanishing after the size check — is a placement
+                # failure, never an uncaught OSError past callers that only
+                # catch the containment class; outcome first
+                raise WorkareaPlacementError(
+                    f"Not saved: {resolved_source.name} could not be copied: "
+                    f"{exc}. Nothing written."
+                ) from exc
+            staged.append((staged_file, staged_file.read_bytes()))
+
+        # Group reuse (bug B8 at the requested names ONLY, C3(e)): the group
+        # is reused only when EVERY target exists, is non-empty (PDR C1(a) —
+        # a 0-byte target may be another writer's claim placeholder) and is
+        # byte-identical to its staged member; a link or reparse target is
+        # never reused — its bytes live outside the work area (S-F4).
+        targets = [resolved_destination / src.name for src in resolved_sources]
+        try:
+            if all(
+                (not _is_reparse_point(t)) and t.exists() and t.stat().st_size > 0
+                for t in targets
+            ) and all(
+                t.read_bytes() == staged[i][1] for i, t in enumerate(targets)
+            ):
+                return list(targets)
+        except OSError:
+            # an unreadable target is not trusted; claim fresh names
+            pass
+
+        # Claim ONE ``_<N>`` for EVERY name of the group before any member
+        # is written: the smallest suffix whose candidate names are ALL
+        # free — a half-taken suffix is released and skipped as a whole, so
+        # the pair can never split.
+        claims: list[Path] = []
+        claims_owned = False
+        counter = 0
+        while len(claims) < len(staged):
+            if counter == 0:
+                candidates = targets
+            else:
+                candidates = [
+                    resolved_destination / f"{src.stem}_{counter}{src.suffix}"
+                    for src in resolved_sources
+                ]
+            counter += 1
+            taken = False
+            for candidate in candidates:
+                # Security finding S-F1: lstat the candidate BEFORE the
+                # O_EXCL claim. On Windows, os.open(O_CREAT|O_EXCL) FOLLOWS
+                # a dangling symlink: the claim would create a 0-byte file
+                # at the link's target OUTSIDE the work area. ANY existing
+                # entry — file, directory, link, dangling link or junction —
+                # is taken.
+                try:
+                    os.lstat(candidate)
+                except OSError:
+                    continue  # the name is free
+                taken = True
+                break
+            if taken:
+                continue
+            for candidate in candidates:
+                claim_path = candidate
+                try:
+                    claim_fd = os.open(
+                        str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                    )
+                    claims_owned = True
+                except FileExistsError:
+                    # lost a lstat-vs-open race: release the partial set
+                    # and take the next ``_<N>`` as a whole
+                    for claim_path in claims:
+                        if claims_owned:
+                            try:
+                                os.unlink(claim_path)
+                            except OSError:
+                                pass
+                    claims.clear()
+                    taken = True
+                    break
+                except OSError as exc:
+                    # any other claim failure is a placement failure; when
+                    # the name exists after all (a race that surfaced late)
+                    # it is simply taken — release and move on. ``failed_path``
+                    # pins the name this claim was trying: the rollback loop
+                    # below rebinds ``claim_path``.
+                    failed_path = claim_path
+                    try:
+                        os.lstat(claim_path)
+                    except OSError:
+                        if claims_owned:
+                            for claim_path in claims:
+                                try:
+                                    os.unlink(claim_path)
+                                except OSError:
+                                    pass
+                        raise WorkareaPlacementError(
+                            f"Not saved: {failed_path.name} in {resolved_destination} "
+                            f"could not be claimed: {exc}. Nothing written."
+                        ) from exc
+                    for claim_path in claims:
+                        if claims_owned:
+                            try:
+                                os.unlink(claim_path)
+                            except OSError:
+                                pass
+                    claims.clear()
+                    taken = True
+                    break
+                os.close(claim_fd)
+                # Security finding S-F1: re-verify the claim is a regular
+                # file this call just created — not a reparse point swapped
+                # in after the pre-claim lstat.
+                claim_stat = os.lstat(claim_path)
+                if not stat.S_ISREG(claim_stat.st_mode) or _is_reparse_point(
+                    claim_path
+                ):
+                    # ``failed_path`` pins the swapped claim: the rollback
+                    # loop below rebinds ``claim_path``.
+                    failed_path = claim_path
+                    if claims_owned:
+                        try:
+                            os.unlink(claim_path)
+                        except OSError:
+                            pass
+                    for claim_path in claims:
+                        if claims_owned:
+                            try:
+                                os.unlink(claim_path)
+                            except OSError:
+                                pass
+                    raise WorkareaPlacementError(
+                        f"Not saved: {failed_path.name} in {resolved_destination} "
+                        "was replaced by a link or special file between the claim "
+                        "and the write. Nothing written."
+                    )
+                claims.append(claim_path)
+            if taken:
+                continue
+
+        # Fill each claim from its staged member. On ANY failure roll back
+        # EVERY own claim — placed or still an empty claim — so no orphan
+        # member and no 0-byte claim survives (PDR C3(c)).
+        for index, (staged_file, _payload) in enumerate(staged):
+            claim_path = claims[index]
+            # ``failed_path`` pins the member whose fill fails: the rollback
+            # loops below rebind ``claim_path`` to the group's last claim.
+            failed_path = claim_path
+            deadline = time.monotonic() + 1.0
+            attempts = 0
+            while True:
+                try:
+                    os.replace(staged_file, claim_path)
+                    break
+                except PermissionError:
+                    attempts += 1
+                    if attempts >= 5 or time.monotonic() >= deadline:
+                        for claim_path in claims:
+                            if claims_owned:
+                                try:
+                                    os.unlink(claim_path)
+                                except OSError:
+                                    pass
+                        raise WorkareaPlacementError(
+                            f"Not saved: {failed_path.name} in {resolved_destination} "
+                            "is still locked after 5 retries, another program may "
+                            "hold it — close it and retry. Nothing written."
+                        ) from None
+                    time.sleep(min(0.05, max(0.0, deadline - time.monotonic())))
+                except OSError as exc:
+                    # any other fill failure fails the whole group —
+                    # never a fallback to a copy-then-delete of the source
+                    for claim_path in claims:
+                        if claims_owned:
+                            try:
+                                os.unlink(claim_path)
+                            except OSError:
+                                pass
+                    raise WorkareaPlacementError(
+                        f"Not saved: {failed_path.name} in {resolved_destination} "
+                        f"could not be written: {exc}. Nothing written."
+                    ) from exc
+        return claims
+    finally:
+        # only ever the staging this call created (LLR-155.1/155.7)
+        if staging_owned:
+            shutil.rmtree(stage_dir, ignore_errors=True)
+
+
 def sanitize_project_name(name: str) -> Optional[str]:
     """Return a filesystem-safe project name or None if empty after cleaning."""
     cleaned = "".join(ch for ch in name.strip() if ch.isalnum() or ch in {"-", "_"})

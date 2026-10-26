@@ -1,0 +1,80 @@
+                dest = project_dir / "splits"
+                before = {p.name: p.read_bytes() for p in dest.iterdir()}
+    
+                # Patch one byte through the Patch Editor (rail key ``6``).
+                await pilot.press("escape")  # close the window
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_editor_panel")) > 0,
+                    "the Patch Editor",
+                )
+                assert await pilot.click(
+                    "#patch_entry_address_input"
+                ), "click missed #patch_entry_address_input"
+                await pilot.press(*f"0x{patch_addr:X}")
+                assert await pilot.click(
+                    "#patch_entry_bytes_input"
+                ), "click missed #patch_entry_bytes_input"
+                await pilot.press(*f"0x{patch_value:02X}")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "the add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "the apply status line",
+                )
+    
+                await _open_split_join_window(app, pilot)
+                await pilot.press("a")
+                await pilot.press("e")
+                # Wait for the SECOND export's status: it names the `_1` write
+                # and the reused siblings (UX-C11).
+                status = ""
+                for _ in range(200):
+                    await pilot.pause()
+                    status = _status_text(app)
+                    if "xported" in status.lower() and "reused" in status:
+                        break
+                after = {p.name: p.read_bytes() for p in dest.iterdir()}
+                return before, after, status
+    
+        before, after, status = asyncio.run(_drive())
+        new_names = sorted(set(after) - set(before))
+        overwritten = [n for n in before if after[n] != before[n]]
+>       assert overwritten == [], f"the first export was clobbered: {overwritten}"
+E       AssertionError: the first export was clobbered: ['prg_range_00.s19']
+E       assert ['prg_range_00.s19'] == []
+E         
+E         Left contains one more item: 'prg_range_00.s19'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:922: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_28_sanitiser_hostile_set_and_boundaries
+FAILED tests/test_b99_export.py::test_tc_b99_29_junction_destination_is_refused
+FAILED tests/test_b99_export.py::test_tc_b99_29_existing_symlink_at_final_name_is_refused
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_set_writes_nothing_outside
+FAILED tests/test_b99_export.py::test_tc_b99_29_hostile_segment_name_renders_literally
+FAILED tests/test_b99_export.py::test_tc_b99_30_mac_only_export_writes_no_data_record
+FAILED tests/test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name
+FAILED tests/test_b99_export.py::test_tc_b99_31_bin_pair_placed_under_one_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair
+FAILED tests/test_b99_export.py::test_tc_b99_31_forced_failure_rolls_back_every_own_claim
+FAILED tests/test_b99_export.py::test_tc_b99_41_case_folded_collision_refuses_before_any_write
+FAILED tests/test_b99_export.py::test_tc_b99_41_one_refused_name_refuses_the_whole_set
+FAILED tests/test_b99_export.py::test_tc_b99_41_over_long_full_path_refused_at_plan_time
+FAILED tests/test_b99_export.py::test_at_b99_11_hostile_segment_name_stays_inside_destination
+FAILED tests/test_b99_export.py::test_at_b99_11_mac_only_export_writes_no_data_record
+FAILED tests/test_b99_export.py::test_at_b99_11_second_export_after_patch_takes_next_free_name
+17 failed in 75.06s (0:01:15)

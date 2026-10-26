@@ -44,9 +44,11 @@ limbs · TC-709 the screen wrap audit · TC-710 the negative-control battery).
 """
 from __future__ import annotations
 
+import shutil
+from bisect import bisect_right
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from rich.style import Style
 from rich.text import Text
@@ -57,11 +59,28 @@ from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.widgets import Button, Static
 from textual.widgets import TextArea
 
+from ..utils import safe_text
 from .a2l import extract_memory_segments
 from .capped_text_area import CappedTextArea
 from .open_folder_chip import titled_header
-from .services.project_gather_service import scoped_home, scoped_home_target
+from .services.project_gather_service import (
+    _check_home_contained,
+    scoped_home,
+    scoped_home_target,
+)
 from .window_help import WindowHelpChip, WindowSection
+from .workspace import (
+    WORKAREA_DIRNAME,
+    WORKAREA_STAGING_DIRNAME,
+    WORKAREA_SUBDIR,
+    WORKAREA_TEMP,
+    WorkareaContainmentError,
+    _find_workarea_root,
+    _is_reparse_point,
+    _private_stage_dir,
+    copy_into_workarea,
+    place_group_into_workarea,
+)
 
 # NOTE (cyclic import): the engine (``s19_app.segment_ops``) imports
 # ``s19_app.tui.changes.io``, whose package init (``s19_app.tui``) eagerly
@@ -486,7 +505,210 @@ def resolve_sample(stem: str, seg: str, ext: str, pattern: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# The export dispatch — thin composition over the engine (HLR-137)
+# HLR-160 — one sanitiser, the plan-time pass and work-area-anchored
+# containment for every export name (LLR-160.1 / 160.2 / 160.5)
+# ---------------------------------------------------------------------------
+
+#: The ASCII allowlist for the SEGMENT part of an export name (LLR-160.1):
+#: every other character maps to ``_``.
+_EXPORT_NAME_SAFE = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
+)
+
+#: The Windows reserved device names — compared case-insensitively, BEFORE
+#: any extension (LLR-160.1). ``COM¹``/``COM²``/``COM³`` are the
+#: superscript-digit aliases Windows itself treats as COM1..COM3, so the
+#: superscripts are normalised to ASCII digits before the allowlist mapping:
+#: the device is then recognised and defused (``_COM1``), not merely masked.
+_EXPORT_RESERVED_DEVICES = frozenset(
+    {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"}
+    | {f"COM{i}" for i in range(10)}
+    | {f"LPT{i}" for i in range(10)}
+)
+
+_EXPORT_SUPER_DIGITS = str.maketrans({"¹": "1", "²": "2", "³": "3"})
+
+#: The segment-part cap, the final-basename cap (LLR-160.1) and the room the
+#: clip reserves for one ``_<N>`` suffix — a placed name must stay inside the
+#: cap even after placement claims the next free suffix. The room covers TWO
+#: digits: from the tenth collision on the suffix is ``_<N>`` with N >= 10,
+#: one character longer than ``_1`` — reserving one digit would let a
+#: 201-character basename through the cap.
+_EXPORT_SEGMENT_MAX = 100
+_EXPORT_BASENAME_MAX = 200
+_EXPORT_SUFFIX_DIGITS = 2
+_EXPORT_SUFFIX_ROOM = len("_") + _EXPORT_SUFFIX_DIGITS
+
+#: The platform full-path limit the plan-time pass checks against
+#: (LLR-160.5) — the shipped Windows MAX_PATH bound this TUI targets.
+_MAX_FULL_PATH = 260
+
+
+class ExportRefusedError(ValueError):
+    """The export plan refused BEFORE any byte is written (LLR-160.2 /
+    LLR-160.5) — a collision, a refused name, an over-long path or a link
+    at a final name.
+
+    Carries the raw/sanitised segment-name pairs so the refusal notice can
+    render each raw name literally (LLR-160.2's ``safe_text`` contract).
+    """
+
+    def __init__(self, reason: str, pairs: Sequence[Tuple[str, str]] = ()) -> None:
+        super().__init__(reason)
+        self.reason = reason
+        self.pairs = list(pairs)
+
+
+class ExportWriteError(Exception):
+    """A part-way export failure (LLR-160.5).
+
+    The message reports truthfully what already happened before the failure —
+    the files written and the files reused, never the two conflated; the
+    written paths ride along for any caller that wants them.
+    """
+
+    def __init__(self, message: str, written: Sequence[Path] = ()) -> None:
+        super().__init__(message)
+        self.written = list(written)
+
+
+@dataclass
+class PlacedExport:
+    """One placed export file and the action that produced it (UX-C11).
+
+    Deliberately a plain data holder, NOT a ``Path`` subclass: on Python
+    3.12+ a ``Path`` subclass whose ``__init__`` skips ``super().__init__()``
+    leaves the pathlib internals (``_raw_paths``) uninitialised, so every
+    ``.name`` access raises ``AttributeError`` — the export placed its files
+    and then crashed painting the status. ``action`` is ``"wrote"`` when
+    placement claimed a fresh name, ``"reused"`` when the existing
+    byte-identical file stood.
+    """
+
+    path: Path
+    action: str
+
+
+def sanitize_export_segment(name: str, index: int) -> str:
+    """
+    Summary:
+        The ONE sanitiser every export name's segment part rides through
+        (LLR-160.1): keep ASCII ``[A-Za-z0-9_-]`` only (mapping every other
+        character to ``_``), prefix ``_`` to a Windows reserved device name
+        (``CON``, ``PRN``, ``AUX``, ``NUL``, ``COM0``–``COM9``,
+        ``LPT0``–``LPT9`` including the superscript digits, ``CONIN$``,
+        ``CONOUT$`` — case-insensitive, compared before any extension),
+        cap the part at 100 characters, and fall back to
+        ``segment_<index>`` when the result is empty. The sanitised part is
+        many-to-one BY DESIGN (``../`` and ``..\\`` both map to ``___``);
+        the plan-time pass (LLR-160.5) refuses the export when two parts
+        collide case-folded.
+
+        The reserved probe runs on the superscript-normalised name BEFORE
+        the allowlist mapping, so ``CONIN$`` is recognised as the device
+        (and defused to ``_CONIN_``) instead of being masked to ``CONIN_``
+        first.
+
+    Args:
+        name (str): The raw segment name (an A2L ``MEMORY_SEGMENT`` name, a
+            range row name or a manual locality name) — the untrusted half
+            of an export name.
+        index (int): The row index — the empty-result fallback name.
+
+    Returns:
+        str: 1–100 characters from ``[A-Za-z0-9_-]``, never a reserved
+            device name.
+    """
+    translated = name.translate(_EXPORT_SUPER_DIGITS)
+    if translated.upper() in _EXPORT_RESERVED_DEVICES:
+        translated = "_" + translated
+    mapped = "".join(ch if ch in _EXPORT_NAME_SAFE else "_" for ch in translated)
+    mapped = mapped[:_EXPORT_SEGMENT_MAX]
+    return mapped if mapped else f"segment_{index}"
+
+
+def build_export_basename(stem: str, segment: str, ext: str, index: int) -> str:
+    """
+    Summary:
+        Build ONE export basename ``<stem>_<segment>`` (LLR-160.1): the
+        segment part rides through :func:`sanitize_export_segment`; the stem
+        — the loaded file's own name, trustworthy — is only ever CLIPPED,
+        never remapped, so that the final basename (one D8 ``_<N>`` suffix
+        and ``ext`` included) stays within :data:`_EXPORT_BASENAME_MAX`.
+
+    Args:
+        stem (str): The loaded-file stem.
+        segment (str): The raw segment name (see :func:`sanitize_export_segment`).
+        ext (str): The dotted extension to reserve room for — ``".addr"``
+            covers a BIN pair (its longer member), ``".s19"``/``".hex"``
+            the text formats.
+        index (int): The row index (the sanitiser's fallback name).
+
+    Returns:
+        str: ``f"{clipped_stem}_{sanitised_part}"`` with
+            ``len(base + "_1" + ext) <= _EXPORT_BASENAME_MAX``.
+    """
+    part = sanitize_export_segment(segment, index)
+    room = (
+        _EXPORT_BASENAME_MAX - len("_") - len(part) - len(ext) - _EXPORT_SUFFIX_ROOM
+    )
+    clipped = stem[: max(room, 1)]
+    return f"{clipped}_{part}"
+
+
+def _refusal_text(reason: str, pairs: Sequence[Tuple[str, str]]) -> Text:
+    """The refusal notice (LLR-160.2 / UX-C10): outcome first, then each raw
+    segment name rendered LITERALLY (:func:`safe_text`, clipped to 80
+    characters) next to its sanitised name. Rich-safe by construction —
+    the hostile text can paint no markup and no style."""
+    text = Text("Export refused: ")
+    text.append(reason)
+    for raw, safe in pairs:
+        text.append(" — segment ")
+        text.append_text(safe_text(raw[:80]))
+        text.append(f" → {safe}")
+    return text
+
+
+def _export_reuse_target(target: Path, staged: Path) -> bool:
+    """True when placement will REUSE ``target`` (bug B8: it exists, is not
+    a link or reparse point, is non-empty and is byte-identical to the
+    staged payload) — the status word (UX-C11), mirroring the placement
+    seam's own rule; an unreadable target is not trusted."""
+    try:
+        return (
+            not _is_reparse_point(target)
+            and target.exists()
+            and target.stat().st_size > 0
+            and target.read_bytes() == staged.read_bytes()
+        )
+    except OSError:
+        return False
+
+
+def _filter_declared_ranges(
+    mem_map: Dict[int, int], declared_ranges: Sequence[Tuple[int, int]]
+) -> Dict[int, int]:
+    """LLR-160.3: keep only the addresses the image DECLARED in its own
+    ranges — a MAC-only session's placeholder entries hold no declared
+    range, so every placeholder is dropped and the export is header-only.
+    A declared-but-absent address contributes nothing (the maps are
+    address-sparse); a present-but-undeclared address is never data."""
+    spans = sorted((int(start), int(end)) for start, end in declared_ranges if end > start)
+    if not spans:
+        return {}
+    starts = [start for start, _ in spans]
+    kept: Dict[int, int] = {}
+    for addr, byte in mem_map.items():
+        i = bisect_right(starts, addr) - 1
+        if i >= 0 and spans[i][0] <= addr < spans[i][1]:
+            kept[addr] = byte
+    return kept
+
+
+# ---------------------------------------------------------------------------
+# The export dispatch — thin composition over the engine (HLR-137) riding
+# the HLR-160 plan pass and the work-area placement (LLR-160.4)
 # ---------------------------------------------------------------------------
 
 
@@ -501,7 +723,8 @@ def write_split_join_export(
     stem: str,
     dest_dir: Path,
     zero_coverage_empty: bool = False,
-) -> List[Path]:
+    declared_ranges: Optional[Sequence[Tuple[int, int]]] = None,
+) -> List[PlacedExport]:
     """Write the planned export (LLR-136) — the engine does the bytes.
 
     Split: one file per row via :func:`segment_ops.fill_range` (``intra_gap``
@@ -510,42 +733,86 @@ def write_split_join_export(
     latter raises :class:`GapConflictError` BEFORE a byte is emitted when a
     pad would clobber source (the fixed ``on_gap_conflict="abort"`` law), so
     a refused export writes nothing. S19/HEX ride the shipped mem_map
-    emitters through :func:`segment_ops.emit_image`; BIN writes exactly
-    ``size`` flat bytes plus the one-line ``.addr`` sidecar (LLR-137.2).
+    emitters through :func:`segment_ops.emit_image`; BIN is the flat bytes
+    plus the one-line ``.addr`` sidecar (LLR-137.2).
+
+    Every name is built by :func:`build_export_basename` (LLR-160.1) and
+    every file is PLACED — single files through
+    :func:`workspace.copy_into_workarea`, a BIN and its ``.addr`` sidecar as
+    one group through :func:`workspace.place_group_into_workarea`
+    (B99-I2a, LLR-160.4): a changed re-export takes the next free ``_<N>``,
+    an identical one is reused, and each returned :class:`PlacedExport`
+    carries the action (``placed.action in {"wrote", "reused"}``) for the
+    status (UX-C11).
+
+    Before any folder or file is created the destination home passes the
+    shipped containment guard ``_check_home_contained`` anchored to the
+    work-area root (LLR-160.2), each final path resolves inside it, and a
+    link or reparse point at a final name refuses the whole export. The
+    plan-time pass (LLR-160.5) then checks every path length the bytes will
+    travel — each final name with the worst-case ``_<N>`` suffix the
+    basename cap reserves room for, and each private staging path, which is
+    longer than the final path — against the platform limit, and every
+    final name (sidecars included, case-folded) for collisions. The whole
+    export refuses, naming the colliding segments (sanitised, each raw name
+    through ``safe_text`` clipped to 80) or the refused name, before any
+    byte. When a write still fails part-way the raised
+    :class:`ExportWriteError` reports what already happened, split
+    truthfully between written and reused files.
 
     ``zero_coverage_empty`` (the UI's LLR-136.6 limb, default off): a split
     row whose span holds no source bytes exports as the EMPTY image at its
     base (0-byte BIN + sidecar / header-only S19/HEX) instead of the
     intra_gap fill's fabricated all-pad run. Off, this function is pure
     engine composition (LLR-137.3's fill materializes every pad).
+
+    ``declared_ranges`` (LLR-160.3, optional): the loaded image's declared
+    ranges; when given, the bytes come ONLY from those ranges — a MAC-only
+    session's placeholder entries are never data, so its export is
+    header-only. ``None`` keeps the legacy whole-map behaviour (the engine
+    purity contract the shipped tests pin).
     """
     EXPORT_FORMATS = _engine_attr("EXPORT_FORMATS")
     emit_image = _engine_attr("emit_image")
     fill_range = _engine_attr("fill_range")
     join_concat = _engine_attr("join_concat")
     join_fill = _engine_attr("join_fill")
-    write_bin_with_sidecar = _engine_attr("write_bin_with_sidecar")
+    emit_bin_from_mem_map = _engine_attr("emit_bin_from_mem_map")
+    bin_addr_sidecar = _engine_attr("bin_addr_sidecar")
     if fmt not in EXPORT_FORMATS:
         raise ValueError(f"fmt must be one of {list(EXPORT_FORMATS)}, got {fmt!r}")
     dest_dir = Path(dest_dir)
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    written: List[Path] = []
+    if declared_ranges is not None:
+        mem_map = _filter_declared_ranges(mem_map, declared_ranges)
 
-    def _write(name: str, planned_map, planned_ranges) -> None:
+    # --- Phase A: the plan — every final name and every payload BEFORE any
+    # byte is written (LLR-160.5). The engine's abort law still lands here,
+    # before the placement, so a refused export writes nothing.
+    limbs: List[Tuple[str, str, List[Tuple[str, object]]]] = []
+
+    def _plan_limb(
+        raw: str, index: int, planned_map, planned_ranges
+    ) -> Tuple[str, str, List[Tuple[str, object]]]:
+        part = sanitize_export_segment(raw, index)
         if fmt == "bin":
-            written.append(
-                write_bin_with_sidecar(
-                    planned_map, planned_ranges, dest_dir / f"{name}.bin"
-                )[0]
-            )
-            return
+            base = build_export_basename(stem, raw, ".addr", index)
+            members = [
+                (
+                    f"{base}.bin",
+                    emit_bin_from_mem_map(planned_map, planned_ranges),
+                ),
+                (
+                    f"{base}.addr",
+                    bin_addr_sidecar(planned_ranges[0][0] if planned_ranges else 0),
+                ),
+            ]
+            return (raw, part, members)
         payload = emit_image(planned_map, planned_ranges, fmt)
-        dest = dest_dir / f"{name}.{fmt}"
-        dest.write_text(payload, encoding="ascii")
-        written.append(dest)
+        base = build_export_basename(stem, raw, f".{fmt}", index)
+        return (raw, part, [(f"{base}.{fmt}", payload)])
 
     if mode == "split":
-        for r in rows:
+        for index, r in enumerate(rows):
             if zero_coverage_empty and not any(
                 r.base <= a < r.base + r.size for a in mem_map
             ):
@@ -555,21 +822,155 @@ def write_split_join_export(
                 # semantics) — never a fabricated all-pad run. The default
                 # False keeps this module pure engine composition (the
                 # intra_gap fill materializes pads, LLR-137.3).
-                _write(f"{stem}_{r.name}", {}, [(r.base, r.base)])
-                continue
-            planned_map, planned_ranges = fill_range(
-                mem_map, r.base, r.base + r.size, pad_byte, intra_gap=gap
-            )
-            _write(f"{stem}_{r.name}", planned_map, planned_ranges)
-        return written
-
-    ranges = [(r.base, r.base + r.size) for r in sorted(rows, key=lambda r: r.base)]
-    if gap == "concat":
-        planned_map, planned_ranges = join_concat(mem_map, ranges)
+                planned_map, planned_ranges = {}, [(r.base, r.base)]
+            else:
+                planned_map, planned_ranges = fill_range(
+                    mem_map, r.base, r.base + r.size, pad_byte, intra_gap=gap
+                )
+            limbs.append(_plan_limb(r.name, index, planned_map, planned_ranges))
     else:
-        planned_map, planned_ranges = join_fill(mem_map, ranges, pad_byte)
-    _write(f"{stem}_joined", planned_map, planned_ranges)
-    return written
+        ranges = [
+            (r.base, r.base + r.size) for r in sorted(rows, key=lambda r: r.base)
+        ]
+        if gap == "concat":
+            planned_map, planned_ranges = join_concat(mem_map, ranges)
+        else:
+            planned_map, planned_ranges = join_fill(mem_map, ranges, pad_byte)
+        limbs.append(_plan_limb("joined", 0, planned_map, planned_ranges))
+
+    # --- LLR-160.2: the destination home passes the shipped containment
+    # guard BEFORE any folder or file is created, anchored to the work-area
+    # root — a junction home resolves outside the root and refuses here.
+    home = _check_home_contained(dest_dir)
+
+    # Resolve every final path inside the home; refuse a link or reparse
+    # point already sitting at a final name (sidecars included) — the write
+    # never goes through it.
+    final_names: List[Tuple[str, str, str]] = []  # (raw segment, part, name)
+    for raw, part, members in limbs:
+        for name, _payload in members:
+            if _is_reparse_point(home / name):
+                raise ExportRefusedError(
+                    f'"{name}" already exists as a link or reparse point — '
+                    "refusing to write through it",
+                    [(raw, part)],
+                )
+            final_names.append((raw, part, name))
+
+    # --- LLR-160.5: the full-path length pass, then the case-folded
+    # collision pass — each refuses the WHOLE export, naming the refused
+    # name or the colliding segments, BEFORE any byte is written. The
+    # length pass measures every path the bytes will travel: the final
+    # name carrying the worst-case ``_<N>`` suffix the basename cap
+    # reserves room for (the placement seam may claim ``_<N>``), and the
+    # private staging path, which is longer than the final path.
+    workarea_root = _find_workarea_root(home)
+    if workarea_root is None:  # pragma: no cover - _check_home_contained proved it
+        raise WorkareaContainmentError(
+            f"Refusing to export: destination is not contained inside "
+            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {home}"
+        )
+    # ``_private_stage_dir`` names its per-write directory ``stage-`` plus
+    # the eight random characters ``tempfile.mkdtemp`` appends — the worst
+    # case is measured so a path that only fits unstaged is refused here.
+    stage_worst = (
+        workarea_root
+        / WORKAREA_TEMP
+        / WORKAREA_STAGING_DIRNAME
+        / ("stage-" + "9" * 8)
+    )
+    for raw, part, name in final_names:
+        suffix = Path(name).suffix
+        stem_part = name[: -len(suffix)] if suffix else name
+        worst_name = (
+            f"{stem_part}_{'9' * _EXPORT_SUFFIX_DIGITS}{suffix}"
+            if suffix
+            else f"{name}_{'9' * _EXPORT_SUFFIX_DIGITS}"
+        )
+        full = str(home / worst_name)
+        if len(full) > _MAX_FULL_PATH:
+            raise ExportRefusedError(
+                f'"{name}" resolves to {len(full)} characters — over the '
+                f"platform limit of {_MAX_FULL_PATH}",
+                [(raw, part)],
+            )
+        staged_full = str(stage_worst / worst_name)
+        if len(staged_full) > _MAX_FULL_PATH:
+            raise ExportRefusedError(
+                f'"{name}" stages at {len(staged_full)} characters — over '
+                f"the platform limit of {_MAX_FULL_PATH}",
+                [(raw, part)],
+            )
+    seen: Dict[str, Tuple[str, str, str]] = {}
+    for raw, part, name in final_names:
+        folded = name.casefold()
+        if folded in seen:
+            other_raw, other_part, other_name = seen[folded]
+            raise ExportRefusedError(
+                "export names collide (compared case-folded): "
+                f'"{other_name}" (segment {safe_text(other_raw[:80])}) and '
+                f'"{name}" (segment {safe_text(raw[:80])})',
+                [(other_raw, other_part), (raw, part)],
+            )
+        seen[folded] = (raw, part, name)
+
+    # --- Phase B: stage the payloads through the work area's own private
+    # staging helper (LLR-155.1 — never the system temp) and place every
+    # file through the work-area seams (single files copy, the BIN/``
+    # .addr`` pair is placed as one group). A part-way failure rolls back
+    # inside the seams and surfaces as an ExportWriteError reporting what
+    # already happened, split truthfully between written and reused files.
+    home.mkdir(parents=True, exist_ok=True)
+    stage_dir = _private_stage_dir(workarea_root)
+    placed: List[PlacedExport] = []
+    try:
+        for _raw, _part, members in limbs:
+            staged_members: List[Tuple[Path, str]] = []
+            for name, payload in members:
+                staged_file = stage_dir / name
+                if isinstance(payload, str):
+                    staged_file.write_text(payload, encoding="ascii")
+                else:
+                    staged_file.write_bytes(payload)
+                staged_members.append((staged_file, name))
+            try:
+                if len(staged_members) == 1:
+                    staged_file, name = staged_members[0]
+                    reused = _export_reuse_target(home / name, staged_file)
+                    final = copy_into_workarea(staged_file, home)
+                    placed.append(
+                        PlacedExport(final, "reused" if reused else "wrote")
+                    )
+                    continue
+                reused = all(
+                    _export_reuse_target(home / name, staged_file)
+                    for staged_file, name in staged_members
+                )
+                finals = place_group_into_workarea(
+                    [staged_file for staged_file, _name in staged_members], home
+                )
+                for final, (_staged, _name) in zip(finals, staged_members):
+                    placed.append(
+                        PlacedExport(final, "reused" if reused else "wrote")
+                    )
+            except Exception as exc:
+                wrote_names = [
+                    p.path.name for p in placed if p.action == "wrote"
+                ]
+                reused_names = [
+                    p.path.name for p in placed if p.action == "reused"
+                ]
+                done = ", ".join(wrote_names) if wrote_names else "nothing"
+                detail = f"Export stopped: {exc}. Already written: {done}"
+                if reused_names:
+                    detail += f"; reused: {', '.join(reused_names)}"
+                raise ExportWriteError(
+                    detail,
+                    written=[p.path for p in placed if p.action == "wrote"],
+                ) from exc
+    finally:
+        shutil.rmtree(stage_dir, ignore_errors=True)
+    return placed
 
 
 # ---------------------------------------------------------------------------
@@ -1624,9 +2025,13 @@ class SplitJoinWindow(WindowSection):
             )
             return
         picked = [rows[i] for i in self._valid_picked(rows)]
-        dest_dir = self._dest_dir()
         GapConflictError = _engine_attr("GapConflictError")
+        dest_dir: Optional[Path] = None
         try:
+            # Inside the try on purpose: a junctioned project home makes the
+            # scoped destination resolution refuse (WorkareaContainmentError)
+            # — that refusal must render as a refusal, never crash the app.
+            dest_dir = self._dest_dir()
             written = write_split_join_export(
                 self._mem_map(),
                 picked,
@@ -1637,6 +2042,7 @@ class SplitJoinWindow(WindowSection):
                 stem=self._stem(),
                 dest_dir=dest_dir,
                 zero_coverage_empty=True,
+                declared_ranges=self._src_ranges(),
             )
         except GapConflictError as exc:
             # The plan's ▒ sweep and the engine agreed to disagree (a racing
@@ -1645,18 +2051,66 @@ class SplitJoinWindow(WindowSection):
             app.set_status(f"export aborted: {exc}")
             app.notify(f"export aborted: {exc}", severity="error", markup=False)
             return
+        except ExportRefusedError as exc:
+            # LLR-160.5 / UX-C10: the refusal names the segments; each raw
+            # name renders literally, clipped, next to its sanitised form.
+            self._armed = False
+            text = _refusal_text(exc.reason, exc.pairs)
+            app.set_status(str(text))
+            app.notify(
+                text,
+                title="Split / Join / Export",
+                severity="error",
+                markup=False,
+            )
+            return
+        except WorkareaContainmentError as exc:
+            # LLR-160.2: the shipped guard refused the destination home —
+            # outside the work-area root or traversing a reparse point.
+            self._armed = False
+            app.set_status(f"Export refused: {exc}")
+            app.notify(
+                safe_text(f"Export refused: {exc}"),
+                title="Split / Join / Export",
+                severity="error",
+                markup=False,
+            )
+            return
+        except ExportWriteError as exc:
+            # LLR-160.5's part-way contract: the message reports what
+            # already happened, split truthfully between written and
+            # reused files.
+            self._armed = False
+            app.set_status(f"Export failed: {exc}")
+            app.notify(
+                safe_text(f"Export failed: {exc}"),
+                title="Split / Join / Export",
+                severity="error",
+                markup=False,
+            )
+            return
         except Exception as exc:
             self._armed = False
             app.set_status(f"export failed: {exc}")
             app.notify(f"export failed: {exc}", severity="error", markup=False)
             return
         self._armed = False
-        names = ", ".join(p.name for p in written[:3])
-        if len(written) > 3:
-            names += ", …"
-        app.set_status(f"exported {len(written)} file(s) → {dest_dir}")
+        # UX-C11: the status leads with the outcome, uses the words
+        # `wrote` / `reused`, and names the actual `_<N>` names.
+        wrote = [p.path.name for p in written if p.action == "wrote"]
+        reused = [p.path.name for p in written if p.action == "reused"]
+        parts = [f"wrote {name}" for name in wrote[:3]]
+        if len(wrote) > 3:
+            parts.append(f"+{len(wrote) - 3} more wrote")
+        if reused:
+            tail = ", ".join(reused[:3])
+            if len(reused) > 3:
+                tail += f" +{len(reused) - 3} more"
+            parts.append(f"reused {tail}")
+        summary = "; ".join(parts) if parts else "nothing to write"
+        app.set_status(f"Exported {len(written)} files: {summary} → {dest_dir}")
         app.notify(
-            f"wrote {names}",
+            f"Exported {len(written)} files: {summary}",
             title="Split / Join / Export",
             severity="information",
             markup=False,
