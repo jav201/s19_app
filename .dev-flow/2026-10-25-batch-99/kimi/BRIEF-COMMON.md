@@ -22,6 +22,9 @@ You are the IMPLEMENTER (`software-dev` role, `C:\Users\jjgh8\.claude\skills\dev
 
 - **Test ids:** never invent a new `TC-B99-NN` or `AT-B99-NN` number. The ids belong to the requirements, and three increments collided with numbers that other LLRs own. An extra arm is a sub-node of the TC it serves (`test_tc_b99_23_<arm>`). If a truly new TC is needed, write `TC-B99-NEW-<n>` in the packet and the orchestrator assigns the number.
 
+- **New test module:** if you add a file under `tests/`, bump `EXPECTED_SCANNED_TEST_FILES` in `tests/test_id_registry.py` by the measured count, with a one-line comment, and run `tests/test_id_registry.py`.
+- **Black-box ATs, concretely:** never `_handle_load_project`, `load_from_path`, `action_show_screen`, `request_action`, `Button.press()` or direct attribute reads in an AT. Use the rail keys, `pilot.click("#id")`, `pilot.press(*text)`, the painted status `#log_line_4`, and files on disk. The working idiom is `tests/test_b99_s0.py` (AT-B99-02). Projects load through the Load project dialog (`#project_ok`).
+
 ## What "done" means for your increment
 1. **RED first.** For every new TC and AT, run it against the unmodified tree and keep the failing transcript. A test that passes before the fix is vacuous: fix the test, not the oracle. Save transcripts under `.dev-flow/2026-10-25-batch-99/evidence/inc-<N>/` (`red-*.txt`, then `green-*.txt`).
 2. **Implement** the smallest change that makes the requirement true.
