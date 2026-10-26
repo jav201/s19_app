@@ -6,7 +6,7 @@ The standing-map residue is in `docs/ARCHITECTURE.md` §10 *Batch-100 declaratio
 > **P2 round 2 (2026-10-26).** This record has been amended for the P2 round-2 dispositions (`P2-dispositions-r2.md`, B-07):
 > - §8 holds the re-derived per-increment file table, and §8.1 the test-arm moves.
 > - The interface changes live in `docs/ARCHITECTURE.md` §11: B100-I2..I9, I11 and I12 are amended, and B100-I13..I22 are new (placement, containment, the `save_patched` split, `derived_from`, the save plan, the unsaved predicate, the session snapshot, the one load seam, the manifest-keys mode, `predict_placement`).
-> - Rationale R25a, R26a, R31a and R34–R37 are added there.
+> - Rationale R25a, R26a, R31a and R34–R37 are added there. **PDR (`a1cad7e`):** ARCH C-1..C-3 are applied to B100-I15 / I16 / I22 in the contract's API form. `derived_from` is added to B100-I1, and `choose_install_set` (`app.py`) to B100-I8. The recent store's location is `%LOCALAPPDATA%` (B100-I9). The `assignments` total cap is in B100-I2, the seam's containment in B100-I14, and the plan's key-list input in B100-I17. §8 holds the decided file counts.
 > - Sections §2–§7 and §10 keep their ARQ-gate text, and §11 of the map supersedes them where the two differ: R25 → B100-I19; R26 → B100-I15; R31 → `%APPDATA%`; the §3.3 problem kinds → B100-I3.
 
 ## 1. BLUF
@@ -209,19 +209,19 @@ Contract (C6 / C8 / privacy):
 | 3 | PH-2 | `tui/app.py` (`_reset_project_session`, `_session_snapshot`) | 1 | ok |
 | 4 | CW-U-2 | `tui/app.py` (focus targets, the load tails) | 1 | ok |
 | 5 | PH-1, D1, R-PC | `tui/app.py`, `tui/services/change_service.py` (the `save_patched` split B100-I15; `mark_saved` / `differs_from_last_saved` B100-I18), `tui/services/project_gather_service.py` (`plan_project_save` B100-I17) | 3 | ok |
-| 6 | PH-4, D2, O-1, P-E | `tui/app.py`, `tui/services/variant_execution_service.py` (`gathered`, `compose_load_announcement`), `tui/screens.py` (the Load-result panel) (+ `tui/styles.tcss`) | 3–4 | ok; at the cap with styles |
-| 7 | PH-5, L-4, D3, O-2, O-11, UX-26 | `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/app.py` (+ `tui/services/project_gather_service.py` for the plan's `files` row) | 3–4 | ok; `derived_from` (B100-I16) lands here, not at 5 or 6, which would add `manifest_writer.py` to those increments |
+| 6 | PH-4, D2, O-1, P-E | `tui/app.py`, `tui/services/variant_execution_service.py` (`gathered`, `compose_load_announcement`), `tui/screens.py` (the Load-result panel), `tui/styles.tcss` (its rules: modal rules live there by convention, `screens.py:131`) | **4** | ⚠ at cap (PDR) |
+| 7 | PH-5, L-4, D3, O-2, O-11, UX-26 | `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/app.py` (`choose_install_set`, LED .34; the plan's `files` row from a key list the app passes, so `project_gather_service.py` is untouched) | 3 | ok; `derived_from` (B100-I16) lands here, not at 5 or 6, which would add `manifest_writer.py` to those increments |
 | 8a | M-2, D4, Q-5 | `tui/app.py`, `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/services/project_gather_service.py` | **4** | **at cap, no slack**: any further file needs a re-cut |
 | 8b | M-3 D5, M-6 D6, M-5 D7 (handler), S-02 | `tui/app.py`, `tui/services/project_gather_service.py`, `tui/workspace.py` (`contained_in_workarea` uses for listing and load) | 3 | ok |
 | 9a | recents store (per-user, S-16), lister, L-2 routing | `tui/workspace.py`, `tui/app.py` | 2 | ok |
-| 9b | P-A C dialog, D10, CW-U-12/13, C8 | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` (+ `tui/services/variant_execution_service.py` if the shared "what installs" function lives there) | 3–4 | ok |
-| 10 | CW-U-5, P-B A, B-02 | `tui/screens.py`, `tui/app.py` (the one load seam B100-I20), `tui/styles.tcss` (+ `tui/screens_directionb.py` for a public dirty-flag accessor) | 3–4 | ok |
+| 9b | P-A C dialog, D10, CW-U-12/13, C8 | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` (`choose_install_set` stays in `app.py`) | 3 | ok |
+| 10 | CW-U-5, P-B A, B-02 | `tui/screens.py`, `tui/app.py` (the one load seam B100-I20), `tui/styles.tcss`, `tui/screens_directionb.py` (a public dirty-flag reader; the flag is private) | **4** | ⚠ at cap (PDR, ARCH C-5) |
 | 11 | M-4 preview, D7 dialog half, P-C B | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` | 3 | ok |
-| 12a + 12b (one unit, R-PD) | N5, P-D A, O-7 | `tui/app.py`, `tui/styles.tcss` (+ `tui/screens.py`) | 2–3 | ok; the `save_patched` split is already in Inc 5, so `change_service.py` is not needed here |
+| 12a + 12b (one unit, R-PD) | N5, P-D A, O-7 | `tui/app.py`, `tui/styles.tcss` (quit reuses the Inc 10 modal with its question text as a parameter) | 2 | ok; the `save_patched` split is already in Inc 5, so `change_service.py` is not needed here |
 
-**No increment exceeds 4 source files.** Inc 8a is at 4. Inc 6, 7, 9b and 10 reach 4 only through their bracketed conditional.
+**No increment exceeds 4 source files.** PDR (`a1cad7e`) decided every conditional: Inc 6, 8a and 10 are at 4 (⚠, with their reasons in the design proposal), Inc 7 and 9b are 3, and Inc 12a+12b is 2. Inc 12's quit question depends on Inc 10's modal taking its text as a parameter (10 → 12).
 
-Hard order: 1 → 6 (save-back naming relies on the reuse rule); 2 → 11 (the summary uses the name rules); 3 → 8a and 3 → 10 (reopen and confirm sit around the reset); 5 → 10 → 11 (the unsaved predicate and the save plan land at 5); 6 → 7 → 8a (the manifest seam, then `files` and `derived_from`, then `active_document`); 9a → 9b; 12a and 12b as one unit. The prototype verdict is in, so no increment is prototype-gated any more.
+Hard order: 1 → 6 (save-back naming relies on the reuse rule); 2 → 11 (the summary uses the name rules); 3 → 8a and 3 → 10 (reopen and confirm sit around the reset); 5 → 10 → 11 (the unsaved predicate and the save plan land at 5); 6 → 7 → 8a (the manifest seam, then `files` and `derived_from`, then `active_document`); 9a → 9b; 7 → 9b (`choose_install_set`); 10 → 12 (the parametrised confirm modal, ARCH-PDR-4); 12a and 12b as one unit. The prototype verdict is in, so no increment is prototype-gated any more.
 
 ### 8.1 Round-2 test-arm moves (B-06)
 

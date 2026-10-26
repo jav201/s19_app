@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-26-batch-100 |
 | Objective | The Load + projects batch: one Load dialog that offers what is already loaded and opens projects, and a project that restores what was saved or says what it could not. Scope: the project round-trip findings of INVESTIGATION-project-roundtrip-2026-10-23 still open (PH-1 Save project drops a pending patch, PH-2 load over a project leaks its A2L/MAC/patches, PH-4 save-back opens the unpatched original, PH-5 manifest problems ignored; M-1..M-7, L-2..L-4), the Load dialog requests (a picker of work-area files and recent sources, Load opens projects, Enter-to-load D10), the G-005 save naming (byte-identical reuse, tests re-pinned), the Code-Wire UI items CW-U-2, CW-U-5, CW-U-12, CW-U-13, the reserved project name, and the progress indicator for long actions (N5 reopened). UI changes go through a prototype round with the operator's verdict before implementation. |
-| Last updated | PDR · 2026-10-26 |
+| Last updated | P3 · 2026-10-26 |
 | Standing authorization | Asked at the kickoff, 2026-10-26; the operator chose, quoted from the answers: autonomy "Igual que b99" (autonomous with exceptions: stop on a HIGH finding or an operator decision; the orchestrator plans and Kimi K2.8 implements in an isolated worktree; commit and push to main at each close; max 4 source files per increment; the prototype round waits for the operator's verdict before implementation); merge "Push directo a main" (each increment lands on main after independent review, no PR); G-005 "Reusar + re-pinear tests"; the 13 local `b99-*` branches "Borrarlas" (done, after checking their content is on main). Carried batch rules from the operator's standing instructions: chat in Spanish, records in English; no operator name in the repo; region extraction described only as memory-region extraction; do not commit `prototypes/`. Every decision the orchestrator takes instead of asking is recorded in this plan's decision log, `state.json.decisions_log` and the post-mortem, and reaches the vault at sync. |
 | First gate | `devflow-validate.py --brief .` at P0 open → exit 0, `0 block · 609 notice · 43 not applicable`; `V7` reports the bundle identical to its manifest at `2026-10-12-rev102`. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin`; `origin/main` = `HEAD` = merge-base = `1d677ba39d2c6aaf09f1ca7e623197065f0b8958`, so `base_ref` is that commit. RC-2: `git ls-remote --exit-code --heads origin main` answered `1d677ba…`. RC-1 (b): every finding in scope is re-executed at `1d677ba` before it becomes a story (`evidence/p0-premises/`), because batch-99 closed some neighbours (PH-3, L-1, CW-U-1, CW-U-3). |
@@ -74,7 +74,8 @@ A project restores exactly what was saved, or names what it could not. Load offe
 | ARQ | done | `design/ARQ-batch-100.md`; approve with conditions (splits, P-E, O-1..O-11 ruled) |
 | P1 | done | `01-requirements.md` (3060d66): US-153..168, HLR-163..178, 58 LLR, 56 TC, 19 AT; Q-1..Q-7 ruled (decisions_log) |
 | P2 | done | approved after a bounded round 3 (02-review.md); 0 HIGH open |
-| PDR | next | design proposal + architect, qa-reviewer, ux-reviewer |
+| PDR | approved with conditions | `design/PDR-2026-10-26-batch-100.md`; a2l.py named crossing (operator) |
+| P3 | in progress | Inc 1 → Kimi K2.8 |
 | Prototype round | done | verdict P-A C, P-B A, P-C B, P-D A, P-E B (`design/veredicto-load-projects.json`) |
 
 ## Roadmap + increment plan

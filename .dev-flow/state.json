@@ -48,7 +48,7 @@
       "reason": "batch 2026-10-26-batch-100 opened by rollover from 2026-10-25-batch-99 (closed at P6, synced); mode full, as batch-99, by the operator's kickoff answers of 2026-10-26"
     }
   ],
-  "current_station": "PDR",
+  "current_station": "P3",
   "phase_status": "not-started",
   "stations_active": [
     "P0",
@@ -151,6 +151,11 @@
       "station": "P2",
       "date": "2026-10-26",
       "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); bounded round 3 per the operator's choice at the P2 iteration cap. P2 approved: round-3 bounded verification by ux-reviewer, architect, security-reviewer, qa-reviewer all approve, 0 HIGH open (02-review.md Round 3); non-blocking conditions carried to PDR (UX-22, UX C-1/C-2, ARCH C-1..C-5, SEC PDR-C1..C3, PDR-QA-1/2). Orchestrator ruling PDR-C3: the recent store moves to %LOCALAPPDATA% (not roaming), per the operator's S-16 intent. PDR is next: design proposal, then architect + qa-reviewer + ux-reviewer."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — PDR-2026-10-26-batch-100 approved with conditions by architect (5 MINOR), qa-reviewer (3 MAJOR, 5 MINOR), ux-reviewer (5 MAJOR, 4 MINOR); no HIGH. Operator decision at this gate on C-UX-1/C-QA-1: \"Cruce con nombre\" — s19_app/tui/a2l.py gains an optional progress callback (bytes consumed), a named frozen-engine crossing; Inc 12 = 3 files and re-freezes a2l.py in test_engine_unchanged. Orchestrator rulings: C-UX-3 early alt+s closes the dialog and saves on a worker under the status line; C-QA-3 gate = six guard files + -k census; full suite after Inc 5, 8b, 12 and at P4 against evidence/suite-full-75f947a.txt (s19_app/tests identical to 1d677ba). All conditions owned per design/PDR-2026-10-26-batch-100.md. P3 is next: Inc 1 to Kimi K2.8."
     }
   ],
   "obsidian_synced": false,
