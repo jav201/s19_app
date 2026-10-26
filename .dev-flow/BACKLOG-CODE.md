@@ -1486,6 +1486,9 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   - The Load failure text reads "Cannot load file: Not saved: …" (a doubled prefix).
   **What closes it:** wrap R2 in `WorkareaPlacementError`; leave a non-owned entry in place on a failed post-claim check and only report it; reword the load-path message.
 
+- **▸ (P2, origin batch-99 Inc-7 review F4) Save project accepts a reserved name** (`app.py` ≈:8123): a project saved as `reports`, `crc`, `splits` and so on no longer appears in the Load project dialog (`RESERVED_WORKAREA_HOMES`). **What closes it:** Save project refuses a name in `RESERVED_WORKAREA_HOMES`, case-folded, with a message naming the reserved set.
+- **▸ (P3, origin batch-99 Inc-7 review F3) AT-B99-13 reads `app.screen` type and `app.workarea`** instead of painted text. **What closes it:** assert on the painted dialog title and on the path shown in the status line.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

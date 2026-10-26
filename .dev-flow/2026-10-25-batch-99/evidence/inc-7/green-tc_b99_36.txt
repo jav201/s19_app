@@ -1,0 +1,2 @@
+tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder PASSED [100%]
+====================== 1 passed, 3 deselected in 10.09s =======================

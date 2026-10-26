@@ -30,6 +30,24 @@ LOG_FILENAME = "s19tui.log"
 # ``<sanitized-basename>.crc.json`` here, so a template name can never redirect the
 # write outside this bounded directory.
 WORKAREA_TEMPLATES = "templates"
+#: Reserved work-area home names (HLR-162 / LLR-162.2): the closed set of
+#: folder homes the tool manages — ``temp``, ``patches``, ``crc`` and
+#: ``splits`` are created directly under the work area (the last two also
+#: inside project dirs), ``templates`` / ``logs`` under ``.s19tool/``, and
+#: ``flows`` / ``flowsets`` / ``reports`` inside project dirs; any of them can
+#: appear at the work-area root. ``S19TuiApp.list_projects`` omits every name here, so no reserved
+#: home can present as a project in the Load project dialog.
+RESERVED_WORKAREA_HOMES = (
+    WORKAREA_TEMP,
+    WORKAREA_PATCHES,
+    WORKAREA_TEMPLATES,
+    LOGS_SUBDIR,
+    "crc",
+    "flows",
+    "flowsets",
+    "splits",
+    "reports",
+)
 # Default size cap for ``copy_into_workarea``. Cap rationale (per security
 # Finding S-N02): realistic A2L upper end is ~100 MB per
 # ``tests/conftest.py`` generators; 256 MB leaves ~2.5x headroom. The cap is

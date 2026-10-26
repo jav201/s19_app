@@ -1,0 +1,276 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b99_34_pick_loads_the_picked_file_name ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_34_pick_loads_the_0')
+
+    def test_tc_b99_34_pick_loads_the_picked_file_name(tmp_path):
+        """Picking ``a.s19`` — boundary: ``a b.s19``, a name with a space — in
+        the Workarea Files list loads that file (the painted status re-push)."""
+    
+        async def _drive(name: str) -> None:
+            src = tmp_path / name
+            shutil.copy(CASE01, src)
+            app = S19TuiApp(base_dir=tmp_path / f"app_{name.replace(' ', '_').replace('.', '_')}")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                assert _files_list_names(app) == [name], _files_list_names(app)
+                await _pick_files_item_and_wait_load(pilot, app, name)
+    
+>       asyncio.run(_drive("a.s19"))
+
+tests\test_b99_load_project.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'a.s19'
+
+    async def _drive(name: str) -> None:
+        src = tmp_path / name
+        shutil.copy(CASE01, src)
+        app = S19TuiApp(base_dir=tmp_path / f"app_{name.replace(' ', '_').replace('.', '_')}")
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            await _load_file_through_dialog(pilot, app, src)
+>           assert _files_list_names(app) == [name], _files_list_names(app)
+E           AssertionError: []
+E           assert [] == ['a.s19']
+E             
+E             Right contains one more item: 'a.s19'
+E             Use -v to get more diff
+
+tests\test_b99_load_project.py:141: AssertionError
+_______________ test_tc_b99_35_reserved_homes_are_not_projects ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_35_reserved_homes_0')
+
+    def test_tc_b99_35_reserved_homes_are_not_projects(tmp_path):
+        """With P1, P2 and every RESERVED_WORKAREA_HOMES name present, the
+        project list holds P1 and P2 only; reserved-only -> empty list."""
+>       from s19_app.tui.workspace import RESERVED_WORKAREA_HOMES
+E       ImportError: cannot import name 'RESERVED_WORKAREA_HOMES' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b99-inc7\s19_app\tui\workspace.py)
+
+tests\test_b99_load_project.py:156: ImportError
+_____________ test_tc_b99_36_workarea_files_reads_the_load_folder _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_tc_b99_36_workarea_files_0')
+
+    def test_tc_b99_36_workarea_files_reads_the_load_folder(tmp_path):
+        """No file loaded -> the list is empty. After one file load the list
+        holds exactly that file (no .staging artefact), and picking it loads it."""
+    
+        async def _drive() -> None:
+            src = tmp_path / "one.s19"
+            shutil.copy(CASE01, src)
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                # Empty boundary: the load folder holds only the .staging home.
+                assert _files_list_names(app) == [], _files_list_names(app)
+                await _load_file_through_dialog(pilot, app, src)
+                names = _files_list_names(app)
+                assert names == ["one.s19"], names
+                assert not any(".staging" in n for n in names), names
+                await _pick_files_item_and_wait_load(pilot, app, "one.s19")
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_load_project.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        src = tmp_path / "one.s19"
+        shutil.copy(CASE01, src)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            # Empty boundary: the load folder holds only the .staging home.
+            assert _files_list_names(app) == [], _files_list_names(app)
+            await _load_file_through_dialog(pilot, app, src)
+            names = _files_list_names(app)
+>           assert names == ["one.s19"], names
+E           AssertionError: []
+E           assert [] == ['one.s19']
+E             
+E             Right contains one more item: 'one.s19'
+E             Use -v to get more diff
+
+tests\test_b99_load_project.py:188: AssertionError
+____________ test_at_b99_13_project_and_file_pickers_load_by_name _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26584/test_at_b99_13_project_and_fil0')
+
+    def test_at_b99_13_project_and_file_pickers_load_by_name(tmp_path):
+        """1. The dialog lists P1 and P2 only (the ``patches`` home is present).
+        2. Three pick paths each load P2 and the status names P2.
+        3. After a file load, the Workarea Files list shows that file, and
+           picking it loads it.
+        4. Empty boundary: with no project, pressing Load loads nothing and the
+           current file stays loaded.
+        """
+        src = tmp_path / "a.s19"
+        shutil.copy(CASE01, src)
+    
+        async def _dialog_lists_projects_only() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case1")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _make_project(app, "P1")
+                _make_project(app, "P2")
+                await pilot.pause()
+                await _open_load_project_dialog(pilot, app)
+                names = sorted(_project_list_names(app))
+                assert names == ["P1", "P2"], names
+    
+        async def _pick_path_highlight_then_ok() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case2")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _make_project(app, "P1")
+                _make_project(app, "P2")
+                await pilot.pause()
+                await _open_load_project_dialog(pilot, app)
+                # Keyboard highlight: focus the list by clicking the P1 row,
+                # move the highlight to P2 with the Down key.
+                await pilot.click(await _project_item(app, "P1"))
+                await pilot.press("down")
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P2'" in _status_text(app),
+                    "the status naming P2 (keyboard highlight + Load)",
+                )
+    
+        async def _pick_path_click_then_ok() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case3")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _make_project(app, "P1")
+                _make_project(app, "P2")
+                await pilot.pause()
+                await _open_load_project_dialog(pilot, app)
+                await pilot.click(await _project_item(app, "P2"))
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P2'" in _status_text(app),
+                    "the status naming P2 (click + Load)",
+                )
+    
+        async def _pick_path_highlight_focus_enter() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case4")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _make_project(app, "P1")
+                _make_project(app, "P2")
+                await pilot.pause()
+                await _open_load_project_dialog(pilot, app)
+                await pilot.click(await _project_item(app, "P1"))
+                await pilot.press("down")
+                await pilot.pause()
+                await pilot.press("tab")
+                await pilot.pause()
+                await pilot.press("enter")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P2'" in _status_text(app),
+                    "the status naming P2 (keyboard highlight + focus Load + enter)",
+                )
+    
+        async def _file_pick_after_load() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case5")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                names = _files_list_names(app)
+                assert names == ["a.s19"], names
+                await _pick_files_item_and_wait_load(pilot, app, "a.s19")
+    
+        async def _empty_boundary_no_project() -> None:
+            app = S19TuiApp(base_dir=tmp_path / "case6")
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                loaded_status = _file_status_text(app)
+                assert "a.s19" in loaded_status, loaded_status
+                # No project exists (only reserved homes): pressing Load loads
+                # nothing and the current file stays loaded. The load left the
+                # Segment Split window holding focus (it binds ``p`` for its own
+                # pad cycle), so the drive uses the shipped "Load project (p)"
+                # button — a real click on the rail surface.
+                await pilot.press("1")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click(
+                    "#ws_load_project_button"
+                ), "click missed #ws_load_project_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "No saved projects found." in _status_text(app),
+                    "the no-projects status line",
+                )
+                assert not isinstance(app.screen, LoadProjectScreen), (
+                    "the dialog must not open with no project"
+                )
+                assert "a.s19" in _file_status_text(app), _file_status_text(app)
+    
+>       asyncio.run(_dialog_lists_projects_only())
+
+tests\test_b99_load_project.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _dialog_lists_projects_only() -> None:
+        app = S19TuiApp(base_dir=tmp_path / "case1")
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _make_project(app, "P1")
+            _make_project(app, "P2")
+            await pilot.pause()
+            await _open_load_project_dialog(pilot, app)
+            names = sorted(_project_list_names(app))
+>           assert names == ["P1", "P2"], names
+E           AssertionError: ['P1', 'P2', 'patches']
+E           assert ['P1', 'P2', 'patches'] == ['P1', 'P2']
+E             
+E             Left contains one more item: 'patches'
+E             Use -v to get more diff
+
+tests\test_b99_load_project.py:243: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name
+FAILED tests/test_b99_load_project.py::test_tc_b99_35_reserved_homes_are_not_projects
+FAILED tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder
+FAILED tests/test_b99_load_project.py::test_at_b99_13_project_and_file_pickers_load_by_name
+4 failed in 20.35s

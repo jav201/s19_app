@@ -1,0 +1,2 @@
+tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name PASSED [100%]
+====================== 1 passed, 3 deselected in 19.48s =======================

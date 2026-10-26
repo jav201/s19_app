@@ -183,6 +183,7 @@ from .workspace import (
     HEX_EXTENSIONS,
     MAC_EXTENSIONS,
     PROJECT_PRIMARY_DATA_EXTENSIONS,
+    RESERVED_WORKAREA_HOMES,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
     WORKAREA_DIRNAME,
@@ -6529,13 +6530,24 @@ class S19TuiApp(App):
             self.logger.debug("A2L DataTable columns already initialized or missing.")
 
     def refresh_files(self) -> None:
-        """Refresh file list from the workarea temp folder."""
+        """Refresh the Workarea Files list from the temp load folder.
+
+        Every file load copies into ``workarea/temp`` (HLR-162 / LLR-162.3,
+        CW-U-3), so that — never the work-area root, never the private
+        ``temp/.staging`` home — is the folder this list reads. Each item
+        carries its file name on ``item.data`` (the Inc-9 dialog-fix idiom),
+        which ``_load_from_item`` reads back; ``str(Label)`` is never the
+        source (Textual 8.2.8 ``Label`` has no ``.text``, CW-U-1).
+        """
         list_view = self.query_one("#files_list", ListView)
         list_view.clear()
-        files = sorted(self.workarea.glob("*"))
+        temp_dir = self.workarea / WORKAREA_TEMP
+        files = sorted(temp_dir.glob("*"))
         for item in files:
             if item.is_file():
-                list_view.append(ListItem(Label(item.name)))
+                entry = ListItem(Label(item.name))
+                entry.data = item.name
+                list_view.append(entry)
         self.logger.info("Workarea refreshed. files=%d", len([f for f in files if f.is_file()]))
 
     def action_refresh_files(self) -> None:
@@ -8496,7 +8508,7 @@ class S19TuiApp(App):
     def list_projects(self) -> List[str]:
         projects = []
         for item in sorted(self.workarea.iterdir()):
-            if item.is_dir() and item.name != WORKAREA_TEMP:
+            if item.is_dir() and item.name not in RESERVED_WORKAREA_HOMES:
                 projects.append(item.name)
         return projects
 
@@ -8996,12 +9008,10 @@ class S19TuiApp(App):
             return
 
     def _load_from_item(self, item: ListItem) -> None:
-        label_widget = item.query_one(Label)
-        if hasattr(label_widget, "text"):
-            filename = label_widget.text
-        else:
-            filename = str(label_widget)
-        candidate = self.workarea / filename
+        filename = getattr(item, "data", None)
+        if not filename:
+            return
+        candidate = self.workarea / WORKAREA_TEMP / filename
         if candidate.exists():
             self.logger.info("Loading from workarea selection: %s", candidate)
             if candidate.suffix.lower() in A2L_EXTENSIONS:

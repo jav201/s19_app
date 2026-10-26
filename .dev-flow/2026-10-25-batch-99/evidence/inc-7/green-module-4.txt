@@ -1,0 +1,19 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc7
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 4 items
+
+tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name PASSED [ 25%]
+tests/test_b99_load_project.py::test_tc_b99_35_reserved_homes_are_not_projects PASSED [ 50%]
+tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder PASSED [ 75%]
+tests/test_b99_load_project.py::test_at_b99_13_project_and_file_pickers_load_by_name PASSED [100%]
+
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b99_load_project.py::test_tc_b99_34_pick_loads_the_picked_file_name
+PASSED tests/test_b99_load_project.py::test_tc_b99_35_reserved_homes_are_not_projects
+PASSED tests/test_b99_load_project.py::test_tc_b99_36_workarea_files_reads_the_load_folder
+PASSED tests/test_b99_load_project.py::test_at_b99_13_project_and_file_pickers_load_by_name
+======================== 4 passed in 66.98s (0:01:06) =========================
