@@ -1,0 +1,6 @@
+tests\test_b99_patch_truth.py:192: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[outside]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[straddle]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_error_cause_is_the_last_diagnostic
+3 failed, 15 deselected in 0.87s

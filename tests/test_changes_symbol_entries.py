@@ -101,7 +101,9 @@ from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
     BLOCK_STATUS_ERROR,
     BLOCK_STATUS_OK,
+    BLOCK_STATUS_SKIPPED,
     FLOW_STATUS_ERROR,
+    FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
     Flow,
     FlowContext,
@@ -768,9 +770,18 @@ def test_tc714_source_a2l_ref_resolves_symbols_through_guard(tmp_path: Path) -> 
 def test_tc714_no_declared_ref_refuses_symbol_entries_no_implicit_a2l(
     tmp_path: Path,
 ) -> None:
-    """TC-714/LLR-142.1 (no-implicit law): a flow whose blocks declare NO
-    a2l_ref applies 0 of the symbol entry's bytes even with a loaded project
-    A2L on the context — and the read refusal names the symbol."""
+    """TC-714/LLR-142.1 (no-implicit law), re-pinned by batch-99 HLR-156
+    (LLR-156.1): a flow whose blocks declare NO a2l_ref refuses the symbol
+    entry even with a loaded project A2L on the context — the PATCH arm is
+    ``error`` (applied 0 of 1 entries, the refusal named), the flow stops
+    BEFORE the WRITE-OUT (no output file, the block ``skipped``) and the run
+    carries the named refusal.
+
+    Re-pin record: ``patch.summary == "applied 0 entries"`` + ``out.s19``
+    written with the source bytes → PATCH ``error``, no file — HLR-156 (a
+    PATCH that applied 0 of at least 1 entry is an ``error``, never an
+    ``ok`` that still writes).
+    """
     project = _make_project(tmp_path, _flow_files((0x64, 0x00)))
     flow = Flow(
         name="no-ref",
@@ -783,10 +794,18 @@ def test_tc714_no_declared_ref_refuses_symbol_entries_no_implicit_a2l(
     result = run_flow(
         flow, FlowContext(project_dir=project, a2l_data=parse_a2l_file(project / "cal.a2l"))
     )
+    assert result.status == FLOW_STATUS_ERROR
     patch = result.block_results[1]
-    assert patch.summary == "applied 0 entries"
-    written = _reload_s19(result.written_paths[0])
-    assert written[0x1000] == 0x01  # untouched
+    assert patch.status == BLOCK_STATUS_ERROR
+    # The document was READ — its only entry was refused at read (the
+    # no-implicit law), so the summary names a refusal, not a parse failure.
+    assert patch.summary == "change document refused"
+    assert patch.diagnostics[-1].startswith("[CHG-SYMBOL-UNRESOLVED]")
+    assert result.change_records == []
+    assert [r.code for r in result.refusals] == ["CHG-SYMBOL-UNRESOLVED"]
+    assert result.written_paths == []
+    assert not (project / "out.s19").exists()
+    assert result.block_results[2].status == BLOCK_STATUS_SKIPPED
     refused = read_change_document(
         str(project / "changes.json"), project, a2l_context=None
     )
@@ -1158,7 +1177,13 @@ def test_tc716_flow_report_change_attribution_section(tmp_path: Path) -> None:
     section lists every change the flow's patch arms applied — one row per
     applied entry (0 unlisted), each naming the symbol when present AND the
     resolved address, with the exact before/after bytes and the A2L reference
-    the entry resolved against."""
+    the entry resolved against.
+
+    Fixture note (batch-99 HLR-156 re-pin): the skipped-outside entry rides
+    in c1.json (an arm that applied some entries and skipped one is
+    ``notices`` and the flow continues); an outside-only change document is
+    now a PATCH ``error`` that stops the flow before the WRITE-OUT (LLR-156.1)
+    and cannot feed this fixture."""
     project = _make_project(
         tmp_path,
         {
@@ -1168,10 +1193,8 @@ def test_tc716_flow_report_change_attribution_section(tmp_path: Path) -> None:
                 [
                     _symbol_entry("Speed", 0x1000, (0x64, 0x00)),
                     {"type": "bytes", "address": "0x00001002", "bytes": "03"},
+                    {"type": "bytes", "address": "0x00002000", "bytes": "AA"},
                 ]
-            ),
-            "c3.json": _change_doc(
-                [{"type": "bytes", "address": "0x00002000", "bytes": "AA"}]
             ),
         },
     )
@@ -1180,18 +1203,21 @@ def test_tc716_flow_report_change_attribution_section(tmp_path: Path) -> None:
         blocks=[
             SourceBlock("prg.s19", a2l_ref="cal.a2l"),
             PatchBlock("c1.json"),
-            PatchBlock("c3.json"),
             WriteOutBlock("out.s19"),
             ReportBlock(),
         ],
     )
     result = run_flow(flow, FlowContext(project_dir=project))
-    assert result.status == FLOW_STATUS_OK
+    # Re-pinned by HLR-156 (LLR-156.1): an arm with a skipped entry is
+    # ``notices`` — the run is ISSUES, not ok.
+    assert result.status == FLOW_STATUS_ISSUES
     reports = sorted((project / "reports").glob("*.md"))
     assert len(reports) == 1
     text = reports[0].read_text(encoding="utf-8")
     assert "## Change attribution" in text
-    section = text.split("## Change attribution")[1]
+    # The section is scoped to its own heading — the not-applied census that
+    # follows (LLR-156.4) legitimately names the skipped address.
+    section = text.split("## Change attribution")[1].split("## Not applied")[0]
     rows = [ln for ln in section.splitlines() if ln.startswith("| #")]
     assert len(rows) == 2, "rows == the applied entries (0 unlisted)"
     speed_row = next(ln for ln in rows if "0x00001000" in ln)
@@ -1202,11 +1228,13 @@ def test_tc716_flow_report_change_attribution_section(tmp_path: Path) -> None:
     noop_row = next(ln for ln in rows if "0x00001002" in ln)
     assert "03" in noop_row
     assert "0x00002000" not in section, (
-        "a skipped-outside entry is not an applied row (the census lists it)"
+        "a skipped-outside entry is not an applied row (the not-applied "
+        "census section lists it)"
     )
-    # the section sits between the ledger and the footprint, per SECTION_HEADINGS
+    # the section sits between the ledger and the not-applied census, per
+    # SECTION_HEADINGS
     assert text.find("## Change attribution") > text.find("## Pipeline ledger")
-    assert text.find("## Change attribution") < text.find("## Image footprint")
+    assert text.find("## Change attribution") < text.find("## Not applied")
 
 
 def test_tc716_change_attribution_empty_renders_never_absent(
@@ -1241,8 +1269,16 @@ def _census_flow_result(tmp_path: Path):
     """Run the census fixture flow and diff its source against the output.
 
     The flow: Speed @0x1000 (produces the run), a no-op address entry
-    @0x1002 (applied, no diff), a refused Ghost entry (dropped at read) and
-    a skipped-outside entry @0x2000 — so the census sees every disposition.
+    @0x1002 (applied, no diff), a skipped-outside entry @0x2000 (notices) and
+    a refused Ghost entry (dropped at read) — so the census sees every
+    disposition. The WRITE-OUT runs BETWEEN the two patch arms: the Ghost
+    document is refused at read, and under batch-99 HLR-156 (LLR-156.1) a
+    document-level refusal is a PATCH ``error`` that stops the flow — the
+    image under diff is the one the WRITE-OUT already produced.
+
+    Fixture note (batch-99 HLR-156 re-pin): an outside-only change document
+    or a refused document is now a PATCH ``error``, never an ``ok`` that
+    still writes; the fixture orders the arms so the output image exists.
     """
     project = _make_project(
         tmp_path,
@@ -1253,12 +1289,10 @@ def _census_flow_result(tmp_path: Path):
                 [
                     _symbol_entry("Speed", 0x1000, (0x64, 0x00)),
                     {"type": "bytes", "address": "0x00001002", "bytes": "03"},
+                    {"type": "bytes", "address": "0x00002000", "bytes": "AA"},
                 ]
             ),
             "c2.json": _change_doc([_symbol_entry("Ghost", 0x1003, (0x09,))]),
-            "c3.json": _change_doc(
-                [{"type": "bytes", "address": "0x00002000", "bytes": "AA"}]
-            ),
         },
     )
     flow = Flow(
@@ -1266,13 +1300,15 @@ def _census_flow_result(tmp_path: Path):
         blocks=[
             SourceBlock("prg.s19", a2l_ref="cal.a2l"),
             PatchBlock("c1.json"),
-            PatchBlock("c2.json"),
-            PatchBlock("c3.json"),
             WriteOutBlock("out.s19"),
+            PatchBlock("c2.json"),
         ],
     )
     result = run_flow(flow, FlowContext(project_dir=project))
-    assert result.status == FLOW_STATUS_OK
+    # Re-pinned by HLR-156 (LLR-156.1): c1's skipped entry makes the run
+    # ``notices`` and the refused Ghost document makes it ``error`` — after
+    # the WRITE-OUT produced the image under diff.
+    assert result.status == FLOW_STATUS_ERROR
     out_path = result.written_paths[0]
     comparison = compare_images(
         ImageSource(

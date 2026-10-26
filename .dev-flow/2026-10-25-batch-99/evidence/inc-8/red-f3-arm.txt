@@ -1,0 +1,8 @@
+E           AssertionError: ('0x00020000 skipped-outside', [])
+E           assert '0x00020000 skipped-outside' in []
+E            +  where [] = BlockResult(index=1, kind='patch', status='notices', summary='applied 1 of 4 entries, 3 not applied', diagnostics=[], findings=[]).diagnostics
+
+tests\test_b99_patch_truth.py:262: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_diagnostics_name_every_non_applied_address
+1 failed in 0.54s

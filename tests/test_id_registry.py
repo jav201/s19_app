@@ -145,7 +145,8 @@ from tools.id_registry import (
 # batch-99 Inc-9: 206 -> 207 (tests/test_b99_truncation.py).
 # batch-99 Inc-4: 207 -> 208 (tests/test_b99_editor_image.py).
 # batch-99 Inc-3a: 208 -> 209 (tests/test_b99_staging.py).
-EXPECTED_SCANNED_TEST_FILES = 209
+# batch-99 Inc-8: 209 -> 210 (tests/test_b99_patch_truth.py).
+EXPECTED_SCANNED_TEST_FILES = 210
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

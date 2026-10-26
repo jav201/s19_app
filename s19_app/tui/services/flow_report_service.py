@@ -65,6 +65,7 @@ from .flow_model import (
     BLOCK_STATUS_SKIPPED,
     BlockResult,
     FlowChangeRecord,
+    FlowRefusal,
 )
 from ..changes.model import DISPOSITION_APPLIED
 from .markdown_safety import MD_ESCAPE, TRUNCATION_MARKER, md_safe
@@ -116,10 +117,16 @@ _STATUS_GLYPH = {
 #: batch-95 inc-004b (LLR-143.1) adds "## Change attribution" directly after
 #: the Pipeline ledger: the ledger says WHAT ran ("patch: applied 2 entries"),
 #: the attribution section names every change the flow's patch arms applied —
-#: the operator's "Todo esto debe terminar en el reporte".
+#: the operator's "Todo esto debe terminar en el reporte". batch-99 Inc-8
+#: (LLR-156.4) adds "## Not applied" and "## Refusals" directly after it: a
+#: not-applied entry or a refusal is never silently absent from the record,
+#: and ``CLEAN`` can never head a run that holds one. Both sections are
+#: ALWAYS present, reading ``- none`` when empty.
 SECTION_HEADINGS = (
     "## Pipeline ledger",
     "## Change attribution",
+    "## Not applied",
+    "## Refusals",
     "## Findings",
     "## Image footprint",
     "## Written files",
@@ -202,6 +209,10 @@ class FlowReportState:
             LLR-143.1) — positional, exactly like ``block_results`` (D-2): a
             REPORT-last flow attributes every patch, a mid-flow report only
             the patches before it.
+        refusals (Sequence[FlowRefusal]): The named refusals the run's PATCH
+            arms retained SO FAR (batch-99 Inc-8, LLR-156.4) — positional
+            exactly like ``change_records``: the "## Refusals" section lists
+            each one, ``- none`` when empty.
     """
 
     flow_name: str
@@ -212,6 +223,7 @@ class FlowReportState:
     written_paths: Sequence[Path] = field(default_factory=tuple)
     project_dir: Optional[Path] = None
     change_records: Sequence[FlowChangeRecord] = field(default_factory=tuple)
+    refusals: Sequence[FlowRefusal] = field(default_factory=tuple)
 
 
 def _fmt_ranges(ranges: Optional[Sequence[Tuple[int, int]]]) -> str:
@@ -272,7 +284,9 @@ def _provisional_status(state: FlowReportState) -> str:
 
     FAILED keys on the EXPLICIT ``aborted`` flag (AMD-4) — never on a summary
     string. Otherwise any ``notices``/``error`` block or any finding means
-    advisories were produced; else CLEAN.
+    advisories were produced; batch-99 Inc-8 (LLR-156.4) extends that to any
+    not-applied change record or any retained refusal — a run that holds one
+    can never head itself ``CLEAN``; else CLEAN.
     """
     if state.aborted:
         return STATUS_FAILED
@@ -280,6 +294,10 @@ def _provisional_status(state: FlowReportState) -> str:
         br.status in {BLOCK_STATUS_NOTICES, BLOCK_STATUS_ERROR} or br.findings
         for br in state.block_results
     ):
+        return STATUS_ISSUES
+    if any(
+        record.disposition != DISPOSITION_APPLIED for record in state.change_records
+    ) or state.refusals:
         return STATUS_ISSUES
     return STATUS_CLEAN
 
@@ -361,12 +379,14 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
         provisional status, block count), the **Pipeline ledger** table (one row
         per reported block), the **Change attribution** section (one row per
         change the flow's patch arms applied — symbol when present, always the
-        resolved address; batch-95 inc-004b, LLR-143.1), a **Findings**
-        section, the **Image footprint** (``Before CRC`` only when a CRC has
-        already run), and **Written files**. Every file-derived field passes
-        :func:`_md_safe`; every glyph, label and address is enum/int-derived.
-        A whole-document byte budget bounds the output so it can never exceed
-        the viewer's size cap (AMD-7).
+        resolved address; batch-95 inc-004b, LLR-143.1), the **Not applied**
+        and **Refusals** sections (batch-99 Inc-8, LLR-156.4 — always present,
+        ``- none`` when empty, so a run holding either can never read
+        ``CLEAN``), a **Findings** section, the **Image footprint** (``Before
+        CRC`` only when a CRC has already run), and **Written files**. Every
+        file-derived field passes :func:`_md_safe`; every glyph, label and
+        address is enum/int-derived. A whole-document byte budget bounds the
+        output so it can never exceed the viewer's size cap (AMD-7).
 
     Args:
         state (FlowReportState): The run state up to the report block.
@@ -425,6 +445,56 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
     put(ledger, "Pipeline ledger")
 
     put(_change_attribution_lines(state), "Change attribution")
+
+    # batch-99 Inc-8 (LLR-156.4): the not-applied records and the refusals —
+    # ALWAYS present, ``- none`` when empty, so a report that holds either
+    # can never read ``CLEAN`` (the status rollup above enforces the same on
+    # the header). Every file-derived field passes _md_safe; addresses and
+    # counts are int-derived.
+    not_applied = [
+        record
+        for record in state.change_records
+        if record.disposition != DISPOSITION_APPLIED
+    ]
+    not_applied_lines = ["## Not applied", ""]
+    if not not_applied:
+        not_applied_lines.append("- none")
+    else:
+        not_applied_lines.extend(
+            [
+                "| Patch | Change document | Address | Disposition |",
+                "|---|---|---|---|",
+            ]
+        )
+        for record in not_applied:
+            not_applied_lines.append(
+                f"| #{record.block_index + 1} "
+                f"| {_md_safe(record.change_doc_ref)} "
+                f"| 0x{record.address_start:08X} "
+                f"| {_md_safe(record.disposition)} |"
+            )
+    not_applied_lines.append("")
+    put(not_applied_lines, "Not applied")
+
+    refusals_lines = ["## Refusals", ""]
+    if not state.refusals:
+        refusals_lines.append("- none")
+    else:
+        refusals_lines.extend(
+            [
+                "| Patch | Change document | Code | Detail |",
+                "|---|---|---|---|",
+            ]
+        )
+        for refusal in state.refusals:
+            refusals_lines.append(
+                f"| #{refusal.block_index + 1} "
+                f"| {_md_safe(refusal.change_doc_ref)} "
+                f"| {_md_safe(refusal.code)} "
+                f"| {_md_safe(refusal.message)} |"
+            )
+    refusals_lines.append("")
+    put(refusals_lines, "Refusals")
 
     findings_lines = ["## Findings", ""]
     any_finding = False

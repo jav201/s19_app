@@ -1,0 +1,5 @@
+
+tests\test_b99_patch_truth.py:333: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_18_chain_outcome_carries_refusals
+1 failed in 1.24s

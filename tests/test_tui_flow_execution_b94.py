@@ -593,7 +593,13 @@ def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> No
     assert state["b_after_a"] == state["b_before"] == {}
     # The run consumed each chain's own bindings: both chains ran clean.
     assert state["statuses"] == ["ok", "ok"], state["statuses"]
-    prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
+    # Re-pinned (batch-99 Inc-8 review fix F1, LLR-156.3): the report now
+    # carries more ``- Chain`` lines (written files, not-applied, refusals)
+    # — the provenance census filters on the `` input `` form.
+    prov = [
+        ln for ln in state["report"].splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     assert len(prov) == 2, f"one provenance line per chain input: {prov}"
     # The chain half is md_safe-escaped in the report (``base_2`` -> ``base\_2``)
     # — match the escaped prefix and disambiguate by the bound file.
@@ -812,8 +818,14 @@ def test_at_b94_23_run_log_inline_failure_and_report_provenance(
     # The all-clean arm is the sibling: 0 ✗ lines naming it.
     assert not any("✗ base ·" in ln for ln in log.splitlines())
     # The report: one provenance line per chain input (2 inputs, 2 lines),
-    # each resolving to the bound path.
-    prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
+    # each resolving to the bound path. Re-pinned (batch-99 Inc-8 review fix
+    # F1, LLR-156.3): filter the provenance census on the `` input `` form —
+    # the report's other ``- Chain`` lines are written/not-applied/refusal
+    # lines added by batch-99.
+    prov = [
+        ln for ln in state["report"].splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     assert len(prov) == 2, prov
     assert all("[bound] path=`" in ln for ln in prov)
     assert all(ln.rstrip("`").endswith("base.s19") for ln in prov)
@@ -977,8 +989,13 @@ def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> 
     assert state["fresh_outputs"] == [], (
         f"an identical-bytes re-run reuses the existing outputs (B8): {state['fresh_outputs']}"
     )
-    # The re-run's provenance names the RELOADED bindings.
-    prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
+    # The re-run's provenance names the RELOADED bindings. Same `` input ``
+    # filter as AT-B94-20/23 (batch-99 Inc-8 review fix F1): the report's
+    # other ``- Chain`` lines are written/not-applied/refusal lines.
+    prov = [
+        ln for ln in state["report"].splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     assert any("variant_b.hex" in ln for ln in prov), prov
     assert any("release.s19" in ln for ln in prov), prov
     # The moved-input arm: a per-chain notice, not a silent stale run.

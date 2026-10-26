@@ -52,6 +52,7 @@ from ..changes import (
 )
 from ..changes.check import run_check_document
 from ..changes.io import parse_change_document
+from ..changes.model import DISPOSITION_APPLIED, DISPOSITION_BLOCKED
 from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
 from .compare_service import SOURCE_EXTERNAL
@@ -517,12 +518,132 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                             message=issue.message,
                         )
                     )
-                applied = summary.counts.get("applied", 0)
-                patch_result = BlockResult(
-                    index, kind, BLOCK_STATUS_OK,
+                applied = summary.counts.get(DISPOSITION_APPLIED, 0)
+                entries = summary.entries
+                arm_refusals = [
+                    refusal for refusal in result.refusals
+                    if refusal.block_index == index
+                ]
+                non_applied = [
+                    entry for entry in entries
+                    if entry.disposition != DISPOSITION_APPLIED
+                ]
+                # batch-99 Inc-8 (LLR-156.1): the PATCH arm's status comes from
+                # its OWN dispositions and refusals — first match wins:
+                # ``error`` when the document could not be read, was blocked
+                # document-wide (every entry it still carried ``blocked`` — a
+                # document-level ERROR refusal), or applied 0 of at least 1
+                # entry; ``notices`` when some entry was not applied and at
+                # least one was; ``ok`` otherwise. An ``error`` stops the flow
+                # BEFORE any later WRITE-OUT (the ``_record_error`` abort path
+                # below) — P-4's ``outside_0x20000 run=ok patch='applied 0
+                # entries'`` is the defect this replaces. The block's LAST
+                # diagnostic is the user-facing cause (UX-C2): the first
+                # refusal code, else the count with the first address and its
+                # disposition.
+                if document.has_errors and not entries:
+                    # Document-level refusals (``MF-*`` parse/structure codes,
+                    # the retired v1 format) mean the document itself could
+                    # not be read; an entry-level refusal (``CHG-*``) means it
+                    # was read but every entry was refused — the summary says
+                    # which. The cause below names the first refusal either
+                    # way (UX-C2); the detail lines name EVERY refusal code
+                    # (batch-99 Inc-8 review fix F3).
+                    document_level = any(
+                        refusal.code.startswith("MF-")
+                        or refusal.code == "CHG-V1-FORMAT"
+                        for refusal in arm_refusals
+                    )
+                    cause = (
+                        f"[{arm_refusals[0].code}] {arm_refusals[0].message}"
+                        if arm_refusals
+                        else "change document could not be read"
+                    )
+                    aborted = _record_error(
+                        result, index, kind,
+                        "change document unreadable"
+                        if document_level else "change document refused",
+                        [],
+                        cause,
+                        detail=[
+                            f"[{refusal.code}] {refusal.message}"
+                            for refusal in arm_refusals
+                        ],
+                    )
+                    continue
+                if entries and all(
+                    entry.disposition == DISPOSITION_BLOCKED for entry in entries
+                ):
+                    cause = (
+                        f"[{arm_refusals[0].code}] {arm_refusals[0].message}"
+                        if arm_refusals
+                        else (
+                            f"applied 0 of {len(entries)} entries: "
+                            f"0x{entries[0].address_start:08X} "
+                            f"{entries[0].disposition}"
+                        )
+                    )
+                    aborted = _record_error(
+                        result, index, kind, "change document blocked", [],
+                        cause,
+                        detail=(
+                            [
+                                f"[{refusal.code}] {refusal.message}"
+                                for refusal in arm_refusals
+                            ]
+                            + [
+                                f"0x{entry.address_start:08X} {entry.disposition}"
+                                for entry in entries
+                            ]
+                        ),
+                    )
+                    continue
+                if entries and applied == 0:
+                    first = non_applied[0]
+                    aborted = _record_error(
+                        result, index, kind,
+                        f"applied 0 of {len(entries)} entries", [],
+                        f"applied 0 of {len(entries)} entries: "
+                        f"0x{first.address_start:08X} {first.disposition}",
+                        detail=[
+                            f"0x{entry.address_start:08X} {entry.disposition}"
+                            for entry in non_applied
+                        ],
+                    )
+                    continue
+                patch_summary = (
                     f"applied {applied} entr"
-                    f"{'y' if applied == 1 else 'ies'}",
+                    f"{'y' if applied == 1 else 'ies'}"
+                    if not non_applied else
+                    f"applied {applied} of {len(entries)} entries, "
+                    f"{len(non_applied)} not applied"
                 )
+                patch_result = BlockResult(
+                    index, kind, BLOCK_STATUS_OK, patch_summary,
+                )
+                if non_applied:
+                    # LLR-156.1: some entry was not applied while at least one
+                    # was — the arm reports ``notices`` (the umbrella word for
+                    # entry-level outcomes, never the block-level ``skipped`` —
+                    # UX-C3b) and the summary names the count. The not-applied
+                    # lines name EVERY non-applied address with its disposition
+                    # (batch-99 Inc-8 review fix F3) and ride ``findings`` as
+                    # FINDING_WARN — the funnel arm's idiom (review round 2 fix
+                    # N1): Flow Builder paints diagnostics ``sev-error`` and
+                    # findings ``sev-warning``, and a notices arm is not an
+                    # error. ``diagnostics`` stays the ``error`` arm's channel
+                    # (its cause LAST, UX-C2). The lane's terminal log line
+                    # keeps the count + first address (UX-C1) from the change
+                    # records; the chain-set / flow / fused reports read both
+                    # channels (LLR-156.3 / LLR-156.4).
+                    patch_result.status = BLOCK_STATUS_NOTICES
+                    patch_result.findings.extend(
+                        Finding(
+                            FINDING_WARN,
+                            f"0x{entry.address_start:08X} {entry.disposition}",
+                        )
+                        for entry in non_applied
+                    )
                 if funnel_missing:
                     # batch-96 B1: an undeclared ${NAME} NEVER fails the run —
                     # the placeholder rode into the doc intact, so the block
@@ -957,7 +1078,11 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     # batch-95 inc-004b (LLR-143.1): the change records
                     # retained SO FAR — a positional report attributes only
                     # the patches before it (D-2), exactly like the ledger.
+                    # batch-99 Inc-8 (LLR-156.4): the refusals ride the same
+                    # positional contract — the report's "## Refusals"
+                    # section lists each one, ``- none`` when empty.
                     change_records=list(result.change_records),
+                    refusals=list(result.refusals),
                 )
                 try:
                     report_path = write_flow_report(report_state, ctx.project_dir)
@@ -1307,12 +1432,18 @@ def _record_error(
     summary: str,
     issues: Sequence[ValidationIssue],
     note: str,
+    detail: Sequence[str] = (),
 ) -> bool:
     """Append an ``error`` :class:`BlockResult` and signal the chain to abort.
+
+    ``detail`` lines (batch-99 Inc-8 review fix F3) name EVERY non-applied
+    address / refusal code between the issue lines and the note — the note
+    stays LAST, the user-facing cause (UX-C2).
 
     Returns ``True`` so the caller can do ``aborted = _record_error(...)``.
     """
     diagnostics = [f"[{issue.code}] {issue.message}" for issue in issues]
+    diagnostics.extend(detail)
     diagnostics.append(note)
     result.block_results.append(
         BlockResult(index, kind, BLOCK_STATUS_ERROR, summary, diagnostics)
@@ -1394,6 +1525,16 @@ class ChainRunOutcome:
             (started_at, finished_at) pair is the elapsed-window oracle the
             sequential/parallel arms assert on (LLR-019).
         diagnostics (List[str]): Whole-chain notes.
+        change_records (List[FlowChangeRecord]): The chain's own per-entry
+            PATCH record — every entry its patch arms read, applied and not
+            applied, in arm then document order (batch-99 Inc-8, LLR-156.2:
+            the fx lane's PATCH cell and the UX-C1 terminal log line read the
+            not-applied entries from here). Copied from the run's
+            ``FlowRunResult.change_records``.
+        refusals (List[FlowRefusal]): The chain's named refusals, copied from
+            ``FlowRunResult.refusals`` (LLR-156.2).
+        image_ranges (List[Tuple[int, int]]): The chain's final image
+            footprint, copied from ``FlowRunResult.image_ranges`` (LLR-156.2).
     """
 
     chain: str
@@ -1405,6 +1546,9 @@ class ChainRunOutcome:
     started_at: float = 0.0
     finished_at: float = 0.0
     diagnostics: List[str] = field(default_factory=list)
+    change_records: List[FlowChangeRecord] = field(default_factory=list)
+    refusals: List[FlowRefusal] = field(default_factory=list)
+    image_ranges: List[Tuple[int, int]] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -1571,6 +1715,12 @@ def run_chain_set(
             started_at=started,
             finished_at=finished,
             diagnostics=list(result.diagnostics),
+            # batch-99 Inc-8 (LLR-156.2): the chain's own record of what its
+            # PATCH arms did and refused — the fx lane painters and the
+            # chain-set report enumerate the not-applied entries from here.
+            change_records=list(result.change_records),
+            refusals=list(result.refusals),
+            image_ranges=list(result.image_ranges),
         )
 
     if mode == CHAIN_RUN_PARALLEL:
@@ -1602,12 +1752,16 @@ def compose_chain_set_report(
         Emit, in order: a header block (set name, generated timestamp, the
         captured MODE — LLR-019.2's persisted arm — and chain count), the
         **Chain ledger** table (one row per chain with its terminal status
-        and elapsed window), and the **Input provenance** section — exactly
+        and elapsed window), the **Input provenance** section — exactly
         ONE line per consumed chain input, ``- Chain <name> input <j>: <ref>
-        [bound] path=<code-span>``, the C-42 emitted form TC-B94-30 pins.
+        [bound] path=<code-span>``, the C-42 emitted form TC-B94-30 pins —
+        and the batch-99 Inc-8 (LLR-156.3) **Written files**, **Not applied**
+        and **Refusals** sections: per lane the written paths, each
+        non-applied entry (address + disposition) and each refusal (code +
+        message), a clean lane listing ``none``.
         Every file-derived field passes :func:`md_safe` / :func:`md_code`
-        (the chain name, template stem, bound ref); every glyph, label and
-        number is enum/int-derived.
+        (the chain name, template stem, bound ref, change document, refusal
+        text); every glyph, label and number is enum/int-derived.
 
     Args:
         record (ChainSetRunResult): The completed set run.
@@ -1655,6 +1809,46 @@ def compose_chain_set_report(
             )
     if not any(outcome.inputs for outcome in record.outcomes):
         lines.append("- (no inputs consumed)")
+    # batch-99 Inc-8 (LLR-156.3): what the run did NOT apply, per lane — the
+    # written file paths, each non-applied entry (address + disposition) and
+    # each refusal (code + message). A clean lane lists ``none``; the sections
+    # are always present. Every file-derived field rides md_safe / md_code;
+    # addresses and counts are int-derived.
+    lines.extend(["", "## Written files", ""])
+    for outcome in record.outcomes:
+        name = md_safe(outcome.chain, limit=64)
+        if not outcome.written_paths:
+            lines.append(f"- Chain {name}: none")
+            continue
+        for path in outcome.written_paths:
+            lines.append(f"- Chain {name}: `{md_code(str(path))}`")
+    lines.extend(["", "## Not applied", ""])
+    for outcome in record.outcomes:
+        name = md_safe(outcome.chain, limit=64)
+        changes = [
+            change for change in outcome.change_records
+            if change.disposition != DISPOSITION_APPLIED
+        ]
+        if not changes:
+            lines.append(f"- Chain {name}: none")
+            continue
+        for change in changes:
+            lines.append(
+                f"- Chain {name}: 0x{change.address_start:08X} "
+                f"{md_safe(change.disposition, limit=32)} "
+                f"({md_safe(change.change_doc_ref, limit=120)})"
+            )
+    lines.extend(["", "## Refusals", ""])
+    for outcome in record.outcomes:
+        name = md_safe(outcome.chain, limit=64)
+        if not outcome.refusals:
+            lines.append(f"- Chain {name}: none")
+            continue
+        for refusal in outcome.refusals:
+            lines.append(
+                f"- Chain {name}: [{md_safe(refusal.code, limit=64)}] "
+                f"{md_safe(refusal.message, limit=240)}"
+            )
     lines.extend(
         [
             "",

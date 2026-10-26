@@ -1,0 +1,30 @@
+            widgets = [panel.query_one("#fx_log"), panel.query_one("#fx_lane_0_head")]
+            widgets += list(panel.query(".fx-card-body")) + list(panel.query(".fx-card-status"))
+            spans = [s for w in widgets for s in _payload_spans(w.render())]
+            return panel, project_dir, log, painted, spans
+    
+        panel, project_dir, log, painted, spans = _run_fx(tmp_path, body)
+    
+>       assert not (project_dir / "out_hostile.s19").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26042/test_at_b99_07_hostile_symbol_0/.s19tool/workarea/proj1') / 'out_hostile.s19').exists
+
+tests\test_b99_patch_truth.py:582: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[outside]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[straddle]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[one_in_one_out]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[kind_check]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[v1]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[malformed]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_patch_status_matrix[blocked_symbol]
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_error_cause_is_the_last_diagnostic
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_named_refusals_are_retained
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_18_chain_outcome_carries_refusals
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_18_chain_outcome_carries_change_records
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_19_chain_set_report_lists_what_was_not_applied
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_20_flow_report_lists_what_was_not_applied
+FAILED tests/test_b99_patch_truth.py::test_at_b99_06_flow_execution_patch_truth
+FAILED tests/test_b99_patch_truth.py::test_at_b99_07_hostile_symbol_name_renders_literally
+15 failed, 2 passed in 10.10s

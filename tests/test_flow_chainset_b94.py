@@ -212,7 +212,10 @@ def test_tc_b94_28_run_consumes_each_chains_own_bindings(tmp_path: Path) -> None
     assert len(prov_b) == 1 and prov_b[0][0] == "variant_b.hex"
     assert prov_b[0][1].endswith("variant_b.hex")
     report = record.report_path.read_text(encoding="utf-8")
-    prov_lines = [ln for ln in report.splitlines() if ln.startswith("- Chain ")]
+    prov_lines = [
+        ln for ln in report.splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     assert len(prov_lines) == 2
     assert any("base.s19" in ln and "`" in ln for ln in prov_lines)
     assert any("variant_b.hex" in ln and "`" in ln for ln in prov_lines)
@@ -277,7 +280,10 @@ def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
         set_name="variants_a_b",
     )
     report = record.report_path.read_text(encoding="utf-8")
-    prov_lines = [ln for ln in report.splitlines() if ln.startswith("- Chain ")]
+    prov_lines = [
+        ln for ln in report.splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     # line count == chain-input count (1 per input, 0 missing/duplicates).
     assert len(prov_lines) == 2
     assert len(set(prov_lines)) == 2, f"duplicate provenance lines: {prov_lines}"
@@ -319,7 +325,10 @@ def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
         set_name="variants_a_b",
     )
     rerun_report = rebound.report_path.read_text(encoding="utf-8")
-    rerun_lines = [ln for ln in rerun_report.splitlines() if ln.startswith("- Chain ")]
+    rerun_lines = [
+        ln for ln in rerun_report.splitlines()
+        if ln.startswith("- Chain ") and " input " in ln
+    ]
     assert len(rerun_lines) == 1
     assert "variant_b.hex" in rerun_lines[0]
     assert "input 1: base" not in rerun_lines[0], (

@@ -131,6 +131,7 @@ from .services.flow_model import (
 )
 from ..utils import safe_text
 from ..validation import ValidationIssue
+from .changes.model import DISPOSITION_APPLIED
 
 
 def _make_flow_block(
@@ -3326,10 +3327,56 @@ class FlowExecutionPanel(ScrollableContainer):
             )
         else:
             end.append(" · done" if outcome.status == FLOW_STATUS_OK else " · done with notices", style=_S_DIM)
+            note = self._patch_not_applied_note(outcome)
+            if note is not None:
+                # UX-C1: a lane whose PATCH ended with entries not applied
+                # names the block and what was not applied on its terminal
+                # line — count, first address and disposition (the umbrella
+                # "not applied" wording, never the block-level "skipped" —
+                # UX-C3b). Clipped at FX_ERROR_LINE_MAX; the full list stays
+                # in the chain-set and flow reports.
+                end.append(clip_head(f" · {note}", FX_ERROR_LINE_MAX), style=_S_DIM)
             if outcome.written_paths:
                 names = ", ".join(path.name for path in outcome.written_paths)
                 end.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
         return [start, end]
+
+    @staticmethod
+    def _patch_not_applied_note(outcome) -> Optional[str]:
+        """The UX-C1 terminal-line rider: ``PATCH: <k> of <n> entries not
+        applied (0xADDR DISP)`` for the first PATCH arm that ended ``notices``
+        with entries not applied, else ``None``.
+
+        The address and disposition are int/enum-derived (they paint from
+        ``outcome.change_records``, never from file text), so the note is
+        markup-safe by construction; a refusal-driven failure paints its
+        coded cause through ``_failure_detail`` on the ``error`` branch
+        instead.
+        """
+        for block_result in outcome.block_results:
+            if (
+                block_result.kind != "patch"
+                or block_result.status != BLOCK_STATUS_NOTICES
+            ):
+                continue
+            records = [
+                record
+                for record in outcome.change_records
+                if record.block_index == block_result.index
+            ]
+            not_applied = [
+                record
+                for record in records
+                if record.disposition != DISPOSITION_APPLIED
+            ]
+            if not_applied:
+                first = not_applied[0]
+                return (
+                    f"PATCH: {len(not_applied)} of {len(records)} entries "
+                    f"not applied (0x{first.address_start:08X} "
+                    f"{first.disposition})"
+                )
+        return None
 
     def _failure_detail(
         self, lane: _FxLane, outcome

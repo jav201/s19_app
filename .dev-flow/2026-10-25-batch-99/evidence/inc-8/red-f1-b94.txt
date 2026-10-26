@@ -1,0 +1,35 @@
+                record = panel.last_run_record
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "b_after_a": b_after_a,
+                    "b_before": b_before,
+                    "log": log,
+                    "report": report,
+                    "statuses": [o.status for o in record.outcomes],
+                }
+    
+        state = asyncio.run(_drive())
+        # Rebinding A left B's binding byte-identical (0 fields changed).
+        assert state["b_after_a"] == state["b_before"] == {}
+        # The run consumed each chain's own bindings: both chains ran clean.
+        assert state["statuses"] == ["ok", "ok"], state["statuses"]
+        prov = [ln for ln in state["report"].splitlines() if ln.startswith("- Chain ")]
+>       assert len(prov) == 2, f"one provenance line per chain input: {prov}"
+E       AssertionError: one provenance line per chain input: ['- Chain base input 1: variant\\_b\\.hex [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26305\\test_at_b94_20_rebind_run_read0\\.s19tool\\workarea\\proj\\variant_b.hex`', '- Chain base\\_2 input 1: release\\.s19 [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26305\\test_at_b94_20_rebind_run_read0\\.s19tool\\workarea\\proj\\release.s19`', '- Chain base: `C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26305\\test_at_b94_20_rebind_run_read0\\.s19tool\\workarea\\proj\\base_out.s19`', '- Chain base\\_2: `C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26305\\test_at_b94_20_rebind_run_read0\\.s19tool\\workarea\\proj\\base_out.s19`', '- Chain base: none', '- Chain base\\_2: none', '- Chain base: none', '- Chain base\\_2: none']
+E       assert 8 == 2
+E        +  where 8 = len(['- Chain base input 1: variant\\_b\\.hex [bound] path=`C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytes...b94_20_rebind_run_read0\\.s19tool\\workarea\\proj\\base_out.s19`', '- Chain base: none', '- Chain base\\_2: none', ...])
+
+tests\test_tui_flow_execution_b94.py:597: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 5 passed in 44.78s
+
+tests\test_tui_flow_execution_b94.py:817: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_23_run_log_inline_failure_and_report_provenance
+1 failed, 1 passed in 13.22s

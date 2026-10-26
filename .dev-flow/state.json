@@ -200,6 +200,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 003 (Inc 3a; US-144 / HLR-155 placement + PH-3; workspace.py, changes/apply.py, changes/io.py, app.py) approved: implemented by Kimi K2.8 in three rounds; code-reviewer BLOCK (3 HIGH) -> OK -> OK; security-reviewer changes required (S-F1 MEDIUM) -> approve; LLR-155.3 amended (LED .7); merged main 194 passed."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 008 (US-145 / HLR-156, truthful PATCH status and run records, D5 mixta; flow_execution_service.py, flow_report_service.py, flow_screens.py) approved: implemented by Kimi K2.8 in three rounds; code-reviewer Block (F1/F2 HIGH) -> OK -> OK; ac6 golden rebaselined (sections added only); merged main 122 passed on the affected set."
     }
   ],
   "obsidian_synced": false,

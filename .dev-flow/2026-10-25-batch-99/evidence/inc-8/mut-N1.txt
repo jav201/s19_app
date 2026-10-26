@@ -1,0 +1,63 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__________ test_tc_b99_17_diagnostics_name_every_non_applied_address __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26608/test_tc_b99_17_diagnostics_nam0')
+
+    def test_tc_b99_17_diagnostics_name_every_non_applied_address(tmp_path: Path) -> None:
+        """TC-B99-17 (LLR-156.1, batch-99 Inc-8 review fix F3, re-pinned by review
+        round 2 fix N1): the ``notices`` arm's not-applied lines name EVERY
+        non-applied address with its disposition as ``FINDING_WARN`` findings
+        (the funnel arm's idiom — Flow Builder paints ``diagnostics`` as
+        ``sev-error``, a notices arm is not an error), and the ``error`` arm's
+        diagnostics name every non-applied address and refusal code — 3
+        non-applied entries (2 outside + 1 straddling) in the ``notices`` arm:
+        all 3 addresses paint as warnings; the same 3 with 0 applied: all 3 in
+        the diagnostics, the cause LAST (UX-C2); the unresolved-symbol arm:
+        ``CHG-SYMBOL-UNRESOLVED`` named."""
+        project = _project(tmp_path)
+        (project / "triple.json").write_text(_THREE_NOT_APPLIED, encoding="utf-8")
+        result = _run_case(project, "triple")
+        patch = result.block_results[1]
+        assert result.status == FLOW_STATUS_ISSUES, result.status
+        assert patch.status == BLOCK_STATUS_NOTICES, patch.status
+>       assert patch.diagnostics == [], patch.diagnostics
+E       AssertionError: ['0x00020000 skipped-outside', '0x00020010 skipped-outside', '0x0000FFFE skipped-partial']
+E       assert ['0x00020000 ...pped-partial'] == []
+E         
+E         Left contains 3 more items, first extra item: '0x00020000 skipped-outside'
+E         Use -v to get more diff
+
+tests\test_b99_patch_truth.py:262: AssertionError
+_________________ test_tc_b99_17_notices_lines_paint_warning __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26608/test_tc_b99_17_notices_lines_p0')
+
+    def test_tc_b99_17_notices_lines_paint_warning(tmp_path: Path) -> None:
+        """TC-B99-17 (LLR-156.1, review round 2 fix N1): a ``notices`` PATCH arm's
+        not-applied lines ride ``findings`` as ``FINDING_WARN`` — the funnel arm's
+        idiom — never ``diagnostics``: Flow Builder paints findings
+        ``sev-warning`` and diagnostics ``sev-error``, so service-side every line
+        is a WARN finding with ``diagnostics`` left empty, and painted the PATCH
+        node's address lines carry the warning severity class with no
+        ``sev-error`` line. The ``error`` arm keeps its census and its cause LAST
+        in ``diagnostics`` (UX-C2) — the channel is not abolished, it stays the
+        error arm's."""
+        project = _project(tmp_path)
+        (project / "triple.json").write_text(_THREE_NOT_APPLIED, encoding="utf-8")
+        result = _run_case(project, "triple")
+        patch = result.block_results[1]
+        assert result.status == FLOW_STATUS_ISSUES, result.status
+        assert patch.status == BLOCK_STATUS_NOTICES, patch.status
+>       assert patch.diagnostics == [], patch.diagnostics
+E       AssertionError: ['0x00020000 skipped-outside', '0x00020010 skipped-outside', '0x0000FFFE skipped-partial']
+E       assert ['0x00020000 ...pped-partial'] == []
+E         
+E         Left contains 3 more items, first extra item: '0x00020000 skipped-outside'
+E         Use -v to get more diff
+
+tests\test_b99_patch_truth.py:324: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_diagnostics_name_every_non_applied_address
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_17_notices_lines_paint_warning
+2 failed, 17 deselected in 0.63s

@@ -20,6 +20,14 @@
 |---|---|---|---|---|---|---|---|
 | #2 | patch\.json | 0x00001000 | 1 | 01 | AA | - | - |
 
+## Not applied
+
+- none
+
+## Refusals
+
+- none
+
 ## Image footprint
 
 - **Before CRC:** 0x00001000–0x00001004  (5 bytes)

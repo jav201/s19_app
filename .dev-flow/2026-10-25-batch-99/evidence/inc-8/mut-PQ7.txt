@@ -1,0 +1,5 @@
+
+tests\test_b99_patch_truth.py:774: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_at_b99_07_hostile_symbol_name_renders_literally
+1 failed in 7.72s

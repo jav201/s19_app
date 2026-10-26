@@ -1,0 +1,5 @@
+
+tests\test_b99_patch_truth.py:444: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_patch_truth.py::test_tc_b99_20_flow_report_lists_what_was_not_applied
+1 failed in 0.73s
