@@ -1,0 +1,178 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_at_b99_08_save_back_keeps_editor_image _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26319/test_at_b99_08_save_back_keeps0')
+
+    def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
+        """Add / Apply / Undo / Add / Apply / Add (no apply) / save back: the
+        written file holds the source bytes at 0xEB10, 01 02 at 0xEB40 and
+        05 06 at 0xEB60, and the final painted status names the applied entry
+        AND the not-applied entry (with the "1 entry" count) and stays visible
+        after the verify result (PDR-UX-C6, review finding F3).
+    
+        RED premise (P-6): on the unmodified tree the save writes the undone
+        entry (``deadbeef`` at 0xEB10) and the status is overwritten by the
+        verify line, so neither assertion can pass.
+        """
+        src = tmp_path / "editor_image.s19"
+        _write_fixture_s19(src)
+        oracle = read_s19(src)
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            # 160 columns: the log line's width-aware cap (max(50, width)) must
+            # not trim the two-clause status this AT asserts — the full line is
+            # ~139 cells.
+            async with app.run_test(size=(160, 54)) as pilot:
+                await pilot.pause()
+    
+                async def _type(input_id: str, text: str) -> None:
+                    assert await pilot.click(f"#{input_id}"), (
+                        f"click missed #{input_id}"
+                    )
+                    await pilot.press("ctrl+shift+a")
+                    await pilot.press(*text)
+    
+                # 1. Load the premise image through the Load file dialog.
+                await _load_fixture(app, pilot, src, "editor_image.s19")
+    
+                # 2. Patch Editor (rail key ``6``): add, apply, undo, add, apply.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                await _type("patch_entry_address_input", "0xEB10")
+                await _type("patch_entry_bytes_input", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "apply status line",
+                )
+                # The Undo/Redo controls render in the editor's JSON pane, so the
+                # drive uses the shipped ``ctrl+z`` key binding (the same guarded
+                # path the Undo button posts to).  The history strip repaints
+                # "1 fwd" when the undo lands (a space-free painted signal).
+                await pilot.press("ctrl+z")
+                await _wait_for(
+                    pilot,
+                    lambda: "1 fwd" in _history_plain(app),
+                    "undo repaints the history strip",
+                )
+                await _type("patch_entry_address_input", "0xEB40")
+                await _type("patch_entry_bytes_input", "01 02")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "second add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "second apply status line",
+                )
+    
+                # 2b. Add a THIRD entry WITHOUT applying it: the save must write
+                # it AND the painted status must name it as not applied before
+                # the save, with the "1 entry" count (review finding F3).
+                await _type("patch_entry_address_input", "0xEB60")
+                await _type("patch_entry_bytes_input", "05 06")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "third add status line",
+                )
+    
+                # 3. Save-back: the prompt renders in the editor's JSON pane.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "patched" in _painted_text(app),
+                    "save-back prompt painted",
+                )
+                assert await pilot.click(
+                    "#patch_saveback_name_input"
+                ), "click missed #patch_saveback_name_input"
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"at_b99_08.s19")
+                assert await pilot.click(
+                    "#patch_saveback_confirm_button"
+                ), "click missed #patch_saveback_confirm_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved + verified" in _status_text(app),
+                    "save-back verify status line",
+                )
+                final_status = _status_text(app)
+                # UX-C6: the status must still name the applied entry AFTER the
+                # verify result surfaces — wait, then re-read the painted line.
+                for _ in range(10):
+                    await pilot.pause()
+                return final_status if final_status == _status_text(app) else (
+                    final_status + " || overwritten by: " + _status_text(app)
+                )
+    
+        status = asyncio.run(_drive())
+    
+        target = None
+        for candidate in sorted(tmp_path.rglob("at_b99_08.s19")):
+            target = candidate
+            break
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+        assert [written.data[0xEB10 + i] for i in range(4)] == [
+            oracle.data[0xEB10 + i] for i in range(4)
+        ], (
+            f"the undone entry reached the file: "
+            f"{[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+        assert [written.data[0xEB40 + i] for i in range(2)] == [0x01, 0x02]
+        assert [written.data[0xEB60 + i] for i in range(2)] == [0x05, 0x06], (
+            f"the never-applied entry must reach the file via the save "
+            f"re-derive: {[written.data.get(0xEB60 + i) for i in range(2)]}"
+        )
+    
+        # UX-C6: one status line carries the verify word AND the applied entry,
+        # outcome first, and nothing overwrites it after the handler returns.
+        assert " || overwritten by: " not in status, (
+            f"the save-back status was overwritten by the verify result: {status}"
+        )
+        assert "Saved + verified: at_b99_08.s19" in status, status
+        assert "0x0000EB40" in status, (
+            f"the final status must name the applied entry: {status}"
+        )
+        # F3: the same line names the entry that was NOT applied before the
+        # save, with the singular "1 entry" count.
+>       assert "includes 1 entry not applied before this save" in status, (
+            f"the final status must name the not-applied entry with its "
+            f"count: {status}"
+        )
+E       AssertionError: the final status must name the not-applied entry with its count: Saved + verified: at_b99_08.s19 — 1 entry applied before this save (0x0000EB40)
+E       assert 'includes 1 entry not applied before this save' in 'Saved + verified: at_b99_08.s19 — 1 entry applied before this save (0x0000EB40)'
+
+tests\test_b99_editor_image.py:690: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_save_back_keeps_editor_image
+1 failed, 7 deselected in 21.09s

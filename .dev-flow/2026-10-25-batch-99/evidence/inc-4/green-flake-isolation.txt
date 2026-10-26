@@ -1,0 +1,4 @@
+tests\test_tui_patch_glyphs.py:400: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - Asserti...
+1 failed, 3 passed in 21.29s

@@ -1,0 +1,45 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_21_editor_image_is_source_plus_document _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26312/test_tc_b99_21_editor_image_is0')
+
+    def test_tc_b99_21_editor_image_is_source_plus_document(tmp_path: Path) -> None:
+        """The p05 sequence writes source bytes at the undone entry's address.
+    
+        Intent: LLR-157.1 — every apply restores the journaled addresses in
+        place in the SAME dict object before applying, so the alias arm (the
+        same bytes seen through another holder of the dict) and the save arm
+        both observe the source byte at 0xEB10.
+        """
+        service, mem_map, ranges = _service_with_image()
+        alias = mem_map  # a second holder of the same dict (app.py merge aliases)
+    
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+        assert alias[0xEB10] == 0xDE, "the apply must write through the shared dict"
+    
+        service.undo()
+        service.add_entry("0xEB40", "", "01 02")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+    
+        result, target = _save_back(
+            service, mem_map, ranges, tmp_path, name="tc21-p05.s19"
+        )
+        assert result.ok, result.message
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+>       assert [written.data[0xEB10 + i] for i in range(4)] == list(SOURCE_EB10), (
+            f"the undone entry must return to the source bytes, "
+            f"got {[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+E       AssertionError: the undone entry must return to the source bytes, got [222, 173, 190, 239]
+E       assert [222, 173, 190, 239] == [32, 65, 112, 112]
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:211: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_21_editor_image_is_source_plus_document
+1 failed, 7 deselected in 0.40s

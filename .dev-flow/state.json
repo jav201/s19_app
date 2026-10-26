@@ -190,6 +190,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 009 (US-143 / HLR-154, truncated and inconsistent images reported, five codes, the flow stops; core.py, hexfile.py, flow_execution_service.py, app.py; frozen-engine crossing named) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH binary-tail HEX regression) fixed, round 2 OK with N1 MEDIUM (CR-only HEX) fixed in round 3 and verified by the orchestrator."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 004 (US-146 / HLR-157, editor image = source + current document via an in-place journal; change_service.py + app.py) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH overlapping save, F2 HIGH stale strip after reload) fixed by Kimi, round 2 PASS-WITH-NOTES (N1-N3 LOW to backlog)."
     }
   ],
   "obsidian_synced": false,

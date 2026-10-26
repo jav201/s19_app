@@ -1,0 +1,38 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_22_save_rederives_and_names_not_applied _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26314/test_tc_b99_22_save_rederives_0')
+
+    def test_tc_b99_22_save_rederives_and_names_not_applied(tmp_path: Path) -> None:
+        """The save re-derives the image from every entry currently in the
+        document and names each entry that was not applied before the save.
+    
+        Intent: LLR-157.2 — remove-after-apply and edit-after-apply leave 0
+        stale bytes; add-after-apply is written by the save AND named in the
+        save status; the saved summary lists exactly the entries the image
+        holds; redo after undo re-applies the kept entry's bytes.
+        """
+        # Arm 1: remove-after-apply -> the removed entry's bytes return to source.
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None)
+        service.remove_entry("0xEB10")
+        result, target = _save_back(
+            service, mem_map, ranges, tmp_path, name="tc22-remove.s19"
+        )
+        assert result.ok, result.message
+        written = read_s19(target)
+>       assert [written.data[0xEB10 + i] for i in range(4)] == list(SOURCE_EB10), (
+            "remove-after-apply left stale bytes in the saved image"
+        )
+E       AssertionError: remove-after-apply left stale bytes in the saved image
+E       assert [222, 173, 190, 239] == [32, 65, 112, 112]
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:276: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_save_rederives_and_names_not_applied
+1 failed, 7 deselected in 0.44s

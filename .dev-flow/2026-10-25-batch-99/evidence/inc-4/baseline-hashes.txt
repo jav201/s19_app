@@ -1,0 +1,2 @@
+c830459e4998f387cd24a7461f5a30881d38f043dbee20b63cf7c0e9b553ddef *s19_app/tui/services/change_service.py
+03eacc66cbd6b0ef49c9e82ab893e31642f8c3ce81767d3fde409bb8a7a24118 *s19_app/tui/app.py

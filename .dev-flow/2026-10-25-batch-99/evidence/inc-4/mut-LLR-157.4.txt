@@ -1,0 +1,94 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________________ test_tc_b99_40_before_bytes_is_source ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26315/test_tc_b99_40_before_bytes_is0')
+
+    def test_tc_b99_40_before_bytes_is_source(tmp_path: Path) -> None:
+        """After apply -> apply on 0xEB10, the record and the report show the
+        source byte as before.
+    
+        Intent: LLR-157.4 — the change record's ``before_bytes`` is the source
+        image's byte even on a repeated apply: the service summary and a
+        before/after report both show ``20 41 70 70`` as before, never
+        ``DE AD BE EF``.
+        """
+        src = tmp_path / "img.s19"
+        _write_fixture_s19(src)
+    
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+        summary = service.apply(mem_map, ranges, None, None, variant_id="img")
+        record = next(r for r in summary.entries if r.address_start == 0xEB10)
+>       assert record.before_bytes == SOURCE_EB10, (
+            f"repeated apply: before_bytes must be the source byte, "
+            f"got {record.before_bytes}"
+        )
+E       AssertionError: repeated apply: before_bytes must be the source byte, got (222, 173, 190, 239)
+E       assert (222, 173, 190, 239) == (32, 65, 112, 112)
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:381: AssertionError
+___________________ test_tc_b99_40_strip_shows_source_byte ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26315/test_tc_b99_40_strip_shows_sou0')
+
+    def test_tc_b99_40_strip_shows_source_byte(tmp_path: Path) -> None:
+        """The before/after strip paints the source byte as "was".
+    
+        Intent: LLR-157.4 (the strip reader) — after apply -> apply on 0xEB10
+        the strip's was-line shows ``20 41 70 70`` (the source byte the change
+        record holds as ``before_bytes``), not the applied ``DE AD BE EF``.
+        """
+        src = tmp_path / "img.s19"
+        _write_fixture_s19(src)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_fixture(app, pilot, src, "img.s19")
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                # White-box seed of the document (a TC arm, not the AT): the
+                # apply clicks below drive the app's own action routing.
+                app._change_service.add_entry("0xEB10", "", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "first apply status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "20 41 70 70" in _strip_plain(app)
+                    or "DE AD BE EF" in _strip_plain(app),
+                    "strip painted after the repeated apply",
+                )
+                return _strip_plain(app)
+    
+        strip = asyncio.run(_drive())
+>       assert "20 41 70 70" in strip, (
+            f"the strip's was-line must show the source byte; got:\n{strip}"
+        )
+E       AssertionError: the strip's was-line must show the source byte; got:
+E         0000EB10 +0 +1 +2 +3 +4 +5 +6 +7
+E           was    DE AD BE EF -- -- -- --
+E           now    DE AD BE EF -- -- -- --
+E         4 B @ 0x0000EB10 · 0 changed
+E       assert '20 41 70 70' in '0000EB10 +0 +1 +2 +3 +4 +5 +6 +7\n  was    DE AD BE EF -- -- -- --\n  now    DE AD BE EF -- -- -- --\n4 B @ 0x0000EB10 · 0 changed'
+
+tests\test_b99_editor_image.py:454: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40_before_bytes_is_source
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_source_byte
+2 failed, 6 deselected in 9.99s

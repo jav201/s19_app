@@ -115,7 +115,11 @@ from .checks_view import (
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.before_after_service import compose_before_after_report
-from .services.change_service import ChangeActionResult, ChangeService
+from .services.change_service import (
+    ChangeActionResult,
+    ChangeService,
+    save_back_status_suffix,
+)
 from .services.compare_service import (
     SOURCE_EXTERNAL,
     SOURCE_PROJECT_VARIANT,
@@ -3316,7 +3320,9 @@ class S19TuiApp(App):
         # which the panel's sentinel default keeps distinct from "not supplied".
         panel.refresh_entries(
             service.rows(loaded_ranges),
-            mem_map=mem_map,
+            # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
+            # overlay — source bytes at every address an apply wrote.
+            mem_map=self._strip_source_map(loaded),
             document=self._patch_document_view(),
         )
         # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
@@ -3414,6 +3420,11 @@ class S19TuiApp(App):
             bytes_per_line=bytes_per_line,
             s0_header=s0_header,
             source_image_path=loaded.path,
+            # batch-99 HLR-157: the save re-derives the image from the whole
+            # document; the linkage inputs keep a re-derived summary's
+            # classification identical to the apply routing's.
+            mac_records=loaded.mac_records,
+            a2l_tags=self._compute_a2l_enriched_tags() or None,
         )
         self._report_change_result(result)
         if result.ok:
@@ -3509,7 +3520,9 @@ class S19TuiApp(App):
         # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh path).
         panel.refresh_entries(
             service.rows(loaded_ranges),
-            mem_map=loaded.mem_map if loaded is not None else None,
+            # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
+            # overlay — source bytes at every address an apply wrote.
+            mem_map=self._strip_source_map(loaded),
             document=self._patch_document_view(),
         )
         # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
@@ -3887,6 +3900,41 @@ class S19TuiApp(App):
         self._report_change_result(result)
         self._refresh_patch_history_view()
 
+    def _strip_source_map(
+        self, loaded: Optional[LoadedFile]
+    ) -> Optional[Mapping[int, int]]:
+        """
+        Summary:
+            The memory map the Patch Editor's before/after strip reads
+            (batch-99 HLR-157, LLR-157.4): the live image overlaid, at every
+            address an apply journaled, with its SOURCE byte — so the strip's
+            ``was`` line shows the byte the image held before any apply even
+            on a repeated apply, when the live map already holds the entry's
+            own bytes. With an empty journal (no apply yet) the live map is
+            returned unchanged.
+
+        Args:
+            loaded (Optional[LoadedFile]): The loaded file whose map feeds
+                the strip; ``None`` (no image) → ``None``, which the panel's
+                refresh reads as "clear the map" (its sentinel keeps that
+                distinct from "not supplied").
+
+        Returns:
+            Optional[Mapping[int, int]]: ``None`` when no image is loaded;
+                else ``ChangeService.source_image_view(loaded.mem_map)`` —
+                the live dict itself or a read-only journal overlay.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.source_image_view``
+            Used by:
+                - the Patch Editor ``refresh_entries`` call sites (the
+                  strip's map pushes)
+        """
+        if loaded is None:
+            return None
+        return self._change_service.source_image_view(loaded.mem_map)
+
     def _surface_verify_result(self) -> None:
         """
         Summary:
@@ -3899,6 +3947,14 @@ class S19TuiApp(App):
             (collect-don't-abort) — surfacing only reads the already-computed
             ``VerifyResult``, it does not re-diff or re-verify.
 
+            batch-99 PDR-UX-C6 (HLR-157): the verify status line — on BOTH
+            arms, ``verified`` and ``mismatch`` — carries the save-back
+            suffix naming the entries the saved image holds and each entry
+            not applied before the save — outcome first, names in the SAME
+            line — so the verify surfacing never overwrites the HLR-157
+            naming text (the PDR-UX-C6 defect was exactly this line
+            replacing the save result's naming).
+
         Args:
             None
 
@@ -3908,16 +3964,23 @@ class S19TuiApp(App):
         Data Flow:
             - Read ``last_summary.verify_result`` (the §6.2 C-10 carrier
               stamped by ``ChangeService.save_patched``); absent → no-op.
-            - ``verified`` → one status line, no notice.
-            - ``mismatch`` → one status line + a ``severity="error"`` notice
-              built from ``stats.run_counts`` / ``byte_counts`` over
-              ``DIFF_KIND_DOMAIN`` (counts/addresses only, never raw bytes —
-              the F-S-05 no-byte-leak precedent).
+            - ``verified`` → one status line composed as ``Saved + verified:
+              {name}`` + :func:`save_back_status_suffix` over
+              ``ChangeService.last_save_applied`` /
+              ``last_save_not_applied``, no notice.
+            - ``mismatch`` → one status line composed as ``Verify MISMATCH:
+              {name}`` + the SAME :func:`save_back_status_suffix` (UX-C6
+              allows no exception — review round 1, finding F5) + a
+              ``severity="error"`` notice built from ``stats.run_counts`` /
+              ``byte_counts`` over ``DIFF_KIND_DOMAIN`` (counts/addresses
+              only, never raw bytes — the F-S-05 no-byte-leak precedent).
 
         Dependencies:
             Uses:
                 - set_status / notify
                 - _verify_mismatch_summary
+                - save_back_status_suffix (over the service's
+                  ``last_save_applied`` / ``last_save_not_applied``)
             Used by:
                 - on_patch_editor_panel_save_back_decision
         """
@@ -3931,10 +3994,25 @@ class S19TuiApp(App):
             else "image"
         )
         if verify.status == STATUS_VERIFIED:
-            self.set_status(f"Saved + verified: {name}")
+            # PDR-UX-C6: the suffix names what the saved image holds and any
+            # entry not applied before the save, in the SAME status line as
+            # the verify word — this line is the final painted status, so the
+            # naming can no longer be overwritten by the verify surfacing.
+            suffix = save_back_status_suffix(
+                self._change_service.last_save_applied,
+                self._change_service.last_save_not_applied,
+            )
+            self.set_status(f"Saved + verified: {name}{suffix}")
             return
         detail = self._verify_mismatch_summary(verify)
-        self.set_status(f"Verify MISMATCH: {name}")
+        # PDR-UX-C6 allows no exception (review round 1, finding F5): the
+        # mismatch arm carries the SAME not-applied naming suffix, so the
+        # names survive on both verify arms, outcome first.
+        suffix = save_back_status_suffix(
+            self._change_service.last_save_applied,
+            self._change_service.last_save_not_applied,
+        )
+        self.set_status(f"Verify MISMATCH: {name}{suffix}")
         self.notify(
             f"{name}: {detail}",
             title="Verify mismatch - file may not match",
@@ -5358,7 +5436,9 @@ class S19TuiApp(App):
         # batch-48 (LLR-080.2) — the load path's memory-map push.
         panel.refresh_entries(
             service.rows(loaded_ranges),
-            mem_map=loaded.mem_map if loaded is not None else None,
+            # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
+            # overlay — source bytes at every address an apply wrote.
+            mem_map=self._strip_source_map(loaded),
             document=self._patch_document_view(),
         )
         # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
@@ -10907,7 +10987,9 @@ class S19TuiApp(App):
             # this site exists to fix (the glyph half, above), one seam over.
             panel.refresh_entries(
                 self._change_service.rows(loaded.ranges),
-                mem_map=loaded.mem_map,
+                # batch-99 HLR-157 (LLR-157.4): the strip reads the journal
+                # overlay — source bytes at every address an apply wrote.
+                mem_map=self._strip_source_map(loaded),
                 document=self._patch_document_view(),
             )
             # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the

@@ -1,0 +1,397 @@
+..F..FFF                                                                 [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b99_22_save_blocks_overlapping_entries ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_tc_b99_22_save_blocks_ove0')
+
+    def test_tc_b99_22_save_blocks_overlapping_entries(tmp_path: Path) -> None:
+        """The save re-derive runs the same collision refresh as the apply, so
+        an interactively created span overlap blocks the save (review F1).
+    
+        Intent: LLR-157.2 — the reviewer's probe: add ``0xEB10 DE AD BE EF``,
+        apply, add ``0xEB12 01 02`` (the spans overlap), save. ``apply`` on the
+        same document blocks BOTH entries; the save must not write an image the
+        apply would refuse: it saves nothing and the refusal says why. Before
+        the fix the save returned ``ok`` and the file held ``DE AD 01 02``
+        with the summary listing both entries as applied.
+        """
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        first = service.apply(mem_map, ranges, None, None)
+        assert first.counts[DISPOSITION_APPLIED] == 1
+        service.add_entry("0xEB12", "", "01 02")
+    
+        # The premise: apply on the same document blocks BOTH entries.
+        blocked = service.apply(mem_map, ranges, None, None)
+>       assert blocked.counts[DISPOSITION_BLOCKED] == 2, (
+                              ^^^^^^^^^^^^^^^^^^^
+            f"apply must block the overlapping document: {blocked.counts}"
+        )
+E       NameError: name 'DISPOSITION_BLOCKED' is not defined
+
+tests\test_b99_editor_image.py:337: NameError
+_______________ test_tc_b99_40_strip_shows_new_file_source_byte _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_tc_b99_40_strip_shows_new0')
+
+    def test_tc_b99_40_strip_shows_new_file_source_byte(tmp_path: Path) -> None:
+        """After a NEW file loads, the strip's "was" line shows the NEW file's
+        byte, not the previous image's source byte (review finding F2).
+    
+        Intent: LLR-157.4 (the strip reader) — the journal binds to the image
+        DICT; when the strip is refreshed with a different dict (file B loaded
+        after an apply on file A), the overlay must not paint file A's source
+        bytes over file B's map. The reviewer's probe: byte ``0x99`` at the
+        strip address in file B.
+        """
+        src_a = tmp_path / "img_a.s19"
+        _write_fixture_s19(src_a)
+        src_b = tmp_path / "img_b.s19"
+        _write_fixture_b_s19(src_b)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_fixture(app, pilot, src_a, "img_a.s19")
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                # White-box seed of the document (a TC arm, not the AT): the
+                # apply click below drives the app's own action routing.
+                app._change_service.add_entry("0xEB10", "", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "apply status line on file A",
+                )
+                # Load file B: the load-triggered strip refresh pushes file B's
+                # map through source_image_view while the journal still holds
+                # file A's source bytes — the defect this arm pins.
+                await _load_fixture(app, pilot, src_b, "img_b.s19")
+                await _wait_for(
+                    pilot,
+                    lambda: "99 98 97 96" in _strip_plain(app)
+                    or "20 41 70 70" in _strip_plain(app),
+                    "strip repainted for file B",
+                )
+                return _strip_plain(app)
+    
+        strip = asyncio.run(_drive())
+>       assert "99 98 97 96" in strip, (
+            f"the strip's was-line must show file B's byte; got:\n{strip}"
+        )
+E       AssertionError: the strip's was-line must show file B's byte; got:
+E         0000EB10 +0 +1 +2 +3 +4 +5 +6 +7
+E           was    20 41 70 70 -- -- -- --
+E           now    DE AD BE EF -- -- -- --
+E         4 B @ 0x0000EB10 · 4 changed
+E       assert '99 98 97 96' in '0000EB10 +0 +1 +2 +3 +4 +5 +6 +7\n  was    20 41 70 70 -- -- -- --\n  now    DE AD BE EF -- -- -- --\n4 B @ 0x0000EB10 · 4 changed'
+
+tests\test_b99_editor_image.py:503: AssertionError
+_________________ test_at_b99_08_save_back_keeps_editor_image _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_at_b99_08_save_back_keeps0')
+
+    def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
+        """Add / Apply / Undo / Add / Apply / Add (no apply) / save back: the
+        written file holds the source bytes at 0xEB10, 01 02 at 0xEB40 and
+        05 06 at 0xEB60, and the final painted status names the applied entry
+        AND the not-applied entry (with the "1 entry" count) and stays visible
+        after the verify result (PDR-UX-C6, review finding F3).
+    
+        RED premise (P-6): on the unmodified tree the save writes the undone
+        entry (``deadbeef`` at 0xEB10) and the status is overwritten by the
+        verify line, so neither assertion can pass.
+        """
+        src = tmp_path / "editor_image.s19"
+        _write_fixture_s19(src)
+        oracle = read_s19(src)
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+    
+                async def _type(input_id: str, text: str) -> None:
+                    assert await pilot.click(f"#{input_id}"), (
+                        f"click missed #{input_id}"
+                    )
+                    await pilot.press("ctrl+shift+a")
+                    await pilot.press(*text)
+    
+                # 1. Load the premise image through the Load file dialog.
+                await _load_fixture(app, pilot, src, "editor_image.s19")
+    
+                # 2. Patch Editor (rail key ``6``): add, apply, undo, add, apply.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                await _type("patch_entry_address_input", "0xEB10")
+                await _type("patch_entry_bytes_input", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "apply status line",
+                )
+                # The Undo/Redo controls render in the editor's JSON pane, so the
+                # drive uses the shipped ``ctrl+z`` key binding (the same guarded
+                # path the Undo button posts to).  The history strip repaints
+                # "1 fwd" when the undo lands (a space-free painted signal).
+                await pilot.press("ctrl+z")
+                await _wait_for(
+                    pilot,
+                    lambda: "1 fwd" in _history_plain(app),
+                    "undo repaints the history strip",
+                )
+                await _type("patch_entry_address_input", "0xEB40")
+                await _type("patch_entry_bytes_input", "01 02")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "second add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "second apply status line",
+                )
+    
+                # 2b. Add a THIRD entry WITHOUT applying it: the save must write
+                # it AND the painted status must name it as not applied before
+                # the save, with the "1 entry" count (review finding F3).
+                await _type("patch_entry_address_input", "0xEB60")
+                await _type("patch_entry_bytes_input", "05 06")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "third add status line",
+                )
+    
+                # 3. Save-back: the prompt renders in the editor's JSON pane.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "patched" in _painted_text(app),
+                    "save-back prompt painted",
+                )
+                assert await pilot.click(
+                    "#patch_saveback_name_input"
+                ), "click missed #patch_saveback_name_input"
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"at_b99_08.s19")
+                assert await pilot.click(
+                    "#patch_saveback_confirm_button"
+                ), "click missed #patch_saveback_confirm_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved + verified" in _status_text(app),
+                    "save-back verify status line",
+                )
+                final_status = _status_text(app)
+                # UX-C6: the status must still name the applied entry AFTER the
+                # verify result surfaces — wait, then re-read the painted line.
+                for _ in range(10):
+                    await pilot.pause()
+                return final_status if final_status == _status_text(app) else (
+                    final_status + " || overwritten by: " + _status_text(app)
+                )
+    
+        status = asyncio.run(_drive())
+    
+        target = None
+        for candidate in sorted(tmp_path.rglob("at_b99_08.s19")):
+            target = candidate
+            break
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+        assert [written.data[0xEB10 + i] for i in range(4)] == [
+            oracle.data[0xEB10 + i] for i in range(4)
+        ], (
+            f"the undone entry reached the file: "
+            f"{[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+        assert [written.data[0xEB40 + i] for i in range(2)] == [0x01, 0x02]
+        assert [written.data[0xEB60 + i] for i in range(2)] == [0x05, 0x06], (
+            f"the never-applied entry must reach the file via the save "
+            f"re-derive: {[written.data.get(0xEB60 + i) for i in range(2)]}"
+        )
+    
+        # UX-C6: one status line carries the verify word AND the applied entry,
+        # outcome first, and nothing overwrites it after the handler returns.
+        assert " || overwritten by: " not in status, (
+            f"the save-back status was overwritten by the verify result: {status}"
+        )
+        assert "Saved + verified: at_b99_08.s19" in status, status
+        assert "0x0000EB40" in status, (
+            f"the final status must name the applied entry: {status}"
+        )
+        # F3: the same line names the entry that was NOT applied before the
+        # save, with the singular "1 entry" count.
+>       assert "includes 1 entry not applied before this save" in status, (
+            f"the final status must name the not-applied entry with its "
+            f"count: {status}"
+        )
+E       AssertionError: the final status must name the not-applied entry with its count: Saved + verified: at_b99_08.s19 — 1 entry applied before this save (0x0000EB40); includes 1 entry not applied before thi
+E       assert 'includes 1 entry not applied before this save' in 'Saved + verified: at_b99_08.s19 — 1 entry applied before this save (0x0000EB40); includes 1 entry not applied before thi'
+
+tests\test_b99_editor_image.py:675: AssertionError
+__________ test_at_b99_08_verify_mismatch_status_still_names_entries __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26295/test_at_b99_08_verify_mismatch0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000170E1AC0750>
+
+    def test_at_b99_08_verify_mismatch_status_still_names_entries(
+        tmp_path: Path, monkeypatch
+    ) -> None:
+        """A forced verify mismatch: the mismatch status line carries the SAME
+        not-applied names as the verified arm (PDR-UX-C6 allows no exception —
+        review finding F5).
+    
+        Intent: UX-C6 / HLR-157 statement 3 — the saved image's not-applied
+        naming must survive on BOTH verify arms. The verify outcome is forced
+        to ``mismatch`` by patching the engine entry point the service module
+        resolves (``change_service.verify_written_image``) — the pilot itself
+        stays black-box: real keys and clicks, painted status observed.
+        """
+        from s19_app.compare import DIFF_KIND_DOMAIN, DiffStats
+        from s19_app.tui.changes.verify import STATUS_MISMATCH, VerifyResult
+        from s19_app.tui.services import change_service as change_service_module
+    
+        def _forced_mismatch(written, intended, file_type):
+            return VerifyResult(
+                status=STATUS_MISMATCH,
+                runs=[],
+                stats=DiffStats(
+                    run_counts={kind: 0 for kind in DIFF_KIND_DOMAIN},
+                    byte_counts={kind: 0 for kind in DIFF_KIND_DOMAIN},
+                ),
+                written_path=written,
+            )
+    
+        monkeypatch.setattr(
+            change_service_module, "verify_written_image", _forced_mismatch
+        )
+    
+        src = tmp_path / "editor_image.s19"
+        _write_fixture_s19(src)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+    
+                async def _type(input_id: str, text: str) -> None:
+                    assert await pilot.click(f"#{input_id}"), (
+                        f"click missed #{input_id}"
+                    )
+                    await pilot.press("ctrl+shift+a")
+                    await pilot.press(*text)
+    
+                await _load_fixture(app, pilot, src, "editor_image.s19")
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                await _type("patch_entry_address_input", "0xEB10")
+                await _type("patch_entry_bytes_input", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "apply status line",
+                )
+                # Second entry added WITHOUT an apply: it is the not-applied
+                # name the mismatch arm must still carry.
+                await _type("patch_entry_address_input", "0xEB40")
+                await _type("patch_entry_bytes_input", "01 02")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "second add status line",
+                )
+    
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "patched" in _painted_text(app),
+                    "save-back prompt painted",
+                )
+                assert await pilot.click(
+                    "#patch_saveback_name_input"
+                ), "click missed #patch_saveback_name_input"
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"at_b99_08m.s19")
+                assert await pilot.click(
+                    "#patch_saveback_confirm_button"
+                ), "click missed #patch_saveback_confirm_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Verify MISMATCH" in _status_text(app),
+                    "mismatch status line",
+                )
+                final_status = _status_text(app)
+                for _ in range(10):
+                    await pilot.pause()
+                return final_status if final_status == _status_text(app) else (
+                    final_status + " || overwritten by: " + _status_text(app)
+                )
+    
+        status = asyncio.run(_drive())
+        assert " || overwritten by: " not in status, (
+            f"the mismatch status was overwritten after the handler: {status}"
+        )
+        assert "Verify MISMATCH: at_b99_08m.s19" in status, status
+>       assert "includes 1 entry not applied before this save" in status, (
+            f"the mismatch line must carry the not-applied naming: {status}"
+        )
+E       AssertionError: the mismatch line must carry the not-applied naming: Verify MISMATCH: at_b99_08m.s19
+E       assert 'includes 1 entry not applied before this save' in 'Verify MISMATCH: at_b99_08m.s19'
+
+tests\test_b99_editor_image.py:799: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_save_blocks_overlapping_entries
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40_strip_shows_new_file_source_byte
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_save_back_keeps_editor_image
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_verify_mismatch_status_still_names_entries
+4 failed, 4 passed in 67.28s (0:01:07)

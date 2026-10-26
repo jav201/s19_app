@@ -1,0 +1,311 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc4
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 5 items
+
+tests\test_b99_editor_image.py FFFFF                                     [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b99_21_editor_image_is_source_plus_document _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_21_editor_image_is0')
+
+    def test_tc_b99_21_editor_image_is_source_plus_document(tmp_path: Path) -> None:
+        """The p05 sequence writes source bytes at the undone entry's address.
+    
+        Intent: LLR-157.1 — every apply restores the journaled addresses in
+        place in the SAME dict object before applying, so the alias arm (the
+        same bytes seen through another holder of the dict) and the save arm
+        both observe the source byte at 0xEB10.
+        """
+        service, mem_map, ranges = _service_with_image()
+        alias = mem_map  # a second holder of the same dict (app.py merge aliases)
+    
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+        assert alias[0xEB10] == 0xDE, "the apply must write through the shared dict"
+    
+        service.undo()
+        service.add_entry("0xEB40", "", "01 02")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+    
+        result, target = _save_back(service, mem_map, ranges, tmp_path)
+        assert result.ok, result.message
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+>       assert [written.data[0xEB10 + i] for i in range(4)] == list(SOURCE_EB10), (
+            f"the undone entry must return to the source bytes, "
+            f"got {[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+E       AssertionError: the undone entry must return to the source bytes, got [222, 173, 190, 239]
+E       assert [222, 173, 190, 239] == [32, 65, 112, 112]
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:186: AssertionError
+_____________ test_tc_b99_22_save_rederives_and_names_not_applied _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_22_save_rederives_0')
+
+    def test_tc_b99_22_save_rederives_and_names_not_applied(tmp_path: Path) -> None:
+        """The save re-derives the image from every entry currently in the
+        document and names each entry that was not applied before the save.
+    
+        Intent: LLR-157.2 — remove-after-apply and edit-after-apply leave 0
+        stale bytes; add-after-apply is written by the save AND named in the
+        save status; the saved summary lists exactly the entries the image
+        holds; redo after undo re-applies the kept entry's bytes.
+        """
+        # Arm 1: remove-after-apply -> the removed entry's bytes return to source.
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None)
+        service.remove_entry("0xEB10")
+        result, target = _save_back(service, mem_map, ranges, tmp_path)
+        assert result.ok, result.message
+        written = read_s19(target)
+>       assert [written.data[0xEB10 + i] for i in range(4)] == list(SOURCE_EB10), (
+            "remove-after-apply left stale bytes in the saved image"
+        )
+E       AssertionError: remove-after-apply left stale bytes in the saved image
+E       assert [222, 173, 190, 239] == [32, 65, 112, 112]
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:247: AssertionError
+____________________ test_tc_b99_40_before_bytes_is_source ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_40_before_bytes_is0')
+
+    def test_tc_b99_40_before_bytes_is_source(tmp_path: Path) -> None:
+        """After apply -> apply on 0xEB10, the record and the report show the
+        source byte as before.
+    
+        Intent: LLR-157.4 — the change record's ``before_bytes`` is the source
+        image's byte even on a repeated apply: the service summary and a
+        before/after report both show ``20 41 70 70`` as before, never
+        ``DE AD BE EF``.
+        """
+        src = tmp_path / "img.s19"
+        _write_fixture_s19(src)
+    
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+        summary = service.apply(mem_map, ranges, None, None, variant_id="img")
+        record = next(r for r in summary.entries if r.address_start == 0xEB10)
+>       assert record.before_bytes == SOURCE_EB10, (
+            f"repeated apply: before_bytes must be the source byte, "
+            f"got {record.before_bytes}"
+        )
+E       AssertionError: repeated apply: before_bytes must be the source byte, got (222, 173, 190, 239)
+E       assert (222, 173, 190, 239) == (32, 65, 112, 112)
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:309: AssertionError
+___________________ test_tc_b99_40a_strip_shows_source_byte ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_tc_b99_40a_strip_shows_so0')
+
+    def test_tc_b99_40a_strip_shows_source_byte(tmp_path: Path) -> None:
+        """The before/after strip paints the source byte as "was".
+    
+        Intent: LLR-157.4 (the strip reader) — after apply -> apply on 0xEB10
+        the strip's was-line shows ``20 41 70 70`` (the source byte the change
+        record holds as ``before_bytes``), not the applied ``DE AD BE EF``.
+        """
+        src = tmp_path / "img.s19"
+        _write_fixture_s19(src)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_fixture(app, pilot, src, "img.s19")
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                # White-box seed of the document (a TC arm, not the AT): the
+                # apply clicks below drive the app's own action routing.
+                app._change_service.add_entry("0xEB10", "", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "first apply status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "20 41 70 70" in _strip_plain(app)
+                    or "DE AD BE EF" in _strip_plain(app),
+                    "strip painted after the repeated apply",
+                )
+                return _strip_plain(app)
+    
+        strip = asyncio.run(_drive())
+>       assert "20 41 70 70" in strip, (
+            f"the strip's was-line must show the source byte; got:\n{strip}"
+        )
+E       AssertionError: the strip's was-line must show the source byte; got:
+E         0000EB10 +0 +1 +2 +3 +4 +5 +6 +7
+E           was    DE AD BE EF -- -- -- --
+E           now    DE AD BE EF -- -- -- --
+E         4 B @ 0x0000EB10 · 0 changed
+E       assert '20 41 70 70' in '0000EB10 +0 +1 +2 +3 +4 +5 +6 +7\n  was    DE AD BE EF -- -- -- --\n  now    DE AD BE EF -- -- -- --\n4 B @ 0x0000EB10 · 0 changed'
+
+tests\test_b99_editor_image.py:382: AssertionError
+_________________ test_at_b99_08_save_back_keeps_editor_image _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26131/test_at_b99_08_save_back_keeps0')
+
+    def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
+        """Add / Apply / Undo / Add / Apply / save back: the written file holds
+        the source bytes at 0xEB10 and 01 02 at 0xEB40, and the final painted
+        status names the applied entry and stays visible after the verify
+        result (PDR-UX-C6).
+    
+        RED premise (P-6): on the unmodified tree the save writes the undone
+        entry (``deadbeef`` at 0xEB10) and the status is overwritten by the
+        verify line, so neither assertion can pass.
+        """
+        src = tmp_path / "editor_image.s19"
+        _write_fixture_s19(src)
+        oracle = read_s19(src)
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive() -> str:
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+    
+                async def _type(input_id: str, text: str) -> None:
+                    assert await pilot.click(f"#{input_id}"), (
+                        f"click missed #{input_id}"
+                    )
+                    await pilot.press("ctrl+shift+a")
+                    await pilot.press(*text)
+    
+                # 1. Load the premise image through the Load file dialog.
+                await _load_fixture(app, pilot, src, "editor_image.s19")
+    
+                # 2. Patch Editor (rail key ``6``): add, apply, undo, add, apply.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                await _type("patch_entry_address_input", "0xEB10")
+                await _type("patch_entry_bytes_input", "DE AD BE EF")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "apply status line",
+                )
+                # The Undo/Redo controls render in the editor's JSON pane, so the
+                # drive uses the shipped ``ctrl+z`` key binding (the same guarded
+                # path the Undo button posts to).  The history strip repaints
+                # "1 fwd" when the undo lands (a space-free painted signal).
+                await pilot.press("ctrl+z")
+                await _wait_for(
+                    pilot,
+                    lambda: "1 fwd" in _history_plain(app),
+                    "undo repaints the history strip",
+                )
+                await _type("patch_entry_address_input", "0xEB40")
+                await _type("patch_entry_bytes_input", "01 02")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "second add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "1 applied, 0 skipped, 0 blocked" in _status_text(app),
+                    "second apply status line",
+                )
+    
+                # 3. Save-back: the prompt renders in the editor's JSON pane.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "patched" in _painted_text(app),
+                    "save-back prompt painted",
+                )
+                assert await pilot.click(
+                    "#patch_saveback_name_input"
+                ), "click missed #patch_saveback_name_input"
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"at_b99_08.s19")
+                assert await pilot.click(
+                    "#patch_saveback_confirm_button"
+                ), "click missed #patch_saveback_confirm_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved + verified" in _status_text(app),
+                    "save-back verify status line",
+                )
+                final_status = _status_text(app)
+                # UX-C6: the status must still name the applied entry AFTER the
+                # verify result surfaces — wait, then re-read the painted line.
+                for _ in range(10):
+                    await pilot.pause()
+                return final_status if final_status == _status_text(app) else (
+                    final_status + " || overwritten by: " + _status_text(app)
+                )
+    
+        status = asyncio.run(_drive())
+    
+        target = None
+        for candidate in sorted(tmp_path.rglob("at_b99_08.s19")):
+            target = candidate
+            break
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+>       assert [written.data[0xEB10 + i] for i in range(4)] == [
+            oracle.data[0xEB10 + i] for i in range(4)
+        ], (
+            f"the undone entry reached the file: "
+            f"{[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+E       AssertionError: the undone entry reached the file: [222, 173, 190, 239]
+E       assert [222, 173, 190, 239] == [32, 65, 112, 112]
+E         
+E         At index 0 diff: 222 != 32
+E         Use -v to get more diff
+
+tests\test_b99_editor_image.py:513: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_21_editor_image_is_source_plus_document
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_save_rederives_and_names_not_applied
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40_before_bytes_is_source
+FAILED tests/test_b99_editor_image.py::test_tc_b99_40a_strip_shows_source_byte
+FAILED tests/test_b99_editor_image.py::test_at_b99_08_save_back_keeps_editor_image
+============================= 5 failed in 30.85s ==============================

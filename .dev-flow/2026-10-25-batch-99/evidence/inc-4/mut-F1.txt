@@ -1,0 +1,40 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b99_22_save_blocks_overlapping_entries ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26318/test_tc_b99_22_save_blocks_ove0')
+
+    def test_tc_b99_22_save_blocks_overlapping_entries(tmp_path: Path) -> None:
+        """The save re-derive runs the same collision refresh as the apply, so
+        an interactively created span overlap blocks the save (review F1).
+    
+        Intent: LLR-157.2 — the reviewer's probe: add ``0xEB10 DE AD BE EF``,
+        apply, add ``0xEB12 01 02`` (the spans overlap), save. ``apply`` on the
+        same document blocks BOTH entries; the save must not write an image the
+        apply would refuse: it saves nothing and the refusal says why. Before
+        the fix the save returned ``ok`` and the file held ``DE AD 01 02``
+        with the summary listing both entries as applied.
+        """
+        service, mem_map, ranges = _service_with_image()
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        first = service.apply(mem_map, ranges, None, None)
+        assert first.counts[DISPOSITION_APPLIED] == 1
+        service.add_entry("0xEB12", "", "01 02")
+    
+        # Arm 1 (the reviewer's probe): save with NO apply after the overlapping
+        # add — nothing but the save's own collision refresh can stamp the
+        # collision, so this arm is vacuous if the refresh is skipped.
+        result, target = _save_back(
+            service, mem_map, ranges, tmp_path, name="tc22-overlap-refused.s19"
+        )
+>       assert not result.ok, (
+            f"the save must refuse a document the apply blocks: {result.message}"
+        )
+E       AssertionError: the save must refuse a document the apply blocks: Patched image saved as tc22-overlap-refused.s19 — 1 entry applied before this save (0x0000EB10); includes 1 entry not applied before this save (0x0000EB12)
+E       assert not True
+E        +  where True = ChangeActionResult(message='Patched image saved as tc22-overlap-refused.s19 — 1 entry applied before this save (0x0000EB10); includes 1 entry not applied before this save (0x0000EB12)', issues=[], ok=True).ok
+
+tests\test_b99_editor_image.py:345: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_22_save_blocks_overlapping_entries
+1 failed, 7 deselected in 0.51s

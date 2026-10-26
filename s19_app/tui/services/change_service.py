@@ -36,6 +36,7 @@ from __future__ import annotations
 import copy
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
@@ -53,6 +54,8 @@ from ..changes import (
     ChangeEntry,
     ChangeSummary,
     DEFAULT_CHANGE_FILE_NAME,
+    DISPOSITION_APPLIED,
+    DISPOSITION_BLOCKED,
     FORMAT_ID,
     FORMAT_VERSION,
     apply_change_document,
@@ -123,6 +126,113 @@ _HISTORY_MAX = 20
 #: :data:`_HISTORY_MAX`, published so the strip can show the depth AGAINST the
 #: limit without importing the constant.
 HISTORY_DEPTH_KEYS: tuple[str, ...] = ("back", "forward", "bound")
+
+
+def save_back_status_suffix(
+    applied: Sequence[int], not_applied: Sequence[int]
+) -> str:
+    """
+    Summary:
+        Render the save-back status suffix naming the entries the saved
+        image holds and each entry that had not been applied before the
+        save (HLR-157 statement 3, PDR-UX-C6) — one clause per list,
+        addresses as ``0x``-prefixed 8-digit uppercase hex in document
+        order. Shared by :meth:`ChangeService.save_patched` (the service
+        message) and ``app.py`` (the verify-suffixed final status line), so
+        both surfaces name the same entries in the same words.
+
+    Args:
+        applied (Sequence[int]): Addresses applied before the save (the
+            pre-save apply's entries still in the document), in document
+            order.
+        not_applied (Sequence[int]): Document entries never applied before
+            the save (added after the last apply), in document order.
+
+    Returns:
+        str: ``" — 1 entry applied before this save (0x0000EB40)"``, with a
+            ``"; includes N entries not applied before this save (...)"``
+            clause appended when ``not_applied`` is non-empty. The em dash
+            attaches the clause to the outcome word in the same status
+            line; the not-applied clause follows the UX-C6 example wording.
+
+    Example:
+        >>> save_back_status_suffix((0xEB40,), ())
+        ' — 1 entry applied before this save (0x0000EB40)'
+        >>> save_back_status_suffix((), (0xEB40,))
+        ' — 0 entries applied before this save; includes 1 entry not applied before this save (0x0000EB40)'
+    """
+    count = len(applied)
+    head = (
+        f"{count} {'entry' if count == 1 else 'entries'} "
+        "applied before this save"
+    )
+    if count:
+        head += " (" + ", ".join(f"0x{address:08X}" for address in applied) + ")"
+    parts = [head]
+    pending = len(not_applied)
+    if pending:
+        parts.append(
+            f"includes {pending} "
+            f"{'entry' if pending == 1 else 'entries'} not applied before "
+            "this save ("
+            + ", ".join(f"0x{address:08X}" for address in not_applied)
+            + ")"
+        )
+    return " — " + "; ".join(parts)
+
+
+class _SourceOverlayMap(Mapping):
+    """
+    Summary:
+        Read-only view of the loaded image's memory map with every
+        journaled address overlaid by its SOURCE byte (batch-99 HLR-157,
+        LLR-157.4) — the "before" half of the Patch Editor's before/after
+        strip. The journal holds exactly the addresses an apply wrote, so
+        ``view[address]`` is the byte the image held before any apply —
+        what the strip's ``was`` line must paint even on a repeated apply,
+        when the live map already holds the entry's own bytes. Unjournaled
+        addresses read through to the live map (they were never written,
+        so the live byte IS the source byte).
+
+    Args:
+        live (Mapping[int, int]): The loaded image's live address-to-byte
+            map (mutated by applies; never mutated here).
+        journal (Dict[int, int]): The change service's journal
+            (address -> source byte). Held by reference: the view is
+            rebuilt per refresh, never retained across mutations.
+
+    Returns:
+        None: Mapping view.
+
+    Data Flow:
+        - ``__getitem__`` checks the journal first, then the live map.
+        - ``__iter__`` / ``__len__`` delegate to the live map — every
+          journaled address belongs to the image (the journal only records
+          addresses the engine read), so the key set is the live one.
+
+    Dependencies:
+        Used by:
+            - ChangeService.source_image_view
+    """
+
+    __slots__ = ("_live", "_journal")
+
+    def __init__(
+        self, live: Mapping[int, int], journal: Dict[int, int]
+    ) -> None:
+        self._live = live
+        self._journal = journal
+
+    def __getitem__(self, key: int) -> int:
+        if key in self._journal:
+            return self._journal[key]
+        return self._live[key]
+
+    def __iter__(self):
+        return iter(self._live)
+
+    def __len__(self) -> int:
+        return len(self._live)
 
 
 def parse_address(address_text: str) -> int:
@@ -764,6 +874,43 @@ class ChangeService:
         #: replayable by :meth:`redo`; cleared by :meth:`_push_history` on any
         #: fresh mutation (a new edit invalidates the redo future).
         self._redo_stack: List[ChangeDocument] = []
+        #: The batch-99 (HLR-157, LLR-157.1) editor-image journal: address ->
+        #: SOURCE byte, recorded the first time an apply writes an address.
+        #: Every :meth:`apply` / :meth:`save_patched` first restores these
+        #: bytes IN PLACE in the image dict (aliases hold it — the app.py
+        #: merge points reuse one dict), then clears the journal and records
+        #: the new write's pre-write bytes — which, post-restore, ARE the
+        #: source bytes. The journal binds to ONE image dict (see
+        #: :attr:`_image_map`); it deliberately survives a change-document
+        #: load/unload, because it describes the IMAGE, and dropping it would
+        #: leave the previous document's bytes in the image (premise P-6).
+        self._journal: Dict[int, int] = {}
+        #: The image dict the journal currently describes — ``None`` until
+        #: the first apply/save. A different dict object at the next
+        #: apply/save means a new file was loaded (every load path funnels
+        #: through one install point and the MAC merges keep the live dict,
+        #: so dict identity IS image identity here); the journal resets then.
+        #: The reference is strong, so a freed dict's ``id()`` can never be
+        #: reused to alias it (the LLR-077.2 id-reuse lesson, applied here).
+        self._image_map: Optional[Dict[int, int]] = None
+        #: The addresses the most recent apply applied (or the most recent
+        #: save re-derived), or ``None`` when no apply is current —
+        #: :meth:`undo` / :meth:`redo` / :meth:`remove_entry` /
+        #: :meth:`edit_entry` / :meth:`edit_entry_json` / :meth:`load` /
+        #: :meth:`load_text` invalidate it, because the document they leave
+        #: behind no longer necessarily matches the last apply. An
+        #: ``add_entry`` does NOT invalidate it: the added entry is exactly
+        #: what :meth:`save_patched` must name as "not applied before this
+        #: save", and the entries the last apply wrote stay applied.
+        self._applied_addresses: Optional[frozenset[int]] = None
+        #: The save-back status carrier (HLR-157 statement 3, PDR-UX-C6):
+        #: the addresses applied before the most recent
+        #: :meth:`save_patched` (still-document entries of the pre-save
+        #: apply) and the document entries never applied before it, both in
+        #: document order. ``app.py`` composes the final status line from
+        #: these after the verify result lands.
+        self.last_save_applied: Tuple[int, ...] = ()
+        self.last_save_not_applied: Tuple[int, ...] = ()
 
     @staticmethod
     def _empty_document() -> ChangeDocument:
@@ -872,6 +1019,10 @@ class ChangeService:
         self.document = self._undo_stack.pop()
         self.last_summary = None
         self.last_check_result = None
+        # HLR-157: the restored change-set no longer necessarily matches the
+        # last apply — the next save names every document entry against a
+        # fresh applied set.
+        self._applied_addresses = None
         return self.document
 
     def redo(self) -> ChangeDocument:
@@ -904,6 +1055,9 @@ class ChangeService:
         self.document = self._redo_stack.pop()
         self.last_summary = None
         self.last_check_result = None
+        # HLR-157: the re-applied change-set gets a fresh applied set at the
+        # next apply/save — until then no entry is "applied before the save".
+        self._applied_addresses = None
         return self.document
 
     def history_depths(self) -> dict[str, int]:
@@ -1205,6 +1359,9 @@ class ChangeService:
         # index lookup + build, so a KeyError / invalid input pushes nothing).
         self._push_history()
         self.document.entries[index] = entry
+        # HLR-157: the edited entry's bytes were never applied — the next
+        # save re-derives the image and names it as not applied before save.
+        self._applied_addresses = None
         return entry
 
     def remove_entry(self, address_text: str) -> None:
@@ -1232,6 +1389,9 @@ class ChangeService:
         # index lookup, so a KeyError on an absent address pushes nothing).
         self._push_history()
         del self.document.entries[index]
+        # HLR-157: the removed entry must not linger as "applied before the
+        # save" — the next save re-derives the image without it.
+        self._applied_addresses = None
 
     def entry_seed_json(self, index: int) -> str:
         """
@@ -1353,6 +1513,9 @@ class ChangeService:
             )
         self._push_history()
         self.document.entries[index] = probe.entries[0]
+        # HLR-157: same invalidation as edit_entry — the replaced entry's
+        # bytes were never applied.
+        self._applied_addresses = None
         return ChangeActionResult(
             message=f"Patch Editor: entry {index} updated.",
             issues=[],
@@ -1414,6 +1577,10 @@ class ChangeService:
         self._push_history()
         self.document = document
         self.last_summary = None
+        # HLR-157: a fresh document has no apply — the journal stays (it
+        # describes the IMAGE and the next apply/save still owes the old
+        # document's addresses their restore), but the applied set resets.
+        self._applied_addresses = None
         error_count = sum(
             1
             for issue in document.issues
@@ -1475,6 +1642,8 @@ class ChangeService:
         self._push_history()
         self.document = document
         self.last_summary = None
+        # HLR-157: same invalidation as load — fresh document, no apply.
+        self._applied_addresses = None
         error_count = sum(
             1
             for issue in document.issues
@@ -1610,6 +1779,147 @@ class ChangeService:
     # Apply + save-back (LLR-002.7 service half)
     # ------------------------------------------------------------------
 
+    def _note_image(self, mem_map: Optional[Dict[int, int]]) -> None:
+        """
+        Summary:
+            Bind the journal to the image dict an apply/save is about to
+            mutate, resetting the journal when the dict OBJECT differs from
+            the bound one (batch-99 HLR-157: a new file was loaded). Every
+            load path funnels through one install point and the MAC-merge
+            paths reuse the live dict, so dict identity is the image
+            identity on this seam; the service holds a strong reference, so
+            CPython cannot recycle a freed dict's ``id()`` under the
+            comparison (the LLR-077.2 id-reuse lesson).
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The image map about to be
+                mutated; ``None`` (no image) is a no-op.
+
+        Data Flow:
+            - ``None`` → return.
+            - Bound dict differs → clear the journal and invalidate the
+              applied-addresses set: the source bytes describe the previous
+              file, and restoring them into the new image would corrupt it.
+            - (Re)bind :attr:`_image_map`.
+
+        Dependencies:
+            Used by:
+                - apply / save_patched
+        """
+        if mem_map is None:
+            return
+        if self._image_map is not None and mem_map is not self._image_map:
+            self._journal.clear()
+            self._applied_addresses = None
+        self._image_map = mem_map
+
+    def _restore_journal(self, mem_map: Optional[Dict[int, int]]) -> None:
+        """
+        Summary:
+            Restore every journaled address to its source byte, IN PLACE in
+            the given dict (LLR-157.1: aliases hold it — the app.py merge
+            points reuse one dict object — so a restore that rebound the
+            dict would leave every alias stale), then clear the journal.
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The image map to restore;
+                ``None`` (no image) is a no-op.
+
+        Data Flow:
+            - For each ``address → byte`` in :attr:`_journal`:
+              ``mem_map[address] = byte`` (in place), then clear the journal.
+
+        Dependencies:
+            Used by:
+                - apply / save_patched
+        """
+        if mem_map is None:
+            return
+        for address, byte in self._journal.items():
+            mem_map[address] = byte
+        self._journal.clear()
+
+    def _capture_journal(self, mem_map: Optional[Dict[int, int]]) -> None:
+        """
+        Summary:
+            Record the source byte of every document entry's span BEFORE the
+            engine writes (LLR-157.1/.4): this runs after
+            :meth:`_restore_journal`, so the live bytes at these addresses
+            ARE the source bytes, and the engine's ``before_bytes`` capture
+            — reading the same live map — records the source byte even on a
+            repeated apply. Only addresses present in the image are read;
+            capturing a blocked/skipped entry's span is harmless, because
+            the byte stored is the live byte and the restore writes it back
+            unchanged.
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The image map about to be
+                written; ``None`` (no image) is a no-op.
+
+        Data Flow:
+            - For each document entry's addressed span:
+              ``self._journal.setdefault(address, mem_map[address])`` for
+              every in-image address (``setdefault``: the first write wins —
+              a span overlap must never overwrite an earlier entry's
+              source byte with a sibling's write).
+
+        Dependencies:
+            Used by:
+                - apply / save_patched
+        """
+        if mem_map is None:
+            return
+        for entry in self.document.entries:
+            start, end = entry.addressed_range
+            for address in range(start, end):
+                if address in mem_map:
+                    self._journal.setdefault(address, mem_map[address])
+
+    def source_image_view(
+        self, mem_map: Optional[Dict[int, int]]
+    ) -> Optional[Mapping[int, int]]:
+        """
+        Summary:
+            The read-only "before" view of the image for the Patch Editor's
+            before/after strip (LLR-157.4): the live map with every
+            journaled address overlaid by its SOURCE byte. With an empty
+            journal (fresh load, nothing applied yet) the live map itself
+            is returned — no wrapper allocation on the hot no-op path.
+            The overlay is only built over the map the journal is BOUND
+            to (:attr:`_image_map`): a different dict means a new file was
+            loaded and no apply/save has rebound the journal yet, and the
+            journaled source bytes describe the PREVIOUS image — the view
+            passes the given map through unchanged and rebinds (review
+            round 1, finding F2), so the strip never paints the old file's
+            bytes after a new load.
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The live image map;
+                ``None`` (no image) passes through.
+
+        Returns:
+            Optional[Mapping[int, int]]: ``None`` when ``mem_map`` is
+                ``None``; ``mem_map`` itself when the journal is empty or
+                bound to a different dict; else a
+                :class:`_SourceOverlayMap` over both. Callers must treat
+                the result as read-only.
+
+        Dependencies:
+            Used by:
+                - app.py (the Patch Editor panel's strip map push)
+        """
+        if mem_map is None:
+            return None
+        if mem_map is not self._image_map:
+            # A map the journal is not bound to: rebind (clears the journal
+            # and the applied-addresses set — they describe the previous
+            # image) and pass the given map through untouched.
+            self._note_image(mem_map)
+            return mem_map
+        if not self._journal:
+            return mem_map
+        return _SourceOverlayMap(mem_map, self._journal)
+
     def apply(
         self,
         mem_map: Optional[Dict[int, int]],
@@ -1623,8 +1933,13 @@ class ChangeService:
         Summary:
             Apply the owned document to the loaded image via the E2 engine
             and record the resulting :class:`ChangeSummary` (LLR-003.4
-            apply). Collision findings are refreshed first so the apply gate
-            judges the document's current entries.
+            apply). Before the engine runs, the batch-99 editor-image
+            journal is restored in place, so the image the engine sees is
+            the SOURCE plus the current document's entries — never the
+            residue of an earlier apply (HLR-157 / LLR-157.1) — and the
+            summary's ``before_bytes`` is the source byte even on a
+            repeated apply (LLR-157.4). Collision findings are refreshed
+            first so the apply gate judges the document's current entries.
 
         Args:
             mem_map (Optional[Dict[int, int]]): ``LoadedFile.mem_map`` —
@@ -1646,17 +1961,27 @@ class ChangeService:
             the save-back flow can stamp ``saved_path``.
 
         Data Flow:
+            - Re-derive the image FIRST (batch-99 HLR-157): bind the journal
+              to this map (:meth:`_note_image`), restore every journaled
+              address to its source byte in place, and journal the source
+              bytes of the spans about to be written — so the engine's
+              ``before_bytes`` is the source byte even on a repeated apply.
             - Refresh collisions (the :meth:`validate` rule) so an
               interactively created collision blocks the apply.
             - Delegate to ``apply_change_document``; store and return the
-              summary.
+              summary; record its applied addresses as the pre-save applied
+              set (LLR-157.2 naming source).
 
         Dependencies:
             Uses:
                 - apply_change_document / collision_issues
+                - _note_image / _restore_journal / _capture_journal
             Used by:
                 - app.py ``apply_doc`` action routing
         """
+        self._note_image(mem_map)
+        self._restore_journal(mem_map)
+        self._capture_journal(mem_map)
         retained = [
             issue
             for issue in self.document.issues
@@ -1674,6 +1999,11 @@ class ChangeService:
             variant_id=variant_id,
         )
         self.last_summary = summary
+        self._applied_addresses = frozenset(
+            record.address_start
+            for record in summary.entries
+            if record.disposition == DISPOSITION_APPLIED
+        )
         return summary
 
     def save_patched(
@@ -1687,22 +2017,41 @@ class ChangeService:
         bytes_per_line: int = 32,
         s0_header: bytes | None = None,
         source_image_path: Optional[Path] = None,
+        mac_records: Optional[Sequence[dict]] = None,
+        a2l_tags: Optional[Sequence[dict]] = None,
     ) -> ChangeActionResult:
         """
         Summary:
-            Persist the post-apply image under the operator-confirmed
-            filename via ``save_patched_image``, stamp the written path onto
-            ``last_summary.saved_path`` (and the caller's source image onto
-            ``last_summary.source_image_path`` — the LLR-038.2 B-2 provenance
-            stamp), then verify-on-save: re-read the
-            written file and diff it against the intended map, stamping the
-            ``VerifyResult`` onto ``last_summary.verify_result`` (HLR-002
-            service half + HLR-003 wiring, §6.2 C-10 back-compatible carrier).
-            The F-S-01 sanitizer and the staged containment live in the
-            engine; ``save_patched_image``'s 2-tuple return is unchanged (M-1).
+            Re-derive the image from every entry currently in the document
+            and persist THAT image under the operator-confirmed filename
+            (batch-99 HLR-157 / LLR-157.2): the journal is restored in
+            place, the current document is re-applied, and the emitted file
+            is the source plus the current document — never the stale
+            residue of an undone, removed or edited entry (premise P-6).
+            The summary is re-derived with the image UNLESS the document is
+            still exactly the one the last apply applied (then the existing
+            ``last_summary`` is kept — same entries, linkage and provenance
+            — and only the save stamps ride it); either way the saved
+            summary lists exactly the entries the image holds. The status
+            names each entry that had not been applied before the save
+            (added after the last apply) via :func:`save_back_status_suffix`,
+            carried on the result message AND on
+            :attr:`last_save_applied` / :attr:`last_save_not_applied` for
+            the app's verify-suffixed final status (PDR-UX-C6). Stamps the
+            written path onto the summary's ``saved_path`` (and the caller's
+            source image onto ``source_image_path`` — the LLR-038.2 B-2
+            provenance stamp), then verify-on-save: re-read the written
+            file and diff it against the intended map, stamping the
+            ``VerifyResult`` onto the summary (HLR-002 service half + HLR-003
+            wiring, §6.2 C-10 back-compatible carrier). The F-S-01 sanitizer
+            and the staged containment live in the engine;
+            ``save_patched_image``'s 2-tuple return is unchanged (M-1).
 
         Args:
-            mem_map (Dict[int, int]): The post-apply address-to-byte map.
+            mem_map (Dict[int, int]): The loaded image's address-to-byte
+                map — mutated in place by the re-derivation (journal restore
+                + document re-apply), so the image stays consistent with
+                what was written.
             ranges (Sequence[Tuple[int, int]]): The image's contiguous
                 ranges.
             dest_dir (Path): The active project directory (or the work-area
@@ -1725,19 +2074,109 @@ class ChangeService:
                 the before/after composer can detect a stale summary
                 (LLR-038.2, B-2). Runtime-only: never serialized by
                 ``ChangeSummary.to_dict``.
+            mac_records (Optional[Sequence[dict]]): Parsed MAC records for
+                the re-derived summary's linkage classification (the app
+                passes ``LoadedFile.mac_records``); ``None`` gives the
+                standalone classification (existing direct callers).
+            a2l_tags (Optional[Sequence[dict]]): Enriched A2L tags for the
+                re-derived summary's linkage; ``None`` gives standalone.
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
-            in ``message`` when the image was persisted; ``False`` with the
-            refusal findings otherwise (``saved_path`` stays ``None``).
+            and the applied / not-applied suffix in ``message`` when the
+            image was persisted; ``False`` with the refusal findings
+            otherwise (``saved_path`` stays ``None``) — including when the
+            re-derived apply blocks every entry (a collision the apply
+            would refuse): then NOTHING is written and ``message`` names
+            the blocked count.
 
         Dependencies:
             Uses:
                 - save_patched_image
                 - verify_written_image
+                - apply_change_document (the save re-derivation)
+                - collision_issues (the apply's collision refresh)
+                - _note_image / _restore_journal / _capture_journal
+                - save_back_status_suffix
             Used by:
                 - app.py save-back confirm handling
         """
+        applied_before = self._applied_addresses or frozenset()
+        applied_now = tuple(
+            entry.address
+            for entry in self.document.entries
+            if entry.address in applied_before
+        )
+        not_applied = tuple(
+            entry.address
+            for entry in self.document.entries
+            if entry.address not in applied_before
+        )
+        self.last_save_applied = applied_now
+        self.last_save_not_applied = not_applied
+        # Re-derive (LLR-157.2): restore the journal in place, then apply
+        # every entry currently in the document, so the emitted image is the
+        # source plus the current document — an undone/removed/edited entry's
+        # bytes return to the source and an added entry is written.
+        self._note_image(mem_map)
+        self._restore_journal(mem_map)
+        self._capture_journal(mem_map)
+        # Refresh collisions first — the same rule :meth:`apply` runs — so
+        # an interactively created span overlap blocks the save re-derive
+        # exactly as it blocks the apply (review round 1, finding F1): the
+        # engine gates on ERROR findings, and without this refresh the save
+        # would write overlapping entries the apply refuses.
+        retained = [
+            issue
+            for issue in self.document.issues
+            if issue.code != CHG_COLLISION
+        ]
+        self.document.issues = retained + collision_issues(
+            self.document.entries
+        )
+        prior = self.last_summary
+        fresh = apply_change_document(
+            self.document,
+            mem_map,
+            ranges,
+            mac_records,
+            a2l_tags,
+            variant_id=prior.variant_id if prior is not None else None,
+        )
+        blocked = fresh.counts[DISPOSITION_BLOCKED]
+        if blocked:
+            # A blocked document saves nothing and says why — the same gate
+            # the apply presents: zero entry bytes reach the file.
+            self.last_summary = fresh
+            return ChangeActionResult(
+                message=(
+                    f"Patched image not saved - {blocked} entr"
+                    f"{'y' if blocked == 1 else 'ies'} blocked - see issues"
+                ),
+                issues=list(self.document.issues),
+                ok=False,
+            )
+        # Keep the existing summary when the document is still exactly the
+        # one the last apply applied (the invalidating mutations clear
+        # _applied_addresses; an add changes the address set) — same entries,
+        # linkage and provenance, and the apply-time before_bytes already are
+        # source bytes thanks to the journal. Otherwise the fresh summary —
+        # built over the just re-derived image — becomes the saved summary,
+        # listing exactly the entries the image holds.
+        reuse_summary = (
+            prior is not None
+            and self._applied_addresses is not None
+            and {entry.address for entry in self.document.entries}
+            == set(self._applied_addresses)
+        )
+        summary = prior if reuse_summary else fresh
+        if not reuse_summary:
+            self.last_summary = fresh
+        self._applied_addresses = frozenset(
+            record.address_start
+            for record in summary.entries
+            if record.disposition == DISPOSITION_APPLIED
+        )
         path, issues = save_patched_image(
             mem_map,
             ranges,
@@ -1747,9 +2186,8 @@ class ChangeService:
             bytes_per_line=bytes_per_line,
             s0_header=s0_header,
         )
-        if self.last_summary is not None:
-            self.last_summary.saved_path = path
-            self.last_summary.source_image_path = source_image_path
+        summary.saved_path = path
+        summary.source_image_path = source_image_path
         if path is None:
             return ChangeActionResult(
                 message="Patched image not saved - see issues",
@@ -1758,14 +2196,16 @@ class ChangeService:
             )
         # Verify-on-save (HLR-003, §6.2 C-10 back-compatible carrier): re-read
         # the just-written file and diff it against the intended map. The
-        # VerifyResult rides last_summary — save_patched_image's 2-tuple return
-        # is untouched (M-1). collect-don't-abort: a mismatch never unlinks the
-        # written file; surfacing is the TUI's job (HLR-004, I4).
+        # VerifyResult rides the saved summary — save_patched_image's 2-tuple
+        # return is untouched (M-1). collect-don't-abort: a mismatch never
+        # unlinks the written file; surfacing is the TUI's job (HLR-004, I4).
         verify = verify_written_image(path, mem_map, source_kind)
-        if self.last_summary is not None:
-            self.last_summary.verify_result = verify
+        summary.verify_result = verify
         return ChangeActionResult(
-            message=f"Patched image saved as {path.name}",
+            message=(
+                f"Patched image saved as {path.name}"
+                f"{save_back_status_suffix(applied_now, not_applied)}"
+            ),
             issues=issues,
             ok=True,
         )

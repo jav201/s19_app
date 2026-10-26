@@ -1474,6 +1474,12 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 
 - **▸ (P3, origin batch-99 Inc-9 review) The S19 loader reads through the locale codec,** so a file with non-ASCII or binary bytes after the terminator can fail to load (the HEX loader was moved to binary reading in Inc-9). Pre-existing. **What closes it:** read S19 in binary like the HEX loader, decoding only the lines before the terminator.
 
+- **▸ (P3, origin batch-99 Inc-4 review N1–N3) Patch Editor journal follow-ups:**
+  - a refused save restores the image to source but keeps the "applied" set, so the next save can call an entry "applied before" (`change_service.py` ≈:2147);
+  - `source_image_view` rebinds and clears the journal on a read (a getter with a side effect);
+  - AT-B99-08 does not assert the exact text "1 entry applied before this save".
+  **What closes it:** reset the applied set with the image on a refused save; move the rebind out of the view getter; one AT assertion.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

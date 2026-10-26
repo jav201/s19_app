@@ -1,0 +1,41 @@
+## reverse census: symbols changed by HLR-157 (refreshed in review round 1)
+
+### save_patched callers in tests:
+tests/test_b99_editor_image.py
+tests/test_b99_s0.py
+tests/test_change_service.py
+tests/test_changes_apply.py
+tests/test_flow_execution.py
+tests/test_flow_execution_service.py
+tests/test_tui_flow_execution_b94.py
+tests/test_tui_patch_card.py
+tests/test_variant_execution.py
+
+### _surface_verify_result pins ('Saved + verified'):
+tests/test_b99_editor_image.py:647:                lambda: "Saved + verified" in _status_text(app),
+tests/test_b99_editor_image.py:684:    assert "Saved + verified: at_b99_08.s19" in status, status
+tests/test_tui_patch_editor_v2.py:931:    assert any("Saved + verified" in line for line in log_lines), log_lines
+
+### exact 'Patched image saved as' pins:
+(none = no pin on the message)
+
+### 'Verify MISMATCH' pins:
+tests/test_b99_editor_image.py:801:                lambda: "Verify MISMATCH" in _status_text(app),
+tests/test_b99_editor_image.py:815:    assert "Verify MISMATCH: at_b99_08m.s19" in status, status
+tests/test_tui_patch_editor_v2.py:995:    assert any("Verify MISMATCH" in line for line in log_lines), log_lines
+
+### test_tc_b99_40a leftovers (must be none):
+(none)
+
+### baseline pre-existing failures (evidence/baseline-pytest-a293213.txt):
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_tc024_report_trigger_surfaces_paths
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded
+FAILED tests/test_tui_patch_layout.py::test_at063c_reparent_safety_at_120 - t...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential

@@ -1,0 +1,61 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_21_editor_image_is_source_plus_document _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26311/test_tc_b99_21_editor_image_is0')
+
+    def test_tc_b99_21_editor_image_is_source_plus_document(tmp_path: Path) -> None:
+        """The p05 sequence writes source bytes at the undone entry's address.
+    
+        Intent: LLR-157.1 — every apply restores the journaled addresses in
+        place in the SAME dict object before applying, so the alias arm (the
+        same bytes seen through another holder of the dict) and the save arm
+        both observe the source byte at 0xEB10.
+        """
+        service, mem_map, ranges = _service_with_image()
+        alias = mem_map  # a second holder of the same dict (app.py merge aliases)
+    
+        service.add_entry("0xEB10", "", "DE AD BE EF")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+        assert alias[0xEB10] == 0xDE, "the apply must write through the shared dict"
+    
+        service.undo()
+        service.add_entry("0xEB40", "", "01 02")
+        service.apply(mem_map, ranges, None, None, variant_id="img")
+    
+        result, target = _save_back(
+            service, mem_map, ranges, tmp_path, name="tc21-p05.s19"
+        )
+        assert result.ok, result.message
+        assert target is not None, "save-back wrote no file"
+        written = read_s19(target)
+        assert [written.data[0xEB10 + i] for i in range(4)] == list(SOURCE_EB10), (
+            f"the undone entry must return to the source bytes, "
+            f"got {[written.data.get(0xEB10 + i) for i in range(4)]}"
+        )
+        assert [written.data[0xEB40 + i] for i in range(2)] == [0x01, 0x02]
+        # The restore happened IN PLACE: the aliased holder sees the source byte.
+        assert alias[0xEB10] == SOURCE_EB10[0], (
+            "the journal restore must write into the same dict object the "
+            "alias holds, not a rebound copy"
+        )
+        # The saved summary lists exactly the entries the image holds.
+        assert _applied_addresses(service) == [0xEB40]
+    
+        # Arm 2 (empty boundary): every entry undone + apply -> image == source.
+        service2, mem_map2, ranges2 = _service_with_image()
+        service2.add_entry("0xEB10", "", "DE AD BE EF")
+        service2.apply(mem_map2, ranges2, None, None)
+        service2.undo()
+        summary2 = service2.apply(mem_map2, ranges2, None, None)
+>       assert all(
+            mem_map2[addr] == SOURCE_EB10[i] for i, addr in enumerate(range(0xEB10, 0xEB14))
+        ), f"image after undo-all must equal the source: {mem_map2}"
+E       AssertionError: image after undo-all must equal the source: {60176: 222, 60177: 173, 60178: 190, 60179: 239, 60224: 0, 60225: 0}
+E       assert False
+E        +  where False = all(<generator object test_tc_b99_21_editor_image_is_source_plus_document.<locals>.<genexpr> at 0x0000020C608ACB80>)
+
+tests\test_b99_editor_image.py:230: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_editor_image.py::test_tc_b99_21_editor_image_is_source_plus_document
+1 failed, 7 deselected in 0.39s
