@@ -1,0 +1,30 @@
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id == "_CONTROL_SCRUB":
+                            scrub_sites.setdefault(module, []).append(node.lineno)
+        assert sorted(def_sites) == [UTILS_MODULE], (
+            f"safe_text must be defined only at {UTILS_MODULE}, found: {def_sites}"
+        )
+        assert sorted(scrub_sites) == [UTILS_MODULE], (
+            f"_CONTROL_SCRUB must be defined only at {UTILS_MODULE}, found: {scrub_sites}"
+        )
+    
+        # LLR-003.3: the measured consumer set imports the NAME safe_text from
+        # s19_app.utils — set-equality, drift in either direction fails.
+        names = _census_names(PRODUCT_ROOT, _product_package_of, _product_module_of)
+        importers = names.get((UTILS_MODULE, "safe_text"), set())
+>       assert importers == MEASURED_SAFE_TEXT_CONSUMERS, (
+            f"safe_text importer set drifted from the measured set: "
+            f"extra={sorted(importers - MEASURED_SAFE_TEXT_CONSUMERS)} "
+            f"missing={sorted(MEASURED_SAFE_TEXT_CONSUMERS - importers)}"
+        )
+E       AssertionError: safe_text importer set drifted from the measured set: extra=['s19_app.tui.segment_split_view'] missing=[]
+E       assert {'s19_app.tui...t_split_view'} == {'s19_app.tui...s_directionb'}
+E         
+E         Extra items in the left set:
+E         's19_app.tui.segment_split_view'
+E         Use -v to get more diff
+
+tests\test_import_census.py:227: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_import_census.py::test_tc653_safe_text_import_census - Asse...
+============================== 1 failed in 2.04s ==============================

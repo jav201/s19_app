@@ -1,0 +1,8 @@
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 33 items
+
+tests\test_tui_snapshot.py .................................             [100%]
+
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+======================= 33 passed in 129.60s (0:02:09) ========================

@@ -1,0 +1,25 @@
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x00000271170AF880>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x0000027116F5CCC0>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x0000027116F5CCC0> = _snapshot_run_before('patch', 'comfortable', {'a2l': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26950/snapshot_public0/snap.a2l'), 'mac'....mac'), 's19': WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26950/snapshot_public0/snap.s19')})
+
+tests\test_tui_snapshot.py:1220: AssertionError
+--------------------------- snapshot report summary ---------------------------
+1 snapshot failed.
+Textual Snapshot Report
+
+1 mismatched snapshots
+
+View the failure report.
+
+C:\Users\jjgh8\Github\s19_app-b99-inc13\snapshot_report.html
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+============================== 1 failed in 2.82s ==============================

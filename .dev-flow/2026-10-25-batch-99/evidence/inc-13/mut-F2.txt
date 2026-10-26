@@ -1,0 +1,4 @@
+
+=========================== short test summary info ===========================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+============================== 1 failed in 2.74s ==============================

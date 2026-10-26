@@ -50,13 +50,17 @@ SERVICES_DIR = PRODUCT_ROOT / "tui" / "services"
 #: become its own import at the new address). batch-94 (Inc-002, the Flow
 #: Builder/Execution panels in ``flow_screens.py``) imports the NAME at its
 #: module top (the C-17 fold — every file-derived string renders through
-#: ``safe_text``); measured in, per the census's own contract.
+#: ``safe_text``); measured in, per the census's own contract. batch-99
+#: (Inc-6, LLR-160.2, the Split/Join view rendering raw segment names and
+#: refusal messages in ``segment_split_view.py``) imports the NAME at its
+#: module top; measured in.
 MEASURED_SAFE_TEXT_CONSUMERS = {
     "s19_app.tui.app",
     "s19_app.tui.checks_view",
     "s19_app.tui.flow_screens",
     "s19_app.tui.issues_view",
     "s19_app.tui.screens_directionb",
+    "s19_app.tui.segment_split_view",
 }
 
 #: The 3 measured old-address TEST importers of safe_text (P2 code lens),

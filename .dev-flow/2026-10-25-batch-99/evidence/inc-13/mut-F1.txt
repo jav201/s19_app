@@ -1,0 +1,6 @@
+E         Use -v to get more diff
+
+tests\test_import_census.py:231: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_import_census.py::test_tc653_safe_text_import_census - Asse...
+============================== 1 failed in 1.44s ==============================
