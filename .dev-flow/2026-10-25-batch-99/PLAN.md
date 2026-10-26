@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-25-batch-99 |
 | Objective | The read/write integrity batch: every written image, report and run record says what was and was not applied. Scope: the ten HIGH findings of INVESTIGATION-read-write-integrity-2026-10-22 (H-1 S0 as image data, H-2 PATCH always ok, H-3 shared staging race, H-4 editor undo vs image, H-5 A2L encode byte order, H-6 COMPU_TAB nearest/clamp, H-7 CRC over an empty region, H-8 truncated images load ok, H-9 export path containment, H-10 run records drop dispositions); project round-trip PH-3 (save-back deletes the work copy, Save project crashes); the Code-Wire data HIGHs CW-D-4 (Bytes field decimal tokens), CW-D-7 (MAC-only export phantom byte), CW-D-10 (RAT_FUNC direction); deeper tests of the CW-U-1 fix (Load project dialog) and its sibling; and a generated synthetic fixture corpus with an independent reader as the oracle. |
-| Last updated | P1 · 2026-10-25 |
+| Last updated | P4 · 2026-10-26 |
 | Standing authorization | Operator commission 2026-10-25, quoted: "Arranca el siguiente batch de s19_app … el batch de integridad de lectura/escritura (RW H-1..H-10, PH-3, HIGHs de datos de CW, pruebas más profundas de CW-U-1, corpus de fixtures sintéticos como oráculo) … TÚ planeas (dev-flow full: P0/P1 requisitos, P2 revisión, plan como página HTML con el backlog abierto ordenado) y la IMPLEMENTACIÓN de cada incremento se delega a Kimi CLI con el modelo Kimi 2.8 … Revisión independiente (code-reviewer/qa) sobre lo que entregue Kimi. Autorización: autónomo con excepciones (parar en hallazgo HIGH o decisión del operador); commit y push a main en cada cierre". Read as: every gate is closed by the orchestrator under this authorization, except (a) a new HIGH finding and (b) an operator decision; both stop the batch. Merge: commit and push to `main` at each close. |
 | First gate | `devflow-validate.py --brief .` at P0 open → exit 0, `0 block · 495 notice · 43 not applicable`; `V7` reports the bundle identity at the installed revision. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin`; `origin/main` = `HEAD` = merge-base = `307065f4b626459c04ca77736132e9e5ee444253`, so no rebase was needed and `base_ref` was stamped from it. RC-2: `git ls-remote --exit-code --heads origin main` answered `307065f…`, newest commit 2026-10-25 10:54 -0600. RC-1 (b): every candidate story was checked against `origin/main`. CW-U-1's dialog fix has shipped (batch-97 Inc-9), so US-151 takes only its deeper tests, the sibling and CW-U-3. Every other finding reproduces on `307065f` (01-requirements §2.7, P-1..P-21). |
@@ -51,7 +51,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 
 ## Where we are
 
-P0 intake is done: 11 stories, 7 `READY` and 4 `REFINE` (D1, D2–D4, D5, D6). ARQ has been delegated to `architect` (module map and parallelisation verdict). P1 requirements are drafted: HLR-152..162, 36 LLRs, 13 ATs, and 21 premises re-run on `307065f`, all TRUE. The REFINE stories are derived provisionally on the recommended option, and they enter P3 only after the operator's verdict. Next: close ARQ, fill §2.8 and LLR-157.3 from it, then run P2 (architect, qa-reviewer and security-reviewer in parallel).
+P4 validation (2026-10-26). All 13 increments are on `main`: 001–011 and 003b are the product changes, 012 the DDR test-fix unit, 013 the P4 suite fixes (tests only). The DDR is approved (`design/DDR-2026-10-25-batch-99.md`). The gate run on `e7732f6` has been triaged (`evidence/suite-triage-e7732f6.md`): no product defect, two stale test pins re-measured in Increment 013, and the intermittent Patch Editor v2 nodes shown to fail on the pre-batch tree too. qa-reviewer returned PASS-WITH-NOTES with no HIGH and no blocker (`design/P4-qa-draft.md` → `04-validation.md`). A confirmation full run on the final tree is in progress (`evidence/suite-full-75f947a.txt`). Next: P5 close (post-mortem, backlog reconciliation, evidence stamp), P6 docs, vault sync.
 
 ## Objective
 
@@ -61,10 +61,15 @@ Every image, report and run record the tool writes says what was and was not app
 
 | Story / station | Status | Notes |
 |---|---|---|
-| P0 | done | DoR: US-141, 142, 144, 146, 148, 149, 151 READY; US-143 (D6), 145 (D5), 147 (D2–D4), 150 (D1) REFINE |
-| ARQ | in progress | `architect` delegated: `docs/ARCHITECTURE.md` batch-99 section + `design/ARQ-batch-99.md` |
-| P1 | drafted | `01-requirements.md` §2.7, §3, §4, IFC, §5 |
-| US-141..US-151 | not started | see the roadmap |
+| P0 | done | DoR: US-141, 142, 144, 146, 148, 149, 151 READY; US-143 (D6), 145 (D5), 147 (D2–D4), 150 (D1) REFINE, resolved by the operator verdict D1–D10 (LED .5) |
+| ARQ | done | `design/ARQ-batch-99.md`; `docs/architecture.md` batch-99 rows B99-I1..I12 + I2a |
+| P1 | done | `01-requirements.md`; ledger LED .1–.8 |
+| P2 | done | `02-review.md`, rounds 1–3 |
+| PDR | approved | `design/PDR-2026-10-25-batch-99.md` |
+| P3 | done | increments 001–011, 003b, 012 |
+| DDR | approved | `design/DDR-2026-10-25-batch-99.md`, every condition discharged |
+| P4 | in validation | `04-validation.md`, PASS-WITH-NOTES; Increment 013 (P4 suite fixes) merged `1a59d3b` |
+| US-141..US-152 | done | 12 of 12 observed black-box (AT-B99-01..14, one node each) |
 
 ## Roadmap + increment plan
 
@@ -84,6 +89,8 @@ Decision-free increments go first, so the operator's verdict does not block the 
 | 9 | US-143 | H-8 | `core.py`, `hexfile.py`, `flow_execution_service.py` | D6 | `core.py`, `hexfile.py`, `flow_execution_service.py`, `app.py` — `725d474` |
 | 10 | US-147, US-152 | H-5, H-6, CW-D-10 | `a2l.py` | D2, D3, D4 | `a2l.py`, `app.py` — `9d7fb18` |
 | 11 | US-150 | CW-D-4 | `change_service.py`, `screens_directionb.py`, `window_help.py` | D1 | `change_service.py`, `screens_directionb.py`, `window_help.py` — `5021bb6` |
+| 12 | DDR conditions | C-18 one node per AT, ledgers, private calls (DQ-1..DQ-4) | 0 (tests only) | DDR | 0 (tests only) — `c1d088a` |
+| 13 | P4 suite fixes | safe_text import census (after Inc 6), Patch Editor snapshot cell (after Inc 11) | 0 (tests only) | P4 | 0 (tests only) — `1a59d3b` |
 
 Each increment runs the same way:
 1. Kimi K2.8 (`kimi-code/kimi-for-coding`, `display_name` "K2.8 Preview" in `~/.kimi-code/config.toml`) implements in an isolated git worktree, with `PYTHONPATH=<worktree>` so pytest imports the worktree's package (the `pip -e` trap).
@@ -142,3 +149,6 @@ Each increment runs the same way:
 |---|---|---|
 | investigation probes `rw-p01..p14`, `proj-p08` at `307065f` | 2026-10-25 | all exit 0; every finding reproduces (01-requirements §2.7) |
 | full suite baseline at `a293213` (`evidence/baseline-pytest-a293213.txt`) | 2026-10-25 | **11 failed, 3617 passed, 3 skipped, 3 xfailed** in 1:54:17. Failing ids: `test_changes_file_notation_help::test_tc1802_…`, `test_tui_commandbar::test_at_b78_03_…`, `test_tui_diff_screen::test_tc024_…`, `test_tui_diff_screen::test_at_b78_32_…`, `test_tui_patch_editor_v2::test_at031b_…`, `test_tui_patch_editor_v2::test_tc328_…`, `test_tui_patch_layout::test_at063c_…`, `test_tui_report_filter_surface::test_at_056e_…`, `test_unified_write::test_tc018_existing_name_is_dedup_suffixed`, `test_window_usage_help::test_tc707_copy_matches_help_sections_md_verbatim`, `test_window_usage_help::test_tc707_numbering_generated_sequential` — every later full run is compared against this set |
+| full suite, gate run at `e7732f6` (`evidence/suite-full-e7732f6.txt`) | 2026-10-26 | **14 failed, 3756 passed, 3 skipped, 3 xfailed** in 2:05:30. 9 baseline ids fail for the same causes (2 baseline ids now pass); 3 ordering or load flakes pass on re-run; 2 stale pins were re-measured in Increment 013. Triage: `evidence/suite-triage-e7732f6.md` |
+| Patch Editor v2 flake comparison, base vs head (`evidence/flake-*.txt`) | 2026-10-26 | intermittent nodes fail on both trees; `at030c` is a single-pause test race (a patient probe always loads) → BACKLOG-CODE |
+| qa-reviewer spot run on main `75f947a` (`evidence/p4-qa/qa-spot-b99-31bac78.txt`) | 2026-10-26 | 142 passed (the b99 files + import census + the re-pinned snapshot cell); collect-only 3773 |

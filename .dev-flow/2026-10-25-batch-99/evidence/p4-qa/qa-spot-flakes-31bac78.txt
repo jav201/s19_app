@@ -1,0 +1,13 @@
+qa-reviewer standalone re-runs on 75f947a2bea161bdac71ee4840ca8c9a27e94d3c (s19_app/ and tests/ identical to 31bac78)
+== run 1
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell
+PASSED tests/test_tui_diff_screen.py::test_tc024_report_trigger_invalid_dest_refused
+2 passed in 8.17s
+== run 2
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell
+PASSED tests/test_tui_diff_screen.py::test_tc024_report_trigger_invalid_dest_refused
+2 passed in 8.10s
+== run 3
+PASSED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell
+PASSED tests/test_tui_diff_screen.py::test_tc024_report_trigger_invalid_dest_refused
+2 passed in 8.11s

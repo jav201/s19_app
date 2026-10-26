@@ -17,5 +17,11 @@ Run 2026-10-26 with `S19_WT=C:/Users/jjgh8/Github/s19_app`, `s19env`. Before-sta
 | P-11 H-9 export containment | `inside dest: False`; `first content survived: False` | `inside dest: True` (name `prg_x__________ESCAPED.s19`); first file intact, second written as `prg_range_00_1.s19` | `rw-p10a_split_export_paths.txt` |
 | P-15 PH-3 | `work copy exists after save-back: False`; `return_code: 1` | `work copy exists after save-back: True`; `app running? True | return_code: None` | `proj-p08.txt` |
 | P-12 emitters exact | `mismatches = 0` | unchanged | `rw-p12_emitters.txt` |
+| P-16 CW-D-4 decimal Bytes tokens (code-read premise) | `0F 10 1F 20` → `0F 0A 1F 14` (audit T2 t2b) | `0F 10 1F 20` → `[0x0f,0x10,0x1f,0x20]`; `G1`, `100` refused naming the token | qa-reviewer probe on main (`../p4-qa/`); TC-B99-32, AT-B99-12 GREEN (`../inc-11/`, `../ddr/`) |
+| P-17 CW-D-10 RAT_FUNC direction (audit premise) | encode used the inverse direction | AT-B99-14 asserts raw 300 for physical 30 | TC-B99-24/43 GREEN, RED `../inc-10/mut-LLR-158.2.txt` |
+| P-18 CW-D-7 MAC-only phantom byte (audit premise) | plan `{packed 0, empty True}`, written `S306800000000079` | MAC-only export writes no data record (`image_b.data == {}`) | TC-B99-30, AT-B99-11 MAC-only arm GREEN (`../inc-6/`, `../ddr/`) |
+| P-19 `_load_from_item` reads `str(label)` (code-read premise) | label text used as the name | `app.py:9021-9031` reads `item.data`; Inc-7 V-3 grep 0 hits | qa-reviewer inspection on main; TC-B99-34, AT-B99-13 GREEN (`../inc-7/`) |
+| P-20 reserved work-area homes listed as projects (code-read premise) | homes listed | `app.py:8519-8524` filters `RESERVED_WORKAREA_HOMES` (`workspace.py:40-50`) | qa-reviewer inspection on main; TC-B99-35, AT-B99-13 GREEN |
+| P-21 no HEX fixtures in the corpus | 0 HEX files | the synthetic corpus ships HEX files checked by the independent reader | AT-B99-01, TC-B99-02/03 GREEN (`../inc-1/`) |
 
-**Verdict:** every premise that served as a RED side has flipped on the merged tree.
+**Verdict:** every premise that served as a RED side has flipped on the merged tree. Rows P-16..P-21 were added at P4 (validation G-007). They are code-read or audit premises with no probe of their own, so their after-state cites the node that now holds them and who checked it.

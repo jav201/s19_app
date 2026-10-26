@@ -1,0 +1,3 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests
+# tree: 75f947a2bea161bdac71ee4840ca8c9a27e94d3c (clean worktree s19_app-b99-suite, no prototypes/)
+# started: 2026-10-26T03:12:20-06:00
