@@ -48,7 +48,7 @@
       "reason": "batch 2026-10-26-batch-100 opened by rollover from 2026-10-25-batch-99 (closed at P6, synced); mode full, as batch-99, by the operator's kickoff answers of 2026-10-26"
     }
   ],
-  "current_station": "P2",
+  "current_station": "PDR",
   "phase_status": "not-started",
   "stations_active": [
     "P0",
@@ -146,6 +146,11 @@
       "station": "P2",
       "date": "2026-10-26",
       "decision": "asked at the gate — P2 iteration cap (3) reached and surfaced to the operator: root cause, the contract's size (69 LLR, ~208k chars vs a 54k budget), so each fix round adds rules that carry new defects; converging (round 1: 6 HIGH / 45 MAJOR; round 2 closed 77 of 86, new 2 HIGH / 25 MAJOR, all with small concrete closures). Operator chose \"Ronda 3 acotada\": apply the round-2 dispositions, then each reviewer verifies ONLY the closure of its own open findings (no new full review); anything later is caught at each increment gate; then PDR."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); bounded round 3 per the operator's choice at the P2 iteration cap. P2 approved: round-3 bounded verification by ux-reviewer, architect, security-reviewer, qa-reviewer all approve, 0 HIGH open (02-review.md Round 3); non-blocking conditions carried to PDR (UX-22, UX C-1/C-2, ARCH C-1..C-5, SEC PDR-C1..C3, PDR-QA-1/2). Orchestrator ruling PDR-C3: the recent store moves to %LOCALAPPDATA% (not roaming), per the operator's S-16 intent. PDR is next: design proposal, then architect + qa-reviewer + ux-reviewer."
     }
   ],
   "obsidian_synced": false,

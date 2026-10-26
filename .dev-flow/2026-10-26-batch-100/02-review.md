@@ -229,3 +229,18 @@ The four round-2 reviews (`design/P2-security-r2.md`, `P2-ux-r2.md`, `P2-qa-r2.m
 | B-14 | architect | minor | new | accepted — reviewer's closure | LLR-163.6 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
 
 **Round 3 bounded verification pending:** each reviewer reads only the rows of its own open findings above and marks each closed or open. A new defect noticed there is recorded and goes to PDR as a condition unless it is a HIGH.
+
+## Round 3 — bounded verification (operator decision after the P2 iteration cap)
+
+Each reviewer checked only the closure of its own open findings against the contract at `4e9c8f1`.
+
+| Reviewer | Record | Verdict | Open | Conditions carried to PDR (non-blocking) |
+|---|---|---|---|---|
+| ux-reviewer | `design/P2-ux-r3.md` | approve | 1 MINOR (UX-22) | UX-22 (LLR-171.2's refusal row is never painted); C-1 (the panel button label names `enter` while focus starts on the list); C-2 (where the per-open image digest runs, and its time budget) |
+| architect | `design/P2-architect-r3.md` | approve | 0 | C-1..C-3 (the map rows B100-I15/I16/I22 take the contract's API forms); C-4 (`_handle_load_project`, the real method name); C-5 (Inc 10 is 4 files, so drop the brackets) |
+| security-reviewer | `design/P2-security-r3.md` | approve | 0 | PDR-C1 (`write_project_manifest` calls `contained_in_workarea`, an 8th writer arm at Inc 8b); PDR-C2 (cap `assignments` in total and by key count); PDR-C3 (`%APPDATA%` roams — see the orchestrator ruling below) |
+| qa-reviewer | `design/P2-qa-r3.md` | approve | 0 | PDR-QA-1 (`SaveProjectScreen.plan` is immutable, read after `alt+s`, compared by landing name and action); PDR-QA-2 (an `image_differs_from_source` pre-check may only lead to the data comparison, never decide "copy" by itself) |
+
+**P2 verdict: approved.** No HIGH is open in any lens. Round 1 recorded 86 findings and round 2 recorded 58, all of them closed or carried as the PDR conditions above.
+
+**Orchestrator ruling on PDR-C3:** the recent-sources store moves to `%LOCALAPPDATA%\s19_app\recent_sources.json`. This is not the roaming `%APPDATA%`. The operator's S-16 choice was "Por usuario … las rutas nunca viajan con el proyecto", and a roaming profile copies the paths to a domain profile server, against that intent. The change goes into the contract at PDR.
