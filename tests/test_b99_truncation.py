@@ -24,13 +24,15 @@ fail the load.
 TC-B99-10 (LLR-154.3) — a flow whose SOURCE image carries any of the five
 codes ends the SOURCE block with status ``error`` (the last diagnostic names
 the code and the file), the chain aborts and no file is written; other load
-notices keep the ``notices`` mapping and a clean image keeps ``ok``.
+notices keep the ``notices`` mapping and a clean image keeps ``ok``. A
+hostile file name in the notice path renders literally (UX-C10).
 
-AT-B99-03 (US-143) — black-box Textual pilot: Load file (``l``) of the cut
-S19 paints ``Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR``
-(never a plain ``Loaded <name> (S19 only)``), the Issues panel names the
-code, a hostile file name renders literally, and Flow Execution ``#fx_run``
-over it fails the SOURCE lane and writes no file.
+AT-B99-03 (US-143) — one black-box Textual pilot session drives the whole
+observable outcome: Load file (``l``) of the cut corpus S19 paints
+``Loaded cut.s19 with integrity notices: S19-NO-TERMINATOR`` (never a plain
+``Loaded <name> (S19 only)``), the Issues panel names the code, and Flow
+Execution (``#fx_run``) over the same defect fails the SOURCE lane and
+writes no file.
 
 Oracle: expected image bytes come from the corpus manifest / the independent
 reader (``tests/support/independent_reader.py``), never from the app's own
@@ -467,68 +469,7 @@ def test_tc_b99_10_clean_source_still_writes(tmp_path: Path):
     assert result.written_paths[0].exists()
 
 
-# --------------------------------------------------------------------------- #
-# AT-B99-03 — US-143: black-box pilot through the TUI
-# --------------------------------------------------------------------------- #
-
-
-def _status_text(app: S19TuiApp) -> str:
-    """The painted file-status label (``#status_text`` — the status line the
-    load leads with; the rolling log-tail lines can scroll it out of view)."""
-    from textual.widgets import Label
-
-    return str(app.query_one("#status_text", Label).render())
-
-
-async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
-    for _ in range(attempts):
-        await pilot.pause()
-        if predicate():
-            return
-    raise AssertionError(f"did not settle: {description}")
-
-
-def test_at_b99_03_pilot_status_and_issues(tmp_path):
-    """Load file (``l``) of the cut S19: the status line leads with
-    ``Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR`` (never
-    a plain ``Loaded <name> (S19 only)``) and the Issues panel names the code.
-    """
-    src = tmp_path / "firmware.s19"
-    shutil.copyfile(CORPUS / "synth_no_terminator.s19", src)
-    app = S19TuiApp(base_dir=tmp_path)
-
-    async def _drive():
-        async with app.run_test(size=(120, 54)) as pilot:
-            await pilot.pause()
-            await pilot.press("l")
-            for _ in range(6):
-                await pilot.pause()
-            assert await pilot.click("#load_path"), "click missed #load_path"
-            await pilot.press(*str(src))
-            assert await pilot.click("#load_ok"), "click missed #load_ok"
-            await _wait_for(
-                pilot,
-                lambda: "integrity notices" in _status_text(app),
-                "load status line",
-            )
-            status = _status_text(app)
-            assert status.startswith(
-                "Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR"
-            ), status
-            assert "(S19 only)" not in status, status
-            await _wait_for(
-                pilot,
-                lambda: any(
-                    "S19-NO-TERMINATOR" in str(chip.render())
-                    for chip in app.query(".issue-code-chip")
-                ),
-                "issues panel names the code",
-            )
-
-    asyncio.run(_drive())
-
-
-def test_at_b99_03_hostile_name_renders_literally(tmp_path):
+def test_tc_b99_10_hostile_name_renders_literally(tmp_path):
     """A hostile file name in the integrity-notice path renders literally:
     the painted status carries the verbatim ``[@click=app.quit]`` name with
     zero markup interpretation (UX-C10)."""
@@ -558,14 +499,34 @@ def test_at_b99_03_hostile_name_renders_literally(tmp_path):
     asyncio.run(_drive())
 
 
-def test_at_b99_03_pilot_flow_source_fails(tmp_path):
-    """Flow Execution over the cut S19, driven ONLY by keys and clicks: the
-    project folder is prepared on disk (its flow file included), the project
-    loads through the Load project dialog (``p``, a click on the
-    ``#project_list`` row, ``#project_ok``), Flow Execution opens on its rail key (``]``), the flow
-    is imported through its picker, the run starts with
-    ``pilot.click("#fx_run")``, and the painted lane log names the code; no
-    file is written."""
+# --------------------------------------------------------------------------- #
+# AT-B99-03 — US-143: black-box pilot through the TUI
+# --------------------------------------------------------------------------- #
+
+
+def _status_text(app: S19TuiApp) -> str:
+    """The painted file-status label (``#status_text`` — the status line the
+    load leads with; the rolling log-tail lines can scroll it out of view)."""
+    from textual.widgets import Label
+
+    return str(app.query_one("#status_text", Label).render())
+
+
+async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
+    for _ in range(attempts):
+        await pilot.pause()
+        if predicate():
+            return
+    raise AssertionError(f"did not settle: {description}")
+
+
+def test_at_b99_03_status_leads_defect_flow_source_fails(tmp_path):
+    """One pilot session drives the whole HLR-154 observable outcome: Load
+    file (``l``) of the cut corpus S19 paints ``Loaded cut.s19 with
+    integrity notices: S19-NO-TERMINATOR`` (never a plain
+    ``Loaded <name> (S19 only)``), the Issues panel names the code, and Flow
+    Execution (``#fx_run``) over the same defect fails the SOURCE lane and
+    writes no file."""
     from textual.widgets import Label
     from textual.widgets import Static
 
@@ -589,6 +550,36 @@ def test_at_b99_03_pilot_flow_source_fails(tmp_path):
     async def _drive():
         async with app.run_test(size=(120, 54)) as pilot:
             await pilot.pause()
+            # 1. Load file dialog: the cut corpus S19 leads with the defect.
+            await pilot.press("l")
+            for _ in range(6):
+                await pilot.pause()
+            assert await pilot.click("#load_path"), "click missed #load_path"
+            await pilot.press(*str(project_dir / "cut.s19"))
+            assert await pilot.click("#load_ok"), "click missed #load_ok"
+            await _wait_for(
+                pilot,
+                lambda: "integrity notices" in _status_text(app),
+                "load status line",
+            )
+            status = _status_text(app)
+            assert status.startswith(
+                "Loaded cut.s19 with integrity notices: S19-NO-TERMINATOR"
+            ), status
+            assert "(S19 only)" not in status, status
+            await _wait_for(
+                pilot,
+                lambda: any(
+                    "S19-NO-TERMINATOR" in str(chip.render())
+                    for chip in app.query(".issue-code-chip")
+                ),
+                "issues panel names the code",
+            )
+            # 2. Flow Execution over the same defect: SOURCE fails, no file.
+            # The file-load worker leaves focus on the segment table, whose
+            # window binds ``p`` (pad cycle); ``tab`` walks focus back out so
+            # the rail key reaches the app binding.
+            await pilot.press("tab")
             await pilot.press("p")
             await _wait_for(
                 pilot,

@@ -1,0 +1,74 @@
+PQ-2(c) skip-claim-removal mutant re-run (DDR DQ-6)
+scratch extract of git archive HEAD (bab3bff) at /tmp/b99-mut2c; tests/test_b99_export.py overlaid from the DDR worktree (C-18 joined state)
+PYTHONPATH=/tmp/b99-mut2c; import probe:
+C:\Users\jjgh8\AppData\Local\Temp\b99-mut2c\s19_app\__init__.py
+workspace.py sha256 before: 01eca67690b5b84e33c06a31f2ccd7a4b669ed4dce24d2a5cf4231af4657b533
+workspace.py sha256 mutant: 49bd7a06df952f4580fb1a51f668a478473b17e5ba2e822f986c8313ec5f12f3
+mutation: place_group_into_workarea PermissionError branch, 'if claims_owned:' -> 'if False:' (claims left behind)
+--- run: pytest tests/test_b99_export.py -k tc_b99_31 ---
+....F.                                                                   [100%]
+================================== FAILURES ===================================
+__________ test_tc_b99_31_forced_failure_rolls_back_every_own_claim ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26920/test_tc_b99_31_forced_failure_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002724708DD10>
+
+    def test_tc_b99_31_forced_failure_rolls_back_every_own_claim(
+        tmp_path: Path, monkeypatch
+    ) -> None:
+        """PQ-2(c): a failure on the second member's fill rolls back EVERY own
+        claim and placed file — no orphan BIN, no 0-byte claim, the pre-existing
+        files intact."""
+        from s19_app.tui import workspace
+        from s19_app.tui.workspace import (
+            WorkareaPlacementError,
+            place_group_into_workarea,
+        )
+    
+        home = _home(tmp_path)
+        home.mkdir(parents=True)
+        # A diverging pair so the placement must claim fresh `_1` names.
+        (home / "t_isle.bin").write_bytes(b"\xEE" * 8)
+        (home / "t_isle.addr").write_text("0x00009999\n", encoding="ascii")
+    
+        src_dir = tmp_path / "src"
+        src_dir.mkdir()
+        (src_dir / "t_isle.bin").write_bytes(b"\x01\x02\x03\x04")
+        (src_dir / "t_isle.addr").write_text("0x00001000\n", encoding="ascii")
+    
+        real_replace = os.replace
+        calls = {"n": 0}
+    
+        def flaky_replace(source, dest):
+            calls["n"] += 1
+            if calls["n"] >= 2:
+                raise PermissionError("forced failure on the second fill")
+            return real_replace(source, dest)
+    
+        monkeypatch.setattr(workspace.os, "replace", flaky_replace)
+        try:
+            place_group_into_workarea(
+                [src_dir / "t_isle.bin", src_dir / "t_isle.addr"], home
+            )
+            raised = None
+        except WorkareaPlacementError as exc:
+            raised = exc
+        assert isinstance(raised, WorkareaPlacementError), raised
+        # Both claims removed: nothing at `_1`, nothing 0-byte, staging empty.
+>       assert sorted(p.name for p in home.iterdir()) == [
+            "t_isle.addr",
+            "t_isle.bin",
+        ]
+E       AssertionError: assert ['t_isle.addr...t_isle_1.bin'] == ['t_isle.addr', 't_isle.bin']
+E         
+E         Left contains 2 more items, first extra item: 't_isle_1.addr'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:587: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_tc_b99_31_forced_failure_rolls_back_every_own_claim
+1 failed, 5 passed, 17 deselected in 1.49s
+exit=1
+--- revert ---
+cmp: identical to the HEAD blob — mutant fully reverted (sha256 of the CRLF archive form: 01eca67690b5b84e33c06a31f2ccd7a4b669ed4dce24d2a5cf4231af4657b533)
+verdict: KILLED — test_tc_b99_31_forced_failure_rolls_back_every_own_claim leaves t_isle_1.addr / t_isle_1.bin behind (1 failed, 5 passed)

@@ -193,12 +193,14 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
             await pilot.pause()
             assert field.value == "0F 10 1F 20", field.value
 
-            # Press the shipped buttons (the save-back confirm sits in a
-            # hidden prompt container until Apply, so a pilot click would
-            # land on a zero-region widget).
-            app.query_one("#patch_entry_add_button", Button).press()
+            # Click the shipped Add and Apply buttons.
+            assert await pilot.click(
+                "#patch_entry_add_button"
+            ), "click missed #patch_entry_add_button"
             await pilot.pause()
-            app.query_one("#patch_doc_apply_button", Button).press()
+            assert await pilot.click(
+                "#patch_doc_apply_button"
+            ), "click missed #patch_doc_apply_button"
             await pilot.pause()
             await pilot.pause()
             await pilot.pause()
@@ -210,6 +212,11 @@ def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
                 "#patch_saveback_name_input", Input
             ).value
             assert saved_name, "the save-back prompt pre-fills the name"
+            # The save-back confirm keeps a press(): the prompt row renders
+            # in the editor's hidden JSON-pane tab and, at this 40-row
+            # window, below the inspector's clip under the status bar — a
+            # pilot click would land on the status bar, not on the button
+            # (probed: the zero-region/underlap persist after Apply).
             app.query_one("#patch_saveback_confirm_button", Button).press()
             await pilot.pause()
             target = workarea / saved_name

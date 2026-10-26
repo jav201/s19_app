@@ -1,11 +1,11 @@
 """
 Batch-99 Increment 3a — private staging, atomic placement (HLR-155;
-LLR-155.1/.2/.3/.4/.7; TC-B99-11/12/13/14/39; AT-B99-05; AT-B99-04's
-distinct-name parallel arm as a regression guard; UX-C4/UX-C5/UX-C10 sinks).
+LLR-155.1/.2/.3/.4/.7; TC-B99-11/12/13/14/39; AT-B99-05; AT-B99-04, both
+arms in one joined node; UX-C4/UX-C5/UX-C10 sinks).
 
 Batch-99 Increment 3b — HLR-155 D7 + D9 (LLR-155.5/.6 and LLR-155.3's
 LED-.7 gather conversion; TC-B99-15/16, TC-B99-13's census + gather-drift
-arms; AT-B99-04's duplicate-name arm; UX-C4/UX-C2/UX-C10 for the D7/D9
+arms; UX-C4/UX-C2/UX-C10 for the D7/D9
 sinks).
 
 Layer A (engine, direct calls):
@@ -76,9 +76,14 @@ method):
   as ``firmware.s19``, then Save project through the real
   ``SaveProjectScreen``: the work copy survives, the app is running, the
   project folder holds the image and the status names it (P-15 flips).
-- **AT-B99-04 distinct-name arm** — 8 lanes with distinct output names run
-  in parallel through Flow Execution (``#fx_run``); each file holds its
-  lane's marker. Regression guard — no RED claim.
+- **AT-B99-04** — ONE black-box session drives both HLR-155 arms: 8
+  distinct-name lanes run in parallel through Flow Execution (the
+  ``parallel`` word of ``#fx_mode`` clicked, Run clicked on ``#fx_run``)
+  write 8 files, each its lane's marker (the chain-set report reads
+  ``Mode: parallel``); two lanes resolving to one WRITE-OUT name
+  (``same.s19`` / ``SAME.s19``, case-folded) refuse the whole set — the
+  painted log and the status line name both lanes and nothing new is
+  written.
 - **UX-C10** — one hostile-name TC per new file-derived sink: the Save
   project file name and the placement-error path; the hostile literal
   renders with 0 markup spans.
@@ -1439,30 +1444,79 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
 
 
 # ---------------------------------------------------------------------------
-# AT-B99-04 distinct-name parallel arm — regression guard (no RED claim)
+# AT-B99-04 — duplicate refused, distinct parallel markers (HLR-155, one node)
 # ---------------------------------------------------------------------------
 
 
-def test_at_b99_04_distinct_names_parallel_regression_guard(tmp_path: Path) -> None:
-    """8 lanes with distinct output names, run in parallel through Flow
-    Execution (``#fx_run``): each file holds its lane's marker.
+async def _fx_import_lane_click(app, pilot, stem: str, lane: int) -> None:
+    """Import ``flows/<stem>.json`` as lane ``lane`` through the shipped
+    picker — real clicks only (``#fx_import``, the stem's painted row, then
+    ``#flow_load_ok``), never ``Button.press()``."""
+    from textual.widgets import Label
 
-    Regression guard for HLR-155's placement — no RED claim (the distinct-
-    name set already passes on the pre-fix tree; the RED side of AT-B99-04 is
-    D7's duplicate-name arm, owned by Inc 3b).
+    panel = app.query_one("#fx_panel")
+    assert await pilot.click("#fx_import"), "click missed #fx_import"
+    assert await _poll(pilot, lambda: bool(app.screen.query("#flow_list"))), (
+        "the flow picker did not open"
+    )
+    target, labels = None, []
+    for item in app.screen.query("#flow_list ListItem"):
+        label = str(item.query_one(Label).render())
+        labels.append(label)
+        if label.strip() == stem:
+            target = item
+    assert target is not None, f"{stem} is not listed: {labels}"
+    target.scroll_visible(animate=False)
+    await pilot.pause()
+    await pilot.pause()
+    await pilot.click(target)
+    await pilot.pause()
+    assert await pilot.click("#flow_load_ok"), "click missed #flow_load_ok"
+    assert await _poll(pilot, lambda: bool(panel.query(f"#fx_lane_{lane}"))), (
+        f"lane {lane} never mounted"
+    )
+
+
+def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -> None:
+    """AT-B99-04 (HLR-155 D7 + the distinct-name parallel arm, LLR-155.5):
+    ONE black-box pilot session drives both outcomes through the shipped
+    surface. (b) First — a chain set of 8 lanes with distinct output names,
+    run in PARALLEL through Flow Execution (the ``parallel`` word of
+    ``#fx_mode`` clicked, Run clicked on ``#fx_run``), writes 8 files, each
+    holding its lane's marker; the run's chain-set report reads
+    ``- **Mode:** parallel`` (a written artifact, never an attribute read).
+    (a) Then — two more lanes whose WRITE-OUT names resolve to one file
+    (``same.s19`` / ``SAME.s19``, case-folded) refuse the WHOLE set: the
+    painted run log (``#fx_log``) leads with the outcome inside the first
+    50 characters (UX-C4), names both lanes and the file, the refusal also
+    reaches the status line (``#log_line_4``), and nothing new is written.
+
+    Lanes cannot be removed from the panel, so the distinct set runs first
+    and the colliding pair is imported after it — a refused set is observed
+    as ``nothing new on disk``, not as ``the directory is empty`` (the 8
+    lane files and the reports of run (b) legitimately stay).
+
+    Every entry is the shipped control: the project loads through the Load
+    project dialog (rail key ``p``, the ``proj`` row, ``#project_ok``), the
+    lanes import through ``#fx_import`` clicks, the mode and Run are
+    clicks; every wait and assertion reads the painted surface, a file on
+    disk, or an ``isinstance`` screen predicate — never
+    ``app._handle_load_project``, ``Button.press()``,
+    ``ModeToggle.set_mode``, ``Input.value =``, or an internal attribute.
     """
-    from tests.b97_fixtures import import_lanes, load_project, make_project, run_lanes, write_flow
+    from textual.widgets import Label, Static
+
+    from s19_app.tui.screens import LoadProjectScreen
+    from tests.b97_fixtures import make_project, write_flow
     from tests.b97_probes import settle
 
-    from s19_app.tui.flow_screens import ModeToggle
-    from s19_app.tui.services.flow_model import SourceBlock, WriteOutBlock
-
-    async def _drive() -> Path:
+    async def _drive() -> dict:
         app = S19TuiApp(base_dir=tmp_path)
+        outcomes: dict = {}
         async with app.run_test(size=(260, 90)) as pilot:
             await settle(pilot)
-            make_project(app, "proj")
-            project_dir = load_project(app, "proj")
+            # fixture staging through the accepted residual: app.workarea
+            project_dir = make_project(app, "proj")
             for i in range(8):
                 (project_dir / f"base{i}.s19").write_text(
                     _emit(0x41 + i), encoding="ascii"
@@ -1472,18 +1526,122 @@ def test_at_b99_04_distinct_names_parallel_regression_guard(tmp_path: Path) -> N
                     f"lane{i}",
                     [SourceBlock(f"base{i}.s19"), WriteOutBlock(f"lane{i}.s19")],
                 )
-            panel = await import_lanes(app, pilot, *[f"lane{i}" for i in range(8)])
-            panel.query_one("#fx_mode", ModeToggle).set_mode("parallel")
-            await run_lanes(app, pilot, panel)
-            return project_dir
+            (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
+            (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
+            write_flow(
+                project_dir,
+                "lane_a",
+                [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
+            )
+            write_flow(
+                project_dir,
+                "lane_b",
+                [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
+            )
 
-    project_dir = asyncio.run(_drive())
+            # load the project through the Load project dialog (rail key ``p``)
+            await pilot.press("p")
+            assert await _poll(
+                pilot, lambda: isinstance(app.screen, LoadProjectScreen)
+            ), "the Load project dialog never opened"
+            row = next(
+                item
+                for item in app.screen.query("#project_list ListItem")
+                if str(item.query_one(Label).render()) == "proj"
+            )
+            await pilot.click(row)
+            await pilot.pause()
+            assert await pilot.click("#project_ok"), "click missed #project_ok"
+            assert await _poll(
+                pilot, lambda: "Loaded project 'proj'" in _painted_status(app)
+            ), f"the project load did not paint: {_painted_status(app)}"
+
+            # Flow Execution (rail key ``]``)
+            await pilot.press("right_square_bracket")
+            panel = app.query_one("#fx_panel")
+            await _poll(pilot, lambda: panel.region.height > 0)
+
+            # (b) the 8-lane distinct-name set, run in parallel
+            for i in range(8):
+                await _fx_import_lane_click(app, pilot, f"lane{i}", i)
+            assert await pilot.click("#fx_mode", offset=(18, 0)), (
+                "click missed the parallel word of #fx_mode"
+            )
+            await settle(pilot)
+            assert await pilot.click("#fx_run"), "click missed #fx_run"
+            assert await _poll(
+                pilot,
+                lambda: all(
+                    (project_dir / f"lane{i}.s19").is_file() for i in range(8)
+                ),
+                attempts=400,
+            ), "the parallel run did not write all 8 lane files"
+            assert await _poll(
+                pilot,
+                lambda: "· done" in app.query_one("#fx_log", Static).render().plain
+                and not app.query_one("#fx_run").disabled,
+                attempts=400,
+            ), "the run never painted its terminal line"
+
+            # (a) the duplicate-name pair refuses the whole set
+            await _fx_import_lane_click(app, pilot, "lane_a", 8)
+            await _fx_import_lane_click(app, pilot, "lane_b", 9)
+            outcomes["pre_refusal"] = sorted(p.name for p in project_dir.iterdir())
+            assert await pilot.click("#fx_run"), "click missed #fx_run"
+            assert await _poll(
+                pilot,
+                lambda: "Chain set not run"
+                in app.query_one("#fx_log", Static).render().plain,
+            ), f"the refusal never painted: {_painted_status(app)}"
+            outcomes["log"] = app.query_one("#fx_log", Static).render().plain
+            outcomes["status"] = _painted_status(app)
+            outcomes["after"] = sorted(p.name for p in project_dir.iterdir())
+            outcomes["project_dir"] = project_dir
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    project_dir: Path = outcomes["project_dir"]
+
+    # (b) 8 files, each holding its own lane's marker (independent reader)
     for i in range(8):
         lane_file = project_dir / f"lane{i}.s19"
-        assert lane_file.is_file(), f"lane {i} wrote no file: {sorted(p.name for p in project_dir.iterdir())}"
+        assert lane_file.is_file(), (
+            f"lane {i} wrote no file: {sorted(p.name for p in project_dir.iterdir())}"
+        )
         assert _data(lane_file) == {0x1000: 0x41 + i}, (
             f"lane{i}.s19 must hold its own marker: {_data(lane_file)}"
         )
+    reports = sorted((project_dir / "reports").glob("*chain-set-report*.md"))
+    assert reports, "the set run writes a chain-set report"
+    report_text = reports[-1].read_text(encoding="utf-8")
+    assert "- **Mode:** parallel" in report_text, (
+        f"the run's report must record the parallel mode: {report_text}"
+    )
+
+    # (a) the painted refusal names both lanes and the file; nothing written
+    lines = [l for l in outcomes["log"].splitlines() if "Chain set not run" in l]
+    assert lines, (
+        f"the refusal must be painted in the run log: {outcomes['log']!r}"
+    )
+    line = lines[-1].strip()
+    assert line.index("Chain set not run") < 50, line
+    assert "lane_a" in line and "lane_b" in line, line
+    assert "same.s19" in line, line
+    assert "Nothing written" in line, line
+    assert "same.s19" not in outcomes["after"], outcomes["after"]
+    assert "SAME.s19" not in outcomes["after"], outcomes["after"]
+    assert outcomes["after"] == outcomes["pre_refusal"], (
+        f"a refused set writes nothing: {outcomes['after']}"
+    )
+
+    # the refusal also reaches the status line (#log_line_4), not only the
+    # run log (LLR-155.5, review finding F2): outcome first (UX-C4), the
+    # lane names literal (UX-C10 — the label's markup stays off)
+    status = outcomes["status"]
+    assert "Chain set not run" in status, status
+    assert status.index("Chain set not run") < 50, status
+    assert "lane_a" in status and "lane_b" in status, status
+    assert "same.s19" in status, status
 
 
 # ---------------------------------------------------------------------------
@@ -2028,93 +2186,6 @@ def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
     )
     text_hits = _final_name_census("sample_text.py", text_sample)
     assert len(text_hits) == 1, text_hits
-
-
-# ---------------------------------------------------------------------------
-# AT-B99-04 duplicate-name arm — the painted refusal, nothing written (D7)
-# ---------------------------------------------------------------------------
-
-
-def test_at_b99_04_duplicate_names_refused_nothing_written(
-    tmp_path: Path,
-) -> None:
-    """AT-B99-04's duplicate-name arm (HLR-155 D7, LLR-155.5): a chain set
-    whose two lanes resolve to one output name (``same.s19`` /
-    ``SAME.s19``, case-folded) is refused — the painted run log (``#fx_log``)
-    leads with the outcome inside the first 50 characters (UX-C4), names
-    both lanes and the file, and no file is written; the refusal also
-    reaches the status line (``#log_line_4``, review finding F2). RED at
-    HEAD: P-5's set writes ``same.s19``.
-
-    Driven by keys and clicks through the shipped Flow Execution panel
-    (review finding F5): lanes are imported through ``#fx_import``, the run
-    is pressed on ``#fx_run``, and every assertion reads the painted
-    ``#fx_log`` or the files on disk — never an internal attribute.
-    """
-    from textual.widgets import Static
-
-    from tests.b97_fixtures import (
-        import_lanes,
-        load_project,
-        make_project,
-        run_lanes,
-        write_flow,
-    )
-    from tests.b97_probes import settle
-
-    async def _drive() -> dict:
-        app = S19TuiApp(base_dir=tmp_path)
-        outcomes: dict = {}
-        async with app.run_test(size=(260, 90)) as pilot:
-            await settle(pilot)
-            make_project(app, "proj")
-            project_dir = load_project(app, "proj")
-            (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
-            (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
-            write_flow(
-                project_dir,
-                "lane_a",
-                [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
-            )
-            write_flow(
-                project_dir,
-                "lane_b",
-                [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
-            )
-            panel = await import_lanes(app, pilot, "lane_a", "lane_b")
-            await run_lanes(app, pilot, panel)
-            outcomes["log"] = app.query_one("#fx_log", Static).render().plain
-            outcomes["status"] = _painted_status(app)
-            outcomes["top_files"] = sorted(
-                p.name for p in project_dir.iterdir()
-            )
-        return outcomes
-
-    outcomes = asyncio.run(_drive())
-
-    lines = [l for l in outcomes["log"].splitlines() if "Chain set not run" in l]
-    assert lines, (
-        f"the refusal must be painted in the run log: {outcomes['log']!r}"
-    )
-    line = lines[-1].strip()
-    assert line.index("Chain set not run") < 50, line
-    assert "lane_a" in line and "lane_b" in line, line
-    assert "same.s19" in line, line
-    assert "Nothing written" in line, line
-    assert "same.s19" not in outcomes["top_files"], outcomes["top_files"]
-    assert "SAME.s19" not in outcomes["top_files"], outcomes["top_files"]
-    assert "reports" not in outcomes["top_files"], (
-        f"a refused set writes nothing: {outcomes['top_files']}"
-    )
-
-    # the refusal also reaches the status line (#log_line_4), not only the
-    # run log (LLR-155.5, review finding F2): outcome first (UX-C4), the
-    # lane names literal (UX-C10 — the label's markup stays off)
-    status = outcomes["status"]
-    assert "Chain set not run" in status, status
-    assert status.index("Chain set not run") < 50, status
-    assert "lane_a" in status and "lane_b" in status, status
-    assert "same.s19" in status, status
 
 
 # ---------------------------------------------------------------------------

@@ -232,9 +232,15 @@ Re-pins recorded (old → new → requirement):
 
 ### Signed-balance test ledger
 
-`post = base − deleted + added` → `5 = 0 − 0 + 5` ✓ reconciles
-(`tests/test_b99_crc_region.py`: 0 baseline nodes — new file — 0 deleted, 5
-added: TC-B99-26, TC-B99-27 + its R23 arm, TC-B99-38, AT-B99-10)
+`post = base − deleted + added` → `8 = 0 − 0 + 8` ✓ reconciles — **DDR-corrected
+2026-10-26** (DDR finding F-6): the line above stated 5 and never took up the
+3 review-round 1 nodes recorded in §2 (`test_tc_b99_26_empty_region_error_note_is_last_and_only`,
+`test_tc_b99_27_boundary_one_present_byte_notices`,
+`test_tc_b99_27_chain_set_report_lists_the_notice`).
+(`tests/test_b99_crc_region.py`: 0 baseline nodes — new file — 0 deleted, 8
+added: TC-B99-26 ×2, TC-B99-27 ×4 (incl. its R23 arm), TC-B99-38, AT-B99-10).
+Count command: `pytest --collect-only -q tests/test_b99_crc_region.py | grep -c "::"`
+→ 8 (and `git show HEAD:tests/test_b99_crc_region.py | grep -c "^def test_"` → 8 defs).
 
 ---
 
@@ -295,7 +301,7 @@ Inc 8").
 | # | Item | Owed in | ✓/⚠/✗ | Evidence (node id · command output · file:line) |
 |---|---|---|---|---|
 | 1 | ≤4 source files, or reason declared | all | ✓ | 2 SOURCE files (`git status` — only `s19_app/tui/operations/crc.py` + `s19_app/tui/services/flow_execution_service.py`) |
-| 2 | Tests written in this same increment | all | ✓ | `tests/test_b99_crc_region.py` (5 nodes, this increment) |
+| 2 | Tests written in this same increment | all | ✓ | `tests/test_b99_crc_region.py` (8 nodes after review round 1 — DDR-corrected 2026-10-26, see the signed-balance ledger) |
 | 3 | Layer 0 written where the criterion applies | `core` · `full` | ✓ | n/a — no shipped-source unit node; the carrier is TC-covered |
 | 4 | **RED counterfactual** declared | `core` · `full` | ✓ | §4: baseline RED + 2 mutations with transcripts + restore digests |
 | 5 | **Reverse census** declared | `core` · `full` | ✓ | §4: 5 probes, population re-validated, 2 re-pins recorded |

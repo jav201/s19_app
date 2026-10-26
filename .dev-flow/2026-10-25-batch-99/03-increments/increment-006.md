@@ -272,7 +272,7 @@ No other test pins the changed behaviour. Foreign greps for the old status wordi
 
 ### Signed-balance test ledger
 
-- **Balance:** `post = base − 0 deleted + 17 added`. The 17 are the new module's nodes (TC-B99-28/29/30/31/41 + AT-B99-11 ×3).
+- **Balance (DDR-corrected 2026-10-26, finding F-6):** `post = base − 0 deleted + 25 added`. The line above stated 17 and never took up the 8 review-round nodes of §6b (round 1: `test_tc_b99_41_over_long_second_segment_refuses_before_any_write`, `test_tc_b99_41_payload_is_staged_inside_the_workarea`, `test_tc_b99_31_fill_failure_names_the_failing_member`; PQ-2 arms: `test_tc_b99_31_orphan_sidecar_claims_the_pair_suffix`, `test_tc_b99_31_mismatched_sidecar_never_reuses_the_pair`; plus the hostile-set/arms). Count command: `pytest --collect-only -q tests/test_b99_export.py | grep -c "::"` → 25 (and `git show HEAD:tests/test_b99_export.py | grep -c "^def test_"` → 25 defs). Composition on disk: TC-B99-28 ×1, TC-B99-29 ×4, TC-B99-30 ×1, TC-B99-31 ×6, TC-B99-41 ×8, AT-B99-11 ×5.
 - **Rewritten in place:** 5 re-pin groups in `test_segment_split_window.py` (8 test functions, 15 parametrized nodes — `test_export_formats_split_byte_level` ×3 and `test_export_formats_join_byte_level` ×6 re-pin `dest_dir` in every arm); `EXPECTED_SCANNED_TEST_FILES` 209 → 210.
 - **No tests deleted.**
 
@@ -365,7 +365,7 @@ Source budget unchanged: `segment_split_view.py`, `workspace.py`
 | # | Item | ✓/⚠/✗ | Evidence |
 |---|---|---|---|
 | 1 | ≤4 source files | ✓ | 2 / 3 (§2) |
-| 2 | Tests written in this same increment | ✓ | 17 new nodes (§4) |
+| 2 | Tests written in this same increment | ✓ | 17 first-round nodes, 25 after review rounds — DDR-corrected 2026-10-26 (see the signed-balance ledger) |
 | 3 | RED counterfactual declared | ✓ | 17 RED (`red-full.txt`) |
 | 4 | Reverse census declared | ✓ | §4, 5 re-pin groups |
 | 5 | Mutation check (C-40) | ✓ | 5 mutants, 5 KILLED, hash-verified reverts |

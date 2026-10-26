@@ -1,6 +1,11 @@
 """batch-99 Increment 8 — HLR-156: PATCH status and run records say what was
 not applied (TC-B99-17..20, AT-B99-06/07).
 
+TC-B99-18 riders arm (DDR finding F-2): one lane whose PATCH and CRC steps both
+end ``notices`` paints BOTH clipped riders — the ``PATCH: … not applied`` note
+and the ``CRC: … region bytes absent`` note — plus the ``wrote …`` segment on
+its terminal line.
+
 The 8-case matrix ports the ``rw-p01`` / ``rw-p06`` probes (P-4, P-13, P-14):
 a flow PATCH arm used to report ``ok`` — ``applied 0 entries`` — for an
 out-of-image, straddling, wrong-kind, v1 or malformed change document, and the
@@ -43,6 +48,7 @@ from s19_app.tui.services.flow_model import (
     FLOW_STATUS_ERROR,
     FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
+    CrcBlock,
     Flow,
     FlowContext,
     PatchBlock,
@@ -457,6 +463,75 @@ def test_tc_b99_18_chain_outcome_carries_change_records(tmp_path: Path) -> None:
         (0x20000, "skipped-outside"),
     ], outcome.change_records
     assert outcome.written_paths and outcome.written_paths[0].name == "mix_out.s19"
+
+
+# --------------------------------------------------------------------------- #
+# TC-B99-18 (DDR finding F-2) — one lane carries BOTH terminal-line riders
+# --------------------------------------------------------------------------- #
+
+
+def test_tc_b99_18_lane_line_carries_patch_and_crc_riders(tmp_path: Path) -> None:
+    """TC-B99-18 (DDR finding F-2, Phase-4 coverage gap): a lane whose PATCH
+    ends ``notices`` (one entry applied, one ``skipped-outside``) and whose
+    CRC step ends ``notices`` (a legacy region straddling the 0xFA2E-0xFCB0
+    gap) paints BOTH separately-clipped riders on its terminal log line —
+    the UX-C1 ``PATCH: … not applied (0x… skipped-outside)`` note AND the
+    UX-C2 ``CRC: … of … region bytes absent`` note (absent count computed
+    independently from the reader's map) — followed by the ``wrote …``
+    segment, and still writes the file. The app appends the riders and never
+    overwrites; no other test drove a lane carrying both."""
+    docs = {
+        "mix.json": _doc(_MIX_ENTRIES),
+        "partial_crc.json": json.dumps(
+            {
+                "polynomial": "0x04C11DB7",
+                "init": "0xFFFFFFFF",
+                "reverse": True,
+                "final_xor": "0xFFFFFFFF",
+                "regions": [
+                    {
+                        "start": "0x0000FA00",
+                        "end": "0x0000FC00",
+                        "output_address": "0x0000FC00",
+                    }
+                ],
+            }
+        ),
+    }
+    flows = {
+        "b99_r": [
+            SourceBlock("prg.s19"),
+            PatchBlock("mix.json"),
+            CrcBlock("partial_crc.json"),
+            WriteOutBlock("o.s19"),
+        ],
+    }
+    project_dir = _stage_project(tmp_path, "proj1", docs, flows)
+    oracle = read_s19(_PRG_S19)
+    absent = sum(1 for addr in range(0xFA00, 0xFC00) if addr not in oracle.data)
+
+    async def body(app, pilot):
+        await _load_project_dialog(app, pilot, "proj1")
+        panel = await _open_flow_execution_key(app, pilot)
+        await _import_flow_picker(app, pilot, "b99_r", 0)
+        await _run_until_heads(app, pilot, {0: "◇"})
+        return "\n".join(painted_rows(app, panel.query_one("#fx_log")))
+
+    # Wider than ``_run_fx``'s 220: both clipped riders plus the ``wrote …``
+    # segment push the terminal line past 220 cells (the F-2 gap itself).
+    async def drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(280, 60)) as pilot:
+            await settle(pilot)
+            return await body(app, pilot)
+
+    log = asyncio.run(drive())
+
+    # Both riders ride the same painted terminal line, then the write segment.
+    assert "PATCH: 1 of 2 entries not applied (0x00020000 skipped-outside)" in log
+    assert f"CRC: {absent} of 512 region bytes absent (0xFA00-0xFC00)" in log
+    assert "wrote o.s19" in log
+    assert (project_dir / "o.s19").exists(), "the notices lane must still WRITE-OUT"
 
 
 # --------------------------------------------------------------------------- #

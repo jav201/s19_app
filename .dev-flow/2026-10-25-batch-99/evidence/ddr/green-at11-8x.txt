@@ -1,0 +1,24 @@
+=== run 1 ===
+.                                                                        [100%]
+1 passed in 31.79s
+=== run 2 ===
+.                                                                        [100%]
+1 passed in 32.12s
+=== run 3 ===
+.                                                                        [100%]
+1 passed in 31.92s
+=== run 4 ===
+.                                                                        [100%]
+1 passed in 32.29s
+=== run 5 ===
+.                                                                        [100%]
+1 passed in 31.26s
+=== run 6 ===
+.                                                                        [100%]
+1 passed in 31.28s
+=== run 7 ===
+.                                                                        [100%]
+1 passed in 31.21s
+=== run 8 ===
+.                                                                        [100%]
+1 passed in 31.38s

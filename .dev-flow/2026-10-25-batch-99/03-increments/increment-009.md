@@ -232,9 +232,15 @@ Pre-existing flakes observed, NOT re-pinned (timing races that pre-date this inc
 
 ### Signed-balance test ledger
 
-`post = base − deleted + added` → `20 = 0 − 0 + 20` ✓ reconciles
-(`tests/test_b99_truncation.py`: 0 baseline nodes — new file — 0 deleted, 20 added:
-TC-B99-08 ×7, TC-B99-09 ×4, TC-B99-10 ×6, AT-B99-03 ×3).
+`post = base − deleted + added` → `25 = 0 − 0 + 25` ✓ reconciles — **DDR-corrected
+2026-10-26** (DDR finding F-6): the line below stated 20 and never took up the
+5 review-round nodes (round 1: `test_tc_b99_08_trailing_blank_lines_no_notice`,
+`test_tc_b99_08_wide_s6_image_no_notice`; round 2: `test_tc_b99_08_s6_mismatch_wide_image`,
+`test_tc_b99_08_damaged_data_line_no_false_count_mismatch`; round 3: `test_tc_b99_09_line_endings_cr_lf_crlf`).
+(`tests/test_b99_truncation.py`: 0 baseline nodes — new file — 0 deleted, 25 added:
+TC-B99-08 ×9, TC-B99-09 ×7, TC-B99-10 ×6, AT-B99-03 ×3 — parametrized arms
+counted per collected node). Count command: `pytest --collect-only -q tests/test_b99_truncation.py | grep -c "::"`
+→ 25 (`git show HEAD:tests/test_b99_truncation.py | grep -c "^def test_"` → 18 defs + 7 parametrized expansions).
 Re-pin ledger: `tests/test_core_srecord_validation.py` 6 → 6 nodes (0 added, 0
 deleted; assertions updated in `test_s19file_collects_errors` per HLR-154).
 
@@ -402,7 +408,7 @@ Batch-99 Increment 10 (per the batch plan / `BRIEF-inc-10.md`).
 | # | Item | Owed in | ✓/⚠/✗ | Evidence (node id · command output · file:line) |
 |---|---|---|---|---|
 | 1 | ≤4 source files, or reason declared | all | ✓ | 4 SOURCE files (`git status` — `core.py`, `hexfile.py`, `flow_execution_service.py`, `app.py`) |
-| 2 | Tests written in this same increment | all | ✓ | `tests/test_b99_truncation.py` (20 nodes, this increment) |
+| 2 | Tests written in this same increment | all | ✓ | `tests/test_b99_truncation.py` (25 nodes after the review rounds — DDR-corrected 2026-10-26, see the signed-balance ledger) |
 | 3 | Layer 0 written where the criterion applies | `core` · `full` | ✓ | LLR-154.1/154.2 are engine-layer and are verified by the TC layer (the repo convention: engine crossing named in the LLR, verified through the loader's public parse); no separate layer-0 node is required by the LLRs' validation fields (`test (unit)` / `test (integration)` = the TCs) |
 | 4 | **RED counterfactual** declared | `core` · `full` | ✓ | §4: `red-initial.txt` (16 failed on the unmodified tree) + 3 mutation transcripts with hash-verified restores |
 | 5 | **Reverse census** declared | `core` · `full` | ✓ | §4: 51-file probe, focused pins re-run (409 tests green), 1 re-pin recorded, 2 pre-existing flakes declared |

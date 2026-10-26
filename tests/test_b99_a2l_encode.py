@@ -51,7 +51,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from textual.widgets import Button, DataTable, Input
+from textual.widgets import DataTable
 
 from s19_app.tui.a2l import (
     encode_physical_to_raw_bytes,
@@ -60,7 +60,6 @@ from s19_app.tui.a2l import (
 )
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
-from s19_app.tui.screens_directionb import LoadedArtifactsPanel
 from tests.b97_probes import painted_rows, settle, settled
 from tests.support.independent_reader import read_s19
 
@@ -505,26 +504,34 @@ def _screen_text(app) -> str:
     return "\n".join("".join(segment.text for segment in strip) for strip in strips)
 
 
-def _a2l_slot_text(app) -> str:
-    """The Loaded panel's A2L slot readout (``_SLOTS`` index 2) — the
-    through-surface render a user sees; a WAIT predicate, never asserted."""
-    panel = app.query_one("#loaded_panel", LoadedArtifactsPanel)
-    cells = list(panel.query(".loaded-detail"))
-    content = cells[2].render()
-    return getattr(content, "plain", str(content))
+def _status_text(app) -> str:
+    """The painted newest status line (the ``#log_line_4`` label)."""
+    from textual.widgets import Label
+
+    return str(app.query_one("#log_line_4", Label).render())
 
 
-async def _load_through_dialog(app, pilot, path: Path, description: str, loaded) -> None:
-    """Load ``path`` through the shipped Load file dialog: ``l``, type the
-    path into ``#load_path``, press ``#load_ok`` — the same controls a user
-    drives; never the private parse/apply services."""
+async def _load_through_dialog(app, pilot, path: Path, description: str) -> None:
+    """Load ``path`` through the shipped Load file dialog: ``l``, click the
+    ``#load_path`` input and TYPE the path, click ``#load_ok`` — the same
+    controls a user drives — and wait on the painted newest log line
+    (``#log_line_4`` naming the file), never an internal attribute."""
     await settle(pilot)
     await pilot.press("l")
-    await settled(pilot, lambda: bool(app.screen.query("#load_path")), "the load dialog opened")
-    app.screen.query_one("#load_path", Input).value = str(path)
-    await pilot.pause()
-    app.screen.query_one("#load_ok", Button).press()
-    await settled(pilot, loaded, description, attempts=200)
+    for _ in range(6):
+        await pilot.pause()
+    assert await pilot.click("#load_path"), "click missed #load_path"
+    await pilot.press(*str(path))
+    assert await pilot.click("#load_ok"), "click missed #load_ok"
+    await settled(
+        pilot,
+        lambda: (
+            f"Loaded {path.name}" in _status_text(app)
+            or f"A2L loaded: {path.name}" in _status_text(app)
+        ),
+        description,
+        attempts=200,
+    )
 
 
 async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:
@@ -532,12 +539,10 @@ async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> N
     async with app.run_test(size=size) as pilot:
         await pilot.pause()
         await _load_through_dialog(
-            app, pilot, s19_path, "the S19 image loaded",
-            lambda: app.current_file is not None,
+            app, pilot, s19_path, "the S19 image loaded (log names case.s19)"
         )
         await _load_through_dialog(
-            app, pilot, a2l_path, "the A2L loaded",
-            lambda: "case.a2l" in _a2l_slot_text(app),
+            app, pilot, a2l_path, "the A2L loaded (log names case.a2l)"
         )
         await pilot.press("escape")
         await pilot.pause()

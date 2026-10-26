@@ -27,10 +27,13 @@ TC-B99-41 (LLR-160.5) — the plan-time pass: case-folded collisions
 name refuses the set, and an over-long full path refuses at plan time.
 
 AT-B99-11 (US-149) — black-box Textual pilot through the Split / Join /
-Export window: a hostile A2L ``MEMORY_SEGMENT`` name lands inside the
-destination under a sanitised name, a MAC-only export carries no data
-record, and a second export after a patch takes ``_<N>`` while the first
-file stays intact. RED on today's tree (P-11).
+Export window (SegmentSplitView) export action: ONE joined node drives
+all three clauses of HLR-160's outcome in a single pilot session — a
+hostile A2L ``MEMORY_SEGMENT`` name lands inside the destination under a
+sanitised name, a MAC-only export carries no data record, and a second
+export after a patch takes ``_<N>`` while the first file stays intact.
+Two TC sub-arms ride the same shipped surface: TC-B99-41's part-way
+failure status (F3) and TC-B99-29's junctioned project home refusal (F6).
 """
 from __future__ import annotations
 
@@ -977,25 +980,50 @@ async def _load_project_pilot(app: S19TuiApp, pilot, name: str) -> None:
     )
 
 
-def test_at_b99_11_hostile_segment_name_stays_inside_destination(
+def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
     tmp_path: Path,
 ) -> None:
-    """An A2L ``MEMORY_SEGMENT`` named ``x/../../../ESCAPED``: the export
-    writes INSIDE the destination under the sanitised name
-    ``prg_x_______ESCAPED.s19`` and nothing appears outside it. RED on
-    today's tree (P-11): the file escapes to ``<project>/ESCAPED.s19``."""
+    """AT-B99-11 (HLR-160) end to end in ONE pilot session, all three
+    clauses in sequence through the shipped Split / Join / Export window
+    (SegmentSplitView) export action.
+
+    HLR-160's Observable outcome: "with an A2L whose segment is named
+    `x/../../../ESCAPED`, the export writes its file inside the
+    destination under a sanitised name, and nothing appears outside it. A
+    MAC-only export writes a file holding no data record. A second export
+    after a patch writes `<name>_1`, the status names it, and the first
+    file is intact."
+
+    Clause (a) — the hostile-segment A2L project exports INSIDE the
+    destination under ``prg_x__________ESCAPED.s19`` and nothing appears
+    outside it. Clause (b) — every artifact is unloaded and
+    ``firmware.mac`` is loaded on its own, so the session is genuinely
+    MAC-only: a manual-range export writes ``firmware_locality_00.s19``
+    holding NO data record (independent reader). Clause (c) — the project
+    is reloaded, one byte is patched through the Patch Editor, and the
+    second export lands as ``_<N>``, named in the painted status
+    (wrote/reused), while the first file's bytes stay intact.
+    """
     app = S19TuiApp(base_dir=tmp_path)
     project_dir = app.workarea / "proj1"
     project_dir.mkdir(parents=True)
     shutil.copyfile(PRG_S19, project_dir / "prg.s19")
     _write_hostile_segment_a2l(project_dir, "x/../../../ESCAPED")
+    mac_src = tmp_path / "firmware.mac"
+    shutil.copyfile(FIRMWARE_MAC, mac_src)
+    oracle = read_s19(PRG_S19)
+    patch_addr = min(oracle.data)
+    patch_value = 0x5A if oracle.data[patch_addr] != 0x5A else 0xC3
+    dest = project_dir / "splits"
 
     async def _drive():
         async with app.run_test(size=(120, 54)) as pilot:
             await pilot.pause()
             await _load_project_pilot(app, pilot, "proj1")
-            before = _snapshot(tmp_path)
+
+            # ---- Clause (a): hostile A2L segment name stays inside dest.
             await _open_split_join_window(app, pilot)
+            before_a = _snapshot(tmp_path)
             # Entering the manual tab hands focus to its TextArea (by
             # design) — click the table back so the window bindings, not
             # the box, take the letters.
@@ -1008,49 +1036,27 @@ def test_at_b99_11_hostile_segment_name_stays_inside_destination(
             await _wait_for(
                 pilot,
                 lambda: "xported" in _status_text(app).lower(),
-                "the export status line",
+                "the clause-a export status line",
                 attempts=200,
             )
-            status = _status_text(app)
-            after = _snapshot(tmp_path)
-            dest = project_dir / "splits"
-            created = sorted(
-                str(p.relative_to(tmp_path)) for p in after - before
+            status_a = _status_text(app)
+            after_a = _snapshot(tmp_path)
+            created_a = sorted(
+                str(p.relative_to(tmp_path)) for p in after_a - before_a
             )
-            return status, created, dest
 
-    status, created, dest = asyncio.run(_drive())
-    # "x/../../../ESCAPED" — 4 slashes + 6 dots, every one mapped to "_".
-    expected_name = "prg_x__________ESCAPED.s19"
-    assert (dest / expected_name).exists(), f"{created} (status: {status})"
-    escape_landing = f"proj1{os.sep}ESCAPED.s19"
-    assert escape_landing not in [c.replace("/", os.sep) for c in created], (
-        f"the escape path appeared: {created}"
-    )
-    assert not (dest.parent / "ESCAPED.s19").exists(), (
-        "HEAD's escape landing exists"
-    )
-    inside = f".s19tool{os.sep}workarea{os.sep}proj1{os.sep}splits{os.sep}"
-    assert all(
-        c.replace("/", os.sep).startswith(inside) for c in created
-    ), created
-    assert expected_name in status, status
-    # The sanitised export is header-only (0 coverage) and parses clean.
-    image = read_s19(dest / expected_name)
-    assert image.data == {} and image.eof_seen and image.errors == []
-
-
-def test_at_b99_11_mac_only_export_writes_no_data_record(tmp_path: Path) -> None:
-    """A MAC-only session's manual-range export writes a file with NO data
-    record (independent reader). RED on today's tree (P-18): the MAC
-    placeholder byte is written as one data record."""
-    src = tmp_path / "firmware.mac"
-    shutil.copyfile(FIRMWARE_MAC, src)
-    app = S19TuiApp(base_dir=tmp_path)
-
-    async def _drive():
-        async with app.run_test(size=(120, 54)) as pilot:
-            await pilot.pause()
+            # ---- Clause (b): a MAC-only export writes no data record.
+            # Unload every artifact first — loading the MAC beside prg.s19
+            # would merely attach it (the coexistence model) and the clause
+            # would not be a MAC-ONLY session. Focus is on the table (the
+            # a2l tab), so the rail keys below bubble to the app.
+            await pilot.press("escape")  # close the window
+            await pilot.press("U")  # unload all artifacts
+            await _wait_for(
+                pilot,
+                lambda: "nloaded" in _status_text(app),
+                "the unload-all status line",
+            )
             await pilot.press("l")
             await _wait_for(
                 pilot,
@@ -1059,7 +1065,7 @@ def test_at_b99_11_mac_only_export_writes_no_data_record(tmp_path: Path) -> None
                 "the Load file dialog",
             )
             assert await pilot.click("#load_path"), "click missed #load_path"
-            await pilot.press(*str(src))
+            await pilot.press(*str(mac_src))
             assert await pilot.click("#load_ok"), "click missed #load_ok"
             await _wait_for(
                 pilot,
@@ -1068,6 +1074,7 @@ def test_at_b99_11_mac_only_export_writes_no_data_record(tmp_path: Path) -> None
                 attempts=200,
             )
             await _open_split_join_window(app, pilot)
+            await pilot.press("t")  # a2l -> ranges (focus -> table)
             await pilot.press("t")  # ranges -> manual (focus -> TextArea)
             await pilot.press(*"0x80000000-0x8000000F")
             assert await pilot.click("#sje_table"), "click missed #sje_table"
@@ -1077,53 +1084,29 @@ def test_at_b99_11_mac_only_export_writes_no_data_record(tmp_path: Path) -> None
             await _wait_for(
                 pilot,
                 lambda: "xported" in _status_text(app).lower(),
-                "the export status line",
+                "the clause-b export status line",
                 attempts=200,
             )
-            return _status_text(app)
 
-    status = asyncio.run(_drive())
-    dest = _home(tmp_path)
-    written = sorted(dest.iterdir()) if dest.exists() else []
-    assert [p.name for p in written] == ["firmware_locality_00.s19"], (
-        f"{written} (status: {status})"
-    )
-    image = read_s19(written[0])
-    assert image.data == {}, f"the MAC placeholder became data: {image.data}"
-    assert image.eof_seen and image.errors == []
-
-
-def test_at_b99_11_second_export_after_patch_takes_next_free_name(
-    tmp_path: Path,
-) -> None:
-    """Export, patch one byte through the Patch Editor, export again: the
-    changed file lands as ``_<N>`` named in the status (wrote/reused), and
-    the first file's bytes are intact. RED on today's tree (P-11): the
-    second export overwrites the first under the same name."""
-    app = S19TuiApp(base_dir=tmp_path)
-    project_dir = app.workarea / "proj1"
-    project_dir.mkdir(parents=True)
-    shutil.copyfile(PRG_S19, project_dir / "prg.s19")
-    oracle = read_s19(PRG_S19)
-    patch_addr = min(oracle.data)
-    patch_value = 0x5A if oracle.data[patch_addr] != 0x5A else 0xC3
-
-    async def _drive():
-        async with app.run_test(size=(120, 54)) as pilot:
-            await pilot.pause()
+            # ---- Clause (c): patch, export again -> <name>_1, first intact.
+            # Leave the window on a table-focused tab BEFORE closing it: a
+            # hidden manual TextArea keeps focus and would swallow the next
+            # key (it is the one widget that eats letters).
+            await pilot.press("t")  # manual -> a2l (focus -> table)
+            await pilot.press("escape")  # close the window
             await _load_project_pilot(app, pilot, "proj1")
             await _open_split_join_window(app, pilot)
+            await pilot.press("t")  # a2l -> ranges (focus -> table)
             assert await pilot.click("#sje_table"), "click missed #sje_table"
             await pilot.press("a")  # ranges tab: all rows
             await pilot.press("e")
             await _wait_for(
                 pilot,
                 lambda: "xported" in _status_text(app).lower(),
-                "the first export status line",
+                "the first (clause-c) export status line",
                 attempts=200,
             )
-            dest = project_dir / "splits"
-            before = {p.name: p.read_bytes() for p in dest.iterdir()}
+            before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
 
             # Patch one byte through the Patch Editor (rail key ``6``).
             await pilot.press("escape")  # close the window
@@ -1164,38 +1147,72 @@ def test_at_b99_11_second_export_after_patch_takes_next_free_name(
             await pilot.press("e")
             # Wait for the SECOND export's status: it names the `_1` write
             # and the reused siblings (UX-C11).
-            status = ""
+            status_c = ""
             for _ in range(200):
                 await pilot.pause()
-                status = _status_text(app)
-                if "xported" in status.lower() and "reused" in status:
+                status_c = _status_text(app)
+                if "xported" in status_c.lower() and "reused" in status_c:
                     break
-            after = {p.name: p.read_bytes() for p in dest.iterdir()}
-            return before, after, status
+            after_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+            return status_a, created_a, before_c, after_c, status_c
 
-    before, after, status = asyncio.run(_drive())
-    new_names = sorted(set(after) - set(before))
-    overwritten = [n for n in before if after[n] != before[n]]
+    status_a, created_a, before_c, after_c, status_c = asyncio.run(_drive())
+
+    # Clause (a) — the sanitised name lands inside the destination and
+    # nothing appears outside it. "x/../../../ESCAPED" — 4 slashes + 6
+    # dots, every one mapped to "_".
+    expected_name = "prg_x__________ESCAPED.s19"
+    assert (dest / expected_name).exists(), f"{created_a} (status: {status_a})"
+    escape_landing = f"proj1{os.sep}ESCAPED.s19"
+    assert escape_landing not in [c.replace("/", os.sep) for c in created_a], (
+        f"the escape path appeared: {created_a}"
+    )
+    assert not (dest.parent / "ESCAPED.s19").exists(), (
+        "HEAD's escape landing exists"
+    )
+    inside = f".s19tool{os.sep}workarea{os.sep}proj1{os.sep}splits{os.sep}"
+    assert all(
+        c.replace("/", os.sep).startswith(inside) for c in created_a
+    ), created_a
+    assert expected_name in status_a, status_a
+    # The sanitised export is header-only (0 coverage) and parses clean.
+    image_a = read_s19(dest / expected_name)
+    assert image_a.data == {} and image_a.eof_seen and image_a.errors == []
+
+    # Clause (b) — the MAC-only export's file holds no data record (the
+    # project is still active, so the file lands in the project's splits).
+    mac_file = dest / "firmware_locality_00.s19"
+    assert mac_file.exists(), f"{sorted(p.name for p in dest.iterdir())}"
+    image_b = read_s19(mac_file)
+    assert image_b.data == {}, f"the MAC placeholder became data: {image_b.data}"
+    assert image_b.eof_seen and image_b.errors == []
+
+    # Clause (c) — the second export takes `_1`, the status names it, and
+    # the first file's bytes are intact.
+    new_names = sorted(set(after_c) - set(before_c))
+    overwritten = [n for n in before_c if after_c[n] != before_c[n]]
     assert overwritten == [], f"the first export was clobbered: {overwritten}"
     assert len(new_names) == 1 and new_names[0].endswith("_1.s19"), (
         f"expected exactly one `_1` file; new={new_names}"
     )
     stem_name = new_names[0][: -len("_1.s19")] + ".s19"
-    assert stem_name in before, (stem_name, sorted(before))
-    assert after[stem_name] == before[stem_name], "the first file changed"
-    assert "_1" in status and "wrote" in status and "reused" in status, status
+    assert stem_name in before_c, (stem_name, sorted(before_c))
+    assert after_c[stem_name] == before_c[stem_name], "the first file changed"
+    assert "_1" in status_c and "wrote" in status_c and "reused" in status_c, (
+        status_c
+    )
     # The independent reader sees the patch only in the `_1` file.
-    splits = project_dir / "splits"
-    image_new = read_s19(splits / new_names[0])
-    image_old = read_s19(splits / stem_name)
+    image_new = read_s19(dest / new_names[0])
+    image_old = read_s19(dest / stem_name)
     assert image_new.data[patch_addr] == patch_value
     assert image_old.data[patch_addr] == oracle.data[patch_addr]
 
 
-def test_at_b99_11_part_way_failure_status_names_the_first_file(
+def test_tc_b99_41_part_way_failure_status_names_the_first_file(
     tmp_path: Path, monkeypatch
 ) -> None:
-    """F3 arm (painted status): an export whose SECOND file's fill fails
+    """TC-B99-41 sub-arm through the shipped window (AT-B99-11's surface):
+    F3 arm (painted status) — an export whose SECOND file's fill fails
     paints a status that names the first file under ``Already written:``
     and never claims the failed file was written. RED before the fix: the
     status contradicted itself ("Nothing written. — files already
@@ -1268,8 +1285,9 @@ def test_at_b99_11_part_way_failure_status_names_the_first_file(
     )
 
 
-def test_at_b99_11_junctioned_project_home_shows_refusal(tmp_path: Path) -> None:
-    """F6 arm: a project dir swapped for a junction escaping the work area
+def test_tc_b99_29_junctioned_project_home_shows_refusal(tmp_path: Path) -> None:
+    """TC-B99-29 sub-arm through the shipped window (AT-B99-11's surface):
+    F6 arm — a project dir swapped for a junction escaping the work area
     makes the scoped destination resolution refuse — the refusal is painted
     and the app does not crash. RED before the fix: ``_dest_dir()`` raised
     OUTSIDE the handler's try, so the key press propagated the exception

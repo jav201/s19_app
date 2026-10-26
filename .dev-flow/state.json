@@ -42,7 +42,7 @@
       "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
     }
   ],
-  "current_station": "P3",
+  "current_station": "P4",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -225,6 +225,16 @@
       "station": "P3",
       "date": "2026-10-26",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 005 (US-148 / HLR-159 + LLR-155.8, CRC never covers an empty region, CRC write stages privately; crc.py, flow_execution_service.py, flow_screens.py — budget widened to 3) approved: implemented by Kimi K2.8 (fix session timed out; the orchestrator ran the final sweep 210 passed and AT-B99-10 x8); code-reviewer round 1 BLOCK (F1 HIGH count not on the FX surface) fixed, round 2 OK; merged main: all batch-99 suites 227 passed. All 12 increments are on main; full suite next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 closed: 12 increments on main (001, 002, 003, 003b, 004-012)."
+    },
+    {
+      "station": "DDR",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. DDR approved (design/DDR-2026-10-25-batch-99.md): architect, software-dev, qa-reviewer approved with conditions; every condition discharged and re-checked. P4 validation next, pending the full suite on e7732f6."
     }
   ],
   "obsidian_synced": false,

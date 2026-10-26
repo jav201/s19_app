@@ -27,7 +27,7 @@ applying), save back.  The independent reader shows the source bytes at
 ``0xEB10``, ``01 02`` at ``0xEB40`` and ``05 06`` at ``0xEB60``, and the
 painted status names the applied entry AND the not-applied entry ("1
 entry" count) and stays visible after the verify result (PDR-UX-C6,
-review finding F3). A second arm forces a verify mismatch and asserts the
+review finding F3). TC-B99-22 arm: forces a verify mismatch and asserts the
 mismatch status line still carries the not-applied names (UX-C6 allows no
 exception — review finding F5).
 """
@@ -696,7 +696,7 @@ def test_at_b99_08_save_back_keeps_editor_image(tmp_path: Path) -> None:
     )
 
 
-def test_at_b99_08_verify_mismatch_status_still_names_entries(
+def test_tc_b99_22_verify_mismatch_status_still_names_entries(
     tmp_path: Path, monkeypatch
 ) -> None:
     """A forced verify mismatch: the mismatch status line carries the SAME
