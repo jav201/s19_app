@@ -1,0 +1,83 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 23 items / 22 deselected / 1 selected
+
+tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder FAILED [100%]
+
+================================== FAILURES ===================================
+___________ test_tc_b99_14_placement_failure_removes_created_folder ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26397/test_tc_b99_14_placement_failu0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AEBC3B56D0>
+
+    def test_tc_b99_14_placement_failure_removes_created_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A placement failure AFTER this call created the project folder
+        removes exactly that folder (review finding F6a): a forced locked
+        target during Save project -> painted failure status, the created
+        folder is gone, the app keeps running. Driven by keys and clicks
+        through the real dialogs (review finding F5).
+    
+        GREEN at the review-round-2 tree — the cleanup landed with round 1 —
+        so the RED proof is the F6a mutant (``_remove_created_project_dir``
+        no-op) in ``mut-fix2-f6a.txt``.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+    
+        def _always_locked(src_path, dst_path):
+            raise PermissionError(13, "locked by another program", str(dst_path))
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                monkeypatch.setattr(os, "replace", _always_locked)
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _poll(pilot, lambda: _painted_status(app).startswith("Not saved"))
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["status"].startswith("Not saved"), outcomes["status"]
+        assert "firmware.s19" in outcomes["status"], outcomes["status"]
+>       assert not (tmp_path / ".s19tool" / "workarea" / "proj").exists(), (
+            "the folder this call created must be removed on placement failure"
+        )
+E       AssertionError: the folder this call created must be removed on placement failure
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = (((WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26397/test_tc_b99_14_placement_failu0') / '.s19tool') / 'workarea') / 'proj').exists
+
+tests\test_b99_staging.py:1209: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+====================== 1 failed, 22 deselected in 15.08s ======================

@@ -962,10 +962,6 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
     from tests.b97_fixtures import DEMO_A2L, ES_MARKER_RE, open_check_editor, staging_block
     from tests.b97_probes import painted_rows
 
-    blocker = None
-    if arm.startswith("write_"):
-        blocker = staging_block(tmp_path, "spec.chk.json", "dir" if arm == "write_dir" else "readonly")
-
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
@@ -978,16 +974,24 @@ def test_tc_b97_58_check_editor_region_states(tmp_path: Path, arm: str) -> None:
                 holder = panel.query("#check_fields_lines")
                 rows = painted_rows(app, holder.first()) if holder else []
                 return [r.strip() for r in rows[1:] if r.strip()]
-            panel.query_one("#check_write_button").press()
-            await settle(pilot, 6)
-            status = panel.query_one("#check_status")
-            return [r.strip() for r in painted_rows(app, status) if r.strip()]
+            # batch-99 Inc-3a re-pin: the blocker plants at the private
+            # staging home AFTER the A2L load (the load itself rides the
+            # same placement and must not be blocked — HLR-155).
+            blocker = staging_block(
+                tmp_path,
+                "spec.chk.json",
+                "dir" if arm == "write_dir" else "readonly",
+            )
+            try:
+                panel.query_one("#check_write_button").press()
+                await settle(pilot, 6)
+                status = panel.query_one("#check_status")
+                return [r.strip() for r in painted_rows(app, status) if r.strip()]
+            finally:
+                if blocker.is_file():
+                    os.chmod(blocker, 0o666)
 
-    try:
-        lines = asyncio.run(_drive())
-    finally:
-        if blocker is not None and blocker.is_file():
-            os.chmod(blocker, 0o666)
+    lines = asyncio.run(_drive())
     assert len(lines) == 1, (arm, lines)
     assert not ES_MARKER_RE.search(lines[0]), lines[0]
     assert "Traceback" not in lines[0]
@@ -2317,10 +2321,6 @@ def test_at_b97_23_each_failed_region_says_so_in_one_line(tmp_path: Path, arm: s
     )
     from tests.b97_probes import painted_rows
 
-    blocker = None
-    if arm.startswith("check_write_"):
-        blocker = staging_block(tmp_path, "spec.chk.json", "dir" if arm == "check_write_dir" else "readonly")
-
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(118, 54)) as pilot:
@@ -2331,9 +2331,21 @@ def test_at_b97_23_each_failed_region_says_so_in_one_line(tmp_path: Path, arm: s
                 return painted_rows(app, panel.query_one("#patch_doc_empty_state"))
             if arm.startswith("check_write_"):
                 panel = await open_check_editor(app, pilot, a2l=DEMO_A2L)
-                panel.query_one("#check_write_button").press()
-                await settle(pilot, 6)
-                return painted_rows(app, panel.query_one("#check_status"))
+                # batch-99 Inc-3a re-pin: the blocker plants at the private
+                # staging home AFTER the A2L load (the load itself rides the
+                # same placement and must not be blocked — HLR-155).
+                blocker = staging_block(
+                    tmp_path,
+                    "spec.chk.json",
+                    "dir" if arm == "check_write_dir" else "readonly",
+                )
+                try:
+                    panel.query_one("#check_write_button").press()
+                    await settle(pilot, 6)
+                    return painted_rows(app, panel.query_one("#check_status"))
+                finally:
+                    if blocker.is_file():
+                        os.chmod(blocker, 0o666)
             project_dir = fx_project(app)
             nul_flow(project_dir)
             if arm == "flow_refused":
@@ -2363,9 +2375,6 @@ def test_at_b97_23_each_failed_region_says_so_in_one_line(tmp_path: Path, arm: s
         rows = [r.strip() for r in asyncio.run(_drive()) if r.strip()]
     except Exception as exc:  # noqa: BLE001 - the main-RED arm: the raise escapes
         escaped, rows = exc, []
-    finally:
-        if blocker is not None and blocker.is_file():
-            os.chmod(blocker, 0o666)
     assert escaped is None, f"{arm}: the failure escaped as {escaped!r}"
     assert len(rows) == 1, (arm, rows)
     assert not ES_MARKER_RE.search(rows[0]) and "Traceback" not in rows[0], rows[0]

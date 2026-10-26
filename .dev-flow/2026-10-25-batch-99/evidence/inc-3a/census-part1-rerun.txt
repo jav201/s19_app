@@ -1,0 +1,81 @@
+..............................................F......................... [ 19%]
+............................F........................................... [ 38%]
+.............................................................x........F. [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+.............                                                            [100%]
+================================== FAILURES ===================================
+___________ test_tc1800_reload_same_content_reuses_existing_target ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc1800_reload_same_conten0')
+
+    def test_tc1800_reload_same_content_reuses_existing_target(tmp_path: Path) -> None:
+        workarea = _workarea(tmp_path)
+        source = tmp_path / "fw.s19"
+        source.write_bytes(b"S113000048656C6C6F0A")
+    
+        first = copy_into_workarea(source, workarea)
+        second = copy_into_workarea(source, workarea)
+    
+        assert second == first, "a byte-identical re-load must reuse the existing target"
+        assert first.name == "fw.s19"
+        on_disk = sorted(p.name for p in workarea.iterdir())
+>       assert on_disk == [".staging", "fw.s19"], (
+            f"re-loading identical content must not duplicate: {on_disk}"
+        )
+E       AssertionError: re-loading identical content must not duplicate: ['.staging', 'fw.s19']
+E       assert ['.staging', 'fw.s19'] == ['fw.s19']
+E         
+E         At index 0 diff: '.staging' != 'fw.s19'
+E         Left contains one more item: 'fw.s19'
+E         Use -v to get more diff
+
+tests\test_copy_into_workarea_content_dedup.py:46: AssertionError
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25811/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x0000018BE42C8A90>
+
+    # ---------------------------------------------------------------------------
+    # Cost bound, grammar unit-checks, file well-formedness.
+    # ---------------------------------------------------------------------------
+    
+    
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+>       wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+E       AssertionError: the guard scanned 204 test modules, not the declared 199. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 204 == 199
+
+tests\test_id_registry.py:558: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_copy_into_workarea_content_dedup.py::test_tc1800_reload_same_content_reuses_existing_target
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+3 failed, 369 passed, 1 xfailed in 142.16s (0:02:22)

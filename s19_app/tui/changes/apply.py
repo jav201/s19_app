@@ -39,6 +39,7 @@ never raw byte or value content.
 from __future__ import annotations
 
 import bisect
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path, PureWindowsPath
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
@@ -52,8 +53,8 @@ from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     WORKAREA_DIRNAME,
     WORKAREA_SUBDIR,
-    WORKAREA_TEMP,
     WorkareaContainmentError,
+    _private_stage_dir,
     copy_into_workarea,
 )
 from .io import (
@@ -637,7 +638,8 @@ def save_patched_image(
         Persist a patched image as S19 text under the project work area —
         the engine half of LLR-002.7 (D-1: S19-only this batch). The
         operator-provided ``filename`` passes the F-S-01 sanitizer; the
-        bytes are staged under ``.s19tool/workarea/temp/`` and placed via
+        bytes are staged under ``.s19tool/workarea/temp/.staging/`` (the
+        shared reparse-checked staging home) and placed via
         ``workspace.copy_into_workarea`` (containment + reparse-point +
         dedup checks reused).
 
@@ -693,8 +695,11 @@ def save_patched_image(
           or refuse an unsupported source (LLR-002.2); sanitize the filename
           with the format-matched suffix (F-S-01).
         - Locate the ``.s19tool/workarea/`` ancestor of ``dest_dir``; emit the
-          format text (S19 or Intel HEX); stage it under ``<workarea>/temp/``;
-          place with ``copy_into_workarea``; unlink the staged file either way.
+          format text (S19 or Intel HEX); stage it in a private ``mkdtemp``
+          directory under ``<workarea>/temp/.staging/`` via
+          ``workspace._private_stage_dir``; place with
+          ``copy_into_workarea``; remove only the owned staging directory
+          either way (LLR-155.1/.7).
 
     Dependencies:
         Uses:
@@ -758,9 +763,20 @@ def save_patched_image(
         )
     else:
         text = emit(dict(mem_map), list(ranges))
-    staged = workarea_root / WORKAREA_TEMP / safe_name
+    # Private staging (LLR-155.1): the emitted bytes are written into a
+    # mkdtemp directory under the shared, reparse-checked
+    # ``temp/.staging/`` home (``workspace._private_stage_dir`` — the same
+    # staging seam ``copy_into_workarea`` uses), never under the shared
+    # ``temp/<user name>``, and placed through the private staging +
+    # exclusive claim. Only the owned staging directory is removed
+    # (LLR-155.7); the loaded work copy under the same name is never
+    # touched.
+    stage_dir: Optional[Path] = None
+    stage_owned = False
     try:
-        staged.parent.mkdir(parents=True, exist_ok=True)
+        stage_dir = _private_stage_dir(workarea_root)
+        stage_owned = True
+        staged = stage_dir / safe_name
         staged.write_text(text, encoding="ascii")
         target = copy_into_workarea(staged, dest_dir)
         return target, issues
@@ -775,10 +791,8 @@ def save_patched_image(
         )
         return None, issues
     finally:
-        try:
-            staged.unlink()
-        except OSError:
-            pass
+        if stage_owned and stage_dir is not None:
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
 
 def _sanitize_s19_filename(

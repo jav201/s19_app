@@ -1,0 +1,63 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_same_name_save_back_keeps_work_copy ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25772/test_tc_b99_11_same_name_save_0')
+
+    def test_tc_b99_11_same_name_save_back_keeps_work_copy(tmp_path: Path) -> None:
+        """A save-back under the loaded image's own name keeps the work copy.
+    
+        RED at HEAD (P-15): ``save_patched_image`` stages at ``temp/<user name>``
+        — the loaded work copy — and its ``finally`` unlinks it.
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        work_copy = root / "temp" / "firmware.s19"
+        work_copy.write_text(_emit(0x11), encoding="ascii")
+        pre_save_bytes = work_copy.read_bytes()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+        assert target is not None, f"save-back refused: {[i.message for i in issues]}"
+        assert target.name == "firmware.s19", target
+>       assert work_copy.exists(), (
+            "the loaded work copy temp/firmware.s19 must survive the save-back"
+        )
+E       AssertionError: the loaded work copy temp/firmware.s19 must survive the save-back
+E       assert False
+E        +  where False = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25772/test_tc_b99_11_same_name_save_0/.s19tool/workarea/temp/firmware.s19').exists
+
+tests\test_b99_staging.py:153: AssertionError
+____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
+
+    def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
+        """RED at HEAD: ``apply.py``'s ``finally: staged.unlink()`` deletes a path
+        rebuilt from the user's name (the LLR-155.7 declared RED site)."""
+        all_violations: list = []
+        for rel, func_name in _CENSUS_TARGETS:
+            all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
+        unexpected = [
+            v
+            for v in all_violations
+            if not (v.startswith(_CRC_EXPECTED[0]) and f":{_CRC_EXPECTED[1]}:" in v)
+        ]
+>       assert unexpected == [], (
+            f"LLR-155.7 violations outside the known Inc-5 CRC site: {unexpected}"
+        )
+E       AssertionError: LLR-155.7 violations outside the known Inc-5 CRC site: ["apply.py:save_patched_image:792 deletes 'staged' without an owned-binding guard"]
+E       assert ['apply.py:sa...inding guard'] == []
+E         
+E         Left contains one more item: "apply.py:save_patched_image:792 deletes 'staged' without an owned-binding guard"
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:548: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+FAILED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+2 failed, 10 deselected in 0.45s

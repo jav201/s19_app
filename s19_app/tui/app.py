@@ -4,6 +4,7 @@ from collections import Counter, deque
 from dataclasses import dataclass, field, replace
 import json
 from pathlib import Path
+import shutil
 import time
 from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
@@ -189,6 +190,7 @@ from .workspace import (
     WORKAREA_TEMP,
     WORKAREA_TEMPLATES,
     WorkareaContainmentError,
+    WorkareaPlacementError,
     build_variant_set,
     copy_into_workarea,
     ensure_workarea,
@@ -8047,6 +8049,18 @@ class S19TuiApp(App):
         """Invoke the A2L tag find-next scan (same as the Find-next button)."""
         self._handle_a2l_tag_find_next()
 
+    @staticmethod
+    def _remove_created_project_dir(project_dir: Path, created: bool) -> None:
+        """Remove the project folder a failed Save project created (F6(a)).
+
+        Only ever the folder THIS call created — a pre-existing project
+        folder is never touched, and its content (if a partial save placed
+        anything) is removed with it so no partial project survives.
+        """
+        if not created:
+            return
+        shutil.rmtree(project_dir, ignore_errors=True)
+
     def _handle_save_dialog(self, payload: Optional[SaveProjectPayload]) -> None:
         if payload is None:
             self.logger.info("Save project canceled.")
@@ -8065,8 +8079,49 @@ class S19TuiApp(App):
             self.set_status("Invalid project name.")
             self.logger.warning("Invalid project name: %s", payload.project_name)
             return
+        # LLR-155.4: a source that vanished since the load (e.g. a same-name
+        # save-back used to delete the work copy) refuses BEFORE the project
+        # folder is created — no empty folder is left behind, the status
+        # leads with the outcome (UX-C4) and the app keeps running.
+        missing_sources = [
+            path
+            for path in (
+                self.current_file.path if self.current_file else None,
+                self.current_file.mac_path if self.current_file else None,
+                self.current_a2l_path,
+            )
+            if path is not None and not path.exists()
+        ]
+        if missing_sources:
+            message = (
+                "Project NOT saved: source file missing: "
+                f"{missing_sources[0].name} — reload it or remove it from "
+                "the project."
+            )
+            self.set_status(message)
+            self.notify(
+                message,
+                title="Project not saved",
+                severity="error",
+                timeout=10.0,
+                markup=False,
+            )
+            self.logger.warning("Save project refused: %s", missing_sources[0])
+            return
         project_dir = (parent_resolved / cleaned).resolve()
-        project_dir.mkdir(parents=True, exist_ok=True)
+        # Review findings F6(a)/S-F5: remember whether THIS call creates the
+        # folder, so a later placement failure can remove exactly what it
+        # created — a pre-existing project folder is never touched. The
+        # ownership decision comes from mkdir itself (exist_ok=False +
+        # FileExistsError), not a racy ``not exists()`` probe: a folder
+        # that appears between the probe and the mkdir would wrongly be
+        # claimed as ours and destroyed on a later failure.
+        try:
+            project_dir.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            created_project_dir = False
+        else:
+            created_project_dir = True
         data_files, a2l_files, error = validate_project_files(project_dir)
         if error:
             self.set_status(error)
@@ -8102,9 +8157,26 @@ class S19TuiApp(App):
             if self.current_a2l_path:
                 saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
                 self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
+        except WorkareaPlacementError as exc:
+            # HLR-155: the locked-target refusal. The exception text already
+            # leads with the outcome and names the file, the cause and the
+            # next step (UX-C4/UX-C5); it is painted at failure severity and
+            # the app keeps running.
+            self.set_status(str(exc))
+            self.notify(
+                str(exc),
+                title="Project not saved",
+                severity="error",
+                timeout=10.0,
+                markup=False,
+            )
+            self.logger.warning("Project save placement failed: %s", exc)
+            self._remove_created_project_dir(project_dir, created_project_dir)
+            return
         except WorkareaContainmentError as exc:
             self.set_status(f"Cannot save project: {exc}")
             self.logger.warning("Project save rejected by workarea guard: %s", exc)
+            self._remove_created_project_dir(project_dir, created_project_dir)
             return
         self.current_project = cleaned
         self.current_project_dir = project_dir

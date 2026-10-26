@@ -1,0 +1,2 @@
+c933f7aafec775c60189ae5533fa3bcaed5cee24c90c8704faa1bf8685264bca *s19_app/tui/workspace.py
+8bdc82db661573e4f14d2138a178bea48fd386a9dece19f01c8fdfee863c4787 *s19_app/tui/app.py

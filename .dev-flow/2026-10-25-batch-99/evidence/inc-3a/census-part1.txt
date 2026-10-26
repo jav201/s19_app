@@ -1,0 +1,126 @@
+..............................................F......................... [ 19%]
+............................F........................................... [ 38%]
+.............................................................x........F. [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+F............                                                            [100%]
+================================== FAILURES ===================================
+___________ test_tc1800_reload_same_content_reuses_existing_target ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25777/test_tc1800_reload_same_conten0')
+
+    def test_tc1800_reload_same_content_reuses_existing_target(tmp_path: Path) -> None:
+        workarea = _workarea(tmp_path)
+        source = tmp_path / "fw.s19"
+        source.write_bytes(b"S113000048656C6C6F0A")
+    
+        first = copy_into_workarea(source, workarea)
+        second = copy_into_workarea(source, workarea)
+    
+        assert second == first, "a byte-identical re-load must reuse the existing target"
+        assert first.name == "fw.s19"
+        on_disk = sorted(p.name for p in workarea.iterdir())
+>       assert on_disk == ["fw.s19"], f"re-loading identical content must not duplicate: {on_disk}"
+E       AssertionError: re-loading identical content must not duplicate: ['.staging', 'fw.s19']
+E       assert ['.staging', 'fw.s19'] == ['fw.s19']
+E         
+E         At index 0 diff: '.staging' != 'fw.s19'
+E         Left contains one more item: 'fw.s19'
+E         Use -v to get more diff
+
+tests\test_copy_into_workarea_content_dedup.py:46: AssertionError
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25777/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25777/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25777/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x000002246E1D0A90>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 204 test modules, not the declared 199. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 204 == 199
+
+tests\test_id_registry.py:558: AssertionError
+______ test_at_038c_missing_original_trigger_refuses_and_writes_nothing _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25777/test_at_038c_missing_original_0')
+
+    def test_at_038c_missing_original_trigger_refuses_and_writes_nothing(
+        tmp_path: Path,
+    ) -> None:
+        """Delete the original between save-back and trigger -> refusal, 0 files.
+    
+        Intent: LLR-038.4 class 3 (source path no longer on disk). GUARD-class:
+        positive diagnostic assert load-bearing; the app keeps running (the
+        follow-up listing read proves no crash).
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> tuple[list[str], set[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                await _drive_apply(app, pilot)
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                image_path.unlink()
+                statuses = _statuses(app)
+                app.set_focus(None)
+                await pilot.press("b")
+                await pilot.pause()
+                return list(statuses), _report_names(project_dir / "reports")
+    
+        statuses, report_files = asyncio.run(_drive())
+        refusals = [s for s in statuses if "Before/after report refused" in s]
+        assert refusals, f"AT-038c: no surfaced refusal diagnostic; statuses: {statuses}"
+>       assert "img.s19" in refusals[0] and "no longer on disk" in refusals[0].lower()
+E       AssertionError: assert ('img.s19' in 'Before/after report refused: No saved patched image - the save-back was declined or refused.')
+
+tests\test_before_after_report.py:414: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_copy_into_workarea_content_dedup.py::test_tc1800_reload_same_content_reuses_existing_target
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_before_after_report.py::test_at_038c_missing_original_trigger_refuses_and_writes_nothing
+4 failed, 368 passed, 1 xfailed in 144.05s (0:02:24)

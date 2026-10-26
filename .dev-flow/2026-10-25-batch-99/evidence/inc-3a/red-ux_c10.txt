@@ -1,0 +1,60 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_________ test_tc_b99_ux_c10_save_project_filename_renders_literally __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25744/test_tc_b99_ux_c10_save_projec0')
+
+    def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -> None:
+        """The Save project file name is a new file-derived sink: a hostile
+        source file name must render literally (0 markup spans) in the painted
+        status and in the error notice."""
+        hostile = f"{HOSTILE_NAME}.s19"
+>       image = _image(tmp_path, hostile, 0x11)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:765: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_staging.py:100: in _image
+    path.write_text(_emit(marker, addr), encoding="ascii")
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25744/test_tc_b99_ux_c10_save_projec0/[red]x[/red][@click=app.quit].s19')
+mode = 'w', buffering = -1, encoding = 'ascii', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-25744\\test_tc_b99_ux_c10_save_projec0\\[red]x[\\red][@click=app.quit].s19'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
+__________ test_tc_b99_ux_c10_placement_error_path_renders_literally __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25744/test_tc_b99_ux_c10_placement_e0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002153AACFDD0>
+
+    def test_tc_b99_ux_c10_placement_error_path_renders_literally(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The placement-error path is a new file-derived sink: the
+        ``WorkareaPlacementError`` text names the hostile file and renders
+        literally when the handler paints it."""
+        from textual.widgets import Label
+    
+>       assert PlacementError is not None
+E       assert None is not None
+
+tests\test_b99_staging.py:809: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+FAILED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+2 failed, 10 deselected in 0.59s

@@ -1,0 +1,25 @@
+reverse census: grep -rln "copy_into_workarea\|save_patched_image\|staging_block\|WorkareaContainmentError" tests/
+tests/__pycache__/test_b99_staging.cpython-311.pyc
+tests/b97_fixtures.py
+tests/test_b97_chips_help.py
+tests/test_b99_staging.py
+tests/test_changes_apply.py
+tests/test_copy_into_workarea_content_dedup.py
+tests/test_crc_designer_view.py
+tests/test_crc_operation.py
+tests/test_flow_execution.py
+tests/test_flow_execution_service.py
+tests/test_flow_external_step_b96.py
+tests/test_flow_persistence.py
+tests/test_id_registry.py
+tests/test_manifest_writer.py
+tests/test_project_gather.py
+tests/test_tui_app.py
+tests/test_tui_directionb.py
+tests/test_tui_flow_execution_b94.py
+tests/test_tui_helpers.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_public_api.py
+tests/test_tui_workspace.py
+tests/test_unified_write.py
+tests/test_variant_execution.py

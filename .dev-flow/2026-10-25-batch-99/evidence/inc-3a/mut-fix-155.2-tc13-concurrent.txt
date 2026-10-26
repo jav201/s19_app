@@ -1,0 +1,263 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0')
+
+    def test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned(
+        tmp_path: Path,
+    ) -> None:
+        """Concurrent in-app placements of ONE name (LLR-155.3, amended by
+        LED .7): threads running ``copy_into_workarea`` with identical and with
+        differing bytes, over 20 trials — every caller's returned path holds its
+        own bytes, and a returned 0-byte target never appears.
+    
+        RED at HEAD (check-then-copy mutation form, and at base ``a52e2be``):
+        placement is an unconditional take of the requested name, so the
+        differing-bytes arm clobbers concurrent writers and the assertion prints
+        the decisive ``parallel mismatches: N`` line.
+        """
+        root = _workarea(tmp_path)
+        mismatches = 0
+        zero_byte_returned = 0
+        reported_total = 0
+        for trial in range(_TRIALS):
+            for identical in (True, False):
+                dest = root / "out" / f"trial{trial:02d}" / ("same" if identical else "diff")
+                dest.mkdir(parents=True)
+    
+                def marker_for(writer: int) -> int:
+                    return 0x11 if identical else 0x41 + writer
+    
+                def place(writer: int) -> tuple[int, Path]:
+                    # every writer places the SAME name from its own source
+                    # directory, so the contention is real
+                    src_dir = tmp_path / f"t13-{trial:02d}-{identical}-{writer}"
+                    src_dir.mkdir(exist_ok=True)
+                    src = src_dir / "shared.s19"
+                    src.write_text(_emit(marker_for(writer)), encoding="ascii")
+                    return writer, copy_into_workarea(src, dest)
+    
+                with ThreadPoolExecutor(
+                    max_workers=_WRITERS_13, thread_name_prefix="b99-tc13"
+                ) as pool:
+>                   results = list(pool.map(place, range(_WRITERS_13)))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:489: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\concurrent\futures\_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\concurrent\futures\_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\concurrent\futures\thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b99_staging.py:484: in place
+    return writer, copy_into_workarea(src, dest)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0/t13-09-False-0/shared.s19')
+destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_concurrent_plac0/.s19tool/workarea/out/trial09/diff')
+max_size_bytes = 268435456
+
+    def copy_into_workarea(
+        source: Path,
+        destination: Path,
+        max_size_bytes: int = DEFAULT_COPY_SIZE_CAP_BYTES,
+    ) -> Path:
+        """
+        Summary:
+            Copy ``source`` into a workarea-contained ``destination`` after enforcing
+            containment, reparse-point, and size guards.
+    
+        Args:
+            source (Path): File to copy. Must be a real file (not a symlink/junction) and
+                must not exceed ``max_size_bytes``.
+            destination (Path): Target directory. Must resolve under
+                ``<base>/.s19tool/workarea/`` and must not traverse a symlink or NTFS junction.
+            max_size_bytes (int): Maximum permitted size for ``source`` in bytes. Defaults to
+                256 MB; configurable per call to support regression testing (per security
+                finding S-N02).
+    
+        Returns:
+            Path: Absolute path of the file written inside ``destination``. A
+                byte-identical target is reused as-is (bug B8 content dedup,
+                never of a 0-byte target); a divergent name collision is
+                resolved by claiming the next free ``_<N>`` name.
+    
+        Raises:
+            WorkareaContainmentError: When ``destination`` is not contained inside a
+                ``.s19tool/workarea/`` root, when ``source`` or ``destination`` (or any traversed
+                parent of ``destination``) is a symbolic link or NTFS reparse point, or when
+                ``source`` exceeds ``max_size_bytes``. Closes Phase 2 blockers S-001, S-002.
+            FileNotFoundError: When ``source`` does not exist.
+            WorkareaPlacementError: When the claimed name cannot be filled within
+                5 retries in 1 s (a locked target), or when the claim or the
+                fill fails with any other ``OSError`` — never an uncaught
+                ``OSError`` past callers that only catch the containment class
+                (review finding F1). Subclass of
+                ``WorkareaContainmentError``; the message leads with the outcome
+                and names the file and the next step (LLR-155.2).
+    
+        Data Flow:
+            - Resolve ``source`` and ``destination`` to absolute paths.
+            - Reject reparse-point sources directly; reject when the destination, or any
+              parent of the destination up to its workarea root, is a reparse point. ``Path.resolve``
+              alone is not sufficient on Windows (per security finding S-N01).
+            - Locate the ``.s19tool/workarea`` ancestor of ``destination``; reject when missing
+              (closes blocker S-001).
+            - Enforce ``max_size_bytes`` on ``source.stat().st_size`` (closes major S-003).
+            - Stage privately (LLR-155.1) via :func:`_private_stage_dir`: both
+              ``temp`` and ``temp/.staging`` reparse-checked, then copy the
+              source into a ``tempfile.mkdtemp`` directory under
+              ``temp/.staging/`` — the source is only read, never
+              moved, renamed or deleted.
+            - Reuse a non-empty byte-identical target (bug B8); race-freeness
+              rests on the immutability invariant (LLR-155.3 as amended by
+              LED .7) — no in-app writer replaces or deletes a placed file —
+              not on a narrower check window. Otherwise claim the requested
+              name — or the next free ``_<N>`` — with
+              ``os.open(O_CREAT|O_EXCL|O_WRONLY)`` (a name taken by ANY type —
+              file, directory or link — counts as taken on every platform;
+              review finding F1) and fill it with
+              ``os.replace``, retrying a ``PermissionError`` up to 5 times within
+              1 s before removing the own claim and raising
+              ``WorkareaPlacementError``.
+            - Remove the own staging directory in a ``finally`` tracked by an
+              ownership flag set right after ``mkdtemp``.
+    
+        Dependencies:
+            Uses:
+                - shutil.copy2 / shutil.rmtree
+                - tempfile.mkdtemp
+                - os.open / os.replace / os.unlink
+                - _is_reparse_point
+                - _path_traverses_reparse_point
+                - _find_workarea_root
+            Used by:
+                - s19_app.tui.app.S19TuiApp (project save and temp-load paths)
+        """
+        # Reject symlinks/junctions on the source side before resolving (which would follow them).
+        if _is_reparse_point(source):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: source is a symbolic link or reparse point: {source}"
+            )
+    
+        resolved_source = source.resolve()
+        if _is_reparse_point(resolved_source):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: resolved source is a symbolic link or reparse point: {resolved_source}"
+            )
+    
+        resolved_destination = destination.resolve()
+        workarea_root = _find_workarea_root(resolved_destination)
+        if workarea_root is None or not resolved_destination.is_relative_to(workarea_root):
+            raise WorkareaContainmentError(
+                "Refusing to copy: destination is not contained inside "
+                f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
+            )
+    
+        # Walk every parent of ``destination`` from the workarea root downwards. Path.resolve()
+        # silently follows reparse points, so a junction anywhere in the chain must be flagged
+        # explicitly via os.lstat() + FILE_ATTRIBUTE_REPARSE_POINT (security finding S-N01).
+        if _path_traverses_reparse_point(resolved_destination, stop_at=workarea_root.parent):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: destination traverses a symbolic link or reparse point: {resolved_destination}"
+            )
+    
+        size = resolved_source.stat().st_size
+        if size > max_size_bytes:
+            raise WorkareaContainmentError(
+                f"Refusing to copy: source size {size} bytes exceeds cap {max_size_bytes} bytes: {resolved_source}"
+            )
+    
+        resolved_destination.mkdir(parents=True, exist_ok=True)
+    
+        # Private staging (LLR-155.1): the reparse-checked shared staging home,
+        # factored into one helper so every work-area writer stages the same way.
+        stage_dir = _private_stage_dir(workarea_root)
+        staging_owned = True
+        try:
+            staged_file = stage_dir / resolved_source.name
+            shutil.copy2(resolved_source, staged_file)
+            staged_bytes = staged_file.read_bytes()
+    
+            # Exclusive, atomic placement (LLR-155.2): claim the final name with
+            # O_CREAT|O_EXCL, taking the next free ``_<N>`` whenever the requested
+            # name is taken, and fill the claim with os.replace. The source is
+            # only ever read, never moved, renamed or deleted.
+            stem = resolved_source.stem
+            suffix = resolved_source.suffix
+            target = resolved_destination / resolved_source.name
+            claim_path: Optional[Path] = None
+            claim_owned = False
+            counter = 0
+            while claim_path is None:
+                candidate = (
+                    target
+                    if counter == 0
+                    else resolved_destination / f"{stem}_{counter}{suffix}"
+                )
+                counter += 1
+                if candidate == target:
+                    # Content dedup (bug B8), race-free by an INVARIANT
+                    # (LLR-155.3, amended by LED .7 — not by a narrower window:
+                    # reading twice cannot close the check-and-reuse race): no
+                    # in-app code path replaces or deletes a file at a final
+                    # name except this placement claiming a free name, so a
+                    # placed file is immutable once placed.
+                    # ``project_gather_service``'s delete-and-recopy
+                    # (:290-299) is the one known violator of the invariant,
+                    # converted by Inc 3b. A 0-byte target is NEVER reused — it
+                    # may be another writer's claim placeholder (PDR C1(a)).
+                    try:
+                        if candidate.exists() and candidate.stat().st_size > 0:
+                            if candidate.read_bytes() == staged_bytes:
+                                return candidate
+                    except OSError:
+                        # an unreadable target is not trusted; claim a fresh name
+                        pass
+                claim_path = candidate
+                # MUTANT (mut-155.2): the exclusive claim is replaced by an
+                # unconditional take of the requested name.
+>               claim_fd = os.open(str(claim_path), os.O_CREAT | os.O_WRONLY)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               PermissionError: [Errno 13] Permission denied: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26227\\test_tc_b99_13_concurrent_plac0\\.s19tool\\workarea\\out\\trial09\\diff\\shared.s19'
+
+s19_app\tui\workspace.py:511: PermissionError
+_______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_zero_byte_targe0')
+
+    def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
+        """A 0-byte target may be another writer's claim placeholder (C1(a))."""
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "empty.s19"
+        target.write_bytes(b"")
+        src = tmp_path / "empty.s19"
+        src.write_bytes(b"")
+    
+        returned = copy_into_workarea(src, dest)
+>       assert returned.name != "empty.s19", (
+            "a 0-byte target (another writer's claim) must never be reused"
+        )
+E       AssertionError: a 0-byte target (another writer's claim) must never be reused
+E       assert 'empty.s19' != 'empty.s19'
+E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26227/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+
+tests\test_b99_staging.py:515: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+FAILED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+2 failed, 15 deselected in 1.57s

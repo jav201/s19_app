@@ -1,0 +1,4 @@
+s19_app/tui/workspace.py CRLF: 845 bare LF: 0
+s19_app/tui/app.py CRLF: 13462 bare LF: 0
+s19_app/tui/changes/apply.py CRLF: 892 bare LF: 0
+s19_app/tui/changes/io.py CRLF: 1988 bare LF: 0

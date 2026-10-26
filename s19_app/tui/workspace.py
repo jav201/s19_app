@@ -5,6 +5,8 @@ import os
 import shutil
 import stat
 import sys
+import tempfile
+import time
 from collections import Counter
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -16,6 +18,10 @@ from .models import ProjectVariantSet, VariantDescriptor
 WORKAREA_DIRNAME = ".s19tool"
 WORKAREA_SUBDIR = "workarea"
 WORKAREA_TEMP = "temp"
+#: Private per-write staging home under ``temp/`` (HLR-155 / LLR-155.1). Each
+#: placement writes into its own ``tempfile.mkdtemp`` directory below this
+#: one, so no two writes can ever share a staged file under a user name.
+WORKAREA_STAGING_DIRNAME = ".staging"
 WORKAREA_PATCHES = "patches"
 LOGS_SUBDIR = "logs"
 LOG_FILENAME = "s19tui.log"
@@ -33,6 +39,16 @@ DEFAULT_COPY_SIZE_CAP_BYTES = 256 * 1024 * 1024
 
 class WorkareaContainmentError(ValueError):
     """Raised when ``copy_into_workarea`` rejects an unsafe source or destination."""
+
+
+class WorkareaPlacementError(WorkareaContainmentError):
+    """Raised when a staged write cannot be placed under its claimed name.
+
+    Subclass of :class:`WorkareaContainmentError` (LLR-155.2) so every caller
+    that already handles a containment refusal reports a placement failure
+    with no edit. The message leads with the outcome, names the file and the
+    folder, gives the cause and the next step, and says nothing was written.
+    """
 
 
 S19_EXTENSIONS = {".s19", ".srec"}
@@ -163,6 +179,8 @@ def _is_reparse_point(path: Path) -> bool:
             - os.lstat
             - stat.FILE_ATTRIBUTE_REPARSE_POINT (Windows attribute constant)
         Used by:
+            - _private_stage_dir
+            - _path_traverses_reparse_point
             - copy_into_workarea
     """
     try:
@@ -259,6 +277,110 @@ def _find_workarea_root(destination: Path) -> Optional[Path]:
         candidate = parent
 
 
+def _private_stage_dir(workarea_root: Path) -> Path:
+    """
+    Summary:
+        Create and return a private per-write staging directory under
+        ``<workarea_root>/temp/.staging/`` (LLR-155.1), reparse-checked at
+        both levels — the one staging home shared by every work-area writer
+        (``copy_into_workarea``, ``save_patched_image`` and
+        ``write_change_document``).
+
+    Args:
+        workarea_root (Path): The resolved ``.s19tool/workarea`` root whose
+            ``temp/.staging/`` home hosts the staging directory.
+
+    Returns:
+        Path: A fresh ``tempfile.mkdtemp`` directory owned by the caller.
+            The caller removes exactly this directory when done
+            (LLR-155.7); the shared ``temp/.staging/`` home persists by
+            design.
+
+    Raises:
+        WorkareaContainmentError: When ``temp`` or ``temp/.staging`` is a
+            symbolic link or reparse point — probed with ``os.lstat``, so
+            a dangling junction is caught by the check itself (security
+            finding S-F3) — when the staging home cannot be prepared, or
+            when the created staging directory fails the post-creation
+            reparse/realpath re-verification (security finding S-F2). A
+            containment-class refusal, never an uncaught ``OSError``
+            (every caller already handles the class, LLR-155.2).
+
+    Data Flow:
+        - Both levels must be real directories: a reparse point at either
+          level would let the staged bytes escape the work area (``Path.
+          resolve`` silently follows them — security finding S-N01).
+        - ``temp/`` is created on demand; the staging home itself is
+          created (never followed) after its reparse check.
+        - The per-write directory comes from ``tempfile.mkdtemp``, so
+          concurrent writers never share a staging path. After the
+          mkdtemp both levels are lstat-rechecked and the created
+          directory's real path must stay under the work area's real
+          path — a seam swapped for a link between the check and the
+          mkdtemp is refused and the created directory removed
+          (security finding S-F2).
+
+    Dependencies:
+        Uses:
+            - tempfile.mkdtemp
+            - _is_reparse_point
+        Used by:
+            - copy_into_workarea
+            - s19_app.tui.changes.apply.save_patched_image
+            - s19_app.tui.changes.io.write_change_document
+    """
+    temp_dir = workarea_root / WORKAREA_TEMP
+    # Security finding S-F3: an lstat-based check, not ``exists()`` — a
+    # dangling junction reports ``exists() == False`` (``Path.exists``
+    # follows the link), so an ``exists()``-based guard never evaluates
+    # the reparse check at all. ``os.lstat`` never follows the link, and
+    # ``_is_reparse_point`` reports OSError (missing path) as False.
+    if _is_reparse_point(temp_dir):
+        raise WorkareaContainmentError(
+            f"Refusing to stage: staging temp is a symbolic link or reparse point: {temp_dir}"
+        )
+    staging_root = temp_dir / WORKAREA_STAGING_DIRNAME
+    if _is_reparse_point(staging_root):
+        raise WorkareaContainmentError(
+            f"Refusing to stage: staging home is a symbolic link or reparse point: {staging_root}"
+        )
+    try:
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        staging_root.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        # a blocked staging seam (a file in the way, a denied home) is a
+        # containment-class refusal, never an uncaught OSError — every
+        # caller already handles WorkareaContainmentError (LLR-155.2)
+        raise WorkareaContainmentError(
+            f"Refusing to stage: staging home cannot be prepared: {exc}"
+        ) from exc
+    try:
+        stage_dir = Path(tempfile.mkdtemp(prefix="stage-", dir=staging_root))
+    except OSError as exc:
+        raise WorkareaContainmentError(
+            f"Refusing to stage: private staging directory cannot be created: {exc}"
+        ) from exc
+    # Security finding S-F2: the mkdtemp race — between the reparse check
+    # and the mkdtemp, the staging seam can be swapped for a link. Re-check
+    # both levels with lstat and require the created directory's real path
+    # to stay under the work area's real path; otherwise remove the
+    # directory this call created and refuse.
+    if _is_reparse_point(temp_dir) or _is_reparse_point(staging_root):
+        shutil.rmtree(stage_dir, ignore_errors=True)
+        raise WorkareaContainmentError(
+            "Refusing to stage: staging home became a symbolic link or "
+            f"reparse point: {staging_root}"
+        )
+    if not os.path.realpath(stage_dir).startswith(
+        os.path.realpath(workarea_root) + os.sep
+    ):
+        shutil.rmtree(stage_dir, ignore_errors=True)
+        raise WorkareaContainmentError(
+            f"Refusing to stage: staging directory escaped the work area: {stage_dir}"
+        )
+    return stage_dir
+
+
 def copy_into_workarea(
     source: Path,
     destination: Path,
@@ -279,9 +401,10 @@ def copy_into_workarea(
             finding S-N02).
 
     Returns:
-        Path: Absolute path of the file written inside ``destination``. A byte-identical
-            target is reused as-is (bug B8 content dedup); divergent name collisions are
-            resolved by appending ``_<N>`` before the suffix.
+        Path: Absolute path of the file written inside ``destination``. A
+            byte-identical target is reused as-is (bug B8 content dedup,
+            never of a 0-byte target); a divergent name collision is
+            resolved by claiming the next free ``_<N>`` name.
 
     Raises:
         WorkareaContainmentError: When ``destination`` is not contained inside a
@@ -289,6 +412,16 @@ def copy_into_workarea(
             parent of ``destination``) is a symbolic link or NTFS reparse point, or when
             ``source`` exceeds ``max_size_bytes``. Closes Phase 2 blockers S-001, S-002.
         FileNotFoundError: When ``source`` does not exist.
+        WorkareaPlacementError: When the staged copy fails with an
+            ``OSError`` (e.g. the source vanishing after the size check —
+            security finding S-F6), when the claimed name cannot be filled
+            within 5 retries in 1 s (a locked target), when the claim or
+            the fill fails with any other ``OSError``, or when the claim
+            cannot be verified as a regular file after the open (security
+            finding S-F1) — never an uncaught ``OSError`` past callers that
+            only catch the containment class (review finding F1). Subclass
+            of ``WorkareaContainmentError``; the message leads with the
+            outcome and names the file and the next step (LLR-155.2).
 
     Data Flow:
         - Resolve ``source`` and ``destination`` to absolute paths.
@@ -298,13 +431,36 @@ def copy_into_workarea(
         - Locate the ``.s19tool/workarea`` ancestor of ``destination``; reject when missing
           (closes blocker S-001).
         - Enforce ``max_size_bytes`` on ``source.stat().st_size`` (closes major S-003).
-        - Create the destination directory and copy the source. A colliding target
-          with identical bytes is returned without a new copy (bug B8); a colliding
-          target with divergent bytes is deduplicated by appending ``_<N>``.
+        - Stage privately (LLR-155.1) via :func:`_private_stage_dir`: both
+          ``temp`` and ``temp/.staging`` reparse-checked, then copy the
+          source into a ``tempfile.mkdtemp`` directory under
+          ``temp/.staging/`` — the source is only read, never
+          moved, renamed or deleted.
+        - Reuse a non-empty byte-identical target (bug B8) that is not a
+            link or reparse point (security finding S-F4); race-freeness
+            rests on the immutability invariant (LLR-155.3 as amended by
+            LED .7) — no in-app writer replaces or deletes a placed file —
+          not on a narrower check window. Otherwise claim the requested
+          name — or the next free ``_<N>`` — with
+          ``os.open(O_CREAT|O_EXCL|O_WRONLY)``, after an ``os.lstat`` of
+          the candidate: a name taken by ANY type — file, directory, link,
+          dangling link or junction — counts as taken on every platform,
+          because on Windows a bare ``O_EXCL`` open FOLLOWS a dangling
+          symlink and would create the claim at the link's target outside
+          the work area (security finding S-F1; review finding F1). The
+          claim is then re-verified with ``os.lstat`` to be a regular file
+          and no reparse point, and filled with
+          ``os.replace``, retrying a ``PermissionError`` up to 5 times within
+          1 s before removing the own claim and raising
+          ``WorkareaPlacementError``.
+        - Remove the own staging directory in a ``finally`` tracked by an
+          ownership flag set right after ``mkdtemp``.
 
     Dependencies:
         Uses:
-            - shutil.copy2
+            - shutil.copy2 / shutil.rmtree
+            - tempfile.mkdtemp
+            - os.open / os.replace / os.unlink
             - _is_reparse_point
             - _path_traverses_reparse_point
             - _find_workarea_root
@@ -346,27 +502,176 @@ def copy_into_workarea(
         )
 
     resolved_destination.mkdir(parents=True, exist_ok=True)
-    target = resolved_destination / resolved_source.name
-    if target.exists():
-        # Content dedup (bug B8): a byte-identical re-load reuses the existing
-        # target instead of suffixing a duplicate copy (same idiom as the
-        # project gather's byte-compare refresh in project_gather_service).
+
+    # Private staging (LLR-155.1): the reparse-checked shared staging home,
+    # factored into one helper so every work-area writer stages the same way.
+    stage_dir = _private_stage_dir(workarea_root)
+    staging_owned = True
+    try:
+        staged_file = stage_dir / resolved_source.name
         try:
-            if target.read_bytes() == resolved_source.read_bytes():
-                return target
-        except OSError:
-            pass  # an unreadable target is not trusted; fall through to the name-dedup suffix
+            shutil.copy2(resolved_source, staged_file)
+        except OSError as exc:
+            # security finding S-F6: an OSError from the copy — e.g. the
+            # source vanishing after the size check — is a placement
+            # failure, never an uncaught OSError past callers that only
+            # catch the containment class; outcome first, naming the source
+            raise WorkareaPlacementError(
+                f"Not saved: {resolved_source.name} could not be copied: "
+                f"{exc}. Nothing written."
+            ) from exc
+        staged_bytes = staged_file.read_bytes()
+
+        # Exclusive, atomic placement (LLR-155.2): claim the final name with
+        # O_CREAT|O_EXCL, taking the next free ``_<N>`` whenever the requested
+        # name is taken, and fill the claim with os.replace. The source is
+        # only ever read, never moved, renamed or deleted.
         stem = resolved_source.stem
         suffix = resolved_source.suffix
-        counter = 1
-        while True:
-            candidate = resolved_destination / f"{stem}_{counter}{suffix}"
-            if not candidate.exists():
-                target = candidate
-                break
+        target = resolved_destination / resolved_source.name
+        claim_path: Optional[Path] = None
+        claim_owned = False
+        counter = 0
+        while claim_path is None:
+            candidate = (
+                target
+                if counter == 0
+                else resolved_destination / f"{stem}_{counter}{suffix}"
+            )
             counter += 1
-    shutil.copy2(resolved_source, target)
-    return target
+            if candidate == target:
+                # Content dedup (bug B8), race-free by an INVARIANT
+                # (LLR-155.3, amended by LED .7 — not by a narrower window:
+                # reading twice cannot close the check-and-reuse race): no
+                # in-app code path replaces or deletes a file at a final
+                # name except this placement claiming a free name, so a
+                # placed file is immutable once placed.
+                # ``project_gather_service``'s delete-and-recopy
+                # (:290-299) is the one known violator of the invariant,
+                # converted by Inc 3b. A 0-byte target is NEVER reused — it
+                # may be another writer's claim placeholder (PDR C1(a)),
+                # and a target that is a link or reparse point is never
+                # reused either — its bytes live outside the work area
+                # (security finding S-F4).
+                try:
+                    if (
+                        not _is_reparse_point(candidate)
+                        and candidate.exists()
+                        and candidate.stat().st_size > 0
+                    ):
+                        if candidate.read_bytes() == staged_bytes:
+                            return candidate
+                except OSError:
+                    # an unreadable target is not trusted; claim a fresh name
+                    pass
+            # Security finding S-F1: lstat the candidate BEFORE the O_EXCL
+            # claim. On Windows, os.open(O_CREAT|O_EXCL) FOLLOWS a dangling
+            # symlink: the claim would create a 0-byte file at the link's
+            # target OUTSIDE the work area and os.replace would then
+            # replace the link. ANY existing entry — file, directory, link,
+            # dangling link or junction — is taken.
+            try:
+                os.lstat(candidate)
+            except OSError:
+                pass  # the name is free
+            else:
+                claim_path = None
+                continue
+            claim_path = candidate
+            try:
+                claim_fd = os.open(
+                    str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                )
+                claim_owned = True
+            except FileExistsError:
+                # lost a lstat-vs-open race: the name is taken after all
+                claim_path = None
+                continue
+            except OSError as exc:
+                # any other claim failure is a placement failure, never an
+                # uncaught OSError past callers that only catch the
+                # containment class (review finding F1); if the name exists
+                # after all (a lstat-vs-open race that surfaced late, e.g.
+                # a directory on Windows raising PermissionError) it is
+                # simply taken — move on to the next ``_<N>``
+                try:
+                    os.lstat(claim_path)
+                except OSError:
+                    raise WorkareaPlacementError(
+                        f"Not saved: {claim_path.name} in {resolved_destination} "
+                        f"could not be claimed: {exc}. Nothing written."
+                    ) from exc
+                claim_path = None
+                continue
+            os.close(claim_fd)
+            # Security finding S-F1: re-verify the claim is a regular file
+            # this call just created — not a reparse point swapped in after
+            # the pre-claim lstat — else remove the claim and refuse.
+            try:
+                claim_stat = os.lstat(claim_path)
+            except OSError as exc:
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise WorkareaPlacementError(
+                    f"Not saved: {claim_path.name} in {resolved_destination} "
+                    f"could not be verified after the claim: {exc}. "
+                    "Nothing written."
+                ) from exc
+            if not stat.S_ISREG(claim_stat.st_mode) or _is_reparse_point(claim_path):
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise WorkareaPlacementError(
+                    f"Not saved: {claim_path.name} in {resolved_destination} "
+                    "was replaced by a link or special file between the claim "
+                    "and the write. Nothing written."
+                )
+
+        deadline = time.monotonic() + 1.0
+        attempts = 0
+        while True:
+            try:
+                os.replace(staged_file, claim_path)
+                break
+            except PermissionError:
+                attempts += 1
+                if attempts >= 5 or time.monotonic() >= deadline:
+                    if claim_owned:
+                        try:
+                            os.unlink(claim_path)
+                        except OSError:
+                            pass
+                    raise WorkareaPlacementError(
+                        f"Not saved: {claim_path.name} in {resolved_destination} "
+                        "is still locked after 5 retries, another program may "
+                        "hold it — close it and retry. Nothing written."
+                    ) from None
+                time.sleep(min(0.05, max(0.0, deadline - time.monotonic())))
+            except OSError as exc:
+                # any other fill failure (e.g. a cross-device replace) fails
+                # the write outright — never a fallback to a move or a
+                # copy-then-delete of the source (LLR-155.2), and never an
+                # uncaught OSError past callers that only catch the
+                # containment class (review finding F1)
+                if claim_owned:
+                    try:
+                        os.unlink(claim_path)
+                    except OSError:
+                        pass
+                raise WorkareaPlacementError(
+                    f"Not saved: {claim_path.name} in {resolved_destination} "
+                    f"could not be written: {exc}. Nothing written."
+                ) from exc
+        return claim_path
+    finally:
+        # only ever the staging this call created (LLR-155.1/155.7)
+        if staging_owned:
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
 
 def sanitize_project_name(name: str) -> Optional[str]:

@@ -1,0 +1,99 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_12_eight_writers_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BECC091F50>
+
+    def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """8 threads x 20 trials request ONE name with distinct markers.
+    
+        RED at HEAD: placement is check-then-copy into a shared target, so the
+        forced interleaving clobbers bytes; the assertion message prints the
+        decisive ``parallel mismatches: N`` line (PQ-8 requires N > 0).
+        """
+        root = _workarea(tmp_path)
+        sources_root = tmp_path / "sources"
+        _pause_on_shared_name(monkeypatch)
+    
+        mismatches = 0
+        reported_total = 0
+        for trial in range(_TRIALS):
+            dest = root / "out" / f"trial{trial:02d}"
+            dest.mkdir(parents=True)
+            trial_sources = sources_root / f"trial{trial:02d}"
+            trial_sources.mkdir(parents=True)
+    
+            def place(writer: int) -> tuple[int, Path]:
+                src_dir = trial_sources / f"w{writer}"
+                src_dir.mkdir(exist_ok=True)
+                src = src_dir / _SHARED_NAME
+                src.write_text(_emit(0x41 + writer), encoding="ascii")
+                return writer, copy_into_workarea(src, dest)
+    
+            with ThreadPoolExecutor(max_workers=_WRITERS, thread_name_prefix="b99-tc12") as pool:
+                results = list(pool.map(place, range(_WRITERS)))
+            reported_total += len(results)
+            for writer, reported in results:
+                if _data(reported) != {0x1000: 0x41 + writer}:
+                    mismatches += 1
+    
+        assert reported_total == _WRITERS * _TRIALS
+>       assert mismatches == 0, f"parallel mismatches: {mismatches}"
+E       AssertionError: parallel mismatches: 140
+E       assert 140 == 0
+
+tests\test_b99_staging.py:225: AssertionError
+___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_13_target_replaced0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001BECA94E490>
+
+    def test_tc_b99_13_target_replaced_between_check_and_reuse(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A hook replaces the target between check and reuse; the caller must
+        receive a path whose bytes equal its own (never the replaced content).
+    
+        RED at HEAD (check-then-copy mutation form): the single compare reuses
+        the target, so the returned path ends up holding the replacement bytes.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "keep.s19"
+        target.write_text(_emit(0x11), encoding="ascii")
+        src = _image(tmp_path, "keep.s19", 0x11)
+        replacement = _emit(0x99)
+    
+        real_read_bytes = Path.read_bytes
+        state = {"fired": False}
+    
+        def _replace_after_first_read(self: Path) -> bytes:
+            data = real_read_bytes(self)
+            if Path(self) == target and not state["fired"]:
+                state["fired"] = True
+                Path(self).write_text(replacement, encoding="ascii")
+            return data
+    
+        monkeypatch.setattr(Path, "read_bytes", _replace_after_first_read)
+        returned = copy_into_workarea(src, dest)
+    
+        assert _data(returned) == {0x1000: 0x11}, (
+            f"the caller must receive a path holding its own bytes, got "
+            f"{returned} -> {_data(returned)}"
+        )
+>       assert returned.name != "keep.s19", (
+            "the replaced target must not be reused"
+        )
+E       AssertionError: the replaced target must not be reused
+E       assert 'keep.s19' != 'keep.s19'
+E        +  where 'keep.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25773/test_tc_b99_13_target_replaced0/.s19tool/workarea/out/keep.s19').name
+
+tests\test_b99_staging.py:318: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+FAILED tests/test_b99_staging.py::test_tc_b99_13_target_replaced_between_check_and_reuse
+2 failed, 10 deselected in 3.33s

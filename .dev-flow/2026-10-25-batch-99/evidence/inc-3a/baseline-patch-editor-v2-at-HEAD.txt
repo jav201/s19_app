@@ -1,0 +1,12 @@
+HEAD baseline (scratch worktree at a52e2be, git worktree add --detach /tmp/b99-head-check):
+command: pytest tests/test_tui_patch_editor_v2.py --no-header -q
+
+HEAD is now at a52e2be batch-99 inc-1: synthetic corpus + independent reader (HLR-152)
+..\..\..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_16_caps_records_and_empties_s0
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document
+5 failed, 47 passed in 164.50s (0:02:44)

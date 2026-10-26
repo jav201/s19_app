@@ -1,0 +1,299 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 23 items / 22 deselected / 1 selected
+
+tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free FAILED [100%]
+
+================================== FAILURES ===================================
+______ test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26380/test_tc_b99_12_dangling_symlin0')
+
+    def test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING symlink at the requested final name counts as taken
+        (security finding S-F1): on Windows ``os.open(O_CREAT|O_EXCL)``
+        FOLLOWS a dangling symlink — the claim would create a 0-byte file at
+        the link's target OUTSIDE the work area and ``os.replace`` would then
+        replace the link. The placement must lstat the candidate first, land
+        on the next ``_<N>``, and leave the link and its (nonexistent) target
+        untouched. Skips with the stated reason when symlink creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: verified empirically on this host —
+        the bare O_EXCL claim followed the link and created the 0-byte file
+        at its target.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = tmp_path / "outside" / "fw.s19"  # parent exists, file never created
+        target.parent.mkdir(exist_ok=True)
+        link = dest / "fw.s19"
+        try:
+            os.symlink(target, link)
+        except OSError as exc:
+            pytest.skip(f"symlink creation not permitted: {exc}")
+        assert not target.exists(), "the link must start dangling"
+    
+        src = _image(tmp_path, "fw.s19", 0x77)
+>       placed = copy_into_workarea(src, dest)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:537: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26380/test_tc_b99_12_dangling_symlin0/fw.s19')
+destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26380/test_tc_b99_12_dangling_symlin0/.s19tool/workarea/out')
+max_size_bytes = 268435456
+
+    def copy_into_workarea(
+        source: Path,
+        destination: Path,
+        max_size_bytes: int = DEFAULT_COPY_SIZE_CAP_BYTES,
+    ) -> Path:
+        """
+        Summary:
+            Copy ``source`` into a workarea-contained ``destination`` after enforcing
+            containment, reparse-point, and size guards.
+    
+        Args:
+            source (Path): File to copy. Must be a real file (not a symlink/junction) and
+                must not exceed ``max_size_bytes``.
+            destination (Path): Target directory. Must resolve under
+                ``<base>/.s19tool/workarea/`` and must not traverse a symlink or NTFS junction.
+            max_size_bytes (int): Maximum permitted size for ``source`` in bytes. Defaults to
+                256 MB; configurable per call to support regression testing (per security
+                finding S-N02).
+    
+        Returns:
+            Path: Absolute path of the file written inside ``destination``. A
+                byte-identical target is reused as-is (bug B8 content dedup,
+                never of a 0-byte target); a divergent name collision is
+                resolved by claiming the next free ``_<N>`` name.
+    
+        Raises:
+            WorkareaContainmentError: When ``destination`` is not contained inside a
+                ``.s19tool/workarea/`` root, when ``source`` or ``destination`` (or any traversed
+                parent of ``destination``) is a symbolic link or NTFS reparse point, or when
+                ``source`` exceeds ``max_size_bytes``. Closes Phase 2 blockers S-001, S-002.
+            FileNotFoundError: When ``source`` does not exist.
+            WorkareaPlacementError: When the staged copy fails with an
+                ``OSError`` (e.g. the source vanishing after the size check —
+                security finding S-F6), when the claimed name cannot be filled
+                within 5 retries in 1 s (a locked target), when the claim or
+                the fill fails with any other ``OSError``, or when the claim
+                cannot be verified as a regular file after the open (security
+                finding S-F1) — never an uncaught ``OSError`` past callers that
+                only catch the containment class (review finding F1). Subclass
+                of ``WorkareaContainmentError``; the message leads with the
+                outcome and names the file and the next step (LLR-155.2).
+    
+        Data Flow:
+            - Resolve ``source`` and ``destination`` to absolute paths.
+            - Reject reparse-point sources directly; reject when the destination, or any
+              parent of the destination up to its workarea root, is a reparse point. ``Path.resolve``
+              alone is not sufficient on Windows (per security finding S-N01).
+            - Locate the ``.s19tool/workarea`` ancestor of ``destination``; reject when missing
+              (closes blocker S-001).
+            - Enforce ``max_size_bytes`` on ``source.stat().st_size`` (closes major S-003).
+            - Stage privately (LLR-155.1) via :func:`_private_stage_dir`: both
+              ``temp`` and ``temp/.staging`` reparse-checked, then copy the
+              source into a ``tempfile.mkdtemp`` directory under
+              ``temp/.staging/`` — the source is only read, never
+              moved, renamed or deleted.
+            - Reuse a non-empty byte-identical target (bug B8) that is not a
+                link or reparse point (security finding S-F4); race-freeness
+                rests on the immutability invariant (LLR-155.3 as amended by
+                LED .7) — no in-app writer replaces or deletes a placed file —
+              not on a narrower check window. Otherwise claim the requested
+              name — or the next free ``_<N>`` — with
+              ``os.open(O_CREAT|O_EXCL|O_WRONLY)``, after an ``os.lstat`` of
+              the candidate: a name taken by ANY type — file, directory, link,
+              dangling link or junction — counts as taken on every platform,
+              because on Windows a bare ``O_EXCL`` open FOLLOWS a dangling
+              symlink and would create the claim at the link's target outside
+              the work area (security finding S-F1; review finding F1). The
+              claim is then re-verified with ``os.lstat`` to be a regular file
+              and no reparse point, and filled with
+              ``os.replace``, retrying a ``PermissionError`` up to 5 times within
+              1 s before removing the own claim and raising
+              ``WorkareaPlacementError``.
+            - Remove the own staging directory in a ``finally`` tracked by an
+              ownership flag set right after ``mkdtemp``.
+    
+        Dependencies:
+            Uses:
+                - shutil.copy2 / shutil.rmtree
+                - tempfile.mkdtemp
+                - os.open / os.replace / os.unlink
+                - _is_reparse_point
+                - _path_traverses_reparse_point
+                - _find_workarea_root
+            Used by:
+                - s19_app.tui.app.S19TuiApp (project save and temp-load paths)
+        """
+        # Reject symlinks/junctions on the source side before resolving (which would follow them).
+        if _is_reparse_point(source):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: source is a symbolic link or reparse point: {source}"
+            )
+    
+        resolved_source = source.resolve()
+        if _is_reparse_point(resolved_source):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: resolved source is a symbolic link or reparse point: {resolved_source}"
+            )
+    
+        resolved_destination = destination.resolve()
+        workarea_root = _find_workarea_root(resolved_destination)
+        if workarea_root is None or not resolved_destination.is_relative_to(workarea_root):
+            raise WorkareaContainmentError(
+                "Refusing to copy: destination is not contained inside "
+                f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
+            )
+    
+        # Walk every parent of ``destination`` from the workarea root downwards. Path.resolve()
+        # silently follows reparse points, so a junction anywhere in the chain must be flagged
+        # explicitly via os.lstat() + FILE_ATTRIBUTE_REPARSE_POINT (security finding S-N01).
+        if _path_traverses_reparse_point(resolved_destination, stop_at=workarea_root.parent):
+            raise WorkareaContainmentError(
+                f"Refusing to copy: destination traverses a symbolic link or reparse point: {resolved_destination}"
+            )
+    
+        size = resolved_source.stat().st_size
+        if size > max_size_bytes:
+            raise WorkareaContainmentError(
+                f"Refusing to copy: source size {size} bytes exceeds cap {max_size_bytes} bytes: {resolved_source}"
+            )
+    
+        resolved_destination.mkdir(parents=True, exist_ok=True)
+    
+        # Private staging (LLR-155.1): the reparse-checked shared staging home,
+        # factored into one helper so every work-area writer stages the same way.
+        stage_dir = _private_stage_dir(workarea_root)
+        staging_owned = True
+        try:
+            staged_file = stage_dir / resolved_source.name
+            try:
+                shutil.copy2(resolved_source, staged_file)
+            except OSError as exc:
+                # security finding S-F6: an OSError from the copy — e.g. the
+                # source vanishing after the size check — is a placement
+                # failure, never an uncaught OSError past callers that only
+                # catch the containment class; outcome first, naming the source
+                raise WorkareaPlacementError(
+                    f"Not saved: {resolved_source.name} could not be copied: "
+                    f"{exc}. Nothing written."
+                ) from exc
+            staged_bytes = staged_file.read_bytes()
+    
+            # Exclusive, atomic placement (LLR-155.2): claim the final name with
+            # O_CREAT|O_EXCL, taking the next free ``_<N>`` whenever the requested
+            # name is taken, and fill the claim with os.replace. The source is
+            # only ever read, never moved, renamed or deleted.
+            stem = resolved_source.stem
+            suffix = resolved_source.suffix
+            target = resolved_destination / resolved_source.name
+            claim_path: Optional[Path] = None
+            claim_owned = False
+            counter = 0
+            while claim_path is None:
+                candidate = (
+                    target
+                    if counter == 0
+                    else resolved_destination / f"{stem}_{counter}{suffix}"
+                )
+                counter += 1
+                if candidate == target:
+                    # Content dedup (bug B8), race-free by an INVARIANT
+                    # (LLR-155.3, amended by LED .7 — not by a narrower window:
+                    # reading twice cannot close the check-and-reuse race): no
+                    # in-app code path replaces or deletes a file at a final
+                    # name except this placement claiming a free name, so a
+                    # placed file is immutable once placed.
+                    # ``project_gather_service``'s delete-and-recopy
+                    # (:290-299) is the one known violator of the invariant,
+                    # converted by Inc 3b. A 0-byte target is NEVER reused — it
+                    # may be another writer's claim placeholder (PDR C1(a)),
+                    # and a target that is a link or reparse point is never
+                    # reused either — its bytes live outside the work area
+                    # (security finding S-F4).
+                    try:
+                        if (
+                            not _is_reparse_point(candidate)
+                            and candidate.exists()
+                            and candidate.stat().st_size > 0
+                        ):
+                            if candidate.read_bytes() == staged_bytes:
+                                return candidate
+                    except OSError:
+                        # an unreadable target is not trusted; claim a fresh name
+                        pass
+                # MUTANT (fix2 S-F1): the pre-claim lstat is removed — a bare
+                # O_EXCL claim follows a dangling symlink on Windows.
+                claim_path = candidate
+                try:
+                    claim_fd = os.open(
+                        str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                    )
+                    claim_owned = True
+                except FileExistsError:
+                    # lost a lstat-vs-open race: the name is taken after all
+                    claim_path = None
+                    continue
+                except OSError as exc:
+                    # any other claim failure is a placement failure, never an
+                    # uncaught OSError past callers that only catch the
+                    # containment class (review finding F1); if the name exists
+                    # after all (a lstat-vs-open race that surfaced late, e.g.
+                    # a directory on Windows raising PermissionError) it is
+                    # simply taken — move on to the next ``_<N>``
+                    try:
+                        os.lstat(claim_path)
+                    except OSError:
+                        raise WorkareaPlacementError(
+                            f"Not saved: {claim_path.name} in {resolved_destination} "
+                            f"could not be claimed: {exc}. Nothing written."
+                        ) from exc
+                    claim_path = None
+                    continue
+                os.close(claim_fd)
+                # Security finding S-F1: re-verify the claim is a regular file
+                # this call just created — not a reparse point swapped in after
+                # the pre-claim lstat — else remove the claim and refuse.
+                try:
+                    claim_stat = os.lstat(claim_path)
+                except OSError as exc:
+                    if claim_owned:
+                        try:
+                            os.unlink(claim_path)
+                        except OSError:
+                            pass
+                    raise WorkareaPlacementError(
+                        f"Not saved: {claim_path.name} in {resolved_destination} "
+                        f"could not be verified after the claim: {exc}. "
+                        "Nothing written."
+                    ) from exc
+                if not stat.S_ISREG(claim_stat.st_mode) or _is_reparse_point(claim_path):
+                    if claim_owned:
+                        try:
+                            os.unlink(claim_path)
+                        except OSError:
+                            pass
+>                   raise WorkareaPlacementError(
+                        f"Not saved: {claim_path.name} in {resolved_destination} "
+                        "was replaced by a link or special file between the claim "
+                        "and the write. Nothing written."
+                    )
+E                   s19_app.tui.workspace.WorkareaPlacementError: Not saved: fw.s19 in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26380\test_tc_b99_12_dangling_symlin0\.s19tool\workarea\out was replaced by a link or special file between the claim and the write. Nothing written.
+
+s19_app\tui\workspace.py:618: WorkareaPlacementError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+====================== 1 failed, 22 deselected in 0.53s =======================

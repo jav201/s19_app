@@ -1,0 +1,162 @@
+F.F.FFFF                                                                 [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_11_junction_at_sta0')
+
+    def test_tc_b99_11_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` (the staging seam) is refused
+        (LLR-155.1, review finding F3): ``save_patched_image`` reports one
+        ``MF-WRITE-CONTAINMENT`` issue and nothing is written anywhere — in
+        particular nothing THROUGH the junction, outside the work area. On
+        Windows the junction is created with ``mklink /J``; when that is not
+        permitted the arm skips with the stated reason.
+    
+        RED at the review-round tree: staging ran directly under ``temp/`` with
+        no reparse check, so the write rode the junction and landed outside the
+        work area.
+        """
+        root = _workarea(tmp_path)
+        outside = _plant_temp_junction(root, tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+>       assert target is None, f"the junction must refuse the write: {target}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26200\test_tc_b99_11_junction_at_sta0\.s19tool\workarea\proj\firmware.s19
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_11_junction_at_sta0/.s19tool/workarea/proj/firmware.s19') is None
+
+tests\test_b99_staging.py:262: AssertionError
+_______ test_tc_b99_12_forced_oserror_in_replace_raises_placement_error _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_12_forced_oserror_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022F848D6CD0>
+
+    def test_tc_b99_12_forced_oserror_in_replace_raises_placement_error(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A forced ``OSError`` (NOT ``PermissionError``) in the replace is
+        wrapped in ``WorkareaPlacementError`` (review finding F1): callers that
+        catch only ``WorkareaContainmentError`` must never see a raw
+        ``OSError``; the own claim is removed, so no 0-byte leftover survives.
+    
+        RED at the review-round tree: the raw ``OSError`` propagates uncaught.
+        """
+>       assert PlacementError is not None
+E       assert None is not None
+
+tests\test_b99_staging.py:409: AssertionError
+_______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_13_zero_byte_targe0')
+
+    def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
+        """A 0-byte target may be another writer's claim placeholder (C1(a))."""
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "empty.s19"
+        target.write_bytes(b"")
+        src = tmp_path / "empty.s19"
+        src.write_bytes(b"")
+    
+        returned = copy_into_workarea(src, dest)
+>       assert returned.name != "empty.s19", (
+            "a 0-byte target (another writer's claim) must never be reused"
+        )
+E       AssertionError: a 0-byte target (another writer's claim) must never be reused
+E       assert 'empty.s19' != 'empty.s19'
+E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+
+tests\test_b99_staging.py:511: AssertionError
+____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
+
+    def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
+        """RED at HEAD: ``apply.py``'s ``finally: staged.unlink()`` deletes a path
+        rebuilt from the user's name (the LLR-155.7 declared RED site)."""
+        all_violations: list = []
+        for rel, func_name in _CENSUS_TARGETS:
+            all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
+        unexpected = [
+            v
+            for v in all_violations
+            if not (v.startswith(_CRC_EXPECTED[0]) and f":{_CRC_EXPECTED[1]}:" in v)
+        ]
+>       assert unexpected == [], (
+            f"LLR-155.7 violations outside the known Inc-5 CRC site: {unexpected}"
+        )
+E       AssertionError: LLR-155.7 violations outside the known Inc-5 CRC site: ["apply.py:save_patched_image:779 deletes 'staged' without an owned-binding guard", "io.py:write_change_document:1610 deletes 'staged' without an owned-binding guard"]
+E       assert ['apply.py:sa...inding guard'] == []
+E         
+E         Left contains 2 more items, first extra item: "apply.py:save_patched_image:779 deletes 'staged' without an owned-binding guard"
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:734: AssertionError
+____________ test_tc_b99_40_change_document_stages_in_private_home ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_change_document0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022F83324910>
+
+    def test_tc_b99_40_change_document_stages_in_private_home(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The converted ``write_change_document`` path (PDR C2; the app-level
+        caller is ``S19TuiApp._on_check_editor_action``'s ``write_doc`` arm and
+        ``change_service``) stages the serialised bytes in a private
+        ``tempfile.mkdtemp`` directory under the reparse-checked
+        ``temp/.staging`` home — never directly under ``temp/`` — and places
+        the document correctly (review finding F4).
+    
+        RED at the review-round tree: staging ran a ``mkdtemp`` directly under
+        ``temp/`` (no reparse check), so the mkdtemp spy sees the wrong home.
+        """
+        real_mkdtemp = tempfile.mkdtemp
+        dirs_seen: list = []
+    
+        def _spy_mkdtemp(*args, **kwargs):
+            created = real_mkdtemp(*args, **kwargs)
+            dirs_seen.append((kwargs.get("dir"), Path(created)))
+            return created
+    
+>       monkeypatch.setattr(workspace.tempfile, "mkdtemp", _spy_mkdtemp)
+                            ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.workspace' has no attribute 'tempfile'
+
+tests\test_b99_staging.py:781: AttributeError
+_____________ test_tc_b99_40_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_junction_at_sta0')
+
+    def test_tc_b99_40_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` refuses the converted ``io.py`` write
+        too (LLR-155.1, review finding F3): one ``MF-WRITE-CONTAINMENT`` issue,
+        nothing written anywhere — in particular nothing through the junction.
+        Skips with the stated reason when link creation is not permitted.
+    
+        RED at the review-round tree: no reparse check existed on this path, so
+        the write rode the junction and landed outside the work area.
+        """
+        root = tmp_path / ".s19tool" / "workarea"
+        root.mkdir(parents=True)
+        outside = _plant_temp_junction(root, tmp_path)
+    
+        written_path, issues = write_change_document(_change_document(), tmp_path)
+    
+>       assert written_path is None, f"the junction must refuse the write: {written_path}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26200\test_tc_b99_40_junction_at_sta0\.s19tool\workarea\patches\changes.json
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26200/test_tc_b99_40_junction_at_sta0/.s19tool/workarea/patches/changes.json') is None
+
+tests\test_b99_staging.py:819: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+FAILED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+FAILED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+FAILED tests/test_b99_staging.py::test_tc_b99_40_change_document_stages_in_private_home
+FAILED tests/test_b99_staging.py::test_tc_b99_40_junction_at_staging_temp_is_refused
+6 failed, 2 passed, 9 deselected in 1.65s

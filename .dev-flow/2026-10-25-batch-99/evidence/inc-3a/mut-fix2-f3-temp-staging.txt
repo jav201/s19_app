@@ -1,0 +1,169 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 23 items / 20 deselected / 3 selected
+
+tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused FAILED [ 33%]
+tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused FAILED [ 66%]
+tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused FAILED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_11_junction_at_sta0')
+
+    def test_tc_b99_11_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` (the staging seam) is refused
+        (LLR-155.1, review finding F3): ``save_patched_image`` reports one
+        ``MF-WRITE-CONTAINMENT`` issue and nothing is written anywhere — in
+        particular nothing THROUGH the junction, outside the work area. On
+        Windows the junction is created with ``mklink /J``; when that is not
+        permitted the arm skips with the stated reason.
+    
+        RED at the review-round tree: staging ran directly under ``temp/`` with
+        no reparse check, so the write rode the junction and landed outside the
+        work area.
+        """
+        root = _workarea(tmp_path)
+        outside = _plant_temp_junction(root, tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+>       assert target is None, f"the junction must refuse the write: {target}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26391\test_tc_b99_11_junction_at_sta0\.s19tool\workarea\proj\firmware.s19
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_11_junction_at_sta0/.s19tool/workarea/proj/firmware.s19') is None
+
+tests\test_b99_staging.py:280: AssertionError
+_________ test_tc_b99_11_dangling_junction_at_staging_temp_is_refused _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_11_dangling_juncti0')
+
+    def test_tc_b99_11_dangling_junction_at_staging_temp_is_refused(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING junction at ``temp`` — target deleted after the junction
+        was made — is caught by the staging check ITSELF (LLR-155.1; security
+        findings S-F2/S-F3): ``Path.exists()`` follows the link and reports
+        False, so an ``exists()``-based guard never evaluates the reparse
+        check; only an ``os.lstat``-based one does. The refusal must name the
+        reparse point (not a generic "cannot be prepared" mkdir failure), and
+        nothing may be created anywhere — in particular not through the
+        junction. Skips with the stated reason when link creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: the ``exists()`` guard skipped the
+        reparse check and the refusal came from the ``mkdir`` fallback with a
+        generic message.
+        """
+        root = _workarea(tmp_path)
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        temp = root / "temp"
+        if temp.is_symlink() or temp.is_file():
+            temp.unlink()
+        elif temp.is_dir():
+            shutil.rmtree(temp)
+        if sys.platform == "win32":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(temp), str(outside)],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                pytest.skip(
+                    "junction creation not permitted: "
+                    f"{result.stdout.strip()} {result.stderr.strip()}"
+                )
+        else:
+            try:
+                os.symlink(outside, temp, target_is_directory=True)
+            except OSError as exc:
+                pytest.skip(f"symlink creation not permitted: {exc}")
+        shutil.rmtree(outside)  # the junction now dangles
+        assert not temp.exists(), "the junction must dangle for this arm"
+        dest = root / "out"
+        dest.mkdir()
+        src = _image(tmp_path, "fw.s19", 0x77)
+    
+        with pytest.raises(WorkareaContainmentError) as excinfo:
+>           copy_into_workarea(src, dest)
+
+tests\test_b99_staging.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\workspace.py:463: in copy_into_workarea
+    stage_dir = _private_stage_dir(workarea_root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\workspace.py:335: in _private_stage_dir
+    stage_dir = Path(tempfile.mkdtemp(prefix="stage-", dir=workarea_root / WORKAREA_TEMP))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+suffix = '', prefix = 'stage-'
+dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_11_dangling_juncti0/.s19tool/workarea/temp')
+
+    def mkdtemp(suffix=None, prefix=None, dir=None):
+        """User-callable function to create and return a unique temporary
+        directory.  The return value is the pathname of the directory.
+    
+        Arguments are as for mkstemp, except that the 'text' argument is
+        not accepted.
+    
+        The directory is readable, writable, and searchable only by the
+        creating user.
+    
+        Caller is responsible for deleting the directory when done with it.
+        """
+    
+        prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)
+    
+        names = _get_candidate_names()
+        if output_type is bytes:
+            names = map(_os.fsencode, names)
+    
+        for seq in range(TMP_MAX):
+            name = next(names)
+            file = _os.path.join(dir, prefix + name + suffix)
+            _sys.audit("tempfile.mkdtemp", file)
+            try:
+>               _os.mkdir(file, 0o700)
+E               FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26391\\test_tc_b99_11_dangling_juncti0\\.s19tool\\workarea\\temp\\stage-5jl8nrar'
+
+..\..\anaconda3\envs\s19env\Lib\tempfile.py:385: FileNotFoundError
+_____________ test_tc_b99_44_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_44_junction_at_sta0')
+
+    def test_tc_b99_44_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` refuses the converted ``io.py`` write
+        too (LLR-155.1, review finding F3): one ``MF-WRITE-CONTAINMENT`` issue,
+        nothing written anywhere — in particular nothing through the junction.
+        Skips with the stated reason when link creation is not permitted.
+    
+        RED at the review-round tree: no reparse check existed on this path, so
+        the write rode the junction and landed outside the work area.
+        """
+        root = tmp_path / ".s19tool" / "workarea"
+        root.mkdir(parents=True)
+        outside = _plant_temp_junction(root, tmp_path)
+    
+        written_path, issues = write_change_document(_change_document(), tmp_path)
+    
+>       assert written_path is None, f"the junction must refuse the write: {written_path}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26391\test_tc_b99_44_junction_at_sta0\.s19tool\workarea\patches\changes.json
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26391/test_tc_b99_44_junction_at_sta0/.s19tool/workarea/patches/changes.json') is None
+
+tests\test_b99_staging.py:1038: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+====================== 3 failed, 20 deselected in 0.61s =======================

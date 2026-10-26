@@ -1,0 +1,76 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_target_replaced0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000230FF7BA5D0>
+
+    def test_tc_b99_13_target_replaced_between_check_and_reuse(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A hook replaces the target between check and reuse; the caller must
+        receive a path whose bytes equal its own (never the replaced content).
+    
+        RED at HEAD (check-then-copy mutation form): the single compare reuses
+        the target, so the returned path ends up holding the replacement bytes.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "keep.s19"
+        target.write_text(_emit(0x11), encoding="ascii")
+        src = _image(tmp_path, "keep.s19", 0x11)
+        replacement = _emit(0x99)
+    
+        real_read_bytes = Path.read_bytes
+        state = {"fired": False}
+    
+        def _replace_after_first_read(self: Path) -> bytes:
+            data = real_read_bytes(self)
+            if Path(self) == target and not state["fired"]:
+                state["fired"] = True
+                Path(self).write_text(replacement, encoding="ascii")
+            return data
+    
+        monkeypatch.setattr(Path, "read_bytes", _replace_after_first_read)
+        returned = copy_into_workarea(src, dest)
+    
+>       assert _data(returned) == {0x1000: 0x11}, (
+            f"the caller must receive a path holding its own bytes, got "
+            f"{returned} -> {_data(returned)}"
+        )
+E       AssertionError: the caller must receive a path holding its own bytes, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-25741\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
+E       assert {4096: 153} == {4096: 17}
+E         
+E         Differing items:
+E         {4096: 153} != {4096: 17}
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:303: AssertionError
+_______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_zero_byte_targe0')
+
+    def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
+        """A 0-byte target may be another writer's claim placeholder (C1(a))."""
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "empty.s19"
+        target.write_bytes(b"")
+        src = tmp_path / "empty.s19"
+        src.write_bytes(b"")
+    
+        returned = copy_into_workarea(src, dest)
+>       assert returned.name != "empty.s19", (
+            "a 0-byte target (another writer's claim) must never be reused"
+        )
+E       AssertionError: a 0-byte target (another writer's claim) must never be reused
+E       assert 'empty.s19' != 'empty.s19'
+E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25741/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+
+tests\test_b99_staging.py:323: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_target_replaced_between_check_and_reuse
+FAILED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+2 failed, 10 deselected in 0.55s

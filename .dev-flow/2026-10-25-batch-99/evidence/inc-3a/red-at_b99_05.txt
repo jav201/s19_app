@@ -1,0 +1,235 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_at_b99_05_save_project_after_same_name_save_back ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26202/test_at_b99_05_save_project_af0')
+
+    def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
+        """Load -> patch -> save back as firmware.s19 -> Save project: the app is
+        running, the project folder holds the image and the status names it.
+        Driven entirely by keys and clicks through the real Load file dialog,
+        the Patch Editor (rail key ``6``) and the real ``SaveProjectScreen``
+        (review finding F5) — inputs are clicked and typed, buttons are clicked,
+        and every wait observes the painted status line (``#log_line_4``) or the
+        painted screen; assertions read the painted status and the files on disk.
+    
+        RED at HEAD (P-15): the save-back deletes the work copy and the next Save
+        project exits the app with code 1.
+        """
+        from textual.widgets import Label
+    
+        image = tmp_path / "firmware.s19"
+        image.write_text(_emit_two(0x11, 0x00), encoding="ascii")
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            # 54 rows: the Patch Editor's docked save-back row sits at the foot
+            # of the JSON pane and is only clickable/painted at the taller
+            # viewport (the b97 ATs and AT-B99-02 drive the panel at 120x54).
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                outcomes["pre_save_bytes"] = work_copy.read_bytes()
+                # 2. Patch Editor (rail key ``6``): one entry at 0x2000.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x2000")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"AA")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _poll(pilot, lambda: "entry added" in _painted_status(app))
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _poll(pilot, lambda: "Apply:" in _painted_status(app))
+                # 3. Save-back under the loaded image's own name: the prompt
+                #    renders in the editor's JSON pane — pick that tab by
+                #    clicking its chip, then wait for the prompt to be PAINTED.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _poll(pilot, lambda: "patched" in _painted_text(app))
+                assert await pilot.click("#patch_saveback_name_input"), (
+                    "click missed #patch_saveback_name_input"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"firmware.s19")
+                assert await pilot.click("#patch_saveback_confirm_button"), (
+                    "click missed #patch_saveback_confirm_button"
+                )
+                await _poll(
+                    pilot,
+                    lambda: (
+                        tmp_path / ".s19tool" / "workarea" / "firmware.s19"
+                    ).is_file(),
+                )
+                outcomes["work_copy_exists"] = work_copy.is_file()
+                outcomes["work_copy_bytes"] = (
+                    work_copy.read_bytes() if work_copy.is_file() else None
+                )
+                # 4. Save project through the real dialog (key ``s``).
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _poll(
+                    pilot, lambda: "Saved project to" in _painted_status(app)
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(
+                    app.query_one("#status_text", Label).render()
+                )
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:1043: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_staging.py:963: in _drive
+    async with app.run_test(size=(120, 54)) as pilot:
+..\..\..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:7985: in _handle_save_dialog
+    saved = copy_into_workarea(self.current_file.path, project_dir)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\workspace.py:342: in copy_into_workarea
+    size = resolved_source.stat().st_size
+           ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26202/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [WinError 2] The system cannot find the file specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26202\\test_at_b99_05_save_project_af0\\.s19tool\\workarea\\temp\\firmware.s19'
+
+..\..\..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: FileNotFoundError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\AppData\Local\Temp\b99-inc3a-base\s19_app\tui\app.py:7985 in  
+│ _handle_save_dialog                                                          
+│                                                                              
+│    7982 │   │   saved_primary_name: Optional[str] = None                     
+│    7983 │   │   try:                                                         
+│    7984 │   │   │   if self.current_file:                                    
+│ ❱  7985 │   │   │   │   saved = copy_into_workarea(self.current_file.path, p 
+│    7986 │   │   │   │   self.logger.info("Project saved. name=%s file=%s", c 
+│    7987 │   │   │   │   if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTE 
+│    7988 │   │   │   │   │   saved_primary_name = saved.name                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │          a2l_files = []                                                  │ 
+│ │            cleaned = 'proj'                                              │ 
+│ │         data_files = []                                                  │ 
+│ │              error = None                                                │ 
+│ │  existing_suffixes = set()                                               │ 
+│ │    parent_resolved = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyt… │ 
+│ │            payload = SaveProjectPayload(                                 │ 
+│ │                      │                                                   │ 
+│ │                      parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\T… │ 
+│ │                      │   project_name='proj',                            │ 
+│ │                      │   batch=(),                                       │ 
+│ │                      │   assignments={}                                  │ 
+│ │                      )                                                   │ 
+│ │        project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pyt… │ 
+│ │ saved_primary_name = None                                                │ 
+│ │   saved_variant_id = None                                                │ 
+│ │               self = S19TuiApp(                                          │ 
+│ │                      │   title='Hex Edit Tool',                          │ 
+│ │                      │   classes={'-dark-mode'},                         │ 
+│ │                      │   pseudo_classes={'dark', 'focus'}                │ 
+│ │                      )                                                   │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\AppData\Local\Temp\b99-inc3a-base\s19_app\tui\workspace.py:34 
+│ 2 in copy_into_workarea                                                      
+│                                                                              
+│   339 │   │   │   f"Refusing to copy: destination traverses a symbolic link  
+│   340 │   │   )                                                              
+│   341 │                                                                      
+│ ❱ 342 │   size = resolved_source.stat().st_size                              
+│   343 │   if size > max_size_bytes:                                          
+│   344 │   │   raise WorkareaContainmentError(                                
+│   345 │   │   │   f"Refusing to copy: source size {size} bytes exceeds cap { 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │          destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │       max_size_bytes = 268435456                                         │ 
+│ │ resolved_destination = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │      resolved_source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │               source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ │        workarea_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/p… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│                                                                              
+│   1010 │   │   Return the result of the stat() system call on this path, lik 
+│   1011 │   │   os.stat() does.                                               
+│   1012 │   │   """                                                           
+│ ❱ 1013 │   │   return os.stat(self, follow_symlinks=follow_symlinks)         
+│   1014 │                                                                     
+│   1015 │   def owner(self):                                                  
+│   1016 │   │   """                                                           
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ follow_symlinks = True                                                   │ 
+│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 
+'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26202\\test_at
+b99_05_save_project_af0\\.s19tool\\workarea\\temp\\firmware.s19'
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+1 failed in 34.37s

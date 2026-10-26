@@ -1,0 +1,483 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 23 items
+
+tests\test_b99_staging.py ..F....FF...F....FFF...                        [100%]
+
+================================== FAILURES ===================================
+_________ test_tc_b99_11_dangling_junction_at_staging_temp_is_refused _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_11_dangling_juncti0')
+
+    def test_tc_b99_11_dangling_junction_at_staging_temp_is_refused(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING junction at ``temp`` — target deleted after the junction
+        was made — is caught by the staging check ITSELF (LLR-155.1; security
+        findings S-F2/S-F3): ``Path.exists()`` follows the link and reports
+        False, so an ``exists()``-based guard never evaluates the reparse
+        check; only an ``os.lstat``-based one does. The refusal must name the
+        reparse point (not a generic "cannot be prepared" mkdir failure), and
+        nothing may be created anywhere — in particular not through the
+        junction. Skips with the stated reason when link creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: the ``exists()`` guard skipped the
+        reparse check and the refusal came from the ``mkdir`` fallback with a
+        generic message.
+        """
+        root = _workarea(tmp_path)
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        temp = root / "temp"
+        if temp.is_symlink() or temp.is_file():
+            temp.unlink()
+        elif temp.is_dir():
+            shutil.rmtree(temp)
+        if sys.platform == "win32":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(temp), str(outside)],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                pytest.skip(
+                    "junction creation not permitted: "
+                    f"{result.stdout.strip()} {result.stderr.strip()}"
+                )
+        else:
+            try:
+                os.symlink(outside, temp, target_is_directory=True)
+            except OSError as exc:
+                pytest.skip(f"symlink creation not permitted: {exc}")
+        shutil.rmtree(outside)  # the junction now dangles
+        assert not temp.exists(), "the junction must dangle for this arm"
+        dest = root / "out"
+        dest.mkdir()
+        src = _image(tmp_path, "fw.s19", 0x77)
+    
+        with pytest.raises(WorkareaContainmentError) as excinfo:
+            copy_into_workarea(src, dest)
+    
+>       assert "symbolic link or reparse point" in str(excinfo.value), (
+            f"the refusal must come from the reparse check itself: {excinfo.value}"
+        )
+E       AssertionError: the refusal must come from the reparse check itself: Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26284\\test_tc_b99_11_dangling_juncti0\\.s19tool\\workarea\\temp'
+E       assert 'symbolic link or reparse point' in "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists...\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26284\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"
+E        +  where "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists...\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26284\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'" = str(WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when...\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26284\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"))
+E        +    where WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when...\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26284\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") = <ExceptionInfo WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot cre...\Temp\\\\pytest-of-jjgh8\\\\pytest-26284\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") tblen=3>.value
+
+tests\test_b99_staging.py:340: AssertionError
+______ test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_12_dangling_symlin0')
+
+    def test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING symlink at the requested final name counts as taken
+        (security finding S-F1): on Windows ``os.open(O_CREAT|O_EXCL)``
+        FOLLOWS a dangling symlink — the claim would create a 0-byte file at
+        the link's target OUTSIDE the work area and ``os.replace`` would then
+        replace the link. The placement must lstat the candidate first, land
+        on the next ``_<N>``, and leave the link and its (nonexistent) target
+        untouched. Skips with the stated reason when symlink creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: verified empirically on this host —
+        the bare O_EXCL claim followed the link and created the 0-byte file
+        at its target.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = tmp_path / "outside" / "fw.s19"  # parent exists, file never created
+        target.parent.mkdir(exist_ok=True)
+        link = dest / "fw.s19"
+        try:
+            os.symlink(target, link)
+        except OSError as exc:
+            pytest.skip(f"symlink creation not permitted: {exc}")
+        assert not target.exists(), "the link must start dangling"
+    
+        src = _image(tmp_path, "fw.s19", 0x77)
+        placed = copy_into_workarea(src, dest)
+    
+>       assert placed.name == "fw_1.s19", placed
+E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_12_dangling_symlin0/.s19tool/workarea/out/fw.s19')
+E       assert 'fw.s19' == 'fw_1.s19'
+E         
+E         - fw_1.s19
+E         ?   --
+E         + fw.s19
+
+tests\test_b99_staging.py:539: AssertionError
+_____________ test_tc_b99_12_source_vanishes_mid_copy_is_wrapped ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_12_source_vanishes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A9A5006D50>
+
+    def test_tc_b99_12_source_vanishes_mid_copy_is_wrapped(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An ``OSError`` from the staging copy — e.g. the source vanishing
+        after the size check — is wrapped in ``WorkareaPlacementError``
+        (security finding S-F6): outcome first, naming the source, never a
+        raw ``OSError`` past callers that catch only the containment class; no
+        claim and no staging dir survives.
+    
+        RED at the review-round-2 tree: the raw ``FileNotFoundError`` escapes
+        ``copy_into_workarea`` uncaught.
+        """
+        assert PlacementError is not None
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        src = _image(tmp_path, "fw.s19", 0x77)
+    
+        def _vanish(source, target, *args, **kwargs):
+            raise FileNotFoundError(2, "source vanished mid-copy", str(source))
+    
+        monkeypatch.setattr(shutil, "copy2", _vanish)
+        with pytest.raises(PlacementError) as excinfo:
+>           copy_into_workarea(src, dest)
+
+tests\test_b99_staging.py:575: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\workspace.py:470: in copy_into_workarea
+    shutil.copy2(resolved_source, staged_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_12_source_vanishes0/fw.s19')
+target = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_12_source_vanishes0/.s19tool/workarea/temp/.staging/stage-jyw76ifo/fw.s19')
+args = (), kwargs = {}
+
+    def _vanish(source, target, *args, **kwargs):
+>       raise FileNotFoundError(2, "source vanished mid-copy", str(source))
+E       FileNotFoundError: [Errno 2] source vanished mid-copy: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26284\\test_tc_b99_12_source_vanishes0\\fw.s19'
+
+tests\test_b99_staging.py:571: FileNotFoundError
+________________ test_tc_b99_13_symlink_target_is_never_reused ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_13_symlink_target_0')
+
+    def test_tc_b99_13_symlink_target_is_never_reused(tmp_path: Path) -> None:
+        """B8 content dedup must SKIP a target that is a link or reparse point
+        (security finding S-F4): a byte-identical file reached THROUGH a
+        symlink is not this work area's placed file — reusing the name would
+        return a path whose bytes live outside the work area. The placement
+        must claim the next ``_<N>`` as a regular file and leave the link and
+        its target untouched. Skips with the stated reason when symlink
+        creation is not permitted.
+    
+        RED at the review-round-2 tree: the dedup read followed the link,
+        matched the bytes and returned the symlink itself.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        payload = _emit(0x77)
+        outside_file = outside / "fw.s19"
+        outside_file.write_text(payload, encoding="ascii")
+        link = dest / "fw.s19"
+        try:
+            os.symlink(outside_file, link)
+        except OSError as exc:
+            pytest.skip(f"symlink creation not permitted: {exc}")
+        src = tmp_path / "fw.s19"
+        src.write_text(payload, encoding="ascii")
+    
+        returned = copy_into_workarea(src, dest)
+    
+>       assert returned.name == "fw_1.s19", returned
+E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_13_symlink_target_0/.s19tool/workarea/out/fw.s19')
+E       assert 'fw.s19' == 'fw_1.s19'
+E         
+E         - fw_1.s19
+E         ?   --
+E         + fw.s19
+
+tests\test_b99_staging.py:729: AssertionError
+___________ test_tc_b99_14_placement_failure_removes_created_folder ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_14_placement_failu0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A9A68E0450>
+
+    def test_tc_b99_14_placement_failure_removes_created_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A placement failure AFTER this call created the project folder
+        removes exactly that folder (review finding F6a): a forced locked
+        target during Save project -> painted failure status, the created
+        folder is gone, the app keeps running. Driven by keys and clicks
+        through the real dialogs (review finding F5).
+    
+        GREEN at the review-round-2 tree — the cleanup landed with round 1 —
+        so the RED proof is the F6a mutant (``_remove_created_project_dir``
+        no-op) in ``mut-fix2-f6a.txt``.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+    
+        def _always_locked(src_path, dst_path):
+            raise PermissionError(13, "locked by another program", str(dst_path))
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                monkeypatch.setattr(os, "replace", _always_locked)
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _poll(
+                    pilot, lambda: "Nothing written" in _painted_status(app)
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["status"].startswith("Not saved"), outcomes["status"]
+        assert "firmware.s19" in outcomes["status"], outcomes["status"]
+>       assert "Nothing written" in outcomes["status"], outcomes["status"]
+E       AssertionError: Not saved: firmware.s19 in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26284\test_tc_b99_14_placement_failu
+E       assert 'Nothing written' in 'Not saved: firmware.s19 in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26284\\test_tc_b99_14_placement_failu'
+
+tests\test_b99_staging.py:1214: AssertionError
+________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_tc_b99_14_preexisting_fol0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A9A71C4790>
+
+    def test_tc_b99_14_preexisting_folder_survives_placement_failure(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A PRE-EXISTING project folder of the same name survives a placement
+        failure untouched (review findings F6a/S-F5): the cleanup removes only
+        what THIS call created, so a folder that already held operator content
+        keeps it. Pairs with the S-F5 flag fix — ``mkdir(exist_ok=False)`` +
+        ``FileExistsError`` decides ownership instead of a racy
+        ``not exists()`` probe. Driven by keys and clicks through the real
+        dialogs.
+    
+        GREEN at the review-round-2 tree — the flag was already conservative —
+        so the RED proof is the S-F5 mutant (``created_project_dir`` forced
+        True) in ``mut-fix2-sf5.txt``.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+        preexisting = tmp_path / ".s19tool" / "workarea" / "proj"
+        preexisting.mkdir(parents=True)
+        sentinel = preexisting / "keep.me"
+        sentinel.write_text("operator content", encoding="ascii")
+    
+        def _always_locked(src_path, dst_path):
+            raise PermissionError(13, "locked by another program", str(dst_path))
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                monkeypatch.setattr(os, "replace", _always_locked)
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _poll(
+                    pilot, lambda: "Nothing written" in _painted_status(app)
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["status"].startswith("Not saved"), outcomes["status"]
+>       assert "Nothing written" in outcomes["status"], outcomes["status"]
+E       AssertionError: Not saved: firmware.s19 in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26284\test_tc_b99_14_preexisting_fol
+E       assert 'Nothing written' in 'Not saved: firmware.s19 in C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26284\\test_tc_b99_14_preexisting_fol'
+
+tests\test_b99_staging.py:1283: AssertionError
+____________ test_at_b99_05_save_project_after_same_name_save_back ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26284/test_at_b99_05_save_project_af0')
+
+    def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
+        """Load -> patch -> save back as firmware.s19 -> Save project: the app is
+        running, the project folder holds the image and the status names it.
+        Driven entirely by keys and clicks through the real Load file dialog,
+        the Patch Editor (rail key ``6``) and the real ``SaveProjectScreen``
+        (review finding F5) — inputs are clicked and typed, buttons are clicked,
+        and every wait observes the painted status line (``#log_line_4``) or the
+        painted screen; assertions read the painted status and the files on disk.
+    
+        RED at HEAD (P-15): the save-back deletes the work copy and the next Save
+        project exits the app with code 1.
+        """
+        from textual.widgets import Label
+    
+        image = tmp_path / "firmware.s19"
+        image.write_text(_emit_two(0x11, 0x00), encoding="ascii")
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            # 54 rows: the Patch Editor's docked save-back row sits at the foot
+            # of the JSON pane and is only clickable/painted at the taller
+            # viewport (the b97 ATs and AT-B99-02 drive the panel at 120x54).
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                outcomes["pre_save_bytes"] = work_copy.read_bytes()
+                # 2. Patch Editor (rail key ``6``): one entry at 0x2000.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x2000")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"AA")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _poll(pilot, lambda: "entry added" in _painted_status(app))
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _poll(pilot, lambda: "Apply:" in _painted_status(app))
+                # 3. Save-back under the loaded image's own name: the prompt
+                #    renders in the editor's JSON pane — pick that tab by
+                #    clicking its chip, then wait for the prompt to be PAINTED.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _poll(pilot, lambda: "patched" in _painted_text(app))
+                assert await pilot.click("#patch_saveback_name_input"), (
+                    "click missed #patch_saveback_name_input"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"firmware.s19")
+                assert await pilot.click("#patch_saveback_confirm_button"), (
+                    "click missed #patch_saveback_confirm_button"
+                )
+                await _poll(
+                    pilot,
+                    lambda: (
+                        tmp_path / ".s19tool" / "workarea" / "firmware.s19"
+                    ).is_file(),
+                )
+                outcomes["work_copy_exists"] = work_copy.is_file()
+                outcomes["work_copy_bytes"] = (
+                    work_copy.read_bytes() if work_copy.is_file() else None
+                )
+                # 4. Save project through the real dialog (key ``s``).
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                # the save's success paints as "Saved project to … (variant
+                # 'firmware')" and is then superseded by the manifest line
+                # within the same tick — wait for and assert on BOTH painted
+                # lines (review finding LOW-2: the wait and the assertion must
+                # be consistent)
+                await _poll(
+                    pilot, lambda: "Saved project to" in _painted_status(app)
+                )
+                outcomes["save_status"] = _painted_status(app)
+                await _poll(
+                    pilot, lambda: _painted_status(app).startswith("Project saved")
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(
+                    app.query_one("#status_text", Label).render()
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["work_copy_exists"] is True, "the save-back deleted the work copy"
+        assert outcomes["work_copy_bytes"] == outcomes["pre_save_bytes"]
+        assert outcomes["app_running"] is True
+>       assert outcomes["save_status"].startswith("Saved project to"), (
+            outcomes["save_status"]
+        )
+E       AssertionError: Project saved + manifest verified
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x000001A9A84FC630>('Saved project to')
+E        +    where <built-in method startswith of str object at 0x000001A9A84FC630> = 'Project saved + manifest verified'.startswith
+
+tests\test_b99_staging.py:1416: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+FAILED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+FAILED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+FAILED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+FAILED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+FAILED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+================== 7 failed, 16 passed in 137.95s (0:02:17) ===================

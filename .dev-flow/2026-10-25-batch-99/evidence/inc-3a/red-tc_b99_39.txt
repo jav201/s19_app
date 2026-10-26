@@ -1,0 +1,31 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
+
+    def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
+        """RED at HEAD: ``apply.py``'s ``finally: staged.unlink()`` deletes a path
+        rebuilt from the user's name (the LLR-155.7 declared RED site)."""
+        all_violations: list = []
+        for rel, func_name in _CENSUS_TARGETS:
+            all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
+        unexpected = [
+            v
+            for v in all_violations
+            if not (v.startswith(_CRC_EXPECTED[0]) and f":{_CRC_EXPECTED[1]}:" in v)
+        ]
+        assert unexpected == [], (
+            f"LLR-155.7 violations outside the known Inc-5 CRC site: {unexpected}"
+        )
+        crc_violations = [v for v in all_violations if f":{_CRC_EXPECTED[1]}:" in v]
+>       assert len(crc_violations) == 1, (
+            f"expected exactly the one known CRC site violating until Inc 5, "
+            f"got {crc_violations}"
+        )
+E       AssertionError: expected exactly the one known CRC site violating until Inc 5, got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_staging.py:526: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+1 failed, 11 deselected in 0.55s

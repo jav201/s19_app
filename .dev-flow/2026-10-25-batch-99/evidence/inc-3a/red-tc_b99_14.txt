@@ -1,0 +1,57 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b99_14_save_project_missing_source __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25742/test_tc_b99_14_save_project_mi0')
+
+    def test_tc_b99_14_save_project_missing_source(tmp_path: Path) -> None:
+        """A missing source at Save project: failure-severity status leading with
+        the outcome and naming the file, no empty project folder, app running.
+    
+        RED at HEAD (P-15): ``copy_into_workarea`` raises ``FileNotFoundError``
+        from ``source.stat()``, which ``_handle_save_dialog`` does not catch — the
+        escape ends the app run.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                notices = _notices(app)
+                statuses = _statuses(app)
+                app.load_from_path(image)
+                await _poll(pilot, lambda: app.current_file is not None)
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                assert work_copy.is_file()
+                work_copy.unlink()
+                app.action_save_project()
+                await pilot.pause()
+                app.screen.query_one("#project_parent_path").value = str(tmp_path / "parent")
+                app.screen.query_one("#project_name").value = "proj"
+                app.screen.query_one("#save_ok").press()
+                await pilot.pause()
+                outcomes["statuses"] = list(statuses)
+                outcomes["notices"] = list(notices)
+                outcomes["log_lines"] = list(app.log_lines)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        failure = [
+            s
+            for s in outcomes["statuses"]
+            if s.startswith("Project NOT saved") and "firmware.s19" in s
+        ]
+>       assert failure, f"no failure-severity status naming the file: {outcomes['statuses']}"
+E       AssertionError: no failure-severity status naming the file: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Parent folder not found or not a directory.']
+E       assert []
+
+tests\test_b99_staging.py:636: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+1 failed, 11 deselected in 2.10s

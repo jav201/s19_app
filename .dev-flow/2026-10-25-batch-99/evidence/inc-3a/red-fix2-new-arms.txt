@@ -1,0 +1,215 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 23 items / 19 deselected / 4 selected
+
+tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused FAILED [ 25%]
+tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free FAILED [ 50%]
+tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped FAILED [ 75%]
+tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused FAILED [100%]
+
+================================== FAILURES ===================================
+_________ test_tc_b99_11_dangling_junction_at_staging_temp_is_refused _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_11_dangling_juncti0')
+
+    def test_tc_b99_11_dangling_junction_at_staging_temp_is_refused(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING junction at ``temp`` — target deleted after the junction
+        was made — is caught by the staging check ITSELF (LLR-155.1; security
+        findings S-F2/S-F3): ``Path.exists()`` follows the link and reports
+        False, so an ``exists()``-based guard never evaluates the reparse
+        check; only an ``os.lstat``-based one does. The refusal must name the
+        reparse point (not a generic "cannot be prepared" mkdir failure), and
+        nothing may be created anywhere — in particular not through the
+        junction. Skips with the stated reason when link creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: the ``exists()`` guard skipped the
+        reparse check and the refusal came from the ``mkdir`` fallback with a
+        generic message.
+        """
+        root = _workarea(tmp_path)
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        temp = root / "temp"
+        if temp.is_symlink() or temp.is_file():
+            temp.unlink()
+        elif temp.is_dir():
+            shutil.rmtree(temp)
+        if sys.platform == "win32":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(temp), str(outside)],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                pytest.skip(
+                    "junction creation not permitted: "
+                    f"{result.stdout.strip()} {result.stderr.strip()}"
+                )
+        else:
+            try:
+                os.symlink(outside, temp, target_is_directory=True)
+            except OSError as exc:
+                pytest.skip(f"symlink creation not permitted: {exc}")
+        shutil.rmtree(outside)  # the junction now dangles
+        assert not temp.exists(), "the junction must dangle for this arm"
+        dest = root / "out"
+        dest.mkdir()
+        src = _image(tmp_path, "fw.s19", 0x77)
+    
+        with pytest.raises(WorkareaContainmentError) as excinfo:
+            copy_into_workarea(src, dest)
+    
+>       assert "symbolic link or reparse point" in str(excinfo.value), (
+            f"the refusal must come from the reparse check itself: {excinfo.value}"
+        )
+E       AssertionError: the refusal must come from the reparse check itself: Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26282\\test_tc_b99_11_dangling_juncti0\\.s19tool\\workarea\\temp'
+E       assert 'symbolic link or reparse point' in "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"
+E        +  where "Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'" = str(WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'"))
+E        +    where WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") = <ExceptionInfo WorkareaContainmentError("Refusing to stage: staging home cannot be prepared: [WinError 183] Cannot create a file when...\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-26282\\\\test_tc_b99_11_dangling_juncti0\\\\.s19tool\\\\workarea\\\\temp'") tblen=3>.value
+
+tests\test_b99_staging.py:340: AssertionError
+______ test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_dangling_symlin0')
+
+    def test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free(
+        tmp_path: Path,
+    ) -> None:
+        """A DANGLING symlink at the requested final name counts as taken
+        (security finding S-F1): on Windows ``os.open(O_CREAT|O_EXCL)``
+        FOLLOWS a dangling symlink — the claim would create a 0-byte file at
+        the link's target OUTSIDE the work area and ``os.replace`` would then
+        replace the link. The placement must lstat the candidate first, land
+        on the next ``_<N>``, and leave the link and its (nonexistent) target
+        untouched. Skips with the stated reason when symlink creation is not
+        permitted.
+    
+        RED at the review-round-2 tree: verified empirically on this host —
+        the bare O_EXCL claim followed the link and created the 0-byte file
+        at its target.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = tmp_path / "outside" / "fw.s19"  # parent exists, file never created
+        target.parent.mkdir(exist_ok=True)
+        link = dest / "fw.s19"
+        try:
+            os.symlink(target, link)
+        except OSError as exc:
+            pytest.skip(f"symlink creation not permitted: {exc}")
+        assert not target.exists(), "the link must start dangling"
+    
+        src = _image(tmp_path, "fw.s19", 0x77)
+        placed = copy_into_workarea(src, dest)
+    
+>       assert placed.name == "fw_1.s19", placed
+E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_dangling_symlin0/.s19tool/workarea/out/fw.s19')
+E       assert 'fw.s19' == 'fw_1.s19'
+E         
+E         - fw_1.s19
+E         ?   --
+E         + fw.s19
+
+tests\test_b99_staging.py:539: AssertionError
+_____________ test_tc_b99_12_source_vanishes_mid_copy_is_wrapped ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000014626B57850>
+
+    def test_tc_b99_12_source_vanishes_mid_copy_is_wrapped(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An ``OSError`` from the staging copy — e.g. the source vanishing
+        after the size check — is wrapped in ``WorkareaPlacementError``
+        (security finding S-F6): outcome first, naming the source, never a
+        raw ``OSError`` past callers that catch only the containment class; no
+        claim and no staging dir survives.
+    
+        RED at the review-round-2 tree: the raw ``FileNotFoundError`` escapes
+        ``copy_into_workarea`` uncaught.
+        """
+        assert PlacementError is not None
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        src = _image(tmp_path, "fw.s19", 0x77)
+    
+        def _vanish(source, target, *args, **kwargs):
+            raise FileNotFoundError(2, "source vanished mid-copy", str(source))
+    
+        monkeypatch.setattr(shutil, "copy2", _vanish)
+        with pytest.raises(PlacementError) as excinfo:
+>           copy_into_workarea(src, dest)
+
+tests\test_b99_staging.py:575: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\workspace.py:470: in copy_into_workarea
+    shutil.copy2(resolved_source, staged_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+source = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0/fw.s19')
+target = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_12_source_vanishes0/.s19tool/workarea/temp/.staging/stage-4ttoisxm/fw.s19')
+args = (), kwargs = {}
+
+    def _vanish(source, target, *args, **kwargs):
+>       raise FileNotFoundError(2, "source vanished mid-copy", str(source))
+E       FileNotFoundError: [Errno 2] source vanished mid-copy: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-26282\\test_tc_b99_12_source_vanishes0\\fw.s19'
+
+tests\test_b99_staging.py:571: FileNotFoundError
+________________ test_tc_b99_13_symlink_target_is_never_reused ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_13_symlink_target_0')
+
+    def test_tc_b99_13_symlink_target_is_never_reused(tmp_path: Path) -> None:
+        """B8 content dedup must SKIP a target that is a link or reparse point
+        (security finding S-F4): a byte-identical file reached THROUGH a
+        symlink is not this work area's placed file — reusing the name would
+        return a path whose bytes live outside the work area. The placement
+        must claim the next ``_<N>`` as a regular file and leave the link and
+        its target untouched. Skips with the stated reason when symlink
+        creation is not permitted.
+    
+        RED at the review-round-2 tree: the dedup read followed the link,
+        matched the bytes and returned the symlink itself.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        payload = _emit(0x77)
+        outside_file = outside / "fw.s19"
+        outside_file.write_text(payload, encoding="ascii")
+        link = dest / "fw.s19"
+        try:
+            os.symlink(outside_file, link)
+        except OSError as exc:
+            pytest.skip(f"symlink creation not permitted: {exc}")
+        src = tmp_path / "fw.s19"
+        src.write_text(payload, encoding="ascii")
+    
+        returned = copy_into_workarea(src, dest)
+    
+>       assert returned.name == "fw_1.s19", returned
+E       AssertionError: WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26282/test_tc_b99_13_symlink_target_0/.s19tool/workarea/out/fw.s19')
+E       assert 'fw.s19' == 'fw_1.s19'
+E         
+E         - fw_1.s19
+E         ?   --
+E         + fw.s19
+
+tests\test_b99_staging.py:729: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+FAILED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+FAILED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+====================== 4 failed, 19 deselected in 0.80s =======================

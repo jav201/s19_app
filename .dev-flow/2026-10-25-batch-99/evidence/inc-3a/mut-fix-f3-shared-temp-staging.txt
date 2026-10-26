@@ -1,0 +1,110 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_11_junction_at_sta0')
+
+    def test_tc_b99_11_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` (the staging seam) is refused
+        (LLR-155.1, review finding F3): ``save_patched_image`` reports one
+        ``MF-WRITE-CONTAINMENT`` issue and nothing is written anywhere — in
+        particular nothing THROUGH the junction, outside the work area. On
+        Windows the junction is created with ``mklink /J``; when that is not
+        permitted the arm skips with the stated reason.
+    
+        RED at the review-round tree: staging ran directly under ``temp/`` with
+        no reparse check, so the write rode the junction and landed outside the
+        work area.
+        """
+        root = _workarea(tmp_path)
+        outside = _plant_temp_junction(root, tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+>       assert target is None, f"the junction must refuse the write: {target}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26220\test_tc_b99_11_junction_at_sta0\.s19tool\workarea\proj\firmware.s19
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_11_junction_at_sta0/.s19tool/workarea/proj/firmware.s19') is None
+
+tests\test_b99_staging.py:262: AssertionError
+____________ test_tc_b99_40_change_document_stages_in_private_home ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021D74939A10>
+
+    def test_tc_b99_40_change_document_stages_in_private_home(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The converted ``write_change_document`` path (PDR C2; the app-level
+        caller is ``S19TuiApp._on_check_editor_action``'s ``write_doc`` arm and
+        ``change_service``) stages the serialised bytes in a private
+        ``tempfile.mkdtemp`` directory under the reparse-checked
+        ``temp/.staging`` home — never directly under ``temp/`` — and places
+        the document correctly (review finding F4).
+    
+        RED at the review-round tree: staging ran a ``mkdtemp`` directly under
+        ``temp/`` (no reparse check), so the mkdtemp spy sees the wrong home.
+        """
+        real_mkdtemp = tempfile.mkdtemp
+        dirs_seen: list = []
+    
+        def _spy_mkdtemp(*args, **kwargs):
+            created = real_mkdtemp(*args, **kwargs)
+            dirs_seen.append((kwargs.get("dir"), Path(created)))
+            return created
+    
+        monkeypatch.setattr(workspace.tempfile, "mkdtemp", _spy_mkdtemp)
+    
+        written_path, issues = write_change_document(_change_document(), tmp_path)
+    
+        assert issues == [], [i.message for i in issues]
+        assert written_path is not None
+        expected_home = (
+            tmp_path / ".s19tool" / "workarea" / "temp" / ".staging"
+        ).resolve()
+        assert dirs_seen, "the write must stage in a private mkdtemp directory"
+        for parent, created in dirs_seen:
+>           assert Path(parent).resolve() == expected_home, (
+                f"staging must live under {expected_home}, not {parent}"
+            )
+E           AssertionError: staging must live under C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26220\test_tc_b99_40_change_document0\.s19tool\workarea\temp\.staging, not C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26220\test_tc_b99_40_change_document0\.s19tool\workarea\temp
+E           assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp') == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp/.staging')
+E            +  where WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp') = resolve()
+E            +    where resolve = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp').resolve
+E            +      where WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp') = Path(WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_change_document0/.s19tool/workarea/temp'))
+
+tests\test_b99_staging.py:792: AssertionError
+_____________ test_tc_b99_40_junction_at_staging_temp_is_refused ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_junction_at_sta0')
+
+    def test_tc_b99_40_junction_at_staging_temp_is_refused(tmp_path: Path) -> None:
+        """A junction/symlink at ``temp`` refuses the converted ``io.py`` write
+        too (LLR-155.1, review finding F3): one ``MF-WRITE-CONTAINMENT`` issue,
+        nothing written anywhere — in particular nothing through the junction.
+        Skips with the stated reason when link creation is not permitted.
+    
+        RED at the review-round tree: no reparse check existed on this path, so
+        the write rode the junction and landed outside the work area.
+        """
+        root = tmp_path / ".s19tool" / "workarea"
+        root.mkdir(parents=True)
+        outside = _plant_temp_junction(root, tmp_path)
+    
+        written_path, issues = write_change_document(_change_document(), tmp_path)
+    
+>       assert written_path is None, f"the junction must refuse the write: {written_path}"
+E       AssertionError: the junction must refuse the write: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-26220\test_tc_b99_40_junction_at_sta0\.s19tool\workarea\patches\changes.json
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26220/test_tc_b99_40_junction_at_sta0/.s19tool/workarea/patches/changes.json') is None
+
+tests\test_b99_staging.py:819: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_40_change_document_stages_in_private_home
+FAILED tests/test_b99_staging.py::test_tc_b99_40_junction_at_staging_temp_is_refused
+3 failed, 14 deselected in 0.57s

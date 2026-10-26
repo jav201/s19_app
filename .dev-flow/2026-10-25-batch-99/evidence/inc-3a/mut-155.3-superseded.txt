@@ -1,0 +1,20 @@
+mut-155.3 (the reuse-compare single-read) — SUPERSEDED, not runnable as a mutation
+
+Review round 1 finding F2 + LED-2026-10-25-batch-99.7 retired the
+double-read narrowing: LLR-155.3 now rests on the immutability invariant
+(no in-app code path replaces or deletes a file at a final name except the
+placement claiming a free name), and the fix round DROPPED the second read
+(tests/test_b99_staging.py TC-B99-13 now models concurrent in-app
+placements; the reuse compare is a single read, with the invariant carried
+by an honest comment in s19_app/tui/workspace.py).
+
+Consequence: the round-1 mutant "reuse compare single-read" is byte-identical
+to the fixed code, so it cannot be applied. The amended LLR-155.3 declares
+its negative control as "restore check-then-copy (mutation) → mismatching
+bytes, RED" — that is mut-155.2, executed in this round and witnessed RED by
+the corrected concurrent arm:
+  - mut-fix-155.2-tc13-concurrent.txt — test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned FAILED
+  - mut-fix-155.2-check-then-copy.txt — test_tc_b99_12_eight_writers_one_name_zero_mismatches FAILED
+
+No mutant left in place; workspace.py restored to sha256
+20c24f0b6864b8cb212904b92685c75f46bcab3e635ae1345e3d2581429502ce.

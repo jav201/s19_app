@@ -1,0 +1,73 @@
+FF.                                                                      [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25740/test_tc_b99_12_eight_writers_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000264A025AB50>
+
+    def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """8 threads x 20 trials request ONE name with distinct markers.
+    
+        RED at HEAD: placement is check-then-copy into a shared target, so the
+        forced interleaving clobbers bytes; the assertion message prints the
+        decisive ``parallel mismatches: N`` line (PQ-8 requires N > 0).
+        """
+        root = _workarea(tmp_path)
+        sources_root = tmp_path / "sources"
+        _pause_on_shared_name(monkeypatch)
+    
+        mismatches = 0
+        reported_total = 0
+        for trial in range(_TRIALS):
+            dest = root / "out" / f"trial{trial:02d}"
+            dest.mkdir(parents=True)
+            trial_sources = sources_root / f"trial{trial:02d}"
+            trial_sources.mkdir(parents=True)
+    
+            def place(writer: int) -> tuple[int, Path]:
+                src_dir = trial_sources / f"w{writer}"
+                src_dir.mkdir(exist_ok=True)
+                src = src_dir / _SHARED_NAME
+                src.write_text(_emit(0x41 + writer), encoding="ascii")
+                return writer, copy_into_workarea(src, dest)
+    
+            with ThreadPoolExecutor(max_workers=_WRITERS, thread_name_prefix="b99-tc12") as pool:
+                results = list(pool.map(place, range(_WRITERS)))
+            reported_total += len(results)
+            for writer, reported in results:
+                if _data(reported) != {0x1000: 0x41 + writer}:
+                    mismatches += 1
+    
+        assert reported_total == _WRITERS * _TRIALS
+>       assert mismatches == 0, f"parallel mismatches: {mismatches}"
+E       AssertionError: parallel mismatches: 140
+E       assert 140 == 0
+
+tests\test_b99_staging.py:214: AssertionError
+___________ test_tc_b99_12_forced_permission_error_refuses_cleanly ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25740/test_tc_b99_12_forced_permissi0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000264A0219650>
+
+    def test_tc_b99_12_forced_permission_error_refuses_cleanly(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A locked target -> ``WorkareaPlacementError`` naming the file, the
+        cause and the next step; 0 zero-byte files; 0 leftover staging dirs.
+    
+        RED at HEAD: no ``WorkareaPlacementError`` exists and no retry/claim
+        machinery runs (``os.replace`` is never called).
+        """
+>       assert PlacementError is not None, (
+            "WorkareaPlacementError must exist (WorkareaContainmentError subclass)"
+        )
+E       AssertionError: WorkareaPlacementError must exist (WorkareaContainmentError subclass)
+E       assert None is not None
+
+tests\test_b99_staging.py:226: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+FAILED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+2 failed, 1 passed, 9 deselected in 1.76s

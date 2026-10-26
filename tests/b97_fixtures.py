@@ -357,18 +357,38 @@ def write_cover_s19(path: Path, tags) -> Path:
 
 
 def staging_block(base_dir: Path, spec_name: str, kind: str) -> Path:
-    """Block the Write's staging path ``<base>/.s19tool/workarea/temp/<name>``
-    with a directory (``kind="dir"``) or a read-only file (``"readonly"``) (P-51)."""
+    """Block the Write's staging seam (P-51) at the batch-99 Inc-3a location
+    (HLR-155 / LLR-155.1): the retired shared ``temp/<name>`` staging path is
+    gone — every write stages in a private ``mkdtemp`` directory under
+    ``temp/.staging/`` and places through an exclusive claim, so a planted
+    file can no longer collide with a staged file and a read-only target can
+    no longer block anything (the new writer never overwrites an existing
+    name). ``kind="dir"`` plants a FILE at ``temp/.staging`` (wrong type at
+    the staging home); ``kind="readonly"`` plants a SYMLINK (a reparse
+    point) at ``temp/.staging`` — LLR-155.1's reparse check refuses either
+    blocker, so the Write reports ``MF-WRITE-CONTAINMENT``. ``spec_name`` is
+    kept for signature compatibility."""
     from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
 
-    temp = base_dir / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "temp"
+    workarea = base_dir / WORKAREA_DIRNAME / WORKAREA_SUBDIR
+    temp = workarea / "temp"
     temp.mkdir(parents=True, exist_ok=True)
-    target = temp / spec_name
+    target = temp / ".staging"
+    # the home may already exist (the first placement — e.g. the A2L load —
+    # creates it and it persists); clear it, then plant the blocker
+    if target.is_symlink() or target.is_file():
+        target.unlink()
+    elif target.is_dir():
+        shutil.rmtree(target)
     if kind == "dir":
-        target.mkdir()
-    else:
+        # wrong type at the staging home: a file where the home belongs
         target.write_text("{}", encoding="utf-8")
-        os.chmod(target, 0o444)
+    else:
+        # a reparse point at the staging home (LLR-155.1's reparse check) —
+        # the retired read-only-FILE seam is gone with the shared staging
+        # path: the new writer never overwrites an existing name, so a
+        # read-only file can no longer block anything
+        os.symlink(workarea / "nowhere", target, target_is_directory=True)
     return target
 
 

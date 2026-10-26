@@ -1,0 +1,141 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 345 items
+
+tests\test_tui_workspace.py ..................................           [  9%]
+tests\test_tui_helpers.py .............................                  [ 18%]
+tests\test_tui_directionb.py ........................................... [ 30%]
+........................................................................ [ 51%]
+.........................FF.F........................................    [ 71%]
+tests\test_flow_persistence.py ........................................  [ 83%]
+tests\test_flow_external_step_b96.py ........                            [ 85%]
+tests\test_unified_write.py ...........F.....                            [ 90%]
+tests\test_manifest_writer.py ..................                         [ 95%]
+tests\test_project_gather.py ...............                             [100%]
+
+================================== FAILURES ===================================
+_______________ test_tc031_engine_modules_have_no_diff_vs_main ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc031_engine_modules_have0')
+
+    def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
+        """The engine / data-processing modules show zero diff vs ``main``.
+    
+        Intent: LLR-014.1 / C-1 — the parse/validate engine is frozen for this
+        view-only batch. ``git diff --stat main`` over ``core.py``,
+        ``hexfile.py``, ``range_index.py``, ``validation/``, ``tui/a2l.py``,
+        ``tui/mac.py`` and ``tui/color_policy.py`` must be empty. An empty diff
+        is the strongest possible verdict for the cosmetic-only rubric (Q-11):
+        there are zero changed lines, so there is trivially no logic, constant
+        or signature change.
+    
+        If a future increment touches an engine module — even cosmetically —
+        this test fails and forces the change to be classified by hand against
+        the rubric (whitespace/comment/import-order = cosmetic; logic/constant/
+        signature = a violation) rather than slipping through silently.
+        """
+        diff_stat = _git("diff", "--stat", "main", "--", *_ENGINE_PATHS)
+>       assert diff_stat.strip() == "", (
+            "the engine / data-processing modules must be byte-identical to "
+            f"the batch start (main); git diff --stat reported:\n{diff_stat}"
+        )
+E       AssertionError: the engine / data-processing modules must be byte-identical to the batch start (main); git diff --stat reported:
+E          s19_app/core.py    | 128 +-------------------
+E          s19_app/hexfile.py |  73 +-----------
+E          s19_app/tui/a2l.py | 334 +++++++++++++----------------------------------------
+E          3 files changed, 89 insertions(+), 446 deletions(-)
+E         
+E       assert 's19_app/core... deletions(-)' == ''
+E         
+E         + s19_app/core.py    | 128 +-------------------
+E         +  s19_app/hexfile.py |  73 +-----------
+E         +  s19_app/tui/a2l.py | 334 +++++++++++++----------------------------------------
+E         +  3 files changed, 89 insertions(+), 446 deletions(-)
+
+tests\test_tui_directionb.py:7050: AssertionError
+__________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc031_engine_modules_have1')
+
+    def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
+        """No engine module file appears in ``git diff --name-only main``.
+    
+        Intent: LLR-014.1 — a second, independent check that no file under the
+        frozen engine surface was modified, added or deleted relative to the
+        batch start. ``--stat`` (the test above) and ``--name-only`` (here)
+        cross-check each other so a formatting quirk in one cannot mask a real
+        change.
+        """
+        names = _git("diff", "--name-only", "main", "--", *_ENGINE_PATHS)
+        changed = [line for line in names.splitlines() if line.strip()]
+>       assert changed == [], (
+            f"engine / data-processing files changed vs the batch start: "
+            f"{changed} — C-1 / LLR-014.1 freezes these modules"
+        )
+E       AssertionError: engine / data-processing files changed vs the batch start: ['s19_app/core.py', 's19_app/hexfile.py', 's19_app/tui/a2l.py'] — C-1 / LLR-014.1 freezes these modules
+E       assert ['s19_app/cor...p/tui/a2l.py'] == []
+E         
+E         Left contains 3 more items, first extra item: 's19_app/core.py'
+E         Use -v to get more diff
+
+tests\test_tui_directionb.py:7067: AssertionError
+_______________ test_tc032_engine_test_files_unmodified_vs_main _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc032_engine_test_files_u0')
+
+    def test_tc032_engine_test_files_unmodified_vs_main(tmp_path: Path) -> None:
+        """The engine/parser/validation test files are byte-identical to ``main``.
+    
+        Intent: LLR-014.2 / AC-B2 — the no-regression contract requires the
+        engine/parser/validation tests to pass with ZERO source modification.
+        This asserts none of those test files appears in ``git diff --name-only
+        main`` — they were not edited by the batch. The UI test files
+        (``test_tui_app.py``, ``test_tui_directionb.py``, …) are intentionally
+        excluded: LLR-014.2 explicitly permits updating UI tests to the new
+        layout (without weakening intent).
+        """
+        names = _git("diff", "--name-only", "main", "--", *_ENGINE_TEST_FILES)
+        changed = [line for line in names.splitlines() if line.strip()]
+>       assert changed == [], (
+            f"engine/parser/validation test files were modified vs the batch "
+            f"start: {changed} — LLR-014.2 / AC-B2 require zero modification to "
+            f"these files"
+        )
+E       AssertionError: engine/parser/validation test files were modified vs the batch start: ['tests/test_core_srecord_validation.py'] — LLR-014.2 / AC-B2 require zero modification to these files
+E       assert ['tests/test_...alidation.py'] == []
+E         
+E         Left contains one more item: 'tests/test_core_srecord_validation.py'
+E         Use -v to get more diff
+
+tests\test_tui_directionb.py:7117: AssertionError
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26403/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc032_engine_test_files_unmodified_vs_main
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+================== 4 failed, 341 passed in 537.99s (0:08:57) ==================

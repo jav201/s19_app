@@ -1,0 +1,374 @@
+FFF.FFFFF.FF                                                             [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_same_name_save_back_keeps_work_copy ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_11_same_name_save_0')
+
+    def test_tc_b99_11_same_name_save_back_keeps_work_copy(tmp_path: Path) -> None:
+        """A save-back under the loaded image's own name keeps the work copy.
+    
+        RED at HEAD (P-15): ``save_patched_image`` stages at ``temp/<user name>``
+        — the loaded work copy — and its ``finally`` unlinks it.
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        work_copy = root / "temp" / "firmware.s19"
+        work_copy.write_text(_emit(0x11), encoding="ascii")
+        pre_save_bytes = work_copy.read_bytes()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+        assert target is not None, f"save-back refused: {[i.message for i in issues]}"
+        assert target.name == "firmware.s19", target
+>       assert work_copy.exists(), (
+            "the loaded work copy temp/firmware.s19 must survive the save-back"
+        )
+E       AssertionError: the loaded work copy temp/firmware.s19 must survive the save-back
+E       assert False
+E        +  where False = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_11_same_name_save_0/.s19tool/workarea/temp/firmware.s19').exists
+
+tests\test_b99_staging.py:142: AssertionError
+____________ test_tc_b99_12_eight_writers_one_name_zero_mismatches ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_12_eight_writers_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD79A92710>
+
+    def test_tc_b99_12_eight_writers_one_name_zero_mismatches(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """8 threads x 20 trials request ONE name with distinct markers.
+    
+        RED at HEAD: placement is check-then-copy into a shared target, so the
+        forced interleaving clobbers bytes; the assertion message prints the
+        decisive ``parallel mismatches: N`` line (PQ-8 requires N > 0).
+        """
+        root = _workarea(tmp_path)
+        sources_root = tmp_path / "sources"
+        _pause_on_shared_name(monkeypatch)
+    
+        mismatches = 0
+        reported_total = 0
+        for trial in range(_TRIALS):
+            dest = root / "out" / f"trial{trial:02d}"
+            dest.mkdir(parents=True)
+            trial_sources = sources_root / f"trial{trial:02d}"
+            trial_sources.mkdir(parents=True)
+    
+            def place(writer: int) -> tuple[int, Path]:
+                src_dir = trial_sources / f"w{writer}"
+                src_dir.mkdir(exist_ok=True)
+                src = src_dir / _SHARED_NAME
+                src.write_text(_emit(0x41 + writer), encoding="ascii")
+                return writer, copy_into_workarea(src, dest)
+    
+            with ThreadPoolExecutor(max_workers=_WRITERS, thread_name_prefix="b99-tc12") as pool:
+                results = list(pool.map(place, range(_WRITERS)))
+            reported_total += len(results)
+            for writer, reported in results:
+                if _data(reported) != {0x1000: 0x41 + writer}:
+                    mismatches += 1
+    
+        assert reported_total == _WRITERS * _TRIALS
+>       assert mismatches == 0, f"parallel mismatches: {mismatches}"
+E       AssertionError: parallel mismatches: 140
+E       assert 140 == 0
+
+tests\test_b99_staging.py:214: AssertionError
+___________ test_tc_b99_12_forced_permission_error_refuses_cleanly ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_12_forced_permissi0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD77F20310>
+
+    def test_tc_b99_12_forced_permission_error_refuses_cleanly(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A locked target -> ``WorkareaPlacementError`` naming the file, the
+        cause and the next step; 0 zero-byte files; 0 leftover staging dirs.
+    
+        RED at HEAD: no ``WorkareaPlacementError`` exists and no retry/claim
+        machinery runs (``os.replace`` is never called).
+        """
+>       assert PlacementError is not None, (
+            "WorkareaPlacementError must exist (WorkareaContainmentError subclass)"
+        )
+E       AssertionError: WorkareaPlacementError must exist (WorkareaContainmentError subclass)
+E       assert None is not None
+
+tests\test_b99_staging.py:226: AssertionError
+___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_target_replaced0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD7999AA10>
+
+    def test_tc_b99_13_target_replaced_between_check_and_reuse(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A hook replaces the target between check and reuse; the caller must
+        receive a path whose bytes equal its own (never the replaced content).
+    
+        RED at HEAD (check-then-copy mutation form): the single compare reuses
+        the target, so the returned path ends up holding the replacement bytes.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "keep.s19"
+        target.write_text(_emit(0x11), encoding="ascii")
+        src = _image(tmp_path, "keep.s19", 0x11)
+        replacement = _emit(0x99)
+    
+        real_read_bytes = Path.read_bytes
+        state = {"fired": False}
+    
+        def _replace_after_first_read(self: Path) -> bytes:
+            data = real_read_bytes(self)
+            if Path(self) == target and not state["fired"]:
+                state["fired"] = True
+                Path(self).write_text(replacement, encoding="ascii")
+            return data
+    
+        monkeypatch.setattr(Path, "read_bytes", _replace_after_first_read)
+        returned = copy_into_workarea(src, dest)
+    
+>       assert _data(returned) == {0x1000: 0x11}, (
+            f"the caller must receive a path holding its own bytes, got "
+            f"{returned} -> {_data(returned)}"
+        )
+E       AssertionError: the caller must receive a path holding its own bytes, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-25737\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
+E       assert {4096: 153} == {4096: 17}
+E         
+E         Differing items:
+E         {4096: 153} != {4096: 17}
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:303: AssertionError
+_______________ test_tc_b99_13_zero_byte_target_is_never_reused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_zero_byte_targe0')
+
+    def test_tc_b99_13_zero_byte_target_is_never_reused(tmp_path: Path) -> None:
+        """A 0-byte target may be another writer's claim placeholder (C1(a))."""
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "empty.s19"
+        target.write_bytes(b"")
+        src = tmp_path / "empty.s19"
+        src.write_bytes(b"")
+    
+        returned = copy_into_workarea(src, dest)
+>       assert returned.name != "empty.s19", (
+            "a 0-byte target (another writer's claim) must never be reused"
+        )
+E       AssertionError: a 0-byte target (another writer's claim) must never be reused
+E       assert 'empty.s19' != 'empty.s19'
+E        +  where 'empty.s19' = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_13_zero_byte_targe0/.s19tool/workarea/out/empty.s19').name
+
+tests\test_b99_staging.py:323: AssertionError
+____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
+
+    def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
+        """RED at HEAD: ``apply.py``'s ``finally: staged.unlink()`` deletes a path
+        rebuilt from the user's name (the LLR-155.7 declared RED site)."""
+        all_violations: list = []
+        for rel, func_name in _CENSUS_TARGETS:
+            all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
+        unexpected = [
+            v
+            for v in all_violations
+            if not (v.startswith(_CRC_EXPECTED[0]) and f":{_CRC_EXPECTED[1]}:" in v)
+        ]
+        assert unexpected == [], (
+            f"LLR-155.7 violations outside the known Inc-5 CRC site: {unexpected}"
+        )
+        crc_violations = [v for v in all_violations if f":{_CRC_EXPECTED[1]}:" in v]
+>       assert len(crc_violations) == 1, (
+            f"expected exactly the one known CRC site violating until Inc 5, "
+            f"got {crc_violations}"
+        )
+E       AssertionError: expected exactly the one known CRC site violating until Inc 5, got []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_staging.py:526: AssertionError
+_________________ test_tc_b99_14_save_project_missing_source __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_14_save_project_mi0')
+
+    def test_tc_b99_14_save_project_missing_source(tmp_path: Path) -> None:
+        """A missing source at Save project: failure-severity status leading with
+        the outcome and naming the file, no empty project folder, app running.
+    
+        RED at HEAD (P-15): ``copy_into_workarea`` raises ``FileNotFoundError``
+        from ``source.stat()``, which ``_handle_save_dialog`` does not catch — the
+        escape ends the app run.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                notices = _notices(app)
+                statuses = _statuses(app)
+                app.load_from_path(image)
+                await _poll(pilot, lambda: app.current_file is not None)
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                assert work_copy.is_file()
+                work_copy.unlink()
+                app.action_save_project()
+                await pilot.pause()
+                app.screen.query_one("#project_parent_path").value = str(tmp_path / "parent")
+                app.screen.query_one("#project_name").value = "proj"
+                app.screen.query_one("#save_ok").press()
+                await pilot.pause()
+                outcomes["statuses"] = list(statuses)
+                outcomes["notices"] = list(notices)
+                outcomes["log_lines"] = list(app.log_lines)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        failure = [
+            s
+            for s in outcomes["statuses"]
+            if s.startswith("Project NOT saved") and "firmware.s19" in s
+        ]
+>       assert failure, f"no failure-severity status naming the file: {outcomes['statuses']}"
+E       AssertionError: no failure-severity status naming the file: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Parent folder not found or not a directory.']
+E       assert []
+
+tests\test_b99_staging.py:636: AssertionError
+____________ test_at_b99_05_save_project_after_same_name_save_back ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_at_b99_05_save_project_af0')
+
+    def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
+        """Load -> patch -> save back as firmware.s19 -> Save project: the app is
+        running, the project folder holds the image and the status names it.
+    
+        RED at HEAD (P-15): the save-back deletes the work copy and the next Save
+        project exits the app with code 1.
+        """
+        from textual.widgets import Button, Input, Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                statuses = _statuses(app)
+                app.load_from_path(image)
+                await _poll(pilot, lambda: app.current_file is not None)
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                pre_save_bytes = work_copy.read_bytes()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                await _drive_apply(app, pilot)
+                app.query_one("#patch_saveback_name_input", Input).value = "firmware.s19"
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["work_copy_exists"] = work_copy.is_file()
+                outcomes["work_copy_bytes"] = (
+                    work_copy.read_bytes() if work_copy.is_file() else None
+                )
+                outcomes["pre_save_bytes"] = pre_save_bytes
+                app.action_save_project()
+                await pilot.pause()
+                app.screen.query_one("#project_parent_path", Input).value = str(
+                    tmp_path / "parent"
+                )
+                app.screen.query_one("#project_name", Input).value = "proj"
+                app.screen.query_one("#save_ok", Button).press()
+                await pilot.pause()
+                outcomes["statuses"] = list(statuses)
+                outcomes["app_running"] = bool(
+                    app.query_one("#status_text", Label).render()
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+>       assert outcomes["work_copy_exists"] is True, "the save-back deleted the work copy"
+E       AssertionError: the save-back deleted the work copy
+E       assert False is True
+
+tests\test_b99_staging.py:697: AssertionError
+_________ test_tc_b99_ux_c10_save_project_filename_renders_literally __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_save_projec0')
+
+    def test_tc_b99_ux_c10_save_project_filename_renders_literally(tmp_path: Path) -> None:
+        """The Save project file name is a new file-derived sink: a hostile
+        source file name must render literally (0 markup spans) in the painted
+        status and in the error notice."""
+        hostile = f"{HOSTILE_NAME}.s19"
+>       image = _image(tmp_path, hostile, 0x11)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:765: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b99_staging.py:100: in _image
+    path.write_text(_emit(marker, addr), encoding="ascii")
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_save_projec0/[red]x[/red][@click=app.quit].s19')
+mode = 'w', buffering = -1, encoding = 'ascii', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-25737\\test_tc_b99_ux_c10_save_projec0\\[red]x[\\red][@click=app.quit].s19'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
+__________ test_tc_b99_ux_c10_placement_error_path_renders_literally __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25737/test_tc_b99_ux_c10_placement_e0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD7B0371D0>
+
+    def test_tc_b99_ux_c10_placement_error_path_renders_literally(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The placement-error path is a new file-derived sink: the
+        ``WorkareaPlacementError`` text names the hostile file and renders
+        literally when the handler paints it."""
+        from textual.widgets import Label
+    
+>       assert PlacementError is not None
+E       assert None is not None
+
+tests\test_b99_staging.py:809: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+FAILED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+FAILED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+FAILED tests/test_b99_staging.py::test_tc_b99_13_target_replaced_between_check_and_reuse
+FAILED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+FAILED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+FAILED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+FAILED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+FAILED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+FAILED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+10 failed, 2 passed in 12.42s

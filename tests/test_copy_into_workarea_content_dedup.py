@@ -43,7 +43,12 @@ def test_tc1800_reload_same_content_reuses_existing_target(tmp_path: Path) -> No
     assert second == first, "a byte-identical re-load must reuse the existing target"
     assert first.name == "fw.s19"
     on_disk = sorted(p.name for p in workarea.iterdir())
-    assert on_disk == ["fw.s19"], f"re-loading identical content must not duplicate: {on_disk}"
+    assert on_disk == [".staging", "fw.s19"], (
+        f"re-loading identical content must not duplicate: {on_disk}"
+    )
+    # HLR-155 (LLR-155.1): the private-staging HOME under temp/ persists;
+    # every per-write mkdtemp directory below it is removed.
+    assert list((workarea / ".staging").iterdir()) == []
     assert first.read_bytes() == source.read_bytes()
 
 

@@ -1,0 +1,52 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b99_13_target_replaced_between_check_and_reuse ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25774/test_tc_b99_13_target_replaced0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000019B9FC0E8D0>
+
+    def test_tc_b99_13_target_replaced_between_check_and_reuse(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A hook replaces the target between check and reuse; the caller must
+        receive a path whose bytes equal its own (never the replaced content).
+    
+        RED at HEAD (check-then-copy mutation form): the single compare reuses
+        the target, so the returned path ends up holding the replacement bytes.
+        """
+        root = _workarea(tmp_path)
+        dest = root / "out"
+        dest.mkdir()
+        target = dest / "keep.s19"
+        target.write_text(_emit(0x11), encoding="ascii")
+        src = _image(tmp_path, "keep.s19", 0x11)
+        replacement = _emit(0x99)
+    
+        real_read_bytes = Path.read_bytes
+        state = {"fired": False}
+    
+        def _replace_after_first_read(self: Path) -> bytes:
+            data = real_read_bytes(self)
+            if Path(self) == target and not state["fired"]:
+                state["fired"] = True
+                Path(self).write_text(replacement, encoding="ascii")
+            return data
+    
+        monkeypatch.setattr(Path, "read_bytes", _replace_after_first_read)
+        returned = copy_into_workarea(src, dest)
+    
+>       assert _data(returned) == {0x1000: 0x11}, (
+            f"the caller must receive a path holding its own bytes, got "
+            f"{returned} -> {_data(returned)}"
+        )
+E       AssertionError: the caller must receive a path holding its own bytes, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-25774\test_tc_b99_13_target_replaced0\.s19tool\workarea\out\keep.s19 -> {4096: 153}
+E       assert {4096: 153} == {4096: 17}
+E         
+E         Differing items:
+E         {4096: 153} != {4096: 17}
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:314: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_target_replaced_between_check_and_reuse
+1 failed, 11 deselected in 0.43s

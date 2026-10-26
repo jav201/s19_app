@@ -1,0 +1,86 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3a
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 23 items / 22 deselected / 1 selected
+
+tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure FAILED [100%]
+
+================================== FAILURES ===================================
+________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26399/test_tc_b99_14_preexisting_fol0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B062237710>
+
+    def test_tc_b99_14_preexisting_folder_survives_placement_failure(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A PRE-EXISTING project folder of the same name survives a placement
+        failure untouched (review findings F6a/S-F5): the cleanup removes only
+        what THIS call created, so a folder that already held operator content
+        keeps it. Pairs with the S-F5 flag fix — ``mkdir(exist_ok=False)`` +
+        ``FileExistsError`` decides ownership instead of a racy
+        ``not exists()`` probe. Driven by keys and clicks through the real
+        dialogs.
+    
+        GREEN at the review-round-2 tree — the flag was already conservative —
+        so the RED proof is the S-F5 mutant (``created_project_dir`` forced
+        True) in ``mut-fix2-sf5.txt``.
+        """
+        from textual.widgets import Label
+    
+        image = _image(tmp_path, "firmware.s19", 0x11)
+        preexisting = tmp_path / ".s19tool" / "workarea" / "proj"
+        preexisting.mkdir(parents=True)
+        sentinel = preexisting / "keep.me"
+        sentinel.write_text("operator content", encoding="ascii")
+    
+        def _always_locked(src_path, dst_path):
+            raise PermissionError(13, "locked by another program", str(dst_path))
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                monkeypatch.setattr(os, "replace", _always_locked)
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _poll(pilot, lambda: _painted_status(app).startswith("Not saved"))
+                outcomes["status"] = _painted_status(app)
+                outcomes["app_running"] = bool(app.query_one("#status_text", Label).render())
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["status"].startswith("Not saved"), outcomes["status"]
+>       assert preexisting.is_dir(), "a pre-existing folder must survive the failure"
+E       AssertionError: a pre-existing folder must survive the failure
+E       assert False
+E        +  where False = is_dir()
+E        +    where is_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26399/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj').is_dir
+
+tests\test_b99_staging.py:1275: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+====================== 1 failed, 22 deselected in 17.02s ======================

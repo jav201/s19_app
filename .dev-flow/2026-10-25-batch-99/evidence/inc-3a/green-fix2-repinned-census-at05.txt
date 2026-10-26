@@ -1,0 +1,16 @@
+tests\test_id_registry.py .............                                  [100%]
+
+======================= 94 passed in 424.74s (0:07:04) ========================
+=== census ===
+tests\test_address_census.py .......................                     [100%]
+
+============================= 23 passed in 33.52s =============================
+=== at_b99_05 x8 ===
+1 passed, 22 deselected in 21.89s
+1 passed, 22 deselected in 22.14s
+1 passed, 22 deselected in 22.82s
+1 passed, 22 deselected in 22.66s
+1 passed, 22 deselected in 22.78s
+1 passed, 22 deselected in 22.82s
+1 passed, 22 deselected in 23.43s
+1 passed, 22 deselected in 22.01s

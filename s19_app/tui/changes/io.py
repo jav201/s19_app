@@ -59,6 +59,7 @@ from __future__ import annotations
 import codecs
 import json
 import re
+import shutil
 from pathlib import Path
 from typing import Callable, Optional, Union
 
@@ -66,8 +67,8 @@ from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     DEFAULT_COPY_SIZE_CAP_BYTES,
     WORKAREA_PATCHES,
-    WORKAREA_TEMP,
     WorkareaContainmentError,
+    _private_stage_dir,
     copy_into_workarea,
     ensure_workarea,
     resolve_input_path,
@@ -1511,7 +1512,8 @@ def write_change_document(
     Summary:
         Serialize a v2 change document to a JSON file placed inside the work
         area through the staged-containment pattern: stage the bytes under
-        ``.s19tool/workarea/temp/`` and let ``workspace.copy_into_workarea``
+        ``.s19tool/workarea/temp/.staging/`` (the shared reparse-checked
+        staging home) and let ``workspace.copy_into_workarea``
         perform the containment-checked final placement (the
         ``write_unified_to_workarea`` pattern, reused not re-invented).
 
@@ -1557,13 +1559,15 @@ def write_change_document(
 
     Data Flow:
         - Serialize ``document``; ensure the work-area structure; stage the
-          bytes in ``.s19tool/workarea/temp/`` — itself inside the work area,
-          so no bytes ever land outside it.
+          bytes in a private ``mkdtemp`` directory under
+          ``.s19tool/workarea/temp/.staging/`` via
+          ``workspace._private_stage_dir`` (LLR-155.1) — itself inside the work
+          area, so no bytes ever land outside it.
         - Place the staged file into the destination folder (the COMMON
           patches folder by default, the change-1 scoped home when given)
           via the copy helper (containment + reparse point + dedup checks
           reused; the helper creates the destination subdir on demand);
-          remove the staged temp file either way.
+          remove only the owned staging directory either way (LLR-155.7).
 
     Dependencies:
         Uses:
@@ -1587,10 +1591,20 @@ def write_change_document(
     )
 
     workarea = ensure_workarea(base_dir)
-    staged = workarea / WORKAREA_TEMP / _safe_name(file_name)
     target_dir = dest_dir if dest_dir is not None else workarea / WORKAREA_PATCHES
+    # Private staging (LLR-155.1): the serialised bytes are written into a
+    # mkdtemp directory under the shared, reparse-checked ``temp/.staging/``
+    # home (``workspace._private_stage_dir`` — the same staging seam
+    # ``copy_into_workarea`` uses), never under the shared
+    # ``temp/<user name>`` (the 14th placement path, PDR C2) — and placed
+    # through the copy helper. Only the owned staging directory is removed
+    # (LLR-155.7).
+    stage_dir: Optional[Path] = None
+    stage_owned = False
     try:
-        staged.parent.mkdir(parents=True, exist_ok=True)
+        stage_dir = _private_stage_dir(workarea)
+        stage_owned = True
+        staged = stage_dir / _safe_name(file_name)
         staged.write_bytes(data)
         target = placement(staged, target_dir)
         return target, issues
@@ -1606,10 +1620,8 @@ def write_change_document(
         )
         return None, issues
     finally:
-        try:
-            staged.unlink()
-        except OSError:
-            pass
+        if stage_owned and stage_dir is not None:
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
 
 def _safe_name(file_name: str) -> str:

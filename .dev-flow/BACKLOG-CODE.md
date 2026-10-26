@@ -1480,6 +1480,12 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   - AT-B99-08 does not assert the exact text "1 entry applied before this save".
   **What closes it:** reset the applied set with the image on a refused save; move the rebind out of the view getter; one AT assertion.
 
+- **▸ (P3, origin batch-99 Inc-3a reviews) Placement residuals:**
+  - R1: a symlink planted between the `lstat` and `os.open` of a claim still creates a 0-byte file at its target; the write is refused, but the cleanup unlinks the planted link (not ours). Python `os.open` cannot refuse reparse points on Windows, and exploiting it needs a same-user attacker.
+  - R2: a source that vanishes after the Save project pre-check raises a raw `FileNotFoundError` (`workspace.py` ≈:498) that the dialog does not catch.
+  - The Load failure text reads "Cannot load file: Not saved: …" (a doubled prefix).
+  **What closes it:** wrap R2 in `WorkareaPlacementError`; leave a non-owned entry in place on a failed post-claim check and only report it; reword the load-path message.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

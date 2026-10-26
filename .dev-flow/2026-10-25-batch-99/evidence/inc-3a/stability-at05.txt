@@ -1,0 +1,24 @@
+=== AT-B99-05 run 1 ===
+.                                                                        [100%]
+1 passed in 34.82s
+=== AT-B99-05 run 2 ===
+.                                                                        [100%]
+1 passed in 35.17s
+=== AT-B99-05 run 3 ===
+.                                                                        [100%]
+1 passed in 35.39s
+=== AT-B99-05 run 4 ===
+.                                                                        [100%]
+1 passed in 35.48s
+=== AT-B99-05 run 5 ===
+.                                                                        [100%]
+1 passed in 36.52s
+=== AT-B99-05 run 6 ===
+.                                                                        [100%]
+1 passed in 33.99s
+=== AT-B99-05 run 7 ===
+.                                                                        [100%]
+1 passed in 34.96s
+=== AT-B99-05 run 8 ===
+.                                                                        [100%]
+1 passed in 34.56s

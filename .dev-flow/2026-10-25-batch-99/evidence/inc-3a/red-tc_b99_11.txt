@@ -1,0 +1,39 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b99_11_same_name_save_back_keeps_work_copy ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25739/test_tc_b99_11_same_name_save_0')
+
+    def test_tc_b99_11_same_name_save_back_keeps_work_copy(tmp_path: Path) -> None:
+        """A save-back under the loaded image's own name keeps the work copy.
+    
+        RED at HEAD (P-15): ``save_patched_image`` stages at ``temp/<user name>``
+        — the loaded work copy — and its ``finally`` unlinks it.
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        work_copy = root / "temp" / "firmware.s19"
+        work_copy.write_text(_emit(0x11), encoding="ascii")
+        pre_save_bytes = work_copy.read_bytes()
+    
+        mem_map = {0x1000: 0x11, 0x2000: 0x99}
+        ranges = [(0x1000, 0x1001), (0x2000, 0x2001)]
+        target, issues = save_patched_image(
+            mem_map, ranges, project_dir, "firmware.s19", source_kind="s19"
+        )
+    
+        assert target is not None, f"save-back refused: {[i.message for i in issues]}"
+        assert target.name == "firmware.s19", target
+>       assert work_copy.exists(), (
+            "the loaded work copy temp/firmware.s19 must survive the save-back"
+        )
+E       AssertionError: the loaded work copy temp/firmware.s19 must survive the save-back
+E       assert False
+E        +  where False = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25739/test_tc_b99_11_same_name_save_0/.s19tool/workarea/temp/firmware.s19').exists
+
+tests\test_b99_staging.py:142: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+1 failed, 11 deselected in 0.53s
