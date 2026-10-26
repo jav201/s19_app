@@ -1,0 +1,9 @@
+OVER_A: datatype/length/effective_byte_order = None 2 big
+resolve_symbol_entry signature: (symbol_text: 'str', value_text: 'str', a2l_data: 'Optional[dict]', *, value_mode: 'str' = 'text') -> 'SymbolPickResult'
+encode physical 4113 (0x1011) -> 1011 issues: [] | expected MSB_FIRST bytes: 1011
+NO FILE WRITTEN (flow stopped): error [('source', 'ok', 'loaded prg.s19 (11 ranges)'), ('patch', 'error', 'change document blocked'), ('write_out', 'skipped', 'skipped (upstream error)')]
+mixed doc: run = error | patch = error change document blocked | dispositions = ['blocked', 'blocked'] | refusals = ['CHG-SYMBOL-UNRESOLVED'] | file changed bytes = 3968
+TAB_NOINTP physical   13.0 -> raw None (decodes back to None) err=the value 13.0 is not a table value - the nearest table values are 10.0 and 20.0 flags=[]
+TAB_NOINTP physical   10.0 -> raw 01 (decodes back to 10.0) err=None flags=[]
+TAB_INTP physical  500.0 -> raw None (decodes back to None) err=the value 500.0 is outside the table range [0.0, 20.0] flags=[]
+TAB_INTP physical  -50.0 -> raw None (decodes back to None) err=the value -50.0 is outside the table range [0.0, 20.0] flags=[]

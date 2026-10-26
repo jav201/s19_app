@@ -1,0 +1,4 @@
+parsed segment block_name: ['x/../../../ESCAPED'] base/size: [(4096, 16)]
+written: C:\Users\jjgh8\AppData\Local\Temp\rwsplit_vvbarscp\.s19tool\workarea\splits\prg_x__________ESCAPED.s19 | resolved: C:\Users\jjgh8\AppData\Local\Temp\rwsplit_vvbarscp\.s19tool\workarea\splits\prg_x__________ESCAPED.s19 | inside dest: True
+second export path == first: False | first content survived: False
+ADAPTED CHECK (D8 sufijo): first file intact after second export: True | second written as: prg_range_00_1.s19

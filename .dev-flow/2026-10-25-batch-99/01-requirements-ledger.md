@@ -91,3 +91,10 @@ above this line is ever edited._
 - **What changed:** LLR-155.3 no longer asks for a "narrower window" between check and reuse; that cannot be closed by reading twice. It now rests on an invariant: no code path inside the work area replaces or deletes a file at a final name except the placement claiming a free name, so placed files are immutable. `project_gather_service.py:290-299` (delete and re-copy of an existing name) is the one known violator, and Inc 3b converts it. TC-B99-13 now models concurrent in-app placements instead of a hook between two reads.
 - **Why:** code-reviewer, Inc-3a round 1, F2 (HIGH): the hook-based TC gave false confidence, and the claim "no in-app writer replaces a name" was false at `project_gather_service.py:290-299`.
 - **Evidence:** `03-increments/increment-003.md` §4b; `s19_app/tui/services/project_gather_service.py:290-299`.
+
+### LED-2026-10-25-batch-99.8 — DDR: TC-B99-44 assigned to LLR-155.1
+- **Requirement:** LLR-155.1
+- **Date:** 2026-10-26
+- **What changed:** LLR-155.1 gains TC-B99-44, the test of the converted `changes/io.py` placement path (PDR condition C2). Inc 3a added it in its round-1 fixes; Kimi numbered it TC-B99-40, which collided with LLR-157.4, and the orchestrator renumbered it to 44. The contract had not recorded it until now.
+- **Why:** qa-reviewer, DDR finding DQ-5.
+- **Evidence:** `tests/test_b99_staging.py` (`tc_b99_44`); `03-increments/increment-003.md` §4b.

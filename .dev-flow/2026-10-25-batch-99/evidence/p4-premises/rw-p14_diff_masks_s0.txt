@@ -1,0 +1,2 @@
+repo diff source vs written: runs = 0 | verify_written_image: verified
+independent parser: written-only addresses = 0

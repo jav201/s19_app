@@ -1,0 +1,7 @@
+NO FILE WRITTEN (flow stopped): error [('source', 'ok', 'loaded fw.s19 (2 ranges)'), ('patch', 'error', 'applied 0 of 1 entries'), ('write_out', 'skipped', 'skipped (upstream error)')]
+run: error [('source', 'ok', 'loaded fw.s19 (2 ranges)'), ('patch', 'error', 'applied 0 of 1 entries'), ('write_out', 'skipped', 'skipped (upstream error)')] ['skipped-outside']
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app\.dev-flow\2026-10-25-batch-99\evidence\p4-premises\adapted\p13a_s0_phantom_patcha.py", line 13, in <module>
+    print("written file: S0 =", meta["s0"], "| data record at 0x0..0xB =", bytes(mem[a] for a in range(0, 12)))
+                                ~~~~^^^^^^
+TypeError: 'NoneType' object is not subscriptable

@@ -1856,7 +1856,7 @@ def test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate(
 #: writers own the placement invariant; the fixed-name writers predate LED .7
 #: with their own non-clobber / atomic schemes (the manifest's fixed
 #: ``project.json`` and the M-5 report names, checked non-existing before
-#: the write); ``write_bin_with_sidecar`` is converted by Inc 6 (LLR-160.4).
+#: the write); ``write_bin_with_sidecar`` was bypassed by Inc 6 (the export no longer calls it) and stays allow-listed as a headless engine API.
 #: Review finding F4a extended the census to ``write_text``; the additional
 #: pinned writers: the diff reports' M-5 collision-counter names (never an
 #: overwrite), the explicit operator-picked export targets (the A2L dump and

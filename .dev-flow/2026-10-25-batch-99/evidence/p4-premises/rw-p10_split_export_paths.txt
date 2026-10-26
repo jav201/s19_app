@@ -1,0 +1,6 @@
+parsed segment block_name: ['x/../../../ESCAPED'] base/size: [(4096, 16)]
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app\.dev-flow\design\investigation-rw-2026-10-22\p10_split_export_paths.py", line 27, in <module>
+    print("written:", w, "| resolved:", w.resolve(), "| inside dest:", w.resolve().is_relative_to(dest.resolve()))
+                                        ^^^^^^^^^
+AttributeError: 'PlacedExport' object has no attribute 'resolve'

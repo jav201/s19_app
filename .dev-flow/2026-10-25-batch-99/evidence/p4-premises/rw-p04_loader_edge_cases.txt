@@ -1,0 +1,22 @@
+s19_good                       run=ok                     source=ok       notices=0 out_bytes=32 out_ranges=[('0x1000', '0x1020')] 
+s19_truncated_no_terminator    run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+s19_bad_checksum               run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 1: Checksum mismatch: expected 64, found 00
+s19_overlap_conflict           run=ok                     source=ok       notices=0 out_bytes=16 out_ranges=[('0x1000', '0x1010')] 
+s19_duplicate_identical        run=ok                     source=ok       notices=0 out_bytes=16 out_ranges=[('0x1000', '0x1010')] 
+s19_count_S5_mismatch          run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+s19_S4_record                  run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 2: Unsupported S-record type: S4
+s19_garbage_line               run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 2: Invalid S-record format: hello world
+s19_lowercase                  run=completed-with-issues  source=notices  notices=1 out_bytes=0 out_ranges=[] | line 1: Invalid S-record format: s1131000000102030405060708090a0b0c0d0
+s19_header_only_S0             run=ok                     source=ok       notices=0 out_bytes=0 out_ranges=[] 
+s19_data_after_term            run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+s19_line_cut_midrecord         run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+s19_S0_nonzero_addr            run=ok                     source=ok       notices=0 out_bytes=16 out_ranges=[('0x1000', '0x1010')] 
+hex_good                       run=ok                     source=ok       notices=0 out_bytes=32 out_ranges=[('0x1000', '0x1020')] 
+hex_no_eof_truncated           run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+hex_data_after_eof             run=error                  source=error    notices=0 out_bytes=0 out_ranges=[] 
+hex_bad_checksum               run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 2: Checksum mismatch
+hex_overlap_conflict           run=ok                     source=ok       notices=0 out_bytes=16 out_ranges=[('0x1000', '0x1010')] 
+hex_unknown_type_06            run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 3: Unsupported record type: 06
+hex_seg_wrap_type02            run=ok                     source=ok       notices=0 out_bytes=16 out_ranges=[('0x1fff8', '0x20008')] 
+hex_missing_colon              run=completed-with-issues  source=notices  notices=1 out_bytes=0 out_ranges=[] | line 2: Missing ':' prefix
+hex_ela_bad_len                run=completed-with-issues  source=notices  notices=1 out_bytes=16 out_ranges=[('0x1000', '0x1010')] | line 1: Invalid extended linear address record length

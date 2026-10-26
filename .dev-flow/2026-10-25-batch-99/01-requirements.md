@@ -653,10 +653,10 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-155.1 — Private staging directory
 - **Traceability:** HLR-155
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.2, LED-2026-10-25-batch-99.8
 - **Statement:** `save_patched_image` (`tui/changes/apply.py`) and `copy_into_workarea` (`tui/workspace.py`) shall stage each write in a private directory created with `tempfile.mkdtemp` under `<workarea>/temp/.staging/`, holding a file with the requested (sanitised) name. They shall check that `<workarea>/temp` and `<workarea>/temp/.staging` are not reparse points (`lstat`) before staging, and shall remove only that directory, tracked by an ownership flag and never by re-deriving a name.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B99-11 — `pytest tests/test_b99_staging.py -k tc_b99_11`
+- **Executed verification:** TC-B99-11 — `pytest tests/test_b99_staging.py -k tc_b99_11`; TC-B99-44 — `-k tc_b99_44` (the converted `changes/io.py` placement path, PDR C2, stages privately and places correctly)
 - **Numeric pass threshold:** a same-name save-back → the loaded work copy exists and is byte-equal to its pre-save bytes; 0 leftover staging directories after success and after a forced failure; the placed name equals the requested name when it is free.
 - **Negative control:** executed on `307065f` (P-15): `work copy exists after save-back: False` → RED.
 - **Boundary catalog:** ☒ boundary ☒ error — the user name equal to the work copy's name; a forced failure mid-placement.

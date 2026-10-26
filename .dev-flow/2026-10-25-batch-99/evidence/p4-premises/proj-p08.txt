@@ -1,0 +1,7 @@
+work copy: temp/firmware.s19 exists: True
+save-back status: ['Patched image saved as firmware.s19 — 1 entry applied before this save (0x8000007C)', 'Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)']
+work copy exists after save-back: True | app still holds: temp/firmware.s19
+workarea files: ['firmware.s19', 'temp/firmware.s19']
+after Save-project dismiss: app running? True | return_code: None
+run_test outcome: no exception | app.return_code: None
+P folder left behind: ['.s19tool/workarea/P/firmware.s19', '.s19tool/workarea/P/project.json']

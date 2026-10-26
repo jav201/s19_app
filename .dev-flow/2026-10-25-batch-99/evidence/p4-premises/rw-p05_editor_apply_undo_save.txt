@@ -1,0 +1,8 @@
+apply#1 counts: {'applied': 1}
+after undo: entries = 0 | last_summary = None
+apply#2 counts: {'applied': 1} entries: ['0xeb40']
+save: True Patched image saved as edited.s19 — 1 entry applied before this save (0x0000EB40) | verify: verified
+file @0xEB10 = 20417070 (source: 20417070 ) — summary of the saved apply lists only ['0xeb40']
+straddle/gap counts: {'skipped-partial': 2}
+editor save fw: verify = verified | extra data bytes in file: 0 [] = b''
+loaded.mem_map has 0x0..: False | ranges[0] = ['0x80000000', '0x80000021']

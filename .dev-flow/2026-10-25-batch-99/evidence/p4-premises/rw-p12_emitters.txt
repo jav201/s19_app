@@ -1,0 +1,6 @@
+HEX crossing 64K: [':020000040000FA', ':10FFF800F8F9FAFBFCFDFEFF000102030405060701', ':00000001FF']
+  linear reader ranges: [('0xfff8', '0x10008')] | 16-bit-wrap reader ranges: [('0x0', '0x8'), ('0xfff8', '0x10000')]
+S19 width: S3-only source <0x10000 re-emitted as: ['S0', 'S1', 'S9']
+S19 addr>32bit emitted: S30610000000001F8 len 17
+  reload errors: [{'line_number': 2, 'line': 'S30610000000001F8', 'segment': 'SRecord constructor', 'error': 'Length mismatch: expected 16 chars, found 17'}]
+random round trips (200, S19+HEX, repo loader + independent parser): mismatches = 0

@@ -1,0 +1,7 @@
+prg.s19 ranges: [('0x17e0', '0x17e1'), ('0x17e8', '0x17ea'), ('0x17f0', '0x17fa'), ('0xeb00', '0xeb02'), ('0xeb04', '0xeb07'), ('0xeb08', '0xfa2e'), ('0xfcb0', '0xfcec'), ('0xfcf8', '0xfd00'), ('0xffbd', '0xffbe'), ('0xffbf', '0xffc0'), ('0xfffe', '0x10000')]
+outside_0x20000          run=error                  patch=error:'applied 0 of 1 entries' dispositions=['skipped-outside'] refusals=[] wrote=[]
+straddle_end             run=error                  patch=error:'applied 0 of 1 entries' dispositions=['skipped-partial'] refusals=[] wrote=[]
+one_in_one_out           run=completed-with-issues  patch=notices:'applied 1 of 2 entries, 1 not applied' dispositions=['applied', 'skipped-outside'] refusals=[] wrote=['out_one_in_one_out.s19']
+kind_check_not_change    run=error                  patch=error:'change document blocked' dispositions=['blocked'] refusals=[] wrote=[]
+v1_legacy                run=error                  patch=error:'change document unreadable' dispositions=[] refusals=['CHG-V1-FORMAT'] wrote=[]
+malformed_json           run=error                  patch=error:'change document unreadable' dispositions=[] refusals=['MF-JSON-PARSE'] wrote=[]

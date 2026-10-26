@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\jjgh8\Github\s19_app\.dev-flow\design\investigation-rw-2026-10-22\p13_s0_phantom_patch.py", line 10, in <module>
+    mem, _, meta = mini_s19(r.written_paths[0])
+                            ~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

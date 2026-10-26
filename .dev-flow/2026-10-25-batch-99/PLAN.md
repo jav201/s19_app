@@ -70,20 +70,20 @@ Every image, report and run record the tool writes says what was and was not app
 
 Decision-free increments go first, so the operator's verdict does not block the start:
 
-| Inc | Story | Findings | SOURCE files (≤4) | Gate on |
-|---|---|---|---|---|
-| 1 | US-141 | corpus + independent reader | 0 (tests only) | — |
-| 2 | US-142 | H-1 | `core.py`, `render/hexview.py` | — |
-| 3a | US-144 | H-3, PH-3; placement LLR-155.1/155.2/155.3/155.4/155.7; the 14th path `changes/io.py:1586` (PDR C2) | `changes/apply.py`, `workspace.py`, `app.py`, `changes/io.py` | — |
-| 3b | US-144 | D7 start check (LLR-155.5), D9 WRITE-OUT verify (LLR-155.6) | `flow_execution_service.py` | D7, D9 |
-| 4 | US-146 | H-4 | `change_service.py` (+ `models.py`) | ARQ mem_map census |
-| 5 | US-148 + LLR-155.8 | H-7, CRC staging; R23 confirmed (coverage count on the CRC region result) | `operations/crc.py`, `flow_execution_service.py` | — |
-| 6 | US-149 | H-9, CW-D-7, B99-I2a group placement (PDR C3/PQ-1) | `segment_split_view.py`, `s19_app/segment_ops.py`, `workspace.py` | D8 for the `_<N>` clause |
-| 7 | US-151 | CW-U-1 tests, sibling, CW-U-3 | `app.py` | — |
-| 8 | US-145 | H-2, H-10 | `flow_execution_service.py`, `flow_report_service.py`, `flow_screens.py` | D5 |
-| 9 | US-143 | H-8 | `core.py`, `hexfile.py`, `flow_execution_service.py` | D6 |
-| 10 | US-147, US-152 | H-5, H-6, CW-D-10 | `a2l.py` | D2, D3, D4 |
-| 11 | US-150 | CW-D-4 | `change_service.py`, `screens_directionb.py`, `window_help.py` | D1 |
+| Inc | Story | Findings | SOURCE files (≤4) | Gate on | As built (commit) |
+|---|---|---|---|---|---|
+| 1 | US-141 | corpus + independent reader | 0 (tests only) | — | 0 (tests only) — `a52e2be` |
+| 2 | US-142 | H-1 | `core.py`, `render/hexview.py` | — | `core.py`, `render/hexview.py` — `c62c842` |
+| 3a | US-144 | H-3, PH-3; placement LLR-155.1/155.2/155.3/155.4/155.7; the 14th path `changes/io.py:1586` (PDR C2) | `changes/apply.py`, `workspace.py`, `app.py`, `changes/io.py` | — | `changes/apply.py`, `changes/io.py`, `workspace.py`, `app.py` — `f1ba70c` |
+| 3b | US-144 | D7 start check (LLR-155.5), D9 WRITE-OUT verify (LLR-155.6) | `flow_execution_service.py` | D7, D9 | `flow_execution_service.py`, `project_gather_service.py`, `app.py` — `4ee51a6` |
+| 4 | US-146 | H-4 | `change_service.py` (+ `models.py`) | ARQ mem_map census | `change_service.py`, `app.py` — `c58b02d` |
+| 5 | US-148 + LLR-155.8 | H-7, CRC staging; R23 confirmed (coverage count on the CRC region result) | `operations/crc.py`, `flow_execution_service.py` | — | `operations/crc.py`, `flow_execution_service.py`, `flow_screens.py` — `e7732f6` |
+| 6 | US-149 | H-9, CW-D-7, B99-I2a group placement (PDR C3/PQ-1) | `segment_split_view.py`, `s19_app/segment_ops.py`, `workspace.py` | D8 for the `_<N>` clause | `segment_split_view.py`, `workspace.py` (`segment_ops.py` untouched) — `87dcd3a` |
+| 7 | US-151 | CW-U-1 tests, sibling, CW-U-3 | `app.py` | — | `app.py`, `workspace.py` — `d62b0c1` |
+| 8 | US-145 | H-2, H-10 | `flow_execution_service.py`, `flow_report_service.py`, `flow_screens.py` | D5 | `flow_execution_service.py`, `flow_report_service.py`, `flow_screens.py` — `7ffad92` |
+| 9 | US-143 | H-8 | `core.py`, `hexfile.py`, `flow_execution_service.py` | D6 | `core.py`, `hexfile.py`, `flow_execution_service.py`, `app.py` — `725d474` |
+| 10 | US-147, US-152 | H-5, H-6, CW-D-10 | `a2l.py` | D2, D3, D4 | `a2l.py`, `app.py` — `9d7fb18` |
+| 11 | US-150 | CW-D-4 | `change_service.py`, `screens_directionb.py`, `window_help.py` | D1 | `change_service.py`, `screens_directionb.py`, `window_help.py` — `5021bb6` |
 
 Each increment runs the same way:
 1. Kimi K2.8 (`kimi-code/kimi-for-coding`, `display_name` "K2.8 Preview" in `~/.kimi-code/config.toml`) implements in an isolated git worktree, with `PYTHONPATH=<worktree>` so pytest imports the worktree's package (the `pip -e` trap).
