@@ -30,12 +30,15 @@ test re-pins:
 
 ## 2 · Files modified
 
-| File | Kind | Change |
-|---|---|---|
-| `tests/test_import_census.py` | test | `MEASURED_SAFE_TEXT_CONSUMERS` += `s19_app.tui.segment_split_view`; comment sentence (LLR-160.2, measured in) |
-| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg` | fixture | single cell regenerated for the LLR-161.2 placeholder |
-| `evidence/inc-13/*` | evidence | RED/GREEN/mutation transcripts + snapshot text diff |
-| **SOURCE files** | **0 / 4** | none — `git status --porcelain -- s19_app/` empty |
+| File | Kind | Traces to | Change |
+|---|---|---|---|
+| `tests/test_import_census.py` | test | LLR-160.2 | `MEASURED_SAFE_TEXT_CONSUMERS` += `s19_app.tui.segment_split_view`; comment sentence (LLR-160.2, measured in) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[patch-comfortable-120x30].svg` | fixture | LLR-161.2 | single cell regenerated for the LLR-161.2 placeholder |
+| `evidence/inc-13/*` | doc | — | evidence: RED/GREEN/mutation transcripts + snapshot text diff |
+
+| Count | Value |
+|---|---|
+| **SOURCE files** | **0 / 4** — none: `git status --porcelain -- s19_app/` empty |
 
 ## 3 · How to test
 

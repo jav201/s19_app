@@ -57,10 +57,10 @@ dialog redesign (routed to the Load+projects batch).
 
 | File | Kind | Traces to | Change |
 |---|---|---|---|
-| `s19_app/tui/workspace.py` | SOURCE (1 of 2) | HLR-162, LLR-162.2 | `RESERVED_WORKAREA_HOMES` tuple constant (+ doc comment) |
-| `s19_app/tui/app.py` | SOURCE (2 of 2) | HLR-162, LLR-162.1/.2/.3 | import the tuple; `list_projects` omits the tuple; `refresh_files` reads `workarea/temp`, stores `entry.data = name`; `_load_from_item` reads `item.data`, resolves against `workarea/temp` |
+| `s19_app/tui/workspace.py` | source | HLR-162, LLR-162.2 | source 1 of 2: `RESERVED_WORKAREA_HOMES` tuple constant (+ doc comment) |
+| `s19_app/tui/app.py` | source | HLR-162, LLR-162.1/.2/.3 | source 2 of 2: import the tuple; `list_projects` omits the tuple; `refresh_files` reads `workarea/temp`, stores `entry.data = name`; `_load_from_item` reads `item.data`, resolves against `workarea/temp` |
 | `tests/test_b99_load_project.py` | test | HLR-162 | TC-B99-34 (both name arms), TC-B99-35 (populated + reserved-only arms), TC-B99-36 (empty + loaded arms), AT-B99-13 (dialog listing, 3 pick paths, file pick, empty boundary) — 4 nodes |
-| `tests/test_id_registry.py` | test | BRIEF-COMMON rule | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (the new module), one-line comment |
+| `tests/test_id_registry.py` | test | HLR-162 (BRIEF-COMMON rule; +1 = `tests/test_b99_load_project.py`) | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (the new module), one-line comment |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-007.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-7/*` | doc | — | transcripts, hashes (outside the count) |
 

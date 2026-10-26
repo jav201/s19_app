@@ -59,6 +59,7 @@ Execution run (`#fx_run`).
 | `s19_app/tui/services/flow_execution_service.py` | SOURCE | HLR-154, LLR-154.3, UX-C2 | `SOURCE_INTEGRITY_CODES` frozenset; the SOURCE arm maps the five codes to a `BLOCK_STATUS_ERROR` (diagnostics `[code] file: message`, last = painted cause) + chain abort; other notices keep `notices` |
 | `s19_app/tui/app.py` | SOURCE | HLR-154, UX-C7, UX-C10 | `_integrity_notice_codes` helper; `_format_coexistence_status` leads with `Loaded <name> with integrity notices: <codes>`; `_compute_mac_view_payload` appends one ERROR `ValidationIssue` per integrity code so the Issues panel names it |
 | `tests/test_b99_truncation.py` | test | HLR-154 | new: TC-B99-08 ×7 nodes (incl. 3 parametrized defect arms), TC-B99-09 ×4 (incl. 2), TC-B99-10 ×6 (incl. 5), AT-B99-03 ×3 pilot nodes |
+| `tests/test_core_srecord_validation.py` | test | LLR-154.1 | re-pin: `test_s19file_collects_errors` expects the trailing `S19-NO-TERMINATOR` integrity notice (`[3, 4]` → `[3, 4, None]`) |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-009.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-9/*` | doc | — | transcripts, hashes (outside the count) |
 

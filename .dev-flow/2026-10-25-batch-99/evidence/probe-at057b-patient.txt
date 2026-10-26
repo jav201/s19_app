@@ -1,0 +1,36 @@
+# patient probe: same presses as AT-057b, each step waits up to 40 pauses for its observable; None = never appeared
+# started: 2026-10-26T05:15:33-06:00
+== tree a293213, 15 runs
+# s19_app from C:\Users\jjgh8\Github\s19_app-b99-suite\s19_app\__init__.py
+run 1: pauses needed {'load': 1, 'validate': 1, 'apply': 2, 'save': 1, 'checks': 1}
+run 2: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 3: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 4: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 5: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 6: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 7: pauses needed {'load': 2, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 8: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 2}
+run 9: pauses needed {'load': 2, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 10: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 11: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 12: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 13: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 14: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 15: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+== tree 75f947a, 15 runs
+# s19_app from C:\Users\jjgh8\Github\s19_app-b99-suite\s19_app\__init__.py
+run 1: pauses needed {'load': 1, 'validate': 1, 'apply': 2, 'save': 1, 'checks': 1}
+run 2: pauses needed {'load': 2, 'validate': 2, 'apply': 1, 'save': 1, 'checks': 1}
+run 3: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 2}
+run 4: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 5: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 6: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 7: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 2, 'checks': 1}
+run 8: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 9: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 10: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 11: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 12: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 13: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}
+run 14: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 2}
+run 15: pauses needed {'load': 1, 'validate': 1, 'apply': 1, 'save': 1, 'checks': 1}

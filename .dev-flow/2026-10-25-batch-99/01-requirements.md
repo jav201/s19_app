@@ -707,11 +707,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-155.6 — WRITE-OUT verifies what it wrote
 - **Traceability:** HLR-155
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.9
 - **Statement:** The flow WRITE-OUT step shall call `verify_written_image` on the written file and end with status `error`, naming the first differing address, when it reports a mismatch.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-16 — `pytest tests/test_b99_staging.py -k tc_b99_16`
-- **Numeric pass threshold:** a write corrupted after placement (forced by a hook) → `error`; an intact write → `ok`.
+- **Numeric pass threshold:** a write with 1 data byte corrupted after placement (forced by a hook) → `error`, the last diagnostic names that 1 byte's address; an intact write → `ok`, 0 bytes differ from the image.
 - **Negative control:** skip the verify call (mutation) → `ok` on the corrupted write, RED.
 - **Boundary catalog:** ☒ error — the mismatch.
 
@@ -748,11 +748,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-156.2 — The chain outcome carries dispositions
 - **Traceability:** HLR-156
-- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.5
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.5, LED-2026-10-25-batch-99.9
 - **Statement:** `ChainRunOutcome` shall carry the run's `change_records`, `refusals` and `image_ranges`, and the Flow Execution lane shall paint each lane's PATCH cell from its block status, so that `notices` and `error` are visible. When a lane's PATCH ends `notices` or `error`, the lane's terminal run-log line shall name the PATCH block, the count of entries not applied, and the first address with its disposition (e.g. `PATCH: 1 of 2 entries not applied (0x00020000 skipped-outside)`), or the first refusal code. Any file-derived text it paints goes through `safe_text`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-18 — `pytest tests/test_b99_patch_truth.py -k tc_b99_18`
-- **Numeric pass threshold:** malformed-doc lane → outcome holds `MF-JSON-PARSE` in `refusals`; lane cell glyph is the error glyph.
+- **Numeric pass threshold:** malformed-doc lane → `refusals` holds exactly 1 code, `MF-JSON-PARSE`; mixed lane → 2 of 2 change records carried in document order (1 `applied`, 1 `skipped-outside`); lane cell glyph is the error glyph.
 - **Negative control:** executed on `307065f` (P-14): `outcome status: ok` → RED.
 - **Boundary catalog:** ☒ error — the malformed lane.
 
@@ -797,6 +797,12 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 - **Numeric pass threshold:** remove-after-apply and edit-after-apply arms → 0 stale bytes; add-after-apply → save → the entry is written and named; summary count == entries in the image.
 - **Negative control:** skip the re-derive on remove (mutation) → stale bytes, RED.
 - **Boundary catalog:** ☒ boundary — redo after undo.
+
+### LLR-157.3 — The change engine is the only in-place writer of the editor image *(retired at LED .2, not reused)*
+- **Traceability:** HLR-157
+- **Ledger:** LED-2026-10-25-batch-99.1
+- **Status:** retired at P2 round 2 (ledger entry .2, finding A2-1) together with TC-B99-37: a name-based census over `mem_map` cannot equal any allow-list at HEAD, in either direction. The id is not reused. The heading was restored at the close gate as the historical record, so the ledger's pairing points at a block (`V26`); no test verifies it.
+- **Statement (historical, retired):** No code path other than the change engine's apply (`tui/changes/apply.py`, reached through `ChangeService.apply`) shall write `LoadedFile.mem_map` in place. Every other writer (the CRC inject, flow and variant runs) shall write a copy.
 
 ### LLR-157.4 — `before_bytes` means the source byte
 - **Traceability:** HLR-157
@@ -850,11 +856,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-159.2 — Partial coverage is a notice on the flow arm
 - **Traceability:** HLR-159
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.9
 - **Statement:** The flow CRC arm shall end with status `notices` naming the absent byte count when the region is partly covered, for legacy and new region forms alike.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B99-27 — `pytest tests/test_b99_crc_region.py -k tc_b99_27`
-- **Numeric pass threshold:** region over a gap → `notices`, count == independent count of absent addresses.
+- **Numeric pass threshold:** region over a gap → `notices`, count == independent count of absent addresses (466 of 512 region bytes on the pinned fixture, exactly 1 notice).
 - **Negative control:** executed on `307065f` (P-9): `region_over_gap run=ok … findings=[]` → RED.
 - **Boundary catalog:** ☒ boundary — full coverage (control `ok`).
 
@@ -922,11 +928,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-161.2 — The field says it is hex
 - **Traceability:** HLR-161
-- **Ledger:** none
+- **Ledger:** LED-2026-10-25-batch-99.9
 - **Statement:** The Bytes field's placeholder and the Patch Editor's window help entry shall state that tokens are hex.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-33 — `pytest tests/test_b99_bytes_field.py -k tc_b99_33`
-- **Numeric pass threshold:** both texts contain `hex`.
+- **Numeric pass threshold:** 2 of 2 texts contain `hex` (the placeholder and the 1 help `Bytes` line); the placeholder is no longer than the input's inner width at 118 columns.
 - **Negative control:** revert the help text (mutation) → RED.
 - **Boundary catalog:** none — static text.
 
@@ -1045,8 +1051,8 @@ FLOW: image_to_final_file
 FLOW: change_dispositions_to_run_records
   SOURCE : a change document applied by a flow PATCH step
   NODES  :
-    - fn    : apply_change_document (changes/apply.py; unchanged pass-through, P-13)
-      owner : LLR-156.1 (reads its output; places no requirement on it)
+    - fn    : apply_change_document (changes/apply.py; unchanged pass-through, P-13; the owner reads its output and places no requirement on it)
+      owner : LLR-156.1
       in    : document + image
       out   : ChangeSummary with per-entry dispositions + refusals
     - fn    : flow PATCH arm status (flow_execution_service.py)
@@ -1205,7 +1211,7 @@ FLOW: corpus_to_manifest
   SINK   : `generate.py --check` exit code
 ```
 
-- **Part B — boundary decomposition:** yes — the TUI has addressable panels, and this batch reworks the output of four (consumers measured with `grep -rl <id> s19_app tests` at `a293213`). The parents `workspace_shell`, `load_project_dialog`, `flow_execution_panel` and `pe_ledger_inspector` are declared in earlier batches' contracts (batch-87, batch-97), not in this one: **V12 could not test parent existence from this contract alone**, which is the batch-87/94/97 precedent.
+- **Part B — boundary decomposition:** yes — the TUI has addressable panels, and this batch reworks the output of four (consumers measured with `grep -rl <id> s19_app tests` at `a293213`). The parents `workspace_shell`, `load_project_dialog` and `patch_win_script` (the PATCH SCRIPT window, `screens_directionb.py:4904`, which holds the Bytes field; `pe_ledger_inspector` of batch-97 declares no output that holds it) are declared by no contract, so V12 reports their balancing as not checked. `flow_execution_panel` is declared in batch-94, and `fx_lane_patch_cell` balances against its `run_lanes` output (close-gate repair, LED-2026-10-25-batch-99.9).
 
 ```
 COMPONENT: workarea_files_list
@@ -1221,6 +1227,7 @@ COMPONENT: workarea_files_list
                     s19_app/tui/styles.tcss
                     tests/test_tui_directionb.py
                     tests/test_tui_snapshot.py
+      owner       : LLR-162.3
 ```
 
 ```
@@ -1236,6 +1243,7 @@ COMPONENT: load_project_list
       consumers   : s19_app/tui/screens.py
                     s19_app/tui/styles.tcss
                     tests/test_b97_load_project_dialog.py
+      owner       : LLR-162.2
 ```
 
 ```
@@ -1244,8 +1252,8 @@ COMPONENT: fx_lane_patch_cell
   SURFACE: Flow Execution lane cables
   INPUTS : ChainRunOutcome.block_results, change_records, refusals
   OUTPUTS:
-    - id          : lane PATCH cell
-      value       : the block status glyph (ok / notices / error) per lane
+    - id          : run_lanes
+      value       : the lane PATCH cell inside each `run_lanes` lane: the block status glyph (ok / notices / error) per lane
       address     : COMPUTED — the PATCH position in each lane's pipeline row (no query id), the run started by query("#fx_run")
       cardinality : one per lane
       consumers   : s19_app/tui/flow_screens.py
@@ -1253,11 +1261,12 @@ COMPONENT: fx_lane_patch_cell
                     tests/test_b97_flow_execution.py
                     tests/test_tui_flow_execution_b94.py
                     tests/b97_fixtures.py
+      owner       : LLR-156.2
 ```
 
 ```
 COMPONENT: patch_bytes_input
-  PARENT : pe_ledger_inspector
+  PARENT : patch_win_script
   SURFACE: Patch Editor entry form
   INPUTS : typed or pasted text
   OUTPUTS:
@@ -1271,6 +1280,7 @@ COMPONENT: patch_bytes_input
                     tests/test_tui_patch_editor_v2.py
                     tests/test_tui_patch_editor_b94.py
                     tests/test_tui_memory_patch.py
+      owner       : LLR-161.2
 ```
 
 ---
@@ -1279,7 +1289,7 @@ COMPONENT: patch_bytes_input
 
 ### 5.1 Methods
 
-- **Layer A — white-box / functional:** TC-B99-01..41 except TC-B99-37 (retired with LLR-157.3 in LED-2026-10-25-batch-99.2) (`test (unit)` / `test (integration)`), each named in its LLR, with a mutation run at Phase 3 (C-40) for every LLR that declares one.
+- **Layer A — white-box / functional:** TC-B99-01..44 except TC-B99-37 (retired with LLR-157.3 in LED-2026-10-25-batch-99.2; TC-B99-42/43 added at LED .6, TC-B99-44 at LED .8) (`test (unit)` / `test (integration)`), each named in its LLR, with a mutation run at Phase 3 (C-40) for every LLR that declares one.
 - **Layer B — black-box acceptance:** AT-B99-01..14. Two maintainer stories name a developer surface rather than a TUI one: US-141 (the generator CLI: its exit code and printed line) and US-152 (the codec API `encode_physical_to_raw_bytes`: its returned `(raw_bytes, error, flags)` tuple only, because no TUI path calls the encoder, P-22). Each one drives the shipped surface and observes files through the independent reader, painted text or report files. AT drivers live beside the TCs in `tests/test_b99_*.py` and are marked `at_b99_NN`.
 - **Oracle:** every byte comparison uses the corpus manifest or the independent reader, never `s19_app`'s loader (P-3).
 - **Regression:** the full suite once per increment cut, against this batch's own baseline `evidence/baseline-pytest-a293213.txt`: one full run at `a293213`, which differs from `base_ref` `307065f` in batch records only. Its counts and failing node ids are cited in PLAN's test ledger. Existing tests that assert today's wrong behaviour (e.g. TC-714, range counts on S0-bearing fixtures) are re-pinned in the increment that changes the behaviour, each named in that packet's reverse census.

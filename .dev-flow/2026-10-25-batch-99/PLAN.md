@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-25-batch-99 |
 | Objective | The read/write integrity batch: every written image, report and run record says what was and was not applied. Scope: the ten HIGH findings of INVESTIGATION-read-write-integrity-2026-10-22 (H-1 S0 as image data, H-2 PATCH always ok, H-3 shared staging race, H-4 editor undo vs image, H-5 A2L encode byte order, H-6 COMPU_TAB nearest/clamp, H-7 CRC over an empty region, H-8 truncated images load ok, H-9 export path containment, H-10 run records drop dispositions); project round-trip PH-3 (save-back deletes the work copy, Save project crashes); the Code-Wire data HIGHs CW-D-4 (Bytes field decimal tokens), CW-D-7 (MAC-only export phantom byte), CW-D-10 (RAT_FUNC direction); deeper tests of the CW-U-1 fix (Load project dialog) and its sibling; and a generated synthetic fixture corpus with an independent reader as the oracle. |
-| Last updated | P4 · 2026-10-26 |
+| Last updated | P6 · 2026-10-26 |
 | Standing authorization | Operator commission 2026-10-25, quoted: "Arranca el siguiente batch de s19_app … el batch de integridad de lectura/escritura (RW H-1..H-10, PH-3, HIGHs de datos de CW, pruebas más profundas de CW-U-1, corpus de fixtures sintéticos como oráculo) … TÚ planeas (dev-flow full: P0/P1 requisitos, P2 revisión, plan como página HTML con el backlog abierto ordenado) y la IMPLEMENTACIÓN de cada incremento se delega a Kimi CLI con el modelo Kimi 2.8 … Revisión independiente (code-reviewer/qa) sobre lo que entregue Kimi. Autorización: autónomo con excepciones (parar en hallazgo HIGH o decisión del operador); commit y push a main en cada cierre". Read as: every gate is closed by the orchestrator under this authorization, except (a) a new HIGH finding and (b) an operator decision; both stop the batch. Merge: commit and push to `main` at each close. |
 | First gate | `devflow-validate.py --brief .` at P0 open → exit 0, `0 block · 495 notice · 43 not applicable`; `V7` reports the bundle identity at the installed revision. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin`; `origin/main` = `HEAD` = merge-base = `307065f4b626459c04ca77736132e9e5ee444253`, so no rebase was needed and `base_ref` was stamped from it. RC-2: `git ls-remote --exit-code --heads origin main` answered `307065f…`, newest commit 2026-10-25 10:54 -0600. RC-1 (b): every candidate story was checked against `origin/main`. CW-U-1's dialog fix has shipped (batch-97 Inc-9), so US-151 takes only its deeper tests, the sibling and CW-U-3. Every other finding reproduces on `307065f` (01-requirements §2.7, P-1..P-21). |
@@ -51,7 +51,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 
 ## Where we are
 
-P4 validation (2026-10-26). All 13 increments are on `main`: 001–011 and 003b are the product changes, 012 the DDR test-fix unit, 013 the P4 suite fixes (tests only). The DDR is approved (`design/DDR-2026-10-25-batch-99.md`). The gate run on `e7732f6` has been triaged (`evidence/suite-triage-e7732f6.md`): no product defect, two stale test pins re-measured in Increment 013, and the intermittent Patch Editor v2 nodes shown to fail on the pre-batch tree too. qa-reviewer returned PASS-WITH-NOTES with no HIGH and no blocker (`design/P4-qa-draft.md` → `04-validation.md`). A confirmation full run on the final tree is in progress (`evidence/suite-full-75f947a.txt`). Next: P5 close (post-mortem, backlog reconciliation, evidence stamp), P6 docs, vault sync.
+P6 close (2026-10-26). All 14 increments are on `main`: 001–011 and 003b are the product changes, 012 the DDR test-fix unit, 013 the P4 suite fixes (tests only). P4 validation is PASS-WITH-NOTES with no HIGH (`04-validation.md`). The confirmation full run on the final tree `75f947a` finished: 12 failed / 3755 passed / 3 skipped / 3 xfailed = 3773, with 8 baseline ids and 4 intermittent test nodes, no product defect (`evidence/suite-triage-75f947a.md`). The post-mortem is written (`05-postmortem.md`), the backlog is reconciled and the close record is `05-close.md`. The closing validator run found record defects that no gate had run the validator on since P0; they are repaired at this gate (see *Gate notices*). Next: the deliverable commit, the evidence stamp, the close commit, the vault sync.
 
 ## Objective
 
@@ -68,7 +68,9 @@ Every image, report and run record the tool writes says what was and was not app
 | PDR | approved | `design/PDR-2026-10-25-batch-99.md` |
 | P3 | done | increments 001–011, 003b, 012 |
 | DDR | approved | `design/DDR-2026-10-25-batch-99.md`, every condition discharged |
-| P4 | in validation | `04-validation.md`, PASS-WITH-NOTES; Increment 013 (P4 suite fixes) merged `1a59d3b` |
+| P4 | done | `04-validation.md`, PASS-WITH-NOTES; Increment 013 (P4 suite fixes) merged `1a59d3b`; confirmation run `evidence/suite-full-75f947a.txt` |
+| P5 | done | `05-postmortem.md` (architect + qa-reviewer), `05-close.md`, backlog reconciled, canon folded |
+| P6 | in progress | `06-docs/` written; evidence stamp, close commit and vault sync next |
 | US-141..US-152 | done | 12 of 12 observed black-box (AT-B99-01..14, one node each) |
 
 ## Roadmap + increment plan
@@ -138,6 +140,14 @@ Each increment runs the same way:
   - V52 (no design proposal) closes at PDR.
   - V53 is a census count, never a block.
   - V55 asked for the standing authorization to be copied into this header; it is copied above.
+- **P6 closing gate run** (`devflow-validate.py --brief .`, 2026-10-26). The first closing run returned **99 block**. The validator had not been run at any gate between P0 and P6, so record defects accumulated unseen. That is a process gap, and it is carried to `BACKLOG-PROCESS.md` with the whole-tree-guards item. The 99 blocks were:
+  - V59 ×79: 35 packet §2 rows with no `Traces to` id or a `Kind` outside the six, and 44 batch-touched files carried by no row. The message's "rebased after init" reading is a misfire on a trunk-pushed batch: all 32 commits in `307065f..HEAD` are this batch's. `base_ref` was **not** re-stamped. Each file got a row in the packet of the commit that touched it.
+  - V20 ×4: stale atlases, regenerated with `--atlas --write`.
+  - V4 ×4, V10, V12 ×2, V21 ×4: `01-requirements.md` wording, recorded in LED .9 with no behaviour change.
+  - V26: retired LLR-157.3 had no block. It was restored as a retired historical heading and added to the canon with status `retired`.
+  - V53, V56 ×2 and V1: a wrong anchor, two run claims citing no transcript, and a bare placeholder.
+  - The repair was done by a general-purpose agent under the orchestrator's brief, touching `.dev-flow/**` only, with LLR-157.3 and the canon row done by the orchestrator. The canon-reading tests passed after the canon edit: `test_id_registry` plus the 7 files that read `REQUIREMENTS.md`, 131 passed and 2 xfailed.
+  - **Re-run: exit 0, `0 block · 891 notice · 50 not applicable`.** The notices are the P0 families (V9, V13, V23, V41 on historical records), plus V56 on the inc-8 mutation rows. Those rows' stored files were overwritten in review round 1 and are left as recorded, not re-digested. Two more: V57 records predating the tree, normal at a close, and V62, which this rewrite clears.
 - **Runtime absences:**
   - This runtime has the named reviewer roles (`architect`, `qa-reviewer`, `security-reviewer`, `code-reviewer`, `ux-reviewer`) as sub-agents, so reviews are independent.
   - The implementer is Kimi CLI, an external runtime. Its packets record `implemented by Kimi K2.8`, and no Kimi session reviews its own work.
@@ -152,3 +162,4 @@ Each increment runs the same way:
 | full suite, gate run at `e7732f6` (`evidence/suite-full-e7732f6.txt`) | 2026-10-26 | **14 failed, 3756 passed, 3 skipped, 3 xfailed** in 2:05:30. 9 baseline ids fail for the same causes (2 baseline ids now pass); 3 ordering or load flakes pass on re-run; 2 stale pins were re-measured in Increment 013. Triage: `evidence/suite-triage-e7732f6.md` |
 | Patch Editor v2 flake comparison, base vs head (`evidence/flake-*.txt`) | 2026-10-26 | intermittent nodes fail on both trees; `at030c` is a single-pause test race (a patient probe always loads) → BACKLOG-CODE |
 | qa-reviewer spot run on main `75f947a` (`evidence/p4-qa/qa-spot-b99-31bac78.txt`) | 2026-10-26 | 142 passed (the b99 files + import census + the re-pinned snapshot cell); collect-only 3773 |
+| full suite, confirmation run on the final tree `75f947a` (`evidence/suite-full-75f947a.txt`) | 2026-10-26 | **12 failed, 3755 passed, 3 skipped, 3 xfailed** in 1:58:07 = 3773. 8 baseline ids; the two Increment 013 pins pass; 4 intermittent nodes, each failing on `a293213` too or passing in isolation on both trees. `at057b` is a single-pause test race made more frequent (10/15 vs 3/15; a patient probe delivers every step). Triage: `evidence/suite-triage-75f947a.md` |

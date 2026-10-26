@@ -107,7 +107,7 @@ MAC-only export writes no data record; a second export after a patch takes
 | `tests/test_b99_export.py` | test | HLR-160 | NEW module: TC-B99-28/29/30/31/41 + AT-B99-11 (17 nodes) + `_export_capture` helper |
 | `tests/test_b99_staging.py` | test | LLR-155.7, PQ-3 | TC-B99-39 census: `place_group_into_workarea` added to `_CENSUS_TARGETS` (sixth writer) + docstring |
 | `tests/test_segment_split_window.py` | test | HLR-160 | re-pins only (see §4 reverse census): BIN export returns the placed pair; the A2L quoted-name expectation rides the sanitiser; direct-call scratch destinations move under a work-area-shaped home |
-| `tests/test_id_registry.py` | test | registry convention | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (this increment's module, measured) |
+| `tests/test_id_registry.py` | test | HLR-160 (registry convention; +1 = `tests/test_b99_export.py`) | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (this increment's module, measured) |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-006.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-6/*` | doc | — | transcripts and hashes (outside the count) |
 

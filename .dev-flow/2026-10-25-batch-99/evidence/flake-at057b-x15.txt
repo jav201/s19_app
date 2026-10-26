@@ -1,0 +1,35 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression, 15 runs per tree, alternating trees
+# started: 2026-10-26T05:12:59-06:00
+run 1 a293213: 1 passed in 2.63s 
+run 1 75f947a: 1 passed in 2.54s 
+run 2 a293213: 1 passed in 2.52s 
+run 2 75f947a: E       AssertionError: Validate: line must post 1 failed in 2.82s 
+run 3 a293213: E       AssertionError: Load must populate the table 1 failed in 2.56s 
+run 3 75f947a: E       AssertionError: Apply: line must post 1 failed in 2.66s 
+run 4 a293213: E       AssertionError: Load must populate the table 1 failed in 2.65s 
+run 4 75f947a: E       AssertionError: Run checks must post the batch-33 loud doc-kind block 1 failed in 2.60s 
+run 5 a293213: 1 passed in 2.46s 
+run 5 75f947a: E       AssertionError: Run checks must post the batch-33 loud doc-kind block 1 failed in 2.64s 
+run 6 a293213: 1 passed in 2.50s 
+run 6 75f947a: E       AssertionError: Save must write one change file 1 failed in 2.73s 
+run 7 a293213: 1 passed in 2.59s 
+run 7 75f947a: E       AssertionError: Load must populate the table 1 failed in 2.49s 
+run 8 a293213: 1 passed in 2.45s 
+run 8 75f947a: E       AssertionError: Apply: line must post 1 failed in 2.66s 
+run 9 a293213: 1 passed in 2.52s 
+run 9 75f947a: 1 passed in 2.82s 
+run 10 a293213: 1 passed in 2.77s 
+run 10 75f947a: 1 passed in 2.88s 
+run 11 a293213: 1 passed in 2.80s 
+run 11 75f947a: 1 passed in 2.50s 
+run 12 a293213: 1 passed in 2.57s 
+run 12 75f947a: E       AssertionError: Apply: line must post 1 failed in 2.61s 
+run 13 a293213: 1 passed in 2.51s 
+run 13 75f947a: 1 passed in 2.52s 
+run 14 a293213: 1 passed in 2.55s 
+run 14 75f947a: E       AssertionError: Validate: line must post 1 failed in 2.66s 
+run 15 a293213: E       AssertionError: Apply: line must post 1 failed in 2.60s 
+run 15 75f947a: E       AssertionError: Run checks must post the batch-33 loud doc-kind block 1 failed in 2.69s 
+# totals
+a293213 failed: 3/15
+75f947a failed: 10/15

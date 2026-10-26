@@ -34,18 +34,22 @@
 
 ## 2 · Files modified
 
-| File | Kind | Change |
-|---|---|---|
-| `tests/test_b99_truncation.py` | test | joined AT-03 node; hostile arm → `test_tc_b99_10_hostile_name_renders_literally`; 2 old AT nodes merged |
-| `tests/test_b99_staging.py` | test | joined AT-04 node (black-box); 2 old AT nodes merged; local `_fx_import_lane_click` helper |
-| `tests/test_b99_editor_image.py` | test | AT-08 mismatch arm → `test_tc_b99_22_verify_mismatch_status_still_names_entries` |
-| `tests/test_b99_export.py` | test | joined AT-11 node; part-way arm → `test_tc_b99_41_…`; junctioned arm → `test_tc_b99_29_…` |
-| `tests/test_b99_a2l_encode.py` | test | `_load_through_dialog` black-box (DQ-3) |
-| `tests/test_b99_bytes_field.py` | test | AT-12 Add/Apply clicked (DQ-4) |
-| `tests/test_b99_patch_truth.py` | test | new `test_tc_b99_18_lane_line_carries_patch_and_crc_riders` |
-| `03-increments/increment-005/006/009.md` | packet | signed-balance ledger lines corrected (F-6) |
-| `evidence/ddr/*` | evidence | transcripts, this packet's evidence home |
-| **SOURCE files** | **0 / 4** | none |
+| File | Kind | Traces to | Change |
+|---|---|---|---|
+| `tests/test_b99_truncation.py` | test | HLR-154 (AT-B99-03) | joined AT-03 node; hostile arm → `test_tc_b99_10_hostile_name_renders_literally`; 2 old AT nodes merged |
+| `tests/test_b99_staging.py` | test | HLR-155 (AT-B99-04) | joined AT-04 node (black-box); 2 old AT nodes merged; local `_fx_import_lane_click` helper |
+| `tests/test_b99_editor_image.py` | test | LLR-157.2 (TC-B99-22) | AT-08 mismatch arm → `test_tc_b99_22_verify_mismatch_status_still_names_entries` |
+| `tests/test_b99_export.py` | test | HLR-160 (AT-B99-11) | joined AT-11 node; part-way arm → `test_tc_b99_41_…`; junctioned arm → `test_tc_b99_29_…` |
+| `tests/test_b99_a2l_encode.py` | test | HLR-158 (AT-B99-09) | `_load_through_dialog` black-box (DQ-3) |
+| `tests/test_b99_bytes_field.py` | test | HLR-161 (AT-B99-12) | AT-12 Add/Apply clicked (DQ-4) |
+| `tests/test_b99_patch_truth.py` | test | LLR-156.2 (TC-B99-18) | new `test_tc_b99_18_lane_line_carries_patch_and_crc_riders` |
+| `03-increments/increment-005/006/009.md` | doc | — | packets: signed-balance ledger lines corrected (F-6) |
+| `evidence/ddr/*` | doc | — | evidence: transcripts, this packet's evidence home |
+| `docs/architecture.md` | doc | — | NOT this increment's work: the module map (`artifact_homes.module_map`, declared as `docs/ARCHITECTURE.md`; the tracked file is lower-case, so V59's exact-path flow-output exclusion does not match it), edited by the batch's open (`a293213`), P2 (`b2c4464`) and DDR (`bab3bff`, the as-built map) commits; carried on the packet of the increment that fixed the DDR findings, so the close-gate diff accounts for it |
+
+| Count | Value |
+|---|---|
+| **SOURCE files** | **0 / 4** — none |
 
 ## 3 · How to test
 
@@ -81,6 +85,24 @@ assertion named: `mut-PQ2c.txt` (forced-failure arm leaves `t_isle_1.addr` /
 Every `N passed` figure above appears in a transcript under
 `evidence/ddr/`; sha256 per file is listed in `evidence/ddr/README.md`'s
 sibling table (hashes recorded in `HANDOFF.md`).
+
+Digests of the stored bytes, computed 2026-10-26 at the close gate; 12 of 13 equal the figures `kimi/ddr-HANDOFF.md` recorded, and `green-export.txt` differs from the handoff's transcription by a digit transposition (`…464e70a174…` stored, `…46470e174…` transcribed), the file unchanged since `c1d088a`.
+
+| Evidence artifact | Path | SHA-256 |
+|---|---|---|
+| Joined AT-B99-03, 8 runs (`1 passed` each) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-at03-8x.txt` | `d0e69effa0c118fb748546e12477db6d750a6c3df7b33deab898628e41810868` |
+| Joined AT-B99-04, 8 runs | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-at04-8x.txt` | `11be7af46692304327acb5b4be81b87eec9c5529ab72c8d58ec4bb86a22c06db` |
+| Joined AT-B99-11, 8 runs | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-at11-8x.txt` | `a95d62e819785a65b7edfb40c3627c7e600f5dbe1007fa074eb874e413f9059c` |
+| New TC-B99-18 dual-rider node (1 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-tc18-riders.txt` | `87752365aa869046469b03bf329d6f5c14b5d82c1c8455b31d17b74f7e403922` |
+| Full sweep `tests/test_b99_*.py` + address census + id registry (175 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-b99.txt` | `d3b08d72113129d05d55cd2c0cffb2f628fe2a44e7cd26a2c80bf6e1c28def20` |
+| Per-file run, truncation (24 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-truncation.txt` | `b546610b7daf22b35f8acd2a679d0dcfa8636a4e44b9817eebb07f59fb19681a` |
+| Per-file run, staging (31 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-staging.txt` | `fa6e402957d533bd9286d2a8647c8f6f752c835ca48d65201b17bbe629c6f4b0` |
+| Per-file run, export (23 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-export.txt` | `9254c8ada3232cbbc79aba464e70a174c29ac79b4fbd7890dbcc1ec2fed18a76` |
+| Per-file run, patch-truth (20 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-patch-truth.txt` | `bcf7be3151639c6e65817e71019b20f88a6045c44649d0f92fbc027cab6814f5` |
+| Per-file run, a2l (7 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-a2l.txt` | `3b6228ade0a9780c3651f3c8a774cdb00a83eda4b33452f3f1124a042894c9d3` |
+| Per-file run, bytes (3 passed) | `.dev-flow/2026-10-25-batch-99/evidence/ddr/green-bytes.txt` | `2662339370e1e14fb0a3801efbe3b6617f5cc7ebced8f02f9c0a53034a1b4093` |
+| DQ-6 mutant PQ-2(c), KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ2c.txt` | `a191ae494f868d7f2cbbd5c183b1428871929f5459a65a7db5d16b2f9f329878` |
+| DQ-6 mutant PQ-6, KILLED | `.dev-flow/2026-10-25-batch-99/evidence/ddr/mut-PQ6.txt` | `8446ed8ee0907702b8377fa12005fc7675fc7bab0b4d06e15f4ee5141b6f6f3d` |
 
 ### Reverse census
 

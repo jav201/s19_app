@@ -80,7 +80,8 @@ the chain-set report under `reports/`, and the flow report.
 | `tests/test_b99_patch_truth.py` | test | HLR-156 | new: TC-B99-17 (8-case matrix + UX-C2 cause + refusal retention + empty-doc boundary), TC-B99-18 (outcome fields), TC-B99-19 (chain-set report), TC-B99-20 (flow report), AT-B99-06, AT-B99-07 (hostile markup arm) — 17 nodes |
 | `tests/test_changes_symbol_entries.py` | test | LLR-156.1 (re-pins) | TC-714 re-pin; TC-716 + the TC-717/718 census fixture re-pinned to the new law |
 | `tests/test_flow_chainset_b94.py` | test | LLR-156.3 (re-pins) | TC-B94-28/TC-B94-30 provenance-line census filtered to ` input ` lines (3 sites) |
-| `tests/goldens/batch71/ac6-unscoped-flow-report.md` | golden | LLR-156.4 | surgical rebaseline (C-24): +8 lines, the two new `- none` sections only |
+| `tests/test_tui_flow_execution_b94.py` | test | LLR-156.3 (re-pins) | review fix F1: AT-B94-20/23 and the reload provenance census filtered to ` input ` lines (3 sites) |
+| `tests/goldens/batch71/ac6-unscoped-flow-report.md` | fixture | LLR-156.4 | golden: surgical rebaseline (C-24): +8 lines, the two new `- none` sections only |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-008.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/*` | doc | — | transcripts, hashes, emitted reports (outside the count) |
 
@@ -179,17 +180,17 @@ All under `artifact_homes.evidence` = `.dev-flow/2026-10-25-batch-99/evidence/in
 
 | Evidence artifact | Path | SHA-256 |
 |---|---|---|
-| RED baseline on the unmodified tree (15 failed, 2 passed) | `red-tc17-20-at06-07.txt` | `9710bf0e…` |
-| GREEN full new-file run (17 passed) | `green-tc17-20-at06-07.txt` | `6cc4333c…` |
-| GREEN re-pinned census/chain-set nodes (7 passed) | `green-repins.txt` | `d9a88332…` |
-| GREEN reverse-census affected suite (362 passed, EXIT=0) | `green-affected-suite.txt` | `85581ee7…` |
+| RED baseline on the unmodified tree (15 failed, 2 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/red-tc17-20-at06-07.txt` | `9710bf0eb890d0c4d0c7ad9448fa0e405b8f7fc36cae7c09dff8ce3b055269e8` |
+| GREEN full new-file run (17 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-tc17-20-at06-07.txt` | `6cc4333ccb096d834bd3563b9650eacf0b29aa6d57e53bb2b1e857642b55a244` |
+| GREEN re-pinned census/chain-set nodes (7 passed) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-repins.txt` | `d9a883328ab45f1fbeb07bdd0fa65204296c461297bc45e3ebef47f4f02d733c` |
+| GREEN reverse-census affected suite (362 passed, EXIT=0) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/green-affected-suite.txt` | `85581ee71b5fb25536d666d542ff8aa8102e7bcd0d91ffa348309e9da518d6ea` |
 | Mutation LLR-156.1 (KILLED — applied-0 arm disabled) | `mut-LLR-156.1.txt` | `6fe273e1…` |
 | Mutation LLR-156.2 (KILLED — outcome `refusals` copy dropped) | `mut-LLR-156.2.txt` | `1a8251fd…` |
 | Mutation LLR-156.4 (KILLED — Not-applied section made conditional) | `mut-LLR-156.4.txt` | `8bea7b19…` |
 | Mutation PQ-7 (KILLED — `md_safe` removed from the Refusals cell; first attempt at `_failure_detail` survived and was re-aimed) | `mut-PQ7.txt` | `8ac6f583…` |
-| Reverse census probe (19 files) | `reverse-census.txt` | `4b0ce926…` |
-| Emitted reports (flow + chain-set, direct driver) | `emitted-reports.txt` | `bb5b90f5…` |
-| Pre-mutation hashes of every touched file | `baseline-hashes.txt` | `f958198e…` |
+| Reverse census probe (19 files) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/reverse-census.txt` | `4b0ce926fafe3815b3ace62f4c91a39edb6c80d9505fee90d332c6db4dc5fd44` |
+| Emitted reports (flow + chain-set, direct driver) | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/emitted-reports.txt` | `bb5b90f5ccf9f8a2f7b289d742347cc43b1e10aecd976580b80138d399afb2df` |
+| Pre-mutation hashes of every touched file | `.dev-flow/2026-10-25-batch-99/evidence/inc-8/baseline-hashes.txt` | `f958198e3f9cb9da2fabf3457fae142967d36ad7b2083b1eea8c4c270ffad292` |
 
 | Field | Value |
 |---|---|

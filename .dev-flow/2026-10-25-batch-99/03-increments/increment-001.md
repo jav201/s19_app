@@ -51,13 +51,27 @@ Shipped surface the user reaches: the maintainer's command line —
 
 | File | Kind | Traces to | Change |
 |---|---|---|---|
-| `.gitattributes` | config | — | append `tests/fixtures/synth/** -text` (corpus bytes are hashed; no EOL conversion either direction) |
-| `tests/support/__init__.py` | test | — | new (package marker for `tests.support`) |
+| `.gitattributes` | config | LLR-152.2 (keeps the hashed corpus bytes exact) | append `tests/fixtures/synth/** -text` (corpus bytes are hashed; no EOL conversion either direction) |
+| `tests/support/__init__.py` | test | LLR-152.3 | new (package marker for `tests.support`) |
 | `tests/support/independent_reader.py` | test | HLR-152, LLR-152.3 | new: `read_s19` / `read_hex` → `Image`, zero `s19_app` imports |
 | `tests/fixtures/synth/generate.py` | fixture | HLR-152, LLR-152.1 | new: deterministic corpus generator, `--out` / `--check [--corpus]` |
 | `tests/fixtures/synth/manifest.json` | generated | LLR-152.2 | new: 16 entries, sha256 + classes + data runs + verdict + load facts + `a2l_expect` |
 | `tests/fixtures/synth/*.s19` (10 files) | generated | LLR-152.2 | new corpus: S1/S2/S3 width edges, S0, S5, S7/S8/S9 non-zero entries, S0-only empty image, MAC pair, A2L pair, 3 S19 defects, overlap |
 | `tests/fixtures/synth/*.hex` (4 files) | generated | LLR-152.2 | new corpus: types 00/01/02/04/05, 64 KiB-boundary record, segment wrap, 2 HEX defects |
+| `tests/fixtures/synth/synth_s1.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_s2.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_s3.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_s0_only.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_mac.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_a2l.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_after_terminator.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_no_terminator.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_wrong_s5.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_overlap.s19` | generated | LLR-152.2 | new corpus file, one of the `*.s19` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_hex_basic.hex` | generated | LLR-152.2 | new corpus file, one of the `*.hex` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_hex_seg.hex` | generated | LLR-152.2 | new corpus file, one of the `*.hex` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_hex_no_eof.hex` | generated | LLR-152.2 | new corpus file, one of the `*.hex` set above (one row per file for the close-gate diff) |
+| `tests/fixtures/synth/synth_hex_after_eof.hex` | generated | LLR-152.2 | new corpus file, one of the `*.hex` set above (one row per file for the close-gate diff) |
 | `tests/fixtures/synth/synth_mac.mac` | generated | LLR-152.2 | new: one address inside the image, one outside |
 | `tests/fixtures/synth/synth_a2l.a2l` | generated | LLR-152.2, PQ-4 | new: A2L pinning MOD_COMMON byte order, RAT_FUNC, TAB_INTP/TAB_NOINTP geometry, MSB_LAST LINEAR control |
 | `tests/test_b99_corpus.py` | test | HLR-152 | new: TC-B99-01..03 + AT-B99-01 |

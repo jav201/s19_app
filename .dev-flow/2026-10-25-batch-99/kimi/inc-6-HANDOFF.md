@@ -47,5 +47,5 @@ __KIMI_UNIT_DONE__
 Files changed: s19_app/tui/segment_split_view.py, s19_app/tui/workspace.py, tests/test_b99_export.py (new), tests/test_b99_staging.py, tests/test_segment_split_window.py, tests/test_id_registry.py, .dev-flow/2026-10-25-batch-99/03-increments/increment-006.md, evidence/inc-6/*.
 Tests added: 17 nodes in tests/test_b99_export.py (TC-B99-28/29/30/31/41 + AT-B99-11); TC-B99-39 census extended (PQ-3); EXPECTED_SCANNED_TEST_FILES 209 → 210.
 RED/GREEN: RED 17/17 on the unmodified tree; GREEN 17 (export) + 23 (staging) + 56 (split window) + 23 (address census) + 13 (id registry) + 23 (segment ops).
-Mutations: 5/5 KILLED (LLR-160.1 sanitiser bypass, LLR-160.2 destination-rooted containment, LLR-160.3 MAC placeholders as data, LLR-160.4 per-file _<N>, LLR-160.5 collision in write loop), each reverted and hash-verified.
+Mutations: 5/5 KILLED (LLR-160.1 sanitiser bypass, LLR-160.2 destination-rooted containment, LLR-160.3 MAC placeholders as data, LLR-160.4 per-file `_<N>`, LLR-160.5 collision in write loop), each reverted and hash-verified.
 Open questions: none — §4b independent review and the full suite are the orchestrator's.

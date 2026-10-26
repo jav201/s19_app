@@ -50,7 +50,7 @@ Shipped surface the user reaches: the Flow Execution lane cells + run log
 | `tests/test_crc_operation.py` | test | HLR-159 | AT-044a / AT-045c re-pinned (legacy coverage silence lifted) — recorded in §4 |
 | `tests/test_b99_patch_truth.py` | test | HLR-156, LLR-159.2 | **review round 1**: TC-B99-19 re-pinned — the chain-set report gained the `## Notices` section, so the clean lane lists `none` in 3 sections (old 2 → new 3) — recorded in §4 |
 | `tests/b97_fixtures.py` | fixture | HLR-159 | the FX fixture `crc.json` now covers bytes prg.s19 holds (the example config's regions are empty over prg.s19 and would now refuse the block; the FX fixtures test execution mechanics) |
-| `tests/test_id_registry.py` | test | — | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (measured) |
+| `tests/test_id_registry.py` | test | HLR-159 (+1 = `tests/test_b99_crc_region.py`) | `EXPECTED_SCANNED_TEST_FILES` 209 → 210 (measured) |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-005.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-5/*` | doc | — | transcripts, hashes (outside the count) |
 

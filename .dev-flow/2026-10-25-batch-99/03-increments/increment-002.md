@@ -57,15 +57,31 @@ WRITE-OUT.
 | `s19_app/core.py` | SOURCE | HLR-153, LLR-153.1 | new `_is_data_record` predicate; `get_memory_map` / `get_record_for_address` / `_build_overlap_map` filter through it (CRLF preserved: 717 `\r\n` before and after) |
 | `s19_app/render/hexview.py` | SOURCE | HLR-153, LLR-153.2 | import the predicate; `build_mem_map_s19` / `build_range_validity_s19` filter through it (CRLF preserved: 397 `\r\n` before and after) |
 | `tests/test_b99_s0.py` | test | HLR-153 | new: TC-B99-04 (+ boundary node), TC-B99-05, TC-B99-06, TC-B99-07, AT-B99-02; review round 1: AT-B99-02 fully key/click-driven (F2), Memory-Map row assertion fixed (F1), TC-B99-06 defective-source arm bounded to defective-record addresses (F5) |
-| `tests/test_entropy_service.py` | test (re-pin) | LLR-153.1 | phantom S0-header window counts re-pinned (re-pin #1) |
-| `tests/test_tui_directionb.py` | test (re-pin) | LLR-153.1 | case_02 coverage literals re-pinned (re-pins #2/#3); AT-040a colour branch rebuilt on a real two-range fixture (F4, re-pin #4) |
-| `tests/test_tui_hexview.py` | test (re-pin) | LLR-153.2 | stub records gain `type="S1"` (re-pins #5/#6) |
-| `tests/test_report_service.py` | test (re-pin) | LLR-153.1 | AT-288 capture pin re-pointed to `tests/goldens/batch99/` (F6) — capture content re-pinned (re-pin #7), sealed batch-92 evidence record restored |
-| `tests/goldens/batch35/at054b-before-after-report.md` | golden (re-pin) | LLR-153.1 | phantom 0x0-0xF diff region removed (re-pin #8); pre-pin bytes backed up |
-| `tests/goldens/batch35/at054b-before-after-report.html` | golden (re-pin) | LLR-153.1 | same re-pin, html arm |
-| `tests/goldens/batch99/at288-pre-move-report.bin` | golden (re-pin, new home) | LLR-153.1 | the S0-free AT-288 capture, moved out of the sealed batch-92 evidence folder (F6) |
-| `tests/__snapshots__/test_tui_snapshot/*.svg` | snapshots (16 re-pins) | LLR-153.1 | 16 density-layout cells regenerated — every delta is the disappeared 6-byte S0 range (multiset proof `repin-snapshot-svg-multiset.txt`); pre-update SVGs backed up in `snapshot-pre-b99-inc2/` (16 files) |
-| `.dev-flow/2026-10-11-batch-92/evidence/at288-pre-move-report.bin` | sealed record | — | **restored** to its batch-92 bytes (`sha256 061ee94c…`, byte-equal to the `.pre-b99-inc2` backup) — a sealed record is never edited (F6); the edit that had been committed in `fc81767` is reverted in the working tree |
+| `tests/test_entropy_service.py` | test | LLR-153.1 | re-pin: phantom S0-header window counts re-pinned (re-pin #1) |
+| `tests/test_tui_directionb.py` | test | LLR-153.1 | re-pin: case_02 coverage literals re-pinned (re-pins #2/#3); AT-040a colour branch rebuilt on a real two-range fixture (F4, re-pin #4) |
+| `tests/test_tui_hexview.py` | test | LLR-153.2 | re-pin: stub records gain `type="S1"` (re-pins #5/#6) |
+| `tests/test_report_service.py` | test | LLR-153.1 | re-pin: AT-288 capture pin re-pointed to `tests/goldens/batch99/` (F6) — capture content re-pinned (re-pin #7), sealed batch-92 evidence record restored |
+| `tests/goldens/batch35/at054b-before-after-report.md` | fixture | LLR-153.1 | golden re-pin: phantom 0x0-0xF diff region removed (re-pin #8); pre-pin bytes backed up |
+| `tests/goldens/batch35/at054b-before-after-report.html` | fixture | LLR-153.1 | golden re-pin: same re-pin, html arm |
+| `tests/goldens/batch99/at288-pre-move-report.bin` | fixture | LLR-153.1 | golden re-pin, new home: the S0-free AT-288 capture, moved out of the sealed batch-92 evidence folder (F6) |
+| `tests/__snapshots__/test_tui_snapshot/*.svg` | fixture | LLR-153.1 | snapshots, 16 re-pins (one row per cell below): 16 density-layout cells regenerated — every delta is the disappeared 6-byte S0 range (multiset proof `repin-snapshot-svg-multiset.txt`); pre-update SVGs backed up in `snapshot-pre-b99-inc2/` (16 files) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-compact-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-120x30].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-comfortable-80x24].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-120x30].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[mac-compact-80x24].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-120x30].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-80x24].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-120x30].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-comfortable-80x24].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-120x30].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-160x40].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[workspace-compact-80x24].svg` | fixture | LLR-153.1 | re-pinned density-layout cell (the 6-byte S0 range removed; see the `*.svg` row above) |
+| `.dev-flow/2026-10-11-batch-92/evidence/at288-pre-move-report.bin` | doc | — | sealed batch-92 evidence record: **restored** to its batch-92 bytes (`sha256 061ee94c…`, byte-equal to the `.pre-b99-inc2` backup) — a sealed record is never edited (F6); the edit that had been committed in `fc81767` is reverted in the working tree |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-002.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-2/*` | doc | — | transcripts, hashes, probes (outside the count) |
 

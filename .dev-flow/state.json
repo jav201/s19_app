@@ -42,7 +42,7 @@
       "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
     }
   ],
-  "current_station": "P4",
+  "current_station": "P6",
   "phase_status": "in-progress",
   "stations_active": [
     "P0",
@@ -246,6 +246,17 @@
       "date": "2026-10-26",
       "decision": "standing authorization — operator commission 2026-10-25. Increment 013 (P4 suite fixes, tests only) gate closed: the full suite on e7732f6 found two un-re-measured whole-tree guards (safe_text import census after Inc-6, Patch Editor snapshot after Inc-11); Kimi K2.8 re-measured both; code-reviewer OK with notes, packet notes fixed; merged 1a59d3b.",
       "notes": "triage: evidence/suite-triage-e7732f6.md; caught at P4: 2 (tests-only, no product change)"
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P4 validation gate closed: PASS-WITH-NOTES, no HIGH, 51/51 requirements, 14/14 ATs (04-validation.md). Confirmation full run on the final tree 75f947a: 12 failed / 3755 passed / 3 skipped / 3 xfailed = 3773; 8 baseline ids, 4 intermittent nodes that fail on a293213 too or pass isolated on both trees; at057b is a single-pause test race made more frequent (10/15 vs 3/15), routed to BACKLOG-CODE. G-001 closed.",
+      "notes": "evidence/suite-full-75f947a.txt; evidence/suite-triage-75f947a.md; evidence/probe-at057b-patient.txt"
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P5 close gate: post-mortem written by architect + qa-reviewer (05-postmortem.md, bf3917d); backlog reconciled (BACKLOG-CODE §Routed 2026-10-26, BACKLOG-PROCESS §Registered by batch-99's close); canon folded (51 folded); 05-close.md written. No HIGH; G-005 (dedup suffix vs byte-identical reuse) carried as an operator decision."
     }
   ],
   "obsidian_synced": false,

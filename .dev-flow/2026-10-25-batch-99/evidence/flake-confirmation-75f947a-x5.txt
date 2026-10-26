@@ -1,0 +1,30 @@
+# command: python -m pytest -q -p no:cacheprovider <4 nodes>, 5 runs per tree
+# nodes: tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+# started: 2026-10-26T05:11:07-06:00
+== run 1 at 75f947a
+4 passed in 8.54s
+== run 2 at 75f947a
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.40s
+== run 3 at 75f947a
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.56s
+== run 4 at 75f947a
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.52s
+== run 5 at 75f947a
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.21s
+== run 1 at a293213
+4 passed in 9.09s
+== run 2 at a293213
+4 passed in 8.28s
+== run 3 at a293213
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 3 passed in 8.13s
+== run 4 at a293213
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_32_preserves_source_s0_header
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+2 failed, 2 passed in 8.59s
+== run 5 at a293213
+4 passed in 8.58s

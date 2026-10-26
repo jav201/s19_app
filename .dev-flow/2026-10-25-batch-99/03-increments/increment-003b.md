@@ -110,12 +110,12 @@ BLUF: the independent review found four defects; all four are fixed here
 |---|---|---|---|
 | `s19_app/tui/services/flow_execution_service.py` | SOURCE | HLR-155 D7/D9, LLR-155.5/.6, B99-I11/I12 | `run_chain_set`: `_write_out_collisions` case-folded pre-flight refusal in `diagnostics`, nothing written; `run_flow` WRITE-OUT arm: `verify_written_image` read-back, `error` naming the first differing address (UX-C2 last-diagnostic); `verify` import; docstrings |
 | `s19_app/tui/services/project_gather_service.py` | SOURCE | LLR-155.3 (LED .7), HLR-155 | `_gather_copy`: drift limb converted to `copy_into_workarea` placement (next free `_<N>`, never an overwrite); `shutil` import dropped; module + function docstrings |
-| `tests/test_b99_staging.py` | test | TC-B99-15/16, TC-B99-13 arms, AT-B99-04 dup arm, UX-C2/C4/C10 | 8 nodes added (see the ledger); Inc-3b imports + module docstring |
-| `tests/test_flow_chainset_b94.py` | test (re-pin) | HLR-155 D7 | `_clean_chain` writes `out_<name>.s19`; the reloaded-set test saves a second template (`base_b`) |
-| `tests/test_tui_flow_execution_b94.py` | test (re-pin) | HLR-155 D7 | `_base_blocks(output=…)`; three two-lane tests import a `base_b` template (own WRITE-OUT name) instead of importing `base` twice; lane-name refs `base_2` → `base_b` |
-| `tests/test_project_gather.py` | test (re-pin) | LLR-155.3 (LED .7) | TC-702 re-pinned: drifted re-save places the next free `_<N>` (2 copies), the placed copy stays immutable |
-| `tests/b97_fixtures.py` | test fixture (re-pin) | HLR-155 D7 | `err_chain_demo` writes `fw_err.s19`; `fx_project` adds the `flash_b` / `six_ok_c` / `six_ok_d` twin templates (own WRITE-OUT names) |
-| `tests/test_b97_flow_execution.py` | test (re-pin) | HLR-155 D7 | `TWO_WAIT` → `("flash_chain", "flash_b")`; `DEEP` → four distinct templates; `test_tc_b97_53…` drives five `cap_*` templates |
+| `tests/test_b99_staging.py` | test | HLR-155; TC-B99-15/16, TC-B99-13 arms, AT-B99-04 dup arm, UX-C2/C4/C10 | 8 nodes added (see the ledger); Inc-3b imports + module docstring |
+| `tests/test_flow_chainset_b94.py` | test | HLR-155 D7 | re-pin: `_clean_chain` writes `out_<name>.s19`; the reloaded-set test saves a second template (`base_b`) |
+| `tests/test_tui_flow_execution_b94.py` | test | HLR-155 D7 | re-pin: `_base_blocks(output=…)`; three two-lane tests import a `base_b` template (own WRITE-OUT name) instead of importing `base` twice; lane-name refs `base_2` → `base_b` |
+| `tests/test_project_gather.py` | test | LLR-155.3 (LED .7) | re-pin: TC-702 re-pinned: drifted re-save places the next free `_<N>` (2 copies), the placed copy stays immutable |
+| `tests/b97_fixtures.py` | fixture | HLR-155 D7 | re-pin: `err_chain_demo` writes `fw_err.s19`; `fx_project` adds the `flash_b` / `six_ok_c` / `six_ok_d` twin templates (own WRITE-OUT names) |
+| `tests/test_b97_flow_execution.py` | test | HLR-155 D7 | re-pin: `TWO_WAIT` → `("flash_chain", "flash_b")`; `DEEP` → four distinct templates; `test_tc_b97_53…` drives five `cap_*` templates |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-003b.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-3b/*` | doc | — | transcripts, hashes, census (outside the count) |
 
@@ -129,10 +129,10 @@ BLUF: the independent review found four defects; all four are fixed here
 
 | File | Kind | Traces to | Change |
 |---|---|---|---|
-| `s19_app/tui/services/project_gather_service.py` | SOURCE (amended) | LLR-138.4 (F1) | `_same_artifact_name` helper; `_gather_copy` now byte-compares the source against the requested name AND every `_<N>` sibling before placing (unchanged re-save after a drift is skipped, `copied=False`); module + function docstrings |
-| `s19_app/tui/app.py` | SOURCE (new) | LLR-155.5 (F2) | `on_flow_execution_panel_run_requested`: a refused set (no outcomes, diagnostics) also paints its outcome-first diagnostic on the status line via `set_status`; handler docstring |
-| `tests/test_b99_staging.py` | test (amended +1 node) | F1/F2/F4a/F4b | new arm `test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate`; AT-B99-04 duplicate arm extended with the painted `#log_line_4` assertions; census extended with the `write_text` limb + 4 allow-list entries + 2 declared exceptions + a `write_text` positive control; UX-C10 D7 node rewritten as a painted-text pilot drive |
-| `tests/test_flow_chainset_b94.py` | test (comment) | F4c | the `:565` comment's "D7's placement" attribution corrected to HLR-155's placement (LLR-155.3) |
+| `s19_app/tui/services/project_gather_service.py` | source | LLR-138.4 (F1) | amended in review round 1: `_same_artifact_name` helper; `_gather_copy` now byte-compares the source against the requested name AND every `_<N>` sibling before placing (unchanged re-save after a drift is skipped, `copied=False`); module + function docstrings |
+| `s19_app/tui/app.py` | source | LLR-155.5 (F2) | new in review round 1: `on_flow_execution_panel_run_requested`: a refused set (no outcomes, diagnostics) also paints its outcome-first diagnostic on the status line via `set_status`; handler docstring |
+| `tests/test_b99_staging.py` | test | HLR-155 (F1/F2/F4a/F4b) | amended, +1 node: new arm `test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate`; AT-B99-04 duplicate arm extended with the painted `#log_line_4` assertions; census extended with the `write_text` limb + 4 allow-list entries + 2 declared exceptions + a `write_text` positive control; UX-C10 D7 node rewritten as a painted-text pilot drive |
+| `tests/test_flow_chainset_b94.py` | test | LLR-155.3 (F4c) | comment only: the `:565` comment's "D7's placement" attribution corrected to HLR-155's placement (LLR-155.3) |
 
 - ✓ No file from another lane touched; `prototypes/` untouched; no commit (working tree only).
 - Interface note: **no new return type** — the D7 refusal reuses `ChainSetRunRecord.diagnostics` (one line per colliding name) with empty `outcomes` and `report_path=None`; `app.py`'s existing handlers paint it via `render_run` with no edit (map rows B99-I11/I12 name `app.py:2800/:2890` as the show-the-refusal sites — they show it unchanged).

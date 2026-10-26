@@ -77,6 +77,10 @@ exception — no shipped TUI path calls the encoder).
 | `s19_app/tui/a2l.py` | SOURCE | HLR-158, UX-C8/UX-C10 | `_DECODE_REASON_TOKENS` / `_short_decode_reason` · `describe_curve_tag` `scalar_reason` · `render_curve_description` `Scalar value: n/a (<reason>)` |
 | `s19_app/tui/app.py` | SOURCE | HLR-158, UX-C8 | the A2L Physical cell: `n/a` when raw bytes are present but the conversion failed; blank when there are no bytes |
 | `tests/test_b99_a2l_encode.py` | test | HLR-158 | new: TC-B99-23/24/25 + AT-B99-09 (pilot, both widths) + AT-B99-14 |
+| `tests/fixtures/synth/generate.py` | fixture | LLR-158.3 | corpus gains the sparse TAB_INTP symbol `TAB_INTP_SPARSE_SYM` (`0x200C`); the file is created in increment-001 |
+| `tests/fixtures/synth/manifest.json` | generated | LLR-158.3 | corpus gains the sparse TAB_INTP symbol `TAB_INTP_SPARSE_SYM` (`0x200C`); the file is created in increment-001 |
+| `tests/fixtures/synth/synth_a2l.a2l` | generated | LLR-158.3 | corpus gains the sparse TAB_INTP symbol `TAB_INTP_SPARSE_SYM` (`0x200C`); the file is created in increment-001 |
+| `tests/fixtures/synth/synth_a2l.s19` | generated | LLR-158.3 | corpus gains the sparse TAB_INTP symbol `TAB_INTP_SPARSE_SYM` (`0x200C`); the file is created in increment-001 |
 | `.dev-flow/2026-10-25-batch-99/03-increments/increment-010.md` | doc | — | this packet |
 | `.dev-flow/2026-10-25-batch-99/evidence/inc-10/*` | doc | — | transcripts, hashes, probes (outside the count) |
 
