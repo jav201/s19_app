@@ -132,6 +132,7 @@ Every TC and AT is specified in `01-requirements.md` §3–§4 with its threshol
 - **E10** an AT size helper: every UI AT runs at `(118, 54)` and `(220, 60)` with `notifications=True`.
 - **E11** `tests/support/independent_reader.py` (batch-99): the image-byte oracle.
 - **E12** the Kimi brief common file: `PYTHONPATH=<worktree>`, an `s19_app.__file__` probe, `NO_COLOR` unset.
+- **E13** a real-terminal capture script, kept outside `prototypes/` (C-UX-5): it opens Windows Terminal in truecolor with `NO_COLOR` unset, captures the app at 118×54, 220×60 and 99×54, and closes every window it opened. The Phase-4 inspection reads its PNGs.
 
 **Per-increment SOURCE file sets** (ARQ §8 / §8.1, every conditional decided at PDR):
 
@@ -150,7 +151,7 @@ Every TC and AT is specified in `01-requirements.md` §3–§4 with its threshol
 | 9b | `screens.py`, `app.py`, `styles.tcss` | 3 |
 | 10 | `screens.py`, `app.py`, `styles.tcss`, `screens_directionb.py` | 4 ⚠ at cap |
 | 11 | `screens.py`, `app.py`, `styles.tcss` | 3 |
-| 12a + 12b | `app.py`, `styles.tcss` | 2 |
+| 12a + 12b | `app.py`, `styles.tcss`, `s19_app/tui/a2l.py` (named frozen-engine crossing, LLR-176.4) | 3 |
 
 ### 5.1 Inc 1 — one placement function, reuse, containment
 
@@ -173,7 +174,7 @@ Every TC and AT is specified in `01-requirements.md` §3–§4 with its threshol
 | LLR-163.1 One placement function holds every guard and decides reuse | TC-B100-01 | Inc 1 | executed on `1d677ba` (`ui_load_dialogs_probe` S7): `copy case_02 again -> firmware_2.s19` → RED. Mutation at Phase 3: restrict the comparison to the bare name → RED; move the size cap back into the wrapper only → the direct … |
 | LLR-163.2 Size before bytes | TC-B100-02 | Inc 1 | a mutation removing the size check → 5 reads → RED. |
 | LLR-163.3 G-005: the re-pinned expectations of TC-018 and AT-031b | re-pinned nodes: test_tc018_existing_name_is_dedup_suffixed, test_at031b_two_saves_are_distinct_no_clobber | Inc 1 | executed on `1d677ba` (P-7): the old single-arm expectations → `FF`. Mutation at Phase 3: disable the reuse → the identical arm of both → RED. |
-| LLR-163.4 The one ripple re-pin | re-pinned nodes: test_tc_b99_31_changed_bytes_take_the_next_free_name, test_tc_b99_31_bin_pair_placed_under_one_suffix | Inc 1 | a mutation disabling the reuse → the re-pinned arm sees `t_isle_2.s19` → RED. |
+| LLR-163.4 The one ripple re-pin | re-pinned node: test_tc_b99_31_changed_bytes_take_the_next_free_name; unchanged: test_tc_b99_31_bin_pair_placed_under_one_suffix (C-QA-8) | Inc 1 | a mutation disabling the reuse → the re-pinned arm sees `t_isle_2.s19` → RED. |
 | LLR-163.5 No "added" status for a reused variant | TC-B100-03 | Inc 1 | a mutation always emitting the added-variant status → RED. |
 | LLR-163.6 The export reports reuse from the placement it performed | TC-B100-57 | Inc 1 | a mutation restoring the requested-name-only check in the export → the `_1` arm reports `wrote` → RED. |
 | LLR-163.7 `predict_placement` uses the placement code itself | TC-B100-68 | Inc 1 | a mutation giving the prediction its own free-name walk that skips directories → the directory arm predicts `firmware_1.s19` → RED. |
@@ -518,14 +519,15 @@ Every TC and AT is specified in `01-requirements.md` §3–§4 with its threshol
 
 ### 5.14 Inc 12a + 12b — real progress and workers (one unit)
 
-**SOURCE files (2):** `app.py`, `styles.tcss` (paths under `s19_app/tui/`).
+**SOURCE files (3):** `app.py`, `styles.tcss`, `a2l.py` (paths under `s19_app/tui/`). `a2l.py` is a named crossing of the frozen engine layer (`docs/ARCHITECTURE.md` §7; C-UX-1 / C-QA-1, the operator's "Cruce con nombre"); the increment re-adds it to `tests/test_engine_unchanged.py::_ENGINE_PATHS`.
 
 **Findings:** N5 (P-D A), O-7, R-PD. One unit.
 - **Design characteristics.**
-  - `begin_busy` / `step_busy` / `end_busy`: one owner of `#status_text`, the bar reset to 0 and hidden when idle, within-step progress from byte counts, one main-thread `set_interval`.
+  - `begin_busy` / `step_busy` / `end_busy`: one owner of `#status_text`, the bar reset to 0 and cleared when idle, keeping its row so the log lines never move (C-UX-7), within-step progress from byte counts, one main-thread `set_interval`.
   - The keyed action table covers all 24 `set_progress` sites.
+  - `a2l.py`'s parse entry point takes an optional `progress(bytes_consumed, total_bytes)` callback and parses exactly what it parses today; `step_busy` feeds the bar from it, so the bar rises at least twice during the case_06 parse (LLR-176.4, AT-B100-17).
   - Project load, Save project (emit, copy, hash and manifest from a copy, after the main-thread re-derive) and the A2L parse run under `@work(thread=True)`, installing through `call_from_thread`.
-  - The refused set while a worker runs; quit asks through the Inc 10 confirm modal, which takes its question text as a parameter, so `screens.py` is not touched.
+  - The refused set while a worker runs; quit asks through the Inc 10 confirm modal, which takes its question text and both button labels as parameters (C-UX-4 / ARCH-PDR-4), so `screens.py` is not touched.
   - The A2L tag-table build stays on the main thread, with its step painted first.
 - **Interfaces:** freezes B100-I12.
 - **Enablers:** E6 (the case_06 A2L and a project holding it, P-33); its worker share is measured above one timer tick at the first run and recorded.
@@ -535,6 +537,7 @@ Every TC and AT is specified in `01-requirements.md` §3–§4 with its threshol
 | LLR-176.1 The busy seam owns `#status_text` and moves the bar within steps | TC-B100-50 | Inc 12 | a mutation dropping `end_busy` on the exception path → 1 indicator left → RED; a mutation setting the bar from the step index only → the within-step arm RED. |
 | LLR-176.2 Every progress caller maps to one action (C-31) | TC-B100-51 | Inc 12 | a mutation removing one action's failure-path end → the census names that action → RED. |
 | LLR-176.3 Main-thread steps paint before they work | TC-B100-52 | Inc 12 | a mutation starting the work before the refresh → the callback reads the previous text → RED. |
+| LLR-176.4 The A2L parser reports the bytes it has consumed (named crossing) | TC-B100-73 | Inc 12 | a mutation calling the callback only once at the end → fewer than 2 calls → RED; a mutation changing a parsed field when a callback is given → the equality arm RED. |
 | LLR-177.1 Three actions on workers, installs on the main thread, everything else refused | TC-B100-53 | Inc 12 | today's synchronous load (`app.py:8510`) → 0 changes → RED; a mutation omitting `v` from the refused set → the image changes during the save → RED. |
 | LLR-177.2 Worker failures keep the app running | TC-B100-54 | Inc 12 | a mutation letting the exception escape the worker → the app exits → RED. |
 
@@ -665,11 +668,12 @@ One command for the six guard files: `pytest tests/test_import_census.py tests/t
 | Output of this PDR | Named consumer downstream | Where the consumer will read it |
 |---|---|---|
 | design characteristics | the Phase-3 increments | §2–§3, and §5.1–§5.14 per increment, quoted in each Kimi brief (`kimi/BRIEF-inc-<N>.md`) |
-| enablers (fixtures, data, scaffolding, env) | Phase 3 and validation | §5 enablers E1–E12, built in the first increment that names them; E12 in `kimi/BRIEF-COMMON.md` |
+| enablers (fixtures, data, scaffolding, env) | Phase 3 and validation | §5 enablers E1–E13, built in the first increment that names them; E12 in `kimi/BRIEF-COMMON.md` |
 | proposed test cases | layers 0/A/B and the DDR | §5.1–§5.14 (mutations per LLR and per AT) and `01-requirements.md` §3–§4; each packet's RED counterfactual and mutation rows |
 | design → requirement traceability | the matrix and the DDR | §5.15, and `06-docs/traceability-matrix.md` at P6 |
 | whole-tree guard commands | every increment gate | §5.16, copied into each packet's gate run |
-| PDR condition dispositions | the PDR verdict and the map update | §9, and LED-2026-10-26-batch-100.24 to .34 |
+| PDR condition dispositions | the PDR verdict and the map update | §9, LED-2026-10-26-batch-100.24 to .34, and the seal's contract-text conditions in LED .35 to .48 |
+| real-terminal look of every changed screen (C-UX-5) | the Phase-4 inspection | E13's PNGs at 118×54, 220×60 and 99×54, read against the prototype verdicts (P-A C, P-B A, P-C B, P-D A, P-E B) |
 
 ## 8 · Parallelisation plan *(only if the batch forks)*
 
@@ -681,7 +685,7 @@ Not applicable. The batch runs one lane, in sequence (ARQ §9; `01-requirements.
 |---|---|---|---|
 | UX-22 (C-3) | discharged: LLR-171.2 paints `no data or A2L file` / `load a file and Save project`; TC-B100-32 arm | LED .24 | Inc 8b |
 | UX C-1 | discharged: `#result_ok` labelled "Close (esc)"; `escape` dismisses from anywhere, `enter` only on the focused button; TC-B100-67 presses `esc` | LED .25 | Inc 6 |
-| UX C-2 | discharged: first frame before any digest; digests once per open on a worker; `computing…` rows; `alt+s` waits; budget 2 s for the case_06 project (assumed, measured at Inc 11) | LED .26 | Inc 11 (plan inputs from Inc 5) |
+| UX C-2 | discharged: first frame before any digest; digests once per open on a worker; `computing…` rows; `alt+s` waits (superseded at the seal: an early `alt+s` closes the dialog, C-UX-3, LED .37); budget 2 s for the case_06 project (assumed, measured at Inc 11) | LED .26 | Inc 11 (plan inputs from Inc 5) |
 | ARCH C-1 (B100-I15 names) | the contract form is frozen (`rederive_for_save`, `emit_and_verify(map, ranges, …)`); map row updated by the architect at PDR | §4 | architect · before Inc 5 |
 | ARCH C-2 (B100-I22 signature) | the contract form is frozen (`predict_placement(digest_or_bytes, size, destination, name)`) | §4 | architect · before Inc 1 |
 | ARCH C-3 (B100-I16 record) | the contract form is frozen (name, SHA-256, byte count; the "not in this project" wording) | §4 | architect · before Inc 7 |

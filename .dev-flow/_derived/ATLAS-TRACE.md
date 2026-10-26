@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: b0b2056967444c0c -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 2b037272d90c52ed -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1987 unique id(s)
+## family US/HLR/LLR — 1988 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2953,6 +2953,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-176.1` | batches |
 | `LLR-176.2` | batches |
 | `LLR-176.3` | batches |
+| `LLR-176.4` | batches |
 | `LLR-177.1` | batches |
 | `LLR-177.2` | batches |
 | `LLR-178.1` | batches |
@@ -3689,7 +3690,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1997 unique id(s)
+## family AT/TC — 1998 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -5410,6 +5411,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-70` | batches |
 | `TC-B100-71` | batches |
 | `TC-B100-72` | batches |
+| `TC-B100-73` | batches |
 | `TC-B77-01` | batches, tests |
 | `TC-B77-02` | batches, tests |
 | `TC-B77-03` | batches, tests |

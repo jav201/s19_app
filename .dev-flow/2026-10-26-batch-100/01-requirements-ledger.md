@@ -494,3 +494,115 @@ above this line is ever edited._
 - **Closes:** the PDR question about `choose_install_set`'s home.
 - **Why:** both of its callers, `_handle_load_project` and the dialog through the app, already sit in `app.py`. Placing it in `variant_execution_service.py` would make Inc 9b 4 files for no reader's benefit.
 - **Evidence:** `design/design-proposal-b100.md` §2 and §9.
+
+### LED-2026-10-26-batch-100.35 — PDR seal: the A2L parse reports progress through a named frozen-engine crossing
+- **Requirement:** HLR-176, LLR-176.1, LLR-176.4
+- **Date:** 2026-10-26
+- **What changed:** new LLR-176.4 (TC-B100-73). It adds an optional bytes-consumed callback to the A2L parse entry point of `s19_app/tui/a2l.py`, and the parsed result stays identical. The crossing is named the way batch-99 named HLR-158's. HLR-176 and LLR-176.1 now drive the bar from that callback during the parse. AT-B100-17's arm requires the bar to rise at least 2 times during the parse. Inc 12 becomes 3 files (`app.py`, `styles.tcss`, `a2l.py`) and re-adds `s19_app/tui/a2l.py` to `tests/test_engine_unchanged.py::_ENGINE_PATHS`. An IFC Part A FLOW node is owned by LLR-176.4.
+- **Closes:** C-UX-1, C-QA-1 (the operator chose "Cruce con nombre").
+- **Why:** the parse is the longest step, and a bar that does not move during it reads as a hang. The callback is the only source of real progress inside the step.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-1, C-QA-1; `.dev-flow/2026-10-25-batch-99/01-requirements.md` (HLR-158 crossing wording).
+
+### LED-2026-10-26-batch-100.36 — PDR seal: the opening key sets the Load dialog's focus
+- **Requirement:** HLR-173, LLR-173.2
+- **Date:** 2026-10-26
+- **What changed:** `l` and `ctrl+l` open the dialog with the focus on `#load_path`. `p` opens it with the focus on `#load_list`, with the open project's row highlighted. VS-PA-4 and VS-PA-6 are restated. LLR-173.2 gains the `p` focus assertion, plus the arm `p`, `enter` → the highlighted project loads, with a mutation for each key.
+- **Closes:** C-UX-2.
+- **Why:** `p` means "pick a project", so Enter on it must load at once. `l` means "type a path".
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-2.
+
+### LED-2026-10-26-batch-100.37 — PDR seal: an early `alt+s` closes the Save dialog; the `computing…` rows are defined
+- **Requirement:** HLR-175, LLR-175.4
+- **Date:** 2026-10-26
+- **What changed:** an `alt+s` pressed before the digests arrive closes the dialog at once. The save then finishes the digests and runs on a worker under the status line. A `computing…` row is a plan row whose landing name and action depend on a digest not yet known: the emitted image, and each copied file whose destination already holds a file of the same name. No other row shows it. LLR-175.4 gains the early-`alt+s` arm and the image-only arm.
+- **Closes:** C-UX-3.
+- **Why:** waiting in an open dialog under a busy indicator hides the work. The status line already carries real progress (P-D A).
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-3.
+
+### LED-2026-10-26-batch-100.38 — PDR seal: the confirm modal takes its question and labels; quit reuses it
+- **Requirement:** HLR-177, LLR-174.2, LLR-177.1
+- **Date:** 2026-10-26
+- **What changed:** the confirm modal takes the question text and both button labels as parameters. LLR-174.2 gains an arm that builds it with a quit question and the labels "Quit (y)" / "Stay (n)". HLR-177 and LLR-177.1 state that quit asks through that modal, with its own text and the focus on No.
+- **Closes:** C-UX-4, ARCH-PDR-4.
+- **Why:** one modal for both questions keeps one key contract. A second modal would duplicate it in Inc 12.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-4, ARCH-PDR-4.
+
+### LED-2026-10-26-batch-100.39 — PDR seal: an idle bar keeps its row
+- **Requirement:** HLR-176, LLR-176.1
+- **Date:** 2026-10-26
+- **What changed:** "the bar is hidden" becomes "the bar is cleared". When idle, the bar is empty and keeps its row. LLR-176.1 gains an idle arm: the bar's row height equals its busy height, and `#log_line_1` stays at the same `y`.
+- **Closes:** C-UX-7.
+- **Why:** a bar that appears and disappears moves the log lines under the reader at every action.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-7.
+
+### LED-2026-10-26-batch-100.40 — PDR seal: a recent row shows path and kind only; VS-PA-5 reconciled
+- **Requirement:** HLR-173, LLR-173.4, LLR-173.6
+- **Date:** 2026-10-26
+- **What changed:** a recent row shows its path and kind from the store, plus "checked when loaded". It shows no size, no last-seen time and no `●`, and makes no stat before Enter. VS-PA-5 now marks only project, file and work-area rows with `●`. LLR-173.4's arm asserts the painted text (path + kind + `checked when loaded`, 0 `●`). LLR-173.6 states that a recent row carries no `●`.
+- **Closes:** C-UX-8, and the conflict between VS-PA-5's `●` on every row kind and LLR-173.4 / LLR-173.6's no-read rule. The no-read rule wins, because a mark needs a read.
+- **Why:** a size or a mark on a recent row needs a filesystem call before Enter, which LLR-173.4 forbids.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-UX-8.
+
+### LED-2026-10-26-batch-100.41 — PDR seal: an autouse isolation of the recent store, plus a guard on the real store
+- **Requirement:** LLR-172.1
+- **Date:** 2026-10-26
+- **What changed:** an autouse fixture in `tests/conftest.py` points `LOCALAPPDATA` at `tmp_path` for every test (Inc 9a). LLR-172.1 gains a guard: the real `%LOCALAPPDATA%\s19_app\recent_sources.json` keeps its digest, or stays absent, after a full test run.
+- **Closes:** C-QA-2.
+- **Why:** a per-test redirect misses every test that loads a source without asking for it, and those tests would write the operator's real recents.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-QA-2.
+
+### LED-2026-10-26-batch-100.42 — PDR seal: the E4 builders state who may write `project.json`
+- **Requirement:** HLR-167, HLR-168, HLR-169, HLR-170, HLR-171
+- **Date:** 2026-10-26
+- **What changed:** the §3 preface states two rules. The E4 project builders say which of them may write `project.json`: only the damaged, legacy and hostile cases. An output-then-consume AT takes its `project.json` only from the shipped handler. These are the HLRs whose ATs consume a saved project.
+- **Closes:** C-QA-4.
+- **Why:** an AT that hand-writes the manifest it then loads tests the builder, not the save.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-QA-4.
+
+### LED-2026-10-26-batch-100.43 — PDR seal: the save-plan budget is measured on the Windows development host
+- **Requirement:** LLR-175.4
+- **Date:** 2026-10-26
+- **What changed:** "within 2 s on the CI host" becomes "within 2 s on the Windows development host". The budget is still an assumption, measured there at Inc 11 and recorded in the packet.
+- **Closes:** C-QA-5.
+- **Why:** the batch has no CI host for the TUI timing arm. The host where the operator runs the app is the one that matters.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-QA-5.
+
+### LED-2026-10-26-batch-100.44 — PDR seal: Windows-only arms skip by name; junctions via `_winapi.CreateJunction`
+- **Requirement:** LLR-163.1, LLR-171.1, LLR-171.4
+- **Date:** 2026-10-26
+- **What changed:** a "Platform arms" paragraph in the §3 preface. Windows-only arms (junctions, links, case-insensitive names) skip on other platforms with a named reason, and the packet counts and names every skip. Junctions are made with `_winapi.CreateJunction`. These are the LLRs that carry such arms.
+- **Closes:** C-QA-6.
+- **Why:** a silent skip reads as a pass, and creating a junction without the documented call needs elevation or a shell.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` C-QA-6.
+
+### LED-2026-10-26-batch-100.45 — PDR seal: `plan_project_save` takes the key list as input from Inc 5
+- **Requirement:** LLR-167.6
+- **Date:** 2026-10-26
+- **What changed:** the manifest-key list is an input of `plan_project_save` from Inc 5, and the app passes the keys it writes. The function does not change when Inc 7 or Inc 8a adds a key.
+- **Closes:** ARCH-PDR-1.
+- **Why:** the plan would otherwise be edited at every key-adding increment, and those increments are already near the file cap.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` ARCH-PDR-1.
+
+### LED-2026-10-26-batch-100.46 — PDR seal: the dialog's marks and preview come from `app.py`
+- **Requirement:** LLR-173.6
+- **Date:** 2026-10-26
+- **What changed:** the dialog gets its `●` marks and preview from `app.py`, through a callback or message to the app, which runs the manifest read on an app-side worker. `screens.py` imports no service module, and the Inc 9b import census confirms it.
+- **Closes:** ARCH-PDR-2.
+- **Why:** a view → service edge would break the layering that `docs/ARCHITECTURE.md` keeps between screens and services.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` ARCH-PDR-2.
+
+### LED-2026-10-26-batch-100.47 — PDR seal: TC-B100-55's "first variant by name" arm moves to Inc 7
+- **Requirement:** LLR-178.1
+- **Date:** 2026-10-26
+- **What changed:** the mutation arm "compares with the first variant by name" is written at Inc 7, where `derived_from` exists. Inc 6 keeps the reasons and the counts. The §5.3 index has a TC-B100-55 row for this split.
+- **Closes:** ARCH-PDR-3.
+- **Why:** at Inc 6 there is no `derived_from`, so the arm could not tell the right base from the first one.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` ARCH-PDR-3.
+
+### LED-2026-10-26-batch-100.48 — PDR seal: the `derived_from` field names are fixed in the Inc 7 packet
+- **Requirement:** LLR-168.4
+- **Date:** 2026-10-26
+- **What changed:** the JSON field names of a `derived_from` record are fixed in the Inc 7 packet and frozen with B100-I16.
+- **Closes:** ARCH-PDR-5.
+- **Why:** later increments (8a, 9b, 11) read these names, so they need one fixed point.
+- **Evidence:** `design/PDR-2026-10-26-batch-100.md` ARCH-PDR-5.
