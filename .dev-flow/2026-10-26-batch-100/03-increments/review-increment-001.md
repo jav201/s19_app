@@ -81,3 +81,70 @@
 - `security-reviewer`: F1 (the S-02 class, executed escapes) and the gather path's scheduling.
 - Orchestrator: F2's "this app's work area" interface question (B100-I14 vs no `workarea` parameter); F7's contract wording; F5's group-word deviation.
 - `qa-reviewer`: the `test_tui_patch_editor_v2.py` order/timing flake, present at base and head.
+
+---
+
+# Round 2 — re-read of corrective pass 1
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc1` at `e044112` with Inc 1 and fix pass 1 uncommitted; `workspace.py` sha256 `c10a9d82…` |
+| Contract | main `5f0ef66`: amended LLR-163.1 and LED .49 (the root is read off the unresolved destination; the group is a second placement kind; 4 source files) |
+| Inputs | `HANDOFF.md` §"Fix pass 1", `BRIEF-inc-1-fix1.md`, packet `increment-001.md` (§2, §4, §5, §6) |
+| **Verdict** | **approve — PASS-WITH-NOTES.** 0 HIGH open. **F1 is discharged**, because I re-read the applied fix on the diff and re-ran the escape probes myself. One new MAJOR (N1) stays open as a recorded note. It does not block, because no shipped writer can build the path it needs. It must be closed in this increment or scheduled in the ledger before Inc 8b. |
+
+## What I executed in round 2 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| F1 probe, export (`probe/s02_export.py`): `<this wa>/P/exports` as a junction to `<other>/.s19tool/workarea/victim` | `fmt=s19` **REFUSED**, `fmt=bin` **REFUSED**, `place_group_into_workarea(junction)` **REFUSED**, direct `place_into_workarea` REFUSED. Victim folder: `[]` |
+| F1 probe, gather (`probe/s02_gather.py`) | `_gather_copy` **REFUSED**. Victim folder: `[]` |
+| F4 probe (`probe/predict_form.py`) | relative destination: predicted == placed (**True**). 8.3 short-name destination: **accepted**, and predicted == placed (True) |
+| New-code probes (`probe/r2_guard.py`) | (a) short-name form through a `.s19tool` junction → REFUSED · (b1) explicit root, destination in another work area → REFUSED · (b2) explicit root, junction inside this work area → REFUSED · (c1) legitimate `.S19TOOL\WORKAREA` → accepted · (c2) upper-case form through a junction → REFUSED · **(d) nested anchor: junction `<this wa>/nest` → `<other>`, destination `<this wa>/nest/.s19tool/workarea/x`, no explicit root → WROTE `other\.s19tool\workarea\x\f.s19`** (N1) · (d′) the same destination with `workarea_root=<this wa>` → REFUSED |
+| Reviewer mutants on scratch copy `mutwt2` (pristine `c10a9d82…`), run against `test_b100_reuse.py` (non-AT), `test_copy_into_workarea_content_dedup.py`, `test_b99_staging.py`, `test_tui_workspace.py` and `test_project_gather.py` | `fold` → **KILLED** (`…upper_case_suffix_name_is_reused_on_windows`) · `contained` → **KILLED** (`…62_explicit_root_refuses_another_workarea`) · `seam` → **KILLED** (`…62_junction_destination…`) · `shortreparse` (reparse refusal removed from the short-name fallback) → **SURVIVED** (104 passed) · `anchorcase` (case-folded anchor match → exact) → **SURVIVED** (104 passed) |
+| Affected files on the fixed tree: `test_b100_reuse.py`, `test_project_gather.py`, `test_segment_split_window.py`, `test_b99_export.py`, `test_b99_staging.py`, the tc018 and at031b nodes, `test_id_registry.py` | **164 passed**, 0 failed |
+| CRLF | the 4 sources and all edited or new test files: 0 bare LF |
+| Evidence digests | 36 of 37 packet rows match the bytes on disk. **`guards.txt` does not**: the packet shows `…5290d9e85f8762a2b5ff0818e0e7f8`, the disk has `…5290d9e85f876a2b5ff0818e0e7f8a`. This is a hand-copy error (N2). |
+
+## Closure table — round 1 findings
+
+| id | Round-1 severity | Status | Evidence of closure (re-read on the diff) |
+|---|---|---|---|
+| **F1** | HIGH | **CLOSED** | `_guarded_destination` (`workspace.py:553-655`) reads the root off the unresolved path, walks it for reparse points, checks the `.s19tool` seam, and only then resolves both sides and compares them. Both placement kinds call it (`:1041`, `:1434`). The export guards and places with the unresolved `dest_dir` (`segment_split_view.py:833`, `:939-941`). The gather routes `_check_home_contained` through the guard and passes the unresolved `home` (`project_gather_service.py:242`, `:357`). My probes: export s19/bin, group and gather are all refused, with 0 bytes in the victim. Three caller arms (`test_tc_b100_62_{export,group,gather}_junction…`), each with a caller-revert RED (`red-04/05/06`). |
+| F2 | MAJOR | **CLOSED, with a note** | My `contained` mutant is now killed, through the explicit-root arm. Note: **no production caller passes `workarea_root`**. On every shipped path the root is still derived from the destination, so there the resolved-pair check remains a backstop, and that is why N1 exists. LED .49 explicitly allows the derived root; I accept the §6 ruling as written. |
+| F3 | MAJOR | **CLOSED** | Four boundary arms (`test_b100_reuse.py:238-316`). The packet's mutants (fold, barename, link, zero) are all killed, and my `fold` mutant is killed too. The link and upper-case arms skip off Windows or without symlink privilege, with the reason given. |
+| F4 | MAJOR | **CLOSED** | `predict_placement` resolves its destination (`workspace.py:1262`); arm `test_tc_b100_68_relative_destination_matches_placed_path`; my probe agrees. |
+| F5 | MAJOR | **CLOSED (census); §6 deviation ACCEPTED with one condition** | The census now works by behaviour, with an exact-set assertion against two declared other rules (`:484-554`). A new rule under any name, or a deleted declared rule, fails it. **§6 group word: accepted.** It is correct because the group's claim loop checks with lstat before claiming and never claims an existing name, so "every returned name was present before" means reused. Condition: the comparison `f.name in names_before` is case-exact. On Windows, a reused group whose existing file differs only in case from the requested name (the group returns the requested spelling) would be reported as `wrote`. Compare case-folded on Windows (N5). |
+| F6 | MINOR | **CLOSED** | The self-confirming lines are deleted (`:803-824`); the mismatch-report arm is deferred to Inc 5 in §6. |
+| F7 | MINOR | **CLOSED; §6 substitution ACCEPTED** | `test_tc_b100_01_one_claim_loop_per_placement_kind` pins exactly 1 `O_EXCL` per kind (2 in total), matching amended LLR-163.1 and LED .49. |
+| F8 | MINOR | **CLOSED, with notes** | Case-insensitive anchor on Windows (`:311-328`) and the 8.3 fallback (`:339-403`). Both forms are accepted, and the escape forms are still refused (probes a, c1, c2). Two notes are in N4. |
+| F9 | MINOR | **CLOSED** (one nit) | The sectioned docstring is restored; the dead block is gone (only the `# pragma: no cover` raise at `:1278` remains, which is fine); the reuse branch logs "Reused variant" (`app.py`); `digest_or_bytes` is typed. Nit: `_reuse_candidate_names` still returns a bare `-> list` (`:696`). |
+| F10 | MINOR | **CLOSED** | `copy_into_workarea` is off `_FINAL_NAME_ALLOWLIST` (`test_b99_staging.py:2031-2037`); the staging tests pass. |
+| F11 | MINOR | **MOSTLY CLOSED; one residual (N2)** | Count and ledger reconcile (37 rows; files `215 = 213 − 0 + 2`; nodes `24 = 14 + 10`, 23 functions with the AT parametrised ×2). The chunk transcripts name their files on line 1; the cap mutation is recorded; `HANDOFF.md` is declared out of the commit. Residual: the `guards.txt` digest is wrong (N2). |
+
+## New findings — round 2
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **N1** | **MAJOR** (does not block: no shipped writer builds this path) | `workspace.py:621-646` (`_guarded_destination`, derived-root branch) | **Nested-anchor bypass.** With no explicit root, the guard picks the **nearest** `.s19tool/workarea` ancestor. The reparse walk then stops at that inner anchor's `.s19tool`, so a junction **between the app's work area and a nested anchor** is never checked. The resolved pair (other work area vs other work area) then passes. This falsifies amended LLR-163.1's own sentence "a junction or link anywhere in the destination is caught". Same S-02 class. Today no shipped writer composes `<wa>/<x>/.s19tool/workarea/…`: project names are sanitised and the sub-folders are fixed names. But it is one typed or loaded path away (the Inc 8b/9a surfaces). | Probe (d): WROTE into `other\.s19tool\workarea\x`. Probe (d′) with an explicit root: REFUSED. | Either (a) when deriving the root, continue the textual reparse walk up to the **outermost** anchor's `.s19tool` (the parts between two anchors lie inside the outer work area, so checking them is correct and cheap), or (b) record a ledger entry so that every app-level writer passes `workarea_root=self.workarea` by Inc 8b, with a TC-B100-62 nested-anchor arm. (a) is a ~5-line change inside Inc 1's own guard; I recommend it. Route to `security-reviewer`. |
+| N2 | MINOR | `increment-001.md`, §4 evidence row `guards.txt` | The recorded SHA-256 does not match the file. Two characters are swapped near the end and the digest is shifted by one; it looks hand-copied. `devflow-evidence.py --check` would fail on it. | `sha256sum` on disk vs the packet row. | Regenerate the row with `devflow-evidence.py --write <packet> --rederive`; never hand-copy a digest. |
+| N3 | MINOR | `tests/test_b100_reuse.py:520-522`, `:493` | The census says `_gather_copy`'s sibling scan is "converted by Inc 3b". Batch-100 has no Inc 3b (that was batch-99's conversion of the delete-and-recopy). The declared rule therefore has no owner. | `design-proposal-b100.md` lists Inc 3 = "a project load starts clean". | Name it as backlog (or the real increment, if the orchestrator schedules one), not "Inc 3b". |
+| N4 | MINOR | `workspace.py:381-391`, `:311-322` | Two F8 branches have no test that kills them: my `shortreparse` and `anchorcase` mutants both SURVIVE. `anchorcase` is close to equivalent, because the 8.3 fallback resolves an upper-case form anyway. `shortreparse` is equivalent for escapes, because the main walk and the seam check still cover `.s19tool` and below. But the fallback's own check also refuses reparse ancestors **above** the anchor (for example a junctioned user or TEMP folder). That refuses a short-name form the base accepted, against the F8 decision "don't refuse forms the base accepted unless they escape". | Mutants SURVIVED. | Limit the fallback's reparse refusal to the anchor and below (the main walk already covers that, so the fallback can simply return the prefix), or keep the stricter rule and declare it in §6. An upper-case arm needs no new test if you declare it equivalent. |
+| N5 | MINOR | `segment_split_view.py:938-942` | This is the F5 acceptance condition: the case-exact group-word comparison can report a reused group as `wrote` on Windows (see F5 above). | Code read. | `fold = str.casefold` on win32 for both sides of the membership test. |
+
+## Verdict
+
+**approve — PASS-WITH-NOTES** (0 HIGH; open: 1 MAJOR, N1; 4 MINOR, N2–N5; plus the F9 nit).
+- **F1 is discharged by this re-read.** The fix is applied on the diff, my own probes refuse all three writers, and the arms carry RED proofs.
+- N2 is a record defect. The orchestrator corrects it before the commit, since a failing evidence check would block.
+- N1 should be fixed in this increment (option a). If it is not, it must have a ledger entry with an owner before Inc 8b. It must not be left implicit.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH; round 2 open: N1 MAJOR, N2–N5 MINOR) · F1 (HIGH, round 1) RESOLVED: one destination guard, `_guarded_destination`, is used by both placement kinds. It reads the root off the unresolved destination, and the export, group and gather now pass unresolved destinations. Re-read on the diff, my escape probes refused all three writers (0 bytes in the victim), and arms `test_tc_b100_62_{export,group,gather}_junction…` each carry a caller-revert RED (`red-04/05/06`). F2–F11 are closed; the §6 F5 and F7 declarations are accepted, F5 on condition N5. Round-2 note N1: a nested-anchor junction escapes the derived-root guard (probe d); fix it in Inc 1 or ledger it before Inc 8b (`review-increment-001.md` §Round 2).
+
+## Hand-offs (round 2)
+
+- `security-reviewer`: N1 (the nested-anchor S-02 variant, executed escape).
+- Orchestrator: N2 (correct the evidence row before the commit); N3 (who owns `_gather_copy`'s rule); the decision on N1, fix now or ledger.

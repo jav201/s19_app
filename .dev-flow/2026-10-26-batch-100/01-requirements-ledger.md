@@ -621,3 +621,21 @@ above this line is ever edited._
   - F7: the "1 claim loop" wording was false while the group keeps its own loop.
 - **Why:** this is the batch-99 S-02 / H-9 class. A guard that resolves the path first cannot see the junction it exists to refuse. The orchestrator ruled on F2 under the batch's standing authorization.
 - **Evidence:** `03-increments/review-increment-001.md` F1, F2, F7.
+
+### LED-2026-10-26-batch-100.50 — Inc 1 gate round 2: app paths stay unresolved, app callers pass the root, the guard walks to the outermost anchor
+- **Requirement:** LLR-163.1, LLR-171.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **App paths stay unresolved.** `current_project_dir` is stored as the path under `self.workarea`, not as `project_dir.resolve()` (`app.py:8506`). Save project builds its target the same way, with no `.resolve()` (`app.py:8135`). Every destination the app hands on therefore still shows any junction under the work area.
+  - **App callers pass the root.** Every placement call in `app.py` (9 sites) passes `workarea_root=self.workarea`. `copy_into_workarea` and `place_group_into_workarea` gain that keyword, and the export and the gather thread it through. An AST census arm checks that every `app.py` placement call names the root.
+  - **The guard walks to the outermost anchor.** When no root is passed, the reparse walk extends to the OUTERMOST `.s19tool/workarea` anchor of the unresolved destination, not just the nearest one. This closes the nested-anchor escape (N1).
+  - **No bare `OSError`.** An invalid path spelling raises the containment refusal, not a bare `OSError` (SEC-2).
+  - **New arms:**
+    - each app route places into a resolved junction target and gets 0 bytes outside: the variant append, the Save project copies, the MAC/A2L syncs, the gather and the export;
+    - a nested-anchor arm.
+  - The file set is unchanged: `workspace.py`, `segment_split_view.py`, `app.py`, `project_gather_service.py` (4 ⚠).
+- **Closes:** security-reviewer Inc 1 SEC-1 (HIGH: the escape still works with resolved app paths; executed), SEC-2 (MINOR), and code-reviewer round 2 N1 (MAJOR: nested-anchor bypass; executed).
+- **Not closed here (routed):** the remaining placement callers `changes/apply.py`, `operations/crc.py`, `services/flow_execution_service.py` and `services/flow_persistence_service.py` would each need a fifth-to-eighth source file to pass the root explicitly. They receive their destinations from the app, which are now unresolved, so the derived-root guard with the outermost-anchor walk covers them. Passing the root explicitly in those four files goes to `BACKLOG-CODE.md` §Routed 2026-10-26 batch-100 as defence in depth. SEC-3 (a false refusal when the work area itself sits under a junction, not run) goes to the backlog too.
+- **Why:** the guard can only know "this app's work area" if it is told the root or sees the path before resolution. The orchestrator ruled under the batch's standing authorization to do both within the 4-file cap. Making the root mandatory in all 8 calling files would break the cap.
+- **Evidence:** `03-increments/security-increment-001.md` SEC-1..3; `03-increments/review-increment-001.md` Round 2 N1.
+

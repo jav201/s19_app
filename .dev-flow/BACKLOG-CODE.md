@@ -1465,6 +1465,15 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 
 ### 🆕 Routed 2026-10-26 — batch-100 P2 round 1 (Load + projects)
 
+- **▸ (security, defence in depth; batch-100 Inc 1 gate, LED .50) Pass `workarea_root` explicitly in the four remaining placement callers.**
+  - **Callers:** `changes/apply.py`, `operations/crc.py`, `services/flow_execution_service.py`, `services/flow_persistence_service.py`.
+  - **Why they are covered today:** batch-100 Inc 1 made the app keep its project paths unresolved, and the guard walks to the outermost anchor.
+  - **Why still route it:** an explicit root removes the dependence on how a caller spells its path.
+  - **What closes it:** each caller takes and passes the app's work-area root; the AST census covers the whole package.
+- **▸ (security MINOR, SEC-3, not run) The 8.3 short-name fallback reparse-checks every component from the drive root.**
+  - **Effect:** a legitimate work area whose base sits under a junction is refused on that route.
+  - **What closes it:** limit the walk to the anchor and below, plus a test arm with a base under a junction.
+
 - **▸ (P2, origin batch-100 P2 architect A-01) Route the three writers that land images in the open project through the manifest writer.** The flow WRITE-OUT block (`flow_execution_service.py:679`), the external-step copy (`:1108`) and variant execution (`variant_execution_service.py:797`) write data files into the open project without `_write_and_verify_manifest`. So `project.json` does not record them: no `files` digest, and no `active_variant` update. Batch-100 reports them at Load as "not recorded" (LLR-169.5) and leaves the routing out of its file budget (`2026-10-26-batch-100/01-requirements-ledger.md` LED .7). **What closes it:** after each run returns, rewrite the manifest through the one seam, carrying every key it does not own, with an output-then-consume AT per writer.
 - **▸ (P3, origin batch-100 P2 architect B-12) Two older Windows device-name lists.** `changes/apply.py:107` (`COM1–9` / `LPT1–9`) and `segment_split_view.py:524` (adds `CONIN$` / `CONOUT$`) keep their own lists. Batch-100 adds one shared predicate in `workspace.py` for its three new uses (LLR-164.1, LLR-169.8, LLR-172.2) and leaves these two alone. **What closes it:** both call the shared predicate, each with an arm per name form.
 
