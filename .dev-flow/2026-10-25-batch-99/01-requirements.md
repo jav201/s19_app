@@ -677,11 +677,11 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-155.3 — Byte-identical reuse stays race-free
 - **Traceability:** HLR-155
-- **Ledger:** none
-- **Statement:** `copy_into_workarea`'s reuse of a byte-identical existing target (B8) shall compare and reuse without a window in which another writer can replace the target between the check and the reuse.
+- **Ledger:** LED-2026-10-25-batch-99.7
+- **Statement:** `copy_into_workarea`'s reuse of a byte-identical existing target (B8) shall be race-free by an invariant, not by a narrower window: no code path inside the work area replaces or deletes a file at a final name except the placement of LLR-155.2 claiming a free name, so a placed file is immutable once placed. `project_gather_service`'s delete-and-recopy of an existing name (`project_gather_service.py:290-299`) is converted to that placement (Inc 3b). B8 never reuses a 0-byte target.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B99-13 — `pytest tests/test_b99_staging.py -k tc_b99_13`
-- **Numeric pass threshold:** a target replaced between check and reuse (forced by a hook) → the caller receives a path whose bytes equal its own.
+- **Numeric pass threshold:** concurrent in-app placements of one name (threads running `copy_into_workarea` with identical and with differing bytes, 20 trials) → every caller's returned path holds its own bytes; a 0-byte target is never reused; after Inc 3b, an AST census finds no `unlink`/`replace`/`copy2` onto an existing final name outside the placement (`project_gather_service` included).
 - **Negative control:** restore check-then-copy (mutation) → mismatching bytes, RED.
 - **Boundary catalog:** ☒ boundary — identical bytes (reuse) vs different bytes (new name).
 

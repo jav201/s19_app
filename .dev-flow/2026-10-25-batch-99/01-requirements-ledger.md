@@ -84,3 +84,10 @@ above this line is ever edited._
 - **What changed:** LLR-158.1 gains TC-B99-42: in a multi-MODULE A2L, each module's own `MOD_COMMON BYTE_ORDER` applies to that module's tags. LLR-158.2 gains TC-B99-43: a RAT_FUNC root where the denominator d·P²+e·P+f is zero is no root. Kimi first numbered both TC-B99-26/27, which collided with LLR-159's ids, and the orchestrator renumbered them before merge.
 - **Why:** code-reviewer, Inc-10 round 1, LOW-a and LOW-b, fixed in the increment rather than deferred.
 - **Evidence:** `03-increments/increment-010.md` §4b; `tests/test_b99_a2l_encode.py`.
+
+### LED-2026-10-25-batch-99.7 — Inc-3a review: B8 reuse is race-free by an immutability invariant
+- **Requirement:** LLR-155.3
+- **Date:** 2026-10-25
+- **What changed:** LLR-155.3 no longer asks for a "narrower window" between check and reuse; that cannot be closed by reading twice. It now rests on an invariant: no code path inside the work area replaces or deletes a file at a final name except the placement claiming a free name, so placed files are immutable. `project_gather_service.py:290-299` (delete and re-copy of an existing name) is the one known violator, and Inc 3b converts it. TC-B99-13 now models concurrent in-app placements instead of a hook between two reads.
+- **Why:** code-reviewer, Inc-3a round 1, F2 (HIGH): the hook-based TC gave false confidence, and the claim "no in-app writer replaces a name" was false at `project_gather_service.py:290-299`.
+- **Evidence:** `03-increments/increment-003.md` §4b; `s19_app/tui/services/project_gather_service.py:290-299`.

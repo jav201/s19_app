@@ -8,8 +8,8 @@ HLR-155, its D7 and D9 clauses (operator verdict: D7 `rechazar`, D9 `si`); LLR-1
 - **UX-C4:** the chain-set refusal leads with the outcome within the first 50 characters, e.g. `Chain set not run: lanes A, B both write same.s19`.
 - **UX-C10:** one hostile-lane-name TC asserting 0 markup spans.
 
-## SOURCE files (max 2)
-`s19_app/tui/services/flow_execution_service.py`, `s19_app/tui/app.py` (the chain-set run handlers near `:2800` / `:2890` show the refusal in the status line).
+## SOURCE files (max 3)
+`s19_app/tui/services/flow_execution_service.py`, `s19_app/tui/app.py` (the chain-set run handlers near `:2800` / `:2890` show the refusal in the status line), `s19_app/tui/services/project_gather_service.py` (LLR-155.3 as amended in LED-2026-10-25-batch-99.7: convert the delete-and-recopy at `:290-299` to `copy_into_workarea`'s placement — a changed file gets the next free `_<N>`, never an overwrite; keep its `(copied, destination)` return contract and update its callers' expectations only if the contract forces it).
 
 ## What to build
 1. `run_chain_set`: before any lane runs, resolve every lane's WRITE-OUT file name and compare them case-folded. On a duplicate, return a refusal naming the lanes and write nothing. Use the existing result shape; do not invent a new return type unless needed, and if you do, add it to the packet's interface note.
@@ -21,6 +21,8 @@ HLR-155, its D7 and D9 clauses (operator verdict: D7 `rechazar`, D9 `si`); LLR-1
 - **AT-B99-04 duplicate arm** (pilot, Flow Execution `#fx_run`): the status line leads with the refusal and names both lanes; no file is written. RED today (P-5's set writes `same.s19`).
 - **UX-C10:** a lane named `[red]x[/red]` → painted literally.
 - Mutations: remove the duplicate check (TC-15 RED); skip the verify call (TC-16 RED). Revert each one.
+
+3. **LLR-155.3 census (TC-B99-13's second arm):** an AST census over `s19_app/` finds no `unlink` / `os.replace` / `shutil.copy2` / `write_bytes` onto an existing final name inside the work area outside the placement functions. Pin the allow-list by function.
 
 ## Reverse census
 `grep -rln "run_chain_set\|write_out\|verify_written_image\|CHAIN_RUN" tests/`. Re-pin only what HLR-155 D7/D9 change.
