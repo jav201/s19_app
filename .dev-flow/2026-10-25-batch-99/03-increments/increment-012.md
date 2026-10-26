@@ -112,7 +112,7 @@ reconciles: 139 collected on disk = 142 − 4 (this increment's merges) + 1
 
 | Field | Value |
 |---|---|
-| **Independent review** | software-dev — spawned as a generic agent with agents/software-dev.md (DDR reviewer) · C-DDR-SD-1 met, ledger met, no SOURCE change, 139 passed · qa-reviewer — spawned as a generic agent with agents/qa-reviewer.md (DDR reviewer) · DQ-1..DQ-4, DQ-6 discharged, 152 passed |
+| **Independent review** | qa-reviewer — spawned as a generic agent with agents/qa-reviewer.md (DDR reviewer) · OK: DQ-1..DQ-4, DQ-6 discharged, 152 passed; also re-checked by software-dev (DDR reviewer, agents/software-dev.md): C-DDR-SD-1 met, ledger met, no SOURCE change, 139 passed |
 
 ## 5 · Risks
 

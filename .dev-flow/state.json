@@ -235,6 +235,11 @@
       "station": "DDR",
       "date": "2026-10-26",
       "decision": "standing authorization — operator commission 2026-10-25. DDR approved (design/DDR-2026-10-25-batch-99.md): architect, software-dev, qa-reviewer approved with conditions; every condition discharged and re-checked. P4 validation next, pending the full suite on e7732f6."
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. Increment 012 (the DDR test-fix unit, tests only) gate closed: reviewed by qa-reviewer and software-dev at the DDR (C-18 one node per AT, ledgers, DQ-2..DQ-6 discharged)."
     }
   ],
   "obsidian_synced": false,
