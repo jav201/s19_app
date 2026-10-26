@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 75 requirement files | corpus digest: 145f8338f94aa4b4 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 9251e59309c4dfb3 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3433,7 +3433,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-CMP-001` | batches, canon |
 | `R-CMP-002` | canon |
 | `R-CMP-003` | canon |
-| `R-CMP-004` | canon |
+| `R-CMP-004` | batches, canon |
 | `R-CMP-005` | canon |
 | `R-CMP-006` | canon |
 | `R-DOC-001` | batches, canon |
