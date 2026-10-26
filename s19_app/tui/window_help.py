@@ -81,7 +81,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "with Run checks.",
             "Address — the entry's start address, `0x…` hex.",
             "String — a text value, written in the document's encoding.",
-            "Bytes — a run of hex bytes, such as `DE AD BE EF`.",
+            "Bytes — every token is a hex byte (1–2 digits, `0x` optional); "
+            "decimals are not accepted, e.g. `DE AD BE EF`.",
             "Add — appends the entry typed in the form.",
             "Edit — replaces the entry at the typed address with the form's "
             "value.",

@@ -175,6 +175,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 002 (US-142 / HLR-153, S0 is not image data; core.py + render/hexview.py, frozen-engine crossing named in LLR-153.1) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH vacuous Memory Map assertion in AT-B99-02, F2-F6 MEDIUM incl. a sealed batch-92 evidence file rewritten -> restored), round 2 OK to advance; orchestrator fixed a modal-compose flake (8/8). Full suite runs on the merged main."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 011 (US-150 / HLR-161, Bytes field hex-only, amends batch-07 LLR-001.2; change_service.py, screens_directionb.py, window_help.py) approved: implemented by Kimi K2.8; code-reviewer round 1 OK with notes (F1/F2 MEDIUM), fixes by Kimi, round 2 OK; orchestrator moved AT-B99-12's load to the Load dialog (8/8)."
     }
   ],
   "obsidian_synced": false,

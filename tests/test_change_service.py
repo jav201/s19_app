@@ -590,7 +590,14 @@ def test_change_service_module_imports_no_textual() -> None:
 
 
 def test_parse_helpers_follow_tui_input_grammar() -> None:
-    """The permissive TUI-input grammar parses; garbage raises ValueError."""
+    """The TUI-input grammar parses; garbage raises ValueError.
+
+    Re-pinned to the hex-only bytes grammar of LLR-161.1 (HLR-161 amends
+    batch-07 LLR-001.2): ``parse_new_bytes("0x01, 2") == [1, 2]`` (a bare
+    decimal token) gave way to the hex token ``02``; ``100`` — three digits —
+    is refused with the token named. ``parse_address`` is unchanged (its own
+    base-0 grammar is not part of HLR-161).
+    """
     assert parse_address("0x100") == 256
     assert parse_address("512") == 512
     with pytest.raises(ValueError):
@@ -598,9 +605,12 @@ def test_parse_helpers_follow_tui_input_grammar() -> None:
     with pytest.raises(ValueError):
         parse_address("-4")
     assert parse_new_bytes("DE AD") == [0xDE, 0xAD]
-    assert parse_new_bytes("0x01, 2") == [1, 2]
+    assert parse_new_bytes("0x01, 02") == [1, 2]
     with pytest.raises(ValueError):
         parse_new_bytes("ZZ")
+    with pytest.raises(ValueError) as err:
+        parse_new_bytes("100")
+    assert "100" in str(err.value)
 
 
 # ---------------------------------------------------------------------------

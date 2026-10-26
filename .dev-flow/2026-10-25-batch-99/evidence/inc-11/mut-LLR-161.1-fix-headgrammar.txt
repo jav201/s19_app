@@ -1,0 +1,157 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar FAILED [ 33%]
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule PASSED [ 66%]
+tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back FAILED [100%]
+
+================================== FAILURES ===================================
+____________________ test_tc_b99_32_hex_only_token_grammar ____________________
+
+    def test_tc_b99_32_hex_only_token_grammar() -> None:
+        """TC-B99-32 (LLR-161.1): every token is base 16, ``0x`` optional.
+    
+        Boundary: ``00`` and ``FF`` accepted (1–2 hex digits). Invalid:
+        ``100`` (three digits), ``G1`` (not hex), ``0x123`` (three digits),
+        ``+F`` / ``-1`` (a sign — ``int(token, 16)`` alone would admit them;
+        ``-1`` surfaced later as a ChangeEntry value-range refusal naming the
+        value, not the token), ``0x+F`` (sign after the prefix), ``１２`` and
+        ``٣٣`` (fullwidth / Arabic-Indic digits — non-ASCII, refused because the
+        grammar is ASCII-only) — each refused with a ``ValueError`` naming the
+        token.
+        """
+>       assert parse_new_bytes("0F 10 1F 20") == [0x0F, 0x10, 0x1F, 0x20]
+E       AssertionError: assert [15, 10, 31, 20] == [15, 16, 31, 32]
+E         
+E         At index 1 diff: 10 != 16
+E         
+E         Full diff:
+E           [
+E               15,
+E         -     16,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests\test_b99_bytes_field.py:48: AssertionError
+___________________ test_at_b99_12_typed_hex_run_saves_back ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26017/test_at_b99_12_typed_hex_run_s0')
+
+    def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
+        """AT-B99-12 (HLR-161): typing ``0F 10 1F 20`` at an in-image address
+        in the Patch Editor, adding, applying and confirming the save-back
+        prompt writes a file holding ``0F 10 1F 20`` at that address, read
+        with the independent reader.
+    
+        Black-box: the image loads through the app's own load path (the
+        ``b97_fixtures`` idiom), the saved file is found on disk under the
+        work area by the name the save-back prompt shows, and only the
+        independent reader inspects the bytes — no injected state, no
+        internal attribute or service.
+    
+        RED on HEAD (P-16): the digit-only tokens ``10`` and ``20`` were read
+        as decimal, so the file held ``0F 0A 1F 14``.
+        """
+        from textual.widgets import Button, Input
+    
+        from s19_app.tui.app import S19TuiApp
+        from s19_app.tui.changes import emit_s19_from_mem_map
+        from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR
+    
+        mem_map = {0x100 + offset: 0x00 for offset in range(16)}
+        image_path = tmp_path / "img.s19"
+        image_path.write_text(
+            emit_s19_from_mem_map(mem_map, [(0x100, 0x110)]), encoding="ascii"
+        )
+        workarea = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                # The app's own load path (b97_fixtures.open_patch_editor),
+                # not an injected current_file.
+                app.load_from_path(image_path)
+                for _ in range(100):
+                    if app.current_file is not None:
+                        break
+                    await pilot.pause(0.05)
+                assert app.current_file is not None, "img.s19 did not load"
+                app.action_show_screen("patch")
+                await pilot.pause()
+    
+                # Type through the real key path (focus + keys, no .value=).
+                address = app.query_one("#patch_entry_address_input", Input)
+                address.focus()
+                await pilot.pause()
+                await pilot.press(*list("0x100"))
+                await pilot.pause()
+    
+                field = app.query_one("#patch_entry_bytes_input", Input)
+                field.focus()
+                await pilot.pause()
+                await pilot.press(
+                    *(ch if ch != " " else "space" for ch in "0F 10 1F 20")
+                )
+                await pilot.pause()
+                assert field.value == "0F 10 1F 20", field.value
+    
+                # Press the shipped buttons (the save-back confirm sits in a
+                # hidden prompt container until Apply, so a pilot click would
+                # land on a zero-region widget).
+                app.query_one("#patch_entry_add_button", Button).press()
+                await pilot.pause()
+                app.query_one("#patch_doc_apply_button", Button).press()
+                await pilot.pause()
+                await pilot.pause()
+                await pilot.pause()
+    
+                # The shipped name input pre-fills the save-back suggestion;
+                # read it (a painted widget value) and find the written file
+                # on disk under the work area.
+                saved_name = app.query_one(
+                    "#patch_saveback_name_input", Input
+                ).value
+                assert saved_name, "the save-back prompt pre-fills the name"
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                target = workarea / saved_name
+                for _ in range(100):
+                    if target.exists():
+                        break
+                    await pilot.pause(0.05)
+                assert target.exists(), (
+                    f"the save-back prompt must write {saved_name!r} under the "
+                    f"work area; {target} is absent"
+                )
+                return target
+    
+        written = asyncio.run(_drive())
+        out = read_s19(written)
+        assert out.errors == [], out.errors
+>       assert [out.data[0x100 + i] for i in range(4)] == [0x0F, 0x10, 0x1F, 0x20], (
+            f"the saved file must hold the typed run 0F 10 1F 20 at 0x100; "
+            f"got {[out.data.get(0x100 + i) for i in range(4)]}"
+        )
+E       AssertionError: the saved file must hold the typed run 0F 10 1F 20 at 0x100; got [15, 10, 31, 20]
+E       assert [15, 10, 31, 20] == [15, 16, 31, 32]
+E         
+E         At index 1 diff: 10 != 16
+E         
+E         Full diff:
+E           [
+E               15,
+E         -     16,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests\test_b99_bytes_field.py:220: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar
+FAILED tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back
+========================= 2 failed, 1 passed in 7.98s =========================

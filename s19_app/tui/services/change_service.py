@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
@@ -171,55 +172,65 @@ def parse_new_bytes(bytes_text: str) -> list[int]:
     """
     Summary:
         Map a Patch Editor bytes input field to an ordered list of integer
-        byte values — the permissive **TUI-input grammar** of LLR-001.2
-        (commas, decimals and ``0x`` prefixes accepted interactively; the
-        canonical writer normalises to the strict wire form on save).
+        byte values — the hex-only **TUI-input grammar** of LLR-161.1
+        (batch-99, amending batch-07 LLR-001.2: every token is base 16,
+        ``0x`` optional; decimals are not accepted — P-16: a digit-only
+        token read as decimal inside a hex dump applied the wrong byte).
 
     Args:
         bytes_text (str): The raw text of the bytes ``Input`` — a run of byte
-            tokens separated by whitespace and/or commas. Each token is a
-            ``0x``-prefixed hex literal or a plain decimal literal; a bare
-            two-digit hex string (for example ``DE AD BE EF``) is also
-            accepted so the engineer can paste a hex-dump fragment directly.
+            tokens separated by whitespace and/or commas. Each token is 1–2
+            hex digits with an optional ``0x`` prefix (for example
+            ``DE AD BE EF`` or ``0xDE AD``); the value is always base 16.
 
     Returns:
-        list[int]: The parsed byte values in input order. Range checking
-        (0-255) and the empty-run rejection are left to
-        ``ChangeEntry.__post_init__`` so there is one authoritative
-        byte-range rule.
+        list[int]: The parsed byte values in input order. The empty-run
+            rejection is left to ``ChangeEntry.__post_init__`` so there is
+            one authoritative byte-range rule; the ASCII 1–2 hex digit
+            grammar already bounds every value to 0–255, so no value can
+            fall outside the byte range.
 
     Raises:
-        ValueError: When ``bytes_text`` holds a token that is neither a valid
-            integer literal nor a bare hex byte string.
+        ValueError: When ``bytes_text`` holds a token that is not 1–2 ASCII
+            hex digits with an optional ``0x`` prefix; the message names the
+            token. A leading sign (``+F``, ``-1``) or non-ASCII digits
+            (``１２``, ``٣٣``) never parse: ``int(token, 16)`` alone would
+            admit them and ``-1`` would surface later as a ChangeEntry
+            value-range refusal naming the value, not the token.
 
     Data Flow:
         - Split on commas and whitespace, drop empty tokens.
-        - Parse each token base-0; a token that fails base-0 but is a pure
-          hex string is retried as base-16 (the bare-hex-dump convenience).
+        - Accept a token only when ``re.fullmatch(r"(?:0[xX])?[0-9A-Fa-f]{1,2}",
+          token)`` matches (ASCII only); anything else is refused with the
+          token named. Only then parse base-16.
 
     Dependencies:
         Used by:
             - ChangeService.add_entry / edit_entry
 
     Example:
-        >>> parse_new_bytes("0x01 0xAB 0xFF")
+        >>> parse_new_bytes("0x01 AB 0xFF")
         [1, 171, 255]
         >>> parse_new_bytes("DE AD BE EF")
         [222, 173, 190, 239]
+        >>> parse_new_bytes("100")
+        Traceback (most recent call last):
+            ...
+        ValueError: invalid byte token '100' - every token is 1-2 hex digits
     """
     tokens = [tok for tok in bytes_text.replace(",", " ").split() if tok]
     values: list[int] = []
     for token in tokens:
-        try:
-            values.append(int(token, 0))
-        except ValueError:
-            try:
-                values.append(int(token, 16))
-            except ValueError:
-                raise ValueError(
-                    f"invalid byte token {token!r} - use hex (0x1F or 1F) "
-                    "or decimal"
-                ) from None
+        # The fullmatch is ASCII-only on purpose: int(token, 16) alone also
+        # admits a sign (+F, -1), non-ASCII digits (１２, ٣٣) and 0x+F;
+        # -1 would then slip through and be refused later by ChangeEntry
+        # with a message naming the value instead of the token.
+        if re.fullmatch(r"(?:0[xX])?[0-9A-Fa-f]{1,2}", token) is None:
+            raise ValueError(
+                f"invalid byte token {token!r} - every token is 1-2 hex "
+                "digits with an optional 0x prefix; decimals are not accepted"
+            )
+        values.append(int(token, 16))
     return values
 
 

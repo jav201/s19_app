@@ -1,0 +1,3 @@
+06a396826dc1b622cf7325c683c5d1a4707083f485a90a61eeff887ef07aa60e *../../../../s19_app/tui/services/change_service.py
+116b082f3af1ec8e65afd8658dcf841ef12076569f123c5bcdfc753863069541 *../../../../s19_app/tui/screens_directionb.py
+bb55a4e9104cd62ab8aa61b115ae2a54d2db2062a315066d8c6491247bebd41f *../../../../s19_app/tui/window_help.py

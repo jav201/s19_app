@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar PASSED [ 33%]
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule PASSED [ 66%]
+tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back PASSED [100%]
+
+============================== 3 passed in 6.97s ==============================

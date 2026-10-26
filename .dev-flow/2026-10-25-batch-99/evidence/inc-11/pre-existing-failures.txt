@@ -1,0 +1,35 @@
+# Pre-existing failures in the reverse-census-affected file set — isolation evidence
+
+Five nodes failed across the affected-file runs. NONE is caused by this
+increment; each is isolated below. After every isolation pass the three
+SOURCE files were restored and verified byte-identical to the pre-mutation
+baseline (SHA-256 in `baseline-hashes.txt`).
+
+1. `test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber`
+   — fails DETERMINISTICALLY with the HEAD versions of the three SOURCE
+   files restored (see `red-at031b-head-isolation.txt`). Pre-existing at
+   HEAD. The test drives `save_doc` twice and expects two dedup-suffixed
+   `*.json` files under `patches/`; the second save reuses the name.
+   Unrelated to the bytes grammar (its entry is `AA BB`, hex under both
+   grammars).
+
+2. `test_tui_patch_glyphs.py::test_at077c_stale_provenance` — FLAKY at
+   HEAD as well: 3 failed / 6 runs at HEAD vs 2 failed / 6 runs on this
+   increment's tree (same node, same command). Arm (b) reads the glyph row
+   count after a single `pilot.pause()` following the remove press; the
+   remove posts through the app router and the read can race it. Pre-existing
+   flake, not a regression.
+
+3. `test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection`
+   — fails with the HEAD SOURCE files restored (see
+   `red-head-isolation-others.txt`). Pre-existing at HEAD. A2B diff report
+   surface; never touches the Bytes field.
+
+4. `test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim`
+   and 5. `test_window_usage_help.py::test_tc707_numbering_generated_sequential`
+   — both raise `FileNotFoundError:
+   .../prototypes/cambios_10_12_2026/help_sections.md`: the untracked
+   prototypes draft is ABSENT from this worktree (environmental; the same
+   FileNotFoundError occurs with HEAD sources restored, see
+   `red-head-isolation-others.txt`). Per the batch rules this increment must
+   not create or edit anything under `prototypes/`.

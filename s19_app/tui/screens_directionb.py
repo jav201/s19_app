@@ -4938,7 +4938,7 @@ class PatchEditorPanel(ScrollableContainer):
                             for label, input_id, placeholder in (
                                 ("Address", "patch_entry_address_input", "0x100"),
                                 ("String", "patch_entry_value_input", "text (document encoding)"),
-                                ("Bytes", "patch_entry_bytes_input", "DE AD BE EF"),
+                                ("Bytes", "patch_entry_bytes_input", "hex bytes, e.g. DE AD BE EF"),
                             ):
                                 with Horizontal(classes="pe-row"):
                                     yield Label(label, classes="pe-label")

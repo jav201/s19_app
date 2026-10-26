@@ -1,0 +1,36 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items / 2 deselected / 1 selected
+
+tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar FAILED [100%]
+
+================================== FAILURES ===================================
+____________________ test_tc_b99_32_hex_only_token_grammar ____________________
+
+    def test_tc_b99_32_hex_only_token_grammar() -> None:
+        """TC-B99-32 (LLR-161.1): every token is base 16, ``0x`` optional.
+    
+        Boundary: ``00`` and ``FF`` accepted (1–2 hex digits). Invalid:
+        ``100`` (three digits), ``G1`` (not hex), ``0x123`` (three digits) —
+        each refused with a ``ValueError`` naming the token.
+        """
+>       assert parse_new_bytes("0F 10 1F 20") == [0x0F, 0x10, 0x1F, 0x20]
+E       AssertionError: assert [15, 10, 31, 20] == [15, 16, 31, 32]
+E         
+E         At index 1 diff: 10 != 16
+E         
+E         Full diff:
+E           [
+E               15,
+E         -     16,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests\test_b99_bytes_field.py:43: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar
+======================= 1 failed, 2 deselected in 0.63s =======================

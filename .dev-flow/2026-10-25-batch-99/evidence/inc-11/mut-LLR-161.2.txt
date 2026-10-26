@@ -1,0 +1,55 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items / 2 deselected / 1 selected
+
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule FAILED [100%]
+
+================================== FAILURES ===================================
+______________ test_tc_b99_33_field_and_help_state_the_hex_rule _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25893/test_tc_b99_33_field_and_help_0')
+
+    def test_tc_b99_33_field_and_help_state_the_hex_rule(tmp_path: Path) -> None:
+        """TC-B99-33 (LLR-161.2): the placeholder contains ``hex``, fits the
+        compact input at width 118 without clipping, and the Patch Editor's
+        window help states the rule — every token is hex, ``0x`` is optional,
+        decimals are not accepted. The String line keeps the document-encoding
+        note (string entries are unchanged by HLR-161).
+    
+        RED on HEAD: the placeholder is ``DE AD BE EF`` (no ``hex``) and the
+        help line reads "a run of hex bytes" without the rule (PQ-6 / UX-C9).
+        """
+    
+        async def _drive() -> tuple[str, int, list[str]]:
+            from textual.widgets import Input
+    
+            from s19_app.tui.app import S19TuiApp
+            from s19_app.tui.window_help import WINDOW_HELP_SECTIONS
+    
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                field = app.query_one("#patch_entry_bytes_input", Input)
+                placeholder = field.placeholder
+                inner_width = field.content_size.width
+            steps = list(WINDOW_HELP_SECTIONS["patch"]["steps"])
+            return placeholder, inner_width, steps
+    
+        placeholder, inner_width, steps = asyncio.run(_drive())
+    
+>       assert "hex" in placeholder, (
+            f"the Bytes placeholder must state hex; got {placeholder!r}"
+        )
+E       AssertionError: the Bytes placeholder must state hex; got 'DE AD BE EF'
+E       assert 'hex' in 'DE AD BE EF'
+
+tests\test_b99_bytes_field.py:91: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule
+======================= 1 failed, 2 deselected in 2.94s =======================

@@ -1,0 +1,9 @@
+# Kimi brief — batch-99 Increment 11 · review fixes (code-reviewer F1–F3)
+
+Read `BRIEF-COMMON.md` first. Same worktree, `C:\Users\jjgh8\Github\s19_app-b99-inc11` (branch `b99-inc11`, uncommitted changes on `e00f2f2`). Do not commit.
+
+- **F1 [MEDIUM] — the grammar admits signs and non-ASCII digits** (`change_service.py:220-224`): `+F` → 15, `0x+F` → 15, `１２` → 0x12, `٣٣` → 51. `-1` is refused only later, by `ChangeEntry`, whose message names the value instead of the token. Accept a token only when `re.fullmatch(r"(?:0[xX])?[0-9A-Fa-f]{1,2}", token)` matches (ASCII only), and otherwise raise the `ValueError` naming the token. Fix the docstring claim at `:188-189`. Add `+F`, `-1`, `0x+F`, `１２` and `٣٣` to TC-B99-32's refused set. Mutation: the `int(token, 16)` path without the fullmatch → RED.
+- **F2 [MEDIUM] — AT-B99-12 is not black-box** (`tests/test_b99_bytes_field.py:145-149, 175`). It injects `app.current_file` and reads `app._change_service...saved_path`. Load the image through the Load file dialog (the `tests/b97_fixtures.py` idiom). Find the saved file on disk (the work-area folder, or the save-back status line naming the file) and read it with the independent reader. Keep the RED on today's tree (`0F 0A 1F 14`).
+- **F3 [LOW]** — packet line 51: three existing tests changed, not two (`test_parse_new_bytes_rejects_a_garbage_token` gained the `100` refusal). Correct the count and the re-pin list.
+
+Re-run `tests/test_b99_bytes_field.py`, `tests/test_change_service.py`, `tests/test_tui_memory_patch.py` and `tests/test_address_census.py`, and run AT-B99-12 8 times for stability. Save `green-fix-*.txt` and `stability-at12.txt`. Update the packet with a "Review round 1 fixes" subsection. Finish with `HANDOFF-fix.md`, ending with `__KIMI_UNIT_DONE__` and the 5-line summary.

@@ -1,0 +1,102 @@
+..F.........                                                             [100%]
+================================== FAILURES ===================================
+________________________ test_at077c_stale_provenance _________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25916/test_at077c_stale_provenance0')
+
+    def test_at077c_stale_provenance(tmp_path: Path) -> None:
+        """Mutating the document reverts every glyph to ``·`` — three ways.
+    
+        Intent (AT-077c ★, LLR-077.2, GATE-BLOCKING — the wrong-answer class):
+        ``last_check_result`` is NOT reset by document mutation (only by undo/redo),
+        so without the provenance stamp a mutated document is index-aligned onto a
+        stale result and rows are labelled with verdicts belonging to entries that
+        no longer exist at that index. There is no error path — the table simply
+        lies.
+    
+        Three arms, each through a REAL button:
+    
+          (a) ``#patch_entry_add_button``    — count grows
+          (b) ``#patch_entry_remove_button`` — count shrinks
+          (c) ``#patch_entry_edit_button``   — **count UNCHANGED**, bytes replaced
+    
+        Arm (c) is the counterfactual that makes this AT non-vacuous: a
+        count-equality guard passes (a) and (b) and silently mislabels (c). Measured
+        (M-3): weakening the signature to ``len(entries)`` fails arm (c) ALONE.
+    
+        The **non-invalidation** arm is asserted first and is equally load-bearing:
+        without it, an implementation that renders ``·`` unconditionally passes
+        every other assertion here.
+        """
+        image = _write_image(tmp_path / "image.s19", _BRANCH_IMAGE)
+    
+        def _drive(mutate) -> list[str]:
+            async def _run() -> list[str]:
+                doc = _write_check_document(
+                    tmp_path / f"checks-{id(mutate)}.json", list(_BRANCH_ENTRIES)
+                )
+                app = S19TuiApp(base_dir=tmp_path)
+                async with app.run_test(size=(120, 30)) as pilot:
+                    await pilot.pause()
+                    app.load_selected_file(image)
+                    await pilot.pause()
+                    _open_patch(app, doc)
+                    await pilot.pause()
+                    _run_checks(app)
+                    await pilot.pause()
+                    assert _glyphs(app) != [GLYPH_NO_RESULT] * 3, (
+                        "PRECONDITION: the run must render real verdicts before the "
+                        "mutation, or the post-mutation assertion is vacuous"
+                    )
+                    mutate(app)
+                    await pilot.pause()
+                    return _glyphs(app)
+    
+            return asyncio.run(_run())
+    
+        def _no_mutation(app: S19TuiApp) -> None:
+            pass
+    
+        def _add(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x200"
+            app.query_one("#patch_entry_value_input", Input).value = "added"
+            app.query_one("#patch_entry_bytes_input", Input).value = ""
+            app.query_one("#patch_entry_add_button", Button).press()
+    
+        def _remove(app: S19TuiApp) -> None:
+            app.query_one("#patch_entry_address_input", Input).value = "0x110"
+            app.query_one("#patch_entry_remove_button", Button).press()
+    
+        def _edit_in_place(app: S19TuiApp) -> None:
+            # Same address, NEW bytes -> the entry count is IDENTICAL.
+            app.query_one("#patch_entry_address_input", Input).value = "0x100"
+            app.query_one("#patch_entry_value_input", Input).value = ""
+            app.query_one("#patch_entry_bytes_input", Input).value = "DE AD"
+            app.query_one("#patch_entry_edit_button", Button).press()
+    
+        # Non-invalidation FIRST — the anti-vacuity arm.
+        unchanged = _drive(_no_mutation)
+        assert unchanged == [GLYPH_PASS, GLYPH_FAIL, GLYPH_UNCHECKABLE], (
+            "with NO mutation the stamp must still match and the glyphs must "
+            f"render; got {unchanged!r}. If this reads all-'·' the implementation "
+            "refuses unconditionally and every arm below is vacuous."
+        )
+    
+        for arm, mutate, expected_rows in (
+            ("(a) add_entry", _add, 4),
+            ("(b) remove_entry", _remove, 2),
+            ("(c) in-place edit, COUNT UNCHANGED", _edit_in_place, 3),
+        ):
+            glyphs = _drive(mutate)
+>           assert len(glyphs) == expected_rows, (
+                f"arm {arm}: the mutation must actually have taken effect; "
+                f"expected {expected_rows} rows, got {len(glyphs)}"
+            )
+E           AssertionError: arm (b) remove_entry: the mutation must actually have taken effect; expected 2 rows, got 3
+E           assert 3 == 2
+E            +  where 3 = len(['✓', '✗', '◐'])
+
+tests\test_tui_patch_glyphs.py:400: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_glyphs.py::test_at077c_stale_provenance - Asserti...
+1 failed, 11 passed in 21.27s

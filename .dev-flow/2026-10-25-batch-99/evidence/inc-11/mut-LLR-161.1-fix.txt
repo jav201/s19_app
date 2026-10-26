@@ -1,0 +1,40 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar FAILED [ 33%]
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule PASSED [ 66%]
+tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back PASSED [100%]
+
+================================== FAILURES ===================================
+____________________ test_tc_b99_32_hex_only_token_grammar ____________________
+
+    def test_tc_b99_32_hex_only_token_grammar() -> None:
+        """TC-B99-32 (LLR-161.1): every token is base 16, ``0x`` optional.
+    
+        Boundary: ``00`` and ``FF`` accepted (1–2 hex digits). Invalid:
+        ``100`` (three digits), ``G1`` (not hex), ``0x123`` (three digits),
+        ``+F`` / ``-1`` (a sign — ``int(token, 16)`` alone would admit them;
+        ``-1`` surfaced later as a ChangeEntry value-range refusal naming the
+        value, not the token), ``0x+F`` (sign after the prefix), ``１２`` and
+        ``٣٣`` (fullwidth / Arabic-Indic digits — non-ASCII, refused because the
+        grammar is ASCII-only) — each refused with a ``ValueError`` naming the
+        token.
+        """
+        assert parse_new_bytes("0F 10 1F 20") == [0x0F, 0x10, 0x1F, 0x20]
+        assert parse_new_bytes("11 22") == [0x11, 0x22]
+        assert parse_new_bytes("0x0A ff") == [0x0A, 0xFF]
+        assert parse_new_bytes("00") == [0x00]
+        assert parse_new_bytes("FF") == [0xFF]
+        for bad in ("100", "G1", "0x123", "+F", "-1", "0x+F", "１２", "٣٣"):
+>           with pytest.raises(ValueError) as err:
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests\test_b99_bytes_field.py:54: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar
+========================= 1 failed, 2 passed in 7.17s =========================

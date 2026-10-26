@@ -1,0 +1,5 @@
+# AT-031b run against HEAD sources (isolation)
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+============================== 1 failed in 2.95s ==============================

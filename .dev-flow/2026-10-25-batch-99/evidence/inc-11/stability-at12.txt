@@ -1,0 +1,16 @@
+=== stability run 1 ===
+1 passed, 2 deselected in 4.68s
+=== stability run 2 ===
+1 passed, 2 deselected in 4.55s
+=== stability run 3 ===
+1 passed, 2 deselected in 4.25s
+=== stability run 4 ===
+1 passed, 2 deselected in 4.56s
+=== stability run 5 ===
+1 passed, 2 deselected in 4.44s
+=== stability run 6 ===
+1 passed, 2 deselected in 4.72s
+=== stability run 7 ===
+1 passed, 2 deselected in 4.30s
+=== stability run 8 ===
+1 passed, 2 deselected in 4.27s

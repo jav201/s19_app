@@ -1,0 +1,12 @@
+# affected-file runs (per-file transcripts green-test_*.txt)
+green-test_b97_chips_help.txt: 79 passed in 359.17s (0:05:59)
+green-test_b97_flow_execution.txt: 75 passed in 427.65s (0:07:07)
+green-test_b97_patch_editor.txt: 38 passed in 245.02s (0:04:05)
+green-test_before_after_report.txt: 15 passed in 19.40s
+green-test_loadfilescreen_input.txt: 33 passed in 53.89s
+green-test_tui_patch_editor_b94.txt: 17 passed in 55.66s
+green-test_tui_patch_editor_v2.txt: 1 failed, 51 passed in 160.34s (0:02:40)
+green-test_tui_patch_glyphs.txt: 1 failed, 11 passed in 21.27s
+green-test_tui_patch_layout.txt: 9 passed in 39.41s
+green-test_tui_report_filter_surface.txt: 1 failed, 13 passed in 124.39s (0:02:04)
+green-test_window_usage_help.txt: 2 failed, 36 passed in 209.09s (0:03:29)

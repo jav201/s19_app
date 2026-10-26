@@ -1,0 +1,201 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc11
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 3 items
+
+tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar FAILED [ 33%]
+tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule FAILED [ 66%]
+tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back FAILED [100%]
+
+================================== FAILURES ===================================
+____________________ test_tc_b99_32_hex_only_token_grammar ____________________
+
+    def test_tc_b99_32_hex_only_token_grammar() -> None:
+        """TC-B99-32 (LLR-161.1): every token is base 16, ``0x`` optional.
+    
+        Boundary: ``00`` and ``FF`` accepted (1–2 hex digits). Invalid:
+        ``100`` (three digits), ``G1`` (not hex), ``0x123`` (three digits) —
+        each refused with a ``ValueError`` naming the token.
+        """
+>       assert parse_new_bytes("0F 10 1F 20") == [0x0F, 0x10, 0x1F, 0x20]
+E       AssertionError: assert [15, 10, 31, 20] == [15, 16, 31, 32]
+E         
+E         At index 1 diff: 10 != 16
+E         
+E         Full diff:
+E           [
+E               15,
+E         -     16,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests\test_b99_bytes_field.py:43: AssertionError
+______________ test_tc_b99_33_field_and_help_state_the_hex_rule _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25861/test_tc_b99_33_field_and_help_0')
+
+    def test_tc_b99_33_field_and_help_state_the_hex_rule(tmp_path: Path) -> None:
+        """TC-B99-33 (LLR-161.2): the placeholder contains ``hex``, fits the
+        compact input at width 118 without clipping, and the Patch Editor's
+        window help states the rule — every token is hex, ``0x`` is optional,
+        decimals are not accepted. The String line keeps the document-encoding
+        note (string entries are unchanged by HLR-161).
+    
+        RED on HEAD: the placeholder is ``DE AD BE EF`` (no ``hex``) and the
+        help line reads "a run of hex bytes" without the rule (PQ-6 / UX-C9).
+        """
+    
+        async def _drive() -> tuple[str, int, list[str]]:
+            from textual.widgets import Input
+    
+            from s19_app.tui.app import S19TuiApp
+            from s19_app.tui.window_help import WINDOW_HELP_SECTIONS
+    
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                field = app.query_one("#patch_entry_bytes_input", Input)
+                placeholder = field.placeholder
+                inner_width = field.content_size.width
+            steps = list(WINDOW_HELP_SECTIONS["patch"]["steps"])
+            return placeholder, inner_width, steps
+    
+        placeholder, inner_width, steps = asyncio.run(_drive())
+    
+>       assert "hex" in placeholder, (
+            f"the Bytes placeholder must state hex; got {placeholder!r}"
+        )
+E       AssertionError: the Bytes placeholder must state hex; got 'DE AD BE EF'
+E       assert 'hex' in 'DE AD BE EF'
+
+tests\test_b99_bytes_field.py:91: AssertionError
+___________________ test_at_b99_12_typed_hex_run_saves_back ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25861/test_at_b99_12_typed_hex_run_s0')
+
+    def test_at_b99_12_typed_hex_run_saves_back(tmp_path: Path) -> None:
+        """AT-B99-12 (HLR-161): typing ``0F 10 1F 20`` at an in-image address
+        in the Patch Editor, adding, applying and confirming the save-back
+        prompt writes a file holding ``0F 10 1F 20`` at that address, read
+        with the independent reader.
+    
+        RED on HEAD (P-16): the digit-only tokens ``10`` and ``20`` were read
+        as decimal, so the file held ``0F 0A 1F 14``.
+        """
+        from textual.widgets import Input
+    
+        from s19_app.core import S19File
+        from s19_app.tui.app import S19TuiApp
+        from s19_app.tui.changes import emit_s19_from_mem_map
+        from s19_app.tui.services.load_service import build_loaded_s19
+    
+        mem_map = {0x100 + offset: 0x00 for offset in range(16)}
+        image_path = tmp_path / "img.s19"
+        image_path.write_text(
+            emit_s19_from_mem_map(mem_map, [(0x100, 0x110)]), encoding="ascii"
+        )
+    
+        async def _drive() -> Path:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                s19 = S19File(str(image_path))
+                app.current_file = build_loaded_s19(
+                    image_path, s19, a2l_path=None, a2l_data=None
+                )
+                app.action_show_screen("patch")
+                await pilot.pause()
+    
+                # Type through the real key path (focus + keys, no .value=).
+                address = app.query_one("#patch_entry_address_input", Input)
+                address.focus()
+                await pilot.pause()
+                await pilot.press(*list("0x100"))
+                await pilot.pause()
+    
+                field = app.query_one("#patch_entry_bytes_input", Input)
+                field.focus()
+                await pilot.pause()
+                await pilot.press(
+                    *(ch if ch != " " else "space" for ch in "0F 10 1F 20")
+                )
+                await pilot.pause()
+                assert field.value == "0F 10 1F 20", field.value
+    
+                await pilot.click("#patch_entry_add_button")
+                await pilot.pause()
+                await pilot.click("#patch_doc_apply_button")
+                await pilot.pause()
+                await pilot.click("#patch_saveback_confirm_button")
+                await pilot.pause()
+    
+                saved = app._change_service.last_summary.saved_path
+                assert saved is not None, "the save-back prompt wrote a file"
+                return Path(saved)
+    
+>       written = asyncio.run(_drive())
+                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_bytes_field.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            s19 = S19File(str(image_path))
+            app.current_file = build_loaded_s19(
+                image_path, s19, a2l_path=None, a2l_data=None
+            )
+            app.action_show_screen("patch")
+            await pilot.pause()
+    
+            # Type through the real key path (focus + keys, no .value=).
+            address = app.query_one("#patch_entry_address_input", Input)
+            address.focus()
+            await pilot.pause()
+            await pilot.press(*list("0x100"))
+            await pilot.pause()
+    
+            field = app.query_one("#patch_entry_bytes_input", Input)
+            field.focus()
+            await pilot.pause()
+            await pilot.press(
+                *(ch if ch != " " else "space" for ch in "0F 10 1F 20")
+            )
+            await pilot.pause()
+            assert field.value == "0F 10 1F 20", field.value
+    
+            await pilot.click("#patch_entry_add_button")
+            await pilot.pause()
+            await pilot.click("#patch_doc_apply_button")
+            await pilot.pause()
+            await pilot.click("#patch_saveback_confirm_button")
+            await pilot.pause()
+    
+            saved = app._change_service.last_summary.saved_path
+>           assert saved is not None, "the save-back prompt wrote a file"
+E           AssertionError: the save-back prompt wrote a file
+E           assert None is not None
+
+tests\test_b99_bytes_field.py:180: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_32_hex_only_token_grammar
+FAILED tests/test_b99_bytes_field.py::test_tc_b99_33_field_and_help_state_the_hex_rule
+FAILED tests/test_b99_bytes_field.py::test_at_b99_12_typed_hex_run_saves_back
+============================== 3 failed in 8.37s ==============================

@@ -1,0 +1,140 @@
+## B1: symbols asserted by other tests
+$ grep -rln "parse_new_bytes\|patch_entry_bytes_input" tests/
+tests/b97_fixtures.py
+tests/test_b97_chips_help.py
+tests/test_b97_flow_execution.py
+tests/test_b97_patch_editor.py
+tests/test_b99_bytes_field.py
+tests/test_before_after_report.py
+tests/test_change_service.py
+tests/test_loadfilescreen_input.py
+tests/test_tui_memory_patch.py
+tests/test_tui_patch_editor_b94.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_patch_glyphs.py
+tests/test_tui_patch_layout.py
+tests/test_tui_report_filter_surface.py
+
+## B1b: decimal consumers (unrelated domains)
+$ grep -rln "parse_new_bytes\|patch_entry_bytes_input\|decimal" tests/ | sort
+tests/b97_fixtures.py
+tests/support/independent_reader.py
+tests/test_a2l_inline_axis_length.py
+tests/test_b97_chips_help.py
+tests/test_b97_flow_execution.py
+tests/test_b97_patch_editor.py
+tests/test_b99_bytes_field.py
+tests/test_before_after_report.py
+tests/test_change_service.py
+tests/test_loadfilescreen_input.py
+tests/test_memory_changelist.py
+tests/test_memory_display.py
+tests/test_report_length_cell.py
+tests/test_tui_directionb.py
+tests/test_tui_insight_style.py
+tests/test_tui_memory_patch.py
+tests/test_tui_patch_editor_b94.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_patch_glyphs.py
+tests/test_tui_patch_layout.py
+tests/test_tui_report_filter_surface.py
+tests/test_tui_report_seam.py
+tests/test_unified_read.py
+
+## B3: golden captures
+$ grep -rl "DE AD BE EF" tests/goldens/ ; grep -rl "DE AD BE EF" tests/__snapshots__/ 2>/dev/null
+(no output above = no hits)
+
+## B4: text consumers of the placeholder / old help line
+$ grep -rln "hex bytes, e.g\.\|a run of hex bytes" tests/ s19_app/ | grep -v __pycache__
+tests/test_b99_bytes_field.py
+s19_app/tui/screens_directionb.py
+
+## A3 / V-3: surviving LLR-001.2 references
+$ grep -rn "LLR-001.2" s19_app/ tests/ | grep -v __pycache__ | cut -c1-100
+s19_app/compare.py:11:one classification (LLR-001.2):
+s19_app/compare.py:20:(LLR-001.2 adjacency rule).
+s19_app/compare.py:104:        produced by :func:`diff_mem_maps` (LLR-001.2).
+s19_app/compare.py:119:          ``kind`` change forces a boundary (LLR-001.2).
+s19_app/compare.py:251:        or ``None`` when ``addr`` is mapped in both with equal bytes (LLR-001
+s19_app/compare.py:279:        statistics (HLR-001 / LLR-001.2 / LLR-001.3 / LLR-001.4).
+s19_app/tui/app.py:218:#: The batch-94 (LLR-002.1/.2, LLR-001.2) rail order — the ten shipped entr
+s19_app/tui/app.py:238:#: The Check Editor's routable action set (LLR-001.2) — write and validate
+s19_app/tui/app.py:5384:        """Populate the Check Editor collector on screen entry (LLR-001.2).
+s19_app/tui/app.py:5461:        """Route a Check Editor write/validate action (LLR-001.2/.009).
+s19_app/tui/app.py:6978:              screen via ``Rail.set_active`` (LLR-001.2), so the rail
+s19_app/tui/app.py:7020:            # batch-94 (LLR-001.2): the collector is populated on entry — 
+s19_app/tui/changes/io.py:12:**Wire grammar (LLR-001.2 / §6.2 C-1 — strict, file-format-defining)
+s19_app/tui/changes/io.py:223:#: integer (the strict wire grammar, LLR-001.2).
+s19_app/tui/changes/io.py:268:#: The strict wire-grammar address pattern (LLR-001.2).
+s19_app/tui/changes/io.py:394:        - Entry parsing (LLR-001.2/.4/.7): entry-count ceiling, strict
+s19_app/tui/changes/io.py:529:        - Entry parsing (LLR-001.2/.4/.7) then the collision check
+s19_app/tui/changes/io.py:843:        collect-don't-abort (LLR-001.2/.4/.7).
+s19_app/tui/changes/io.py:908:        grammar, skip-and-continue (LLR-001.2/.4/.7) — extended by c
+s19_app/tui/changes/io.py:1130:        (LLR-001.2).
+s19_app/tui/changes/io.py:1185:        (LLR-001.2/.4/.7, F-S-02/F-S-04).
+s19_app/tui/changes/io.py:1313:        (LLR-001.2 / §6.2 C-1 / F-Q-04).
+s19_app/tui/changes/io.py:1455:        object (LLR-001.2) — the change-5 symbol form (batch-95 LLR
+s19_app/tui/changes/model.py:12:A v2 entry comes in exactly two kinds (LLR-001.2): a **string patch*
+s19_app/tui/changes/model.py:85:        value preserved for canonical re-serialization (LLR-001.2).
+s19_app/tui/operations/model.py:6:(LLR-001.2), and the closed :data:`STATUS_DOMAIN`. Headless by con
+s19_app/tui/operations/model.py:193:        — the §6.2 C-2 canonical 7-field contract (LLR-001.2)
+s19_app/tui/operations/model.py:273:            construction time (LLR-001.2).
+s19_app/tui/operations/model.py:295:            never the full ``mem_map`` (LLR-001.2 disclosure gua
+s19_app/tui/operations/requirements/REQ-crc.md:73:| `region_segments(mem_map, start, end)` | Filter 
+s19_app/tui/operations/requirements/REQ-crc.md:74:| `compute_region_crc(mem_map, start, end, *, para
+s19_app/tui/rail.py:190:        marker (LLR-001.2). It is a presentational widget: clicking a row
+s19_app/tui/rail.py:199:            Defaults to ``"workspace"`` (LLR-001.2 — Workspace active at
+s19_app/tui/rail.py:259:            clearing it from the previously active item (LLR-001.2).
+s19_app/tui/services/change_service.py:74:#: The two v2 entry kinds (LLR-001.2 wire field ``type``).
+s19_app/tui/services/change_service.py:131:        memory address — the permissive **TUI-input gra
+s19_app/tui/services/change_service.py:175:        (batch-99, amending batch-07 LLR-001.2: every tok
+s19_app/tui/services/compare_service.py:509:        - Diff the two memory maps via ``engine`` (LLR-0
+s19_app/tui/services/flow_persistence_service.py:977:    """Serialize ``flow`` and write it to ``flo
+s19_app/tui/services/flow_report_service.py:271:    """Roll the blocks-so-far up to a report status 
+s19_app/tui/services/manifest_writer.py:157:        emitted manifest round-trips on both Windows and
+s19_app/tui/services/operation_service.py:63:        operation's ``execute`` (LLR-001.2).
+s19_app/tui/styles.tcss:475: * (batch-06 LLR-001.1 / LLR-001.2 / LLR-001.3). */
+s19_app/tui/styles.tcss:1896: * with the single Calm Dark accent (`$accent-calm`) — the LLR-001.2
+tests/test_b99_bytes_field.py:3:LLR-161.1 (amends batch-07 LLR-001.2): ``parse_new_bytes`` reads eve
+tests/test_changes_schema.py:5:Covers LLR-001.1 (metadata round-trip), LLR-001.2 (entry shapes under
+tests/test_changes_schema.py:116:# TC-002 — LLR-001.2: entry shapes under the strict wire grammar.
+tests/test_changes_schema.py:200:    exact CHG-* code (LLR-001.2)."""
+tests/test_change_service.py:596:    batch-07 LLR-001.2): ``parse_new_bytes("0x01, 2") == [1, 2]`` (
+tests/test_compare_engine.py:5:    test_classification_set_equality            TC-001  LLR-001.2
+tests/test_compare_engine.py:6:    test_classification_set_equality_random     TC-001  LLR-001.2
+tests/test_compare_engine.py:7:    test_adjacency_merge_same_kind_merges       TC-002  LLR-001.2
+tests/test_compare_engine.py:8:    test_adjacency_change_forces_boundary       TC-002  LLR-001.2
+tests/test_compare_engine.py:9:    test_boundary_cases                         TC-003  LLR-001.2
+tests/test_compare_engine.py:77:# TC-001 — classification set-equality (LLR-001.2).
+tests/test_compare_engine.py:116:# TC-002 — adjacency-merge (LLR-001.2): same-kind adjacency merge
+tests/test_compare_engine.py:150:# TC-003 — boundary cases (LLR-001.2): addr 0, touching different
+tests/test_hex_emit.py:13:- test_data_records_max_16_bytes_and_checksum → TC-002       → LLR-001
+tests/test_hex_emit.py:87:    """TC-002 (LLR-001.2): <=16 data bytes/record; reader confirms 0 check
+tests/test_manifest_writer.py:8:- TC-001b / LLR-001.2 — ``batch`` / ``assignments`` entries are em
+tests/test_manifest_writer.py:118:# TC-001b / LLR-001.2 — project-relative POSIX paths, 0 escapes
+tests/test_manifest_writer.py:125:    Intent (LLR-001.2): the writer's entries must satisfy the read
+tests/test_manifest_writer.py:144:        assert "\\" not in entry  # forward-slash only (LLR-001.2)
+tests/test_manifest_writer.py:153:    """A back-slash entry is normalized to POSIX before emission (
+tests/test_operations.py:7:- **TC-001** — ``test_operation_result_schema`` (LLR-001.2): the §6.2 
+tests/test_operations.py:150:    """TC-001 / LLR-001.2 — canonical schema, determinism, domain, di
+tests/test_tui_check_editor.py:23:  (LLR-001.2).
+tests/test_tui_check_editor.py:157:# TC-B94-07 — rail mounting + write message routing (LLR-001.2)
+tests/test_tui_check_editor.py:163:    message reaches the service handler (LLR-001.2).
+tests/test_tui_check_editor.py:175:    ``check_editor`` (LLR-001.2's ``set_active`` seam).
+tests/test_tui_directionb.py:13:  - LLR-001.2 — single active rail item (Workspace active at start
+tests/test_tui_directionb.py:585:#          (LLR-001.2)
+tests/test_tui_directionb.py:592:    Intent: LLR-001.2 — the rail marks exactly one item active wi
+tests/test_tui_directionb.py:615:    Intent: LLR-001.2 — the single-active-item invariant holds ac
+tests/test_tui_mac_layout.py:19:  - TC-003 / LLR-001.2 — the records pane holds the ~4/7 share and
+tests/test_tui_mac_layout.py:178:    """TC-003 / LLR-001.2 — the records pane is proportional (4fr
+tests/test_tui_memory_patch.py:12:  amending the permissive LLR-001.2 split, never the file format);
+tests/test_tui_memory_patch.py:138:    Re-pinned from the permissive LLR-001.2 grammar: every token 
+tests/test_tui_memory_patch.py:139:    ``0x`` optional (HLR-161 amends batch-07 LLR-001.2 — decima
+tests/test_tui_search_pagination.py:82:# LLR-001.2 — search after pagination resumes from first vi
+tests/test_unified_roundtrip.py:44:# TC-025 — every byte run survives in exact order (LLR-001.2)
+tests/test_unified_write.py:17:  - TC-017 — entry encoding (REWRITTEN to the v2 wire grammar, LLR-
+tests/test_unified_write.py:190:# TC-017 — entry encoding on the wire (LLR-001.2)
+tests/test_unified_write.py:195:    """TC-017 — ``entries`` is a JSON array of objects (LLR-001.2)
+tests/test_unified_write.py:220:    REWRITTEN re-pin: LLR-001.2 deliberately departs from the batch-
+tests/test_unified_write.py:240:    """TC-017 — the exact address and ordered byte run survive (LL

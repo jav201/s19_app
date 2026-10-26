@@ -7,8 +7,9 @@ What remains here after the retirement:
 
 - the four **TUI-input grammar** helper unit checks (SURVIVES — re-pointed to
   ``services/change_service.py``, the v2 home of ``parse_address`` /
-  ``parse_new_bytes``; the permissive grammar is the TUI-input convenience of
-  the LLR-001.2 grammar split, never the file format);
+  ``parse_new_bytes``; the bytes grammar is the hex-only TUI-input rule of
+  LLR-161.1 — every token 1–2 hex digits, ``0x`` optional, decimals refused —
+  amending the permissive LLR-001.2 split, never the file format);
 - the entry-row display REWRITE (the v2 ``ChangeService.rows`` value column
   carries the hex byte preview and the containment status); and
 - the bad-address-is-reported REWRITE (an unparseable address typed into the
@@ -131,14 +132,23 @@ def test_parse_address_rejects_blank_and_negative() -> None:
         parse_address("-1")
 
 
-def test_parse_new_bytes_accepts_hex_decimal_and_bare_hex() -> None:
-    """A new-bytes field parses prefixed hex, decimal and bare hex tokens."""
+def test_parse_new_bytes_accepts_prefixed_and_bare_hex() -> None:
+    """A new-bytes field parses 0x-prefixed and bare hex tokens (LLR-161.1).
+
+    Re-pinned from the permissive LLR-001.2 grammar: every token is base 16,
+    ``0x`` optional (HLR-161 amends batch-07 LLR-001.2 — decimals are not
+    accepted). Single-digit tokens stay valid hex, so the values below are
+    unchanged under the hex-only rule.
+    """
     assert parse_new_bytes("0x01 0xAB 0xFF") == [1, 171, 255]
     assert parse_new_bytes("DE AD BE EF") == [222, 173, 190, 239]
     assert parse_new_bytes("1, 2, 3") == [1, 2, 3]
 
 
 def test_parse_new_bytes_rejects_a_garbage_token() -> None:
-    """A non-numeric byte token is rejected."""
+    """A token that is not 1–2 hex digits is rejected, naming the token."""
     with pytest.raises(ValueError):
         parse_new_bytes("01 ZZ 03")
+    with pytest.raises(ValueError) as err:
+        parse_new_bytes("100")
+    assert "100" in str(err.value)
