@@ -20,6 +20,8 @@ You are the IMPLEMENTER (`software-dev` role, `C:\Users\jjgh8\.claude\skills\dev
 - Match the surrounding code: comment density, docstring style (the repo uses `Summary:` / `Args:` / `Returns:` docstrings on public functions), naming, idiom.
 - Token economy: read large files by line range or grep, never whole. `01-requirements.md` is about 1200 lines, `app.py` more than 10 000. Stop at about 200k context: write `HANDOFF.md` in the worktree root saying what is done and what is left, then end.
 
+- **Test ids:** never invent a new `TC-B99-NN` or `AT-B99-NN` number. The ids belong to the requirements, and three increments collided with numbers that other LLRs own. An extra arm is a sub-node of the TC it serves (`test_tc_b99_23_<arm>`). If a truly new TC is needed, write `TC-B99-NEW-<n>` in the packet and the orchestrator assigns the number.
+
 ## What "done" means for your increment
 1. **RED first.** For every new TC and AT, run it against the unmodified tree and keep the failing transcript. A test that passes before the fix is vacuous: fix the test, not the oracle. Save transcripts under `.dev-flow/2026-10-25-batch-99/evidence/inc-<N>/` (`red-*.txt`, then `green-*.txt`).
 2. **Implement** the smallest change that makes the requirement true.
