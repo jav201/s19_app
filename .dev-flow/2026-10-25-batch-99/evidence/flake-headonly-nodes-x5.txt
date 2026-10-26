@@ -1,0 +1,23 @@
+== a293213 run 1
+4 passed in 8.62s
+== a293213 run 2
+4 passed in 8.17s
+== a293213 run 3
+4 passed in 8.61s
+== a293213 run 4
+4 passed in 8.37s
+== a293213 run 5
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_loud_mismatch_notice - ...
+1 failed, 3 passed in 8.30s
+== e7732f6 run 1
+4 passed in 8.92s
+== e7732f6 run 2
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_loud_mismatch_notice - ...
+1 failed, 3 passed in 8.35s
+== e7732f6 run 3
+4 passed in 8.52s
+== e7732f6 run 4
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+1 failed, 3 passed in 9.42s
+== e7732f6 run 5
+4 passed in 8.85s

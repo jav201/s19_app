@@ -1,0 +1,42 @@
+== run 1 at a293213
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_quiet_pass_on_faithful_hex_save
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document
+7 failed, 45 passed in 126.08s (0:02:06)
+== run 1 at e7732f6
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+FAILED tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document
+5 failed, 47 passed in 148.98s (0:02:28)
+== run 2 at a293213
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged
+FAILED tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup
+4 failed, 48 passed in 124.97s (0:02:04)
+== run 2 at e7732f6
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_loud_mismatch_notice - ...
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged
+FAILED tests/test_tui_patch_editor_v2.py::test_tc344_undo_redo_disabled_for_file_backed_document
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+5 failed, 47 passed in 139.31s (0:02:19)
+== run 3 at a293213
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+2 failed, 50 passed in 142.29s (0:02:22)
+== run 3 at e7732f6
+FAILED tests/test_tui_patch_editor_v2.py::test_verify_quiet_pass_on_faithful_hex_save
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_32_packs_wide_records_and_populates_s0
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+FAILED tests/test_tui_patch_editor_v2.py::test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded
+FAILED tests/test_tui_patch_editor_v2.py::test_tc345_entry_edit_json_disabled_for_file_backed_document
+6 failed, 46 passed in 126.88s (0:02:06)
+__DONE__

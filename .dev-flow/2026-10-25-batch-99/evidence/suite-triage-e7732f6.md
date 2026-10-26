@@ -44,3 +44,9 @@ f1ba70c 1 failed
 ## Why the increment gates missed the two real ones
 
 Each increment ran its affected test files, chosen by a reverse census of the changed symbols. Neither failure is reachable that way. The import census reads module imports, not a symbol. The snapshot reads rendered text, not the placeholder constant. Both are whole-tree guards, and they are found only by a full run. Recorded for the post-mortem.
+
+## Patch Editor v2 file — intermittent nodes (base vs head)
+
+Whole-file re-runs of `tests/test_tui_patch_editor_v2.py` fail a varying set of nodes on BOTH trees. In `flake-patch-editor-v2-base-vs-head.txt`, three alternating runs each failed 7 / 4 / 2 on `a293213` and 5 / 5 / 6 on `e7732f6`, while other agents were loading the machine. Four nodes failed only on head in those runs. They were re-run as a group, 12 times per tree (`flake-at068b-at030c-x12.txt`). Base: 3 of 12 group runs fail, including `at068b` ×2 and `tc344` ×1. Head: 3 of 12 fail, with `at030c`, `tc344` and `verify_loud_mismatch` ×1 each. `at068b`, `tc344` and `verify_loud_mismatch` therefore fail on the base too, so they are pre-batch flakes.
+
+`at030c` failed only on head (about 4 of 20 head runs, 0 of 20 base runs). Its failure reads `got -0x1`: no entry was loaded yet when the test read the document, after one `pilot.pause()` for a two-hop message path (`Select.Changed` → `ChangeFileSelected` → `ChangeService.load`). A patient probe (temporary copy, deleted) waited up to 40 pauses and recorded how many it needed. Alone: 20 of 20 loaded `0x300` at 1 pause. After three other nodes in the same process: 15 of 15 loaded `0x300`, 14 at 1 pause and 1 at 2. The file always loads, and the test reads one pause early. This is a single-pause race in the test, not a product defect. Routed to BACKLOG-CODE: wait on the condition in `at030c` / `at068b` (bounded pause loop), as the BRIEF-COMMON animator rule does for scrolls.

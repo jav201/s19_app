@@ -1,0 +1,24 @@
+a293213 1 test_at068b_per_entry_json_popup_edits_only_selected_entry  | 1 failed, 3 passed in 9.09s
+a293213 2  | 4 passed in 8.74s
+a293213 3  | 4 passed in 8.08s
+a293213 4  | 4 passed in 8.88s
+a293213 5  | 4 passed in 8.77s
+a293213 6 test_tc344_undo_redo_disabled_for_file_backed_document  | 1 failed, 3 passed in 9.04s
+a293213 7  | 4 passed in 8.47s
+a293213 8  | 4 passed in 8.40s
+a293213 9  | 4 passed in 8.31s
+a293213 10  | 4 passed in 8.57s
+a293213 11  | 4 passed in 8.33s
+a293213 12 test_at068b_per_entry_json_popup_edits_only_selected_entry  | 1 failed, 3 passed in 8.97s
+e7732f6 1  | 4 passed in 9.26s
+e7732f6 2 test_tc344_undo_redo_disabled_for_file_backed_document  | 1 failed, 3 passed in 9.13s
+e7732f6 3  | 4 passed in 8.50s
+e7732f6 4 test_verify_loud_mismatch_notice  | 1 failed, 3 passed in 8.82s
+e7732f6 5  | 4 passed in 8.37s
+e7732f6 6  | 4 passed in 8.59s
+e7732f6 7  | 4 passed in 8.36s
+e7732f6 8 test_at030c_directly_dropped_file_is_listed_and_loadable  | 1 failed, 3 passed in 8.45s
+e7732f6 9  | 4 passed in 8.51s
+e7732f6 10  | 4 passed in 8.70s
+e7732f6 11  | 4 passed in 8.85s
+e7732f6 12  | 4 passed in 8.41s
