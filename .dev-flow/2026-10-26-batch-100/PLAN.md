@@ -112,7 +112,7 @@ Sequential, one Kimi K2.8 worktree per increment, ≤4 SOURCE files each (ARQ §
 - `app.py` is in 14 of 15 increments · certain · sequential merges, one worktree each.
 - `project.json` gains keys read by 3 modules · medium · additive keys only, no `schema_version` bump, old projects open with a notice (ARQ §3).
 - Whole-tree guards (import census, snapshot cells, id registry) missed at increment gates in batch-99 · high · run them at EVERY increment gate, plus `devflow-validate --brief` at every gate.
-- `current_a2l_data` is never cleared (ARQ §2, code-read) · medium · covered by Inc 3's `vars(app)` comparison AT.
+- `current_a2l_data` is never cleared (ARQ §2, code-read) · medium · covered by Inc 3's `_session_snapshot()` comparison (TC-B100-09, derived from the live app per A-07) and the surface AT-B100-03.
 
 ## Conventions honored
 

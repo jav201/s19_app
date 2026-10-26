@@ -136,6 +136,11 @@
       "station": "P1",
       "date": "2026-10-26",
       "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header). P1 requirements drafted (3060d66): US-153..US-168, HLR-163..HLR-178, 58 LLR, TC-B100-01..56 + 3 re-pinned tests, AT-B100-01..19; US-163..US-168 REFINE pending the prototype verdict (slots VS-*); validator 0 block. Orchestrator rulings on the author's open questions: Q-1 PROJECT_NAME_MAX_CHARS = 64 (P2 architect checks path limits); Q-2 O-9 narrowed to the silent-merge case (typed name differs from its sanitised folder and that folder holds a project), an exact-name save into an existing project keeps LLR-005.1 with a warning in the Inc 11 dialog — flagged to the operator; Q-3 vars(app) stays a TC, AT-B100-03 observes the surface; Q-4 US-143 precedent accepted; Q-5 pasted document saved as patches/changes.json with M-1 reuse; Q-6 stays slot VS-PD-3; Q-7 assumption accepted. P2 review (architect, qa-reviewer, security-reviewer, ux-reviewer) is next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — operator answer on S-16 (P2 round 1, security): the recent-sources list lives per user (\"Por usuario\"), in %APPDATA%\\s19_app\\recent_sources.json, outside any work area, so source paths never travel with a shared or committed .s19tool folder. To be written into the contract (LLR-172.x) with the round-2 re-review fixes. Also recorded: P1 round 2 applied (0c7ca1d), P2 round 2 re-review launched (architect, qa-reviewer, security-reviewer, ux-reviewer)."
     }
   ],
   "obsidian_synced": false,
