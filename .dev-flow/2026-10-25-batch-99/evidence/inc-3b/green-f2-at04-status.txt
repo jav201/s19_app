@@ -1,0 +1,8 @@
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 32 items / 29 deselected / 3 selected
+
+tests/test_b99_staging.py::test_at_b99_04_distinct_names_parallel_regression_guard PASSED [ 33%]
+tests/test_b99_staging.py::test_at_b99_04_duplicate_names_refused_nothing_written PASSED [ 66%]
+tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally PASSED [100%]
+
+====================== 3 passed, 29 deselected in 11.43s ======================

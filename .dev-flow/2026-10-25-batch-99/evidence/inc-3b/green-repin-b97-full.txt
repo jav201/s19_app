@@ -1,0 +1,50 @@
+..................................................F..................... [ 46%]
+........................................................................ [ 93%]
+..........                                                               [100%]
+================================== FAILURES ===================================
+___________ test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26649/test_tc_b97_64_burst_on_two_wa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FEDA68CF10>
+
+    def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 (LLR-147.13 boundary, P-60): ``two_wait`` — after the dwell,
+        ``press("c", "c")`` confirms one lane (the attention lane) and the other
+        still waits: the attention moves to it and its dwell restarts when its
+        attention class is painted; one more ``c`` after the dwell confirms it.
+    
+        RED by mutation: no dwell → the burst confirms 2; the dwell stamped when
+        the record arrived (not after the attention paint) → 2.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c", "c")
+            await poll(pilot, lambda: not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 6)
+            after_burst = (list(confirms.posts), panel._lanes[1].paused_block, panel.query_one("#fx_confirm_1").has_class("fx-attention"))
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 2, 200)
+            return after_burst, list(confirms.posts)
+    
+        after_burst, posts = run_fx(tmp_path, (118, 54), body, stems=TWO_WAIT, run=True, evidence=True)
+>       assert after_burst == ([(0, 2)], 2, True), after_burst
+E       AssertionError: ([(0, 2), (1, 2)], None, False)
+E       assert ([(0, 2), (1,..., None, False) == ([(0, 2)], 2, True)
+E         
+E         At index 0 diff: [(0, 2), (1, 2)] != [(0, 2)]
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1546: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one
+1 failed, 153 passed in 992.60s (0:16:32)

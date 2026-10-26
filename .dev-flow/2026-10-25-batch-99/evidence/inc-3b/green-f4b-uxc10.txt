@@ -1,0 +1,8 @@
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 1 item
+
+tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally PASSED [100%]
+
+============================== 1 passed in 4.21s ==============================

@@ -1,0 +1,12 @@
+        # the refusal also reaches the status line (#log_line_4), not only the
+        # run log (LLR-155.5, review finding F2): outcome first (UX-C4), the
+        # lane names literal (UX-C10 — the label's markup stays off)
+        status = outcomes["status"]
+>       assert "Chain set not run" in status, status
+E       AssertionError: Loaded project 'proj' -> prg.s19
+E       assert 'Chain set not run' in "Loaded project 'proj' -> prg.s19"
+
+tests\test_b99_staging.py:2074: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_at_b99_04_duplicate_names_refused_nothing_written
+============================== 1 failed in 4.18s ==============================

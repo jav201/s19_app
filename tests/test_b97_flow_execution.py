@@ -287,8 +287,14 @@ SIX = ("six_ok_a", "six_ok_b", "six_wait")
 #: Five 6-block lanes, the last one waiting: its card lies past the lanes
 #: viewport on BOTH axes at 118x54 (wait_third_6 fits vertically there with
 #: Inc-6's 5-row cards; the y-axis arm needs a taller set — packet §6).
-DEEP = ("six_ok_a", "six_ok_b", "six_ok_a", "six_ok_b", "six_wait")
-TWO_WAIT = ("flash_chain", "flash_chain")
+#: batch-99 Inc 3b (HLR-155 D7 re-pin): four DISTINCT templates — the
+#: duplicated ``six_ok_a``/``six_ok_b`` pair shared one WRITE-OUT name per
+#: pair and the set is refused at start now (the twins ride ``six_ok_c`` /
+#: ``six_ok_d``, own names, same blocks).
+DEEP = ("six_ok_a", "six_ok_b", "six_ok_c", "six_ok_d", "six_wait")
+#: batch-99 Inc 3b (HLR-155 D7 re-pin): two waiting lanes need two output
+#: names — ``flash_b`` is ``flash_chain`` with its own WRITE-OUT name.
+TWO_WAIT = ("flash_chain", "flash_b")
 VERTICAL = ((118, 54), (118, 53))
 CABLE_VOCAB = set("▓░✗◇□")
 REPORTS = "reports"
@@ -1058,12 +1064,34 @@ def test_tc_b97_53_run_log_paints_at_most_eight_lines(tmp_path: Path) -> None:
         report = panel.last_run_record.report_path.read_text(encoding="utf-8")
         return rows, report
 
-    rows, report = run_fx(tmp_path, (118, 54), body, stems=("patch_chain",) * 5, run=True)
+    # batch-99 Inc 3b (HLR-155 D7 re-pin): five lanes need five output names
+    # — one template imported five times mounts five lanes resolving to one
+    # file, and that set is refused at start now. The five ``cap_*``
+    # templates differ only in the WRITE-OUT name.
+    from dataclasses import replace
+
+    from tests.b97_fixtures import patch_chain_demo, write_flow
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = fx_project(app)
+            for i in range(5):
+                blocks = patch_chain_demo()
+                blocks[3] = replace(blocks[3], output_name=f"cap_{i}.s19")
+                write_flow(project_dir, f"cap_{i}", blocks)
+            panel = await import_lanes(app, pilot, *(f"cap_{i}" for i in range(5)))
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            return await body(app, pilot, panel, project_dir)
+
+    rows, report = asyncio.run(_drive())
     assert len(rows) == 8, rows
     assert rows[0] == "… 3 earlier lines — the full log is in the run report", rows[0]
-    assert "patch_chain_5 · done with notices" in rows[-1], rows[-1]
+    assert "cap_4 · done with notices" in rows[-1], rows[-1]
     report = report.replace("\\_", "_")  # the report escapes Markdown underscores
-    assert all(f"patch_chain_{n}" in report for n in (2, 3, 4, 5)), "the report keeps every chain"
+    assert all(f"cap_{n}" in report for n in (1, 2, 3, 4)), "the report keeps every chain"
 
 
 # --------------------------------------------------------------------------- #

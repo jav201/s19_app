@@ -53,6 +53,7 @@ from ..changes import (
 from ..changes.check import run_check_document
 from ..changes.io import parse_change_document
 from ..changes.model import DISPOSITION_APPLIED, DISPOSITION_BLOCKED
+from ..changes.verify import STATUS_VERIFIED, verify_written_image
 from ..a2l_parse import parse_a2l_file
 from .a2l_service import enrich_tags_and_render
 from .compare_service import SOURCE_EXTERNAL
@@ -682,6 +683,33 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
                 result.written_paths.append(saved_path)
+                # HLR-155 D9 / LLR-155.6: read the placed file back and
+                # compare it with the image that was meant to persist. A
+                # mismatch — a byte the file failed to hold (``only_a``) or
+                # one held with the wrong value (``changed``) — ends the
+                # block ``error`` and aborts the chain; the LAST diagnostic,
+                # the painted cause (UX-C2), names the first differing
+                # address.
+                verify = verify_written_image(saved_path, mem_map, fmt)
+                if verify.status != STATUS_VERIFIED:
+                    first_diff = min(run.start for run in verify.runs)
+                    diagnostics = [
+                        f"{run.kind} 0x{run.start:06X}..0x{run.end:06X} "
+                        f"({run.length} byte{'' if run.length == 1 else 's'})"
+                        for run in verify.runs
+                    ]
+                    diagnostics.append(
+                        f"first difference at 0x{first_diff:06X}"
+                    )
+                    result.block_results.append(
+                        BlockResult(
+                            index, kind, BLOCK_STATUS_ERROR,
+                            f"wrote {saved_path.name} but read-back differs",
+                            diagnostics,
+                        )
+                    )
+                    aborted = True
+                    continue
                 result.block_results.append(
                     BlockResult(index, kind, BLOCK_STATUS_OK,
                                 f"wrote {saved_path.name}")
@@ -1617,6 +1645,38 @@ def _chain_inputs(
     return inputs
 
 
+def _write_out_collisions(
+    chains: Sequence[ChainSpec],
+) -> List[Tuple[str, List[str]]]:
+    """Group the set's lanes by their WRITE-OUT output name (case-folded).
+
+    HLR-155 D7 / LLR-155.5's refusal limb: parallel lanes sharing an output
+    name write each other's image (P-5), so the set is refused before any
+    lane runs. Returns one ``(output name, lane names)`` pair per name two
+    or more lanes resolve to, in first-collision order; a name a single
+    lane writes — even twice, where the sequential placement's ``_<N>``
+    fallback already applies — is not a collision.
+    """
+    by_folded: Dict[str, Tuple[str, List[str]]] = {}
+    order: List[str] = []
+    for spec in chains:
+        for block in spec.flow.blocks:
+            if not isinstance(block, WriteOutBlock):
+                continue
+            folded = block.output_name.casefold()
+            if folded not in by_folded:
+                by_folded[folded] = (block.output_name, [])
+                order.append(folded)
+            lane_names = by_folded[folded][1]
+            if spec.name not in lane_names:
+                lane_names.append(spec.name)
+    return [
+        by_folded[folded]
+        for folded in order
+        if len(by_folded[folded][1]) > 1
+    ]
+
+
 def run_chain_set(
     chains: Sequence[ChainSpec],
     ctx: FlowContext,
@@ -1641,6 +1701,12 @@ def run_chain_set(
         per consumed input, LLR-020.2) is written under ``reports/``; a
         failed write is RECORDED, never raised (the fused-report idiom).
 
+        HLR-155 D7 / LLR-155.5: when two or more lanes resolve to one
+        WRITE-OUT file name (case-folded), the set is refused BEFORE any
+        lane runs — one ``diagnostics`` line per colliding name, naming the
+        lanes (the outcome leads, UX-C4), and nothing is written: no lane
+        runs and no chain-set report is emitted.
+
     Args:
         chains (Sequence[ChainSpec]): The lanes to run, in lane order.
         ctx (FlowContext): The project directory + optional MAC/A2L context.
@@ -1655,7 +1721,9 @@ def run_chain_set(
 
     Returns:
         ChainSetRunResult: One :class:`ChainRunOutcome` per chain in lane
-        order, the captured mode, the report path, and whole-set notes.
+        order, the captured mode, the report path, and whole-set notes. On
+        a duplicate WRITE-OUT name (D7) the record carries no outcomes and
+        one refusal line per colliding name in ``diagnostics``.
 
     Raises:
         ValueError: When ``mode`` is not one of ``CHAIN_RUN_MODES``
@@ -1680,6 +1748,24 @@ def run_chain_set(
     record = ChainSetRunRecord(mode=mode)
     if not chains:
         record.diagnostics.append("no chains in set - nothing was executed")
+        return record
+
+    # HLR-155 D7 / LLR-155.5: before ANY lane runs, resolve every lane's
+    # WRITE-OUT file names and refuse the set when two or more lanes
+    # resolve to one name (compared case-folded). The refusal rides the
+    # record's existing diagnostics shape — the panel paints it as the run
+    # log — names the lanes and the name (UX-C4: the outcome leads), and
+    # writes nothing: no lane runs and no chain-set report is emitted.
+    collisions = _write_out_collisions(chains)
+    if collisions:
+        for output_name, lane_names in collisions:
+            listing = ", ".join(f"'{name}'" for name in lane_names)
+            verb = "both write" if len(lane_names) == 2 else "all write"
+            record.diagnostics.append(
+                f"Chain set not run: lanes {listing} {verb} "
+                f"'{output_name}' — give each lane its own output name. "
+                "Nothing written."
+            )
         return record
 
     def _run_one(spec: ChainSpec) -> ChainRunOutcome:

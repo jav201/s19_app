@@ -3,6 +3,11 @@ Batch-99 Increment 3a — private staging, atomic placement (HLR-155;
 LLR-155.1/.2/.3/.4/.7; TC-B99-11/12/13/14/39; AT-B99-05; AT-B99-04's
 distinct-name parallel arm as a regression guard; UX-C4/UX-C5/UX-C10 sinks).
 
+Batch-99 Increment 3b — HLR-155 D7 + D9 (LLR-155.5/.6 and LLR-155.3's
+LED-.7 gather conversion; TC-B99-15/16, TC-B99-13's census + gather-drift
+arms; AT-B99-04's duplicate-name arm; UX-C4/UX-C2/UX-C10 for the D7/D9
+sinks).
+
 Layer A (engine, direct calls):
 - **TC-B99-11** (LLR-155.1) — a same-name save-back keeps the loaded work
   copy: byte-equal to its pre-save bytes, the placed name is the requested
@@ -111,6 +116,24 @@ from s19_app.tui.changes.io import (
     write_change_document,
 )
 from s19_app.tui.changes.model import ChangeDocument, ChangeEntry
+from s19_app.tui.services import flow_execution_service as fx_service
+from s19_app.tui.services.flow_execution_service import (
+    ChainSpec,
+    run_chain_set,
+    run_flow,
+)
+from s19_app.tui.services.flow_model import (
+    BLOCK_STATUS_ERROR,
+    BLOCK_STATUS_OK,
+    FLOW_STATUS_ERROR,
+    FLOW_STATUS_OK,
+    Flow,
+    FlowContext,
+    FlowRunResult,
+    SourceBlock,
+    WriteOutBlock,
+)
+from s19_app.tui.services.project_gather_service import gather_project_artifacts
 from s19_app.tui.workspace import WorkareaContainmentError, copy_into_workarea
 
 from tests.support import independent_reader
@@ -1570,6 +1593,597 @@ def test_tc_b99_ux_c10_placement_error_path_renders_literally(
     error_notices = [n for n in outcomes["notices"] if n[2] == "error"]
     assert error_notices and any(HOSTILE_NAME in n[1] for n in error_notices), (
         outcomes["notices"]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Increment 3b — HLR-155 D7 + D9 (LLR-155.5/.6, LLR-155.3 LED-.7 conversion)
+# ---------------------------------------------------------------------------
+
+
+def _dup_spec(name: str, output: str) -> ChainSpec:
+    """One chain-set lane: a SOURCE input and a WRITE-OUT under ``output``."""
+    return ChainSpec(
+        name=name,
+        template="tpl",
+        flow=Flow(
+            name="tpl",
+            blocks=[SourceBlock("in.s19"), WriteOutBlock(output)],
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-B99-15 — duplicate output names are refused at start (LLR-155.5)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b99_15_duplicate_write_out_names_refused(tmp_path: Path) -> None:
+    """Two lanes resolving to one output name (compared case-folded —
+    ``same.s19`` and ``SAME.s19``) refuse the set BEFORE any lane runs:
+    the injected executor is never called, the refusal (existing
+    ``ChainSetRunRecord.diagnostics`` shape) leads with the outcome
+    (UX-C4), names both lanes and the name, and nothing is written.
+
+    RED at HEAD (P-5): the lanes run and write each other's image —
+    ``same.s19`` exists after the run and no refusal exists.
+    """
+    root = _workarea(tmp_path)
+    project_dir = root / "proj"
+    project_dir.mkdir()
+    calls: list = []
+
+    def _spy(flow: Flow, ctx: FlowContext) -> FlowRunResult:
+        calls.append(flow)
+        return FlowRunResult(status=FLOW_STATUS_OK)
+
+    record = run_chain_set(
+        [_dup_spec("lane_a", "same.s19"), _dup_spec("lane_b", "SAME.s19")],
+        FlowContext(project_dir=project_dir),
+        run_one=_spy,
+    )
+
+    assert calls == [], "no lane may run once the set is refused"
+    assert record.outcomes == [], record.outcomes
+    assert record.report_path is None, "a refused set writes no report either"
+    assert list(project_dir.iterdir()) == [], list(project_dir.iterdir())
+    assert record.diagnostics, "the refusal must name the lanes"
+    message = record.diagnostics[0]
+    assert message.index("Chain set not run") < 50, message
+    assert "lane_a" in message and "lane_b" in message, message
+    assert "same.s19" in message, message
+    assert "Nothing written" in message, message
+
+
+def test_tc_b99_15_distinct_names_run(tmp_path: Path) -> None:
+    """The control arm: distinct output names refuse nothing and every lane
+    runs (the invalid/boundary pair of LLR-155.5's catalog)."""
+    root = _workarea(tmp_path)
+    project_dir = root / "proj"
+    project_dir.mkdir()
+    calls: list = []
+
+    def _spy(flow: Flow, ctx: FlowContext) -> FlowRunResult:
+        calls.append(flow)
+        return FlowRunResult(status=FLOW_STATUS_OK)
+
+    record = run_chain_set(
+        [_dup_spec("lane_a", "out_a.s19"), _dup_spec("lane_b", "out_b.s19")],
+        FlowContext(project_dir=project_dir),
+        run_one=_spy,
+    )
+
+    assert len(calls) == 2, calls
+    assert len(record.outcomes) == 2, record.outcomes
+    assert record.diagnostics == [], record.diagnostics
+
+
+# ---------------------------------------------------------------------------
+# TC-B99-16 — WRITE-OUT verifies what it wrote (LLR-155.6, HLR-155 D9)
+# ---------------------------------------------------------------------------
+
+
+def _verify_flow(tmp_path: Path) -> tuple:
+    """A project dir + a two-block flow (SOURCE → WRITE-OUT)."""
+    project_dir = _workarea(tmp_path) / "proj"
+    project_dir.mkdir(parents=True)
+    (project_dir / "fw.s19").write_text(_emit_two(0x11, 0x22), encoding="ascii")
+    flow = Flow(
+        name="verify",
+        blocks=[SourceBlock("fw.s19"), WriteOutBlock("out.s19")],
+    )
+    return project_dir, flow
+
+
+def test_tc_b99_16_corrupted_write_out_is_error_naming_address(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A WRITE-OUT whose placed file is corrupted after placement — a hook
+    flips one data byte (checksum recomputed, so the record parses with the
+    wrong value) between the write and the read-back — ends the block
+    ``error``, aborts the run, and the LAST diagnostic, the painted cause
+    (UX-C2), names the first differing address.
+
+    RED at HEAD: no read-back exists, so the corrupted write reports
+    ``wrote out.s19`` / ``ok``.
+    """
+    from s19_app.tui.changes.apply import save_patched_image as real_save
+    from tests.b97_fixtures import flip_one_data_byte
+
+    project_dir, flow = _verify_flow(tmp_path)
+    flipped: list = []
+
+    def _corrupting_save(mem_map, ranges, save_dir, output_name, **kwargs):
+        target, issues = real_save(
+            mem_map, ranges, save_dir, output_name, **kwargs
+        )
+        if target is not None:
+            flipped.append(flip_one_data_byte(target, target))
+        return target, issues
+
+    monkeypatch.setattr(fx_service, "save_patched_image", _corrupting_save)
+    result = run_flow(flow, FlowContext(project_dir=project_dir))
+
+    assert flipped, "the corruption hook did not fire"
+    assert result.status == FLOW_STATUS_ERROR, result.status
+    write_out = result.block_results[1]
+    assert write_out.status == BLOCK_STATUS_ERROR, write_out.summary
+    last = write_out.diagnostics[-1]
+    assert last == f"first difference at 0x{flipped[0]:06X}", (
+        write_out.diagnostics
+    )
+
+
+def test_tc_b99_16_intact_write_out_is_ok(tmp_path: Path) -> None:
+    """The control arm: an intact write verifies byte-for-byte and the
+    WRITE-OUT block stays ``ok`` (LLR-155.6's boundary catalog)."""
+    project_dir, flow = _verify_flow(tmp_path)
+    result = run_flow(flow, FlowContext(project_dir=project_dir))
+    write_out = result.block_results[1]
+    assert write_out.status == BLOCK_STATUS_OK, write_out.summary
+    assert result.status == FLOW_STATUS_OK, result.status
+    assert _data(project_dir / "out.s19") == {0x1000: 0x11, 0x2000: 0x22}
+
+
+# ---------------------------------------------------------------------------
+# TC-B99-13 arms — LLR-155.3: the gather conversion + the final-name census
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b99_13_gather_drift_places_next_free_name(tmp_path: Path) -> None:
+    """LLR-155.3 (LED .7): the gather's drift limb rides HLR-155's placement
+    (LLR-155.1/.2) — a drifted source is placed under the next free ``_<N>``
+    name and the existing final name is never replaced or deleted; a
+    byte-identical re-gather is skipped. RED at HEAD: ``_gather_copy``
+    unlinks and recopies in place, so the drifted destination is replaced
+    (the restored check-then-copy form the LLR's negative control declares).
+    """
+    root = _workarea(tmp_path)
+    project_dir = root / "proj"
+    project_dir.mkdir()
+    common = tmp_path / "common"
+    common.mkdir()
+    source = tmp_path / "lib" / "hotfix.json"
+    source.parent.mkdir()
+    source.write_text('{"v": 1}', encoding="utf-8")
+
+    def _gather() -> object:
+        return gather_project_artifacts(
+            project_dir,
+            active_document=source,
+            active_document_kind="change",
+            common_patches_dir=common,
+            common_templates_dir=common,
+        )
+
+    first = _gather()
+    assert first.issues == [], [i.message for i in first.issues]
+    assert first.gathered == {"patches": ["patches/hotfix.json"]}, first.gathered
+    placed = project_dir / "patches" / "hotfix.json"
+    assert placed.read_text(encoding="utf-8") == '{"v": 1}'
+
+    # drift: the changed source takes the next free name, never an overwrite
+    source.write_text('{"v": 2}', encoding="utf-8")
+    second = _gather()
+    assert second.issues == [], [i.message for i in second.issues]
+    assert second.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+        second.gathered
+    )
+    assert placed.read_text(encoding="utf-8") == '{"v": 1}', (
+        "a placed file is immutable once placed (LLR-155.3)"
+    )
+    assert (project_dir / "patches" / "hotfix_1.json").read_text(
+        encoding="utf-8"
+    ) == '{"v": 2}'
+
+    # identical bytes again: skipped, back to the requested name
+    source.write_text('{"v": 1}', encoding="utf-8")
+    third = _gather()
+    assert third.gathered == {"patches": ["patches/hotfix.json"]}, third.gathered
+
+
+def test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate(
+    tmp_path: Path,
+) -> None:
+    """LLR-138.4 (review finding F1): after ONE drift the changed bytes live
+    at the placed ``_<N>`` name, so every later UNCHANGED re-save must
+    byte-compare against the ``_<N>`` sibling too and be skipped — two
+    unchanged re-saves add no ``_2``/``_3`` copies. RED at HEAD: the compare
+    runs only against ``<name>``, so the first unchanged re-save places
+    ``hotfix_2.json``.
+    """
+    root = _workarea(tmp_path)
+    project_dir = root / "proj"
+    project_dir.mkdir()
+    common = tmp_path / "common"
+    common.mkdir()
+    source = tmp_path / "lib" / "hotfix.json"
+    source.parent.mkdir()
+    source.write_text('{"v": 1}', encoding="utf-8")
+
+    def _gather() -> object:
+        return gather_project_artifacts(
+            project_dir,
+            active_document=source,
+            active_document_kind="change",
+            common_patches_dir=common,
+            common_templates_dir=common,
+        )
+
+    first = _gather()
+    assert first.issues == [], [i.message for i in first.issues]
+    assert first.gathered == {"patches": ["patches/hotfix.json"]}, first.gathered
+
+    # one drift: the changed bytes are placed at the next free name
+    source.write_text('{"v": 2}', encoding="utf-8")
+    second = _gather()
+    assert second.issues == [], [i.message for i in second.issues]
+    assert second.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+        second.gathered
+    )
+
+    # two unchanged re-saves: both skipped against the placed sibling — the
+    # home still holds exactly ``hotfix.json`` + ``hotfix_1.json``
+    for _ in range(2):
+        again = _gather()
+        assert again.issues == [], [i.message for i in again.issues]
+        assert again.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+            again.gathered
+        )
+    home = project_dir / "patches"
+    assert sorted(entry.name for entry in home.iterdir()) == [
+        "hotfix.json",
+        "hotfix_1.json",
+    ], sorted(entry.name for entry in home.iterdir())
+    assert (home / "hotfix.json").read_text(encoding="utf-8") == '{"v": 1}'
+    assert (home / "hotfix_1.json").read_text(encoding="utf-8") == '{"v": 2}'
+
+
+#: The pinned allow-list (LLR-155.3): the only functions inside ``s19_app/``
+#: that may call ``unlink`` / ``os.replace`` / ``shutil.copy2`` /
+#: ``write_bytes`` / ``write_text`` onto a final name. The four placement
+#: writers own the placement invariant; the fixed-name writers predate LED .7
+#: with their own non-clobber / atomic schemes (the manifest's fixed
+#: ``project.json`` and the M-5 report names, checked non-existing before
+#: the write); ``write_bin_with_sidecar`` is converted by Inc 6 (LLR-160.4).
+#: Review finding F4a extended the census to ``write_text``; the additional
+#: pinned writers: the diff reports' M-5 collision-counter names (never an
+#: overwrite), the explicit operator-picked export targets (the A2L dump and
+#: the split/join export — overwriting the chosen path IS the action's
+#: semantics). The CRC designer's same-name template save moved to the
+#: declared exceptions below (review round 2).
+_FINAL_NAME_ALLOWLIST = {
+    "s19_app/tui/workspace.py": frozenset(
+        {"copy_into_workarea", "_private_stage_dir"}
+    ),
+    "s19_app/tui/app.py": frozenset({"action_dump_a2l_json"}),
+    "s19_app/tui/changes/apply.py": frozenset({"save_patched_image"}),
+    "s19_app/tui/changes/io.py": frozenset({"write_change_document"}),
+    "s19_app/tui/operations/crc.py": frozenset({"write_crc_image"}),
+    "s19_app/tui/segment_split_view.py": frozenset({"_write"}),
+    "s19_app/tui/services/manifest_writer.py": frozenset(
+        {"write_project_manifest"}
+    ),
+    "s19_app/tui/services/flow_execution_service.py": frozenset(
+        {"write_chain_set_report"}
+    ),
+    "s19_app/tui/services/flow_report_service.py": frozenset(
+        {"write_flow_report"}
+    ),
+    "s19_app/tui/services/flow_fused_report_service.py": frozenset(
+        {"write_fused_flow_report"}
+    ),
+    "s19_app/tui/services/report_service.py": frozenset(
+        {"generate_project_report"}
+    ),
+    "s19_app/tui/services/diff_report_service.py": frozenset(
+        {"generate_diff_report", "generate_diff_report_html"}
+    ),
+    "s19_app/segment_ops.py": frozenset({"write_bin_with_sidecar"}),
+}
+
+#: Declared exceptions (review finding F4a): ``write_text`` sites the census
+#: flags that hold the house ``exists()`` + counter dedup (they never
+#: overwrite an existing name, but they are not the pinned placement either —
+#: a re-save with changes dedups to ``_<N>`` instead of placing through
+#: HLR-155). Recorded here as pinned exceptions and in the increment packet's
+#: backlog — conversion candidates, NOT fixed in this round.
+_FINAL_NAME_DECLARED_EXCEPTIONS = {
+    "s19_app/tui/services/flow_persistence_service.py": frozenset(
+        {"save_flow_json", "save_chain_set"}
+    ),
+    # Review round 2: the CRC designer's same-name template save overwrites
+    # in place in the project templates/ folder, which the gather also writes
+    # into -- a real violator of the immutability invariant, declared here and
+    # routed to the backlog (not converted in this increment).
+    "s19_app/tui/crc_designer_view.py": frozenset({"_save_template"}),
+}
+
+
+def _final_name_census(rel: str, source_text: str) -> list:
+    """The LLR-155.3 AST census over one module's text: every
+    ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
+    ``write_text`` call (review finding F4a added the ``write_text`` limb)
+    must sit inside that file's pinned allow-list of functions, unless the
+    enclosing function is a pinned declared exception."""
+    tree = ast.parse(source_text)
+    parents: dict = {}
+    for node in ast.walk(tree):
+        for child in ast.iter_child_nodes(node):
+            parents[child] = node
+
+    def _enclosing_function(call: ast.Call) -> Optional[str]:
+        node = parents.get(call)
+        while node is not None:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                return node.name
+            node = parents.get(node)
+        return None
+
+    allowed = _FINAL_NAME_ALLOWLIST.get(rel, frozenset())
+    violations: list = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        primitive: Optional[str] = None
+        if isinstance(func, ast.Attribute):
+            if func.attr == "unlink":
+                primitive = "unlink"
+            elif func.attr in ("write_bytes", "write_text"):
+                primitive = func.attr
+            elif (
+                func.attr == "copy2"
+                and isinstance(func.value, ast.Name)
+                and func.value.id == "shutil"
+            ):
+                primitive = "shutil.copy2"
+            elif (
+                func.attr == "replace"
+                and isinstance(func.value, ast.Name)
+                and func.value.id == "os"
+            ):
+                primitive = "os.replace"
+        if primitive is None:
+            continue
+        owner = _enclosing_function(node)
+        if owner in allowed:
+            continue
+        if owner in _FINAL_NAME_DECLARED_EXCEPTIONS.get(rel, frozenset()):
+            continue
+        violations.append(
+            f"{rel}:{node.lineno} {primitive} outside the pinned "
+            f"placement allow-list (in {owner!r})"
+        )
+    return violations
+
+
+def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
+    """LLR-155.3's census arm (TC-B99-13's second arm): across ``s19_app/``
+    no ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
+    ``write_text`` (the ``write_text`` limb is review finding F4a) onto an
+    existing final name exists outside the pinned placement functions and
+    the pinned declared exceptions — in particular
+    ``project_gather_service._gather_copy`` holds none after the Inc-3b
+    conversion. RED at HEAD: ``_gather_copy`` still unlinks and recopies in
+    place (``project_gather_service.py:297/299``).
+    """
+    all_violations: list = []
+    pkg_root = REPO_ROOT / "s19_app"
+    for path in sorted(pkg_root.rglob("*.py")):
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        all_violations.extend(
+            _final_name_census(rel, path.read_text(encoding="utf-8"))
+        )
+    assert all_violations == [], (
+        "LLR-155.3: a final-name replace/delete/copy outside the placement "
+        f"functions: {all_violations}"
+    )
+
+    # load-bearing emptiness: the converted gather holds NONE of the five
+    # censused primitives
+    gather_rel = "s19_app/tui/services/project_gather_service.py"
+    gather_text = (REPO_ROOT / gather_rel).read_text(encoding="utf-8")
+    gather_hits = _final_name_census(gather_rel, gather_text)
+    assert gather_hits == [], (
+        f"_gather_copy must place through copy_into_workarea, never "
+        f"unlink/copy2: {gather_hits}"
+    )
+
+    # positive control: the identical probe on a restored-style module finds
+    # the delete-and-recopy pattern (the LLR-155.3 negative control's form)
+    sample = (
+        "import shutil\n"
+        "from pathlib import Path\n\n"
+        "def _gather_copy(source: Path, home: Path):\n"
+        "    destination = home / source.name\n"
+        "    if destination.exists():\n"
+        "        destination.unlink()\n"
+        "    shutil.copy2(source, destination)\n"
+    )
+    sample_hits = _final_name_census("sample.py", sample)
+    assert len(sample_hits) == 2, sample_hits
+
+    # positive control for the write_text limb (review finding F4a): the
+    # identical probe flags a plain ``write_text`` onto a final name in an
+    # un-pinned, un-declared function
+    text_sample = (
+        "from pathlib import Path\n\n"
+        "def save_anything(target: Path) -> None:\n"
+        "    target.write_text('{}', encoding='utf-8')\n"
+    )
+    text_hits = _final_name_census("sample_text.py", text_sample)
+    assert len(text_hits) == 1, text_hits
+
+
+# ---------------------------------------------------------------------------
+# AT-B99-04 duplicate-name arm — the painted refusal, nothing written (D7)
+# ---------------------------------------------------------------------------
+
+
+def test_at_b99_04_duplicate_names_refused_nothing_written(
+    tmp_path: Path,
+) -> None:
+    """AT-B99-04's duplicate-name arm (HLR-155 D7, LLR-155.5): a chain set
+    whose two lanes resolve to one output name (``same.s19`` /
+    ``SAME.s19``, case-folded) is refused — the painted run log (``#fx_log``)
+    leads with the outcome inside the first 50 characters (UX-C4), names
+    both lanes and the file, and no file is written; the refusal also
+    reaches the status line (``#log_line_4``, review finding F2). RED at
+    HEAD: P-5's set writes ``same.s19``.
+
+    Driven by keys and clicks through the shipped Flow Execution panel
+    (review finding F5): lanes are imported through ``#fx_import``, the run
+    is pressed on ``#fx_run``, and every assertion reads the painted
+    ``#fx_log`` or the files on disk — never an internal attribute.
+    """
+    from textual.widgets import Static
+
+    from tests.b97_fixtures import (
+        import_lanes,
+        load_project,
+        make_project,
+        run_lanes,
+        write_flow,
+    )
+    from tests.b97_probes import settle
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        outcomes: dict = {}
+        async with app.run_test(size=(260, 90)) as pilot:
+            await settle(pilot)
+            make_project(app, "proj")
+            project_dir = load_project(app, "proj")
+            (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
+            (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
+            write_flow(
+                project_dir,
+                "lane_a",
+                [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
+            )
+            write_flow(
+                project_dir,
+                "lane_b",
+                [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
+            )
+            panel = await import_lanes(app, pilot, "lane_a", "lane_b")
+            await run_lanes(app, pilot, panel)
+            outcomes["log"] = app.query_one("#fx_log", Static).render().plain
+            outcomes["status"] = _painted_status(app)
+            outcomes["top_files"] = sorted(
+                p.name for p in project_dir.iterdir()
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+
+    lines = [l for l in outcomes["log"].splitlines() if "Chain set not run" in l]
+    assert lines, (
+        f"the refusal must be painted in the run log: {outcomes['log']!r}"
+    )
+    line = lines[-1].strip()
+    assert line.index("Chain set not run") < 50, line
+    assert "lane_a" in line and "lane_b" in line, line
+    assert "same.s19" in line, line
+    assert "Nothing written" in line, line
+    assert "same.s19" not in outcomes["top_files"], outcomes["top_files"]
+    assert "SAME.s19" not in outcomes["top_files"], outcomes["top_files"]
+    assert "reports" not in outcomes["top_files"], (
+        f"a refused set writes nothing: {outcomes['top_files']}"
+    )
+
+    # the refusal also reaches the status line (#log_line_4), not only the
+    # run log (LLR-155.5, review finding F2): outcome first (UX-C4), the
+    # lane names literal (UX-C10 — the label's markup stays off)
+    status = outcomes["status"]
+    assert "Chain set not run" in status, status
+    assert status.index("Chain set not run") < 50, status
+    assert "lane_a" in status and "lane_b" in status, status
+    assert "same.s19" in status, status
+
+
+# ---------------------------------------------------------------------------
+# UX-C10 — the D7 lane-name sink renders literally (0 markup spans)
+# ---------------------------------------------------------------------------
+
+
+def test_tc_b99_ux_c10_d7_lane_name_renders_literally(tmp_path: Path) -> None:
+    """The D7 refusal names the lanes — a hostile lane name is a new
+    file-derived sink (PDR UX-C10). Driven through the shipped Flow
+    Execution panel (review finding F4b): both colliding lanes are imported
+    through ``#fx_import`` and run with ``#fx_run``; the assertion reads the
+    PAINTED ``#fx_log`` — the hostile literal survives verbatim in the
+    painted ``.plain`` and the painted text carries 0 style spans. The test
+    never calls ``safe_text`` itself: markup interpretation would show up
+    as style spans ON the painted surface.
+    """
+    from textual.widgets import Static
+
+    from tests.b97_fixtures import (
+        import_lanes,
+        load_project,
+        make_project,
+        run_lanes,
+        write_flow,
+    )
+    from tests.b97_probes import settle
+
+    hostile = "[red]x[red]"  # no path separator: a lane name IS a file stem,
+    # so the painted-surface drive cannot carry "/" — the markup-opening
+    # "[red" token is the hostile part UX-C10 cares about
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(260, 90)) as pilot:
+            await settle(pilot)
+            make_project(app, "proj")
+            project_dir = load_project(app, "proj")
+            (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
+            (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
+            write_flow(
+                project_dir,
+                hostile,
+                [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
+            )
+            write_flow(
+                project_dir,
+                "plain",
+                [SourceBlock("base_b.s19"), WriteOutBlock("same.s19")],
+            )
+            panel = await import_lanes(app, pilot, hostile, "plain")
+            await run_lanes(app, pilot, panel)
+            return app.query_one("#fx_log", Static).render()
+
+    painted = asyncio.run(_drive())
+
+    assert "Chain set not run" in painted.plain, painted.plain
+    assert hostile in painted.plain, (
+        f"the hostile lane name must survive verbatim in the painted "
+        f"log: {painted.plain!r}"
+    )
+    assert painted.spans == [], (
+        f"the hostile lane name must add 0 markup spans: {painted.spans}"
     )
 
 

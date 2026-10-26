@@ -1,0 +1,16 @@
+=== AT-B99-04 run 1 ===
+1 passed in 3.73s
+=== AT-B99-04 run 2 ===
+1 passed in 3.90s
+=== AT-B99-04 run 3 ===
+1 passed in 4.05s
+=== AT-B99-04 run 4 ===
+1 passed in 3.61s
+=== AT-B99-04 run 5 ===
+1 passed in 3.65s
+=== AT-B99-04 run 6 ===
+1 passed in 3.56s
+=== AT-B99-04 run 7 ===
+1 passed in 3.81s
+=== AT-B99-04 run 8 ===
+1 passed in 3.33s

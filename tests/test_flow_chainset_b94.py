@@ -75,6 +75,9 @@ def _project(tmp_path: Path) -> Path:
 
 
 def _clean_chain(name: str, template: str = "base") -> ChainSpec:
+    # batch-99 Inc 3b (HLR-155 D7 / LLR-155.5 re-pin): every chain writes its
+    # OWN output name — a set whose lanes resolve to one name is refused at
+    # start now, so the two-chain fixtures below must not share ``out.s19``.
     return ChainSpec(
         name=name,
         template=template,
@@ -83,7 +86,7 @@ def _clean_chain(name: str, template: str = "base") -> ChainSpec:
             blocks=[
                 SourceBlock("base.s19"),
                 PatchBlock("hotfix.json"),
-                WriteOutBlock("out.s19"),
+                WriteOutBlock(f"out_{name}.s19"),
             ],
         ),
     )
@@ -501,14 +504,18 @@ def test_at_b94_24_service_half_reloaded_set_reruns(tmp_path: Path) -> None:
         _clean_chain("a"),
         ChainSpec(
             name="b",
-            template="base",
+            template="base_b",
             flow=_clean_chain("b").flow,
             bindings={0: "variant_b.hex"},
         ),
     ]
-    # The template the set references must exist under flows/ (the reload
-    # resolves it through the hardened flow loader).
+    # The templates the set references must exist under flows/ (the reload
+    # resolves them through the hardened flow loader). batch-99 Inc 3b
+    # (HLR-155 D7 re-pin): the two chains keep their OWN output names, so
+    # the reloaded set still resolves one output name per lane — two chains
+    # from one template naming one file are refused at start now.
     fps.save_flow_json(chains[0].flow, "base", project)
+    fps.save_flow_json(chains[1].flow, "base_b", project)
     first = run_chain_set(chains, ctx, set_name="variants_a_b")
     saved = fps.save_chain_set(
         fps.ChainSet(
@@ -556,7 +563,7 @@ def test_at_b94_24_service_half_reloaded_set_reruns(tmp_path: Path) -> None:
                 bindings=dict(entry.inputs),
             )
         )
-    out_paths = [project / "out.s19"]
+    out_paths = [project / "out_a.s19", project / "out_b.s19"]
     before = [path.read_bytes() for path in out_paths]
     second = run_chain_set(reloaded_chains, ctx, set_name="variants_a_b")
     assert [outcome.status for outcome in second.outcomes] == [
@@ -564,6 +571,10 @@ def test_at_b94_24_service_half_reloaded_set_reruns(tmp_path: Path) -> None:
         FLOW_STATUS_OK,
     ]
     after = [path.read_bytes() for path in out_paths]
+    # HLR-155's placement (LLR-155.3, not D7) may land a re-run's write
+    # under a fresh ``_<N>`` name instead of refreshing the requested name
+    # in place, so regeneration is asserted on the written-path contract,
+    # not on byte change at the requested name.
     assert before != after or all(
         outcome.written_paths for outcome in second.outcomes
     ), "the re-run must regenerate the outputs (fresh writes)"

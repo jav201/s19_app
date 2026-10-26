@@ -432,8 +432,11 @@ def test_tc702_no_project_keeps_common_homes(tmp_path: Path) -> None:
 
 def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
     """TC-702 (LLR-138.4, snapshot refresh): divergence from a later COMMON
-    edit is repaired by a re-save — the project copy is refreshed in place
-    (same name, new bytes), never duplicated."""
+    edit is repaired by a re-save — batch-99 Inc 3b re-pin (LLR-155.3,
+    LED-2026-10-25-batch-99.7): the drifted copy is PLACED through HLR-155's
+    placement and takes the next free ``_<N>`` name; the previously placed
+    copy is immutable (never overwritten), so a re-save with drifted bytes
+    keeps both files and the manifest records the name actually placed."""
     external = tmp_path / "a.s19"
     external.write_text(S19_A, encoding="utf-8")
 
@@ -447,7 +450,7 @@ def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
             _save_project(app, _payload(app, batch=("boost.json",)))
             await _flush(pilot)
             # Later COMMON edit after the first snapshot — the save's re-gather
-            # must refresh the project copy in place.
+            # must place the drifted copy under the next free name.
             common_doc.write_text(
                 _change_doc_text("change") + " ", encoding="utf-8"
             )
@@ -458,10 +461,18 @@ def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
             return common_doc.read_bytes(), len(copies)
 
     common_now, copy_count = asyncio.run(_drive())
-    assert copy_count == 1, f"a refresh must keep exactly one copy; found {copy_count}"
-    refreshed = (tmp_path / ".s19tool" / "workarea" / "proj" / "patches" / "boost.json")
+    assert copy_count == 2, (
+        f"a drifted re-save keeps the placed copy and adds the next free "
+        f"_<N> name; found {copy_count}"
+    )
+    refreshed = (tmp_path / ".s19tool" / "workarea" / "proj" / "patches" / "boost_1.json")
     assert refreshed.read_bytes() == common_now, (
-        "a re-save must refresh the stale copy to the COMMON original's bytes"
+        "a re-save must place the drifted copy at the next free name, "
+        "holding the COMMON original's bytes"
+    )
+    original = (tmp_path / ".s19tool" / "workarea" / "proj" / "patches" / "boost.json")
+    assert original.read_bytes() != common_now, (
+        "the previously placed copy is immutable once placed (LLR-155.3)"
     )
 
 

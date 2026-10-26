@@ -1,0 +1,393 @@
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+....................................................................F... [ 42%]
+........................................................................ [ 57%]
+........................................................................ [ 71%]
+........................................................................ [ 85%]
+....F...F.........F........................F............................ [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_at_b97_16_in_session_resize_grows_and_returns ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_at_b97_16_in_session_resi0')
+
+    def test_at_b97_16_in_session_resize_grows_and_returns(tmp_path: Path) -> None:
+        """AT-B97-16 (US-139 / HLR-149, black-box; A.5, PC-19): in ONE session
+        ``resize_terminal`` 118x54 → 220x60 → 260x70 → 118x54 with the widest
+        values loaded; after each step each screen is shown through the rail and
+        read as painted: its adaptive width (the Parameter column, the Patch Value
+        column, the Builder card, the lane card) is non-decreasing and strictly
+        wider at 220 than at 118; at 220x60 and 260x70 the void after each
+        adaptive element is <= 2 cells, or more only with no clipped line in that
+        band (LLR-149.5, read over content regions); 0 blank panel rows outside
+        the growing region (the Builder's 3 named separator rows excepted) and 0
+        descendants off the panel at every step; back at 118x54 each screen
+        paints exactly the rows of its first 118x54 reading.
+    
+        RED on ``main`` (P-22, P-32): EXT-STEP inputs 28 at both sizes, Patch 3
+        blank rows. On the batch base ``51ee191`` this node is RED only
+        structurally (no ``#patch_main``, ``evidence/inc-7/red-at.txt``); its
+        clauses are shown RED by mutants M10-M12 (``evidence/inc-7/mutations.txt``).
+        """
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            out = []
+            async with app.run_test(size=(118, 54)) as pilot:
+                await _at_session(app, pilot, tmp_path)
+                for size in ((118, 54), (220, 60), (260, 70), (118, 54)):
+                    await pilot.resize_terminal(*size)
+                    await _poll(pilot, lambda: app.size == size)
+                    await settle(pilot, 4)
+                    out.append((size, {key: await _at_16_reading(app, pilot, key) for key in AT_SCREENS}))
+            return out
+    
+        steps = asyncio.run(_drive())
+        for size, readings in steps:
+            for key, r in readings.items():
+                assert r["overflow"] == [], (size, key, r["overflow"])
+                assert r["blank"] == [], (size, key, r["blank"])
+                if size[0] >= 220:
+>                   assert r["void"] <= 2 or r["clipped"] == 0, (size, key, r["void"], r["clipped"])
+E                   AssertionError: ((220, 60), 'flow_execution', 216, 2)
+E                   assert (216 <= 2 or 2 == 0)
+
+tests\test_b97_width.py:1688: AssertionError
+_______________ test_paste_parse_then_apply_matches_file_loaded _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_paste_parse_then_apply_ma0')
+
+    def test_paste_parse_then_apply_matches_file_loaded(tmp_path: Path) -> None:
+        """A parsed paste replaces the document and drives the existing apply
+        path with the SAME save-back prompt name as a file-loaded document.
+    
+        Intent: LLR-014.2 — the ``parse_paste`` action routes the paste text
+        through ``ChangeService.load_text``, replacing the owned document
+        (entries present). LLR-014.3 (F-A-06) — the parsed document then drives
+        the EXISTING ``apply_doc`` path, and the post-apply save-back prompt's
+        pre-filled name is IDENTICAL to a file-loaded document's, since the
+        name is ``<variant_id>-patched.s19`` (driven by the loaded image's stem,
+        NOT by ``source_path``). No new write surface — the same apply path.
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input, TextArea
+    
+        image_path = _make_s19_image(tmp_path)
+        # One entry inside the loaded image's [0x100, 0x110) range so apply
+        # writes ≥1 entry and the save-back prompt opens (S19).
+        entries = [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+        paste_text = json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": entries,
+            }
+        )
+        doc_path = _write_v2_document(tmp_path / "patch.json", entries)
+    
+        async def _apply_via(source: str) -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                if source == "paste":
+                    app.query_one(
+                        "#patch_paste_text", TextArea
+                    ).text = paste_text
+                    app.query_one(
+                        "#patch_paste_parse_button", Button
+                    ).press()
+                else:
+                    _set_entry_inputs(app, path_text=str(doc_path))
+                    panel.request_action("load_doc")
+                await pilot.pause()
+    
+                outcomes["entries"] = len(
+                    app._change_service.document.entries
+                )
+    
+                panel.request_action("apply_doc")
+                await pilot.pause()
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["saveback_name"] = name_input.value
+            return outcomes
+    
+        pasted = asyncio.run(_apply_via("paste"))
+        loaded = asyncio.run(_apply_via("file"))
+    
+        # parse_paste replaced the document with the parsed entries.
+>       assert pasted["entries"] == 1
+E       assert 0 == 1
+
+tests\test_tui_patch_editor_v2.py:311: AssertionError
+____________________________ test_save_back_prompt ____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_save_back_prompt0')
+
+    def test_save_back_prompt(tmp_path: Path) -> None:
+        """The post-apply prompt offers an editable suggestion; decline writes
+        nothing; adversarial typed names are contained or refused.
+    
+        Intent: LLR-002.7 UI half (F-Q-10) — after an apply with ≥1 applied
+        entry on an S19 image the prompt appears pre-filled with
+        ``<variant_id>-patched.s19``; declining leaves ``saved_path`` ``None``
+        and writes no file; the operator-typed name passes the F-S-01
+        sanitizer — a traversal name and an absolute path are neutralised into
+        the work area, a reserved device name is refused (3 adversarial cases —
+        the v2 replacement for the retired batch-04 containment tests).
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            workarea = tmp_path / ".s19tool" / "workarea"
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                async def _apply() -> None:
+                    panel.request_action("apply_doc")
+                    await pilot.pause()
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+    
+                # Stage 1 — prompt appears with the pre-filled suggestion.
+                await _apply()
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["suggestion"] = name_input.value
+    
+                # Stage 2 — decline: nothing written, saved_path stays None.
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await pilot.pause()
+                outcomes["prompt_hidden_after_decline"] = prompt.has_class(
+                    "hidden"
+                )
+                outcomes["declined_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["s19_after_decline"] = sorted(
+                    p.name for p in workarea.rglob("*.s19")
+                )
+    
+                # Stage 3 — the suggestion is editable; adversarial names.
+                async def _confirm_with(name: str) -> None:
+                    await _apply()
+                    name_input.value = name
+                    app.query_one(
+                        "#patch_saveback_confirm_button", Button
+                    ).press()
+                    await pilot.pause()
+    
+                await _confirm_with("..\\escape.s19")
+                outcomes["traversal_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["traversal_escaped"] = (
+                    (tmp_path / "escape.s19").exists()
+                    or (tmp_path.parent / "escape.s19").exists()
+                )
+    
+                await _confirm_with("C:\\evil\\abs.s19")
+                outcomes["absolute_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+    
+                await _confirm_with("CON.s19")
+                outcomes["reserved_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["reserved_files"] = sorted(
+                    p.name for p in workarea.rglob("CON*")
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        assert outcomes["prompt_shown"] is True
+        assert outcomes["suggestion"] == "img-patched.s19"
+        assert outcomes["prompt_hidden_after_decline"] is True
+        assert outcomes["declined_saved_path"] is None
+        assert outcomes["s19_after_decline"] == [], (
+            "declining the prompt must write no patched image"
+        )
+    
+        traversal_path = outcomes["traversal_saved_path"]
+>       assert traversal_path is not None
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:630: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+___________ test_at064c_edit_json_disabled_for_file_backed_document ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26599/test_at064c_edit_json_disabled0')
+
+    def test_at064c_edit_json_disabled_for_file_backed_document(
+        tmp_path: Path,
+    ) -> None:
+        """Edit JSON is DISABLED for a file-backed doc → no popup, no clobber.
+    
+        Intent (AT-064c, US-064b / LLR-064b.4, A-01 data-loss guard): after a
+        FILE load (``source_path is not None``) the Edit-JSON control is disabled
+        and the popup cannot open — so the stale ``DUMMY_CHANGESET_TEXT`` buffer
+        can never be Confirmed to ``load_text``-REPLACE the loaded document. The
+        test also drives the mechanism directly (posting ``EditJsonRequested``) to
+        prove the handler's guard refuses to push the modal and mutates nothing.
+        For a paste-authored doc (``source_path is None``) the same control is
+        ENABLED and the popup opens — the two states asserted in ONE node so the
+        guard is a real discriminator (C-10), not a constant.
+        """
+        from textual.widgets import Button
+    
+        from s19_app.tui.screens import ChangeSetJsonScreen
+    
+        doc_path = _write_v2_document(
+            tmp_path / "loaded.json",
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+        )
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x222", "value": "PASTED"}]
+        )
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                # (a) FILE-backed document → source_path not None → disabled.
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+                await pilot.pause()
+                outcomes["file_source"] = (
+                    app._change_service.document.source_path is not None
+                )
+                outcomes["disabled_when_file"] = app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                outcomes["entries_before"] = _entry_addresses(app)
+    
+                # Drive the mechanism directly — the guard must refuse to push.
+                panel.post_message(
+                    PatchEditorPanel.EditJsonRequested(paste_text="{}")
+                )
+                await pilot.pause()
+                outcomes["popup_after_guarded_open"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+                outcomes["entries_after_guarded_open"] = _entry_addresses(app)
+    
+                # (b) PASTE-authored document → source_path None → enabled + opens.
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["paste_source_none"] = (
+                    app._change_service.document.source_path is None
+                )
+                outcomes["enabled_when_paste"] = not app.query_one(
+                    "#patch_edit_json_button", Button
+                ).disabled
+                app.query_one("#patch_edit_json_button", Button).press()
+                await pilot.pause()
+                outcomes["popup_opens_for_paste"] = isinstance(
+                    app.screen, ChangeSetJsonScreen
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        # (a) file-backed → disabled, guarded open is a no-op, 0 clobber.
+        assert outcomes["file_source"] is True
+        assert outcomes["disabled_when_file"] is True, (
+            "Edit JSON must be DISABLED when a file-backed document is loaded"
+        )
+        assert outcomes["popup_after_guarded_open"] is False, (
+            "the guard must refuse to push the popup over a file-backed document"
+        )
+        assert outcomes["entries_after_guarded_open"] == outcomes[
+            "entries_before"
+        ], "a guarded open must not mutate the loaded document (no clobber)"
+        # (b) paste-authored → enabled, popup opens.
+        assert outcomes["paste_source_none"] is True
+        assert outcomes["enabled_when_paste"] is True, (
+            "Edit JSON must be ENABLED for a paste-authored document"
+        )
+>       assert outcomes["popup_opens_for_paste"] is True, (
+            "the popup must open for a paste-authored document"
+        )
+E       AssertionError: the popup must open for a paste-authored document
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:3376: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_width.py::test_at_b97_16_in_session_resize_grows_and_returns
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at064c_edit_json_disabled_for_file_backed_document
+5 failed, 500 passed in 2459.16s (0:40:59)

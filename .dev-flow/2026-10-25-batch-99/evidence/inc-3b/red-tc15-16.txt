@@ -1,0 +1,104 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 31 items / 27 deselected / 4 selected
+
+tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused FAILED [ 25%]
+tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run PASSED      [ 50%]
+tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address FAILED [ 75%]
+tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok PASSED  [100%]
+
+================================== FAILURES ===================================
+______________ test_tc_b99_15_duplicate_write_out_names_refused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26575/test_tc_b99_15_duplicate_write0')
+
+    def test_tc_b99_15_duplicate_write_out_names_refused(tmp_path: Path) -> None:
+        """Two lanes resolving to one output name (compared case-folded —
+        ``same.s19`` and ``SAME.s19``) refuse the set BEFORE any lane runs:
+        the injected executor is never called, the refusal (existing
+        ``ChainSetRunRecord.diagnostics`` shape) leads with the outcome
+        (UX-C4), names both lanes and the name, and nothing is written.
+    
+        RED at HEAD (P-5): the lanes run and write each other's image —
+        ``same.s19`` exists after the run and no refusal exists.
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        calls: list = []
+    
+        def _spy(flow: Flow, ctx: FlowContext) -> FlowRunResult:
+            calls.append(flow)
+            return FlowRunResult(status=FLOW_STATUS_OK)
+    
+        record = run_chain_set(
+            [_dup_spec("lane_a", "same.s19"), _dup_spec("lane_b", "SAME.s19")],
+            FlowContext(project_dir=project_dir),
+            run_one=_spy,
+        )
+    
+>       assert calls == [], "no lane may run once the set is refused"
+E       AssertionError: no lane may run once the set is refused
+E       assert [Flow(name='t...1, funnel=())] == []
+E         
+E         Left contains 2 more items, first extra item: Flow(name='tpl', blocks=[SourceBlock(image_ref='in.s19', file_type='s19', a2l_ref=None, kind='source'), WriteOutBlock(output_name='same.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     Flow(...
+E         
+E         ...Full output truncated (36 lines hidden), use '-vv' to show
+
+tests\test_b99_staging.py:1646: AssertionError
+_________ test_tc_b99_16_corrupted_write_out_is_error_naming_address __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26575/test_tc_b99_16_corrupted_write0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002A87B43CF50>
+
+    def test_tc_b99_16_corrupted_write_out_is_error_naming_address(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A WRITE-OUT whose placed file is corrupted after placement — a hook
+        flips one data byte (checksum recomputed, so the record parses with the
+        wrong value) between the write and the read-back — ends the block
+        ``error``, aborts the run, and the LAST diagnostic, the painted cause
+        (UX-C2), names the first differing address.
+    
+        RED at HEAD: no read-back exists, so the corrupted write reports
+        ``wrote out.s19`` / ``ok``.
+        """
+        from s19_app.tui.changes.apply import save_patched_image as real_save
+        from tests.b97_fixtures import flip_one_data_byte
+    
+        project_dir, flow = _verify_flow(tmp_path)
+        flipped: list = []
+    
+        def _corrupting_save(mem_map, ranges, save_dir, output_name, **kwargs):
+            target, issues = real_save(
+                mem_map, ranges, save_dir, output_name, **kwargs
+            )
+            if target is not None:
+                flipped.append(flip_one_data_byte(target, target))
+            return target, issues
+    
+        monkeypatch.setattr(fx_service, "save_patched_image", _corrupting_save)
+        result = run_flow(flow, FlowContext(project_dir=project_dir))
+    
+        assert flipped, "the corruption hook did not fire"
+>       assert result.status == FLOW_STATUS_ERROR, result.status
+E       AssertionError: ok
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_staging.py:1728: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+FAILED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+================= 2 failed, 2 passed, 27 deselected in 1.62s ==================

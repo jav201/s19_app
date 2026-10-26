@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 31 items / 30 deselected / 1 selected
+
+tests/test_b99_staging.py::test_at_b99_04_duplicate_names_refused_nothing_written PASSED [100%]
+
+====================== 1 passed, 30 deselected in 4.99s =======================

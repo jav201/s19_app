@@ -1,0 +1,20 @@
+## reverse census: grep -rln "run_chain_set\|write_out\|verify_written_image\|CHAIN_RUN" tests/
+tests/b97_fixtures.py
+tests/test_b97_chips_help.py
+tests/test_b97_flow_builder.py
+tests/test_b97_flow_execution.py
+tests/test_b97_width.py
+tests/test_b99_editor_image.py
+tests/test_b99_staging.py
+tests/test_changes_apply.py
+tests/test_crc_operation.py
+tests/test_flow_a2b_b94.py
+tests/test_flow_chainset_b94.py
+tests/test_flow_external_step_b96.py
+tests/test_flow_report_wire.py
+tests/test_manifest_verify.py
+tests/test_tui_directionb.py
+tests/test_tui_flow_builder_b94.py
+tests/test_tui_flow_execution_b94.py
+tests/test_tui_patch_editor_v2.py
+tests/test_verify_on_save.py

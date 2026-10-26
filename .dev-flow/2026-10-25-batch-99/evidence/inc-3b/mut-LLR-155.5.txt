@@ -1,0 +1,148 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 31 items / 28 deselected / 3 selected
+
+tests\test_b99_staging.py FFF                                            [100%]
+
+================================== FAILURES ===================================
+______________ test_tc_b99_15_duplicate_write_out_names_refused _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_tc_b99_15_duplicate_write0')
+
+    def test_tc_b99_15_duplicate_write_out_names_refused(tmp_path: Path) -> None:
+        """Two lanes resolving to one output name (compared case-folded —
+        ``same.s19`` and ``SAME.s19``) refuse the set BEFORE any lane runs:
+        the injected executor is never called, the refusal (existing
+        ``ChainSetRunRecord.diagnostics`` shape) leads with the outcome
+        (UX-C4), names both lanes and the name, and nothing is written.
+    
+        RED at HEAD (P-5): the lanes run and write each other's image —
+        ``same.s19`` exists after the run and no refusal exists.
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        calls: list = []
+    
+        def _spy(flow: Flow, ctx: FlowContext) -> FlowRunResult:
+            calls.append(flow)
+            return FlowRunResult(status=FLOW_STATUS_OK)
+    
+        record = run_chain_set(
+            [_dup_spec("lane_a", "same.s19"), _dup_spec("lane_b", "SAME.s19")],
+            FlowContext(project_dir=project_dir),
+            run_one=_spy,
+        )
+    
+>       assert calls == [], "no lane may run once the set is refused"
+E       AssertionError: no lane may run once the set is refused
+E       assert [Flow(name='t...1, funnel=())] == []
+E         
+E         Left contains 2 more items, first extra item: Flow(name='tpl', blocks=[SourceBlock(image_ref='in.s19', file_type='s19', a2l_ref=None, kind='source'), WriteOutBlock(output_name='same.s19', fmt='s19', kind='write_out')], schema_version=1, funnel=())
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:1646: AssertionError
+___________ test_at_b99_04_duplicate_names_refused_nothing_written ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_at_b99_04_duplicate_names0')
+
+    def test_at_b99_04_duplicate_names_refused_nothing_written(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B99-04's duplicate-name arm (HLR-155 D7, LLR-155.5): a chain set
+        whose two lanes resolve to one output name (``same.s19`` /
+        ``SAME.s19``, case-folded) is refused — the painted run log (``#fx_log``)
+        leads with the outcome inside the first 50 characters (UX-C4), names
+        both lanes and the file, and no file is written. RED at HEAD: P-5's set
+        writes ``same.s19``.
+    
+        Driven by keys and clicks through the shipped Flow Execution panel
+        (review finding F5): lanes are imported through ``#fx_import``, the run
+        is pressed on ``#fx_run``, and every assertion reads the painted
+        ``#fx_log`` or the files on disk — never an internal attribute.
+        """
+        from textual.widgets import Static
+    
+        from tests.b97_fixtures import (
+            import_lanes,
+            load_project,
+            make_project,
+            run_lanes,
+            write_flow,
+        )
+        from tests.b97_probes import settle
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(260, 90)) as pilot:
+                await settle(pilot)
+                make_project(app, "proj")
+                project_dir = load_project(app, "proj")
+                (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
+                (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
+                write_flow(
+                    project_dir,
+                    "lane_a",
+                    [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
+                )
+                write_flow(
+                    project_dir,
+                    "lane_b",
+                    [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
+                )
+                panel = await import_lanes(app, pilot, "lane_a", "lane_b")
+                await run_lanes(app, pilot, panel)
+                outcomes["log"] = app.query_one("#fx_log", Static).render().plain
+                outcomes["top_files"] = sorted(
+                    p.name for p in project_dir.iterdir()
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        lines = [l for l in outcomes["log"].splitlines() if "Chain set not run" in l]
+>       assert lines, (
+            f"the refusal must be painted in the run log: {outcomes['log']!r}"
+        )
+E       AssertionError: the refusal must be painted in the run log: '00:00.000 lane_a · started\n00:00.011 ▓ lane_a · done · wrote same.s19\n00:00.011 lane_b · started\n00:00.022 ▓ lane_b · done · wrote SAME_1.s19'
+E       assert []
+
+tests\test_b99_staging.py:1997: AssertionError
+______________ test_tc_b99_ux_c10_d7_lane_name_renders_literally ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26583/test_tc_b99_ux_c10_d7_lane_nam0')
+
+    def test_tc_b99_ux_c10_d7_lane_name_renders_literally(tmp_path: Path) -> None:
+        """The D7 refusal names the lanes — a hostile lane name is a new
+        file-derived sink (PDR UX-C10). The Text the sink paints rides
+        ``safe_text``; the hostile literal must survive in ``.plain`` with 0
+        style spans.
+        """
+        from s19_app.utils import safe_text
+    
+        hostile = "[red]x[/red]"
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+    
+        record = run_chain_set(
+            [_dup_spec(hostile, "same.s19"), _dup_spec("plain", "same.s19")],
+            FlowContext(project_dir=project_dir),
+        )
+    
+>       assert record.outcomes == []
+E       AssertionError: assert [ChainRunOutc...agnostics=[])] == []
+E         
+E         Left contains 2 more items, first extra item: ChainRunOutcome(chain='[red]x[/red]', template='tpl', status='error', block_results=[BlockResult(index=0, kind='source..._d7_lane_nam0\\.s19tool\\workarea\\proj\\in.s19')], started_at=64108.2014137, finished_at=64108.202131, diagnostics=[])
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:2035: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+FAILED tests/test_b99_staging.py::test_at_b99_04_duplicate_names_refused_nothing_written
+FAILED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+====================== 3 failed, 28 deselected in 5.94s =======================

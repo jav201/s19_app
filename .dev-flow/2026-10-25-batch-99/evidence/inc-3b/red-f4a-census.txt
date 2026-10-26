@@ -1,0 +1,9 @@
+write_text-limb violations without the F4a dispositions: 7
+  s19_app/tui/app.py:6872 write_text outside the pinned placement allow-list (in 'action_dump_a2l_json')
+  s19_app/tui/crc_designer_view.py:1259 write_text outside the pinned placement allow-list (in '_save_template')
+  s19_app/tui/segment_split_view.py:544 write_text outside the pinned placement allow-list (in '_write')
+  s19_app/tui/services/diff_report_service.py:1761 write_text outside the pinned placement allow-list (in 'generate_diff_report')
+  s19_app/tui/services/diff_report_service.py:2642 write_text outside the pinned placement allow-list (in 'generate_diff_report_html')
+  s19_app/tui/services/flow_persistence_service.py:1032 write_text outside the pinned placement allow-list (in 'save_flow_json')
+  s19_app/tui/services/flow_persistence_service.py:1506 write_text outside the pinned placement allow-list (in 'save_chain_set')
+RED probe OK: the new limb catches all 7 write_text sites; the F4a dispositions are load-bearing.

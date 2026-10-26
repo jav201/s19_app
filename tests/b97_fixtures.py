@@ -723,8 +723,18 @@ def err_chain_demo() -> list:
     with one entry at ``0x00020000`` (outside ``prg.s19``); on HEAD
     ``b514b07`` such a patch reports ``ok`` — ``applied 0 entries`` — so the
     chain never errs. A missing change doc is the error the run log's
-    ``'<ref>' missing`` line names."""
-    return patch_chain_blocks(ERR_CHANGE_DOC)[:3] + [patch_chain_demo()[3]]
+    ``'<ref>' missing`` line names.
+
+    batch-99 Inc 3b re-pin (HLR-155 D7 / LLR-155.5): the err lane keeps its
+    OWN output name — the THREE set pairs this chain with ``patch_chain``,
+    and two lanes resolving to one WRITE-OUT name refuse the set at start
+    now, before the err lane's missing-doc error can even paint.
+    """
+    from s19_app.tui.services.flow_model import WriteOutBlock
+
+    return patch_chain_blocks(ERR_CHANGE_DOC)[:3] + [
+        WriteOutBlock("fw_err.s19")
+    ]
 
 
 def crc_wait_chain_demo(project_dir: Path) -> list:
@@ -814,6 +824,16 @@ def fx_project(app, name: str = "proj1") -> Path:
     write_flow(project_dir, "six_ok_b", six_ok_demo("six_b.s19"))
     write_flow(project_dir, "six_wait", six_wait_demo(project_dir))
     write_flow(project_dir, "flash2_chain", flash2_chain_demo(project_dir))
+    # batch-99 Inc 3b (HLR-155 D7 re-pins): the twin lanes of the TWO_WAIT /
+    # DEEP sets keep their OWN output names — two lanes resolving to one
+    # WRITE-OUT name refuse the set at start now (LLR-155.5), so the
+    # second lane of each pair rides its own template differing only in
+    # the WRITE-OUT name.
+    flash_b = flash_chain_demo(project_dir)
+    flash_b[-1] = replace(flash_b[-1], output_name="fw_app_flashed_copy_b.s19")
+    write_flow(project_dir, "flash_b", flash_b)
+    write_flow(project_dir, "six_ok_c", six_ok_demo("six_c.s19"))
+    write_flow(project_dir, "six_ok_d", six_ok_demo("six_d.s19"))
     chain_b = patch_chain_demo()
     chain_b[3] = replace(chain_b[3], output_name="fw_b.s19")
     write_flow(project_dir, "patch_chain_b", chain_b)

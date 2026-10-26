@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 31 items / 24 deselected / 7 selected
+
+tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused PASSED [ 14%]
+tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run PASSED      [ 28%]
+tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address PASSED [ 42%]
+tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok PASSED  [ 57%]
+tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name PASSED [ 71%]
+tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement PASSED [ 85%]
+tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally PASSED [100%]
+
+====================== 7 passed, 24 deselected in 1.83s =======================

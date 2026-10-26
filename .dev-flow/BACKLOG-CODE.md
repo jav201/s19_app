@@ -1489,6 +1489,13 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 - **▸ (P2, origin batch-99 Inc-7 review F4) Save project accepts a reserved name** (`app.py` ≈:8123): a project saved as `reports`, `crc`, `splits` and so on no longer appears in the Load project dialog (`RESERVED_WORKAREA_HOMES`). **What closes it:** Save project refuses a name in `RESERVED_WORKAREA_HOMES`, case-folded, with a message naming the reserved set.
 - **▸ (P3, origin batch-99 Inc-7 review F3) AT-B99-13 reads `app.screen` type and `app.workarea`** instead of painted text. **What closes it:** assert on the painted dialog title and on the path shown in the status line.
 
+- **▸ (P3, origin batch-99 Inc-3b review) Writers that bypass the HLR-155 placement (LLR-155.3 declared exceptions):**
+  - `crc_designer_view._save_template` overwrites a same-name template in place in the project `templates/` folder, which the gather also writes into;
+  - `flow_persistence_service.save_flow_json` / `save_chain_set` dedup with `exists()` plus a counter, outside the placement.
+  - The `workspace.py` comment calling the gather "the one known violator" is stale.
+  **What closes it:** route these writers through `copy_into_workarea`, or record that replacing a library entry is their intended behaviour (with a requirement), then drop them from the declared exceptions in `tests/test_b99_staging.py`.
+- **▸ (flake, observed batch-99) `test_b97_flow_execution::test_tc_b97_64_a_new_set_run_restarts_the_dwell`** fails under parallel load and passes alone (3/3 on main). It joins the batch-97 flake list.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

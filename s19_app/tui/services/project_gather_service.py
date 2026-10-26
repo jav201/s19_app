@@ -34,11 +34,17 @@ Classification into homes rides the v2 wire's own ``kind`` discriminator
 never lands in the change-set home and vice versa.
 
 Snapshot semantics (LLR-138.4): every gather is a COPY stamped at save time.
-A destination whose bytes already equal the source is skipped (an idempotent
-re-save produces no ``_<N>`` duplicates); a destination that drifted from the
-source is OVERWRITTEN in place (a re-save refreshes stale copies). Divergence
-from later COMMON edits is accepted — the same semantics as the shipped
-binaries copy-in.
+A destination whose bytes already equal the source is skipped — the compare
+runs against the requested name and every existing ``_<N>`` sibling the
+placement produced, so an idempotent re-save stays duplicate-free even
+after drifts (an unchanged re-save reuses the placed ``_<N>`` copy instead
+of stacking another one); a destination that drifted from the source is
+never overwritten in place — since Inc 3b (LLR-155.3, amended by
+LED-2026-10-25-batch-99.7) the changed copy is placed through HLR-155's
+placement (LLR-155.1/.2, :func:`copy_into_workarea`) and takes the next
+free ``_<N>`` name, so a placed artifact is immutable once placed.
+Divergence from later COMMON edits is accepted — the same semantics as the
+shipped binaries copy-in.
 
 Containment (the shipped law): every gathered byte resolves under
 ``<base>/.s19tool/workarea/`` — the destination re-runs ``copy_into_workarea``'s
@@ -56,7 +62,6 @@ seam for both changes.
 from __future__ import annotations
 
 import json
-import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Sequence
@@ -66,6 +71,7 @@ from ..workspace import (
     WorkareaContainmentError,
     _find_workarea_root,
     _path_traverses_reparse_point,
+    copy_into_workarea,
 )
 from .variant_execution_service import MANIFEST_ARTIFACT
 
@@ -246,14 +252,55 @@ def _check_home_contained(home: Path) -> Path:
     return resolved
 
 
+def _same_artifact_name(source_name: str, candidate_name: str) -> bool:
+    """
+    Summary:
+        The sibling-name shape one artifact's placements can take:
+        ``<name>`` itself or a ``_<N>`` suffix of it (the house placement
+        idiom) — ``hotfix.json``, ``hotfix_1.json``, … . Names that merely
+        share the stem prefix (``hotfix_extra.json``) are a different
+        artifact and never match.
+
+    Args:
+        source_name (str): The artifact's file name (e.g. ``hotfix.json``).
+        candidate_name (str): A sibling candidate in the destination home.
+
+    Returns:
+        bool: ``True`` when ``candidate_name`` is ``<name>`` or one of its
+            ``_<N>`` placements.
+
+    Data Flow:
+        - Pure string comparison — no IO, no parse.
+
+    Dependencies:
+        Used by:
+            - _gather_copy
+    """
+    source = Path(source_name)
+    candidate = Path(candidate_name)
+    if candidate.suffix != source.suffix:
+        return False
+    if candidate.stem == source.stem:
+        return True
+    prefix = source.stem + "_"
+    return candidate.stem.startswith(prefix) and candidate.stem[
+        len(prefix):
+    ].isdigit()
+
+
 def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
     """
     Summary:
         Copy one used artifact into its contained project home with the
-        snapshot semantics (LLR-138.4): skip when the destination already
-        holds the source's exact bytes (idempotent re-save — never a
-        ``_<N>`` duplicate), overwrite in place when it drifted (re-save
-        refreshes stale copies), create the home on demand.
+        snapshot semantics (LLR-138.4): skip when a destination the
+        placement could have produced — the requested name or an existing
+        ``_<N>`` sibling — already holds the source's exact bytes (an
+        idempotent re-save, after any number of drifts, adds no further
+        ``_<N>`` duplicate); place a drifted source through HLR-155's
+        placement (LLR-155.1/.2 via :func:`copy_into_workarea`) so it takes
+        the next free ``_<N>`` name and the existing final name is never
+        replaced or deleted (LLR-155.3 as amended by LED
+        2026-10-25-batch-99.7); create the home on demand.
 
     Args:
         source (Path): The artifact's current on-disk path (the COMMON
@@ -264,40 +311,58 @@ def _gather_copy(source: Path, home: Path) -> tuple[bool, Path]:
 
     Returns:
         tuple[bool, Path]: ``(copied, destination)`` — ``copied`` is
-            ``False`` when the destination already held the source's bytes
-            (skipped), ``True`` when bytes were written; ``destination``
-            is the resolved target file either way.
+            ``False`` when a matching sibling already held the source's
+            bytes (skipped), ``True`` when bytes were placed;
+            ``destination`` is the resolved target file either way — the
+            sibling that held the bytes on a skip (the requested name or an
+            ``_<N>`` placement), the next free ``_<N>`` name on drift.
 
     Raises:
         WorkareaContainmentError: When ``home`` fails the containment
-            checks (the escape-refusal limb).
-        OSError: When the read/compare/write fails mid-copy.
+            checks (the escape-refusal limb) or the placement refuses.
+        OSError: When the read/compare fails mid-copy.
+        FileNotFoundError: When ``source`` does not exist.
 
     Data Flow:
         - ``_check_home_contained(home)`` first — no byte moves before the
           containment verdict.
-        - Destination == resolved home / source name; byte-compare on hit;
-          ``unlink`` then ``shutil.copy2`` on drift.
+        - Byte-compare against the requested name and every ``_<N>``
+          sibling; on drift, ``copy_into_workarea`` stages privately and
+          claims the next free name — never an ``unlink``/recopy onto the
+          existing final name.
 
     Dependencies:
         Uses:
             - _check_home_contained
-            - shutil.copy2
+            - _same_artifact_name (the sibling scan)
+            - copy_into_workarea (the placement, LLR-155.1/.2)
         Used by:
             - gather_project_artifacts
     """
     resolved_home = _check_home_contained(home)
+    source_bytes = source.read_bytes()
     destination = resolved_home / source.name
-    if destination.exists():
-        try:
-            if destination.read_bytes() == source.read_bytes():
-                return False, destination
-        except OSError:
-            pass  # an unreadable destination is overwritten, not trusted
-        destination.unlink()
-    resolved_home.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source, destination)
-    return True, destination
+    # LLR-138.4 (review finding F1): the byte-compare must run against
+    # EVERY name the placement could have produced — ``<name>`` and each
+    # ``_<N>`` — not only the requested name. After one drift the current
+    # bytes live at ``_<N>``; comparing only ``<name>`` would place a fresh
+    # ``_<N+1>`` on every unchanged re-save.
+    if resolved_home.is_dir():
+        for sibling in sorted(resolved_home.iterdir()):
+            if sibling.is_symlink() or not _same_artifact_name(
+                source.name, sibling.name
+            ):
+                continue  # a symlinked or foreign name is not a placement
+            # this artifact produced — never trusted as a reuse target
+            try:
+                if sibling.is_file() and sibling.read_bytes() == source_bytes:
+                    return False, sibling
+            except OSError:
+                continue  # an unreadable sibling is not trusted, so the
+                # scan keeps looking and the placement takes the next
+                # free name
+    placed = copy_into_workarea(source, resolved_home)
+    return True, placed
 
 
 @dataclass(slots=True)

@@ -1,0 +1,1594 @@
+...............F..FFF..FF.....F.F.FFF..FFF..FFF.FFF.FF.F..FFFFF.F....F.. [ 33%]
+.F...................................................................... [ 66%]
+.......................................................................  [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b97_21_three_lane_run_paints_each_cable _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_21_three_lane_run_0')
+
+    def test_tc_b97_21_three_lane_run_paints_each_cable(tmp_path: Path) -> None:
+        """TC-B97-21 (LLR-147.1, painted arm): after the 3-lane run at 118x54 the
+        cables read lane 0 ``▓ ▓ ◇`` (``ok ok notices ok``), lane 1 ``▓ □ ░``
+        (waiting at block 3) and lane 2 ``▓ ✗ ░`` (the patch block errs) — read
+        off the painted cells; before the run every cable is ``░``.
+    
+        RED on main: the lane paints a progress bar, no ``◇`` (main-observable
+        clause, asserted first). Mutation: the cable painted from block j+1's
+        status.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            before = [cable_marks(app, panel, i, 4) for i in range(3)] if panel.query("#fx_cable_0_0") else None
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            plain = panel.lane_paint_plain(0)
+            statuses = [[r.status for r in o.block_results] for o in panel.last_run_record.outcomes]
+            assert "◇" in plain, f"lane 0 paints its notices cable: {plain!r}"
+            return plain, before, [cable_marks(app, panel, i, 4) for i in range(3)], statuses
+    
+>       plain, before, after, statuses = run_fx(tmp_path, (118, 54), body, stems=THREE)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_21_three_lane_run_0/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+        before = [cable_marks(app, panel, i, 4) for i in range(3)] if panel.query("#fx_cable_0_0") else None
+        await run_lanes(app, pilot, panel, key=True)
+        await settle(pilot, 4)
+        plain = panel.lane_paint_plain(0)
+        statuses = [[r.status for r in o.block_results] for o in panel.last_run_record.outcomes]
+>       assert "◇" in plain, f"lane 0 paints its notices cable: {plain!r}"
+E       AssertionError: lane 0 paints its notices cable: '░ patch_chain · not run · 4 blocks\n╭─ ◉ LOAD ──────────╮     ╭─ ▣ PATCH ─────────╮    ╭─ ✓ CHECK ─────────╮    ╭─ ▼ WRITE-OUT ─────╮\n│ prg.s19           │     │ calib_hotfix.json │    │ baseline.chk.json │    │ …_app_patched.s19 │\n│ Bind fmt s19      │──░─▶│ → image           │─░─▶│ advisory → image  │─░─▶│ fmt s19 → file    │\n│ ░ not run         │     │ ░ not run         │    │ ░ not run         │    │ ░ not run         │\n╰───────────────────╯     ╰───────────────────╯    ╰───────────────────╯    ╰───────────────────╯'
+E       assert '◇' in '░ patch_chain · not run · 4 blocks\n╭─ ◉ LOAD ──────────╮     ╭─ ▣ PATCH ─────────╮    ╭─ ✓ CHECK ─────────╮    ╭─ ▼ ...░ not run         │\n╰───────────────────╯     ╰───────────────────╯    ╰───────────────────╯    ╰───────────────────╯'
+
+tests\test_b97_flow_execution.py:440: AssertionError
+___ test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size0] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus0')
+size = (118, 54)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608046AA90>
+
+    @pytest.mark.parametrize("size", VERTICAL)
+    def test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept(
+        tmp_path: Path, size, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """TC-B97-23 (LLR-147.3, 3-lane fixture; PC-24 at 118x53): after Run by
+        ``enter`` lane 1 waits — its waiting card and ``#fx_confirm_1`` lie in
+        the lanes viewport, the focus is still on ``#fx_run``, lanes 0 and 2 show
+        no Confirm, two red pending lines lead with a glyph outside the cable
+        vocabulary, the REQUIRED line names ``flash_chain`` and the confirm key;
+        the attention Confirm paints differently from ``#fx_run`` (compositor
+        strips); after a confirm the REQUIRED line is gone.
+    
+        Why: the human must see what is owed, and the key that answers it, without
+        the focus jumping (a repeated key must not attest work, U2-3). RED on
+        main: no REQUIRED line. Mutations: Confirm auto-focused; the REQUIRED
+        line not cleared.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
+            assert required_main, "a REQUIRED line is shown while a lane waits"
+            view = panel.query_one("#fx_lanes_scroll").scrollable_content_region
+            card = panel.query_one("#fx_card_1_2").region
+            confirm = panel.query_one("#fx_confirm_1")
+            pending = [r.strip() for r in painted_rows(app, panel.query_one("#fx_lane_1_pending")) if r.strip()]
+            pending_colours = {run.fg for run in strip_runs(app, panel.query_one("#fx_lane_1_pending"))}
+            required = [r.strip() for r in painted_rows(app, panel.query_one("#fx_required")) if r.strip()]
+            confirm_runs = strip_runs(app, confirm)
+            run_runs = strip_runs(app, panel.query_one("#fx_run"))
+            state = dict(
+                card_in=_inside(card, view),
+                confirm_in=_inside(confirm.region, view),
+                focused=app.focused.id if app.focused else None,
+                others=[panel.query_one(f"#fx_confirm_{i}").display for i in (0, 2)],
+                pending=pending,
+                pending_colours=pending_colours,
+                required=required,
+                confirm_style={(r.fg, r.bg, r.bold) for r in confirm_runs},
+                run_style={(r.fg, r.bg, r.bold) for r in run_runs},
+            )
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1 and not panel.query_one("#fx_required").display, 200)
+            state["required_after"] = [w for w in panel.query("#fx_required") if is_displayed(w)]
+            return state
+    
+>       state = run_fx(tmp_path, size, body, stems=THREE, run=True, evidence=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:572: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus0/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+        required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
+>       assert required_main, "a REQUIRED line is shown while a lane waits"
+E       AssertionError: a REQUIRED line is shown while a lane waits
+E       assert []
+
+tests\test_b97_flow_execution.py:543: AssertionError
+___ test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size1] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus1')
+size = (118, 53)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260827A2510>
+
+    @pytest.mark.parametrize("size", VERTICAL)
+    def test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept(
+        tmp_path: Path, size, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """TC-B97-23 (LLR-147.3, 3-lane fixture; PC-24 at 118x53): after Run by
+        ``enter`` lane 1 waits — its waiting card and ``#fx_confirm_1`` lie in
+        the lanes viewport, the focus is still on ``#fx_run``, lanes 0 and 2 show
+        no Confirm, two red pending lines lead with a glyph outside the cable
+        vocabulary, the REQUIRED line names ``flash_chain`` and the confirm key;
+        the attention Confirm paints differently from ``#fx_run`` (compositor
+        strips); after a confirm the REQUIRED line is gone.
+    
+        Why: the human must see what is owed, and the key that answers it, without
+        the focus jumping (a repeated key must not attest work, U2-3). RED on
+        main: no REQUIRED line. Mutations: Confirm auto-focused; the REQUIRED
+        line not cleared.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
+            assert required_main, "a REQUIRED line is shown while a lane waits"
+            view = panel.query_one("#fx_lanes_scroll").scrollable_content_region
+            card = panel.query_one("#fx_card_1_2").region
+            confirm = panel.query_one("#fx_confirm_1")
+            pending = [r.strip() for r in painted_rows(app, panel.query_one("#fx_lane_1_pending")) if r.strip()]
+            pending_colours = {run.fg for run in strip_runs(app, panel.query_one("#fx_lane_1_pending"))}
+            required = [r.strip() for r in painted_rows(app, panel.query_one("#fx_required")) if r.strip()]
+            confirm_runs = strip_runs(app, confirm)
+            run_runs = strip_runs(app, panel.query_one("#fx_run"))
+            state = dict(
+                card_in=_inside(card, view),
+                confirm_in=_inside(confirm.region, view),
+                focused=app.focused.id if app.focused else None,
+                others=[panel.query_one(f"#fx_confirm_{i}").display for i in (0, 2)],
+                pending=pending,
+                pending_colours=pending_colours,
+                required=required,
+                confirm_style={(r.fg, r.bg, r.bold) for r in confirm_runs},
+                run_style={(r.fg, r.bg, r.bold) for r in run_runs},
+            )
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1 and not panel.query_one("#fx_required").display, 200)
+            state["required_after"] = [w for w in panel.query("#fx_required") if is_displayed(w)]
+            return state
+    
+>       state = run_fx(tmp_path, size, body, stems=THREE, run=True, evidence=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:572: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_three_lane_paus1/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+        required_main = [w for w in panel.query("#fx_required") if is_displayed(w)]
+>       assert required_main, "a REQUIRED line is shown while a lane waits"
+E       AssertionError: a REQUIRED line is shown while a lane waits
+E       assert []
+
+tests\test_b97_flow_execution.py:543: AssertionError
+_______________ test_tc_b97_23_two_waiting_lanes_one_attention ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_two_waiting_lan0')
+
+    def test_tc_b97_23_two_waiting_lanes_one_attention(tmp_path: Path) -> None:
+        """TC-B97-23 (LLR-147.3 boundary: two lanes waiting): one REQUIRED line
+        naming the attention lane (the first in lane order), two Confirms shown,
+        and only the attention Confirm in the attention style — its painted
+        cells differ from the other waiting Confirm's and from ``#fx_run``'s.
+    
+        RED by mutation: ``fx-attention`` left on every waiting Confirm → the two
+        Confirms paint equal styles.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            styles = {}
+            for wid in ("fx_confirm_0", "fx_confirm_1", "fx_run"):
+                styles[wid] = {(r.fg, r.bg, r.bold) for r in strip_runs(app, panel.query_one(f"#{wid}"))}
+            required = [r.strip() for r in painted_rows(app, panel.query_one("#fx_required")) if r.strip()]
+            shown = [panel.query_one(f"#fx_confirm_{i}").display for i in (0, 1)]
+            classes = [panel.query_one(f"#fx_confirm_{i}").has_class("fx-attention") for i in (0, 1)]
+            return styles, required, shown, classes
+    
+        styles, required, shown, classes = run_fx(tmp_path, (118, 54), body, stems=TWO_WAIT, run=True)
+>       assert shown == [True, True]
+E       assert [False, False] == [True, True]
+E         
+E         At index 0 diff: False != True
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:606: AssertionError
+_ test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size0] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_waiting_card_pa2')
+size = (118, 54), fixture = 'deep'
+
+    @pytest.mark.parametrize("size", VERTICAL)
+    @pytest.mark.parametrize("fixture", ["wait_third_6", "deep"])
+    def test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view(tmp_path: Path, size, fixture) -> None:
+        """TC-B97-23 (LLR-147.3, the waiting lane past the viewport; PC-24): on
+        ``wait_third_6`` the waiting card would lie past the viewport's right
+        edge at scroll 0 (fixture guard) and on ``deep`` past its right AND
+        bottom edges; after the pause the waiting card and its Confirm lie inside
+        the viewport and the focus is still on ``#fx_run``.
+    
+        RED by mutation: the scroll step removed → the card outside the
+        viewport.
+        """
+        stems = SIX if fixture == "wait_third_6" else DEEP
+        lane = len(stems) - 1
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            view = scroll.scrollable_content_region
+            card = panel.query_one(f"#fx_card_{lane}_4")
+            confirm = panel.query_one(f"#fx_confirm_{lane}")
+            await poll(pilot, lambda: _inside(card.region, view) and _inside(confirm.region, view))
+            at_zero = (card.region.right + int(scroll.scroll_x), card.region.bottom + int(scroll.scroll_y))
+            return (
+                at_zero, (view.right, view.bottom), _inside(card.region, view), _inside(confirm.region, view),
+                app.focused.id if app.focused else None,
+            )
+    
+        at_zero, edges, card_in, confirm_in, focused = run_fx(tmp_path, size, body, stems=stems, run=True)
+        assert at_zero[0] > edges[0], f"guard: the card lies past the right edge at scroll 0: {at_zero} {edges}"
+        if fixture == "deep":
+>           assert at_zero[1] > edges[1], f"guard: the card lies past the bottom edge at scroll 0: {at_zero} {edges}"
+E           AssertionError: guard: the card lies past the bottom edge at scroll 0: (128, 37) (114, 38)
+E           assert 37 > 38
+
+tests\test_b97_flow_execution.py:643: AssertionError
+_ test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size1] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_23_waiting_card_pa3')
+size = (118, 53), fixture = 'deep'
+
+    @pytest.mark.parametrize("size", VERTICAL)
+    @pytest.mark.parametrize("fixture", ["wait_third_6", "deep"])
+    def test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view(tmp_path: Path, size, fixture) -> None:
+        """TC-B97-23 (LLR-147.3, the waiting lane past the viewport; PC-24): on
+        ``wait_third_6`` the waiting card would lie past the viewport's right
+        edge at scroll 0 (fixture guard) and on ``deep`` past its right AND
+        bottom edges; after the pause the waiting card and its Confirm lie inside
+        the viewport and the focus is still on ``#fx_run``.
+    
+        RED by mutation: the scroll step removed → the card outside the
+        viewport.
+        """
+        stems = SIX if fixture == "wait_third_6" else DEEP
+        lane = len(stems) - 1
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            view = scroll.scrollable_content_region
+            card = panel.query_one(f"#fx_card_{lane}_4")
+            confirm = panel.query_one(f"#fx_confirm_{lane}")
+            await poll(pilot, lambda: _inside(card.region, view) and _inside(confirm.region, view))
+            at_zero = (card.region.right + int(scroll.scroll_x), card.region.bottom + int(scroll.scroll_y))
+            return (
+                at_zero, (view.right, view.bottom), _inside(card.region, view), _inside(confirm.region, view),
+                app.focused.id if app.focused else None,
+            )
+    
+        at_zero, edges, card_in, confirm_in, focused = run_fx(tmp_path, size, body, stems=stems, run=True)
+        assert at_zero[0] > edges[0], f"guard: the card lies past the right edge at scroll 0: {at_zero} {edges}"
+        if fixture == "deep":
+>           assert at_zero[1] > edges[1], f"guard: the card lies past the bottom edge at scroll 0: {at_zero} {edges}"
+E           AssertionError: guard: the card lies past the bottom edge at scroll 0: (128, 37) (114, 37)
+E           assert 37 > 37
+
+tests\test_b97_flow_execution.py:643: AssertionError
+____________ test_tc_b97_25_painted_lanes_log_and_rerun_in_english ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_25_painted_lanes_l0')
+
+    def test_tc_b97_25_painted_lanes_log_and_rerun_in_english(tmp_path: Path) -> None:
+        """TC-B97-25 (LLR-147.5, painted arm): the painted lanes and run log of
+        the 3-lane run and of the confirmed re-run, and every block summary and
+        diagnostic of both records, hold 0 ``ES_MARKER`` matches.
+    
+        RED on HEAD ``b514b07`` (P-17): ``· ESPERANDO HUMANO — paso externo
+        (block 3/4) · LOG 'flash_log.txt' pendiente``. Mutation: the re-run line
+        reverted to Spanish.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            records = [panel.last_run_record]
+            texts = ["\n".join(painted_rows(app, panel))]
+            texts += [panel.lane_paint_plain(i) for i in range(3)]
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: "re-run" in panel.run_log_plain(), 200)
+            await settle(pilot, 4)
+            texts.append("\n".join(painted_rows(app, panel)))
+            texts.append(panel.run_log_plain())
+            lines = [line for text in texts for line in text.splitlines()]
+            for record in records:
+                lines += _painted(record)
+            return lines
+    
+        lines = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert any("re-run" in line for line in lines), "the confirmed re-run is painted"
+E       AssertionError: the confirmed re-run is painted
+E       assert False
+E        +  where False = any(<generator object test_tc_b97_25_painted_lanes_log_and_rerun_in_english.<locals>.<genexpr> at 0x00000260FC1F64D0>)
+
+tests\test_b97_flow_execution.py:802: AssertionError
+________ test_tc_b97_52_waiting_colour_only_on_waiting_human_elements _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_52_waiting_colour_0')
+
+    def test_tc_b97_52_waiting_colour_only_on_waiting_human_elements(tmp_path: Path) -> None:
+        """TC-B97-52 (LLR-147.7): over the 3-lane paused run every painted cell
+        in the waiting colour (within 4°) belongs to a waiting-human element —
+        the waiting card, the cable into it, the paused lane's status text, a
+        waiting lane's Confirm, the REQUIRED line, the run log's ``□`` line — and
+        each of the six kinds carries at least one; every other accent painted on
+        the four screens lies at least 20° from the waiting hue (39.3°); at least
+        three distinct accents are collected; the Builder, Check Editor and Patch
+        Editor paint 0 waiting cells.
+    
+        RED on main (P-16): the waiting state paints ``.sev-warning`` (no
+        waiting-colour cell, the guard). Mutation: a notices glyph in the
+        waiting colour.
+        """
+        from tests.b97_fixtures import calib_hotfix, load_change_file, load_flow, open_check_editor, open_flow_builder, open_patch_editor
+    
+        async def body(app, pilot, panel, project_dir):
+            assert any(
+                hue_matches(r.fg, WAITING) or hue_matches(r.bg, WAITING) for r in strip_runs(app, panel)
+            ), "guard: at least one cell paints the waiting colour while a lane waits"
+            owners = {
+                "card": [panel.query_one("#fx_card_1_2")],
+                "cable": [panel.query_one("#fx_cable_1_1")],
+                "status": [panel.query_one("#fx_lane_1_head")],
+                "confirm": [panel.query_one("#fx_confirm_1")],
+                "required": [panel.query_one("#fx_required")],
+            }
+            log = panel.query_one("#fx_log")
+            log_rows = painted_rows(app, log)
+            wait_rows = [log.region.y + i for i, row in enumerate(log_rows) if "□" in row]
+            stray, kinds = [], set()
+            runs = strip_runs(app, panel)
+            for run in runs:
+                if not (hue_matches(run.fg, WAITING) or hue_matches(run.bg, WAITING)):
+                    continue
+                kind = next(
+                    (k for k, ws in owners.items() for w in ws if w.region.contains(run.x, run.y)), None
+                )
+                if kind is None and run.y in wait_rows and "□" in run.text:
+                    kind = "log"
+                if kind is None:
+                    stray.append(run)
+                else:
+                    kinds.add(kind)
+            accents = _accents(runs)
+            others = {}
+            builder = await open_flow_builder(app, pilot)
+            await load_flow(app, pilot, "crc_chain")
+            builder.query_one("#flow_run").press()
+            await poll(pilot, lambda: bool(builder.query("#flow_result .flow-banner")))
+            await settle(pilot, 2)
+            others["flow"] = strip_runs(app, builder)
+            check = await open_check_editor(app, pilot)
+            others["check_editor"] = strip_runs(app, check)
+            patch = await open_patch_editor(app, pilot, image=False)
+            await load_change_file(app, pilot, patch, calib_hotfix(project_dir, "dirty.json"))
+            patch.query_one("#patch_entry_address_input").value = "0xEB20"
+            patch.query_one("#patch_entry_bytes_input").value = "01"
+            patch.query_one("#patch_entry_add_button").press()
+            await settle(pilot, 4)
+            others["patch"] = strip_runs(app, patch)
+            return stray, kinds, accents, others
+    
+>       stray, kinds, accents, others = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_52_waiting_colour_0/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+>       assert any(
+            hue_matches(r.fg, WAITING) or hue_matches(r.bg, WAITING) for r in strip_runs(app, panel)
+        ), "guard: at least one cell paints the waiting colour while a lane waits"
+E       AssertionError: guard: at least one cell paints the waiting colour while a lane waits
+E       assert False
+E        +  where False = any(<generator object test_tc_b97_52_waiting_colour_only_on_waiting_human_elements.<locals>.body.<locals>.<genexpr> at 0x00000260FFB09C40>)
+
+tests\test_b97_flow_execution.py:914: AssertionError
+_________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+    def test_tc_b97_53_no_blank_row_outside_or_between_lanes(tmp_path: Path, size) -> None:
+        """TC-B97-53 (LLR-147.8; PC-24 at 118x53): after the 3-lane run no panel
+        row outside ``#fx_lanes_scroll`` is blank, no blank row lies between two
+        consecutive lanes, and the lanes frame ends on the REQUIRED line's row
+        (the first shown of ``#fx_required`` / ``#fx_log``).
+    
+        RED on main (P-32): 3 blank rows outside the lanes frame
+        (main-observable, asserted first).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            blank = blank_panel_rows(app, panel, outside=scroll)
+            lanes = [panel.query_one(f"#fx_lane_{i}") for i in range(3)] if panel.query("#fx_lane_2") else []
+            gaps = [lanes[i + 1].region.y - lanes[i].region.bottom for i in range(len(lanes) - 1)]
+            first = next(w for w in (panel.query_one("#fx_required"), panel.query_one("#fx_log")) if w.display)
+            return blank, gaps, scroll.region.bottom, first.region.y, first.id
+    
+        blank, gaps, bottom, first_y, first_id = run_fx(tmp_path, size, body, stems=THREE, run=True)
+        assert blank == [], f"blank panel rows outside the lanes frame: {blank}"
+        assert gaps == [0, 0], gaps
+>       assert first_id == "fx_required" and bottom == first_y, (bottom, first_y, first_id)
+E       AssertionError: (41, 41, 'fx_log')
+E       assert ('fx_log' == 'fx_required'
+E         
+E         - fx_required
+E         + fx_log)
+
+tests\test_b97_flow_execution.py:1019: AssertionError
+_________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou1')
+size = (118, 53)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+    def test_tc_b97_53_no_blank_row_outside_or_between_lanes(tmp_path: Path, size) -> None:
+        """TC-B97-53 (LLR-147.8; PC-24 at 118x53): after the 3-lane run no panel
+        row outside ``#fx_lanes_scroll`` is blank, no blank row lies between two
+        consecutive lanes, and the lanes frame ends on the REQUIRED line's row
+        (the first shown of ``#fx_required`` / ``#fx_log``).
+    
+        RED on main (P-32): 3 blank rows outside the lanes frame
+        (main-observable, asserted first).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            blank = blank_panel_rows(app, panel, outside=scroll)
+            lanes = [panel.query_one(f"#fx_lane_{i}") for i in range(3)] if panel.query("#fx_lane_2") else []
+            gaps = [lanes[i + 1].region.y - lanes[i].region.bottom for i in range(len(lanes) - 1)]
+            first = next(w for w in (panel.query_one("#fx_required"), panel.query_one("#fx_log")) if w.display)
+            return blank, gaps, scroll.region.bottom, first.region.y, first.id
+    
+        blank, gaps, bottom, first_y, first_id = run_fx(tmp_path, size, body, stems=THREE, run=True)
+        assert blank == [], f"blank panel rows outside the lanes frame: {blank}"
+        assert gaps == [0, 0], gaps
+>       assert first_id == "fx_required" and bottom == first_y, (bottom, first_y, first_id)
+E       AssertionError: (40, 40, 'fx_log')
+E       assert ('fx_log' == 'fx_required'
+E         
+E         - fx_required
+E         + fx_log)
+
+tests\test_b97_flow_execution.py:1019: AssertionError
+_________ test_tc_b97_53_no_blank_row_outside_or_between_lanes[size2] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_no_blank_row_ou2')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (118, 53), (220, 60)])
+    def test_tc_b97_53_no_blank_row_outside_or_between_lanes(tmp_path: Path, size) -> None:
+        """TC-B97-53 (LLR-147.8; PC-24 at 118x53): after the 3-lane run no panel
+        row outside ``#fx_lanes_scroll`` is blank, no blank row lies between two
+        consecutive lanes, and the lanes frame ends on the REQUIRED line's row
+        (the first shown of ``#fx_required`` / ``#fx_log``).
+    
+        RED on main (P-32): 3 blank rows outside the lanes frame
+        (main-observable, asserted first).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            scroll = panel.query_one("#fx_lanes_scroll")
+            blank = blank_panel_rows(app, panel, outside=scroll)
+            lanes = [panel.query_one(f"#fx_lane_{i}") for i in range(3)] if panel.query("#fx_lane_2") else []
+            gaps = [lanes[i + 1].region.y - lanes[i].region.bottom for i in range(len(lanes) - 1)]
+            first = next(w for w in (panel.query_one("#fx_required"), panel.query_one("#fx_log")) if w.display)
+            return blank, gaps, scroll.region.bottom, first.region.y, first.id
+    
+        blank, gaps, bottom, first_y, first_id = run_fx(tmp_path, size, body, stems=THREE, run=True)
+        assert blank == [], f"blank panel rows outside the lanes frame: {blank}"
+        assert gaps == [0, 0], gaps
+>       assert first_id == "fx_required" and bottom == first_y, (bottom, first_y, first_id)
+E       AssertionError: (47, 47, 'fx_log')
+E       assert ('fx_log' == 'fx_required'
+E         
+E         - fx_required
+E         + fx_log)
+
+tests\test_b97_flow_execution.py:1019: AssertionError
+______________ test_tc_b97_53_run_log_paints_at_most_eight_lines ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_run_log_paints_0')
+
+    def test_tc_b97_53_run_log_paints_at_most_eight_lines(tmp_path: Path) -> None:
+        """TC-B97-53 (LLR-147.8, design §3 ``FX_LOG_MAX_ROWS = 8``): five lanes
+        run (10 log lines) paint exactly 8 log rows — ``… 3 earlier lines — the
+        full log is in the run report`` then the newest 7 — and the lanes frame
+        keeps the rest of the height; the run report keeps every chain.
+    
+        Why: an unbounded log would eat the lanes, the screen's hero. RED on
+        HEAD ``b514b07``: the log paints all 10 lines. Mutation: the cap
+        raised.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            rows = [r.strip() for r in painted_rows(app, panel.query_one("#fx_log")) if r.strip()]
+            report = panel.last_run_record.report_path.read_text(encoding="utf-8")
+            return rows, report
+    
+>       rows, report = run_fx(tmp_path, (118, 54), body, stems=("patch_chain",) * 5, run=True)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:1061: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_53_run_log_paints_0/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+        rows = [r.strip() for r in painted_rows(app, panel.query_one("#fx_log")) if r.strip()]
+>       report = panel.last_run_record.report_path.read_text(encoding="utf-8")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'read_text'
+
+tests\test_b97_flow_execution.py:1058: AttributeError
+_ test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems0-expected0] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_54_run_and_each_wa0')
+stems = ('patch_chain', 'flash_chain', 'err_chain')
+expected = ['fx_confirm_1', 'fx_run']
+
+    @pytest.mark.parametrize("stems,expected", [(THREE, ["fx_confirm_1", "fx_run"]), (TWO_WAIT, ["fx_confirm_0", "fx_confirm_1", "fx_run"])])
+    def test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements(tmp_path: Path, stems, expected) -> None:
+        """TC-B97-54 (LLR-147.9): before the run ``#fx_run`` is the one filled
+        element; while lanes wait, each waiting lane's Confirm joins it (two
+        lanes waiting → two Confirms).
+    
+        RED by mutation: a primary Import.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            before = _filled(panel)
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            return before, _filled(panel)
+    
+        before, waiting = run_fx(tmp_path, (118, 54), body, stems=stems)
+        assert before == ["fx_run"], before
+>       assert waiting == expected, waiting
+E       AssertionError: ['fx_run']
+E       assert ['fx_run'] == ['fx_confirm_1', 'fx_run']
+E         
+E         At index 0 diff: 'fx_run' != 'fx_confirm_1'
+E         Right contains one more item: 'fx_run'
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1098: AssertionError
+_ test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems1-expected1] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_54_run_and_each_wa1')
+stems = ('flash_chain', 'flash_chain')
+expected = ['fx_confirm_0', 'fx_confirm_1', 'fx_run']
+
+    @pytest.mark.parametrize("stems,expected", [(THREE, ["fx_confirm_1", "fx_run"]), (TWO_WAIT, ["fx_confirm_0", "fx_confirm_1", "fx_run"])])
+    def test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements(tmp_path: Path, stems, expected) -> None:
+        """TC-B97-54 (LLR-147.9): before the run ``#fx_run`` is the one filled
+        element; while lanes wait, each waiting lane's Confirm joins it (two
+        lanes waiting → two Confirms).
+    
+        RED by mutation: a primary Import.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            before = _filled(panel)
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            return before, _filled(panel)
+    
+        before, waiting = run_fx(tmp_path, (118, 54), body, stems=stems)
+        assert before == ["fx_run"], before
+>       assert waiting == expected, waiting
+E       AssertionError: ['fx_run']
+E       assert ['fx_run'] == ['fx_confirm_..._1', 'fx_run']
+E         
+E         At index 0 diff: 'fx_run' != 'fx_confirm_0'
+E         Right contains 2 more items, first extra item: 'fx_confirm_1'
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1098: AssertionError
+______________ test_tc_b97_55_confirm_rerun_is_one_run_at_a_time ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_confirm_rerun_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026081FD8290>
+
+    def test_tc_b97_55_confirm_rerun_is_one_run_at_a_time(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-55 (LLR-147.10 confirm arm, LED-…97.29): during the confirm
+        re-run of ``flash_chain``, one more press of ``#fx_confirm_1`` and one of
+        ``#fx_run`` → 1 ``ExternalStepConfirmed``, 1 ``run_chain_set`` call, 1 new
+        report; ``#fx_run`` and the Confirm are disabled inside the re-run; after
+        it Run is enabled and the Confirm hidden (the lane finished).
+    
+        Why: a second Confirm queued during its own re-run would confirm the
+        lane's NEXT waiting entry with no human. RED on main: 2 confirms.
+        Mutation: the Confirm left enabled during the re-run.
+        """
+        holder = {"armed": False}
+    
+        def during():
+            if not holder["armed"]:
+                return
+            panel = holder["panel"]
+            holder["inside"] = (panel.query_one("#fx_run").disabled, panel.query_one("#fx_confirm_1").disabled)
+            panel.query_one("#fx_confirm_1").press()
+            panel.query_one("#fx_run").press()
+    
+        spy = RunSpy(monkeypatch, during=during)
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            holder["panel"] = panel
+            calls_before = len(spy.calls)
+            before = reports_of(project_dir)
+            holder["armed"] = True
+            panel.query_one("#fx_confirm_1").press()
+            await poll(pilot, lambda: len(spy.calls) > calls_before and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 10)
+            new = [p for p in reports_of(project_dir) if p not in before]
+            return (
+                len(confirms.posts), len(spy.calls) - calls_before, len(new), holder.get("inside"),
+                panel.query_one("#fx_run").disabled, panel.query_one("#fx_confirm_1").display,
+            )
+    
+        posts, calls, new, inside, run_disabled, confirm_shown = run_fx(
+            tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True
+        )
+>       assert posts == 1 and calls == 1, (posts, calls)
+E       AssertionError: (0, 0)
+E       assert (0 == 1)
+
+tests\test_b97_flow_execution.py:1209: AssertionError
+____ test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_confirm_rerun_t0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608042A010>
+
+    def test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-55 (LLR-147.10 confirm error arm, PC-15): a confirm re-run that
+        raises appends exactly one line naming the chain and ``RuntimeError:
+        boom`` (no traceback); lane 1 still waits at block 3 with its Confirm
+        shown and enabled; after the dwell one more ``c`` re-runs it.
+    
+        RED on main: the raise escapes the confirm handler. Mutation: an error
+        painter that leaves the block confirmed → the retry confirms 0.
+        """
+        holder = {"raise": False}
+        spy = RunSpy(monkeypatch)
+        original = fes.run_chain_set
+    
+        def flaky(chains, ctx, **kwargs):
+            if holder["raise"]:
+                holder["raise"] = False
+                spy.calls.append(("raised",))
+                raise RuntimeError("boom")
+            return original(chains, ctx, **kwargs)
+    
+        monkeypatch.setattr(fes, "run_chain_set", flaky)
+        escaped = {}
+    
+        async def body(app, pilot, panel, project_dir):
+            await run_lanes(app, pilot, panel, key=True)
+            await settle(pilot, 4)
+            log_before = panel.run_log_plain().splitlines()
+            holder["raise"] = True
+            panel.query_one("#fx_confirm_1").press()
+            await poll(pilot, lambda: "boom" in panel.run_log_plain(), 200)
+            await settle(pilot, 6)
+            log_after = panel.run_log_plain().splitlines()
+            lane = panel._lanes[1]
+            state = (lane.paused_block, panel.query_one("#fx_confirm_1").display, panel.query_one("#fx_confirm_1").disabled)
+            calls = len(spy.calls)
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(spy.calls) > calls, 200)
+            return log_before, log_after, state, len(spy.calls) - calls
+    
+        try:
+            before, after, state, retried = run_fx(tmp_path, (118, 54), body, stems=THREE, evidence=True)
+        except Exception as exc:  # noqa: BLE001 - the main-RED arm: the raise escapes
+            escaped["exc"] = exc
+            before, after, state, retried = [], [], None, 0
+        assert "exc" not in escaped, f"the confirm re-run's raise escaped the handler: {escaped.get('exc')!r}"
+        added = after[len(before):]
+>       assert len(added) == 1 and "flash_chain" in added[0] and "RuntimeError: boom" in added[0], added
+E       AssertionError: []
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests\test_b97_flow_execution.py:1265: AssertionError
+_______________ test_tc_b97_56_focus_order_keys_and_chip_states _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_56_focus_order_key0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026082800AD0>
+
+    def test_tc_b97_56_focus_order_keys_and_chip_states(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-56 (LLR-147.11): after the 3-lane run the focus chain runs
+        header chips → Import… → mode → Run → set row → lanes (``#fx_lanes_scroll``,
+        then per lane its rebind input, its Bind, its Confirm) with no group
+        inversion and no displayed control left out; ``enter`` and ``space`` act
+        on one member of each button group (Import…, the mode switch, Save Set,
+        Bind, Confirm); a focused chip paints differently from its unfocused
+        self.
+    
+        RED on main (P-33): no header chip on the screen — counted by TYPE
+        (main-observable, asserted first). Mutation: ``space`` unbound on the chip
+        class.
+        """
+        from s19_app.tui.open_folder_chip import OpenFolderChip
+        from s19_app.tui.window_help import WindowHelpChip
+    
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            screen = app.query_one("#screen_flow_execution")
+            chips = (len(screen.query(OpenFolderChip)), len(screen.query(WindowHelpChip)))
+            assert chips == (1, 1), f"one folder chip and one help chip in the header: {chips}"
+            chain = [w.id for w in app.screen.focus_chain if w.id]
+            groups = {wid: g for g, ids in enumerate(KEY_GROUPS) for wid in ids}
+            lanes_group = len(KEY_GROUPS)
+            seq = [groups.get(w, lanes_group) for w in chain if w in groups or w.startswith(("fx_lanes_scroll", "fx_in_", "fx_bind_", "fx_confirm_"))]
+            reference = {
+                w.id for w in screen.query("*")
+                if w.id and isinstance(w, (Button, Input, Select)) and is_displayed(w) and not w.disabled
+            }
+            index = {wid: chain.index(wid) for wid in ("fx_lanes_scroll", "fx_in_0_0", "fx_in_1_0", "fx_bind_1_0", "fx_confirm_1", "fx_in_2_0")}
+            acted = {}
+    
+            async def key_on(wid, key, predicate):
+                widget = panel.query_one(f"#{wid}")
+                widget.focus()
+                await poll(pilot, lambda: app.focused is widget and not widget.has_class("-active"), 120)
+                await pilot.press(key)
+                acted[(wid, key)] = await poll(pilot, predicate, 120)
+    
+            for key in ("enter", "space"):
+                await key_on("fx_import", key, lambda: bool(app.screen.query("#flow_load_cancel")))
+                app.screen.query_one("#flow_load_cancel").press()
+                await poll(pilot, lambda: not app.screen.query("#flow_load_cancel"))
+                mode = panel.query_one("#fx_mode")
+                before = mode.mode
+                await key_on("fx_mode", key, lambda: mode.mode != before)
+                panel.query_one("#fx_set_name").value = f"keyed_{key}"
+                await key_on("fx_save", key, lambda: (project_dir / "flowsets" / f"keyed_{key}.json").exists())
+                panel.query_one("#fx_in_0_0").value = f"prg_v2.s19" if key == "enter" else "prg.s19"
+                await key_on("fx_bind_0_0", key, lambda: panel.lane_bindings("patch_chain").get(0) == panel.query_one("#fx_in_0_0").value)
+            await key_on("fx_confirm_1", "space", lambda: len(confirms.posts) == 1)
+            states = {}
+            anchor = panel.query_one("#fx_set_name")
+            for wid in ("fx_import", "fx_run", "fx_bind_2_0"):
+                chip = panel.query_one(f"#{wid}")
+                anchor.focus()
+                await poll(pilot, lambda: app.focused is anchor)
+                await settle(pilot, 2)
+                unfocused = chip_style(app, chip)
+                chip.focus()
+                await poll(pilot, lambda: app.focused is chip)
+                await settle(pilot, 2)
+                states[wid] = (unfocused, chip_style(app, chip))
+            return seq, sorted(reference - set(chain)), index, acted, states
+    
+>       seq, missing, index, acted, states = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:1348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:1312: in body
+    index = {wid: chain.index(wid) for wid in ("fx_lanes_scroll", "fx_in_0_0", "fx_in_1_0", "fx_bind_1_0", "fx_confirm_1", "fx_in_2_0")}
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <tuple_iterator object at 0x00000260FF5366E0>
+
+>   index = {wid: chain.index(wid) for wid in ("fx_lanes_scroll", "fx_in_0_0", "fx_in_1_0", "fx_bind_1_0", "fx_confirm_1", "fx_in_2_0")}
+                  ^^^^^^^^^^^^^^^^
+E   ValueError: 'fx_confirm_1' is not in list
+
+tests\test_b97_flow_execution.py:1312: ValueError
+____________________ test_tc_b97_63_three_lane_head_marks _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_63_three_lane_head0')
+
+    def test_tc_b97_63_three_lane_head_marks(tmp_path: Path) -> None:
+        """TC-B97-63 (LLR-147.12, header marks on the 3-lane run): ``◇ □ ✗`` —
+        notices, waiting, error — the worst status of each lane read at scroll 0.
+    
+        RED on main: no lane head (the main-observable clause reads the first
+        glyph of the painted lane box: ``╭``).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            heads = panel.query(".fx-lane-head")
+            rows = [painted_rows(app, h)[0].strip() for h in heads]
+            return [row[:1] for row in rows] or [panel.lane_paint_plain(i).strip()[:1] for i in range(3)]
+    
+        marks = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True)
+>       assert marks == ["◇", "□", "✗"], marks
+E       AssertionError: ['░', '░', '░']
+E       assert ['░', '░', '░'] == ['◇', '□', '✗']
+E         
+E         At index 0 diff: '░' != '◇'
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1422: AssertionError
+________ test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_c_after_the_dwe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260FF7068D0>
+
+    def test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 (LLR-147.13): with lane 1 waiting (its log and output file
+        present) and the focus on ``#fx_run``, ``c`` after ``CONFIRM_DWELL_S``
+        re-runs lane 1 with its waiting block confirmed: the lane ends without
+        waiting, the REQUIRED line is gone and the status line reads ``Confirmed
+        flash_chain — re-running from block 3/4.``; the help entry and the
+        REQUIRED line both name ``c``.
+    
+        Named supersession (gate fold, ux M2): I-9's ``Confirmed <chain> — the
+        run continues.`` claimed an outcome before the re-run ran; the line now
+        says what happens next.
+    
+        RED on main (P-43): ``c`` is unbound (main-observable, asserted first) →
+        0 re-runs.
+        """
+        from s19_app.tui.window_help import section_body_text
+    
+        spy = RunSpy(monkeypatch)
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            required = [r.strip() for r in painted_rows(app, panel.query_one("#fx_required")) if r.strip()]
+            calls = len(spy.calls)
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(spy.calls) > calls and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 4)
+            from s19_app.tui.window_help import window_keys_text
+    
+            return (
+                required, list(confirms.posts), spy.calls[calls:], panel._lanes[1].last_status,
+                panel.query_one("#fx_required").display, list(app.log_lines)[-1:],
+                window_keys_text(app, "flow_execution"),
+            )
+    
+        required, posts, calls, status, shown, status_line, keys_text = run_fx(
+            tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True
+        )
+>       assert posts == [(1, 2)], posts
+E       AssertionError: []
+E       assert [] == [(1, 2)]
+E         
+E         Right contains one more item: (1, 2)
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1477: AssertionError
+___________ test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_burst_on_two_wa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260816A9350>
+
+    def test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 (LLR-147.13 boundary, P-60): ``two_wait`` — after the dwell,
+        ``press("c", "c")`` confirms one lane (the attention lane) and the other
+        still waits: the attention moves to it and its dwell restarts when its
+        attention class is painted; one more ``c`` after the dwell confirms it.
+    
+        RED by mutation: no dwell → the burst confirms 2; the dwell stamped when
+        the record arrived (not after the attention paint) → 2.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c", "c")
+            await poll(pilot, lambda: not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 6)
+            after_burst = (list(confirms.posts), panel._lanes[1].paused_block, panel.query_one("#fx_confirm_1").has_class("fx-attention"))
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 2, 200)
+            return after_burst, list(confirms.posts)
+    
+        after_burst, posts = run_fx(tmp_path, (118, 54), body, stems=TWO_WAIT, run=True, evidence=True)
+>       assert after_burst == ([(0, 2)], 2, True), after_burst
+E       AssertionError: ([], None, False)
+E       assert ([], None, False) == ([(0, 2)], 2, True)
+E         
+E         At index 0 diff: [] != [(0, 2)]
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1518: AssertionError
+____________ test_tc_b97_64_arriving_with_bracket_c_confirms[rail] ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_arriving_with_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260810F8A10>
+arrival = 'rail'
+
+    @pytest.mark.parametrize("arrival", ["rail", "none"])
+    def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch, arrival) -> None:
+        """TC-B97-64 (LLR-147.13, PC-13 arrival arms): with lane 1 waiting, show
+        the Workspace, then arrive with ``]`` — the focus left on the rail, or
+        with no focus at all — and ``c`` after the dwell confirms 1.
+    
+        Why: ``]`` moves no focus, so a binding on the screen's section would be
+        dead on the commonest arrival path while the REQUIRED line says ``press
+        c``. RED by mutation: ``c`` bound on the section (the sealed D10) → 0.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            app.action_show_screen("workspace")
+            await settle(pilot, 2)
+            if arrival == "rail":
+                rail = app.query_one("#rail_item_workspace")
+                rail.focus()
+                await poll(pilot, lambda: app.focused is rail)
+            else:
+                app.set_focus(None)
+                await poll(pilot, lambda: app.focused is None)
+            await pilot.press("right_square_bracket")
+            await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+            focused = app.focused.id if app.focused else None
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1, 200)
+            return focused, list(confirms.posts)
+    
+        focused, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+        assert focused == ("rail_item_workspace" if arrival == "rail" else None), focused
+>       assert posts == [(1, 2)], posts
+E       AssertionError: []
+E       assert [] == [(1, 2)]
+E         
+E         Right contains one more item: (1, 2)
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1605: AssertionError
+____________ test_tc_b97_64_arriving_with_bracket_c_confirms[none] ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_arriving_with_b1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026080645410>
+arrival = 'none'
+
+    @pytest.mark.parametrize("arrival", ["rail", "none"])
+    def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch, arrival) -> None:
+        """TC-B97-64 (LLR-147.13, PC-13 arrival arms): with lane 1 waiting, show
+        the Workspace, then arrive with ``]`` — the focus left on the rail, or
+        with no focus at all — and ``c`` after the dwell confirms 1.
+    
+        Why: ``]`` moves no focus, so a binding on the screen's section would be
+        dead on the commonest arrival path while the REQUIRED line says ``press
+        c``. RED by mutation: ``c`` bound on the section (the sealed D10) → 0.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            app.action_show_screen("workspace")
+            await settle(pilot, 2)
+            if arrival == "rail":
+                rail = app.query_one("#rail_item_workspace")
+                rail.focus()
+                await poll(pilot, lambda: app.focused is rail)
+            else:
+                app.set_focus(None)
+                await poll(pilot, lambda: app.focused is None)
+            await pilot.press("right_square_bracket")
+            await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+            focused = app.focused.id if app.focused else None
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1, 200)
+            return focused, list(confirms.posts)
+    
+        focused, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+        assert focused == ("rail_item_workspace" if arrival == "rail" else None), focused
+>       assert posts == [(1, 2)], posts
+E       AssertionError: []
+E       assert [] == [(1, 2)]
+E         
+E         Right contains one more item: (1, 2)
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1605: AssertionError
+____________ test_tc_b97_64_c_confirms_nothing_out_of_scope[modal] ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_c_confirms_noth1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260804EF710>
+scope = 'modal'
+
+    @pytest.mark.parametrize("scope", ["hidden", "modal", "input", "nothing_waits"])
+    def test_tc_b97_64_c_confirms_nothing_out_of_scope(tmp_path: Path, monkeypatch, scope) -> None:
+        """TC-B97-64 (LLR-147.13 scope and invalid arms): ``c`` confirms nothing
+        while the Workspace is shown (``check_action``), under the ``?`` help
+        modal, with the focus in ``#fx_in_0_0`` (the input's value gains ``c``),
+        or with no lane waiting (the status line says so). The modal arm carries
+        its positive control (gate fold, code-reviewer F4): once the modal is
+        closed, the same ``c`` confirms once — so its 0 is the modal's doing.
+    
+        RED by mutation: the ``check_action`` arm removed → the hidden arm
+        confirms 1.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+        stems = ("patch_chain",) if scope == "nothing_waits" else THREE
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            note = None
+            if scope == "hidden":
+                app.action_show_screen("workspace")
+                await settle(pilot, 2)
+            elif scope == "modal":
+                app.query_one("#window_help_flow_execution").press()
+                await poll(pilot, lambda: type(app.screen).__name__ == "WindowHelpScreen")
+            elif scope == "input":
+                field = panel.query_one("#fx_in_0_0")
+                field.focus()
+                await poll(pilot, lambda: app.focused is field)
+                field.cursor_position = len(field.value)
+            await pilot.press("c")
+            await settle(pilot, 10)
+            if scope == "input":
+                note = panel.query_one("#fx_in_0_0").value
+            if scope == "nothing_waits":
+                note = list(app.log_lines)[-1:]
+            posts = list(confirms.posts)
+            if scope == "modal":
+                app.screen.dismiss()
+                await poll(pilot, lambda: type(app.screen).__name__ != "WindowHelpScreen")
+                await pilot.press("c")
+                await poll(pilot, lambda: len(confirms.posts) == 1, 200)
+                note = list(confirms.posts)
+            return posts, note
+    
+        posts, note = run_fx(tmp_path, (118, 54), body, stems=stems, run=True, evidence=True)
+        assert posts == [], posts
+        if scope == "modal":
+>           assert note == [(1, 2)], f"positive control: with the modal closed, c confirms once: {note}"
+E           AssertionError: positive control: with the modal closed, c confirms once: []
+E           assert [] == [(1, 2)]
+E             
+E             Right contains one more item: (1, 2)
+E             Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1659: AssertionError
+______ test_tc_b97_64_stray_enter_on_run_runs_again_and_confirms_nothing ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_stray_enter_on_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260809A9A10>
+
+    def test_tc_b97_64_stray_enter_on_run_runs_again_and_confirms_nothing(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 (LLR-147.13 invalid arm, P-60): with lane 1 waiting and the
+        focus on ``#fx_run``, a second ``enter`` starts one more run (1 more
+        ``run_chain_set`` call, 1 more report) and confirms nothing — lane 1 waits
+        again.
+    
+        RED by mutation: Confirm auto-focused → the second ``enter`` confirms.
+        """
+        spy = RunSpy(monkeypatch)
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            calls = len(spy.calls)
+            before = reports_of(project_dir)
+            assert app.focused is not None and app.focused.id == "fx_run", app.focused
+            await pilot.press("enter")
+            await poll(pilot, lambda: len(spy.calls) > calls and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 4)
+            new = [p for p in reports_of(project_dir) if p not in before]
+            return len(spy.calls) - calls, len(new), list(confirms.posts), panel._lanes[1].paused_block
+    
+        more, reports, posts, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert more == 1 and reports == 1, (more, reports)
+E       AssertionError: (1, 0)
+E       assert (1 == 1 and 0 == 1)
+
+tests\test_b97_flow_execution.py:1688: AssertionError
+__________ test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_failed_rerun_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026081C40390>
+
+    def test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 / LLR-148.9 (gate fold, ux M2): when a confirmed re-run ends
+        in error — here the human wrote the log but left no output file — the
+        status line reads ``flash_chain failed at block 3/4 — <reason>; Run
+        re-runs the set.``, after the confirm line said ``re-running from block
+        3/4``.
+    
+        Why: the confirm line no longer claims success, so the failure must be
+        said where the confirm was. RED on the pre-fold tree: the status line
+        keeps ``Confirmed flash_chain — the run continues.``.
+        """
+        from tests.b97_probes import record_statuses
+    
+        confirms = ConfirmSpy(monkeypatch)
+        statuses = record_statuses(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            (project_dir / "flash_log.txt").write_text("flashed OK\n", encoding="utf-8")
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1 and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 4)
+            return list(statuses)[-2:], panel._lanes[1].last_status
+    
+        lines, status = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True)
+>       assert status == "error", status
+E       AssertionError: 
+E       assert '' == 'error'
+E         
+E         - error
+
+tests\test_b97_flow_execution.py:1718: AssertionError
+_______________ test_tc_b97_64_a_new_set_run_restarts_the_dwell _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_new_set_run_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026082816B50>
+
+    def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 / I-7 (c) (gate fold, code-reviewer F1): a new set run
+        restarts the attention even when the same lane waits at the same block,
+        through ``_rearm_attention(restart=True)`` — so a ``c`` right after the
+        run ends is a ``c`` inside the dwell and confirms nothing.
+    
+        Why: the old lane's dwell base was taken before the run; reusing it would
+        let a ``c`` typed during the run confirm the moment the run ends.
+        Mutation: the restart arm removed → the ``c`` confirms 1.
+        """
+        from tests.b97_probes import record_statuses
+    
+        confirms = ConfirmSpy(monkeypatch)
+        statuses = record_statuses(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            await poll(pilot, lambda: panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await run_lanes(app, pilot, panel, key=True)
+            await pilot.press("c")
+            await settle(pilot, 6)
+            return list(confirms.posts), list(statuses)[-1:], panel._lanes[1].paused_block
+    
+        posts, last, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert posts == [] and paused == 2, (posts, paused)
+E       AssertionError: ([], None)
+E       assert ([] == []
+E         
+E         Use -v to get more diff and None == 2)
+
+tests\test_b97_flow_execution.py:1747: AssertionError
+_____ test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_64_a_restart_with_0')
+
+    def test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention(tmp_path: Path) -> None:
+        """TC-B97-64 / I-7 (c) (Inc-6 gate re-read, code-reviewer F6): a new set
+        run after which no lane waits clears the attention — the REQUIRED line is
+        hidden and no Confirm keeps ``fx-attention``.
+    
+        Why: ``restart`` clears the attention first, so the old ``target ==
+        current`` early return (both ``None``) skipped the clean-up and left
+        "press c to confirm" on screen with nothing to confirm.
+        Mutation: ``and not restart`` removed from the early return → the
+        REQUIRED line stays shown.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            await poll(pilot, lambda: panel._attention is not None, 200)
+            before = panel.query_one("#fx_required").display
+            for lane in panel._lanes:
+                lane.paused_block = None
+            panel._rearm_attention(restart=True)
+            await settle(pilot, 4)
+            return (
+                before,
+                panel.query_one("#fx_required").display,
+                [c.id for c in panel.query(".fx-confirm") if c.has_class("fx-attention")],
+                panel._attention,
+            )
+    
+        before, shown, lit, attention = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert before is True, "the fixture starts with a lane waiting"
+E       AssertionError: the fixture starts with a lane waiting
+E       assert False is True
+
+tests\test_b97_flow_execution.py:1778: AssertionError
+___________ test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_55_c_during_a_run_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000260FFE71450>
+
+    def test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-55 / LLR-147.10 (gate fold, code-reviewer F5): ``c`` while a run
+        is in flight confirms nothing and says so in its own words — ``c: a run is
+        in progress — wait for it to finish.`` — not the dwell line.
+    
+        RED on the pre-fold tree: the dwell line ``c ignored — … a moment ago``.
+        Mutation: the in-flight arm removed.
+        """
+        holder = {}
+    
+        def during():
+            panel = holder.get("panel")
+            if panel is not None and "line" not in holder:
+                holder["line"] = panel.confirm_attention()
+    
+        RunSpy(monkeypatch, during=during)
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            await poll(pilot, lambda: panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            holder["panel"] = panel
+            await run_lanes(app, pilot, panel, key=True)
+            return holder.get("line"), list(confirms.posts)
+    
+        line, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert line == "c: a run is in progress — wait for it to finish.", line
+E       AssertionError: c: no lane is waiting for confirmation.
+E       assert 'c: no lane i...confirmation.' == 'c: a run is ...it to finish.'
+E         
+E         - c: a run is in progress — wait for it to finish.
+E         + c: no lane is waiting for confirmation.
+
+tests\test_b97_flow_execution.py:1808: AssertionError
+______________ test_tc_b97_63_lane_head_time_is_on_the_set_clock ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_tc_b97_63_lane_head_time_0')
+
+    def test_tc_b97_63_lane_head_time_is_on_the_set_clock(tmp_path: Path) -> None:
+        """TC-B97-63 / LLR-147.12 (gate fold, ux L2): a lane head's time is the
+        log's clock — the time since the set run began, ``mm:ss.mmm`` — so a
+        later lane never reads as faster than it was: each head's time equals its
+        terminal log line's stamp.
+    
+        RED on the pre-fold tree: the head paints the lane's own duration
+        (``0.031s``).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            heads = [painted_rows(app, panel.query_one(f"#fx_lane_{i}_head"))[0] for i in (0, 2)]
+            log = panel.run_log_plain().splitlines()
+            return heads, log
+    
+        heads, log = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True)
+        for head, chain in zip(heads, ("patch_chain", "err_chain")):
+>           terminal = next(line for line in log if f" {chain} · " in line and "started" not in line)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           StopIteration
+
+tests\test_b97_flow_execution.py:1866: StopIteration
+_______ test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_at_b97_09_three_lanes_run0')
+
+    def test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log(tmp_path: Path) -> None:
+        """AT-B97-09 (US-137 / HLR-147, black-box): rail key ``]`` → Flow
+        Execution; Import… ×3 (``patch_chain``, ``flash_chain``, ``err_chain``);
+        click Run → cables ``▓▓◇`` / ``▓□░`` / ``▓✗░``; lane 1's card and Confirm
+        inside the lanes viewport, the Confirm painted unlike Run, the focus left
+        on Run; 0 ``ES_MARKER`` in the log; every waiting-colour cell inside a
+        waiting-human element; then ``crc_wait_chain`` imported and run: its CRC
+        card in the CRC token beside the waiting card.
+    
+        RED on main (P-17): a progress bar and a Spanish log (main-observable:
+        the log matches ``ES_MARKER``, asserted first).
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            app.action_show_screen("workspace")
+            await settle(pilot, 2)
+            await pilot.press("right_square_bracket")
+            await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+            for stem in THREE:
+                await import_flow(app, pilot, stem)
+            await poll(pilot, lambda: panel.query_one("#fx_lane_2").region.width > 0)
+            await settle(pilot, 2)
+            await pilot.click("#fx_run")
+            await poll(pilot, lambda: panel.last_run_record is not None and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 6)
+            log = panel.run_log_plain()
+            assert _spanish(log.splitlines()) == [], f"the run log is in English: {log!r}"
+            marks = [cable_marks(app, panel, i, 4) for i in range(3)]
+            view = panel.query_one("#fx_lanes_scroll").scrollable_content_region
+            inside = (view.contains_region(panel.query_one("#fx_card_1_2").region), view.contains_region(panel.query_one("#fx_confirm_1").region))
+            confirm = {(r.fg, r.bg) for r in strip_runs(app, panel.query_one("#fx_confirm_1"))}
+            run = {(r.fg, r.bg) for r in strip_runs(app, panel.query_one("#fx_run"))}
+            focused = app.focused.id if app.focused else None
+            owners = [panel.query_one(w) for w in ("#fx_card_1_2", "#fx_cable_1_1", "#fx_lane_1_head", "#fx_confirm_1", "#fx_required")]
+            log_widget = panel.query_one("#fx_log")
+            stray = [
+                r for r in strip_runs(app, panel)
+                if (hue_matches(r.fg, WAITING) or hue_matches(r.bg, WAITING))
+                and not any(w.region.contains(r.x, r.y) for w in owners)
+                and not (log_widget.region.contains(r.x, r.y) and "□" in r.text)
+            ]
+            await import_flow(app, pilot, "crc_wait_chain")
+            await poll(pilot, lambda: panel.query_one("#fx_lane_3").region.width > 0)
+            await run_lanes(app, pilot, panel)
+            await settle(pilot, 6)
+            crc = [r.fg for r in strip_runs(app, panel.query_one("#fx_card_3_1")) if "CRC" in r.text]
+            return marks, inside, confirm, run, focused, stray, crc
+    
+        marks, inside, confirm, run, focused, stray, crc = run_fx(tmp_path, (118, 54), body)
+>       assert marks == [["▓", "▓", "◇"], ["▓", "□", "░"], ["▓", "✗", "░"]], marks
+E       AssertionError: [['░', '░', '░'], ['░', '░', '░'], ['░', '░', '░']]
+E       assert [['░', '░', '...░', '░', '░']] == [['▓', '▓', '...▓', '✗', '░']]
+E         
+E         At index 0 diff: ['░', '░', '░'] != ['▓', '▓', '◇']
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:2039: AssertionError
+_________________ test_at_b97_20_keys_only_run_pause_confirm __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26597/test_at_b97_20_keys_only_run_p0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002608162FC90>
+
+    def test_at_b97_20_keys_only_run_pause_confirm(tmp_path: Path, monkeypatch) -> None:
+        """AT-B97-20 (US-137 / HLR-147, black-box, keys only): Import… ×3 by
+        ``enter`` and the picker's keys; the mode by key; ``enter`` on Run → lane
+        1 waits; ``enter`` again → one more report, lane 1 waiting again, 0
+        confirms; ``tab`` into ``#fx_in_0_0`` and ``c`` → the input ends with
+        ``c``, 0 confirms; ``tab`` out, wait 0.6 s, ``c`` → lane 1 re-runs
+        confirmed and the REQUIRED line clears; the REQUIRED line named
+        ``flash_chain``.
+    
+        RED on main (P-43): ``c`` unbound (main-observable). Mutations: Confirm
+        auto-focused → the second ``enter`` confirms; no dwell.
+        """
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            for stem in THREE:
+                await _import_by_keys(app, pilot, panel, stem)
+            mode = panel.query_one("#fx_mode")
+            mode.focus()
+            await poll(pilot, lambda: app.focused is mode)
+            await pilot.press("space")
+            await poll(pilot, lambda: mode.mode == "parallel")
+            await pilot.press("space")
+            await poll(pilot, lambda: mode.mode == "sequential")
+            await pilot.press("tab")
+            await poll(pilot, lambda: app.focused is not None and app.focused.id == "fx_run")
+            before = reports_of(project_dir)
+            await pilot.press("enter")
+            await poll(pilot, lambda: panel.last_run_record is not None and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 4)
+            required = [r.strip() for r in painted_rows(app, panel.query_one("#fx_required")) if r.strip()]
+            await pilot.press("enter")
+            await poll(pilot, lambda: len(reports_of(project_dir)) == len(before) + 2 and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 4)
+            stray = (len(reports_of(project_dir)) - len(before), list(confirms.posts), panel._lanes[1].paused_block)
+            for _ in range(60):
+                if app.focused is not None and app.focused.id == "fx_in_0_0":
+                    break
+                await pilot.press("tab")
+            field = panel.query_one("#fx_in_0_0")
+            field.cursor_position = len(field.value)
+            await pilot.press("c")
+            await settle(pilot, 4)
+            typed = (field.value, list(confirms.posts))
+            await pilot.press("tab")
+            await poll(pilot, lambda: app.focused is not field)
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1 and not panel.query_one("#fx_required").display, 200)
+            return required, stray, typed, list(confirms.posts), panel._lanes[1].last_status
+    
+        required, stray, typed, posts, status = run_fx(tmp_path, (118, 54), body, evidence=True)
+>       assert len(required) == 1 and "flash_chain" in required[0], required
+E       AssertionError: []
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests\test_b97_flow_execution.py:2237: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_21_three_lane_run_paints_each_cable
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_three_lane_pause_waiting_lane_in_view_focus_kept[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_two_waiting_lanes_one_attention
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_23_waiting_card_past_the_viewport_is_brought_into_view[deep-size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_25_painted_lanes_log_and_rerun_in_english
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_52_waiting_colour_only_on_waiting_human_elements
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_no_blank_row_outside_or_between_lanes[size2]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_run_log_paints_at_most_eight_lines
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems0-expected0]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_54_run_and_each_waiting_confirm_are_the_filled_elements[stems1-expected1]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_confirm_rerun_is_one_run_at_a_time
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_confirm_rerun_that_raises_leaves_the_entry_unconfirmed
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_56_focus_order_keys_and_chip_states
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_63_three_lane_head_marks
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_after_the_dwell_confirms_the_attention_lane
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[rail]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[none]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_c_confirms_nothing_out_of_scope[modal]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_stray_enter_on_run_runs_again_and_confirms_nothing
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_failed_rerun_says_so_on_the_status_line
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_restart_with_no_lane_waiting_clears_the_attention
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_c_during_a_run_says_a_run_is_in_progress
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_63_lane_head_time_is_on_the_set_clock
+FAILED tests/test_b97_flow_execution.py::test_at_b97_09_three_lanes_run_paused_lane_in_view_english_log
+FAILED tests/test_b97_flow_execution.py::test_at_b97_20_keys_only_run_pause_confirm
+31 failed, 184 passed in 1518.68s (0:25:18)

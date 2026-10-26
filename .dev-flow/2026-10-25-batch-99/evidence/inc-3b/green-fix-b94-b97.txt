@@ -1,0 +1,15 @@
+            f"rebinding to the same ref wrote a record: {state['noop_bindings']}"
+        )
+        # Editing A changed exactly A's record.
+>       assert state["after_a"] == {0: "variant_b.hex"}, state["after_a"]
+E       AssertionError: {}
+E       assert {} == {0: 'variant_b.hex'}
+E         
+E         Right contains 1 more item:
+E         {0: 'variant_b.hex'}
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:531: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+1 failed, 85 passed in 552.13s (0:09:12)

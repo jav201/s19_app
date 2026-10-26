@@ -1,0 +1,106 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc3b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 31 items / 29 deselected / 2 selected
+
+tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name FAILED [ 50%]
+tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement FAILED [100%]
+
+================================== FAILURES ===================================
+______________ test_tc_b99_13_gather_drift_places_next_free_name ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26576/test_tc_b99_13_gather_drift_pl0')
+
+    def test_tc_b99_13_gather_drift_places_next_free_name(tmp_path: Path) -> None:
+        """LLR-155.3 (LED .7): the gather's drift limb rides HLR-155's placement
+        (LLR-155.1/.2) — a drifted source is placed under the next free ``_<N>``
+        name and the existing final name is never replaced or deleted; a
+        byte-identical re-gather is skipped. RED at HEAD: ``_gather_copy``
+        unlinks and recopies in place, so the drifted destination is replaced
+        (the restored check-then-copy form the LLR's negative control declares).
+        """
+        root = _workarea(tmp_path)
+        project_dir = root / "proj"
+        project_dir.mkdir()
+        common = tmp_path / "common"
+        common.mkdir()
+        source = tmp_path / "lib" / "hotfix.json"
+        source.parent.mkdir()
+        source.write_text('{"v": 1}', encoding="utf-8")
+    
+        def _gather() -> object:
+            return gather_project_artifacts(
+                project_dir,
+                active_document=source,
+                active_document_kind="change",
+                common_patches_dir=common,
+                common_templates_dir=common,
+            )
+    
+        first = _gather()
+        assert first.issues == [], [i.message for i in first.issues]
+        assert first.gathered == {"patches": ["patches/hotfix.json"]}, first.gathered
+        placed = project_dir / "patches" / "hotfix.json"
+        assert placed.read_text(encoding="utf-8") == '{"v": 1}'
+    
+        # drift: the changed source takes the next free name, never an overwrite
+        source.write_text('{"v": 2}', encoding="utf-8")
+        second = _gather()
+        assert second.issues == [], [i.message for i in second.issues]
+>       assert second.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+            second.gathered
+        )
+E       AssertionError: {'patches': ['patches/hotfix.json']}
+E       assert {'patches': [...hotfix.json']} == {'patches': [...tfix_1.json']}
+E         
+E         Differing items:
+E         {'patches': ['patches/hotfix.json']} != {'patches': ['patches/hotfix_1.json']}
+E         
+E         Full diff:
+E           {
+E               'patches': [...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests\test_b99_staging.py:1789: AssertionError
+___________ test_tc_b99_13_no_final_name_replace_outside_placement ____________
+
+    def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
+        """LLR-155.3's census arm (TC-B99-13's second arm): across ``s19_app/``
+        no ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` onto
+        an existing final name exists outside the pinned placement functions —
+        in particular ``project_gather_service._gather_copy`` holds none after
+        the Inc-3b conversion. RED at HEAD: ``_gather_copy`` still unlinks and
+        recopies in place (``project_gather_service.py:297/299``).
+        """
+        all_violations: list = []
+        pkg_root = REPO_ROOT / "s19_app"
+        for path in sorted(pkg_root.rglob("*.py")):
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            all_violations.extend(
+                _final_name_census(rel, path.read_text(encoding="utf-8"))
+            )
+>       assert all_violations == [], (
+            "LLR-155.3: a final-name replace/delete/copy outside the placement "
+            f"functions: {all_violations}"
+        )
+E       AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/services/project_gather_service.py:299 shutil.copy2 outside the pinned placement allow-list (in '_gather_copy')", "s19_app/tui/services/project_gather_service.py:297 unlink outside the pinned placement allow-list (in '_gather_copy')"]
+E       assert ["s19_app/tui...ather_copy')"] == []
+E         
+E         Left contains 2 more items, first extra item: "s19_app/tui/services/project_gather_service.py:299 shutil.copy2 outside the pinned placement allow-list (in '_gather_copy')"
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     's19_app/tui/services/project_gather_service.py:299 shutil.copy2 outside '...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests\test_b99_staging.py:1907: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+FAILED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+====================== 2 failed, 29 deselected in 2.25s =======================

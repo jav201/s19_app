@@ -1,0 +1,7 @@
+collecting ... collected 3 items
+
+tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement PASSED [ 33%]
+tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name PASSED [ 66%]
+tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate PASSED [100%]
+
+============================== 3 passed in 1.38s ==============================

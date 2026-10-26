@@ -1,0 +1,30 @@
+        second = _gather()
+        assert second.issues == [], [i.message for i in second.issues]
+        assert second.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+            second.gathered
+        )
+    
+        # two unchanged re-saves: both skipped against the placed sibling — the
+        # home still holds exactly ``hotfix.json`` + ``hotfix_1.json``
+        for _ in range(2):
+            again = _gather()
+            assert again.issues == [], [i.message for i in again.issues]
+>           assert again.gathered == {"patches": ["patches/hotfix_1.json"]}, (
+                again.gathered
+            )
+E           AssertionError: {'patches': ['patches/hotfix_2.json']}
+E           assert {'patches': [...tfix_2.json']} == {'patches': [...tfix_1.json']}
+E             
+E             Differing items:
+E             {'patches': ['patches/hotfix_2.json']} != {'patches': ['patches/hotfix_1.json']}
+E             
+E             Full diff:
+E               {
+E                   'patches': [...
+E             
+E             ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests\test_b99_staging.py:1850: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+============================== 1 failed in 0.57s ==============================

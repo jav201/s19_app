@@ -2805,8 +2805,10 @@ class S19TuiApp(App):
             non-default arm). The service wraps the union ``run_flow`` per
             chain; this handler re-implements no block semantics. The record
             comes back to :meth:`FlowExecutionPanel.render_run` for the lanes
-            + the run-log strip; a no-project state paints the log error
-            instead of running.
+            + the run-log strip; a REFUSED set (no outcomes, D7
+            diagnostics) also paints its outcome-first line on the status
+            line (LLR-155.5, finding F2); a no-project state paints the log
+            error instead of running.
 
         Args:
             event (FlowExecutionPanel.RunRequested): Carries the lanes, the
@@ -2844,6 +2846,15 @@ class S19TuiApp(App):
             panel.render_run_error(fx_run_error_line(exc))
             return
         panel.render_run(record)
+        if not record.outcomes and record.diagnostics:
+            # HLR-155 D7 / LLR-155.5 (review finding F2): a refused set's
+            # outcome-first line must reach the status line (#log_line_4),
+            # not only the run log — the label's markup stays off, so the
+            # lane names paint literally (UX-C10) and the outcome leads
+            # inside UX-C4's first 50 characters. (The confirm re-run below
+            # drives ONE lane, which D7 can never refuse — a collision needs
+            # two lanes — so it needs no such paint.)
+            self.set_status(record.diagnostics[0])
 
     def on_flow_execution_panel_external_step_confirmed(
         self, event: "FlowExecutionPanel.ExternalStepConfirmed"

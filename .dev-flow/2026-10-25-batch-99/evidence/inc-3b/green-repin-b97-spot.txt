@@ -1,0 +1,59 @@
+..........F.                                                             [100%]
+================================== FAILURES ===================================
+______________ test_tc_b97_53_run_log_paints_at_most_eight_lines ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26640/test_tc_b97_53_run_log_paints_0')
+
+    def test_tc_b97_53_run_log_paints_at_most_eight_lines(tmp_path: Path) -> None:
+        """TC-B97-53 (LLR-147.8, design §3 ``FX_LOG_MAX_ROWS = 8``): five lanes
+        run (10 log lines) paint exactly 8 log rows — ``… 3 earlier lines — the
+        full log is in the run report`` then the newest 7 — and the lanes frame
+        keeps the rest of the height; the run report keeps every chain.
+    
+        Why: an unbounded log would eat the lanes, the screen's hero. RED on
+        HEAD ``b514b07``: the log paints all 10 lines. Mutation: the cap
+        raised.
+        """
+    
+        async def body(app, pilot, panel, project_dir):
+            rows = [r.strip() for r in painted_rows(app, panel.query_one("#fx_log")) if r.strip()]
+            report = panel.last_run_record.report_path.read_text(encoding="utf-8")
+            return rows, report
+    
+>       rows, report = run_fx(tmp_path, (118, 54), body, stems=("patch_chain",) * 5, run=True)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b97_flow_execution.py:1061: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b97_flow_execution.py:329: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b97_flow_execution.py:327: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+panel = FlowExecutionPanel(id='fx_panel')
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26640/test_tc_b97_53_run_log_paints_0/.s19tool/workarea/proj1')
+
+    async def body(app, pilot, panel, project_dir):
+        rows = [r.strip() for r in painted_rows(app, panel.query_one("#fx_log")) if r.strip()]
+>       report = panel.last_run_record.report_path.read_text(encoding="utf-8")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'read_text'
+
+tests\test_b97_flow_execution.py:1058: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_53_run_log_paints_at_most_eight_lines
+1 failed, 11 passed, 63 deselected in 33.63s

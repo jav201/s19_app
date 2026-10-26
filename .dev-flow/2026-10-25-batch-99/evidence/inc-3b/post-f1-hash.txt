@@ -1,0 +1,1 @@
+8e4f018c370ffeb29536baa1ce7d0d65a88557402f2ffb9a8186abc1fc145379 *s19_app/tui/services/project_gather_service.py

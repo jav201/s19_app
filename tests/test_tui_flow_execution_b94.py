@@ -61,11 +61,11 @@ def _patch_json(n_entries: int = 1) -> str:
     )
 
 
-def _base_blocks(source: str = "base.s19") -> list:
+def _base_blocks(source: str = "base.s19", output: str = "base_out.s19") -> list:
     return [
         SourceBlock(source),
         PatchBlock("hotfix.json"),
-        WriteOutBlock("base_out.s19"),
+        WriteOutBlock(output),
     ]
 
 
@@ -558,15 +558,24 @@ def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> No
             await pilot.pause()
             await _show_fx(app, pilot, project)
             panel = app.query_one("#fx_panel", FlowExecutionPanel)
+            # batch-99 Inc 3b (HLR-155 D7 re-pin): the two lanes keep their
+            # OWN output names — importing one template twice mounts two
+            # lanes resolving to one file, and that set is refused at start
+            # now. The second template differs only in the WRITE-OUT name.
+            fps.save_flow_json(
+                Flow(name="base_b", blocks=_base_blocks(output="base_b_out.s19")),
+                "base_b",
+                project,
+            )
             await _import_stem(app, pilot, "base")
             await pilot.pause()
-            await _import_stem(app, pilot, "base")
+            await _import_stem(app, pilot, "base_b")
             await pilot.pause()
-            b_before = panel.lane_bindings("base_2")
+            b_before = panel.lane_bindings("base_b")
 
             _bind(app, 0, 0, "variant_b.hex")
             await pilot.pause()
-            b_after_a = panel.lane_bindings("base_2")
+            b_after_a = panel.lane_bindings("base_b")
             _bind(app, 1, 0, "release.s19")
             await pilot.pause()
 
@@ -601,7 +610,7 @@ def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> No
         if ln.startswith("- Chain ") and " input " in ln
     ]
     assert len(prov) == 2, f"one provenance line per chain input: {prov}"
-    # The chain half is md_safe-escaped in the report (``base_2`` -> ``base\_2``)
+    # The chain half is md_safe-escaped in the report (``base_b`` -> ``base\_b``)
     # — match the escaped prefix and disambiguate by the bound file.
     a_line = next(
         ln for ln in prov if ln.startswith("- Chain base input 1")
@@ -615,7 +624,7 @@ def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> No
     # The run-log paints both lanes' completions.
     # batch-97 Inc-6 (named supersession, D7 (b) / PC-2): the terminal mark of
     # a clean chain is the cable vocabulary's `▓` (`✓` means check block).
-    assert "▓ base" in state["log"] and "▓ base_2" in state["log"]
+    assert "▓ base" in state["log"] and "▓ base_b" in state["log"]
 
 
 # --------------------------------------------------------------------------- #
@@ -849,9 +858,17 @@ def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
             await pilot.pause()
             await _show_fx(app, pilot, project)
             panel = app.query_one("#fx_panel", FlowExecutionPanel)
+            # batch-99 Inc 3b (HLR-155 D7 re-pin): two lanes need two output
+            # names — the second template differs only in the WRITE-OUT
+            # name (a one-name set is refused at start now).
+            fps.save_flow_json(
+                Flow(name="base_b", blocks=_base_blocks(output="base_b_out.s19")),
+                "base_b",
+                project,
+            )
             await _import_stem(app, pilot, "base")
             await pilot.pause()
-            await _import_stem(app, pilot, "base")
+            await _import_stem(app, pilot, "base_b")
             await pilot.pause()
             app.query_one("#fx_run", Button).press()
             for _ in range(15):
@@ -866,7 +883,7 @@ def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
     # Per chain >=2 status lines (start + terminal), 2 chains.
     # batch-97 Inc-6 (named supersession, Q-B97-6a / D7 (b)): the start line
     # carries no mark, the clean terminal mark is `▓`.
-    for chain in ("base", "base_2"):
+    for chain in ("base", "base_b"):
         assert f"{chain} · started" in plain, plain
         assert f"▓ {chain}" in plain, plain
     # The all-clean arm: 0 ✗ lines anywhere.
@@ -896,9 +913,17 @@ def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> 
             await pilot.pause()
             await _show_fx(app, pilot, project)
             panel = app.query_one("#fx_panel", FlowExecutionPanel)
+            # batch-99 Inc 3b (HLR-155 D7 re-pin): two lanes need two output
+            # names — the second template differs only in the WRITE-OUT
+            # name (a one-name set is refused at start now).
+            fps.save_flow_json(
+                Flow(name="base_b", blocks=_base_blocks(output="base_b_out.s19")),
+                "base_b",
+                project,
+            )
             await _import_stem(app, pilot, "base")
             await pilot.pause()
-            await _import_stem(app, pilot, "base")
+            await _import_stem(app, pilot, "base_b")
             await pilot.pause()
             _bind(app, 0, 0, "variant_b.hex")
             await pilot.pause()
@@ -938,12 +963,16 @@ def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> 
             import time as _time
 
             _time.sleep(0.01)
-            before_files = sorted(project.glob("base_out*.s19"))
+            before_files = sorted(project.glob("base_out*.s19")) + sorted(
+                project.glob("base_b_out*.s19")
+            )
             app.query_one("#fx_run", Button).press()
             for _ in range(15):
                 await pilot.pause()
             record = panel.last_run_record
-            after_files = sorted(project.glob("base_out*.s19"))
+            after_files = sorted(project.glob("base_out*.s19")) + sorted(
+                project.glob("base_b_out*.s19")
+            )
             fresh = [p for p in after_files if p not in before_files]
             report = (
                 record.report_path.read_text(encoding="utf-8")
@@ -975,7 +1004,7 @@ def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> 
     assert state["saved_exists"], "save set must write flowsets/variants_a_b.json"
     # Reload restored the SAVED bindings (not the panel's post-save dirt):
     # C-12 — the reloaded set is what re-runs.
-    assert state["restored"] == {"base": {0: "variant_b.hex"}, "base_2": {0: "release.s19"}}, (
+    assert state["restored"] == {"base": {0: "variant_b.hex"}, "base_b": {0: "release.s19"}}, (
         state["restored"]
     )
     # The re-run regenerated both chains' outputs (statuses ok, one written

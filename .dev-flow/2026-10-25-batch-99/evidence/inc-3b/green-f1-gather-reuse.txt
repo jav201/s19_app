@@ -1,0 +1,12 @@
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 32 items / 26 deselected / 6 selected
+
+tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned PASSED [ 16%]
+tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused PASSED [ 33%]
+tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused PASSED [ 50%]
+tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name PASSED [ 66%]
+tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate PASSED [ 83%]
+tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement PASSED [100%]
+
+====================== 6 passed, 26 deselected in 5.25s =======================

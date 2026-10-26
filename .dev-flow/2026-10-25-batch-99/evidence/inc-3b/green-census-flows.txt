@@ -1,0 +1,453 @@
+FFFF...F.....F...FF........................................F......       [100%]
+================================== FAILURES ===================================
+____________ test_tc_b94_05_mode_capture_in_run_record_and_report _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_05_mode_capture_in0')
+
+    def test_tc_b94_05_mode_capture_in_run_record_and_report(tmp_path: Path) -> None:
+        """TC-B94-05 (LLR-019.2, white-box): the record's mode field reads
+        ``parallel`` in 1/1 driven parallel runs and ``sequential`` on the
+        untouched default arm — and the EMITTED report persists the same mode
+        line (the C-42 predicate pins the producer's own form).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+    
+        driven = run_chain_set(
+            [_clean_chain("a"), _clean_chain("b")],
+            ctx,
+            mode=CHAIN_RUN_PARALLEL,
+            set_name="variants_a_b",
+        )
+        untouched = run_chain_set(
+            [_clean_chain("a"), _clean_chain("b")],
+            ctx,
+            set_name="variants_a_b",
+        )
+    
+        # The C-10 captured-value assertion: the driven record differs from the
+        # default arm's record; 1/1 driven parallel runs read ``parallel``.
+        assert driven.mode == CHAIN_RUN_PARALLEL
+        assert untouched.mode == CHAIN_RUN_SEQUENTIAL
+        assert driven.mode != untouched.mode
+        # The persisted surface: the emitted report's own Mode line.
+>       assert driven.report_path is not None
+E       assert None is not None
+E        +  where None = ChainSetRunRecord(mode='parallel', outcomes=[], report_path=None, diagnostics=["Chain set not run: lanes 'a', 'b' both write 'out.s19' — give each lane its own output name. Nothing written."]).report_path
+
+tests\test_flow_chainset_b94.py:124: AssertionError
+__________ test_tc_b94_05_parallel_dispatch_runs_chains_concurrently __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_05_parallel_dispat0')
+
+    def test_tc_b94_05_parallel_dispatch_runs_chains_concurrently(
+        tmp_path: Path,
+    ) -> None:
+        """TC-B94-05's dispatch arm (LLR-019.2): parallel mode executes both
+        chains CONCURRENTLY — each chain waits on a two-party barrier inside its
+        own window, so overlap is structural, not statistical.
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+        barrier = threading.Barrier(2)
+        entered: list[str] = []
+    
+        def _run_one(flow: Flow, run_ctx: FlowContext):
+            entered.append(flow.name)
+            barrier.wait(timeout=10)
+            return run_chain_set.__globals__["run_flow"](flow, run_ctx)
+    
+        record = run_chain_set(
+            [_clean_chain("a"), _clean_chain("b")],
+            ctx,
+            mode=CHAIN_RUN_PARALLEL,
+            run_one=_run_one,
+        )
+>       assert sorted(entered) == ["a", "b"], (
+            f"both chains must ENTER their windows (the barrier proves "
+            f"concurrency); entered={entered}"
+        )
+E       AssertionError: both chains must ENTER their windows (the barrier proves concurrency); entered=[]
+E       assert [] == ['a', 'b']
+E         
+E         Right contains 2 more items, first extra item: 'a'
+E         Use -v to get more diff
+
+tests\test_flow_chainset_b94.py:155: AssertionError
+____________ test_tc_b94_28_run_consumes_each_chains_own_bindings _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_28_run_consumes_ea0')
+
+    def test_tc_b94_28_run_consumes_each_chains_own_bindings(tmp_path: Path) -> None:
+        """TC-B94-28 (LLR-018.2, integration): chain A's provenance names A's
+        file, B's names B's, 0 cross-mentions; a missing input fails that chain
+        only (the siblings complete).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+        record = run_chain_set(
+            [
+                _clean_chain("a"),
+                ChainSpec(
+                    name="b",
+                    template="base",
+                    flow=_clean_chain("b").flow,
+                    bindings={0: "variant_b.hex"},
+                ),
+            ],
+            ctx,
+            set_name="variants_a_b",
+        )
+>       assert [outcome.status for outcome in record.outcomes] == [
+            FLOW_STATUS_OK,
+            FLOW_STATUS_OK,
+        ]
+E       AssertionError: assert [] == ['ok', 'ok']
+E         
+E         Right contains 2 more items, first extra item: 'ok'
+E         Use -v to get more diff
+
+tests\test_flow_chainset_b94.py:204: AssertionError
+______________ test_tc_b94_30_chain_set_report_provenance_lines _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_30_chain_set_repor0')
+
+    def test_tc_b94_30_chain_set_report_provenance_lines(tmp_path: Path) -> None:
+        """TC-B94-30 (LLR-020.2, C-42): the report carries one provenance line
+        per chain input — 1 per input, 0 missing, 0 duplicates; every line
+        resolves to the bound path (name equality with the binding record).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+        record = run_chain_set(
+            [
+                _clean_chain("a"),
+                ChainSpec(
+                    name="b",
+                    template="base",
+                    flow=_clean_chain("b").flow,
+                    bindings={0: "variant_b.hex"},
+                ),
+            ],
+            ctx,
+            set_name="variants_a_b",
+        )
+>       report = record.report_path.read_text(encoding="utf-8")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'read_text'
+
+tests\test_flow_chainset_b94.py:279: AttributeError
+_______________ test_at_b94_24_service_half_reloaded_set_reruns _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_24_service_half_re0')
+
+    def test_at_b94_24_service_half_reloaded_set_reruns(tmp_path: Path) -> None:
+        """The C-12 chain at the service layer: the RELOADED set is what re-runs
+        — reload restores 0-field-diff, and a re-run against the restored
+        bindings regenerates every chain's output (content changes).
+        """
+        project = _project(tmp_path)
+        ctx = FlowContext(project_dir=project)
+        chains = [
+            _clean_chain("a"),
+            ChainSpec(
+                name="b",
+                template="base",
+                flow=_clean_chain("b").flow,
+                bindings={0: "variant_b.hex"},
+            ),
+        ]
+        # The template the set references must exist under flows/ (the reload
+        # resolves it through the hardened flow loader).
+        fps.save_flow_json(chains[0].flow, "base", project)
+        first = run_chain_set(chains, ctx, set_name="variants_a_b")
+        saved = fps.save_chain_set(
+            fps.ChainSet(
+                name="variants_a_b",
+                chains=tuple(
+                    fps.ChainSetEntry(
+                        chain=spec.name,
+                        template=spec.template,
+                        # EFFECTIVE inputs — the operator overrides merged over
+                        # the template's own SOURCE refs (LLR-021.1's >=1-input
+                        # contract records what the chain consumes, not only
+                        # what the operator re-typed).
+                        inputs=tuple(
+                            (index, spec.bindings.get(index, block.image_ref))
+                            for index, block in enumerate(spec.flow.blocks)
+                            if isinstance(block, SourceBlock)
+                        ),
+                        outputs=tuple(path.name for path in outcome.written_paths),
+                    )
+                    for spec, outcome in zip(chains, first.outcomes)
+                ),
+            ),
+            "variants_a_b",
+            project,
+        )
+>       assert saved is not None
+E       assert None is not None
+
+tests\test_flow_chainset_b94.py:528: AssertionError
+___________ test_at_b94_20_rebind_run_reads_each_chains_own_inputs ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_20_rebind_run_read0')
+
+    def test_at_b94_20_rebind_run_reads_each_chains_own_inputs(tmp_path: Path) -> None:
+        """AT-B94-20 (HLR-018, black-box): rebind chain A->variant_b.hex and
+        chain B->release.s19; the run reads X for A and Y for B (the report's
+        provenance lines); rebinding A leaves B's binding byte-identical.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                b_before = panel.lane_bindings("base_2")
+    
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                b_after_a = panel.lane_bindings("base_2")
+                _bind(app, 1, 0, "release.s19")
+                await pilot.pause()
+    
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                log = panel.run_log_plain()
+                record = panel.last_run_record
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+                return {
+                    "b_after_a": b_after_a,
+                    "b_before": b_before,
+                    "log": log,
+                    "report": report,
+                    "statuses": [o.status for o in record.outcomes],
+                }
+    
+        state = asyncio.run(_drive())
+        # Rebinding A left B's binding byte-identical (0 fields changed).
+        assert state["b_after_a"] == state["b_before"] == {}
+        # The run consumed each chain's own bindings: both chains ran clean.
+>       assert state["statuses"] == ["ok", "ok"], state["statuses"]
+E       AssertionError: []
+E       assert [] == ['ok', 'ok']
+E         
+E         Right contains 2 more items, first extra item: 'ok'
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:595: AssertionError
+______________ test_tc_b94_29_run_log_emission_and_all_clean_arm ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc_b94_29_run_log_emissio0')
+
+    def test_tc_b94_29_run_log_emission_and_all_clean_arm(tmp_path: Path) -> None:
+        """TC-B94-29 (LLR-020.1, white-box over the shipped strip): per chain
+        >=2 status lines (start, terminal); the all-clean arm shows 0 ``✗``
+        lines; the painted strip is markup-safe (the C-32 painted oracle).
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                from textual.widgets import Static as _Static
+    
+                rendered = app.query_one("#fx_log", _Static).render()
+                return {"plain": rendered.plain, "spans": rendered.spans}
+    
+        state = asyncio.run(_drive())
+        plain = state["plain"]
+        # Per chain >=2 status lines (start + terminal), 2 chains.
+        # batch-97 Inc-6 (named supersession, Q-B97-6a / D7 (b)): the start line
+        # carries no mark, the clean terminal mark is `▓`.
+        for chain in ("base", "base_2"):
+>           assert f"{chain} · started" in plain, plain
+E           AssertionError: Chain set not run: lanes 'base', 'base_2' both write 'base_out.s19' — give each lane its own output name. Nothing written.
+E           assert 'base · started' in "Chain set not run: lanes 'base', 'base_2' both write 'base_out.s19' — give each lane its own output name. Nothing written."
+
+tests\test_tui_flow_execution_b94.py:858: AssertionError
+__________ test_at_b94_24_save_reload_rerun_regenerates_and_notices ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_at_b94_24_save_reload_rer0')
+
+    def test_at_b94_24_save_reload_rerun_regenerates_and_notices(tmp_path: Path) -> None:
+        """AT-B94-24 (HLR-021, black-box; C-10 non-default battery + C-12):
+        bind TWO different inputs to two chains, run, save the set, reload it,
+        re-run — both outputs regenerate (driven by the RELOADED bindings, not
+        the panel's current state); a moved input yields a per-chain
+        provenance-mismatch notice, not a silent stale run.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                _bind(app, 0, 0, "variant_b.hex")
+                await pilot.pause()
+                _bind(app, 1, 0, "release.s19")
+                await pilot.pause()
+    
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+    
+                # Save the set under its own name.
+                app.query_one("#fx_set_name", Input).value = "variants_a_b"
+                app.query_one("#fx_save", Button).press()
+                await pilot.pause()
+                await pilot.pause()
+                saved_path = project / fps.FLOWSETS_SUBDIR / "variants_a_b.json"
+                saved_exists = saved_path.exists()
+    
+                # C-12: dirty the panel state AFTER the save — the reload, not
+                # the current panel, is what re-runs.
+                _bind(app, 0, 0, "base.s19")
+                await pilot.pause()
+    
+                # Reload through the shipped Load Set control.
+                select = app.query_one("#fx_set_select", Select)
+                assert str(select.value) == "variants_a_b", str(select.value)
+                app.query_one("#fx_load", Button).press()
+                for _ in range(10):
+                    await pilot.pause()
+                restored = {
+                    name: panel.lane_bindings(name) for name in panel.lane_names()
+                }
+    
+                # Re-run: both outputs regenerate. ``save_patched_image`` never
+                # overwrites — a re-run lands FRESH artifacts (the ``_<N>``
+                # dedup idiom), so regeneration is asserted on the artifact set.
+                import time as _time
+    
+                _time.sleep(0.01)
+                before_files = sorted(project.glob("base_out*.s19"))
+                app.query_one("#fx_run", Button).press()
+                for _ in range(15):
+                    await pilot.pause()
+                record = panel.last_run_record
+                after_files = sorted(project.glob("base_out*.s19"))
+                fresh = [p for p in after_files if p not in before_files]
+                report = (
+                    record.report_path.read_text(encoding="utf-8")
+                    if record.report_path
+                    else ""
+                )
+    
+                # The moved-input arm: rename an input away, reload — the lane
+                # mounts with the per-chain mismatch notice.
+                (project / "variant_b.hex").rename(project / "moved_away.hex")
+                app.query_one("#fx_load", Button).press()
+                for _ in range(10):
+                    await pilot.pause()
+                notice = app.query_one("#fx_notice", Static).render().plain
+                paint_after_move = panel.lane_paint_plain(0)
+                return {
+                    "saved_exists": saved_exists,
+                    "restored": restored,
+                    "statuses": [o.status for o in record.outcomes],
+                    "written": [len(o.written_paths) for o in record.outcomes],
+                    "fresh_outputs": [p.name for p in fresh],
+                    "report": report,
+                    "notice": notice,
+                    "paint_after_move": paint_after_move,
+                }
+    
+        state = asyncio.run(_drive())
+        # Save persisted the whole set.
+        assert state["saved_exists"], "save set must write flowsets/variants_a_b.json"
+        # Reload restored the SAVED bindings (not the panel's post-save dirt):
+        # C-12 — the reloaded set is what re-runs.
+        assert state["restored"] == {"base": {0: "variant_b.hex"}, "base_2": {0: "release.s19"}}, (
+            state["restored"]
+        )
+        # The re-run regenerated both chains' outputs (statuses ok, one written
+        # path each). Fresh-artifact count: 0 — B8/TC-1800 (content-identical
+        # reload reuses the target, no `_1` duplicate) supersedes the old
+        # dedup-suffix idiom for the identical-bytes re-run; the C-12 substance
+        # (the RELOADED bindings are what re-run, named in the provenance below)
+        # is unchanged.
+>       assert state["statuses"] == ["ok", "ok"], state["statuses"]
+E       AssertionError: []
+E       assert [] == ['ok', 'ok']
+E         
+E         Right contains 2 more items, first extra item: 'ok'
+E         Use -v to get more diff
+
+tests\test_tui_flow_execution_b94.py:975: AssertionError
+__________________ test_tc702_resave_refreshes_stale_copies ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26594/test_tc702_resave_refreshes_st0')
+
+    def test_tc702_resave_refreshes_stale_copies(tmp_path: Path) -> None:
+        """TC-702 (LLR-138.4, snapshot refresh): divergence from a later COMMON
+        edit is repaired by a re-save — the project copy is refreshed in place
+        (same name, new bytes), never duplicated."""
+        external = tmp_path / "a.s19"
+        external.write_text(S19_A, encoding="utf-8")
+    
+        async def _drive() -> tuple[bytes, int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            common_doc = _write_common_doc(app, "boost.json", kind="change")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(external)
+                await _flush(pilot)
+                _save_project(app, _payload(app, batch=("boost.json",)))
+                await _flush(pilot)
+                # Later COMMON edit after the first snapshot — the save's re-gather
+                # must refresh the project copy in place.
+                common_doc.write_text(
+                    _change_doc_text("change") + " ", encoding="utf-8"
+                )
+                _save_project(app, _payload(app, batch=("boost.json",)))
+                await _flush(pilot)
+                home = app.workarea / "proj" / PROJECT_PATCHES_DIR
+                copies = list(home.glob("boost*.json"))
+                return common_doc.read_bytes(), len(copies)
+    
+        common_now, copy_count = asyncio.run(_drive())
+>       assert copy_count == 1, f"a refresh must keep exactly one copy; found {copy_count}"
+E       AssertionError: a refresh must keep exactly one copy; found 2
+E       assert 2 == 1
+
+tests\test_project_gather.py:461: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_05_mode_capture_in_run_record_and_report
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_05_parallel_dispatch_runs_chains_concurrently
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_28_run_consumes_each_chains_own_bindings
+FAILED tests/test_flow_chainset_b94.py::test_tc_b94_30_chain_set_report_provenance_lines
+FAILED tests/test_flow_chainset_b94.py::test_at_b94_24_service_half_reloaded_set_reruns
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_20_rebind_run_reads_each_chains_own_inputs
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_29_run_log_emission_and_all_clean_arm
+FAILED tests/test_tui_flow_execution_b94.py::test_at_b94_24_save_reload_rerun_regenerates_and_notices
+FAILED tests/test_project_gather.py::test_tc702_resave_refreshes_stale_copies
+9 failed, 57 passed in 182.92s (0:03:02)
