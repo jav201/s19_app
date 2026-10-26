@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_26_per_module_mod_common_byte_order FAILED [100%]
+
+================================== FAILURES ===================================
+_______________ test_tc_b99_26_per_module_mod_common_byte_order _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25991/test_tc_b99_26_per_module_mod_0')
+
+    def test_tc_b99_26_per_module_mod_common_byte_order(tmp_path: Path) -> None:
+        """In a multi-MODULE A2L, module one's MSB_FIRST applies only to its own
+        tags and module two's MSB_LAST to its: BIG_SYM encodes 4113 → ``10 11``
+        and LITTLE_SYM → ``11 10`` — the first module's byte order must not leak
+        across the module boundary."""
+        two_path = tmp_path / "two_module.a2l"
+        two_path.write_text(_TWO_MODULE_A2L, encoding="utf-8")
+        two = parse_a2l_file(two_path)
+        tags = _tags(two)
+    
+        big = tags["BIG_SYM"]
+        little = tags["LITTLE_SYM"]
+>       assert big["effective_byte_order"] == "big"  # MOD_BIG MOD_COMMON MSB_FIRST
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'little' == 'big'
+E         
+E         - big
+E         + little
+
+tests\test_b99_a2l_encode.py:250: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_26_per_module_mod_common_byte_order
+======================= 1 failed, 6 deselected in 0.63s =======================

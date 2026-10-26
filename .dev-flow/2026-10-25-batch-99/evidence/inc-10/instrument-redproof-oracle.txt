@@ -1,0 +1,4 @@
+=== Instrument RED-proof: the independent oracle reports FAILURE first ===
+reader bytes @0x2000: [16, 17]
+PASS: reader agrees with the manifest pin '1011'
+FAILURE REPORTED (expected): deliberately wrong (byte-swapped) expectation

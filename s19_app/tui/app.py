@@ -12519,9 +12519,14 @@ class S19TuiApp(App):
         glyph = "✓" if tag.get("in_memory") else "·"
         source_text = str(tag.get("source") or "assigned")
         raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
-        physical_value_text = str(
-            tag.get("physical_value") if tag.get("physical_value") is not None else ""
-        )
+        if tag.get("physical_value") is not None:
+            physical_value_text = str(tag.get("physical_value"))
+        elif tag.get("raw_value") is not None:
+            # the bytes are present but the COMPU_METHOD refused them (UX-C8):
+            # "n/a", kept distinct from the blank cell of a tag with no bytes
+            physical_value_text = "n/a"
+        else:
+            physical_value_text = ""
         in_mem_text = _a2l_tag_in_memory_display(tag)
         region_text = str(tag.get("memory_region") or "unknown")
         limits_text = ""

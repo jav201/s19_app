@@ -810,20 +810,20 @@ interpreter `s19env`. Full transcripts: `.dev-flow/2026-10-25-batch-99/evidence/
 
 ### LLR-158.1 — Byte-order fallback reads `MOD_COMMON`
 - **Traceability:** HLR-158
-- **Ledger:** none, LED-2026-10-25-batch-99.4
+- **Ledger:** none, LED-2026-10-25-batch-99.4, LED-2026-10-25-batch-99.6
 - **Statement:** *(LLR-158.1..158.3 cross the frozen engine layer — `tui/a2l.py`, `docs/ARCHITECTURE.md` §7; named here.)* The effective byte order (`tui/a2l.py`) shall fall back tag → RECORD_LAYOUT → tag endian → `MOD_COMMON BYTE_ORDER` → `little`, and `encode_physical_to_raw_bytes` and the decode path shall both use it.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B99-23 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_23`
+- **Executed verification:** TC-B99-23 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_23`; TC-B99-42 — `-k tc_b99_42` (each MODULE's own `MOD_COMMON BYTE_ORDER` in a two-module A2L)
 - **Numeric pass threshold:** MSB_FIRST 2-byte: encode 4113 → `10 11`; decode `10 11` → 4113; a symbol whose RECORD_LAYOUT or tag declares `MSB_LAST` (the ASAM little-endian token; `LSB_FIRST` is not an ASAM token) keeps little-endian under a `MSB_FIRST` module.
 - **Negative control:** executed on `307065f` (P-7): `little` → RED.
 - **Boundary catalog:** ☒ boundary — 1-byte value (order irrelevant), 2- and 4-byte values.
 
 ### LLR-158.2 — RAT_FUNC direction
 - **Traceability:** HLR-158
-- **Ledger:** LED-2026-10-25-batch-99.1
+- **Ledger:** LED-2026-10-25-batch-99.1, LED-2026-10-25-batch-99.6
 - **Statement:** `_apply_compu_method` shall decode a RAT_FUNC by solving INT = f(PHYS) for PHYS, taking the root inside the tag's declared physical limits when exactly one is, else the smaller-magnitude root, and returning a decode failure (shown `n/a` with the reason) when no real root exists. The encoder shall compute INT = f(PHYS) directly.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B99-24 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_24`
+- **Executed verification:** TC-B99-24 — `pytest tests/test_b99_a2l_encode.py -k tc_b99_24`; TC-B99-43 — `-k tc_b99_43` (a root where d·P²+e·P+f = 0 is no root)
 - **Numeric pass threshold:** `RAT_FUNC_DIV_10`: 30 → raw 300; 25 → raw 250; raw 300 → 30.0; a quadratic coefficient set → the root inside the limits; a no-real-root raw value → decode failure; LINEAR control unchanged.
 - **Negative control:** executed on `307065f` (P-17): 30 → `03 00` → RED.
 - **Boundary catalog:** ☒ invalid — a coefficient set with no inverse is refused (existing message kept).

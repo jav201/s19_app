@@ -1,0 +1,42 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags FAILED [100%]
+
+================================== FAILURES ===================================
+_________________ test_tc_b99_25_compu_tab_refusals_and_flags _________________
+
+    def test_tc_b99_25_compu_tab_refusals_and_flags() -> None:
+        """TAB_NOINTP 13.0 is refused naming 10.0 and 15.0; TAB_INTP 500.0 and
+        −50.0 are refused naming the exact range text ``[0.0, 62.5]``; 3.4
+        encodes raw 1 with a flag naming the written 2.5; 5.0 encodes raw 2 with
+        no flag. On the sparse table the encode inverse-interpolates: both
+        endpoints encode exactly, 40.0 → raw 50 with no flag, and 3.9 → raw 10
+        with a flag naming the written 4.0."""
+        expect = _manifest_expect()
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        # --- TAB_NOINTP ---------------------------------------------------------
+        nointp_expect = expect["symbols"]["TAB_NOINTP_SYM"]
+        assert nointp_expect["typed_refused"] == 13.0
+        assert nointp_expect["named_nearest"] == [10.0, 15.0]
+        nointp = tags["TAB_NOINTP_SYM"]
+        for raw_x, table_y in ((0, 10.0), (1, 15.0), (2, 20.0)):
+            encoded, error, flags = _encode(nointp, payload, table_y)
+            assert error is None, f"{table_y} is a table value: {error}"
+            assert flags == []
+            assert encoded == (0x00, raw_x)
+        encoded, error, flags = _encode(nointp, payload, 13.0)
+>       assert encoded is None
+E       assert (0, 1) is None
+
+tests\test_b99_a2l_encode.py:382: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags
+======================= 1 failed, 6 deselected in 0.67s =======================

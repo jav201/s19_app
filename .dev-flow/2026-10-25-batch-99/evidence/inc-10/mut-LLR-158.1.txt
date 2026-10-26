@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_23_byte_order_falls_back_to_mod_common FAILED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b99_23_byte_order_falls_back_to_mod_common ______________
+
+    def test_tc_b99_23_byte_order_falls_back_to_mod_common() -> None:
+        """MSB_FIRST 2-byte: encode 4113 → ``10 11``, decode ``10 11`` → 4113; the
+        tag-declared ``MSB_LAST`` keeps ``0F 00`` under the MSB_FIRST module."""
+        expect = _manifest_expect()
+        assert expect["byte_order"] == "MSB_FIRST"
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        msb = tags["SYM_U16_MSB"]
+        assert msb["record_layout_name"] == "RL_U16_NO_BO"  # layout declares none
+        assert msb["endian"] is None  # tag declares none
+>       assert msb["effective_byte_order"] == "big"  # MOD_COMMON MSB_FIRST
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'little' == 'big'
+E         
+E         - big
+E         + little
+
+tests\test_b99_a2l_encode.py:201: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_23_byte_order_falls_back_to_mod_common
+======================= 1 failed, 6 deselected in 0.47s =======================

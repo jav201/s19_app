@@ -1,0 +1,102 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags FAILED [100%]
+
+================================== FAILURES ===================================
+_________________ test_tc_b99_25_compu_tab_refusals_and_flags _________________
+
+    def test_tc_b99_25_compu_tab_refusals_and_flags() -> None:
+        """TAB_NOINTP 13.0 is refused naming 10.0 and 15.0; TAB_INTP 500.0 and
+        −50.0 are refused naming the exact range text ``[0.0, 62.5]``; 3.4
+        encodes raw 1 with a flag naming the written 2.5; 5.0 encodes raw 2 with
+        no flag. On the sparse table the encode inverse-interpolates: both
+        endpoints encode exactly, 40.0 → raw 50 with no flag, and 3.9 → raw 10
+        with a flag naming the written 4.0."""
+        expect = _manifest_expect()
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        # --- TAB_NOINTP ---------------------------------------------------------
+        nointp_expect = expect["symbols"]["TAB_NOINTP_SYM"]
+        assert nointp_expect["typed_refused"] == 13.0
+        assert nointp_expect["named_nearest"] == [10.0, 15.0]
+        nointp = tags["TAB_NOINTP_SYM"]
+        for raw_x, table_y in ((0, 10.0), (1, 15.0), (2, 20.0)):
+            encoded, error, flags = _encode(nointp, payload, table_y)
+            assert error is None, f"{table_y} is a table value: {error}"
+            assert flags == []
+            assert encoded == (0x00, raw_x)
+        encoded, error, flags = _encode(nointp, payload, 13.0)
+        assert encoded is None
+        assert flags == []
+        assert error is not None
+        assert "the nearest table values are 10.0 and 15.0" in error  # exact text
+    
+        # --- TAB_INTP (dense table) ----------------------------------------------
+        intp_expect = expect["symbols"]["TAB_INTP_SYM"]
+        assert intp_expect["refused"] == [-50.0, 500.0]
+        intp = tags["TAB_INTP_SYM"]
+        grid = intp_expect["grid"]
+        assert grid == {"typed": 5.0, "expected_raw": 2, "written_physical": 5.0}
+        encoded, error, flags = _encode(intp, payload, 5.0)
+        assert error is None, error
+        assert encoded == (0x00, 0x02)
+        assert flags == []  # grid value: no flag
+    
+        off = intp_expect["off_grid"]
+        assert off == {"typed": 3.4, "expected_raw": 1, "written_physical": 2.5,
+                       "flag_names": "2.5"}
+        encoded, error, flags = _encode(intp, payload, 3.4)
+        assert error is None, error
+        assert encoded == (0x00, 0x01)
+        assert len(flags) == 1
+        assert "2.5" in flags[0]  # the written physical value, by content
+        assert "3.4" in flags[0]  # the typed value, by content
+    
+        for refused in intp_expect["refused"]:
+            encoded, error, flags = _encode(intp, payload, refused)
+            assert encoded is None
+            assert flags == []
+            assert error is not None
+            assert "[0.0, 62.5]" in error  # the exact range text
+    
+        # --- TAB_INTP (sparse table: inverse interpolation between brackets) ----
+        sparse_expect = expect["symbols"]["TAB_INTP_SPARSE_SYM"]
+        sparse = tags["TAB_INTP_SPARSE_SYM"]
+        enriched = {
+            t["name"]: t
+            for t in enrich_a2l_tags_with_values(payload, _corpus_mem_map())
+        }
+        decoded = enriched["TAB_INTP_SPARSE_SYM"]
+        assert decoded["raw_value"] == sparse_expect["raw"] == 50
+        assert decoded["physical_value"] == sparse_expect["physical"] == 40.0
+    
+        for arm in sparse_expect["endpoints"]:
+            encoded, error, flags = _encode(sparse, payload, arm["typed"])
+            assert error is None, error
+            assert flags == []
+            assert encoded == (0x00, arm["expected_raw"])
+        exact = sparse_expect["interior_exact"]
+        encoded, error, flags = _encode(sparse, payload, exact["typed"])
+>       assert (encoded, error, flags) == ((0x00, exact["expected_raw"]), None, [])
+E       AssertionError: assert ((0, 25), Non...eds as 10.0']) == ((0, 50), None, [])
+E         
+E         At index 0 diff: (0, 25) != (0, 50)
+E         
+E         Full diff:
+E           (
+E               (
+E                   0,...
+E         
+E         ...Full output truncated (12 lines hidden), use '-vv' to show
+
+tests\test_b99_a2l_encode.py:433: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags
+======================= 1 failed, 6 deselected in 0.51s =======================

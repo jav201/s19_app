@@ -77,3 +77,10 @@ above this line is ever edited._
   - PDR condition **UX-C7** (owned by Inc 9 with the D6 verdict) is folded into HLR-154: an interactive load of a file with an integrity notice leads its status with the defect, never a plain `Loaded <name>`.
 - **Why:** the operator verdict of 2026-10-25 and the PDR conditions that waited for it (`design/PDR-2026-10-25-batch-99.md`).
 - **Evidence:** `design/veredicto-b99.json`; `design/PDR-ux.md` UX-C1, UX-C7.
+
+### LED-2026-10-25-batch-99.6 — Inc-10 review: per-module byte order and the zero-denominator root become tested clauses
+- **Requirement:** LLR-158.1, LLR-158.2
+- **Date:** 2026-10-25
+- **What changed:** LLR-158.1 gains TC-B99-42: in a multi-MODULE A2L, each module's own `MOD_COMMON BYTE_ORDER` applies to that module's tags. LLR-158.2 gains TC-B99-43: a RAT_FUNC root where the denominator d·P²+e·P+f is zero is no root. Kimi first numbered both TC-B99-26/27, which collided with LLR-159's ids, and the orchestrator renumbered them before merge.
+- **Why:** code-reviewer, Inc-10 round 1, LOW-a and LOW-b, fixed in the increment rather than deferred.
+- **Evidence:** `03-increments/increment-010.md` §4b; `tests/test_b99_a2l_encode.py`.

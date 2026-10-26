@@ -1,0 +1,28 @@
+=== Reverse census grep (trigger B1) ===
+tests/fixtures/synth/generate.py
+tests/fixtures/synth/manifest.json
+tests/fixtures/synth/synth_a2l.a2l
+tests/test_a2l_curve_description.py
+tests/test_a2l_record_layout_walker.py
+tests/test_b99_a2l_encode.py
+tests/test_changes_symbol_entries.py
+tests/test_tui_a2l.py
+tests/test_tui_a2l_detail.py
+tests/test_tui_app.py
+tests/test_tui_public_api.py
+
+=== Re-validation results (all GREEN, no re-pin needed) ===
+tests/test_a2l_curve_description.py   - in green-affected.txt (158 passed run)
+tests/test_a2l_record_layout_walker.py - in green-affected.txt
+tests/test_changes_symbol_entries.py   - in green-affected.txt (TC-712 round-trips LINEAR/IDENTICAL/TAB-exact: unchanged limbs)
+tests/test_tui_a2l.py                  - in green-affected.txt (TC-622 pins LINEAR only)
+tests/test_tui_a2l_detail.py           - green-a2l-pilot.txt
+tests/test_tui_app.py                  - green-tui-app.txt (filter test uses plain dicts, not the cell builder)
+tests/test_tui_public_api.py           - green-affected.txt (payload-shape locks)
+tests/fixtures/synth/*                 - corpus consumed by tests/test_b99_a2l_encode.py (green-full.txt)
+
+Re-pins: NONE. No existing test pinned the old RAT_FUNC direction (P-17),
+the MOD_COMMON-less fallback (P-7) or the silent nearest/clamp (P-8) -
+all three were RED-today premises. LINEAR / IDENTICAL / exact-TAB limbs
+are behaviourally unchanged, so TC-712/TC-1811/TC-622 keep passing
+without modification.

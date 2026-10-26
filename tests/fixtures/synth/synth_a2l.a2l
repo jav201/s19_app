@@ -41,6 +41,10 @@
       COMPU_TAB_REF TAB_NOINTP_TBL
     /end COMPU_METHOD
 
+    /begin COMPU_METHOD CM_TAB_INTP_SPARSE "%6.2" TAB_INTP "%6.2" ""
+      COMPU_TAB_REF TAB_INTP_SPARSE_TBL
+    /end COMPU_METHOD
+
     /begin COMPU_TAB TAB_INTP_TBL
       "intp table, 2.5 PHYS per raw step"
       TAB_INTP
@@ -84,6 +88,16 @@
       DEFAULT_VALUE "0"
     /end COMPU_TAB
 
+    /begin COMPU_TAB TAB_INTP_SPARSE_TBL
+      "sparse intp table, bend at raw 25 (0->0, 25->10, 100->100)"
+      TAB_INTP
+      3
+      0 0.0
+      25 10.0
+      100 100.0
+      DEFAULT_VALUE "0"
+    /end COMPU_TAB
+
     /begin CHARACTERISTIC SYM_U16_MSB "2-byte MSB symbol, no BYTE_ORDER of its own"
       VALUE 0x2000 RL_U16_NO_BO 0 CM_IDENT 0 65535
     /end CHARACTERISTIC
@@ -100,6 +114,9 @@
       VALUE 0x2008 RL_U16_NO_BO 0 CM_LINEAR_MUL_2 0 100
       BYTE_ORDER MSB_LAST
     /end CHARACTERISTIC
+    /begin CHARACTERISTIC TAB_INTP_SPARSE_SYM "sparse TAB_INTP, raw 50 decodes to 40.0"
+      VALUE 0x200C RL_U16_NO_BO 0 CM_TAB_INTP_SPARSE 0 100
+    /end CHARACTERISTIC
 
     /begin GROUP GRP_SYNTH_B99 "GRP_SYNTH_B99 group"
       /begin REF_CHARACTERISTIC
@@ -108,6 +125,7 @@
       TAB_INTP_SYM
       TAB_NOINTP_SYM
       LINEAR_MUL_2
+      TAB_INTP_SPARSE_SYM
       /end REF_CHARACTERISTIC
     /end GROUP
   /end MODULE

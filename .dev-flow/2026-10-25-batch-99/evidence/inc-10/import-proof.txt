@@ -1,0 +1,2 @@
+$ python -c "import s19_app; print(s19_app.__file__)"
+C:\Users\jjgh8\Github\s19_app-b99-inc10\s19_app\__init__.py

@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_27_rat_func_zero_denominator_root FAILED [100%]
+
+================================== FAILURES ===================================
+________________ test_tc_b99_27_rat_func_zero_denominator_root ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25993/test_tc_b99_27_rat_func_zero_d0')
+
+    def test_tc_b99_27_rat_func_zero_denominator_root(tmp_path: Path) -> None:
+        """INT = (P² − 4)/(P − 2) at raw 5 multiplies through to P² − 5P + 6 = 0 —
+        roots 2 and 3 — but P = 2 zeroes the declared denominator d·P² + e·P + f,
+        so it is spurious: the decode must return P = 3.0, not the smaller
+        magnitude 2.0; with BOTH candidates spurious the decode fails."""
+        quad_path = tmp_path / "quad.a2l"
+        quad_path.write_text(_QUAD_A2L, encoding="utf-8")
+        quad = parse_a2l_file(quad_path)
+        # raw 5 big-endian: 00 05 at 0x3006
+        mem_map = {0x3006: 0x00, 0x3007: 0x05}
+        qenr = {t["name"]: t for t in enrich_a2l_tags_with_values(quad, mem_map)}
+        hole = qenr["HOLE_SYM"]
+        assert hole["raw_value"] == 5
+>       assert hole["physical_value"] == 3.0, (
+            "P = 2 zeroes the denominator - the decode must take the other root"
+        )
+E       AssertionError: P = 2 zeroes the denominator - the decode must take the other root
+E       assert 2.0 == 3.0
+
+tests\test_b99_a2l_encode.py:330: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_27_rat_func_zero_denominator_root
+======================= 1 failed, 6 deselected in 0.55s =======================

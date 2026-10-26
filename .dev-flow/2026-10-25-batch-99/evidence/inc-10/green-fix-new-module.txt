@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items
+
+tests/test_b99_a2l_encode.py::test_tc_b99_23_byte_order_falls_back_to_mod_common PASSED [ 14%]
+tests/test_b99_a2l_encode.py::test_tc_b99_26_per_module_mod_common_byte_order PASSED [ 28%]
+tests/test_b99_a2l_encode.py::test_tc_b99_24_rat_func_direction_and_root_selection PASSED [ 42%]
+tests/test_b99_a2l_encode.py::test_tc_b99_27_rat_func_zero_denominator_root PASSED [ 57%]
+tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags PASSED [ 71%]
+tests/test_b99_a2l_encode.py::test_at_b99_14_codec_api_encode_surface PASSED [ 85%]
+tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column PASSED [100%]
+
+============================= 7 passed in 12.75s ==============================

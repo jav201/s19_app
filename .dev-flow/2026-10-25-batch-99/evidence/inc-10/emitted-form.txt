@@ -1,0 +1,10 @@
+=== Emitted-form assertions (C-42): the bytes/text the producers emit ===
+emitted bytes 4113 -> (16, 17) (pinned 10 11)
+emitted bytes 30    -> (1, 44) (pinned 01 2C = raw 300)
+emitted bytes 30 LIN-> (15, 0) (pinned 0F 00, MSB_LAST)
+emitted error 13.0  -> the value 13.0 is not a table value - the nearest table values are 10.0 and 15.0
+emitted error 500   -> the value 500.0 is outside the table range [0.0, 62.5]
+emitted flag  3.4   -> ['the value 3.4 is not a table value - the write proceeds as 2.5']
+decoded physical RAT_FUNC_SYM: 30.0 (pinned 30.0)
+decoded physical SYM_U16_MSB : 4113 (pinned 4113.0)
+ALL EMITTED-FORM ASSERTIONS PASS

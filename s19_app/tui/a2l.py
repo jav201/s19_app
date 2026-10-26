@@ -1718,7 +1718,19 @@ def _table_lookup(value: float, table: dict, interpolate: bool) -> tuple[Any, st
     return None, "value outside interpolation range"
 
 
-def _apply_compu_method(raw_value: Any, method: Optional[dict], compu_tables_by_name: dict[str, dict]) -> tuple[Any, str, str]:
+def _apply_compu_method(
+    raw_value: Any,
+    method: Optional[dict],
+    compu_tables_by_name: dict[str, dict],
+    limits: Optional[tuple[Optional[float], Optional[float]]] = None,
+) -> tuple[Any, str, str]:
+    """Apply one COMPU_METHOD in the decode direction (raw → physical).
+
+    ``limits`` carries the tag's declared ``(lower_limit, upper_limit)`` in
+    physical units; a RAT_FUNC with two real roots takes the one inside them
+    when exactly one is (LLR-158.2). Callers without tag limits pass ``None``
+    (the smaller-magnitude root then wins).
+    """
     if raw_value is None:
         return None, "missing", "raw value unavailable"
     if isinstance(raw_value, list):
@@ -1734,14 +1746,10 @@ def _apply_compu_method(raw_value: Any, method: Optional[dict], compu_tables_by_
         b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
         return (a * raw_value) + b, "ok", ""
     if conversion_type == "RAT_FUNC":
-        coeffs = method.get("coeffs") or []
-        padded = [(coeffs[i] if i < len(coeffs) and coeffs[i] is not None else 0.0) for i in range(6)]
-        a, b, c, d, e, f = padded
-        numerator = (a * (raw_value**2)) + (b * raw_value) + c
-        denominator = (d * (raw_value**2)) + (e * raw_value) + f
-        if math.isclose(denominator, 0.0):
-            return None, "error", "RAT_FUNC denominator is zero"
-        return numerator / denominator, "ok", ""
+        physical, rat_error = _invert_rat_func(float(raw_value), method, limits)
+        if physical is None:
+            return None, "error", rat_error or "RAT_FUNC inversion failed"
+        return physical, "ok", ""
     if conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
         table_name = method.get("compu_tab_ref")
         table = compu_tables_by_name.get(table_name or "")
@@ -1763,14 +1771,12 @@ def _apply_compu_method(raw_value: Any, method: Optional[dict], compu_tables_by_
 _FLOAT_ENCODE_DATATYPES = frozenset({"FLOAT32_IEEE", "FLOAT64_IEEE"})
 
 
-def _invert_rat_func(physical: float, method: dict) -> tuple[Optional[float], str]:
-    """Invert one RAT_FUNC COMPU_METHOD (physical → raw), quadratic solve.
+def _eval_rat_func(physical: float, method: dict) -> tuple[Optional[float], str]:
+    """Evaluate one RAT_FUNC COMPU_METHOD in the encode direction (physical → raw).
 
-    Solves ``physical = (a·x² + b·x + c) / (d·x² + e·x + f)`` for ``x`` —
-    i.e. the quadratic ``(a − p·d)x² + (b − p·e)x + (c − p·f) = 0``. Two real
-    roots choose by the smallest absolute value (the shipped decode's domain
-    is calibration monotonicity; the encode documents one deterministic
-    pick). Returns ``(raw, "")`` or ``(None, reason)``.
+    ASAP2 declares INT = f(PHYS) = (a·P² + b·P + c) / (d·P² + e·P + f) with
+    COEFFS ``a b c d e f``; the encode computes it directly. Returns
+    ``(raw, "")`` or ``(None, reason)``.
     """
     coeffs = method.get("coeffs") or []
     padded = [
@@ -1778,34 +1784,93 @@ def _invert_rat_func(physical: float, method: dict) -> tuple[Optional[float], st
         for i in range(6)
     ]
     a, b, c, d, e, f = padded
-    quad_a = a - physical * d
-    quad_b = b - physical * e
-    quad_c = c - physical * f
+    numerator = (a * (physical**2)) + (b * physical) + c
+    denominator = (d * (physical**2)) + (e * physical) + f
+    if math.isclose(denominator, 0.0):
+        return None, "RAT_FUNC denominator is zero"
+    return numerator / denominator, ""
+
+
+def _invert_rat_func(
+    raw_value: float,
+    method: dict,
+    limits: Optional[tuple[Optional[float], Optional[float]]] = None,
+) -> tuple[Optional[float], str]:
+    """Invert one RAT_FUNC COMPU_METHOD for the decode direction (raw → physical).
+
+    The A2L declares INT = f(PHYS) = (a·P² + b·P + c) / (d·P² + e·P + f); the
+    decode solves f(P) = raw for P — the quadratic (a − r·d)P² + (b − r·e)P +
+    (c − r·f) = 0. Two real roots take the one inside the tag's declared
+    physical ``limits`` when exactly one is, else the smaller-magnitude root.
+    Returns ``(physical, "")`` or ``(None, reason)``.
+    """
+    coeffs = method.get("coeffs") or []
+    padded = [
+        (coeffs[i] if i < len(coeffs) and coeffs[i] is not None else 0.0)
+        for i in range(6)
+    ]
+    a, b, c, d, e, f = padded
+    quad_a = a - raw_value * d
+    quad_b = b - raw_value * e
+    quad_c = c - raw_value * f
     if math.isclose(quad_a, 0.0):
         if math.isclose(quad_b, 0.0):
             return None, "RAT_FUNC has no solution for this value"
-        return -quad_c / quad_b, ""
+        root = -quad_c / quad_b
+        if math.isclose(
+            (d * root * root) + (e * root) + f, 0.0, rel_tol=0.0, abs_tol=1e-12
+        ):
+            return None, "RAT_FUNC root has a zero denominator"
+        return root, ""
     discriminant = quad_b * quad_b - 4.0 * quad_a * quad_c
     if discriminant < 0.0:
         return None, "RAT_FUNC has no real root for this value"
     root = math.sqrt(discriminant)
     first = (-quad_b + root) / (2.0 * quad_a)
     second = (-quad_b - root) / (2.0 * quad_a)
-    if abs(second) < abs(first):
-        return second, ""
-    return first, ""
+    if math.isclose(first, second, rel_tol=0.0, abs_tol=1e-12):
+        first = second = (first + second) / 2.0
+    # The quadratic comes from multiplying INT = f(PHYS) by the denominator,
+    # so a root where d·P² + e·P + f is zero is spurious — it is not a root
+    # of the declared conversion and is dropped.
+    def _defined(value: float) -> bool:
+        denom = (d * value * value) + (e * value) + f
+        return not math.isclose(denom, 0.0, rel_tol=0.0, abs_tol=1e-12)
+
+    candidates = [
+        value for value in (first, second) if _defined(value)
+    ]
+    if not candidates:
+        return None, "RAT_FUNC root has a zero denominator"
+    lower = limits[0] if limits else None
+    upper = limits[1] if limits else None
+
+    def _inside(value: float) -> bool:
+        if lower is not None and value < lower:
+            return False
+        if upper is not None and value > upper:
+            return False
+        return True
+
+    inside = [value for value in candidates if _inside(value)]
+    if len(inside) == 1:
+        return inside[0], ""
+    return min(candidates, key=abs), ""
 
 
 def _reverse_table_lookup(
     physical: float, table: dict, interpolate: bool
-) -> tuple[Optional[float], str]:
-    """Invert one COMPU_TAB (physical → raw): exact/nearest, or interpolated.
+) -> tuple[Optional[float], str, Optional[str]]:
+    """Invert one COMPU_TAB (physical → raw), LLR-158.3.
 
-    ``TAB_NOINTP`` mirrors the shipped decode's :func:`_table_lookup` fallback
-    (exact y match, else the x of the nearest y). ``TAB_INTP`` inverse-
-    interpolates between the bracketing y's and clamps outside the table's
-    y-range to the nearest endpoint's x (the decode clamps the same way).
-    Non-numeric y entries are skipped; a table with no numeric y refuses.
+    ``TAB_NOINTP`` refuses a value that is not exactly a table value, naming
+    the two nearest table values. ``TAB_INTP`` refuses a value outside the
+    table's physical range, naming the range; inside it, the value is
+    inverse-interpolated between the bracketing entries to a fractional raw
+    and the nearest integer raw is returned, with a flag naming the physical
+    value that will actually be written whenever it differs from the typed
+    one. Non-numeric entries are skipped; a table with no numeric entries
+    refuses. Returns ``(raw, "", flag_or_None)`` or ``(None, reason, None)``.
     """
     numeric: list[tuple[float, float]] = []
     for raw_x, raw_y in table.get("entries") or []:
@@ -1813,28 +1878,59 @@ def _reverse_table_lookup(
         if y is not None:
             numeric.append((float(raw_x), y))
     if not numeric:
-        return None, "lookup table has no numeric entries"
-    numeric.sort(key=lambda item: item[0])
+        return None, "lookup table has no numeric entries", None
     if not interpolate:
         for raw_x, y in numeric:
             if math.isclose(y, physical, rel_tol=0.0, abs_tol=1e-9):
-                return raw_x, ""
-        nearest = min(numeric, key=lambda item: abs(item[1] - physical))
-        return nearest[0], ""
+                return raw_x, "", None
+        by_proximity = sorted(numeric, key=lambda item: abs(item[1] - physical))
+        named = sorted({y for _, y in by_proximity[:2]})
+        if len(named) == 1:
+            nearest_text = str(named[0])
+        else:
+            nearest_text = f"{named[0]} and {named[1]}"
+        return None, (
+            f"the value {physical} is not a table value - "
+            f"the nearest table values are {nearest_text}"
+        ), None
     numeric.sort(key=lambda item: item[1])
-    if physical <= numeric[0][1]:
-        return numeric[0][0], ""
-    if physical >= numeric[-1][1]:
-        return numeric[-1][0], ""
-    for left, right in zip(numeric, numeric[1:]):
-        lx, ly = left
-        rx, ry = right
-        if ly <= physical <= ry:
-            if math.isclose(ry, ly):
-                return lx, ""
-            ratio = (physical - ly) / (ry - ly)
-            return lx + ratio * (rx - lx), ""
-    return None, "value outside interpolation range"
+    y_min = numeric[0][1]
+    y_max = numeric[-1][1]
+    if physical < y_min or physical > y_max:
+        return None, (
+            f"the value {physical} is outside the table range "
+            f"[{y_min}, {y_max}]"
+        ), None
+    for raw_x, y in numeric:
+        if math.isclose(y, physical, rel_tol=0.0, abs_tol=1e-9):
+            return raw_x, "", None
+    # ASAM TAB_INTP: inverse-interpolate the physical value between the two
+    # bracketing entries to a fractional raw, then write the nearest integer
+    # raw (decoding it forward names the physical value actually written).
+    raw_fraction: Optional[float] = None
+    for (left_raw, left_y), (right_raw, right_y) in zip(numeric, numeric[1:]):
+        if left_y <= physical <= right_y and not math.isclose(
+            right_y, left_y, rel_tol=0.0, abs_tol=1e-12
+        ):
+            raw_fraction = left_raw + (physical - left_y) * (
+                right_raw - left_raw
+            ) / (right_y - left_y)
+            break
+    if raw_fraction is None:
+        return None, (
+            f"the value {physical} is not invertible in this table"
+        ), None
+    raw_x = round(raw_fraction)
+    written, _ = _table_lookup(float(raw_x), table, True)
+    written_f = _to_float(written)
+    if written_f is None:
+        return None, "lookup table has no numeric entries", None
+    if math.isclose(written_f, physical, rel_tol=0.0, abs_tol=1e-9):
+        return float(raw_x), "", None
+    return float(raw_x), "", (
+        f"the value {physical} is not a table value - "
+        f"the write proceeds as {written_f}"
+    )
 
 
 def _invert_physical_to_raw(
@@ -1858,9 +1954,12 @@ def _invert_physical_to_raw(
             ``TAB_NOINTP`` / ``TAB_INTP`` inversion input).
 
     Returns:
-        tuple[Optional[float], Optional[str]]: ``(raw, None)`` on success;
-        ``(None, reason)`` on refusal — the reason names the limb, exactly as
-        the scalar encoder's shipped refusals name them.
+        tuple[Optional[float], Optional[str], list[str]]: ``(raw, None,
+        flags)`` on success — the flags carry non-fatal conversion limbs (an
+        in-range ``TAB_INTP`` value whose nearest table entry decodes to a
+        different physical value: the flag names the written value).
+        ``(None, reason, [])`` on refusal — the reason names the limb,
+        exactly as the scalar encoder's shipped refusals name them.
 
     Raises:
         None: every limb is a returned reason.
@@ -1869,53 +1968,58 @@ def _invert_physical_to_raw(
         - ``method is None`` → identity (mirrors the decode's
           ``identity_fallback``); ``IDENTICAL`` → identity.
         - ``LINEAR`` → ``raw = (physical − b) / a``; ``a == 0`` refuses.
-        - ``RAT_FUNC`` → :func:`_invert_rat_func`; no real root refuses.
-        - ``TAB_NOINTP`` / ``TAB_INTP`` → :func:`_reverse_table_lookup`;
-          missing/empty/non-numeric table refuses.
+        - ``RAT_FUNC`` → :func:`_eval_rat_func` (INT = f(PHYS) directly);
+          a zero denominator refuses.
+        - ``TAB_NOINTP`` / ``TAB_INTP`` → :func:`_reverse_table_lookup`
+          (LLR-158.3): ``TAB_NOINTP`` refuses a non-table value naming the
+          two nearest; ``TAB_INTP`` refuses a value outside the table range
+          naming the range, and flags an in-range off-grid write naming the
+          physical value that will be written; missing/empty/non-numeric
+          table refuses.
         - ``FORM`` / unknown conversion type on a DEFINED method → REFUSE.
 
     Dependencies:
         Uses:
-            - ``_invert_rat_func`` / ``_reverse_table_lookup``
+            - ``_eval_rat_func`` / ``_reverse_table_lookup``
         Used by:
             - ``encode_physical_to_raw_bytes`` / ``_encode_curve_record_bytes``
 
     Example:
         >>> _invert_physical_to_raw(110.0, {"conversion_type": "LINEAR", "coeffs_linear": [2.0, 10.0]}, None)
-        (50.0, None)
+        (50.0, None, [])
     """
     if method is None:
-        return physical, None  # the identity limb (no COMPU_METHOD)
+        return physical, None, []  # the identity limb (no COMPU_METHOD)
     conversion_type = str(method.get("conversion_type") or "").upper()
     if conversion_type == "IDENTICAL":
-        return physical, None
+        return physical, None, []
     if conversion_type == "LINEAR":
         coeffs = method.get("coeffs_linear") or []
         lin_a = coeffs[0] if len(coeffs) > 0 and coeffs[0] is not None else 1.0
         lin_b = coeffs[1] if len(coeffs) > 1 and coeffs[1] is not None else 0.0
         if math.isclose(lin_a, 0.0):
-            return None, "LINEAR conversion coefficient a is zero"
-        return (physical - lin_b) / lin_a, None
+            return None, "LINEAR conversion coefficient a is zero", []
+        return (physical - lin_b) / lin_a, None, []
     if conversion_type == "RAT_FUNC":
-        raw, rat_error = _invert_rat_func(physical, method)
+        raw, rat_error = _eval_rat_func(physical, method)
         if raw is None:
-            return None, rat_error or "RAT_FUNC inversion failed"
-        return raw, None
+            return None, rat_error or "RAT_FUNC evaluation failed", []
+        return raw, None, []
     if conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
         table = (compu_tabs_by_name or {}).get(
             str(method.get("compu_tab_ref") or "")
         )
         if table is None or not table.get("entries"):
-            return None, "lookup table missing or empty"
-        raw, tab_error = _reverse_table_lookup(
+            return None, "lookup table missing or empty", []
+        raw, tab_error, tab_flag = _reverse_table_lookup(
             physical, table, conversion_type == "TAB_INTP"
         )
         if raw is None:
-            return None, tab_error or "table inversion failed"
-        return raw, None
+            return None, tab_error or "table inversion failed", []
+        return raw, None, [tab_flag] if tab_flag else []
     # FORM (the decode's own unsupported limb) and every unknown conversion
     # type on a DEFINED method.
-    return None, f"conversion type {conversion_type!r} is not supported"
+    return None, f"conversion type {conversion_type!r} is not supported", []
 
 
 def _encode_curve_record_bytes(
@@ -2055,11 +2159,12 @@ def _encode_curve_record_bytes(
             if isinstance(item, bool) or not isinstance(item, (int, float)):
                 return None, "the value is not numeric", []
             physical = float(item)
-            raw, conversion_error = _invert_physical_to_raw(
+            raw, conversion_error, conversion_flags = _invert_physical_to_raw(
                 physical, method, compu_tabs_by_name
             )
             if conversion_error is not None:
                 return None, conversion_error, []
+            flags.extend(conversion_flags)
             if not math.isfinite(raw):
                 return None, "the converted raw value is not finite", []
             if is_float:
@@ -2139,11 +2244,15 @@ def encode_physical_to_raw_bytes(
             ``identity_fallback``;
           - ``IDENTICAL`` → identity;
           - ``LINEAR`` → raw = (physical − b) / a; ``a == 0`` refuses;
-          - ``RAT_FUNC`` → quadratic inversion
-            (:func:`_invert_rat_func`); no real root refuses;
+          - ``RAT_FUNC`` → direct evaluation INT = f(PHYS)
+            (:func:`_eval_rat_func`, LLR-158.2); a zero denominator refuses;
           - ``TAB_NOINTP`` / ``TAB_INTP`` → reverse table lookup
-            (:func:`_reverse_table_lookup`); missing/empty/non-numeric table
-            refuses;
+            (:func:`_reverse_table_lookup`, LLR-158.3): a non-table
+            ``TAB_NOINTP`` value refuses naming the two nearest; a
+            ``TAB_INTP`` value outside the table range refuses naming the
+            range; an in-range value encodes the nearest raw and FLAGS when
+            the written physical value differs from the typed one;
+            missing/empty/non-numeric table refuses;
           - ``FORM`` / unknown conversion type on a DEFINED method →
             REFUSE (``FORM`` is the decode's own unsupported limb);
           - non-numeric value → REFUSE;
@@ -2230,7 +2339,7 @@ def encode_physical_to_raw_bytes(
     if method_name and method_name != "NO_COMPU_METHOD":
         method = (compu_methods_by_name or {}).get(method_name)
     physical = float(physical_value)
-    raw, conversion_error = _invert_physical_to_raw(
+    raw, conversion_error, conversion_flags = _invert_physical_to_raw(
         physical, method, compu_tabs_by_name
     )
     if conversion_error is not None:
@@ -2277,7 +2386,7 @@ def encode_physical_to_raw_bytes(
     raw_bytes = tuple(packed)
 
     # --- the out-of-limits limb: FLAG + proceed --------------------------------
-    flags: list[str] = []
+    flags: list[str] = list(conversion_flags)
     lower_limit = _to_float(tag.get("lower_limit"))
     upper_limit = _to_float(tag.get("upper_limit"))
     if (lower_limit is not None and physical < lower_limit) or (
@@ -2302,11 +2411,22 @@ def extract_a2l_tags(
     record_layouts_by_name = record_layouts_by_name or {}
     compu_methods_by_name = compu_methods_by_name or {}
 
-    def walk(section_list: list[dict]) -> None:
+    def _module_byte_order(section: dict) -> Optional[str]:
+        for child in section.get("children") or []:
+            if child.get("name") == "MOD_COMMON":
+                found = _byte_order_from_section_lines(child.get("lines") or [])
+                if found:
+                    return found
+        return None
+
+    def walk(section_list: list[dict], enclosing_byte_order: Optional[str]) -> None:
         for section in section_list:
             name = section.get("name", "")
             meta = section.get("meta", "")
-            lines = section.get("lines", [])
+            lines = section.get("lines") or []
+            module_byte_order = enclosing_byte_order
+            if name == "MODULE":
+                module_byte_order = _module_byte_order(section) or enclosing_byte_order
             if name in target_sections:
                 parsed_name, description = parse_begin_meta(meta)
                 if name == "MEASUREMENT":
@@ -2466,6 +2586,8 @@ def extract_a2l_tags(
                 if not tag.get("effective_byte_order"):
                     tag["effective_byte_order"] = _normalize_byte_order(tag.get("endian"))
                 if not tag.get("effective_byte_order"):
+                    tag["effective_byte_order"] = module_byte_order
+                if not tag.get("effective_byte_order"):
                     tag["effective_byte_order"] = "little"
 
                 if not tag.get("compu_method_name"):
@@ -2476,9 +2598,9 @@ def extract_a2l_tags(
                 tag["memory_region"] = classify_address(tag.get("address"), memory_segments)
                 tags.append(tag)
             if section.get("children"):
-                walk(section["children"])
+                walk(section["children"], module_byte_order)
 
-    walk(sections)
+    walk(sections, None)
     # R5 external-axis post-pass: a CURVE/MAP whose AXIS_DESCR references an
     # AXIS_PTS record (COM_AXIS / RES_AXIS / CURVE_AXIS) derives its length
     # from the referenced record's max_axis_points when that reference
@@ -2612,7 +2734,15 @@ def enrich_a2l_tags_with_values(a2l_data: dict, mem_map: Optional[Dict[int, int]
         compu_method_unit = None
         if isinstance(method, dict):
             compu_method_unit = method.get("unit")
-        physical_value, conversion_status, conversion_error = _apply_compu_method(raw_value, method, compu_tabs_by_name)
+        physical_value, conversion_status, conversion_error = _apply_compu_method(
+            raw_value,
+            method,
+            compu_tabs_by_name,
+            limits=(
+                _to_float(tag.get("lower_limit")),
+                _to_float(tag.get("upper_limit")),
+            ),
+        )
         lower_limit = _to_float(tag.get("lower_limit"))
         upper_limit = _to_float(tag.get("upper_limit"))
         physical_number = _to_float(physical_value)
@@ -2765,6 +2895,12 @@ def describe_curve_tag(
         description["status"] = "not_a_curve"
         description["scalar_raw"] = tag.get("raw_value")
         description["scalar_phys"] = tag.get("physical_value")
+        if tag.get("physical_value") is None and tag.get("raw_value") is not None:
+            # the bytes are present but the conversion refused them (UX-C8):
+            # the modal reads the short enum-derived reason, never A2L text
+            description["scalar_reason"] = _short_decode_reason(
+                tag.get("conversion_status"), tag.get("conversion_error")
+            )
         return description
 
     axis_meta = tag.get("axis_meta") or []
@@ -2892,7 +3028,7 @@ def describe_curve_tag(
     values_phys = []
     for raw_item in values_raw:
         phys_item, conv_status, conv_error = _apply_compu_method(
-            raw_item, method, compu_tabs_by_name
+            raw_item, method, compu_tabs_by_name, limits=(lower_limit, upper_limit)
         )
         if conv_status in ("error", "unsupported", "unknown_method"):
             description["notes"].append(f"value conversion failed: {conv_error}")
@@ -3010,6 +3146,32 @@ def _format_point_number(value: Any) -> str:
     return f"{number:g}"
 
 
+#: The shipped decode's refusal strings → the short modal reason tokens
+#: (UX-C8: ``Scalar value: n/a (<reason>)``). UX-C10: every token is derived
+#: from this fixed enum, never from A2L text.
+_DECODE_REASON_TOKENS = {
+    "RAT_FUNC denominator is zero": "rat_func_denominator_zero",
+    "RAT_FUNC has no real root for this value": "rat_func_no_real_root",
+    "RAT_FUNC has no solution for this value": "rat_func_no_solution",
+    "RAT_FUNC inversion failed": "rat_func_inversion_failed",
+    "lookup table missing": "lookup_table_missing",
+    "lookup table is empty": "lookup_table_empty",
+    "value outside interpolation range": "value_outside_table_range",
+}
+
+
+def _short_decode_reason(status: Any, error: Any) -> Optional[str]:
+    """Map a decode failure to its short enum-derived reason token (UX-C8)."""
+    if not error:
+        return None
+    token = _DECODE_REASON_TOKENS.get(str(error))
+    if token is not None:
+        return token
+    if status:
+        return str(status)
+    return "undecodable"
+
+
 def render_curve_description(description: dict) -> str:
     """Render the E9 description model as plain text (markup=False safe).
 
@@ -3060,7 +3222,13 @@ def render_curve_description(description: dict) -> str:
     status = description.get("status")
     if status == "not_a_curve":
         scalar = description.get("scalar_phys")
-        scalar_text = _format_point_number(scalar) if scalar is not None else "n/a"
+        reason = description.get("scalar_reason")
+        if scalar is not None:
+            scalar_text = _format_point_number(scalar)
+        elif reason:
+            scalar_text = f"n/a ({reason})"
+        else:
+            scalar_text = "n/a"
         lines.append("")
         lines.append(f"Scalar value: {scalar_text} {unit or ''}".rstrip())
         lines.append("(this characteristic is not a CURVE/MAP - no point table)")

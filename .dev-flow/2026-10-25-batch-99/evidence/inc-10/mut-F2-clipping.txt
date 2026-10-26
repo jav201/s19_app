@@ -1,0 +1,78 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 7 items / 6 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column FAILED [100%]
+
+================================== FAILURES ===================================
+__________________ test_at_b99_09_a2l_window_physical_column __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0')
+
+    def test_at_b99_09_a2l_window_physical_column(tmp_path: Path) -> None:
+        """AT-B99-09 (US-147): through the shipped Load dialog, the A2L window
+        paints 30.0 for RAT_FUNC_SYM and 4113 for SYM_U16_MSB, ``40.0`` for the
+        sparse-table symbol and ``n/a`` for the undecodable symbol — distinct from
+        the blank cell of the no-bytes symbol — and the describe modal reads
+        ``Scalar value: n/a (rat_func_no_real_root)``: at 118x40 AND 80x24, all
+        from painted screen text (no clipping at either width)."""
+        s19_path, a2l_path = _undecodable_pair(tmp_path)
+        for size in _SIZES:
+>           asyncio.run(_run_at_09(s19_path, a2l_path, size))
+
+tests\test_b99_a2l_encode.py:618: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s19_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0/case.s19')
+a2l_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25996/test_at_b99_09_a2l_window_phys0/case.a2l')
+size = (118, 40)
+
+    async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:
+        app = S19TuiApp(base_dir=s19_path.parent)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await _load_through_dialog(
+                app, pilot, s19_path, "the S19 image loaded",
+                lambda: app.current_file is not None,
+            )
+            await _load_through_dialog(
+                app, pilot, a2l_path, "the A2L loaded",
+                lambda: "case.a2l" in _a2l_slot_text(app),
+            )
+            await pilot.press("escape")
+            await pilot.pause()
+            await pilot.press("2")
+            await settled(
+                pilot,
+                lambda: "A2L Explorer" in _screen_text(app),
+                "the A2L screen paints",
+            )
+    
+            # The painted arms differ by width; the describe-modal arms (below)
+            # run at BOTH widths.
+            if size[0] >= 118:
+                table = app.query_one("#a2l_tags_list", DataTable)
+                rows = painted_rows(app, table)
+                rat_row = next(r for r in rows if "RAT_FUNC_SYM" in r)
+>               assert "30.0" in rat_row, f"RAT_FUNC_SYM row at {size}: {rat_row!r}"
+E               AssertionError: RAT_FUNC_SYM row at (118, 40): '✓ RAT_FUNC_SYM       0x000020022     formula300 30.     yes '
+E               assert '30.0' in '✓ RAT_FUNC_SYM       0x000020022     formula300 30.     yes '
+
+tests\test_b99_a2l_encode.py:557: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column
+======================= 1 failed, 6 deselected in 4.49s =======================

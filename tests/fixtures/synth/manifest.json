@@ -123,9 +123,9 @@
       "class": [
         "s19.s3"
       ],
-      "sha256": "28145caf1761e849e82f840bd8c58f6058bbc96572d36741f2d4ffe9a5ef733b",
+      "sha256": "51c5432d04c7450e18eb6be6eceb64027cfab66f2bdb0a2d16e98960b5d0abad",
       "data": {
-        "0x2000": "1011012C000200010F00"
+        "0x2000": "1011012C000200010F0000000032"
       },
       "verdict": "ok",
       "header": null,
@@ -212,6 +212,36 @@
                 "bytes": "0F00"
               }
             ]
+          },
+          "TAB_INTP_SPARSE_SYM": {
+            "address": "0x200C",
+            "bytes": "0032",
+            "raw": 50,
+            "physical": 40.0,
+            "interior_exact": {
+              "typed": 40.0,
+              "expected_raw": 50,
+              "written_physical": 40.0
+            },
+            "interior_fractional": {
+              "typed": 3.9,
+              "expected_raw": 10,
+              "written_physical": 4.0,
+              "flag_names": "4.0"
+            },
+            "endpoints": [
+              {
+                "typed": 0.0,
+                "expected_raw": 0
+              },
+              {
+                "typed": 100.0,
+                "expected_raw": 100
+              }
+            ],
+            "refused": [
+              150.0
+            ]
           }
         }
       }
@@ -222,7 +252,7 @@
       "class": [
         "a2l.pair"
       ],
-      "sha256": "9a8a56708265465b7ef8e59adce4f1193649076f485c1c08a5ce7c474ded2b3c",
+      "sha256": "09895803ed3dad90fccc42f3f4cd08fcef2626cbbd910054e1d41f7d301350c6",
       "verdict": "ok",
       "paired": "synth_a2l.s19"
     },

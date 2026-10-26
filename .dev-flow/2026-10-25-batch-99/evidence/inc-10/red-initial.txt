@@ -1,0 +1,189 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items
+
+tests/test_b99_a2l_encode.py::test_tc_b99_23_byte_order_falls_back_to_mod_common FAILED [ 20%]
+tests/test_b99_a2l_encode.py::test_tc_b99_24_rat_func_direction_and_root_selection FAILED [ 40%]
+tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags FAILED [ 60%]
+tests/test_b99_a2l_encode.py::test_at_b99_14_codec_api_encode_surface FAILED [ 80%]
+tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column FAILED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc_b99_23_byte_order_falls_back_to_mod_common ______________
+
+    def test_tc_b99_23_byte_order_falls_back_to_mod_common() -> None:
+        """MSB_FIRST 2-byte: encode 4113 → ``10 11``, decode ``10 11`` → 4113; the
+        tag-declared ``MSB_LAST`` keeps ``0F 00`` under the MSB_FIRST module."""
+        expect = _manifest_expect()
+        assert expect["byte_order"] == "MSB_FIRST"
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        msb = tags["SYM_U16_MSB"]
+        assert msb["record_layout_name"] == "RL_U16_NO_BO"  # layout declares none
+        assert msb["endian"] is None  # tag declares none
+>       assert msb["effective_byte_order"] == "big"  # MOD_COMMON MSB_FIRST
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'little' == 'big'
+E         
+E         - big
+E         + little
+
+tests\test_b99_a2l_encode.py:158: AssertionError
+____________ test_tc_b99_24_rat_func_direction_and_root_selection _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25810/test_tc_b99_24_rat_func_direct0')
+
+    def test_tc_b99_24_rat_func_direction_and_root_selection(tmp_path: Path) -> None:
+        """Encode computes INT = f(PHYS) (30 → 300, 25 → 250); decode solves for
+        PHYS (raw 300 → 30.0); a quadratic picks the root inside the limits even
+        when it is NOT the smaller-magnitude one; no real root is a decode
+        failure; LINEAR is unchanged."""
+        expect = _manifest_expect()
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        rat = tags["RAT_FUNC_SYM"]
+        rat_expect = expect["symbols"]["RAT_FUNC_SYM"]
+        for case in rat_expect["encode"]:
+            encoded, error, flags = _encode(rat, payload, case["physical"])
+            assert error is None, error
+            assert flags == []
+>           assert encoded == tuple(case["raw"].to_bytes(2, "big"))
+E           AssertionError: assert (3, 0) == (1, 44)
+E             
+E             At index 0 diff: 3 != 1
+E             
+E             Full diff:
+E               (
+E             -     1,
+E             ?     ^...
+E             
+E             ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests\test_b99_a2l_encode.py:210: AssertionError
+_________________ test_tc_b99_25_compu_tab_refusals_and_flags _________________
+
+    def test_tc_b99_25_compu_tab_refusals_and_flags() -> None:
+        """TAB_NOINTP 13.0 is refused naming 10.0 and 15.0; TAB_INTP 500.0 and
+        −50.0 are refused naming the range 0.0..62.5; 3.4 encodes raw 1 with a flag
+        naming the written 2.5; 5.0 encodes raw 2 with no flag. Table values are
+        accepted exactly."""
+        expect = _manifest_expect()
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        # --- TAB_NOINTP ---------------------------------------------------------
+        nointp_expect = expect["symbols"]["TAB_NOINTP_SYM"]
+        assert nointp_expect["typed_refused"] == 13.0
+        assert nointp_expect["named_nearest"] == [10.0, 15.0]
+        nointp = tags["TAB_NOINTP_SYM"]
+        for raw_x, table_y in ((0, 10.0), (1, 15.0), (2, 20.0)):
+            encoded, error, flags = _encode(nointp, payload, table_y)
+            assert error is None, f"{table_y} is a table value: {error}"
+            assert flags == []
+>           assert encoded == (0x00, raw_x)
+E           assert (1, 0) == (0, 1)
+E             
+E             At index 0 diff: 1 != 0
+E             
+E             Full diff:
+E               (
+E             +     1,
+E                   0,
+E             -     1,
+E               )
+
+tests\test_b99_a2l_encode.py:265: AssertionError
+___________________ test_at_b99_14_codec_api_encode_surface ___________________
+
+    def test_at_b99_14_codec_api_encode_surface() -> None:
+        """The codec API (P-22's declared exception) returns raw 300 for 30 on the
+        RAT_FUNC symbol, ``10 11`` for 4113 on the MSB symbol, and an error naming
+        the range for 500 on the TAB_INTP symbol — only ``(raw_bytes, error,
+        flags)`` is observed."""
+        expect = _manifest_expect()
+        payload = _corpus_payload()
+        tags = _tags(payload)
+    
+        raw_bytes, error, flags = _encode(tags["RAT_FUNC_SYM"], payload, 30)
+>       assert raw_bytes == (0x01, 0x2C)  # raw 300, MSB_FIRST
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert (3, 0) == (1, 44)
+E         
+E         At index 0 diff: 3 != 1
+E         
+E         Full diff:
+E           (
+E         -     1,
+E         ?     ^...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests\test_b99_a2l_encode.py:316: AssertionError
+__________________ test_at_b99_09_a2l_window_physical_column __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25810/test_at_b99_09_a2l_window_phys0')
+
+    def test_at_b99_09_a2l_window_physical_column(tmp_path: Path) -> None:
+        """AT-B99-09 (US-147): the A2L window shows 30.0 / 4113.0 in the Physical
+        column, n/a for the undecodable symbol (blank for the no-bytes symbol),
+        and the modal reads ``Scalar value: n/a (rat_func_no_real_root)`` — at
+        118x40 and 80x24 (no clipping at either width)."""
+        s19_path, a2l_path = _undecodable_pair(tmp_path)
+        for size in _SIZES:
+>           asyncio.run(_run_at_09(s19_path, a2l_path, size))
+
+tests\test_b99_a2l_encode.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s19_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25810/test_at_b99_09_a2l_window_phys0/case.s19')
+a2l_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25810/test_at_b99_09_a2l_window_phys0/case.a2l')
+size = (118, 40)
+
+    async def _run_at_09(s19_path: Path, a2l_path: Path, size: tuple[int, int]) -> None:
+        app = S19TuiApp(base_dir=s19_path.parent)
+        app.current_a2l_path = a2l_path
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            loaded = app._parse_loaded_file(s19_path)
+            assert loaded is not None, "shipped parse chain returned no LoadedFile"
+            prepared = app._prepare_load_payload(loaded)
+            app._apply_prepared_load(prepared, s19_path, 0.0)
+            for _ in range(8):
+                await pilot.pause()
+            app.action_show_screen("a2l")
+            for _ in range(4):
+                await pilot.pause()
+    
+            table = app.query_one("#a2l_tags_list", DataTable)
+            rows = _physical_table_view(app, table)
+            painted = "\n".join(rows)
+            # US-147: the Physical column decodes as the A2L declares
+            rat_row = next(r for r in rows if "RAT_FUNC_SYM" in r)
+>           assert "30.0" in rat_row, f"RAT_FUNC_SYM row at {size}: {rat_row!r}"
+E           AssertionError: RAT_FUNC_SYM row at (118, 40): '✓ RAT_FUNC_SYM  0x000020022     formula11265112650.0yes  unk'
+E           assert '30.0' in '✓ RAT_FUNC_SYM  0x000020022     formula11265112650.0yes  unk'
+
+tests\test_b99_a2l_encode.py:393: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_23_byte_order_falls_back_to_mod_common
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_24_rat_func_direction_and_root_selection
+FAILED tests/test_b99_a2l_encode.py::test_tc_b99_25_compu_tab_refusals_and_flags
+FAILED tests/test_b99_a2l_encode.py::test_at_b99_14_codec_api_encode_surface
+FAILED tests/test_b99_a2l_encode.py::test_at_b99_09_a2l_window_physical_column
+============================== 5 failed in 3.86s ==============================

@@ -155,6 +155,10 @@ def _a2l_text() -> str:
       COMPU_TAB_REF TAB_NOINTP_TBL
     /end COMPU_METHOD
 
+    /begin COMPU_METHOD CM_TAB_INTP_SPARSE "%6.2" TAB_INTP "%6.2" ""
+      COMPU_TAB_REF TAB_INTP_SPARSE_TBL
+    /end COMPU_METHOD
+
     /begin COMPU_TAB TAB_INTP_TBL
       "intp table, 2.5 PHYS per raw step"
       TAB_INTP
@@ -170,6 +174,16 @@ def _a2l_text() -> str:
       0 10.0
       1 15.0
       2 20.0
+      DEFAULT_VALUE "0"
+    /end COMPU_TAB
+
+    /begin COMPU_TAB TAB_INTP_SPARSE_TBL
+      "sparse intp table, bend at raw 25 (0->0, 25->10, 100->100)"
+      TAB_INTP
+      3
+      0 0.0
+      25 10.0
+      100 100.0
       DEFAULT_VALUE "0"
     /end COMPU_TAB
 
@@ -189,6 +203,9 @@ def _a2l_text() -> str:
       VALUE 0x2008 RL_U16_NO_BO 0 CM_LINEAR_MUL_2 0 100
       BYTE_ORDER MSB_LAST
     /end CHARACTERISTIC
+    /begin CHARACTERISTIC TAB_INTP_SPARSE_SYM "sparse TAB_INTP, raw 50 decodes to 40.0"
+      VALUE 0x200C RL_U16_NO_BO 0 CM_TAB_INTP_SPARSE 0 100
+    /end CHARACTERISTIC
 
     /begin GROUP GRP_SYNTH_B99 "GRP_SYNTH_B99 group"
       /begin REF_CHARACTERISTIC
@@ -197,6 +214,7 @@ def _a2l_text() -> str:
       TAB_INTP_SYM
       TAB_NOINTP_SYM
       LINEAR_MUL_2
+      TAB_INTP_SPARSE_SYM
       /end REF_CHARACTERISTIC
     /end GROUP
   /end MODULE
@@ -251,6 +269,28 @@ def _a2l_expect() -> dict:
                 "physical": 30.0,
                 "byte_order": "MSB_LAST",
                 "encode": [{"physical": 30, "bytes": "0F00"}],
+            },
+            "TAB_INTP_SPARSE_SYM": {
+                "address": "0x200C",
+                "bytes": "0032",
+                "raw": 50,
+                "physical": 40.0,
+                "interior_exact": {
+                    "typed": 40.0,
+                    "expected_raw": 50,
+                    "written_physical": 40.0,
+                },
+                "interior_fractional": {
+                    "typed": 3.9,
+                    "expected_raw": 10,
+                    "written_physical": 4.0,
+                    "flag_names": "4.0",
+                },
+                "endpoints": [
+                    {"typed": 0.0, "expected_raw": 0},
+                    {"typed": 100.0, "expected_raw": 100},
+                ],
+                "refused": [150.0],
             },
         },
     }
@@ -355,7 +395,7 @@ def build_corpus() -> dict:
               "; Synthetic MAC\nSYNTH_INSIDE=1000\nSYNTH_OUTSIDE=7FFF0\n",
               paired="synth_mac.s19")
 
-    a2l_block = bytes.fromhex("1011012C000200010F00")
+    a2l_block = bytes.fromhex("1011012C000200010F0000000032")
     content, data = _s19_content(None, [("3", 0x2000, a2l_block)], term=("S9", 0x2000))
     add_s19("synth_a2l.s19", ["s19.s3"], content, data,
             None, ["S9", 0x2000], None, paired="synth_a2l.a2l",

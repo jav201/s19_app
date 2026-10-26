@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc10
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items / 4 deselected / 1 selected
+
+tests/test_b99_a2l_encode.py::test_tc_b99_24_rat_func_direction_and_root_selection PASSED [100%]
+
+======================= 1 passed, 4 deselected in 0.50s =======================

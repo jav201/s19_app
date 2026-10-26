@@ -1468,6 +1468,10 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 - **▸ (feature, origin batch-99 P2 Q-1) No TUI surface enters an A2L symbol by physical value.** `ChangeService.add_symbol_entry` / `resolve_symbol_entry` / `encode_physical_to_raw_bytes` have no app caller (batch-99 P-22), so batch-99 fixes the encoder (HLR-158) and verifies it at service level only. **What closes it:** a symbol-entry control in the Patch Editor. It is a UI change, so it needs a prototype round first.
 - **▸ (P3, origin batch-99 ARQ) The module map's file name differs in case between the index and the working tree:** the index tracks `docs/architecture.md`, while the working tree shows `docs/ARCHITECTURE.md`. It is harmless on Windows; a Linux checkout gets the index's name. **What closes it:** `git mv` to one spelling and update the references.
 
+- **▸ (P3, origin batch-99 Inc-10 review) RAT_FUNC "zero denominator" decode failure has no reason token** in `_DECODE_REASON_TOKENS` (`tui/a2l.py` ≈:3152), so the describe modal reads `n/a (error)`. **What closes it:** add the token and a modal-text arm.
+- **▸ (P3, origin batch-99 Inc-10) Axis-point RAT_FUNC decodes pass no physical limits** (axis limits are not parsed), so the root pick uses the smaller-magnitude fallback. **What closes it:** parse AXIS_DESCR limits and pass them to the decode.
+- **▸ (P3, origin batch-99 Inc-11 review F4) `changes/io.py:16-19` docstring is stale:** it still lists decimals in the TUI bytes grammar and names a non-existent `cdfx_service.py`. **What closes it:** the TUI bytes grammar is hex-only (LLR-161.1) and lives in `services/change_service.py`.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

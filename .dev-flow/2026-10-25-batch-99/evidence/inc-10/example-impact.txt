@@ -1,0 +1,3 @@
+case_06 tags total: 220040 (multi-byte: 71513)
+case_06 multi-byte tags now decoding big-endian (were not on main): 71513
+examples\case_00_public\software_a.a2l: tags 13990, RAT_FUNC tags whose decode direction changed: 1640
