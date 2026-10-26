@@ -138,7 +138,11 @@ from tools.id_registry import (
 # batch-97 Inc-7 (2026-10-23): 198 -> 199, measured (the guard's own count): the
 # out-of-band Inc-9 added ``tests/test_b97_load_project_dialog.py`` (LLR-151.1)
 # without the bump; Inc-7's gate run caught it. Inc-7 adds no module.
-EXPECTED_SCANNED_TEST_FILES = 199
+# batch-99 (2026-10-25): 199 -> 206, measured (the guard's own count) on main after
+# Inc-1, 2, 10 and 11 landed without the bump (the corpus, reader and test modules
+# those increments added; the guard counts them, the list is not restated here).
+# Each later batch-99 increment bumps it for its own module (BRIEF-COMMON rule).
+EXPECTED_SCANNED_TEST_FILES = 206
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the
