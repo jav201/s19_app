@@ -240,6 +240,12 @@
       "station": "P4",
       "date": "2026-10-26",
       "decision": "standing authorization — operator commission 2026-10-25. Increment 012 (the DDR test-fix unit, tests only) gate closed: reviewed by qa-reviewer and software-dev at the DDR (C-18 one node per AT, ledgers, DQ-2..DQ-6 discharged)."
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. Increment 013 (P4 suite fixes, tests only) gate closed: the full suite on e7732f6 found two un-re-measured whole-tree guards (safe_text import census after Inc-6, Patch Editor snapshot after Inc-11); Kimi K2.8 re-measured both; code-reviewer OK with notes, packet notes fixed; merged 1a59d3b.",
+      "notes": "triage: evidence/suite-triage-e7732f6.md; caught at P4: 2 (tests-only, no product change)"
     }
   ],
   "obsidian_synced": false,
