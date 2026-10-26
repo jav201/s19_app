@@ -110,7 +110,9 @@ reconciles: 139 collected on disk = 142 − 4 (this increment's merges) + 1
 
 ## 4b · Independent review
 
-pending — orchestrator.
+| Field | Value |
+|---|---|
+| **Independent review** | software-dev — spawned as a generic agent with agents/software-dev.md (DDR reviewer) · C-DDR-SD-1 met, ledger met, no SOURCE change, 139 passed · qa-reviewer — spawned as a generic agent with agents/qa-reviewer.md (DDR reviewer) · DQ-1..DQ-4, DQ-6 discharged, 152 passed |
 
 ## 5 · Risks
 
