@@ -3336,10 +3336,41 @@ class FlowExecutionPanel(ScrollableContainer):
                 # UX-C3b). Clipped at FX_ERROR_LINE_MAX; the full list stays
                 # in the chain-set and flow reports.
                 end.append(clip_head(f" · {note}", FX_ERROR_LINE_MAX), style=_S_DIM)
+            crc_note = self._crc_absent_note(outcome)
+            if crc_note is not None:
+                # batch-99 (HLR-159 / LLR-159.2, UX-C2): a lane whose CRC
+                # step covered only part of a region names the exact absent
+                # count on its terminal line — the block finding text, int-
+                # derived by construction. Clipped at FX_ERROR_LINE_MAX; the
+                # full list stays in the chain-set and flow reports.
+                end.append(clip_head(f" · {crc_note}", FX_ERROR_LINE_MAX), style=_S_DIM)
             if outcome.written_paths:
                 names = ", ".join(path.name for path in outcome.written_paths)
                 end.append(f" · wrote {safe_text(names).plain}", style=_S_DIM)
         return [start, end]
+
+    @staticmethod
+    def _crc_absent_note(outcome) -> Optional[str]:
+        """The HLR-159 terminal-line rider: the first partly-covered CRC
+        block finding (``CRC: <k> of <n> region bytes absent (...)``) of the
+        first CRC arm that ended ``notices``, else ``None``.
+
+        The finding text is composed in the flow arm from ints only (the
+        absent count read from the region result, ARCH R23, and the declared
+        span length from the config grammar), so painting it verbatim is
+        markup-safe by construction — the same text the chain-set report
+        lists through ``md_safe``.
+        """
+        for block_result in outcome.block_results:
+            if (
+                block_result.kind != "crc"
+                or block_result.status != BLOCK_STATUS_NOTICES
+            ):
+                continue
+            for finding in block_result.findings:
+                if "region bytes absent" in finding.message:
+                    return finding.message
+        return None
 
     @staticmethod
     def _patch_not_applied_note(outcome) -> Optional[str]:

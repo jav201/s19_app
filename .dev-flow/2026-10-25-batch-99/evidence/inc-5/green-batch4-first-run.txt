@@ -1,0 +1,5 @@
+
+tests\test_b97_flow_execution.py:1518: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one
+1 failed, 93 passed in 654.48s (0:10:54)

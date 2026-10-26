@@ -1,0 +1,37 @@
+## Reverse census — batch-99 Inc-5
+
+### B1: symbols asserted by other tests
+$ grep -rln "region_segments\|crc_diagnostics\|write_crc_image\|EMITTED_NAME_SUFFIX\|injected 1 CRC" tests/
+tests/goldens/batch71/ac6-unscoped-flow-report.md
+tests/test_b99_crc_region.py
+tests/test_b99_staging.py
+tests/test_crc_designer_view.py
+tests/test_crc_operation.py
+tests/test_tui_crc_surface.py
+
+### new/changed symbol consumers inside s19_app
+$ grep -rn "first_empty_target_span\|CrcCoverageResult\|absent_bytes" s19_app/ | grep -v ".pyc"
+s19_app/tui/operations/crc.py:55:class CrcCoverageResult(CrcRegionResult):
+s19_app/tui/operations/crc.py:65:        ``absent_bytes == declared span length`` — the LLR-159.1 empty-region
+s19_app/tui/operations/crc.py:69:        absent_bytes (int): Declared-span addresses holding no image byte
+s19_app/tui/operations/crc.py:84:    absent_bytes: int = 0
+s19_app/tui/operations/crc.py:87:def first_empty_target_span(
+s19_app/tui/operations/crc.py:120:        if region.absent_bytes == declared:
+s19_app/tui/operations/crc.py:860:        count ``absent_bytes`` (batch-99 HLR-159 / ARCH R23 — always a
+s19_app/tui/operations/crc.py:861:        :class:`CrcCoverageResult`).
+s19_app/tui/operations/crc.py:924:        # and travels on the result (CrcCoverageResult) for every consumer.
+s19_app/tui/operations/crc.py:934:            CrcCoverageResult(
+s19_app/tui/operations/crc.py:941:                absent_bytes=absent,
+s19_app/tui/operations/crc.py:956:        :func:`first_empty_target_span`), per-target truncation warnings,
+s19_app/tui/operations/crc.py:1283:            CrcCoverageResult(
+s19_app/tui/operations/crc.py:1294:                absent_bytes=getattr(region, "absent_bytes", 0),
+s19_app/tui/operations/crc.py:1447:    empty_span = first_empty_target_span(config, check_results)
+s19_app/tui/operations/crc.py:1696:            empty_span = first_empty_target_span(config, crc_regions)
+s19_app/tui/services/flow_execution_service.py:121:    first_empty_target_span,
+s19_app/tui/services/flow_execution_service.py:694:                empty_span = first_empty_target_span(config, crc_regions)
+s19_app/tui/services/flow_execution_service.py:730:                    < region.absent_bytes
+s19_app/tui/services/flow_execution_service.py:755:                                f"{region.absent_bytes} absent byte(s) - "
+
+### WORKAREA_TEMP no longer imported by crc.py
+$ grep -n "WORKAREA_TEMP" s19_app/tui/operations/crc.py || echo "no hit in crc.py"
+no hit in crc.py

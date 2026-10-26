@@ -60,9 +60,9 @@ Layer A (engine, direct calls):
   ``workspace._private_stage_dir``, the one helper that owns the mkdtemp)
   or to the path passed as the
   first argument of an ``os.open(..., O_EXCL)`` claim, inside a branch
-  guarded by a boolean assigned immediately after that creation. Exactly one
-  known exception: the CRC write site's ``finally`` unlink (expected RED
-  until Inc 5, LLR-155.8).
+  guarded by a boolean assigned immediately after that creation. Zero known
+  exceptions: the CRC write site converted to private staging in batch-99
+  Inc-5 (LLR-155.8) — the census passes with zero exceptions.
 
 Layer B (black-box, Textual pilot over the shipped chain; review finding
 F5 — every drive is keys and clicks: rail keys, clicked inputs and buttons,
@@ -958,30 +958,19 @@ _CENSUS_TARGETS = [
     (Path("s19_app/tui/operations/crc.py"), "write_crc_image"),
 ]
 
-#: The one known exception: the CRC write stages at ``temp/<name>`` and
-#: unlinks a re-derived name in ``finally`` — converted by Inc 5
-#: (LLR-155.8). Expected RED until then.
-_CRC_EXPECTED = ("crc.py", "write_crc_image")
-
-
+#: The CRC write converted to private staging in batch-99 Inc-5 (LLR-155.8):
+#: it now stages via ``workspace._private_stage_dir`` (a per-write mkdtemp
+#: under ``temp/.staging/``) and removes only the owned staging directory, so
+#: the census holds with ZERO exceptions.
 def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
-    """RED at HEAD: ``apply.py``'s ``finally: staged.unlink()`` deletes a path
-    rebuilt from the user's name (the LLR-155.7 declared RED site)."""
+    """The five placement writers delete only what they created: 0
+    violations, no exceptions (the Inc-5 LLR-155.8 CRC conversion removed
+    the last known site)."""
     all_violations: list = []
     for rel, func_name in _CENSUS_TARGETS:
         all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
-    unexpected = [
-        v
-        for v in all_violations
-        if not (v.startswith(_CRC_EXPECTED[0]) and f":{_CRC_EXPECTED[1]}:" in v)
-    ]
-    assert unexpected == [], (
-        f"LLR-155.7 violations outside the known Inc-5 CRC site: {unexpected}"
-    )
-    crc_violations = [v for v in all_violations if f":{_CRC_EXPECTED[1]}:" in v]
-    assert len(crc_violations) == 1, (
-        f"expected exactly the one known CRC site violating until Inc 5, "
-        f"got {crc_violations}"
+    assert all_violations == [], (
+        f"LLR-155.7 violations: {all_violations}"
     )
 
 

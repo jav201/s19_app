@@ -1,0 +1,328 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc5
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 5 items
+
+tests/test_b99_crc_region.py::test_tc_b99_26_empty_region_errors_and_writes_nothing FAILED [ 20%]
+tests/test_b99_crc_region.py::test_tc_b99_27_partial_region_notices_name_absent_count FAILED [ 40%]
+tests/test_b99_crc_region.py::test_tc_b99_27_r23_coverage_count_travels_on_the_region_result FAILED [ 60%]
+tests/test_b99_crc_region.py::test_tc_b99_38_concurrent_crc_writes_of_the_same_stem FAILED [ 80%]
+tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot FAILED [100%]
+
+================================== FAILURES ===================================
+____________ test_tc_b99_26_empty_region_errors_and_writes_nothing ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_26_empty_region_er0')
+
+    def test_tc_b99_26_empty_region_errors_and_writes_nothing(tmp_path: Path) -> None:
+        """``0x20000-0x30000`` on ``prg.s19`` → the CRC block errors, the flow
+        stops before WRITE-OUT (0 files), the slot bytes stay absent, and the
+        block's last diagnostic names the cause (UX-C2). RED at HEAD (P-9):
+        ``run=ok crc=ok … slot_bytes=00000000``."""
+        project = _make_project(tmp_path)
+        (project / "empty_crc.json").write_text(
+            _crc_config("0x20000", "0x30000", "0x2FFFC"), encoding="utf-8"
+        )
+        flow = Flow(
+            name="region_no_bytes",
+            blocks=[
+                SourceBlock("prg.s19"),
+                CrcBlock("empty_crc.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+>       assert [br.status for br in result.block_results] == [
+            BLOCK_STATUS_OK,
+            BLOCK_STATUS_ERROR,
+            BLOCK_STATUS_SKIPPED,
+        ]
+E       AssertionError: assert ['ok', 'notices', 'ok'] == ['ok', 'error', 'skipped']
+E         
+E         At index 1 diff: 'notices' != 'error'
+E         
+E         Full diff:
+E           [
+E               'ok',
+E         +     'notices',...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests\test_b99_crc_region.py:137: AssertionError
+___________ test_tc_b99_27_partial_region_notices_name_absent_count ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_27_partial_region_0')
+
+    def test_tc_b99_27_partial_region_notices_name_absent_count(tmp_path: Path) -> None:
+        """A legacy region over the 0xFA2E-0xFCB0 gap ends ``notices`` naming the
+        exact count of absent bytes (== an independent count from the reader's
+        map); the flow reports ``completed-with-issues`` and still writes a file
+        whose slot matches an independent CRC over the present bytes.
+    
+        RED at HEAD (P-9): ``region_over_gap run=ok … findings=[]``."""
+        project = _make_project(tmp_path)
+        (project / "noop.json").write_text(_change_doc([]), encoding="utf-8")
+        (project / "partial_crc.json").write_text(
+            _crc_config("0xFA00", "0xFC00", "0xFC00"), encoding="utf-8"
+        )
+        flow = Flow(
+            name="region_over_gap",
+            blocks=[
+                SourceBlock("prg.s19"),
+                PatchBlock("noop.json"),  # keeps the CRC block AFTER a PATCH arm
+                CrcBlock("partial_crc.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+>       assert [br.status for br in result.block_results] == [
+            BLOCK_STATUS_OK,
+            BLOCK_STATUS_OK,
+            BLOCK_STATUS_NOTICES,
+            BLOCK_STATUS_OK,
+        ]
+E       AssertionError: assert ['ok', 'ok', 'ok', 'ok'] == ['ok', 'ok', 'notices', 'ok']
+E         
+E         At index 2 diff: 'ok' != 'notices'
+E         
+E         Full diff:
+E           [
+E               'ok',
+E               'ok',...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests\test_b99_crc_region.py:183: AssertionError
+_______ test_tc_b99_27_r23_coverage_count_travels_on_the_region_result ________
+
+    def test_tc_b99_27_r23_coverage_count_travels_on_the_region_result() -> None:
+        """ARCH R23 (condition C5): the coverage count is carried on the CRC
+        region result — every consumer reads that one number."""
+        oracle = read_s19(PRG)
+        op_input = OperationInput(
+            mem_map=dict(oracle.data),
+            ranges=[(PARTIAL_START, PARTIAL_END)],
+            input_path=None,
+            variant_id=None,
+            file_type="s19",
+        )
+    
+        empty_config, errors = parse_crc_config(
+            _crc_config("0x20000", "0x30000", "0x2FFFC")
+        )
+        assert errors == []
+        partial_config, errors = parse_crc_config(
+            _crc_config("0xFA00", "0xFC00", "0xFC00")
+        )
+        assert errors == []
+    
+        empty_result = check_regions(op_input, empty_config)[0]
+        # 0 present bytes: the absent count equals the declared span length.
+>       assert empty_result.absent_bytes == EMPTY_END - EMPTY_START
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'CrcRegionResult' object has no attribute 'absent_bytes'
+
+tests\test_b99_crc_region.py:236: AttributeError
+____________ test_tc_b99_38_concurrent_crc_writes_of_the_same_stem ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_tc_b99_38_concurrent_crc_0')
+
+    def test_tc_b99_38_concurrent_crc_writes_of_the_same_stem(tmp_path: Path) -> None:
+        """Two concurrent writers of ``fw-crc.s19`` per trial, 20 trials: every
+        written file's CRC slot equals its own image's CRC (independent reader +
+        ``zlib.crc32`` oracle). Under shared ``temp/<name>`` staging (the HEAD
+        behavior, restored by the LLR-155.8 mutation) the same probe reports a
+        nonzero mismatch count (PQ-8)."""
+        mismatches: list[str] = []
+        for trial in range(_TC38_TRIALS):
+            workarea_base = tmp_path / f"trial-{trial:02d}"
+            payloads = [_tc38_payload(trial * 2), _tc38_payload(trial * 2 + 1)]
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                halves = list(
+                    pool.map(lambda p: _tc38_check_one(workarea_base, p), payloads)
+                )
+            mismatches.extend(h for h in halves if h)
+>       assert mismatches == [], (
+            f"{len(mismatches)} of {_TC38_TRIALS * 2} concurrent writes landed "
+            f"another image's bytes: {mismatches[:4]}"
+        )
+E       AssertionError: 20 of 40 concurrent writes landed another image's bytes: ['slot f5c83c7b != own CRC f9291182 in fw-crc.s19', 'slot 6c2079cf != own CRC 55d43f42 in fw-crc.s19', 'slot cf369ab5 != own CRC dcc51bd3 in fw-crc.s19', 'slot ae6a4928 != own CRC 0149c138 in fw-crc.s19']
+E       assert ['slot f5c83c...c_1.s19', ...] == []
+E         
+E         Left contains 20 more items, first extra item: 'slot f5c83c7b != own CRC f9291182 in fw-crc.s19'
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     'slot f5c83c7b != own CRC f9291182 in fw-crc.s19',...
+E         
+E         ...Full output truncated (20 lines hidden), use '-vv' to show
+
+tests\test_b99_crc_region.py:327: AssertionError
+____________________ test_at_b99_10_flow_crc_region_pilot _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26571/test_at_b99_10_flow_crc_region0')
+
+    def test_at_b99_10_flow_crc_region_pilot(tmp_path: Path) -> None:
+        """Flow Execution, driven ONLY by keys and clicks: the empty-region lane
+        paints its CRC card ``✗ error``, writes no file and the run log names the
+        cause (``CRC region 0x20000-0x30000 holds 0 image bytes - nothing
+        written``); the gap-region lane paints ``◇ notices`` and writes a file
+        whose slot matches an independent CRC over the present bytes.
+    
+        RED at HEAD (P-9): both lanes run ``ok`` — the empty lane writes
+        ``out_empty.s19`` and the log carries no cause line."""
+        from textual.widgets import Label
+    
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(PRG, project_dir / "prg.s19")
+        (project_dir / "empty_crc.json").write_text(
+            _crc_config("0x20000", "0x30000", "0x2FFFC"), encoding="utf-8"
+        )
+        (project_dir / "partial_crc.json").write_text(
+            _crc_config("0xFA00", "0xFC00", "0xFC00"), encoding="utf-8"
+        )
+        (project_dir / "noop.json").write_text(_change_doc([]), encoding="utf-8")
+        write_flow(
+            project_dir,
+            "empty_flow",
+            [
+                SourceBlock("prg.s19"),
+                CrcBlock("empty_crc.json"),
+                WriteOutBlock("out_empty.s19"),
+            ],
+        )
+        write_flow(
+            project_dir,
+            "partial_flow",
+            [
+                SourceBlock("prg.s19"),
+                PatchBlock("noop.json"),
+                CrcBlock("partial_crc.json"),
+                WriteOutBlock("out_partial.s19"),
+            ],
+        )
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                # The project loads through the Load project dialog.
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                row = next(
+                    row
+                    for row in app.screen.query("#project_list ListItem")
+                    if "proj1" in str(row.query_one(Label).render())
+                )
+                await pilot.click(row)
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "proj1"
+                    in str(app.query_one("#status_context").render()),
+                    "the project context label",
+                )
+                await pilot.press("right_square_bracket")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#fx_panel")) > 0,
+                    "the Flow Execution panel",
+                )
+                await _import_lane(app, pilot, "empty_flow", 0)
+                await _import_lane(app, pilot, "partial_flow", 1)
+                assert await pilot.click("#fx_run"), "click missed #fx_run"
+                await _wait_for(
+                    pilot,
+                    lambda: "chain halted" in _painted_log(app)
+                    and not app.query_one("#fx_run").disabled,
+                    "the failed lane painted in the run log",
+                )
+    
+                log = _painted_log(app)
+                # Empty region: the terminal line names the user-facing cause
+                # (UX-C2) and the chain halts before WRITE-OUT.
+                assert "empty_flow" in log, log
+                assert "chain halted" in log, log
+                assert (
+                    "CRC region 0x20000-0x30000 holds 0 image bytes - nothing written"
+                    in log
+                ), log
+                # Gap region: the lane ends with notices and still writes.
+                assert "partial_flow" in log, log
+                assert "done with notices" in log, log
+                # The painted lane cards carry the block statuses.
+                panel = app.query_one("#fx_panel")
+                assert "✗ error" in panel.lane_paint_plain(0), (
+                    panel.lane_paint_plain(0)
+                )
+                assert "◇ notices" in panel.lane_paint_plain(1), (
+                    panel.lane_paint_plain(1)
+                )
+                # The empty lane wrote nothing; the gap lane's slot matches an
+                # independent CRC over the present bytes (the reader's oracle).
+                assert not (project_dir / "out_empty.s19").exists(), (
+                    "WRITE-OUT ran despite the empty-region error"
+                )
+                out_partial = project_dir / "out_partial.s19"
+                assert out_partial.exists(), "the notices lane wrote no file"
+                oracle = read_s19(project_dir / "prg.s19")
+                present = bytes(
+                    oracle.data[addr]
+                    for addr in range(PARTIAL_START, PARTIAL_END)
+                    if addr in oracle.data
+                )
+                written = read_s19(out_partial)
+                slot = bytes(written.data[PARTIAL_OUTPUT + i] for i in range(4))
+                assert slot == zlib.crc32(present).to_bytes(4, "little")
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_crc_region.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_crc_region.py:461: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b99_10_flow_crc_region_pilot.<locals>._drive.<locals>.<lambda> at 0x0000018B19B985E0>
+description = 'the failed lane painted in the run log', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200):
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the failed lane painted in the run log
+
+tests\test_b99_crc_region.py:357: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_tc_b99_26_empty_region_errors_and_writes_nothing
+FAILED tests/test_b99_crc_region.py::test_tc_b99_27_partial_region_notices_name_absent_count
+FAILED tests/test_b99_crc_region.py::test_tc_b99_27_r23_coverage_count_travels_on_the_region_result
+FAILED tests/test_b99_crc_region.py::test_tc_b99_38_concurrent_crc_writes_of_the_same_stem
+FAILED tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot - A...
+======================== 5 failed in 70.46s (0:01:10) =========================

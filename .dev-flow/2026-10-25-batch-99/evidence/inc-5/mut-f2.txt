@@ -1,0 +1,9 @@
+MUTATION mut-f2 (LLR-159.1 / UX-C2 negative control): crc_diagnostics no longer skips a fully
+empty target — the empty region gets a 'covers present bytes only' note before its error.
+
+E        +    where ['CRC: 1 region(s): 0 matched, 0 mismatched, 1 no-stored-value', 'CRC region 0x20000-0x30000: 65536 absent byte(s) - the CRC covers present bytes only', 'CRC region 0x20000-0x30000 holds 0 image bytes - nothing written'] = OperationResult(operation_id='crc', status='error', input_path=None, variant_id=None, output=LoadedFile(path=WindowsPa...t_address=196604, computed_crc=0, stored_value=None, matched=None, written=False, output_bytes=4, absent_bytes=65536)]).notes
+
+tests\test_b99_crc_region.py:190: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_tc_b99_26_empty_region_error_note_is_last_and_only
+1 failed, 30 passed in 0.76s

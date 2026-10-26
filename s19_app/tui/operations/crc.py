@@ -17,6 +17,7 @@ Region membership reuses the frozen :mod:`s19_app.range_index` primitives
 
 from __future__ import annotations
 
+import shutil
 import zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -28,8 +29,8 @@ from ..changes.io import emit_s19_from_mem_map
 from ..changes.verify import VerifyResult, verify_written_image
 from ..models import LoadedFile
 from ..workspace import (
-    WORKAREA_TEMP,
     WorkareaContainmentError,
+    _private_stage_dir,
     copy_into_workarea,
     ensure_workarea,
 )
@@ -48,6 +49,78 @@ DEFAULT_FINAL_XOR: int = 0xFFFFFFFF
 LE32_WIDTH: int = 4
 
 _MASK32: int = 0xFFFFFFFF
+
+
+@dataclass
+class CrcCoverageResult(CrcRegionResult):
+    """
+    Summary:
+        A :class:`CrcRegionResult` that also carries the region coverage
+        count (batch-99, HLR-159 / ARCH R23, PDR condition C5): the number of
+        absent bytes across the target's declared spans. The count is computed
+        ONCE in :func:`check_regions` and travels on the result, so the flow
+        arm, :func:`write_crc_image` and the operation execute path all read
+        that one number instead of re-deriving coverage (the rejected R23
+        alternative). A target holding no image byte has
+        ``absent_bytes == declared span length`` — the LLR-159.1 empty-region
+        test every consumer applies.
+
+    Args:
+        absent_bytes (int): Declared-span addresses holding no image byte
+            (0 for a fully covered target — the boundary the readers key on).
+
+    Data Flow:
+        - Produced by :func:`check_regions`; preserved by
+          :func:`inject_crcs` on the re-emitted ``written=True`` results.
+
+    Dependencies:
+        Used by:
+            - flow_execution_service (the flow CRC arm)
+            - write_crc_image (the empty-region refusal)
+            - CrcOperation.execute (the empty-region error status)
+            - tests/test_b99_crc_region.py (TC-B99-27 R23 arm)
+    """
+
+    absent_bytes: int = 0
+
+
+def first_empty_target_span(
+    config: CrcConfig, crc_regions: list[CrcCoverageResult]
+) -> Optional[tuple[int, int]]:
+    """
+    Summary:
+        The ``(start, end)`` of the FIRST configured target holding no image
+        byte (batch-99, LLR-159.1), or ``None`` when every target covers at
+        least one byte. The coverage count is read from the region results
+        (ARCH R23 — computed once by :func:`check_regions`); only the declared
+        span length (config grammar, never image-derived) is combined with it.
+
+    Args:
+        config (CrcConfig): The parsed config whose normalized targets pair
+            with ``crc_regions`` in evaluation order.
+        crc_regions (list[CrcCoverageResult]): The per-target results from
+            :func:`check_regions`, in normalized order (always
+            :class:`CrcCoverageResult` — the R23 carrier).
+
+    Returns:
+        Optional[tuple[int, int]]: The first empty target's first span as
+            half-open ``(start, end)``, else ``None``.
+
+    Data Flow:
+        - ``zip(normalized_targets(config), crc_regions)`` — one uniform loop
+          over the same normalized order :func:`check_regions` emitted.
+
+    Dependencies:
+        Used by:
+            - write_crc_image (refuse before any injection)
+            - CrcOperation.execute (the ``error`` status)
+            - flow_execution_service (the flow CRC arm)
+    """
+    for target, region in zip(normalized_targets(config), crc_regions):
+        declared = sum(end - start for start, end in target.spans)
+        if region.absent_bytes == declared:
+            return target.spans[0]
+    return None
 
 
 def _reflect(value: int, width: int) -> int:
@@ -784,7 +857,9 @@ def check_regions(
         list[CrcRegionResult]: One result per target, in normalized order
         (legacy regions then groups, each file-ordered), carrying
         ``output_address`` / ``computed_crc`` / ``stored_value`` /
-        ``matched`` / ``written=False`` / ``output_bytes``.
+        ``matched`` / ``written=False`` / ``output_bytes`` and the coverage
+        count ``absent_bytes`` (batch-99 HLR-159 / ARCH R23 — always a
+        :class:`CrcCoverageResult`).
 
     Raises:
         None: Missing stored bytes yield ``stored_value=None`` /
@@ -845,33 +920,59 @@ def check_regions(
         # the direct equality below gives for free).
         mask = (1 << (8 * target.output_bytes)) - 1
         matched = None if stored is None else (stored == (computed & mask))
+        # batch-99 (HLR-159 / ARCH R23, PDR C5): the coverage count — absent
+        # bytes across the target's declared spans — is computed HERE, once,
+        # and travels on the result (CrcCoverageResult) for every consumer.
+        absent = sum(
+            (end - start)
+            - sum(
+                len(segment)
+                for segment in region_segments(op_input.mem_map, start, end)
+            )
+            for start, end in target.spans
+        )
         results.append(
-            CrcRegionResult(
+            CrcCoverageResult(
                 output_address=target.output_address,
                 computed_crc=computed,
                 stored_value=stored,
                 matched=matched,
                 written=False,
                 output_bytes=target.output_bytes,
+                absent_bytes=absent,
             )
         )
     return results
 
 
-def crc_diagnostics(op_input: OperationInput, config: CrcConfig) -> list[str]:
+def crc_diagnostics(
+    op_input: OperationInput,
+    config: CrcConfig,
+    crc_results: list[CrcCoverageResult],
+) -> list[str]:
     """
     Summary:
-        Build the batch-32 group diagnostic notes (LLR-GRP-001.6/.8,
-        LLR-WID-001.3) for one config over one input: per-group gap
-        coverage, per-target truncation warnings, and group-involved
-        overlap warnings. A legacy-only config yields ``[]`` — legacy
-        regions NEVER emit any of these notes (Q4 / S-7 scope pin, AT-044a
-        strict compat).
+        Build the group diagnostic notes (LLR-GRP-001.6/.8,
+        LLR-WID-001.3) plus the batch-99 region coverage notes
+        (HLR-159 / LLR-159.2) for one config over one input: per-target
+        coverage — a partly covered target names its exact absent count
+        (read from the region result, ARCH R23 — never re-derived here),
+        legacy regions included — a 0-present-byte target is NOT a note, it
+        is the LLR-159.1 ``error`` the callers derive via
+        :func:`first_empty_target_span` and append AFTER these notes (UX-C2:
+        the cause stays the last line), per-target truncation warnings,
+        and group-involved overlap warnings. A fully covered legacy-only
+        config yields ``[]`` — full coverage stays silent (the Q4 legacy
+        silence shrinks to full coverage only).
 
     Args:
         op_input (OperationInput): The neutral input; ``mem_map`` is read
-            only to count present bytes per declared span.
+            only to NAME which declared spans are gapped (display text, not
+            the count).
         config (CrcConfig): The parsed config (regions + groups).
+        crc_results (list[CrcCoverageResult]): The per-target results from
+            :func:`check_regions` in the same normalized order — the single
+            carrier of the absent-byte count (ARCH R23).
 
     Returns:
         list[str]: Zero or more plain-text notes, in stable order: coverage
@@ -881,9 +982,11 @@ def crc_diagnostics(op_input: OperationInput, config: CrcConfig) -> list[str]:
         surface renders ``markup=False``).
 
     Data Flow:
-        - Per GROUP target: absent count = Σ(span length − present bytes)
-          via :func:`region_segments`; > 0 → ONE aggregate note naming the
-          group, its gapped spans and the total (never one note per span).
+        - Per GROUP target: the absent count is ``region.absent_bytes``
+          from the paired result; > 0 (and < the declared span length — a
+          fully empty target is the error, not a note) → ONE aggregate note
+          naming the group, its gapped spans and the total (never one note
+          per span).
         - Per target with ``output_bytes`` < 4 → one truncation warning
           (only groups can carry a non-4 width).
         - Per target pair where ≥1 member is a GROUP: self-overlap
@@ -898,7 +1001,6 @@ def crc_diagnostics(op_input: OperationInput, config: CrcConfig) -> list[str]:
             - region_segments
         Used by:
             - CrcOperation.execute (notes assembly)
-            - write_crc_image (via the execute check path)
             - tests/test_crc_operation.py (AT-045c/046b/047c/047g notes)
 
     Example:
@@ -911,33 +1013,52 @@ def crc_diagnostics(op_input: OperationInput, config: CrcConfig) -> list[str]:
         ...     regions=[CrcRegion(0, 1, 0x10)], polynomial=0x04C11DB7,
         ...     init=0xFFFFFFFF, reverse=True, final_xor=0xFFFFFFFF,
         ... )
-        >>> crc_diagnostics(op_input, cfg)
+        >>> crc_diagnostics(op_input, cfg, check_regions(op_input, cfg))
         []
     """
     targets = normalized_targets(config)
     notes: list[str] = []
 
     group_number = 0
-    for target in targets:
-        if not target.is_group:
+    for target, region in zip(targets, crc_results):
+        if target.is_group:
+            group_number += 1
+        # batch-99 (HLR-159 / ARCH R23): the count travels on the region
+        # result — read it, never re-derive it.
+        total_absent = region.absent_bytes
+        declared = sum(end - start for start, end in target.spans)
+        if total_absent == 0 or total_absent == declared:
+            # Fully covered stays silent; fully EMPTY is not a coverage
+            # note at all — it is the LLR-159.1 error the callers append
+            # after these notes (UX-C2: the cause stays the last line).
             continue
-        group_number += 1
-        total_absent = 0
         gapped_spans: list[str] = []
         for start, end in target.spans:
             present = sum(
                 len(segment)
                 for segment in region_segments(op_input.mem_map, start, end)
             )
-            absent = (end - start) - present
-            if absent > 0:
-                total_absent += absent
+            if (end - start) - present > 0:
                 gapped_spans.append(f"[0x{start:X}, 0x{end:X})")
-        if total_absent > 0:
+        if target.is_group:
+            # batch-32 (LLR-GRP-001.6): ONE aggregate note naming the group,
+            # its gapped spans and the total (never one note per span).
             notes.append(
                 f"CRC group {group_number}: {total_absent} absent byte(s) in "
                 f"declared span(s) {', '.join(gapped_spans)} — the CRC "
                 "covers present bytes only"
+            )
+        else:
+            # batch-99 (HLR-159 / LLR-159.2): legacy regions are no longer
+            # silent about partial coverage — the notice names the exact
+            # absent count (the Q4 legacy-silent pin scoped the batch-32
+            # GROUP diagnostics; the coverage count now travels on the
+            # region result, ARCH R23, and names itself for every region
+            # form).
+            start, end = target.spans[0]
+            notes.append(
+                f"CRC region 0x{start:X}-0x{end:X}: {total_absent} absent "
+                "byte(s) - the CRC covers present bytes only"
             )
 
     for target in targets:
@@ -1175,13 +1296,18 @@ def inject_crcs(
                 region.output_address + width,
             )
         written_regions.append(
-            CrcRegionResult(
+            CrcCoverageResult(
                 output_address=region.output_address,
                 computed_crc=region.computed_crc,
                 stored_value=region.stored_value,
                 matched=region.matched,
                 written=True,
                 output_bytes=width,
+                # batch-99 (ARCH R23): the coverage count survives the
+                # re-emission — ``getattr`` keeps hand-built plain
+                # CrcRegionResult inputs (the screens re-inject path)
+                # valid at their default of 0.
+                absent_bytes=getattr(region, "absent_bytes", 0),
             )
         )
 
@@ -1258,11 +1384,18 @@ def write_crc_image(
     Summary:
         The side-effectful CRC write path, headless and only-writes-when-called
         (LLR-003.1/.2/.3, re-scoped LLR-003.5; §6.2 D-6/D-8). It computes the
-        per-region CRCs (:func:`check_regions`), injects them into a working
+        per-region CRCs (:func:`check_regions`), refuses with one finding when
+        any target holds no image byte (batch-99, HLR-159 / LLR-159.1:
+        ``error`` result, nothing injected, no file — the coverage count is
+        read from the results, ARCH R23), injects them into a working
         copy (:func:`inject_crcs`, original never mutated), serializes the
-        injected map via ``emit_s19_from_mem_map``, stages the text under
-        ``<workarea_base>/.s19tool/workarea/temp/`` and places it into the
-        contained work area via ``copy_into_workarea`` — which enforces the
+        injected map via ``emit_s19_from_mem_map``, stages the text in a
+        PRIVATE ``mkdtemp`` directory under
+        ``<workarea_base>/.s19tool/workarea/temp/.staging/``
+        (:func:`workspace._private_stage_dir`, batch-99 LLR-155.8 — never the
+        shared ``temp/<name>``; only the owned staging directory is removed,
+        LLR-155.7) and places it into the contained work area via
+        ``copy_into_workarea`` — which enforces the
         REAL containment seam (``_find_workarea_root`` +
         ``is_relative_to(workarea_root)`` + ``_path_traverses_reparse_point``)
         AND name-dedups on collision (no overwrite, F-S-03) — then verifies the
@@ -1323,17 +1456,34 @@ def write_crc_image(
             - tests/test_crc_operation.py (TC-123, TC-124, TC-126, containment)
     """
     check_results = check_regions(op_input, config)
+    # batch-99 (HLR-159 / LLR-159.1): a target holding 0 image bytes is an
+    # error — nothing is injected and no file is written. The coverage
+    # count is read from the region results (ARCH R23); the finding names
+    # the user-facing cause (UX-C2).
+    empty_span = first_empty_target_span(config, check_results)
+    if empty_span is not None:
+        start, end = empty_span
+        return CrcWriteResult(
+            crc_regions=check_results,
+            written_path=None,
+            verify_status=None,
+            verify_runs=[],
+            findings=[
+                f"CRC region 0x{start:X}-0x{end:X} holds 0 image bytes - "
+                "nothing written"
+            ],
+        )
     working_mem, working_ranges, written_regions = inject_crcs(
         op_input, check_results
     )
 
     workarea = ensure_workarea(workarea_base)
-    temp_dir = workarea / WORKAREA_TEMP
     target_dir = (workarea / CRC_OUTPUT_SUBDIR) if dest_dir is None else dest_dir
     file_name = _emitted_file_name(op_input.input_path)
-    staged = temp_dir / file_name
 
     placed: Optional[Path] = None
+    stage_dir: Optional[Path] = None
+    stage_owned = False
     try:
         # F-S-06 defense-in-depth: emit is inside the try so a hypothetical
         # KeyError (an injected range claiming an address absent from the
@@ -1343,7 +1493,16 @@ def write_crc_image(
         s19_text = emit_s19_from_mem_map(
             working_mem, working_ranges, bytes_per_line=bytes_per_line
         )
-        staged.parent.mkdir(parents=True, exist_ok=True)
+        # batch-99 (LLR-155.8): stage privately via
+        # ``workspace._private_stage_dir`` — a per-write mkdtemp directory
+        # under the reparse-checked ``temp/.staging/`` home, never the
+        # shared ``temp/<name>`` — and place through ``copy_into_workarea``,
+        # which enforces containment and name-dedups. Only the owned staging
+        # DIRECTORY is removed (LLR-155.7); a re-derived name is never
+        # unlinked.
+        stage_dir = _private_stage_dir(workarea)
+        stage_owned = True
+        staged = stage_dir / file_name
         staged.write_text(s19_text, encoding="utf-8")
         placed = copy_into_workarea(staged, target_dir)
     except (WorkareaContainmentError, OSError, KeyError) as exc:
@@ -1358,10 +1517,8 @@ def write_crc_image(
             ],
         )
     finally:
-        try:
-            staged.unlink()
-        except OSError:
-            pass
+        if stage_owned:
+            shutil.rmtree(stage_dir, ignore_errors=True)
 
     verify_result: VerifyResult = verify_written_image(
         placed, working_mem, "s19"
@@ -1473,9 +1630,14 @@ class CrcOperation(Operation):
             carrying the per-region verdicts on ``crc_regions`` and a summary
             note. When ``config`` is ``None`` there is nothing to check, so
             ``crc_regions`` is ``None`` and a single explaining note is
-            returned. Either way ``status`` is ``"ok"`` and the input snapshot
-            is never mutated; ``output`` is a fresh ``LoadedFile`` over the
-            input's ``mem_map`` / ``ranges``.
+            returned. batch-99 (HLR-159 / LLR-159.1): when a configured target
+            holds no image byte the operation ends with status ``"error"`` —
+            the check path injects nothing anyway — and the LAST note names
+            the user-facing cause (``CRC region 0x…-0x… holds 0 image bytes -
+            nothing written``, UX-C2); partial coverage is reported by the
+            coverage notes naming the absent count (LLR-159.2). Either way the
+            input snapshot is never mutated; ``output`` is a fresh
+            ``LoadedFile`` over the input's ``mem_map`` / ``ranges``.
 
         Args:
             op_input (OperationInput): The neutral input; only ``mem_map`` is
@@ -1535,16 +1697,31 @@ class CrcOperation(Operation):
         if config is None:
             crc_regions: Optional[list[CrcRegionResult]] = None
             notes = ["CRC: no config supplied — nothing to check"]
+            status = "ok"
         else:
             crc_regions = check_regions(op_input, config)
             # batch-32: the summary keeps its exact legacy wording (a
             # legacy-only config's notes stay byte-identical, AT-044a);
             # group diagnostics append AFTER it and are [] for legacy-only.
             notes = [_summarize_check(crc_regions)]
-            notes.extend(crc_diagnostics(op_input, config))
+            # batch-99 (ARCH R23): the coverage notes read the absent count
+            # from the check results — the one number check_regions computed.
+            notes.extend(crc_diagnostics(op_input, config, crc_regions))
+            status = "ok"
+            # batch-99 (HLR-159 / LLR-159.1): a target holding 0 image bytes
+            # ends the operation ``error`` — nothing injected, and the LAST
+            # note names the user-facing cause (UX-C2).
+            empty_span = first_empty_target_span(config, crc_regions)
+            if empty_span is not None:
+                start, end = empty_span
+                notes.append(
+                    f"CRC region 0x{start:X}-0x{end:X} holds 0 image bytes - "
+                    "nothing written"
+                )
+                status = "error"
         return OperationResult(
             operation_id=self.operation_id,
-            status="ok",
+            status=status,
             input_path=op_input.input_path,
             variant_id=op_input.variant_id,
             output=output,

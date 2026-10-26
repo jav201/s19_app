@@ -1,0 +1,32 @@
+$ grep -rln 'crc_diagnostics' tests/
+(no hits)
+
+$ grep -rln 'first_empty_target_span' tests/
+(no hits)
+
+$ grep -rln 'absent byte\|covers present bytes only' tests/ (group/operation-path wording — unchanged by the fix round)
+tests/test_b99_crc_region.py
+tests/test_crc_engine.py
+tests/test_crc_operation.py
+
+$ grep -rln 'region bytes absent' tests/ (the new F1 carrier text)
+tests/test_b99_crc_region.py
+
+$ grep -rln 'Chain good: none' tests/
+tests/test_b99_patch_truth.py
+
+$ grep -rln 'compose_chain_set_report\|chain-set report' tests/ | grep -v __pycache__
+tests/test_b97_flow_execution.py
+tests/test_b99_crc_region.py
+tests/test_b99_patch_truth.py
+tests/test_flow_chainset_b94.py
+
+$ grep -rln '_log_lines\|fx_log' tests/ | grep -v __pycache__
+tests/test_b97_chips_help.py
+tests/test_b97_flow_execution.py
+tests/test_b97_width.py
+tests/test_b99_crc_region.py
+tests/test_b99_patch_truth.py
+tests/test_b99_truncation.py
+tests/test_flow_external_step_b96.py
+tests/test_tui_flow_execution_b94.py

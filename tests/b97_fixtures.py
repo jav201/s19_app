@@ -10,6 +10,7 @@ Editor opener.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -646,7 +647,28 @@ def flow_project(app, name: str = "proj1") -> Path:
     project_dir = load_project(app, name)
     calib_hotfix(project_dir)
     baseline_check(project_dir)
-    shutil.copyfile(REPO_ROOT / "examples" / "crc_config.example.json", project_dir / "crc.json")
+    # batch-99 Inc-5 (HLR-159): the fixture CRC config covers bytes prg.s19
+    # actually holds (0xEB08-0xFA00, output at 0x10000). The example config's
+    # regions hold no image byte of prg.s19 and now refuse the CRC block —
+    # these FX fixtures test execution mechanics, not coverage refusals.
+    (project_dir / "crc.json").write_text(
+        json.dumps(
+            {
+                "polynomial": "0x04C11DB7",
+                "init": "0xFFFFFFFF",
+                "reverse": True,
+                "final_xor": "0xFFFFFFFF",
+                "regions": [
+                    {
+                        "start": "0x0000EB08",
+                        "end": "0x0000FA00",
+                        "output_address": "0x00010000",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     write_flow(project_dir, "patch_chain", patch_chain_demo())
     write_flow(project_dir, "flash_chain", flash_chain_demo(project_dir))
     write_flow(project_dir, "crc_chain", crc_chain_demo())

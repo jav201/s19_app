@@ -1,0 +1,15 @@
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2704: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+2 failed, 1108 passed in 3960.17s (1:06:00)

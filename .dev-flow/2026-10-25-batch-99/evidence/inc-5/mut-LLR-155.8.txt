@@ -1,0 +1,55 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_38_concurrent_crc_writes_of_the_same_stem ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26635/test_tc_b99_38_concurrent_crc_0')
+
+    def test_tc_b99_38_concurrent_crc_writes_of_the_same_stem(tmp_path: Path) -> None:
+        """Two concurrent writers of ``fw-crc.s19`` per trial, 20 trials: every
+        written file's CRC slot equals its own image's CRC (independent reader +
+        ``zlib.crc32`` oracle). Under shared ``temp/<name>`` staging (the HEAD
+        behavior, restored by the LLR-155.8 mutation) the same probe reports a
+        nonzero mismatch count (PQ-8)."""
+        mismatches: list[str] = []
+        for trial in range(_TC38_TRIALS):
+            workarea_base = tmp_path / f"trial-{trial:02d}"
+            payloads = [_tc38_payload(trial * 2), _tc38_payload(trial * 2 + 1)]
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                halves = list(
+                    pool.map(lambda p: _tc38_check_one(workarea_base, p), payloads)
+                )
+            mismatches.extend(h for h in halves if h)
+>       assert mismatches == [], (
+            f"{len(mismatches)} of {_TC38_TRIALS * 2} concurrent writes landed "
+            f"another image's bytes: {mismatches[:4]}"
+        )
+E       AssertionError: 20 of 40 concurrent writes landed another image's bytes: ['slot f9291182 != own CRC f5c83c7b in fw-crc_1.s19', 'slot 55d43f42 != own CRC 6c2079cf in fw-crc_1.s19', 'slot cf369ab5 != own CRC dcc51bd3 in fw-crc.s19', 'slot ae6a4928 != own CRC 0149c138 in fw-crc.s19']
+E       assert ['slot f92911...c_1.s19', ...] == []
+E         
+E         Left contains 20 more items, first extra item: 'slot f9291182 != own CRC f5c83c7b in fw-crc_1.s19'
+E         Use -v to get more diff
+
+tests\test_b99_crc_region.py:327: AssertionError
+____________ test_tc_b99_39_delete_calls_delete_only_owned_staging ____________
+
+    def test_tc_b99_39_delete_calls_delete_only_owned_staging() -> None:
+        """The five placement writers delete only what they created: 0
+        violations, no exceptions (the Inc-5 LLR-155.8 CRC conversion removed
+        the last known site)."""
+        all_violations: list = []
+        for rel, func_name in _CENSUS_TARGETS:
+            all_violations.extend(_delete_census(REPO_ROOT / rel, func_name))
+>       assert all_violations == [], (
+            f"LLR-155.7 violations: {all_violations}"
+        )
+E       AssertionError: LLR-155.7 violations: ["crc.py:write_crc_image:1507 deletes 'staged' without an owned-binding guard"]
+E       assert ['crc.py:writ...inding guard'] == []
+E         
+E         Left contains one more item: "crc.py:write_crc_image:1507 deletes 'staged' without an owned-binding guard"
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:947: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_tc_b99_38_concurrent_crc_writes_of_the_same_stem
+FAILED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+2 failed, 26 deselected in 46.77s

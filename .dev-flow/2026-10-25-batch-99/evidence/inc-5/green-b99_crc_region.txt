@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\jjgh8\Github\s19_app-b99-inc5
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 5 items
+
+tests\test_b99_crc_region.py .....                                       [100%]
+
+======================== 5 passed in 63.13s (0:01:03) =========================

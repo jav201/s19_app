@@ -1,0 +1,11 @@
+MUTATION mut-f1 (LLR-159.2 negative control): the flow arm finding text drops the absent count
+("CRC: region partly covered (0x...-0x...) - the CRC covers present bytes only")
+
+
+tests\test_b99_crc_region.py:640: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_tc_b99_27_partial_region_notices_name_absent_count
+FAILED tests/test_b99_crc_region.py::test_tc_b99_27_boundary_one_present_byte_notices
+FAILED tests/test_b99_crc_region.py::test_tc_b99_27_chain_set_report_lists_the_notice
+FAILED tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot - A...
+4 failed, 4 passed in 46.14s

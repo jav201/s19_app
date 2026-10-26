@@ -220,6 +220,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 006 (US-149 / HLR-160, export containment + B99-I2a group placement, D8 sufijo; segment_split_view.py, workspace.py) approved: implemented by Kimi K2.8 (one session timed out after implementation; a resume session finished it); code-reviewer and security-reviewer round 1 F1 HIGH (Path subclass crash on Python 3.12+) fixed, round 2 approve on 3.11 and 3.12; orchestrator added an in-range ESC arm (mutation-checked) and extended the LLR-155.3 census allow-list for the group placement after merging with Inc 3b."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 005 (US-148 / HLR-159 + LLR-155.8, CRC never covers an empty region, CRC write stages privately; crc.py, flow_execution_service.py, flow_screens.py — budget widened to 3) approved: implemented by Kimi K2.8 (fix session timed out; the orchestrator ran the final sweep 210 passed and AT-B99-10 x8); code-reviewer round 1 BLOCK (F1 HIGH count not on the FX surface) fixed, round 2 OK; merged main: all batch-99 suites 227 passed. All 12 increments are on main; full suite next."
     }
   ],
   "obsidian_synced": false,

@@ -148,7 +148,8 @@ from tools.id_registry import (
 # batch-99 Inc-8: 209 -> 210 (tests/test_b99_patch_truth.py).
 # batch-99 Inc-7: 210 -> 211 (tests/test_b99_load_project.py).
 # batch-99 Inc-6: 211 -> 212 (tests/test_b99_export.py).
-EXPECTED_SCANNED_TEST_FILES = 212
+# batch-99 Inc-5: 212 -> 213 (tests/test_b99_crc_region.py).
+EXPECTED_SCANNED_TEST_FILES = 213
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

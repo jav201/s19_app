@@ -118,7 +118,12 @@ from .variant_execution_service import (
     plan_variant_executions,
 )
 from ..models import ProjectVariantSet, VariantDescriptor  # noqa: F401 - typing
-from ..operations.crc import check_regions, inject_crcs
+from ..operations.crc import (
+    check_regions,
+    first_empty_target_span,
+    inject_crcs,
+    normalized_targets,
+)
 from ..operations.crc_config import parse_crc_config
 from ..operations.model import OperationInput
 from ..workspace import copy_into_workarea
@@ -779,8 +784,10 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 # LLR-089.2..092.3: compute a CRC over the CURRENT (post-patch)
                 # threaded image via the shared kernel, inject it, and thread the
                 # (possibly grown) working image forward. A malformed/unsafe
-                # config fails the block CLOSED (aborts); a CRC before any PATCH
-                # is a non-blocking WARN. crc.py is reused verbatim, never edited.
+                # config fails the block CLOSED (aborts), as does a target
+                # holding no image byte (batch-99, HLR-159 / LLR-159.1); a CRC
+                # before any PATCH is a non-blocking WARN and partial coverage
+                # is a notice naming the absent count (LLR-159.2).
                 if mem_map is None or ranges is None:
                     aborted = _record_error(
                         result, index, kind, "no image", [],
@@ -826,6 +833,22 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     file_type=WRITE_FMT_S19,
                 )
                 crc_regions = check_regions(op_input, config)
+                # batch-99 (HLR-159 / LLR-159.1): a target holding 0 image
+                # bytes refuses the block CLOSED — error, nothing injected,
+                # and the flow stops before any later WRITE-OUT (the existing
+                # `_record_error` abort path; the run log's terminal line
+                # paints this note as the user-facing cause, UX-C2). The
+                # coverage count is READ from the region results (ARCH R23),
+                # never recomputed here.
+                empty_span = first_empty_target_span(config, crc_regions)
+                if empty_span is not None:
+                    start, end = empty_span
+                    aborted = _record_error(
+                        result, index, kind, "empty CRC region", [],
+                        f"CRC region 0x{start:X}-0x{end:X} holds 0 image "
+                        "bytes - nothing written",
+                    )
+                    continue
                 # LLR-089.3 / LLR-090.1: inject_crcs builds a WORKING COPY (never
                 # mutates the input map/ranges) and grows ranges via
                 # _extend_ranges; reassign the threaded image to it.
@@ -842,21 +865,52 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                 crc_before_patch = (
                     not patch_indices or index < min(patch_indices)
                 )
+                # batch-99 (HLR-159 / LLR-159.2): a PARTLY covered target ends
+                # the block `notices` too, with one finding per partly covered
+                # target naming the exact absent count against the declared
+                # span length (the count read from the region results, ARCH
+                # R23). Fully covered targets stay silent, exactly like the
+                # crc.py diagnostic arm; the finding text is the single
+                # carrier the lane terminal line and the chain-set report
+                # paint (UX-C2 / LLR-020.2).
+                partial_targets = [
+                    (target, region)
+                    for target, region in zip(
+                        normalized_targets(config), crc_regions
+                    )
+                    if 0
+                    < region.absent_bytes
+                    < sum(end - start for start, end in target.spans)
+                ]
                 summary = (
                     f"injected {injected} CRC region"
                     f"{'' if injected == 1 else 's'}"
                 )
-                if crc_before_patch:
+                if crc_before_patch or partial_targets:
                     crc_block = BlockResult(
                         index, kind, BLOCK_STATUS_NOTICES, summary
                     )
-                    crc_block.findings.append(
-                        Finding(
-                            FINDING_WARN,
-                            "CRC before PATCH: the image is finalized before "
-                            "any patch is applied",
+                    if crc_before_patch:
+                        crc_block.findings.append(
+                            Finding(
+                                FINDING_WARN,
+                                "CRC before PATCH: the image is finalized before "
+                                "any patch is applied",
+                            )
                         )
-                    )
+                    for target, region in partial_targets:
+                        start, end = target.spans[0]
+                        declared = sum(
+                            e - s for s, e in target.spans
+                        )
+                        crc_block.findings.append(
+                            Finding(
+                                FINDING_WARN,
+                                f"CRC: {region.absent_bytes} of {declared} "
+                                f"region bytes absent (0x{start:X}-0x{end:X}) "
+                                "- the CRC covers present bytes only",
+                            )
+                        )
                     result.block_results.append(crc_block)
                 else:
                     result.block_results.append(
@@ -1844,10 +1898,14 @@ def compose_chain_set_report(
         and the batch-99 Inc-8 (LLR-156.3) **Written files**, **Not applied**
         and **Refusals** sections: per lane the written paths, each
         non-applied entry (address + disposition) and each refusal (code +
-        message), a clean lane listing ``none``.
+        message), a clean lane listing ``none``; plus the batch-99 Inc-5
+        review-fix (HLR-159 / LLR-159.2) **Notices** section: per lane every
+        advisory block finding (e.g. a partly covered CRC region's absent
+        count), a clean lane listing ``none``.
         Every file-derived field passes :func:`md_safe` / :func:`md_code`
         (the chain name, template stem, bound ref, change document, refusal
-        text); every glyph, label and number is enum/int-derived.
+        text, finding text); every glyph, label and number is
+        enum/int-derived.
 
     Args:
         record (ChainSetRunResult): The completed set run.
@@ -1934,6 +1992,27 @@ def compose_chain_set_report(
             lines.append(
                 f"- Chain {name}: [{md_safe(refusal.code, limit=64)}] "
                 f"{md_safe(refusal.message, limit=240)}"
+            )
+    # batch-99 Inc-5 review fix (HLR-159 / LLR-159.2): the advisory block
+    # findings reach the report — per lane every finding of every block
+    # (e.g. a partly covered CRC region's exact absent count), a clean lane
+    # listing ``none``. Finding text may be file-derived: md_safe, never raw.
+    lines.extend(["", "## Notices", ""])
+    for outcome in record.outcomes:
+        name = md_safe(outcome.chain, limit=64)
+        findings = [
+            (block_result, finding)
+            for block_result in outcome.block_results
+            for finding in block_result.findings
+        ]
+        if not findings:
+            lines.append(f"- Chain {name}: none")
+            continue
+        for block_result, finding in findings:
+            lines.append(
+                f"- Chain {name} block {block_result.index + 1} "
+                f"({md_safe(block_result.kind, limit=16)}): "
+                f"{md_safe(finding.message, limit=240)}"
             )
     lines.extend(
         [

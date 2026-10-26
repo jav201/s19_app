@@ -1503,6 +1503,8 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   **What closes it:** one outcome-first message; reserve the width for three suffix digits; scrub `reason` in `_refusal_text`.
 - **▸ (CI, origin batch-99 Inc-6) CI runs only Python 3.11** while `requires-python >= 3.11`. A `Path`-subclass crash on 3.12 passed every 3.11 test. **What closes it:** add 3.12 to the CI matrix.
 
+- **▸ (P2, origin batch-99 Inc-5 review) The chain-set report's `## Notices` section has no per-block cap** (`flow_execution_service.py` ≈:1916-1930). SOURCE parse errors are unbounded, which is why the flow report caps findings at `MAX_REPORT_FINDINGS_PER_BLOCK`. **What closes it:** apply the same cap, plus a "+N more" line.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

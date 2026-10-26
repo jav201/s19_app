@@ -1,0 +1,40 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_26_empty_region_errors_and_writes_nothing ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26633/test_tc_b99_26_empty_region_er0')
+
+    def test_tc_b99_26_empty_region_errors_and_writes_nothing(tmp_path: Path) -> None:
+        """``0x20000-0x30000`` on ``prg.s19`` → the CRC block errors, the flow
+        stops before WRITE-OUT (0 files), the slot bytes stay absent, and the
+        block's last diagnostic names the cause (UX-C2). RED at HEAD (P-9):
+        ``run=ok crc=ok … slot_bytes=00000000``."""
+        project = _make_project(tmp_path)
+        (project / "empty_crc.json").write_text(
+            _crc_config("0x20000", "0x30000", "0x2FFFC"), encoding="utf-8"
+        )
+        flow = Flow(
+            name="region_no_bytes",
+            blocks=[
+                SourceBlock("prg.s19"),
+                CrcBlock("empty_crc.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+>       assert [br.status for br in result.block_results] == [
+            BLOCK_STATUS_OK,
+            BLOCK_STATUS_ERROR,
+            BLOCK_STATUS_SKIPPED,
+        ]
+E       AssertionError: assert ['ok', 'notices', 'ok'] == ['ok', 'error', 'skipped']
+E         
+E         At index 1 diff: 'notices' != 'error'
+E         Use -v to get more diff
+
+tests\test_b99_crc_region.py:137: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_tc_b99_26_empty_region_errors_and_writes_nothing
+1 failed, 4 deselected in 0.79s

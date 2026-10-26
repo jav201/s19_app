@@ -612,9 +612,15 @@ def test_at047a_mixed_check_per_target_verdicts_and_order(tmp_path: Path) -> Non
 
 
 def test_at045c_gap_note_names_group_and_count_legacy_stays_silent() -> None:
-    """AT-045c (note half) + Q4/AT-044a branch: a gapped GROUP span emits ONE
-    aggregate coverage note naming the group and absent count; a gapped
-    LEGACY region in the same run emits nothing (TC-203.2)."""
+    """AT-045c (note half), RE-PINNED by batch-99 HLR-159 / LLR-159.2
+    (old value: exactly ONE coverage note — the group only, a gapped legacy
+    region stayed silent under the Q4 pin; new value: TWO — the group
+    aggregate AND the legacy region's own notice naming the exact absent
+    count; the node name is registry-pinned (AT-044a / AT-045c / TC-203.2)
+    and stays, the docstring records the re-pin): a gapped GROUP span emits
+    ONE aggregate coverage note naming the group and absent count; the gapped
+    LEGACY region in the same run emits its own notice naming the count
+    (TC-203.2)."""
     payload = bytes(range(0x20, 0x40))  # 32B @ 0x1000
     mem = _mem_from_bytes(0x1000, payload)
     del mem[0x1005]
@@ -636,12 +642,16 @@ def test_at045c_gap_note_names_group_and_count_legacy_stays_silent() -> None:
         payload[0x00:0x05] + payload[0x07:0x10]
     )
     coverage_notes = [n for n in result.notes if "absent byte(s)" in n]
-    assert len(coverage_notes) == 1, (
-        f"exactly ONE coverage note (group only, never legacy); got {result.notes}"
+    assert len(coverage_notes) == 2, (
+        f"the group aggregate AND the legacy notice; got {result.notes}"
     )
-    assert "CRC group 1" in coverage_notes[0]
-    assert "2 absent byte(s)" in coverage_notes[0]
-    assert "present bytes only" in coverage_notes[0]
+    group_note = next(n for n in coverage_notes if "CRC group 1" in n)
+    assert "2 absent byte(s)" in group_note
+    assert "present bytes only" in group_note
+    legacy_note = next(n for n in coverage_notes if "CRC region" in n)
+    assert "0x1000-0x1010" in legacy_note
+    assert "2 absent byte(s)" in legacy_note
+    assert "present bytes only" in legacy_note
 
 
 @pytest.mark.parametrize("width", [1, 2])
@@ -859,16 +869,19 @@ def test_at047b_write_reread_groups_c12(tmp_path: Path) -> None:
 
 
 def test_at044a_legacy_gapped_golden_compat(tmp_path: Path) -> None:
-    """AT-044a - the compat pin (must PASS pre- and post-change): a
-    legacy-only config over a GAPPED region produces the FROZEN golden
-    results (literal values derived from the independent zlib oracle at
-    authoring time, never recomputed through the pipeline under test),
-    exactly the one summary note (zero new notes - the Q4 branch), the
-    unchanged serializer keys, and a verified on-disk write whose stored
-    bytes decode to the golden (TC-203.11)."""
+    """AT-044a - the compat pin, RE-PINNED by batch-99 HLR-159 / LLR-159.2
+    (old value: exactly the one summary note — the legacy path stayed silent
+    about the gap under the Q4 pin; new value: the summary note PLUS the
+    legacy coverage notice naming 1 absent byte): a legacy-only config over a
+    GAPPED region produces the FROZEN golden results (literal values derived
+    from the independent zlib oracle at authoring time, never recomputed
+    through the pipeline under test), the serializer keys unchanged, and a
+    verified on-disk write whose stored bytes decode to the golden
+    (TC-203.11). The golden CRC itself is untouched — compute over present
+    bytes is unchanged; only the coverage silence lifted."""
     payload = bytes(range(0x10, 0x50))  # 64B @ 0x1000
     mem = _mem_from_bytes(0x1000, payload)
-    del mem[0x1015]  # the gap: legacy path must stay SILENT about it
+    del mem[0x1015]  # the gap: HLR-159 now names it instead of staying silent
     # Ranges reflect the gap (the parse layer derives ranges from present
     # keys; emit_s19_from_mem_map requires every in-range address present).
     op_input = OperationInput(
@@ -885,8 +898,11 @@ def test_at044a_legacy_gapped_golden_compat(tmp_path: Path) -> None:
     assert golden == zlib.crc32(payload[0x00:0x15] + payload[0x16:0x20])
 
     result = CrcOperation().execute(op_input, config=config)
+    assert result.status == "ok"
     assert result.notes == [
-        "CRC: 1 region(s): 0 matched, 1 mismatched, 0 no-stored-value"
+        "CRC: 1 region(s): 0 matched, 1 mismatched, 0 no-stored-value",
+        "CRC region 0x1000-0x1020: 1 absent byte(s) - the CRC covers "
+        "present bytes only",
     ]
     entry = result.crc_regions[0]
     assert entry.computed_crc == golden

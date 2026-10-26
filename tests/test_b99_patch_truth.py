@@ -495,9 +495,13 @@ def test_tc_b99_19_chain_set_report_lists_what_was_not_applied(tmp_path: Path) -
     assert "MF-JSON-PARSE" in text
     assert "out_mix.s19" in text and "out_good.s19" in text
     assert "out_bad.s19" not in text, "the error lane wrote nothing"
-    # Clean lanes list `none`; sections are always present.
+    # Clean lanes list `none`; sections are always present. RE-PINNED
+    # (batch-99 Inc-5 review fix F1, LLR-159.2): the chain-set report gained
+    # the always-present `## Notices` section (advisory block findings), so
+    # the clean lane now lists `none` in three sections (old value: 2; new
+    # value: 3).
     assert "## Not applied" in text and "## Refusals" in text and "## Written files" in text
-    assert text.count("- Chain good: none") == 2, text
+    assert text.count("- Chain good: none") == 3, text
     # The hostile change-doc name is file-derived: escaped, never raw.
     assert md_safe(_HOSTILE_DOC, limit=120) in text
     assert _HOSTILE_DOC not in text
