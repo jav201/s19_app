@@ -606,3 +606,18 @@ above this line is ever edited._
 - **Closes:** ARCH-PDR-5.
 - **Why:** later increments (8a, 9b, 11) read these names, so they need one fixed point.
 - **Evidence:** `design/PDR-2026-10-26-batch-100.md` ARCH-PDR-5.
+
+### LED-2026-10-26-batch-100.49 — Inc 1 gate: containment is judged on the unresolved destination; the group is a second placement kind
+- **Requirement:** LLR-163.1
+- **Date:** 2026-10-26
+- **What changed:**
+  - In LLR-163.1, `contained_in_workarea` takes the work-area root from the destination as the caller gave it, before any resolution. That is either the nearest `.s19tool/workarea` ancestor of the unresolved path, or a root an app-level caller passes explicitly. Only then are the root and the destination resolved and compared, and every caller passes the unresolved destination.
+  - `place_group_into_workarea` is named as the second placement kind. It keeps its frozen reuse rule (R30) and goes through the same destination guard.
+  - The AST threshold becomes one claim loop per placement kind (2), with three junction arms: the export, the group, and Save project's gather.
+  - Inc 1's file set adds `project_gather_service.py`, for 4 files (⚠ at cap). The gather is a writer that resolves before the guard, and the guard must see its destination unresolved.
+- **Closes:** code-reviewer Inc 1 F1, F2 and F7.
+  - F1 (HIGH): the S-02 escape is still live through the export, the group and the gather. The reviewer executed it.
+  - F2: a root taken from the destination itself was near-tautological.
+  - F7: the "1 claim loop" wording was false while the group keeps its own loop.
+- **Why:** this is the batch-99 S-02 / H-9 class. A guard that resolves the path first cannot see the junction it exists to refuse. The orchestrator ruled on F2 under the batch's standing authorization.
+- **Evidence:** `03-increments/review-increment-001.md` F1, F2, F7.
