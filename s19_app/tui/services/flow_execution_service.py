@@ -41,8 +41,8 @@ from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ...compare import ComparisonResult, ImageRef, diff_mem_maps
-from ...core import S19File
-from ...hexfile import IntelHexFile
+from ...core import S19File, S19_INTEGRITY_NOTICE_CODES, load_notice_code
+from ...hexfile import HEX_INTEGRITY_NOTICE_CODES, IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..changes import (
     READ_SIZE_CAP_BYTES,
@@ -122,6 +122,14 @@ from ..operations.model import OperationInput
 from ..workspace import copy_into_workarea
 
 
+#: Load-integrity notice codes that turn the flow SOURCE block into an
+#: ``error`` and abort the chain (HLR-154 / LLR-154.3, map row B99-I10).
+#: Every other load notice keeps the advisory ``notices`` mapping (LLR-085.2).
+SOURCE_INTEGRITY_CODES = frozenset(
+    S19_INTEGRITY_NOTICE_CODES + HEX_INTEGRITY_NOTICE_CODES
+)
+
+
 def _read_change_doc_with_funnel(
     path: Path,
     base_dir: Path,
@@ -193,7 +201,9 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
 
     Data Flow:
         - SOURCE → ``build_loaded_s19/hex`` → seed ``mem_map``/``ranges``;
-          parser ``errors`` → advisory WARN findings (``notices``, LLR-085.2).
+          parser ``errors`` → advisory WARN findings (``notices``, LLR-085.2),
+          EXCEPT the five HLR-154 integrity codes (LLR-154.3) which end the
+          block ``error`` and abort the chain, writing no file.
           Change-5 (LLR-142): a declared ``a2l_ref`` resolves through the
           manifest guard and its tag map becomes the run's symbol-resolution
           context before any PATCH; a dangling reference refuses the run,
@@ -355,7 +365,30 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     if run_a2l_data else None
                 )
                 load_errors = getattr(loaded, "errors", None) or []
-                if load_errors:
+                integrity_errors = [
+                    err for err in load_errors
+                    if load_notice_code(err) in SOURCE_INTEGRITY_CODES
+                ]
+                if integrity_errors:
+                    # LLR-154.3: a truncated/inconsistent source image is a
+                    # STOP, not an advisory — the SOURCE block ends ``error``,
+                    # the chain aborts and no file is written. Every
+                    # diagnostic (so the LAST one, the painted cause) names
+                    # the code and the file (UX-C2).
+                    diagnostics = [
+                        f"[{load_notice_code(err)}] {path.name}: "
+                        f"{err.get('error', 'load error')}"
+                        for err in integrity_errors
+                    ]
+                    result.block_results.append(
+                        BlockResult(
+                            index, kind, BLOCK_STATUS_ERROR,
+                            f"loaded {path.name} with integrity notices",
+                            diagnostics,
+                        )
+                    )
+                    aborted = True
+                elif load_errors:
                     # LLR-085.2: surface parser-collected per-record errors as
                     # advisory WARN notices; the image is still threaded
                     # downstream (notify, don't block — no `aborted`).

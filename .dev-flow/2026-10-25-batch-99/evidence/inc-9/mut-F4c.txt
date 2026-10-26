@@ -1,0 +1,5 @@
+
+tests\test_b99_truncation.py:277: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_damaged_data_line_no_false_count_mismatch
+1 failed, 22 deselected in 0.38s

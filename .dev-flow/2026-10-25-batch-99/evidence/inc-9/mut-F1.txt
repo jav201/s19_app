@@ -1,0 +1,6 @@
+E                       UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+s19_app\hexfile.py:64: UnicodeDecodeError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_binary_tail_after_eof - U...
+1 failed, 22 deselected in 0.44s

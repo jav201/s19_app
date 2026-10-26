@@ -1,0 +1,6 @@
+E         Use -v to get more diff
+
+tests\test_b99_truncation.py:251: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_s6_mismatch_wide_image - ...
+1 failed, 1 passed, 21 deselected in 1.38s

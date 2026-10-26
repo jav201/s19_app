@@ -1,0 +1,572 @@
+FFF.F.FFF.FFFFFF.FFF                                                     [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_08_defect_files[synth_no_terminator.s19] _____________
+
+name = 'synth_no_terminator.s19'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".s19")])
+    def test_tc_b99_08_defect_files(name: str):
+        """Each S19 defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-defect bytes (oracle: the corpus manifest).
+        """
+        path = CORPUS / name
+        s19 = S19File(str(path))
+    
+        errors = s19.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:154: AssertionError
+_______________ test_tc_b99_08_defect_files[synth_wrong_s5.s19] _______________
+
+name = 'synth_wrong_s5.s19'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".s19")])
+    def test_tc_b99_08_defect_files(name: str):
+        """Each S19 defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-defect bytes (oracle: the corpus manifest).
+        """
+        path = CORPUS / name
+        s19 = S19File(str(path))
+    
+        errors = s19.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:154: AssertionError
+___________ test_tc_b99_08_defect_files[synth_after_terminator.s19] ___________
+
+name = 'synth_after_terminator.s19'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".s19")])
+    def test_tc_b99_08_defect_files(name: str):
+        """Each S19 defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-defect bytes (oracle: the corpus manifest).
+        """
+        path = CORPUS / name
+        s19 = S19File(str(path))
+    
+        errors = s19.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:154: AssertionError
+_________________ test_tc_b99_08_junk_tail_counted_not_parsed _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_08_junk_tail_count0')
+
+    def test_tc_b99_08_junk_tail_counted_not_parsed(tmp_path):
+        """A 100 000-line junk tail after the terminator: ONE notice stating the
+        count, zero per-line issues, zero image bytes from the tail."""
+        base = (CORPUS / "synth_s1.s19").read_text(encoding="ascii")
+        target = tmp_path / "junk_tail.s19"
+        target.write_text(
+            base + "".join(f"S1JUNKLINE{i:06X}\n" for i in range(100_000)),
+            encoding="ascii",
+        )
+    
+        s19 = S19File(str(target))
+        errors = s19.get_errors()
+>       assert len(errors) == 1, f"expected exactly one notice, got {len(errors)}"
+E       AssertionError: expected exactly one notice, got 100000
+E       assert 100000 == 1
+E        +  where 100000 = len([{'error': 'Invalid byte count hex: JU', 'line': 'S1JUNKLINE000000', 'line_number': 6, 'segment': 'SRecord constructor...': 'Invalid byte count hex: JU', 'line': 'S1JUNKLINE000005', 'line_number': 11, 'segment': 'SRecord constructor'}, ...])
+
+tests\test_b99_truncation.py:193: AssertionError
+___________________ test_tc_b99_08_wide_s6_image_no_notice ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_08_wide_s6_image_n0')
+
+    def test_tc_b99_08_wide_s6_image_no_notice(tmp_path):
+        """An S6-counted image of MORE than 65 535 data records: the S5 width
+        gate skips the (wrong) S5 count and the matching S6 count passes — 0
+        notices. Generated into tmp (no big file committed)."""
+        records = [
+            _s1_record(0x1000 + (i % 480) * 32, bytes([i & 0xFF]) * 16)
+            for i in range(0x10000)
+        ]
+        lines = records + [_s5_record(7), _s6_record(0x10000), "S9030000FC"]
+        target = tmp_path / "wide_s6.s19"
+        target.write_text("\n".join(lines) + "\n", encoding="ascii")
+    
+        s19 = S19File(str(target))
+        assert _codes(s19.get_errors()) == [], s19.get_errors()[:3]
+>       assert len(s19.records) == 0x10000 + 3  # data + S5 + S6 + S9 terminator
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert 65538 == (65536 + 3)
+E        +  where 65538 = len([<s19_app.core.SRecord object at 0x000001A9F770A550>, <s19_app.core.SRecord object at 0x000001A9F7709CD0>, <s19_app.co...709D10>, <s19_app.core.SRecord object at 0x000001A9F770A010>, <s19_app.core.SRecord object at 0x000001A9F770A150>, ...])
+E        +    where [<s19_app.core.SRecord object at 0x000001A9F770A550>, <s19_app.core.SRecord object at 0x000001A9F7709CD0>, <s19_app.co...709D10>, <s19_app.core.SRecord object at 0x000001A9F770A010>, <s19_app.core.SRecord object at 0x000001A9F770A150>, ...] = <s19_app.core.S19File object at 0x000001A9F770A410>.records
+
+tests\test_b99_truncation.py:227: AssertionError
+______________ test_tc_b99_09_defect_files[synth_hex_no_eof.hex] ______________
+
+name = 'synth_hex_no_eof.hex'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".hex")])
+    def test_tc_b99_09_defect_files(name: str):
+        """Each HEX defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-EOF bytes (oracle: the independent reader).
+        """
+        path = CORPUS / name
+        hex_file = IntelHexFile(str(path))
+    
+        errors = hex_file.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:245: AssertionError
+____________ test_tc_b99_09_defect_files[synth_hex_after_eof.hex] _____________
+
+name = 'synth_hex_after_eof.hex'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".hex")])
+    def test_tc_b99_09_defect_files(name: str):
+        """Each HEX defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-EOF bytes (oracle: the independent reader).
+        """
+        path = CORPUS / name
+        hex_file = IntelHexFile(str(path))
+    
+        errors = hex_file.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:245: AssertionError
+_________________ test_tc_b99_09_junk_tail_counted_not_parsed _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_09_junk_tail_count0')
+
+    def test_tc_b99_09_junk_tail_counted_not_parsed(tmp_path):
+        """A 100 000-line junk tail after the EOF: ONE notice stating the count,
+        zero per-line issues, zero image bytes from the tail."""
+        base = (CORPUS / "synth_hex_basic.hex").read_text(encoding="ascii")
+        target = tmp_path / "junk_tail.hex"
+        tail = "".join(
+            (":garbage\n" if i % 2 else f"junk{i}\n") for i in range(100_000)
+        )
+        target.write_text(base + tail, encoding="ascii")
+    
+        hex_file = IntelHexFile(str(target))
+        errors = hex_file.get_errors()
+>       assert len(errors) == 1, f"expected exactly one notice, got {len(errors)}"
+E       AssertionError: expected exactly one notice, got 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:277: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no0')
+name = 'synth_no_terminator.s19', file_type = 's19', code = 'S19-NO-TERMINATOR'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='ok', summary='loaded synth_no_terminator.s19 (1 ranges)', diagnostics=[], findings=[])
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no1')
+name = 'synth_wrong_s5.s19', file_type = 's19', code = 'S19-COUNT-MISMATCH'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='ok', summary='loaded synth_wrong_s5.s19 (1 ranges)', diagnostics=[], findings=[])
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no2')
+name = 'synth_after_terminator.s19', file_type = 's19'
+code = 'S19-AFTER-TERMINATOR'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='ok', summary='loaded synth_after_terminator.s19 (2 ranges)', diagnostics=[], findings=[])
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_truncation.py:322: AssertionError
+__ test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no3')
+name = 'synth_hex_no_eof.hex', file_type = 'hex', code = 'HEX-NO-EOF'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='ok', summary='loaded synth_hex_no_eof.hex (1 ranges)', diagnostics=[], findings=[])
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_tc_b99_10_source_error_no4')
+name = 'synth_hex_after_eof.hex', file_type = 'hex', code = 'HEX-AFTER-EOF'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='ok', summary='loaded synth_hex_after_eof.hex (1 ranges)', diagnostics=[], findings=[])
+E       assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b99_truncation.py:322: AssertionError
+___________________ test_at_b99_03_pilot_status_and_issues ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_pilot_status_an0')
+
+    def test_at_b99_03_pilot_status_and_issues(tmp_path):
+        """Load file (``l``) of the cut S19: the status line leads with
+        ``Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR`` (never
+        a plain ``Loaded <name> (S19 only)``) and the Issues panel names the code.
+        """
+        src = tmp_path / "firmware.s19"
+        shutil.copyfile(CORPUS / "synth_no_terminator.s19", src)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(src))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "integrity notices" in _status_text(app),
+                    "load status line",
+                )
+                status = _status_text(app)
+                assert (
+                    "Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR"
+                    in status
+                ), status
+                assert "(S19 only)" not in status, status
+                await _wait_for(
+                    pilot,
+                    lambda: any(
+                        "S19-NO-TERMINATOR" in str(chip.render())
+                        for chip in app.query(".issue-code-chip")
+                    ),
+                    "issues panel names the code",
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_truncation.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_truncation.py:388: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b99_03_pilot_status_and_issues.<locals>._drive.<locals>.<lambda> at 0x000001A9F6811080>
+description = 'load status line', attempts = 100
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: load status line
+
+tests\test_b99_truncation.py:367: AssertionError
+________________ test_at_b99_03_hostile_name_renders_literally ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_hostile_name_re0')
+
+    def test_at_b99_03_hostile_name_renders_literally(tmp_path):
+        """A hostile file name in the integrity-notice path renders literally:
+        the painted status carries the verbatim ``[@click=app.quit]`` name with
+        zero markup interpretation (UX-C10)."""
+        name = "[@click=app.quit]cut.s19"
+        src = tmp_path / name
+        shutil.copyfile(CORPUS / "synth_no_terminator.s19", src)
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(src))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "integrity notices" in _status_text(app),
+                    "load status line",
+                )
+                status = _status_text(app)
+                assert name in status, status
+                assert "S19-NO-TERMINATOR" in status, status
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_truncation.py:438: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_truncation.py:429: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b99_03_hostile_name_renders_literally.<locals>._drive.<locals>.<lambda> at 0x000001A9F67F0C20>
+description = 'load status line', attempts = 100
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 100):
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: load status line
+
+tests\test_b99_truncation.py:367: AssertionError
+___________________ test_at_b99_03_pilot_flow_source_fails ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-25982/test_at_b99_03_pilot_flow_sour0')
+
+    def test_at_b99_03_pilot_flow_source_fails(tmp_path):
+        """Flow Execution ``#fx_run`` over the cut S19: the lane log names the
+        code, the SOURCE block fails and no file is written."""
+        from tests.b97_fixtures import (
+            import_flow,
+            load_project,
+            make_project,
+            open_flow_execution,
+            run_lanes,
+            write_flow,
+        )
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                project_dir = make_project(app, "proj1")
+                shutil.copyfile(
+                    CORPUS / "synth_no_terminator.s19", project_dir / "cut.s19"
+                )
+                write_flow(
+                    project_dir,
+                    "cut_flow",
+                    [SourceBlock("cut.s19"), WriteOutBlock("out.s19")],
+                )
+                load_project(app, "proj1")
+                panel = await open_flow_execution(app, pilot)
+                await import_flow(app, pilot, "cut_flow")
+                await run_lanes(app, pilot, panel)
+                log = panel.run_log_plain()
+                assert "S19-NO-TERMINATOR" in log, log
+                assert "cut.s19" in log, log
+                assert not (project_dir / "out.s19").exists(), (
+                    "WRITE-OUT ran despite the integrity notice"
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_truncation.py:478: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive():
+        async with app.run_test(size=(120, 54)) as pilot:
+            await pilot.pause()
+            project_dir = make_project(app, "proj1")
+            shutil.copyfile(
+                CORPUS / "synth_no_terminator.s19", project_dir / "cut.s19"
+            )
+            write_flow(
+                project_dir,
+                "cut_flow",
+                [SourceBlock("cut.s19"), WriteOutBlock("out.s19")],
+            )
+            load_project(app, "proj1")
+            panel = await open_flow_execution(app, pilot)
+            await import_flow(app, pilot, "cut_flow")
+            await run_lanes(app, pilot, panel)
+            log = panel.run_log_plain()
+>           assert "S19-NO-TERMINATOR" in log, log
+E           AssertionError: 00:00.000 cut_flow · started
+E             00:00.004 ▓ cut_flow · done · wrote out.s19
+E           assert 'S19-NO-TERMINATOR' in '00:00.000 cut_flow · started\n00:00.004 ▓ cut_flow · done · wrote out.s19'
+
+tests\test_b99_truncation.py:472: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_defect_files[synth_no_terminator.s19]
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_defect_files[synth_wrong_s5.s19]
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_defect_files[synth_after_terminator.s19]
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_junk_tail_counted_not_parsed
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_wide_s6_image_no_notice
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_defect_files[synth_hex_no_eof.hex]
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_defect_files[synth_hex_after_eof.hex]
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_junk_tail_counted_not_parsed
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF]
+FAILED tests/test_b99_truncation.py::test_at_b99_03_pilot_status_and_issues
+FAILED tests/test_b99_truncation.py::test_at_b99_03_hostile_name_renders_literally
+FAILED tests/test_b99_truncation.py::test_at_b99_03_pilot_flow_source_fails
+16 failed, 4 passed in 37.08s

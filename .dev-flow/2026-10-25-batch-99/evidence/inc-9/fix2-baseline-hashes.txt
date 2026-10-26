@@ -1,0 +1,2 @@
+c26a7540a966bcf31d8a3d73a7876076495c47783553fd1d459106a95317cd90 *../../../../s19_app/hexfile.py
+11bde2cd34ca35b9ef20f47c7f1e6ec49bad4b0ea6dca08b4e456eec894979c6 *../../../../tests/test_b99_truncation.py

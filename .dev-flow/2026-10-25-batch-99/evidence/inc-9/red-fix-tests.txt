@@ -1,0 +1,60 @@
+    def test_tc_b99_08_damaged_data_line_no_false_count_mismatch(tmp_path):
+        """A data line that fails to parse still counts toward the S5/S6 tally
+        (LLR-154.1): the damaged line gives its OWN parse issue and never a
+        false ``S19-COUNT-MISMATCH`` — the S5 count matching the parsed-plus-
+        damaged tally is the control that pins this."""
+        good = [
+            _s1_record(0x1000 + i * 16, bytes([0xA0 + i]) * 8)
+            for i in range(2)
+        ]
+        damaged = good[1][:-2] + "ZZ"  # S1-prefixed, not hexadecimal
+        lines = [good[0], damaged, _s5_record(3), "S9030000FC"]
+        target = tmp_path / "damaged_data_line.s19"
+        target.write_text("\n".join(lines) + "\n", encoding="ascii")
+    
+        s19 = S19File(str(target))
+        errors = s19.get_errors()
+>       assert _codes(errors) == [], errors
+E       AssertionError: [{'error': 'Invalid checksum hex: ZZ', 'line': 'S10B1010A1A1A1A1A1A1A1A1ZZ', 'line_number': 2, 'segment': 'SRecord con...19-COUNT-MISMATCH: S5 count 3 does not match 1 data records', 'line': '', 'line_number': None, 'segment': 'integrity'}]
+E       assert ['S19-COUNT-MISMATCH'] == []
+E         
+E         Left contains one more item: 'S19-COUNT-MISMATCH'
+E         Use -v to get more diff
+
+tests\test_b99_truncation.py:275: AssertionError
+____________________ test_tc_b99_09_binary_tail_after_eof _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26193/test_tc_b99_09_binary_tail_aft0')
+
+    def test_tc_b99_09_binary_tail_after_eof(tmp_path):
+        """A valid HEX (272 data bytes) followed by 50 000 newlines and raw
+        ``0xFF`` padding: the load succeeds — the tail after the first EOF record
+        is counted by stripping the BYTES, never decoded — with ONE
+        ``HEX-AFTER-EOF`` notice for the single non-empty tail line."""
+        base = CORPUS / "synth_hex_basic.hex"
+        target = tmp_path / "binary_tail.hex"
+        target.write_bytes(base.read_bytes() + b"\n" * 50_000 + b"\xff" * 4096)
+    
+>       hex_file = IntelHexFile(str(target))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_truncation.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\hexfile.py:34: in __init__
+    self._load()
+s19_app\hexfile.py:51: in _load
+    for line_number, raw_line in enumerate(handle, 1):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <encodings.utf_8.IncrementalDecoder object at 0x0000027BBBF3F290>
+input = b'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...ff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+final = False
+
+>   ???
+E   UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 1476: invalid start byte
+
+<frozen codecs>:322: UnicodeDecodeError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_damaged_data_line_no_false_count_mismatch
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_binary_tail_after_eof - U...
+2 failed, 4 passed, 17 deselected in 22.47s

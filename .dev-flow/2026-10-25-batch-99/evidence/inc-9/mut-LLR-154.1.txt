@@ -1,0 +1,25 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b99_08_defect_files[synth_no_terminator.s19] _____________
+
+name = 'synth_no_terminator.s19'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".s19")])
+    def test_tc_b99_08_defect_files(name: str):
+        """Each S19 defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-defect bytes (oracle: the corpus manifest).
+        """
+        path = CORPUS / name
+        s19 = S19File(str(path))
+    
+        errors = s19.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:154: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_08_defect_files[synth_no_terminator.s19]
+1 failed, 19 deselected in 0.53s

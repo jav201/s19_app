@@ -110,9 +110,15 @@ def test_s19file_collects_errors(tmp_path: Path):
 
     assert len(parsed.records) == 2
     assert [record.address for record in parsed.records] == [0x1000, 0x1000]
-    assert [error["line_number"] for error in parsed.get_errors()] == [3, 4]
+    # HLR-154 re-pin: this fixture has no S7/S8/S9 terminator, so the loader
+    # now appends one trailing S19-NO-TERMINATOR integrity notice after the
+    # two parser errors (old expectation pinned the pre-HLR-154 behaviour of
+    # zero extra errors on an unterminated file).
+    assert [error["line_number"] for error in parsed.get_errors()] == [3, 4, None]
     assert parsed.get_errors()[0]["segment"] == "SRecord constructor"
     assert parsed.get_errors()[1]["segment"] == "validation"
+    assert parsed.get_errors()[2]["segment"] == "integrity"
+    assert parsed.get_errors()[2]["error"].startswith("S19-NO-TERMINATOR")
 
 
 def test_s19file_emits_load_summary_log(tmp_path: Path, caplog: pytest.LogCaptureFixture):

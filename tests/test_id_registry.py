@@ -142,7 +142,8 @@ from tools.id_registry import (
 # Inc-1, 2, 10 and 11 landed without the bump (the corpus, reader and test modules
 # those increments added; the guard counts them, the list is not restated here).
 # Each later batch-99 increment bumps it for its own module (BRIEF-COMMON rule).
-EXPECTED_SCANNED_TEST_FILES = 206
+# batch-99 Inc-9: 206 -> 207 (tests/test_b99_truncation.py).
+EXPECTED_SCANNED_TEST_FILES = 207
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

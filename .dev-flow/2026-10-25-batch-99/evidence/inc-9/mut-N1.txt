@@ -1,0 +1,57 @@
+.....FF                                                                  [100%]
+================================== FAILURES ===================================
+___________________ test_tc_b99_09_line_endings_cr_lf_crlf ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26329/test_tc_b99_09_line_endings_cr0')
+
+    def test_tc_b99_09_line_endings_cr_lf_crlf(tmp_path):
+        """The same HEX content saved CR-only, LF-only and CRLF: every encoding
+        loads the same 272-byte image with ZERO notices (bytes ``splitlines``
+        splits on ``\\r``, ``\\n`` and ``\\r\\n`` alike; the old binary iteration
+        read a CR-only file as ONE line — 0 image bytes and a false
+        ``HEX-NO-EOF``)."""
+        base = (CORPUS / "synth_hex_basic.hex").read_text(encoding="ascii")
+        assert "\r" not in base, "fixture assumed LF-only"
+        oracle = read_hex(CORPUS / "synth_hex_basic.hex")
+        variants = {
+            "cr_only": base.replace("\n", "\r").encode("ascii"),
+            "lf_only": base.encode("ascii"),
+            "crlf": base.replace("\n", "\r\n").encode("ascii"),
+        }
+        for name, content in variants.items():
+            target = tmp_path / f"line_endings_{name}.hex"
+            target.write_bytes(content)
+            hex_file = IntelHexFile(str(target))
+>           assert hex_file.get_errors() == [], (name, hex_file.get_errors())
+E           AssertionError: ('cr_only', [{'error': 'Length mismatch: expected 15, found 627', 'line': ':020000040001F9\r:80FF00001269E47B9511F1911...-NO-EOF: no type 01 EOF record; the image may be truncated', 'line': '', 'line_number': None, 'segment': 'integrity'}])
+E           assert [{'error': 'L... 'integrity'}] == []
+E             
+E             Left contains 2 more items, first extra item: {'error': 'Length mismatch: expected 15, found 627', 'line': ':020000040001F9\r:80FF00001269E47B9511F19119C8EA5A100A7B...r:100000005B96952DCED3C434BA86CE5822E4A23363\r:0400000500010000F6\r:00000001FF', 'line_number': 1, 'segment': 'length'}
+E             Use -v to get more diff
+
+tests\test_b99_truncation.py:383: AssertionError
+________________ test_tc_b99_09_cr_only_binary_tail_after_eof _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26329/test_tc_b99_09_cr_only_binary_0')
+
+    def test_tc_b99_09_cr_only_binary_tail_after_eof(tmp_path):
+        """A CR-only HEX file followed by raw ``0xFF`` padding: the load succeeds
+        with ONE ``HEX-AFTER-EOF`` notice — after the CR-split the padding is a
+        single stripped non-empty line, counted, never decoded — and the pre-EOF
+        image matches the oracle."""
+        base = (CORPUS / "synth_hex_basic.hex").read_text(encoding="ascii")
+        target = tmp_path / "cr_only_binary_tail.hex"
+        target.write_bytes(base.replace("\n", "\r").encode("ascii") + b"\xff" * 4096)
+    
+        hex_file = IntelHexFile(str(target))
+        errors = hex_file.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: [{'error': 'Invalid UTF-8: not valid UTF-8 text', 'line': "b':020000040001F9\\r:80FF00001269E47B9511F19119C8EA5A100A7B...X-NO-EOF: no type 01 EOF record; the image may be truncated', 'line': '', 'line_number': None, 'segment': 'integrity'}]
+E       assert 2 == 1
+E        +  where 2 = len([{'error': 'Invalid UTF-8: not valid UTF-8 text', 'line': "b':020000040001F9\\r:80FF00001269E47B9511F19119C8EA5A100A7B...X-NO-EOF: no type 01 EOF record; the image may be truncated', 'line': '', 'line_number': None, 'segment': 'integrity'}])
+
+tests\test_b99_truncation.py:398: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_line_endings_cr_lf_crlf
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_cr_only_binary_tail_after_eof
+2 failed, 5 passed, 18 deselected in 0.53s

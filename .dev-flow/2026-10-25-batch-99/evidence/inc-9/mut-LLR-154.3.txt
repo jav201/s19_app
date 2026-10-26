@@ -1,0 +1,180 @@
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+_ test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no0')
+name = 'synth_no_terminator.s19', file_type = 's19', code = 'S19-NO-TERMINATOR'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='notices', summary='loaded synth_no_terminator.s19 (1 ranges, 1 integrity n...ngs=[Finding(severity='warn', message='S19-NO-TERMINATOR: no S7/S8/S9 terminator record; the image may be truncated')])
+E       assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no1')
+name = 'synth_wrong_s5.s19', file_type = 's19', code = 'S19-COUNT-MISMATCH'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='notices', summary='loaded synth_wrong_s5.s19 (1 ranges, 1 integrity notice...ostics=[], findings=[Finding(severity='warn', message='S19-COUNT-MISMATCH: S5 count 3 does not match 2 data records')])
+E       assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no2')
+name = 'synth_after_terminator.s19', file_type = 's19'
+code = 'S19-AFTER-TERMINATOR'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='notices', summary='loaded synth_after_terminator.s19 (1 ranges, 1 integrit...[], findings=[Finding(severity='warn', message='S19-AFTER-TERMINATOR: 1 record(s) after the terminator were ignored')])
+E       assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b99_truncation.py:322: AssertionError
+__ test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF] ___
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no3')
+name = 'synth_hex_no_eof.hex', file_type = 'hex', code = 'HEX-NO-EOF'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='notices', summary='loaded synth_hex_no_eof.hex (1 ranges, 1 integrity noti...stics=[], findings=[Finding(severity='warn', message='HEX-NO-EOF: no type 01 EOF record; the image may be truncated')])
+E       assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b99_truncation.py:322: AssertionError
+_ test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-26099/test_tc_b99_10_source_error_no4')
+name = 'synth_hex_after_eof.hex', file_type = 'hex', code = 'HEX-AFTER-EOF'
+
+    @pytest.mark.parametrize("name,file_type,code", _FLOW_DEFECTS)
+    def test_tc_b99_10_source_error_no_file(
+        tmp_path: Path, name: str, file_type: str, code: str
+    ):
+        """A flow over a defect source: SOURCE ``error`` whose LAST diagnostic
+        names the code and the file, WRITE-OUT skipped, no file written."""
+        project = tmp_path / ".s19tool" / "workarea" / "proj"
+        project.mkdir(parents=True)
+        shutil.copyfile(CORPUS / name, project / name)
+        out_name = "out.hex" if file_type == WRITE_FMT_HEX else "out.s19"
+        flow = Flow(
+            name="t",
+            blocks=[
+                SourceBlock(name, file_type=file_type),
+                WriteOutBlock(out_name, fmt=file_type),
+            ],
+        )
+    
+        result = run_flow(flow, FlowContext(project_dir=project))
+    
+        source = result.block_results[0]
+>       assert source.status == BLOCK_STATUS_ERROR, source
+E       AssertionError: BlockResult(index=0, kind='source', status='notices', summary='loaded synth_hex_after_eof.hex (1 ranges, 1 integrity n...ostics=[], findings=[Finding(severity='warn', message='HEX-AFTER-EOF: 1 record(s) after the EOF record were ignored')])
+E       assert 'notices' == 'error'
+E         
+E         - error
+E         + notices
+
+tests\test_b99_truncation.py:322: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_no_terminator.s19-s19-S19-NO-TERMINATOR]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_wrong_s5.s19-s19-S19-COUNT-MISMATCH]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_after_terminator.s19-s19-S19-AFTER-TERMINATOR]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_hex_no_eof.hex-hex-HEX-NO-EOF]
+FAILED tests/test_b99_truncation.py::test_tc_b99_10_source_error_no_file[synth_hex_after_eof.hex-hex-HEX-AFTER-EOF]
+5 failed, 15 deselected in 0.72s

@@ -1,0 +1,79 @@
+# Reverse census — batch-99 increment 9 (trigger B1 + A3)
+## Probe 1: symbols changed, asserted by other tests
+$ grep -rln "S7\|S8\|S9\|terminator\|EOF\|_load(" tests/ --include="*.py"
+tests/b97_fixtures.py
+tests/conftest.py
+tests/fixtures/synth/generate.py
+tests/support/independent_reader.py
+tests/test_a2l_multiline_headers.py
+tests/test_b97_flow_execution.py
+tests/test_b99_corpus.py
+tests/test_b99_s0.py
+tests/test_b99_truncation.py
+tests/test_before_after_report.py
+tests/test_changes_apply.py
+tests/test_changes_symbol_entries.py
+tests/test_cli.py
+tests/test_compare_service.py
+tests/test_core_srecord_validation.py
+tests/test_crc_operation.py
+tests/test_flow_a2b_b94.py
+tests/test_flow_chainset_b94.py
+tests/test_flow_crc_block.py
+tests/test_flow_crc_ribbon.py
+tests/test_flow_crc_ui.py
+tests/test_flow_execution.py
+tests/test_flow_execution_service.py
+tests/test_flow_external_step_b96.py
+tests/test_flow_funnel_b96.py
+tests/test_flow_multi_image.py
+tests/test_flow_multi_image_ui.py
+tests/test_flow_report_ac6_golden.py
+tests/test_hex_emit.py
+tests/test_memory_display.py
+tests/test_project_gather.py
+tests/test_report_addendum_bound.py
+tests/test_report_producer_bound.py
+tests/test_report_service.py
+tests/test_tui_a2l_detail.py
+tests/test_tui_a2l_issue_recolor.py
+tests/test_tui_app.py
+tests/test_tui_directionb.py
+tests/test_tui_evidence_packs.py
+tests/test_tui_flow_builder_b94.py
+tests/test_tui_flow_execution_b94.py
+tests/test_tui_hostile_map.py
+tests/test_tui_manifest_save.py
+tests/test_tui_operations_view.py
+tests/test_tui_patch_editor_v2.py
+tests/test_tui_patch_variant.py
+tests/test_tui_report_filter_surface.py
+tests/test_tui_report_seam.py
+tests/test_tui_report_view.py
+tests/test_tui_variants.py
+tests/test_tui_workspace_insight.py
+tests/test_unified_read.py
+tests/test_validation_service_supplemental.py
+tests/test_variant_execution.py
+
+Re-validation: the symbols changed are S19File._load, IntelHexFile._load,
+SRecord.ADDRESS_LENGTH_MAP (S6 added), _format_coexistence_status,
+_compute_mac_view_payload and the flow SOURCE arm. Behaviour pins found:
+$ grep -rn "S19 only)\|_format_coexistence_status" tests/ --include="*.py"
+tests/test_filename_markup_safety.py
+tests/test_tui_app.py
+tests/test_tui_commandbar.py
+-> tests/test_tui_app.py (4 nodes, errors=[] fixtures — re-validated, unchanged),
+   tests/test_filename_markup_safety.py (errors=[] fixture — re-validated, unchanged),
+   tests/test_tui_commandbar.py (comment only).
+
+$ grep -rn "S6\|Unsupported S-record" tests/ --include="*.py" (excl. fixtures)
+-> test_srecord_unsupported_type_raises pins S4 rejection — S6 not pinned anywhere; re-validated.
+
+## Behaviour-change re-pins (requirement HLR-154 changes the pinned behaviour):
+test::node — old value -> new value — requirement
+tests/test_core_srecord_validation.py::test_s19file_collects_errors — expected error line_numbers [3, 4] -> [3, 4, None] + S19-NO-TERMINATOR integrity dict — HLR-154 (fixture has no terminator; the loader now reports it)
+
+## Pre-existing flakes observed (NOT re-pinned; race pre-dates this increment):
+tests/test_before_after_report.py::test_at_061a_* — single pilot.pause after Button.press races the @work before-after worker; fails ~1/3 on BOTH this tree and is timing-only. Evidence: failed once, passed twice in 3 consecutive runs on this tree.
+tests/test_before_after_report.py::test_tc330_* — NoMatches teardown flake in the same batch run; passed in isolation.

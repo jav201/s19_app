@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 import logging
+import re
 
 """
 S19 RECORD STRUCTURE REFERENCE
@@ -77,6 +78,7 @@ class SRecord:
         'S2': 3,
         'S3': 4,
         'S5': 2,
+        'S6': 3,
         'S7': 4,
         'S8': 3,
         'S9': 2,
@@ -233,6 +235,34 @@ def _is_data_record(record: "SRecord") -> bool:
     return record.type in {"S1", "S2", "S3"}
 
 
+#: S19 load-integrity notice codes (HLR-154 / LLR-154.1, map row B99-I10).
+#: Each notice is one ``load_errors`` dict whose ``error`` text starts with
+#: the code; consumers match through :func:`load_notice_code`.
+S19_INTEGRITY_NOTICE_CODES = (
+    "S19-NO-TERMINATOR",
+    "S19-COUNT-MISMATCH",
+    "S19-AFTER-TERMINATOR",
+)
+
+
+def load_notice_code(err: dict) -> Optional[str]:
+    """
+    Summary:
+        Return the leading integrity-notice code of a loader error dict
+        (``S19-NO-TERMINATOR``, ``S19-COUNT-MISMATCH``,
+        ``S19-AFTER-TERMINATOR``, ``HEX-NO-EOF``, ``HEX-AFTER-EOF``) when the
+        ``error`` text carries one, else ``None``.
+
+    Args:
+        err (dict): A ``S19File``/``IntelHexFile`` error record.
+
+    Returns:
+        Optional[str]: The code token, or ``None`` for plain parser errors.
+    """
+    match = re.match(r"^((?:S19|HEX)-[A-Z0-9-]+)", str(err.get("error", "")))
+    return match.group(1) if match else None
+
+
 class S19File:
     """
     Represents an entire S19 file, including logging, loading, validation,
@@ -260,16 +290,48 @@ class S19File:
         """
         Loads the file and parses all records line by line.
         Collects all errors (parse and validation) into a unified error list.
+
+        LLR-154.1: the first S7/S8/S9 record is the terminator — every later
+        non-empty line is a trailing record that is counted but never parsed
+        and never enters the image (one ``S19-AFTER-TERMINATOR`` notice with
+        the count). A file without a terminator carries
+        ``S19-NO-TERMINATOR``; an S5 count that differs from the data-record
+        count (compared only while the count fits the 16-bit field) or an S6
+        count (while it fits the 24-bit field) carries
+        ``S19-COUNT-MISMATCH``. The tally behind the comparison counts the
+        parsed data records PLUS the unparseable non-empty lines that start
+        with ``S1``/``S2``/``S3``, so a damaged data line gives its own parse
+        issue and never a false count mismatch.
         """
+        terminator_seen = False
+        trailing_records = 0
+        data_record_count = 0
+        s5_count: Optional[int] = None
+        s6_count: Optional[int] = None
         try:
             with open(self.path, 'r') as f:
                 for line_number, line in enumerate(f, 1):
                     line = line.strip()
                     if not line:
                         continue
+                    if terminator_seen:
+                        # LLR-154.1: after the terminator every non-empty
+                        # line is a trailing record — counted, never parsed,
+                        # never imaged, no per-line issue.
+                        trailing_records += 1
+                        continue
                     try:
                         record = SRecord(line)
                         self.records.append(record)
+
+                        if _is_data_record(record):
+                            data_record_count += 1
+                        elif record.type == "S5":
+                            s5_count = record.address
+                        elif record.type == "S6":
+                            s6_count = record.address
+                        elif record.type in {"S7", "S8", "S9"}:
+                            terminator_seen = True
 
                         # Collect validation errors if any
                         if not record.valid:
@@ -282,6 +344,12 @@ class S19File:
                                 })
 
                     except ValueError as e:
+                        if line[:2] in {"S1", "S2", "S3"}:
+                            # LLR-154.1: an unparseable data line still counts
+                            # toward the S5/S6 tally, so a damaged data record
+                            # gives its own parse issue and never a false
+                            # S19-COUNT-MISMATCH.
+                            data_record_count += 1
                         self.load_errors.append({
                             'line_number': line_number,
                             'line': line,
@@ -295,6 +363,40 @@ class S19File:
         except Exception as e:
             logger.exception(f"Unexpected error while loading file: {e}")
             raise
+        if not terminator_seen:
+            self.load_errors.append({
+                'line_number': None,
+                'line': '',
+                'segment': 'integrity',
+                'error': 'S19-NO-TERMINATOR: no S7/S8/S9 terminator record; '
+                         'the image may be truncated'
+            })
+        if (s5_count is not None and data_record_count <= 0xFFFF
+                and s5_count != data_record_count):
+            self.load_errors.append({
+                'line_number': None,
+                'line': '',
+                'segment': 'integrity',
+                'error': f'S19-COUNT-MISMATCH: S5 count {s5_count} does not '
+                         f'match {data_record_count} data records'
+            })
+        if (s6_count is not None and data_record_count <= 0xFFFFFF
+                and s6_count != data_record_count):
+            self.load_errors.append({
+                'line_number': None,
+                'line': '',
+                'segment': 'integrity',
+                'error': f'S19-COUNT-MISMATCH: S6 count {s6_count} does not '
+                         f'match {data_record_count} data records'
+            })
+        if trailing_records:
+            self.load_errors.append({
+                'line_number': None,
+                'line': '',
+                'segment': 'integrity',
+                'error': f'S19-AFTER-TERMINATOR: {trailing_records} '
+                         f'record(s) after the terminator were ignored'
+            })
         validation_errors = sum(1 for item in self.load_errors if item.get("segment") == "validation")
         constructor_errors = sum(1 for item in self.load_errors if item.get("segment") == "SRecord constructor")
         logger.info(

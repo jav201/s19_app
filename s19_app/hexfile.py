@@ -6,6 +6,14 @@ from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
+#: HEX load-integrity notice codes (HLR-154 / LLR-154.2, map row B99-I10).
+#: Each notice is one ``load_errors`` dict whose ``error`` text starts with
+#: the code; consumers match through ``s19_app.core.load_notice_code``.
+HEX_INTEGRITY_NOTICE_CODES = (
+    "HEX-NO-EOF",
+    "HEX-AFTER-EOF",
+)
+
 
 @dataclass
 class HexRecord:
@@ -26,14 +34,53 @@ class IntelHexFile:
         self._load()
 
     def _load(self) -> None:
+        """Parse the file, collecting per-record errors.
+
+        LLR-154.2: the first type-01 record is the EOF — every later non-empty
+        line is a trailing record that is counted but never parsed and never
+        enters the image (one ``HEX-AFTER-EOF`` notice with the count). A file
+        without a type-01 record carries ``HEX-NO-EOF``.
+
+        The file is read in BINARY and split into lines with bytes
+        ``splitlines()`` — ``\r``, ``\n`` and ``\r\n`` alike, so a CR-only
+        file loads the same image as its LF twin. Lines are decoded strictly
+        only up to and including the first EOF record; after it, non-empty
+        lines are counted by stripping the BYTES and are never decoded, so a
+        valid HEX followed by raw padding (e.g. ``0xFF``) still loads with
+        the notice.
+        """
         upper_address = 0
         segment_base = 0
         use_segment = False
+        eof_seen = False
+        trailing_records = 0
         try:
-            with open(self.path, "r", encoding="utf-8") as handle:
-                for line_number, raw_line in enumerate(handle, 1):
-                    line = raw_line.strip()
-                    if not line:
+            with open(self.path, "rb") as handle:
+                # Bytes splitlines splits on \r, \n and \r\n alike, so a
+                # CR-only HEX file loads the same image as its LF/CRLF twin
+                # (review round 2, N1: iterating the handle split on \n only
+                # and read a CR-only file as one line — 0 bytes, false
+                # HEX-NO-EOF).
+                data = handle.read()
+                for line_number, raw_line in enumerate(data.splitlines(), 1):
+                    stripped = raw_line.strip()
+                    if not stripped:
+                        continue
+                    if eof_seen:
+                        # LLR-154.2: after the EOF every non-empty line is a
+                        # trailing record — counted, never parsed, never
+                        # imaged, no per-line issue.
+                        trailing_records += 1
+                        continue
+                    try:
+                        line = stripped.decode("utf-8")
+                    except UnicodeDecodeError:
+                        self._add_error(
+                            line_number,
+                            repr(stripped),
+                            "format",
+                            "Invalid UTF-8: not valid UTF-8 text",
+                        )
                         continue
                     if not line.startswith(":"):
                         self._add_error(line_number, line, "format", "Missing ':' prefix")
@@ -97,7 +144,7 @@ class IntelHexFile:
                         for offset, value in enumerate(data):
                             self.memory[base + offset] = value
                     elif record_type == 0x01:
-                        break
+                        eof_seen = True
                     elif record_type == 0x02:
                         if len(data) != 2:
                             self._add_error(
@@ -145,6 +192,22 @@ class IntelHexFile:
         except FileNotFoundError:
             logger.error("HEX file not found: path=%s", self.path)
             raise
+        if not eof_seen:
+            self.load_errors.append({
+                "line_number": None,
+                "line": "",
+                "segment": "integrity",
+                "error": "HEX-NO-EOF: no type 01 EOF record; "
+                         "the image may be truncated",
+            })
+        if trailing_records:
+            self.load_errors.append({
+                "line_number": None,
+                "line": "",
+                "segment": "integrity",
+                "error": f"HEX-AFTER-EOF: {trailing_records} record(s) "
+                         f"after the EOF record were ignored",
+            })
         logger.info(
             "HEX load summary: path=%s records=%d addresses=%d errors=%d",
             self.path,

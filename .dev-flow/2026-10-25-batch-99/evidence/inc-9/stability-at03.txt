@@ -1,0 +1,24 @@
+=== AT-B99-03 run 1 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 21.31s
+=== AT-B99-03 run 2 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 21.80s
+=== AT-B99-03 run 3 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 20.95s
+=== AT-B99-03 run 4 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 20.76s
+=== AT-B99-03 run 5 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 22.13s
+=== AT-B99-03 run 6 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 22.50s
+=== AT-B99-03 run 7 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 22.93s
+=== AT-B99-03 run 8 ===
+...                                                                      [100%]
+3 passed, 20 deselected in 23.30s

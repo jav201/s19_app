@@ -1,0 +1,25 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_tc_b99_09_defect_files[synth_hex_no_eof.hex] ______________
+
+name = 'synth_hex_no_eof.hex'
+
+    @pytest.mark.parametrize("name", [n for n in DEFECT_MESSAGES if n.endswith(".hex")])
+    def test_tc_b99_09_defect_files(name: str):
+        """Each HEX defect file yields exactly its notice, naming the defect.
+    
+        The image holds only the pre-EOF bytes (oracle: the independent reader).
+        """
+        path = CORPUS / name
+        hex_file = IntelHexFile(str(path))
+    
+        errors = hex_file.get_errors()
+>       assert len(errors) == 1, errors
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_b99_truncation.py:245: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_truncation.py::test_tc_b99_09_defect_files[synth_hex_no_eof.hex]
+1 failed, 19 deselected in 0.52s

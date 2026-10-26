@@ -185,6 +185,11 @@
       "station": "P3",
       "date": "2026-10-25",
       "decision": "standing authorization — operator commission 2026-10-25. P3 increment 010 (US-147 + US-152 / HLR-158, A2L codec: MOD_COMMON byte order, RAT_FUNC per ASAM, COMPU_TAB rules; a2l.py + app.py, frozen-engine crossing named) approved: implemented by Kimi K2.8; code-reviewer round 1 Block (F1 HIGH TAB_INTP regression, F2 HIGH AT not black-box) fixed by Kimi, round 2 OK; TC-B99-42/43 added (LED .6); user-visible impact recorded (71,513 case_06 tags big-endian, 1,640 RAT_FUNC tags in software_a change direction)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 009 (US-143 / HLR-154, truncated and inconsistent images reported, five codes, the flow stops; core.py, hexfile.py, flow_execution_service.py, app.py; frozen-engine crossing named) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH binary-tail HEX regression) fixed, round 2 OK with N1 MEDIUM (CR-only HEX) fixed in round 3 and verified by the orchestrator."
     }
   ],
   "obsidian_synced": false,

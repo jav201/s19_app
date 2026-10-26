@@ -1,0 +1,15 @@
+E         
+E         - 0x300
+E         ?   ^
+E         + 0x200
+E         ?   ^
+
+tests\test_tui_patch_editor_v2.py:3956: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc032_engine_test_files_unmodified_vs_main
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry
+6 failed, 522 passed, 1 xfailed in 931.84s (0:15:31)

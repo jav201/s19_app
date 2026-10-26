@@ -1472,6 +1472,8 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 - **▸ (P3, origin batch-99 Inc-10) Axis-point RAT_FUNC decodes pass no physical limits** (axis limits are not parsed), so the root pick uses the smaller-magnitude fallback. **What closes it:** parse AXIS_DESCR limits and pass them to the decode.
 - **▸ (P3, origin batch-99 Inc-11 review F4) `changes/io.py:16-19` docstring is stale:** it still lists decimals in the TUI bytes grammar and names a non-existent `cdfx_service.py`. **What closes it:** the TUI bytes grammar is hex-only (LLR-161.1) and lives in `services/change_service.py`.
 
+- **▸ (P3, origin batch-99 Inc-9 review) The S19 loader reads through the locale codec,** so a file with non-ASCII or binary bytes after the terminator can fail to load (the HEX loader was moved to binary reading in Inc-9). Pre-existing. **What closes it:** read S19 in binary like the HEX loader, decoding only the lines before the terminator.
+
 ### 🆕 Decided 2026-10-25 — operator decisions export (`.dev-flow/design/reconcile-2026-10-23/veredicto-decisiones-s19.json`)
 
 - **Checks window (R-049):** B — becomes the window that runs check files; prototype round first.

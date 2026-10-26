@@ -29,8 +29,8 @@ from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 
 from ..compare import DIFF_KIND_DOMAIN
-from ..core import S19File
-from ..hexfile import IntelHexFile
+from ..core import S19File, S19_INTEGRITY_NOTICE_CODES, load_notice_code
+from ..hexfile import HEX_INTEGRITY_NOTICE_CODES, IntelHexFile
 from .a2l_parse import parse_a2l_file
 from .changes import STATUS_VERIFIED, VerifyResult
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
@@ -959,6 +959,36 @@ def dominant_band_label(
     if not totals:
         return None
     return max(totals, key=lambda label: totals[label])
+
+
+def _integrity_notice_codes(errors: Optional[Sequence[dict]]) -> List[str]:
+    """
+    Summary:
+        Ordered, de-duplicated HLR-154 integrity-notice codes carried by a
+        ``LoadedFile.errors`` list (``S19-NO-TERMINATOR``,
+        ``S19-COUNT-MISMATCH``, ``S19-AFTER-TERMINATOR``, ``HEX-NO-EOF``,
+        ``HEX-AFTER-EOF``); plain parser errors contribute nothing.
+
+    Args:
+        errors (Optional[Sequence[dict]]): Loader error dicts from
+            ``S19File.get_errors()`` / ``IntelHexFile.get_errors()``.
+
+    Returns:
+        List[str]: The codes in first-appearance order (empty when the load
+        carries no integrity notice).
+    """
+    codes: List[str] = []
+    for err in errors or []:
+        code = load_notice_code(err)
+        if code in _INTEGRITY_NOTICE_CODES and code not in codes:
+            codes.append(code)
+    return codes
+
+
+#: The five HLR-154 load-integrity notice codes (map row B99-I10).
+_INTEGRITY_NOTICE_CODES = frozenset(
+    S19_INTEGRITY_NOTICE_CODES + HEX_INTEGRITY_NOTICE_CODES
+)
 
 
 def build_loader_facts_text(
@@ -10446,6 +10476,24 @@ class S19TuiApp(App):
                 dedupe_issues=self._deduplicate_issues,
                 overlapped_addresses=overlap_set,
             )
+            # HLR-154 / UX-C7: an integrity notice on the loaded image is an
+            # ERROR issue naming the code, so the Issues panel reports a
+            # truncated or inconsistent image — not only the loader-facts
+            # counter.
+            for err in getattr(loaded, "errors", None) or []:
+                code = load_notice_code(err)
+                if code in _INTEGRITY_NOTICE_CODES:
+                    issues.append(
+                        ValidationIssue(
+                            code=code,
+                            severity=ValidationSeverity.ERROR,
+                            message=str(err.get("error", code)),
+                            artifact=str(
+                                getattr(loaded, "file_type", None) or "load"
+                            ),
+                            line_number=err.get("line_number"),
+                        )
+                    )
             self.logger.info(
                 "MAC validation computed: records=%d issues=%d elapsed_seconds=%.3f",
                 len(records or []),
@@ -10999,11 +11047,23 @@ class S19TuiApp(App):
         Data Flow:
             - Classify the loaded payload as primary-only, MAC-only, or primary+MAC.
             - Include the source file name and, when available, an attached MAC name.
+            - HLR-154 / UX-C7: when the load carries an integrity notice (a
+              truncated or inconsistent image), the line LEADS with the
+              defect — ``Loaded <name> with integrity notices: <code>`` —
+              never a plain ``Loaded <name>``. The text is file-derived and
+              reaches ``#status_text`` (``markup=False``), so a hostile file
+              name renders literally (UX-C10).
 
         Dependencies:
             Used by:
                 - ``_apply_loaded_file``
         """
+        codes = _integrity_notice_codes(getattr(loaded, "errors", None))
+        if codes:
+            return (
+                f"Loaded {path.name} with integrity notices: "
+                f"{', '.join(codes)}"
+            )
         if loaded.file_type in {"s19", "hex"} and loaded.mac_records:
             if loaded.mac_path and loaded.mac_path != path:
                 return (
