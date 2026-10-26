@@ -1,0 +1,76 @@
+# command: (cwd=<scratch>/snap1d677ba) s19env/python.exe -m pytest -p no:cacheprovider -q tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:46:20-06:00
+# import check: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap1d677ba\s19_app\__init__.py C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap1d677ba\tests\conftest.py
+
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — a save onto an existing filename is dedup-suffixed.
+    
+        A silent clobber is forbidden: a second save under the same name must
+        produce a distinct ``_<N>``-suffixed file. This asserts the second write
+        lands at ``cs_1.json`` and both files survive on disk.
+        """
+        document = change_document_factory()
+    
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first != second, "the second save silently clobbered the first"
+E       AssertionError: the second save silently clobbered the first
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') != WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json')
+
+tests\test_unified_write.py:385: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+    
+        Intent: HLR-031 no-clobber — saving the same change document twice must
+        produce two on-disk files with DIFFERING names (dedup-suffixed by
+        ``copy_into_workarea``), never one clobbered file and never an error. This
+        pins the no-clobber contract by exact count + name distinctness rather than
+        merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+        guard makes the second save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+        asyncio.run(_drive())
+    
+        saved = list(patches.glob("*.json"))
+>       assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+E       AssertionError: two saves must keep two files, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')]
+E       assert 1 == 2
+E        +  where 1 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27094/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json')])
+
+tests\test_tui_patch_editor_v2.py:1336: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+2 failed in 2.47s
+# exit: 1

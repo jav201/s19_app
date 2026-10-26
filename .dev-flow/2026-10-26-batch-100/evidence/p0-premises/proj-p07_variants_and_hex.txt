@@ -1,0 +1,17 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p07_variants_and_hex.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p07_variants_and_hex.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:44:23-06:00
+
+variants: ['firmware', 'prg', 'prghex'] active: prg
+after select prghex -> current: prghex.hex active: prghex
+V tree: ['firmware.s19', 'prg.s19', 'prghex.hex', 'project.json'] | project.json active: prghex
+temp: ['.staging', 'firmware.s19', 'prg.s19', 'prghex.hex']
+RELOAD active: prghex file: prghex.hex image == pre-save HEX image: True
+   variant firmware s19 97B/f254f33fe540
+   variant prg s19 3968B/e00adf014daa
+   variant prghex hex 3968B/e00adf014daa
+select prg after reload -> status: ['Loaded prg.s19'] | temp grew: False | project files: ['firmware.s19', 'prg.s19', 'prghex.hex', 'project.json']
+
+# exit: 0
+# finished: 2026-10-26T06:44:37-06:00

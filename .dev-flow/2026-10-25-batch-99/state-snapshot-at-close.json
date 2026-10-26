@@ -1,0 +1,277 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-10-25-batch-99",
+  "batch_objective": "The read/write integrity batch: every written image, report and run record says what was and was not applied. Scope: the ten HIGH findings of INVESTIGATION-read-write-integrity-2026-10-22 (H-1 S0 as image data, H-2 PATCH always ok, H-3 shared staging race, H-4 editor undo vs image, H-5 A2L encode byte order, H-6 COMPU_TAB nearest/clamp, H-7 CRC over an empty region, H-8 truncated images load ok, H-9 export path containment, H-10 run records drop dispositions); project round-trip PH-3 (save-back deletes the work copy, Save project crashes); the Code-Wire data HIGHs CW-D-4 (Bytes field decimal tokens), CW-D-7 (MAC-only export phantom byte), CW-D-10 (RAT_FUNC direction); deeper tests of the CW-U-1 fix (Load project dialog) and its sibling; and a generated synthetic fixture corpus with an independent reader as the oracle.",
+  "mode": "full",
+  "mode_history": [
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-08-24",
+      "reason": "Same ruling as batch-85/86 (C-50): the IFC record's declared home is .dev-flow/<batch>/01-requirements.md, a Phase-1 artifact /fast-dev-flow has no phase for."
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-08",
+      "reason": "batch 2026-10-08-batch-91 opened by rollover from 2026-09-06-batch-90 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": null,
+      "to": "core",
+      "date": "2026-10-11",
+      "reason": "batch 2026-10-11-batch-93 opened by rollover from 2026-10-08-batch-91 (HELD at P1, not closed -- its hold reason, rev60's packet template, is long satisfied; it resumes as its own step); mode core declared by the commission"
+    },
+    {
+      "from": "core",
+      "to": "full",
+      "date": "2026-10-12",
+      "reason": "operator standing preference this week (batch-92 commissioned full; batch-94 assumed full — to confirm at kickoff)"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-19",
+      "reason": "batch 2026-10-19-batch-97 opened by rollover from 2026-10-12-batch-94 (closed at P6, synced); mode full by the operator's standing rule (dev-flow runs full) and the input: a design port of an operator-approved prototype round across four screens"
+    },
+    {
+      "from": null,
+      "to": "full",
+      "date": "2026-10-25",
+      "reason": "batch 2026-10-25-batch-99 opened by rollover from 2026-10-19-batch-97 (closed at P6, synced); mode full by the operator's commission (dev-flow full: P0/P1 requirements, P2 review)"
+    }
+  ],
+  "current_station": "P6",
+  "phase_status": "approved",
+  "stations_active": [
+    "P0",
+    "ARQ",
+    "P1",
+    "P2",
+    "PDR",
+    "P3",
+    "DDR",
+    "P4",
+    "P5",
+    "P6"
+  ],
+  "iterations_per_station": {
+    "P0": 0,
+    "ARQ": 0,
+    "P1": 2,
+    "P2": 0,
+    "PDR": 0,
+    "P3": 0,
+    "DDR": 0,
+    "P4": 0,
+    "P5": 0,
+    "P6": 0
+  },
+  "triggers": {
+    "evaluated_at": "2026-10-25T14:05:40",
+    "fired": [
+      "A2",
+      "A3",
+      "B1",
+      "B3",
+      "B4",
+      "C6",
+      "C8",
+      "D1",
+      "E1",
+      "E2"
+    ],
+    "not_fired": [
+      "A1",
+      "A4",
+      "B2",
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C7",
+      "D2",
+      "E3",
+      "F1",
+      "F2"
+    ],
+    "record": ".dev-flow/2026-10-25-batch-99/PLAN.md#triggers"
+  },
+  "artifact_homes": {
+    "requirements": "repo:.dev-flow/2026-10-25-batch-99/01-requirements.md",
+    "requirements_ledger": "repo:.dev-flow/2026-10-25-batch-99/01-requirements-ledger.md",
+    "traceability": "repo:.dev-flow/2026-10-25-batch-99/06-docs/traceability-matrix.md",
+    "tests": "repo:tests/",
+    "module_map": "repo:docs/architecture.md",
+    "increments": "repo:.dev-flow/2026-10-25-batch-99/03-increments/",
+    "evidence": "repo:.dev-flow/2026-10-25-batch-99/evidence/",
+    "backlog": "repo:.dev-flow/BACKLOG.md",
+    "design_pdr": "vault:s19_app/design/PDR-2026-10-25-batch-99.md",
+    "design_ddr": "vault:s19_app/design/DDR-2026-10-25-batch-99.md",
+    "postmortem": "vault:s19_app/dev-flow-batches/2026-10-25-batch-99/",
+    "metrics": "vault:s19_app/dev-flow-batches/2026-10-25-batch-99/README.md",
+    "requirements_canon": "repo:REQUIREMENTS.md"
+  },
+  "artifacts": {},
+  "decisions_log": [
+    {
+      "station": "P0",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25 (PLAN header). P0 intake approved: 11 stories US-141..US-151; READY US-141, 142, 144, 146, 148, 149, 151; REFINE US-143 (D6), 145 (D5), 147 (D2-D4), 150 (D1), pending the operator's verdict on design/plan-b99.html; RC-1/RC-2 recorded; ARQ is next."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. ARQ approved: docs/ARCHITECTURE.md batch-99 declarations (R18-R23) and interface amendments B99-I1..I9; no boundary move; frozen-engine crossings (core.py, hexfile.py, a2l.py) named in LLR-153.1, 154.1, 154.2, 158.1; mem_map census: one in-place writer (LLR-157.3); parallelisation verdict sequential, no fork (A4 stays not fired); CRC staging joins HLR-159 as LLR-159.3. P1 is next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P1 requirements drafted and self-approved for review: HLR-152..162, 38 LLRs (TC-B99-01..38), AT-B99-01..13, 21 premises TRUE on 307065f, IFC 11 flows; REFINE stories derived provisionally on the recommended options and gated at P3. P2 cross-agent review is next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 round 1 gate: iterate-to-refine (1 blocker Q-1, 20 majors, 29 minors; 02-review.md). All P1-routed findings folded in LED-2026-10-25-batch-99.1; round 2 re-review next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P1 amendment LED-2026-10-25-batch-99.1 complete (41 LLRs, TC-B99-01..41, P-22/P-23 added, B99-I10..I12 in the map); P2 round 2 next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 round 2 gate: iterate-to-refine (1 blocker Q-1 text, 6 majors, 13 minors). Folded in LED-2026-10-25-batch-99.2; round 3 re-review next."
+    },
+    {
+      "station": "P1",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P1 amendment LED-2026-10-25-batch-99.2 complete (US-152 added, LLR-157.3 retired, 40 LLRs, AT-B99-01..14); P2 round 3 next."
+    },
+    {
+      "station": "P2",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P2 approved at round 3 (qa approve, security approve; architect A3-1/A3-2 folded in LED-2026-10-25-batch-99.3, open with PDR as owner). PDR next: design/design-proposal-b99.md reviewed by architect, qa-reviewer, ux-reviewer."
+    },
+    {
+      "station": "PDR",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. PDR approved with conditions (architect, qa-reviewer, ux-reviewer; design/PDR-2026-10-25-batch-99.md): C2/C4/C5/C6/C7 discharged now, the rest owned by named increments; no prototype round owed (ux §4). P3 increment 001 (US-141 corpus) next, implemented by Kimi K2.8."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 001 (US-141 / HLR-152, synthetic corpus + independent reader, 0 SOURCE files) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH LSB_FIRST token, traced to the contract, LED-2026-10-25-batch-99.4), round 2 OK to advance; orchestrator re-ran 5 passed and --check (16 files). Full suite not re-run for this cut: tests-only, no existing test touched; the batch baseline run is in progress."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "asked at the gate — operator verdict 2026-10-25 on D1-D10 (design/veredicto-b99.json): recommended option on all ten; applied in LED-2026-10-25-batch-99.5; US-143/145/147/150/152 READY; increments 3b, 8, 9, 10, 11 unblocked."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 002 (US-142 / HLR-153, S0 is not image data; core.py + render/hexview.py, frozen-engine crossing named in LLR-153.1) approved: implemented by Kimi K2.8; code-reviewer round 1 changes required (F1 HIGH vacuous Memory Map assertion in AT-B99-02, F2-F6 MEDIUM incl. a sealed batch-92 evidence file rewritten -> restored), round 2 OK to advance; orchestrator fixed a modal-compose flake (8/8). Full suite runs on the merged main."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 011 (US-150 / HLR-161, Bytes field hex-only, amends batch-07 LLR-001.2; change_service.py, screens_directionb.py, window_help.py) approved: implemented by Kimi K2.8; code-reviewer round 1 OK with notes (F1/F2 MEDIUM), fixes by Kimi, round 2 OK; orchestrator moved AT-B99-12's load to the Load dialog (8/8)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 010 (US-147 + US-152 / HLR-158, A2L codec: MOD_COMMON byte order, RAT_FUNC per ASAM, COMPU_TAB rules; a2l.py + app.py, frozen-engine crossing named) approved: implemented by Kimi K2.8; code-reviewer round 1 Block (F1 HIGH TAB_INTP regression, F2 HIGH AT not black-box) fixed by Kimi, round 2 OK; TC-B99-42/43 added (LED .6); user-visible impact recorded (71,513 case_06 tags big-endian, 1,640 RAT_FUNC tags in software_a change direction)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 009 (US-143 / HLR-154, truncated and inconsistent images reported, five codes, the flow stops; core.py, hexfile.py, flow_execution_service.py, app.py; frozen-engine crossing named) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH binary-tail HEX regression) fixed, round 2 OK with N1 MEDIUM (CR-only HEX) fixed in round 3 and verified by the orchestrator."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 004 (US-146 / HLR-157, editor image = source + current document via an in-place journal; change_service.py + app.py) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH overlapping save, F2 HIGH stale strip after reload) fixed by Kimi, round 2 PASS-WITH-NOTES (N1-N3 LOW to backlog)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 003 (Inc 3a; US-144 / HLR-155 placement + PH-3; workspace.py, changes/apply.py, changes/io.py, app.py) approved: implemented by Kimi K2.8 in three rounds; code-reviewer BLOCK (3 HIGH) -> OK -> OK; security-reviewer changes required (S-F1 MEDIUM) -> approve; LLR-155.3 amended (LED .7); merged main 194 passed."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 008 (US-145 / HLR-156, truthful PATCH status and run records, D5 mixta; flow_execution_service.py, flow_report_service.py, flow_screens.py) approved: implemented by Kimi K2.8 in three rounds; code-reviewer Block (F1/F2 HIGH) -> OK -> OK; ac6 golden rebaselined (sections added only); merged main 122 passed on the affected set."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 007 (US-151 / HLR-162, project and work-area pickers load by name, RESERVED_WORKAREA_HOMES, CW-U-3; workspace.py + app.py) approved: implemented by Kimi K2.8; code-reviewer OK with notes (F1 MEDIUM evidence citation fixed by the orchestrator; F3/F4 LOW to backlog)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 003b (US-144 / HLR-155 D7 rechazar + D9 si + the LLR-155.3 immutability invariant; flow_execution_service.py, project_gather_service.py, app.py) approved: implemented by Kimi K2.8; code-reviewer round 1 BLOCK (F1 HIGH gather re-save duplicate regression) fixed, round 2 F3 hashes and a census reclassification done by the orchestrator; 40+ re-pins audited as intent-preserving; merged main 195 passed + 1 known dwell flake (passes alone 3/3)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-25",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 006 (US-149 / HLR-160, export containment + B99-I2a group placement, D8 sufijo; segment_split_view.py, workspace.py) approved: implemented by Kimi K2.8 (one session timed out after implementation; a resume session finished it); code-reviewer and security-reviewer round 1 F1 HIGH (Path subclass crash on Python 3.12+) fixed, round 2 approve on 3.11 and 3.12; orchestrator added an in-range ESC arm (mutation-checked) and extended the LLR-155.3 census allow-list for the group placement after merging with Inc 3b."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 increment 005 (US-148 / HLR-159 + LLR-155.8, CRC never covers an empty region, CRC write stages privately; crc.py, flow_execution_service.py, flow_screens.py — budget widened to 3) approved: implemented by Kimi K2.8 (fix session timed out; the orchestrator ran the final sweep 210 passed and AT-B99-10 x8); code-reviewer round 1 BLOCK (F1 HIGH count not on the FX surface) fixed, round 2 OK; merged main: all batch-99 suites 227 passed. All 12 increments are on main; full suite next."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P3 closed: 12 increments on main (001, 002, 003, 003b, 004-012)."
+    },
+    {
+      "station": "DDR",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. DDR approved (design/DDR-2026-10-25-batch-99.md): architect, software-dev, qa-reviewer approved with conditions; every condition discharged and re-checked. P4 validation next, pending the full suite on e7732f6."
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. Increment 012 (the DDR test-fix unit, tests only) gate closed: reviewed by qa-reviewer and software-dev at the DDR (C-18 one node per AT, ledgers, DQ-2..DQ-6 discharged)."
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. Increment 013 (P4 suite fixes, tests only) gate closed: the full suite on e7732f6 found two un-re-measured whole-tree guards (safe_text import census after Inc-6, Patch Editor snapshot after Inc-11); Kimi K2.8 re-measured both; code-reviewer OK with notes, packet notes fixed; merged 1a59d3b.",
+      "notes": "triage: evidence/suite-triage-e7732f6.md; caught at P4: 2 (tests-only, no product change)"
+    },
+    {
+      "station": "P4",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P4 validation gate closed: PASS-WITH-NOTES, no HIGH, 51/51 requirements, 14/14 ATs (04-validation.md). Confirmation full run on the final tree 75f947a: 12 failed / 3755 passed / 3 skipped / 3 xfailed = 3773; 8 baseline ids, 4 intermittent nodes that fail on a293213 too or pass isolated on both trees; at057b is a single-pause test race made more frequent (10/15 vs 3/15), routed to BACKLOG-CODE. G-001 closed.",
+      "notes": "evidence/suite-full-75f947a.txt; evidence/suite-triage-75f947a.md; evidence/probe-at057b-patient.txt"
+    },
+    {
+      "station": "P5",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P5 close gate: post-mortem written by architect + qa-reviewer (05-postmortem.md, bf3917d); backlog reconciled (BACKLOG-CODE §Routed 2026-10-26, BACKLOG-PROCESS §Registered by batch-99's close); canon folded (51 folded); 05-close.md written. No HIGH; G-005 (dedup suffix vs byte-identical reuse) carried as an operator decision."
+    },
+    {
+      "station": "P6",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator commission 2026-10-25. P6 docs gate: 06-docs written (docs-writer, presentation-builder) and updated with the confirmation result; closing validator run exit 0, 0 block (after repairing 99 record BLOCKs); close stamped on 79d8810. Awaiting /dev-flow-sync."
+    },
+    {
+      "station": "P6",
+      "date": "2026-10-26",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-10-25-batch-99/ — 583 files + README (03-increments excluded, repo home); visual evidence refreshed 2026-10-26 (15 passed, 90/90 fresh); module_map path case corrected to docs/architecture.md"
+    }
+  ],
+  "obsidian_synced": true,
+  "created_at": "2026-10-25T13:49:22.011408",
+  "owner": "C:/Users/jjgh8/Github/s19_app",
+  "base_ref": "307065f4b626459c04ca77736132e9e5ee444253"
+}

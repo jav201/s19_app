@@ -1,0 +1,28 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p05_names_paths_and_load_file_routing.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p05_names_paths_and_load_file_routing.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:44:23-06:00
+
+name 'my proj'                -> project='myproj' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\my', 'Project saved + manifest verified']
+name '../evil'                -> project='evil' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\ev', 'Project saved + manifest verified']
+name '..'                     -> project='evil' status=['Invalid project name.']
+name 'Δelta-ñ_1'              -> project='Δelta-ñ_1' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\Δe', 'Project saved + manifest verified']
+name 'a b'                    -> project='ab' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\ab', 'Project saved + manifest verified']
+name 'ab'                     -> project='ab' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\ab', 'Project saved + manifest verified']
+name 'CON'                    -> project='CON' status=['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\CO', 'Project saved + manifest verified']
+   !! _handle_save_dialog RAISED FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\.s19tool\\workarea\\xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+name 'xxxxxxxxxxxxxxxxxxxx'   -> project='CON' status=[]
+workarea dirs: ['CON', 'ab', 'evil', 'myproj', 'patches', 'temp', 'Δelta-ñ_1']
+list_projects(): ['ab', 'CON', 'evil', 'myproj', 'Δelta-ñ_1']
+ab/ files: ['firmware.s19', 'project.json']
+parent outside workarea -> status: ['Cannot save project: Refusing to copy: destination is not contained inside <base>/.s19tool/workarea/: C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\elsewhere\\Ext'] | left behind: []
+   current_project after refused save: CON
+parent = another workarea -> status: ['Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_572988t_\\other\\.s19', 'Project saved + manifest verified']
+   files there: ['firmware.s19', 'project.json'] | listed by Load project? False
+Load file 'ab' -> status=['Unsupported file type: '] project=Other current_file=temp/firmware.s19 temp ['.staging', 'firmware.s19']->['.staging', 'firmware.s19']
+Load file 'ab/project.json' -> status=['Unsupported file type: .json'] project=Other current_file=temp/firmware.s19 temp ['.staging', 'firmware.s19']->['.staging', 'firmware.s19']
+Load file 'ab/firmware.s19' -> status=['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19'] project=Other current_file=temp/firmware.s19 temp ['.staging', 'firmware.s19']->['.staging', 'firmware.s19']
+corrupt project image -> status: ["Loaded project 'Bad' -> firmware.s19"] | mem bytes: 0 | errors: ["{'line_number': 1, 'line': 'S3FFgarbage', 'segment': 'SRecor", "{'line_number': None, 'line': '', 'segment': 'integrity', 'e"] | file-status line: Loaded firmware.s19 with integrity notices: S19-NO-TERMINATOR
+
+# exit: 0
+# finished: 2026-10-26T06:44:37-06:00

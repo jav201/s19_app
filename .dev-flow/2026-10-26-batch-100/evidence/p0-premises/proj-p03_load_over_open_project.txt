@@ -1,0 +1,22 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p03_load_over_open_project.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p03_load_over_open_project.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:43:50-06:00
+
+P1 files: ['firmware.a2l', 'firmware.mac', 'firmware.s19', 'project.json']
+P2 files: ['prg.s19', 'project.json']
+after P1 load (+1 patch entry): {'file': 'firmware.s19', 'file_dir': 'P1', 'mem': '97B/6bd5c57b3aca', 'mac_path': 'firmware.mac', 'mac_records': 2, 'a2l_path': 'firmware.a2l', 'a2l_dir': 'P1', 'a2l_tags': 3, 'project': 'P1', 'variants': ['firmware'], 'active_variant': 'firmware', 'change_entries': 1, 'change_source': None, 'declared_regions': 1}
+P2 cold: {'file': 'prg.s19', 'file_dir': 'P2', 'mem': '3968B/e00adf014daa', 'mac_path': None, 'mac_records': 0, 'a2l_path': None, 'a2l_dir': None, 'a2l_tags': 0, 'project': 'P2', 'variants': ['prg'], 'active_variant': 'prg', 'change_entries': 0, 'change_source': None, 'declared_regions': 0}
+P2 warm: {'file': 'prg.s19', 'file_dir': 'P2', 'mem': '3968B/e00adf014daa', 'mac_path': 'firmware.mac', 'mac_records': 2, 'a2l_path': 'firmware.a2l', 'a2l_dir': 'P1', 'a2l_tags': 3, 'project': 'P2', 'variants': ['prg'], 'active_variant': 'prg', 'change_entries': 1, 'change_source': None, 'declared_regions': 0}
+  LEAK mac_path: cold=None  after-P1='firmware.mac'
+  LEAK mac_records: cold=0  after-P1=2
+  LEAK a2l_path: cold=None  after-P1='firmware.a2l'
+  LEAK a2l_dir: cold=None  after-P1='P1'
+  LEAK a2l_tags: cold=0  after-P1=3
+  LEAK change_entries: cold=0  after-P1=1
+status: ['Apply: 1 applied, 0 skipped, 0 blocked', "Loaded project 'P2' -> prg.s19"] notices: []
+P2 files after re-save: ['firmware.a2l', 'firmware.mac', 'prg.s19', 'project.json']
+re-save status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_6f0lkoyd\\.s19tool\\workarea\\P2 (variant 'prg')", 'Project saved + manifest verified']
+
+# exit: 0
+# finished: 2026-10-26T06:44:12-06:00

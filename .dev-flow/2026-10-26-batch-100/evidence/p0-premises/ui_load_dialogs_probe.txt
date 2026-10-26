@@ -1,0 +1,80 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe ui_load_dialogs_probe.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/2026-10-26-batch-100/evidence/p0-premises/ui_load_dialogs_probe.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:48:21-06:00
+
+s19_app imported from: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\snap1d677ba\s19_app\__init__.py
+== S1 Load file dialog
+work-area temp before opening: ['.staging', 'firmware.s19', 'firmware_1.s19']
+`l` with no focus -> screen: LoadFileScreen
+ctrl+l -> screen: LoadFileScreen | focused: OsClipboardInput#load_path
+dialog widgets:
+    Label#None Load file (S19/HEX/MAC/A2L):
+    OsClipboardInput#load_path value='' placeholder='C:\\path\\to\\file.s19, .hex, .mac, or .a2l'
+    Button#load_ok Load
+    Button#load_cancel Cancel
+dialog has a list/picker widget? none
+dialog names a work-area file (firmware_1)? False | names a recent source (case_01/case_02)? False
+empty Load click -> screen: LoadFileScreen | new status: [] | new notices: []
+empty Enter -> screen: LoadFileScreen | new status: [] | new notices: []
+Enter with a typed path -> screen: LoadFileScreen | current_file before/after: firmware_1.s19 / firmware_1.s19
+escape on LoadFileScreen -> screen: LoadFileScreen | stack: ['Screen', 'LoadFileScreen']
+
+== S2 Save project dialog
+ctrl+s -> screen: SaveProjectScreen
+    Label#None Save project folder under:
+    OsClipboardInput#project_parent_path value='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_7dvnj5yp\\.s19tool\\workarea' placeholder='C:\\path\\to\\parent\\folder'
+    Label#None Project name (new folder name):
+    OsClipboardInput#project_name value='' placeholder='letters, numbers, - _'
+empty name Save click -> screen: SaveProjectScreen | new status: [] | new notices: []
+escape on SaveProjectScreen -> screen: SaveProjectScreen | stack: ['Screen', 'SaveProjectScreen']
+
+== S3 Load project dialog
+action_load_project -> screen: LoadProjectScreen
+    Label#None Load project:
+    ListView#project_list
+    ListItem#None
+    Label#None P
+    Button#project_ok Load
+    Button#project_cancel Cancel
+escape on LoadProjectScreen -> screen: LoadProjectScreen | stack: ['Screen', 'LoadProjectScreen']
+
+== S4 focus after a load (CW-U-2)
+after Load file dialog: current_file: prg.s19 | focused: _SegTable#sje_table | focused region area: 0 | split window hidden: True
+   `p` -> Screen
+   `k` -> Screen
+   `t` -> Screen
+after Load project dialog: project: P | focused: _SegTable#sje_table | focused region area: 0 | status: ["Loaded project 'P' -> firmware.s19"]
+   `p` -> Screen
+
+== S5 load over a patched, unsaved image (CW-U-5)
+patched in memory: 97B/f254f33fe540 -> 97B/ca59d9e96607 | status: ['Apply: 1 applied, 0 skipped, 0 blocked']
+Load file over patched image -> stack: ['Screen'] | current_file: firmware_1.s19 | image still patched? False | new status: ['Copying into workarea temp...', 'Parsing firmware_1.s19...', 'Loaded firmware_1.s19', "Added variant 'firmware_1' to project 'P'"] | new notices: []
+Load project over patched image -> stack: ['Screen'] | image still patched? False | new status: ["Loaded project 'P' -> firmware.s19"] | new notices: []
+
+== S6 reserved project names
+RESERVED_WORKAREA_HOMES: ('temp', 'patches', 'templates', 'logs', 'crc', 'flows', 'flowsets', 'splits', 'reports')
+dialog Save 'reports' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\reports (variant 'firmware')", 'Project saved + manifest verified'] | current_project: reports
+handler Save 'crc' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\crc (variant 'firmware')", 'Project saved + manifest verified'] | current_project: crc
+handler Save 'Splits' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\Splits (variant 'firmware')", 'Project saved + manifest verified'] | current_project: Splits
+handler Save 'flows' -> status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_0u56kzbg\\.s19tool\\workarea\\flows (variant 'firmware')", 'Project saved + manifest verified'] | current_project: flows
+workarea dirs: ['Splits', 'crc', 'flows', 'patches', 'reports', 'temp']
+list_projects(): ['Splits']
+
+== S7 copy_into_workarea _<N> growth (M-1)
+copy case_01        -> firmware.s19
+copy case_02        -> firmware_1.s19
+copy case_02 again  -> firmware_2.s19
+copy case_01 again  -> firmware.s19
+copy case_02 third  -> firmware_3.s19
+temp: ['firmware.s19  358  8a35f3808f25', 'firmware_1.s19  310  a9e114d56077', 'firmware_2.s19  310  a9e114d56077', 'firmware_3.s19  310  a9e114d56077']
+copy temp/firmware_1.s19 into temp -> firmware_1.s19 | temp: ['.staging', 'firmware.s19', 'firmware_1.s19', 'firmware_2.s19', 'firmware_3.s19']
+
+== S7b app load of a file already in the work area
+Load file temp/firmware_1.s19 -> current_file: temp/firmware_1.s19 | status: ['Parsing firmware_1.s19...', 'Loaded firmware_1.s19'] | temp: ['.staging', 'firmware.s19', 'firmware_1.s19']
+save-back status: ['Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)'] | workarea files: ['firmware.s19', 'temp/firmware.s19', 'temp/firmware_1.s19']
+re-load external case_01 -> current_file: temp/firmware.s19 | temp: ['.staging', 'firmware.s19', 'firmware_1.s19']
+
+
+# exit: 0
+# finished: 2026-10-26T06:49:07-06:00

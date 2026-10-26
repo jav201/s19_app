@@ -52,3 +52,4 @@ AT-TC-REGISTRY.jsonl text eol=lf
 # byte-comparison oracle; store the corpus verbatim (-text, like the evidence
 # bytes above).
 tests/fixtures/synth/** -text
+.dev-flow/2026-10-26-batch-100/evidence/** -text

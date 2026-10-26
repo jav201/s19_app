@@ -1,0 +1,16 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p06_subfolders_docs_saveas.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p06_subfolders_docs_saveas.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:44:23-06:00
+
+[A] editor doc before save: C:\Users\jjgh8\AppData\Local\Temp\projprobe_7lbdin_o\.s19tool\workarea\patches\boost.json 1
+[A/B] P tree after save + flow: ['firmware.a2l', 'firmware.s19', 'flows/f1.json', 'patches/boost.json', 'project.json', 'reports/r.md']
+[A] project.json: {'schema_version': 1, 'active_variant': 'firmware', 'batch': [], 'assignments': {}, 'gathered': {'patches': ['patches/boost.json']}}
+[A] after Load: editor doc = None entries = 0
+[B] after Load: list_saved_flows(active project) = ['f1']
+[C] Save-as P -> Q status: ["Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_7lbdin_o\\.s19tool\\workarea\\Q (variant 'firmware')", 'Project saved + manifest verified']
+[C] Q tree: ['firmware.a2l', 'firmware.s19', 'project.json']
+[C] active project now: Q | flows visible: []
+
+# exit: 0
+# finished: 2026-10-26T06:44:33-06:00

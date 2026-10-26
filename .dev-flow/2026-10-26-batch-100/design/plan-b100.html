@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan batch 100</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--dim:#5f6670;--line:#dcd9d0;--acc:#2f6fb5;--ok:#2e7d4f;--warn:#b0413e;--amb:#a86a12;--tag:#eceae3;--l1:#e3eefa;--l2:#fbeedd;--l3:#e6f3ea;--l4:#efe6f7;--vio:#7a4fb0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--amb:#e0a650;--tag:#2a2e33;--l1:#1f2c3b;--l2:#3a2e1f;--l3:#1f3326;--l4:#2c2238;--vio:#b493e0}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--warn:#e07a76;--amb:#e0a650;--tag:#2a2e33;--l1:#1f2c3b;--l2:#3a2e1f;--l3:#1f3326;--l4:#2c2238;--vio:#b493e0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 90px}
+h1{font-size:1.5rem;margin:0 0 4px} h2{font-size:1.2rem;margin:28px 0 8px} h3{font-size:1.02rem;margin:0 0 4px}
+.lead{color:var(--dim);margin:0 0 16px}
+.bluf{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);padding:12px 14px;border-radius:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0}
+.ctx{color:var(--dim);font-size:.93rem;margin:0 0 10px}
+.opt{display:block;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.opt:has(input:checked){border-color:var(--acc);outline:1px solid var(--acc)}
+.opt .c{font-size:.9rem;color:var(--dim);display:block;margin-top:2px}
+.rec{font-size:.75rem;background:var(--ok);color:#fff;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:middle}
+code{background:var(--tag);border-radius:3px;padding:0 4px;font-size:.88em}
+textarea{width:100%;min-height:40px;margin-top:6px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;font:inherit}
+#gen{min-height:90px}
+table{width:100%;border-collapse:collapse;font-size:.9rem;background:var(--card)}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--tag)}
+.wrap{overflow-x:auto}
+.pill{display:inline-block;font-size:.75rem;border-radius:4px;padding:0 6px;background:var(--tag)}
+.free{background:var(--ok);color:#fff} .gated{background:var(--amb);color:#fff} .proto{background:var(--vio);color:#fff}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--ink);font:12px system-ui,Segoe UI,sans-serif}
+svg .dim{fill:var(--dim)}
+.bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 16px;font:inherit;cursor:pointer}
+ol li,ul li{margin:3px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Plan del batch 100 — Load y proyectos</h1>
+<p class="lead">2026-10-26 · base <code>1d677ba</code> · dev-flow full · implementación delegada a Kimi K2.8 (<code>kimi-code/kimi-for-coding</code>), con revisión independiente después de cada incremento · autonomía igual que b99, push directo a main.</p>
+
+<div class="bluf"><b>Resumen.</b> Hoy un proyecto <b>no devuelve lo que guardaste</b>, y Load es solo un cuadro de texto. Volví a correr las sondas de la investigación de proyectos sobre el main actual. El batch 99 ya cerró PH-3, la lista con <code>patches</code> y la carpeta vacía. <b>Todo lo demás sigue reproduciéndose</b>. Por ejemplo:
+<ul>
+<li>Save project con un parche aplicado guarda el original y dice «manifest verified».</li>
+<li>Abrir P2 encima de P1 se lleva el A2L, el MAC y la entrada del parche de P1.</li>
+<li>Después de guardar la imagen parchada, Load abre el original.</li>
+</ul>
+Son <b>12 incrementos</b>:
+<ul>
+<li>Los <b>4 primeros no dependen de ti</b> y arrancan ya.</li>
+<li>Del 5 al 8 esperan <b>7 decisiones</b>. Cada una trae marcada la opción que recomiendo.</li>
+<li>Del 9 al 12 cambian lo que ves y esperan la <b>ronda de prototipos</b>, con capturas reales y tu veredicto.</li>
+</ul>
+<b>Cambia solo lo que objetes</b> y pulsa «Exportar».</div>
+
+<h2 id="fig">1 · Cómo se ordena el trabajo</h2>
+<svg viewBox="0 0 960 340" role="img" aria-label="Increments 1 to 4 run now; 5 to 8 wait for decisions D1 to D7; 9 to 12 wait for the prototype round">
+ <text x="10" y="22" font-weight="600">Sin decisiones tuyas (arrancan ya)</text>
+ <g>
+  <rect x="10" y="34" width="225" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="18" y="54">1 · Sin copias duplicadas</text><text x="18" y="70">M-1 + G-005 (reusar)</text><text x="18" y="84" class="dim">workspace · tests</text>
+  <rect x="245" y="34" width="225" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="253" y="54">2 · Guardas de Save project</text><text x="253" y="70">M-4 aviso · M-7 · reservados</text><text x="253" y="84" class="dim">app · workspace</text>
+  <rect x="480" y="34" width="225" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="488" y="54">3 · Abrir proyecto = de cero</text><text x="488" y="70">PH-2</text><text x="488" y="84" class="dim">app · change_service</text>
+  <rect x="715" y="34" width="233" height="54" rx="6" fill="var(--l3)" stroke="var(--ok)"/><text x="723" y="54">4 · Foco donde trabajas</text><text x="723" y="70">CW-U-2</text><text x="723" y="84" class="dim">app</text>
+ </g>
+ <text x="10" y="122" font-weight="600">Esperan tus decisiones</text>
+ <g>
+  <rect x="10" y="134" width="225" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="18" y="154">5 · Save guarda lo que ves</text><text x="18" y="170">PH-1 · D1</text><text x="18" y="184" class="dim">app · manifest_writer</text>
+  <rect x="245" y="134" width="225" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="253" y="154">6 · Reabre la última imagen</text><text x="253" y="170">PH-4 · D2</text><text x="253" y="184" class="dim">app · manifest_writer</text>
+  <rect x="480" y="134" width="225" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="488" y="154">7 · Load dice lo que no pudo</text><text x="488" y="170">PH-5 · L-4 · D3</text><text x="488" y="184" class="dim">manifest_writer · app</text>
+  <rect x="715" y="134" width="233" height="54" rx="6" fill="var(--l2)" stroke="var(--amb)"/><text x="723" y="154">8 · Qué incluye un proyecto</text><text x="723" y="170">M-2 M-3 M-5 M-6 · D4–D7</text><text x="723" y="184" class="dim">app · manifest_writer</text>
+ </g>
+ <text x="10" y="222" font-weight="600">Esperan la ronda de prototipos (capturas reales + tu veredicto)</text>
+ <g>
+  <rect x="10" y="234" width="225" height="54" rx="6" fill="var(--l4)" stroke="var(--vio)"/><text x="18" y="254">9 · Un solo diálogo Load</text><text x="18" y="270">selector · proyectos · Enter</text><text x="18" y="284" class="dim">P-A · L-2 · D10 · CW-U-12/13</text>
+  <rect x="245" y="234" width="225" height="54" rx="6" fill="var(--l4)" stroke="var(--vio)"/><text x="253" y="254">10 · Pregunta antes de perder</text><text x="253" y="270">CW-U-5 · proyecto sobre proyecto</text><text x="253" y="284" class="dim">P-B</text>
+  <rect x="480" y="234" width="225" height="54" rx="6" fill="var(--l4)" stroke="var(--vio)"/><text x="488" y="254">11 · Diálogo Save project</text><text x="488" y="270">nombre real · avisos</text><text x="488" y="284" class="dim">P-C · M-4 · CW-U-12/13</text>
+  <rect x="715" y="234" width="233" height="54" rx="6" fill="var(--l4)" stroke="var(--vio)"/><text x="723" y="254">12 · Progreso visible</text><text x="723" y="270">N5 reabierto</text><text x="723" y="284" class="dim">P-D</text>
+ </g>
+ <rect x="10" y="300" width="938" height="34" rx="6" fill="var(--l1)" stroke="var(--line)"/>
+ <text x="20" y="322">P0 intake ✓ → ARQ mapa → P1 requisitos → P2 revisión → PDR (+ veredicto de la ronda) → P3 incrementos (Kimi + revisión) → DDR → P4 → P5 → P6</text>
+</svg>
+
+<h2 id="dec">2 · Decisiones (7)</h2>
+<div id="qs"></div>
+<div class="q"><h3>Notas generales / pedidos nuevos</h3><textarea id="gen" placeholder="Cualquier cosa que falte, pedidos nuevos, cambios de prioridad, otra superficie para la ronda..."></textarea></div>
+
+<h2 id="inc">3 · Incrementos</h2>
+<div class="wrap"><table>
+<tr><th>#</th><th>Qué cambia para ti</th><th>Hallazgos</th><th>Archivos fuente (≤4)</th><th>Estado</th></tr>
+<tr><td>1</td><td>Volver a cargar un archivo idéntico a uno que ya está en el área de trabajo no crea otra copia <code>_N</code>; lo reutiliza. Guardar con un nombre que ya existe reutiliza el archivo si los bytes son iguales (tu respuesta a G-005). tc018 y at031b se reescriben a ese comportamiento.</td><td>M-1, G-005</td><td>workspace</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>2</td><td>Varios cambios en Save project:
+ <ul>
+ <li>Un nombre que se sanea (<code>a b</code> → <code>ab</code>) o que coincide con un proyecto existente se avisa antes de mezclarlos.</li>
+ <li>Un nombre muy largo da un mensaje en vez de tumbar la app.</li>
+ <li><code>reports</code>, <code>crc</code> o <code>Splits</code> se rechazan como nombre de proyecto, sin importar mayúsculas.</li>
+ <li>Ningún guardado rechazado deja una carpeta vacía.</li>
+ </ul></td><td>M-4 (aviso), M-7, nombre reservado, L-3 restante</td><td>app, workspace</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>3</td><td>Abrir un proyecto empieza de cero: no hereda el A2L, el MAC ni las entradas del Patch Editor del anterior, y un guardado posterior ya no los copia al proyecto nuevo.</td><td>PH-2</td><td>app, change_service</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>4</td><td>Después de cargar un archivo o un proyecto, el foco queda en una ventana visible y las teclas responden.</td><td>CW-U-2</td><td>app</td><td><span class="pill free">libre</span></td></tr>
+<tr><td>5</td><td>Save project guarda la imagen que ves, con el parche aplicado, y el estado lo dice.</td><td>PH-1, conflicto R-TUI-012 / LLR-015.3</td><td>app, manifest_writer</td><td><span class="pill gated">D1</span></td></tr>
+<tr><td>6</td><td>Después de guardar la imagen parchada en el proyecto, Load la reabre (o te dice cuál abrió).</td><td>PH-4</td><td>app, manifest_writer</td><td><span class="pill gated">D2</span></td></tr>
+<tr><td>7</td><td>Load project avisa cuando:
+ <ul>
+ <li>el manifiesto está dañado;</li>
+ <li>una imagen está corrupta o vacía;</li>
+ <li>un archivo cambió en disco desde que se guardó;</li>
+ <li>falta un archivo, y lo nombra.</li>
+ </ul></td><td>PH-5, L-4</td><td>manifest_writer, variant_execution_service (lector del manifiesto), app</td><td><span class="pill gated">D3</span></td></tr>
+<tr><td>8</td><td>El proyecto guarda y reabre:
+ <ul>
+ <li>el documento del Patch Editor;</li>
+ <li>«guardar como» se lleva flows/, patches/, checks/ y reports/;</li>
+ <li>un proyecto de solo A2L abre;</li>
+ <li>un proyecto siempre se guarda donde Load puede encontrarlo.</li>
+ </ul></td><td>M-2, M-3, M-6, M-5</td><td>app, manifest_writer, variant_execution_service</td><td><span class="pill gated">D4–D7</span></td></tr>
+<tr><td>9</td><td>Un solo diálogo Load:
+ <ul>
+ <li>lista los proyectos, los archivos del área de trabajo y las fuentes recientes, y además deja escribir una ruta;</li>
+ <li>abre proyectos;</li>
+ <li>Enter carga;</li>
+ <li><code>esc</code> cierra;</li>
+ <li>Load vacío explica por qué no hizo nada.</li>
+ </ul></td><td>pedido Load, L-2, D10, CW-U-12/13</td><td>screens, app</td><td><span class="pill proto">ronda P-A</span></td></tr>
+<tr><td>10</td><td>Antes de reemplazar una imagen con parche sin guardar, o un proyecto abierto, la app pregunta. Teclas directas: <code>y</code>/<code>n</code>/<code>esc</code>.</td><td>CW-U-5</td><td>screens, app</td><td><span class="pill proto">ronda P-B</span></td></tr>
+<tr><td>11</td><td>Save project:
+ <ul>
+ <li>muestra el nombre real de la carpeta antes de guardar;</li>
+ <li>avisa si ya existe;</li>
+ <li>dice si hay un parche pendiente;</li>
+ <li><code>esc</code> cierra.</li>
+ </ul></td><td>M-4 (vista previa), CW-U-12/13</td><td>screens, app</td><td><span class="pill proto">ronda P-C</span></td></tr>
+<tr><td>12</td><td>Las acciones largas (cargar, guardar, flujos, reportes) muestran que están trabajando y cuánto llevan.</td><td>N5 reabierto</td><td>app, screens</td><td><span class="pill proto">ronda P-D</span></td></tr>
+</table></div>
+<p class="ctx">Cada incremento: Kimi K2.8 implementa en un worktree aislado, con <code>PYTHONPATH</code> apuntando al worktree. Después revisan code-reviewer y qa-reviewer, más ux-reviewer en los incrementos 9–12. Cada cierre corre las guardas de todo el árbol (censo de imports, celdas de snapshot, registro de ids) y el validador de dev-flow: son las dos lecciones del batch 99. Luego commit y push a main.</p>
+
+<h2 id="proto">4 · La ronda de prototipos</h2>
+<p class="ctx">Se arma en <code>prototypes/load_projects/</code>, que no se commitea, sobre una copia real de la app. Las capturas son de Windows Terminal en color real, a 118×54 y 220×60. Cada botón lleva tecla directa. Sale en una sola página de veredicto con campo de notas. Mientras decides lo de arriba, ya la estoy armando.</p>
+<div class="wrap"><table>
+<tr><th>Superficie</th><th>Variantes que voy a mostrar</th></tr>
+<tr><td><b>P-A · diálogo Load</b></td><td>A: pestañas (Proyectos · Área de trabajo · Recientes · Ruta). B: una sola lista por secciones con la ruta arriba como filtro. C: dos paneles, la lista a la izquierda y a la derecha qué se va a abrir (archivos, variantes, A2L/MAC, estado del manifiesto). En las tres Enter carga, y en las tres decides si el clic también carga (D10).</td></tr>
+<tr><td><b>P-B · pregunta antes de perder trabajo</b></td><td>A: pregunta corta (<code>y</code> reemplazar · <code>n</code> cancelar). B: pregunta que lista qué se pierde (N entradas sin guardar, el A2L/MAC que se cierra) y ofrece <code>s</code> guardar primero.</td></tr>
+<tr><td><b>P-C · diálogo Save project</b></td><td>A: el nombre con una línea debajo con la carpeta real y los avisos. B: el nombre más un resumen de lo que se va a guardar (imagen con o sin parche, MAC, A2L, documento, subcarpetas).</td></tr>
+<tr><td><b>P-D · progreso</b></td><td>A: en la línea de estado, con spinner, paso actual y tiempo transcurrido. B: ventana modal con barra y <code>esc</code> para cancelar donde se pueda. C: barra fina sobre la barra de teclas.</td></tr>
+</table></div>
+
+<h2 id="bl">5 · Backlog abierto, en orden</h2>
+<ol>
+<li><b>Este batch (100)</b>: Load y proyectos.</li>
+<li><b>Prototipo del scroll del carril en espera</b> (tu orden del 25).</li>
+<li><b>Batch 98: reportes</b>:
+ <ul>
+ <li>el reporte de Flow Execution (R-014);</li>
+ <li><b>los hallazgos F6 de Code-Wire</b>: F6-1 (High), el reporte escrito se corta a 512 filas por ventana; F6-2, el bloque A2B de un flujo no referencia los cambios del flujo; F6-3 y F6-4, los menores.</li>
+ </ul>
+ Si quieres cerrar F6-1 antes, puede ir en un batch corto propio.</li>
+<li><b>Ventana Checks como ejecutora de archivos de checks</b> (R-049, tu decisión B), con ronda de prototipos que falta agendar.</li>
+<li><b>Abiertos que esperan tu respuesta:</b> la pregunta de las curvas A2L (R-069) y la página de revisión de la barra de teclas (PC-26).</li>
+<li><b>Pendientes que dejó el cierre del batch 99:</b>
+ <ul>
+ <li>G-002: brazos de superficie (HEX cortado vía <code>l</code>, <code>G1</code> tecleado en Bytes);</li>
+ <li>G-003: AT-06 lee el reporte del chain set;</li>
+ <li>G-006;</li>
+ <li>los LOW del DDR;</li>
+ <li>las carreras de una sola pausa en las pruebas del Patch Editor (at030c, at068b, at057b).</li>
+ </ul></li>
+<li><b>Pendientes medianos y bajos de la investigación de integridad</b>:
+ <ul>
+ <li>M-1: el terminador se reescribe a 0;</li>
+ <li>M-2: los traslapes se resuelven sin avisar;</li>
+ <li>M-3: una carga con pérdidas igual escribe;</li>
+ <li>M-5 a M-10;</li>
+ <li>L-1 a L-7.</li>
+ </ul></li>
+<li><b>Code-Wire, medianos y bajos:</b> CW-U-6..11, CW-D-2/6/8/9/12/16. Los del piloto: referencias A2L en forma de bloque, marca de traslape, doble lectura del S19 y doble pasada de validación.</li>
+<li><b>Resto del batch 97:</b>
+ <ul>
+ <li>el comentario <code>^E</code>;</li>
+ <li>los mutantes AT-16/24;</li>
+ <li>2 detalles de UX de la ayuda;</li>
+ <li>la regeneración de capturas de referencia en CI;</li>
+ <li>la página de revisión de b94.</li>
+ </ul></li>
+<li><b>Dos paletas de comandos</b> con nombres casi iguales (P3).</li>
+<li><b>Proceso:</b> validador en cada gate, guardas de todo el árbol en cada incremento, y las otras 5 lecciones del batch 99 (BACKLOG-PROCESS).</li>
+</ol>
+
+<h2 id="ev">6 · Evidencia de partida (re-corrida en <code>1d677ba</code>)</h2>
+<div class="wrap"><table>
+<tr><th>Hallazgo</th><th>Lo que imprimió la sonda hoy</th></tr>
+<tr><td>PH-1</td><td><code>project firmware.s19 == in-memory patched image? False | == original? True</code>, con estado <code>Project saved + manifest verified</code></td></tr>
+<tr><td>PH-2</td><td><code>LEAK mac_records: cold=0 after-P1=2</code> · <code>LEAK a2l_tags: cold=0 after-P1=3</code> · <code>LEAK change_entries: cold=0 after-P1=1</code></td></tr>
+<tr><td>PH-4</td><td><code>[A] RELOAD -&gt; file=firmware.s19 variants=['firmware', 'firmware_1'] active=firmware image_is_patched=False</code></td></tr>
+<tr><td>PH-5</td><td>Un <code>project.json</code> roto, una imagen corrupta o editada en disco: <code>Loaded project 'P' …</code> con <code>notices=[]</code></td></tr>
+<tr><td>M-1</td><td><code>firmware_1.s19 310 a9e114d56077</code> y <code>firmware_2.s19 310 a9e114d56077</code>: dos copias idénticas</td></tr>
+<tr><td>M-7</td><td><code>_handle_save_dialog RAISED FileNotFoundError: [WinError 3]</code></td></tr>
+<tr><td>Load</td><td><code>dialog names a work-area file (firmware_1)? False | names a recent source? False</code>; Enter con ruta: no hace nada</td></tr>
+<tr><td>CW-U-2</td><td><code>focused: _SegTable#sje_table | focused region area: 0 | split window hidden: True</code></td></tr>
+<tr><td>CW-U-5</td><td>Load sobre una imagen parchada: no pregunta nada, la reemplaza y agrega <code>firmware_1</code> como variante</td></tr>
+<tr><td>CW-U-12/13</td><td><code>esc</code> no cierra Load file, Save project ni Load project. Load o Save vacío: sin estado ni aviso</td></tr>
+<tr><td>Reservado</td><td><code>reports</code>, <code>crc</code> y <code>flows</code> se guardan como proyecto y luego no aparecen en la lista. <code>Splits</code> sí aparece, porque el filtro distingue mayúsculas</td></tr>
+<tr><td>Ya cerrados por b99</td><td>PH-3 (<code>work copy exists after save-back: True</code>), L-1 (<code>list_projects(): ['P']</code>), L-3 (<code>left behind: []</code>)</td></tr>
+</table></div>
+<p class="ctx">Transcripciones: <code>.dev-flow/2026-10-26-batch-100/evidence/p0-premises/</code>. Las sondas se corrieron sobre un <code>git archive</code> de <code>1d677ba</code>, nunca sobre el checkout vivo.</p>
+</main>
+<div class="bar"><span id="cnt"></span><button id="exp">Exportar veredicto (JSON)</button></div>
+<script>
+const Q=[
+{id:"D1",t:"D1 · Save project con un parche aplicado y sin guardar (incremento 5)",
+ ctx:"Hoy Save project copia el archivo del disco, no la imagen que ves. El parche se pierde y el estado dice «manifest verified». La raíz son dos requisitos que se contradicen: R-TUI-012 dice «copiar el archivo» y LLR-015.3 dice «escribir con el emisor».",
+ rec:"imagen",
+ o:[["imagen","Guardar la imagen en memoria con el emisor, verificada, y el estado dice cuántas entradas lleva aplicadas","Lo que reabres es lo que veías. Se corrige R-TUI-012 para alinearlo con LLR-015.3. Un archivo sin parches se sigue copiando byte a byte."],
+    ["preguntar","Preguntar: guardar la imagen parchada, guardar el original o cancelar","Nunca se decide por ti, pero cada guardado con parche suma un diálogo. La pregunta tendría que pasar por la ronda de prototipos."],
+    ["rechazar","Rechazar Save project hasta que guardes el parche en el editor","Nada se pierde en silencio, pero son dos pasos donde hoy hay uno."]]},
+{id:"D2",t:"D2 · Qué imagen abre el proyecto después de guardar la versión parchada (incremento 6)",
+ ctx:"Guardar el parche con un proyecto abierto crea otra variante (<code>firmware_1.s19</code>), pero <code>project.json</code> sigue marcando el original como activo. Load lo abre sin decir nada.",
+ rec:"ultima",
+ o:[["ultima","La imagen guardada pasa a ser la variante activa. Load dice cuál abrió y cuáles más hay","Reabres donde te quedaste. Para volver al original lo eliges como variante."],
+    ["original","El original sigue activo, pero Load lista las variantes y marca cuál tiene el parche","El proyecto siempre abre igual, pero tienes que cambiar de variante a mano cada vez."]]},
+{id:"D3",t:"D3 · Load project con problemas en el manifiesto o en los archivos (incremento 7)",
+ ctx:"Hoy un <code>project.json</code> roto, una imagen corrupta o vacía o un archivo editado en disco cargan con «Loaded project» y sin aviso. El manifiesto no guarda tamaño ni hash de ningún archivo, así que hoy no se puede detectar un cambio en disco.",
+ rec:"abre_y_reporta",
+ o:[["abre_y_reporta","Guardar el tamaño y el SHA-256 de cada archivo. Al abrir: cargar lo válido y mostrar la lista de problemas (archivo cambiado, archivo que falta, imagen que no se pudo leer, manifiesto roto con valores por defecto)","Puedes inspeccionar un proyecto dañado y sabes exactamente qué no está bien. Los proyectos viejos sin hash abren con el aviso «sin huellas guardadas»."],
+    ["rechaza","Cualquier problema rechaza la carga completa, con la lista de motivos","Nunca trabajas sobre un proyecto a medias, pero tampoco puedes abrirlo para ver qué pasó."]]},
+{id:"D4",t:"D4 · El documento del Patch Editor dentro del proyecto (incremento 8)",
+ ctx:"Hoy un documento de cambios con archivo se copia a <code>patches/</code> al guardar, pero Load no lo reabre. Uno pegado a mano ni siquiera se guarda.",
+ rec:"reabrir",
+ o:[["reabrir","El proyecto guarda el documento activo (también el pegado, como archivo en <code>patches/</code>) y Load lo reabre en el editor","Al reabrir ves tus entradas de cambio, no solo la imagen."],
+    ["no","No se restaura, y Load lo dice","Menos alcance. Las entradas quedan en <code>patches/</code> y las abres tú."]]},
+{id:"D5",t:"D5 · «Guardar como» un proyecto abierto con otro nombre (incremento 8)",
+ ctx:"Hoy el proyecto nuevo solo recibe los archivos de datos. flows/, patches/, checks/ y reports/ se quedan en el anterior, y el proyecto nuevo aparece sin flujos.",
+ rec:"copiar",
+ o:[["copiar","Copiar también flows/, patches/, checks/ y reports/","El proyecto nuevo es una copia completa del que tenías abierto."],
+    ["decir","No copiar; el diálogo avisa que el proyecto nuevo arranca solo con los archivos cargados","Proyectos más livianos, pero los flujos se quedan atrás si no lo lees."]]},
+{id:"D6",t:"D6 · Proyecto con solo A2L (incremento 8)",
+ ctx:"Hoy se puede guardar un proyecto que solo tiene el A2L, pero Load lo rechaza con «No supported files».",
+ rec:"abrir",
+ o:[["abrir","Load abre un proyecto de solo A2L, sin imagen","Lo que se guarda se puede abrir. Sirve para preparar el A2L antes de tener la imagen."],
+    ["rechazar","Save project rechaza guardar sin imagen","Un proyecto siempre tiene imagen, pero ya no puedes guardar solo el trabajo del A2L."]]},
+{id:"D7",t:"D7 · Dónde se puede guardar un proyecto (incremento 8)",
+ ctx:"Hoy el diálogo deja elegir otra carpeta (Browse…). Fuera de un área de trabajo se rechaza, pero dentro del área de trabajo de otra instalación se guarda y Load nunca lo lista.",
+ rec:"solo_workarea",
+ o:[["solo_workarea","Siempre dentro del área de trabajo de la app; se quita Browse… de Save project","Todo lo que guardas aparece en Load. Para mover un proyecto, copias la carpeta."],
+    ["listar_otros","Mantener Browse…, y Load también lista los proyectos de otras áreas de trabajo que ya usaste","Más flexible, pero suma una lista de ubicaciones recordadas que hay que mantener."]]}
+];
+const box=document.getElementById("qs");
+Q.forEach(q=>{const d=document.createElement("div");d.className="q";
+d.innerHTML=`<h3>${q.t}</h3><p class="ctx">${q.ctx}</p>`+q.o.map(([v,l,c])=>`<label class="opt"><input type="radio" name="${q.id}" value="${v}" ${v===q.rec?"checked":""}> <b>${l}</b>${v===q.rec?'<span class="rec">recomendada</span>':""}<span class="c">${c}</span></label>`).join("")+`<textarea data-id="${q.id}" placeholder="Nota (opcional)"></textarea>`;
+box.appendChild(d);});
+function upd(){const n=Q.filter(q=>document.querySelector(`input[name="${q.id}"]:checked`)).length;document.getElementById("cnt").textContent=`${n} de ${Q.length} respondidas`;}
+document.addEventListener("change",upd);upd();
+document.getElementById("exp").onclick=()=>{const out={page:"s19-plan-b100",exported:new Date().toISOString(),items:{},general_notes:document.getElementById("gen").value};
+Q.forEach(q=>{const c=document.querySelector(`input[name="${q.id}"]:checked`);out.items[q.id]={verdict:c?c.value:null,note:document.querySelector(`textarea[data-id="${q.id}"]`).value};});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download="veredicto-b100.json";a.click();};
+</script>
+</body>
+</html>

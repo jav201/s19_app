@@ -1,0 +1,15 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p08_saveback_clobbers_work_copy.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p08_saveback_clobbers_work_copy.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:43:50-06:00
+
+work copy: temp/firmware.s19 exists: True
+save-back status: ['Patched image saved as firmware.s19 — 1 entry applied before this save (0x8000007C)', 'Saved + verified: firmware.s19 — 1 entry applied before this save (0x8000007C)']
+work copy exists after save-back: True | app still holds: temp/firmware.s19
+workarea files: ['firmware.s19', 'temp/firmware.s19']
+after Save-project dismiss: app running? True | return_code: None
+run_test outcome: no exception | app.return_code: None
+P folder left behind: ['.s19tool/workarea/P/firmware.s19', '.s19tool/workarea/P/project.json']
+
+# exit: 0
+# finished: 2026-10-26T06:43:56-06:00

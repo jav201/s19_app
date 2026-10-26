@@ -1,0 +1,30 @@
+# command: S19_WT=<scratch>/snap1d677ba PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 (NO_COLOR unset) s19env/python.exe p01_roundtrip_full_session.py 
+# probe source: C:/Users/jjgh8/Github/s19_app/.dev-flow/design/investigation-projects-2026-10-23/p01_roundtrip_full_session.py
+# tree: 1d677ba (git archive)
+# started: 2026-10-26T06:43:50-06:00
+
+SESSION before save: {'file': 'firmware.s19', 'file_dir': 'temp', 'mem': '97B/ca59d9e96607', 'mac_path': 'firmware.mac', 'mac_records': 2, 'a2l_path': 'firmware.a2l', 'a2l_dir': 'temp', 'a2l_tags': 3, 'project': None, 'variants': None, 'active_variant': None, 'change_entries': 1, 'change_source': None, 'declared_regions': 0}
+  in-memory patch changed 4 bytes at ['0x8000007c', '0x8000007d', '0x8000007e', '0x8000007f']
+SAVE status: ['Apply: 1 applied, 0 skipped, 0 blocked', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\projprobe_l12_bp8g\\.s19tool\\workarea\\P1 (variant 'firmware')", 'Project saved + manifest verified'] notices: []
+PROJECT TREE:
+    firmware.a2l  1444  a43f41b53603
+    firmware.mac  33  990c68f3f632
+    firmware.s19  358  8a35f3808f25
+    project.json  98  f95ce9c63cfb
+project.json: {'schema_version': 1, 'active_variant': 'firmware', 'batch': [], 'assignments': {}}
+project firmware.s19 == in-memory patched image? False | == original? True
+LOAD list_projects(): ['P1']
+SESSION after load: {'file': 'firmware.s19', 'file_dir': 'P1', 'mem': '97B/f254f33fe540', 'mac_path': 'firmware.mac', 'mac_records': 2, 'a2l_path': 'firmware.a2l', 'a2l_dir': 'P1', 'a2l_tags': 3, 'project': 'P1', 'variants': ['firmware'], 'active_variant': 'firmware', 'change_entries': 0, 'change_source': None, 'declared_regions': 0}
+LOAD status: ["Loaded project 'P1' -> firmware.s19 + firmware.mac"] notices: []
+  DIFF file_dir: saved-session='temp'  restored='P1'
+  DIFF mem: saved-session='97B/ca59d9e96607'  restored='97B/f254f33fe540'
+  DIFF a2l_dir: saved-session='temp'  restored='P1'
+  DIFF project: saved-session=None  restored='P1'
+  DIFF variants: saved-session=None  restored=['firmware']
+  DIFF active_variant: saved-session=None  restored='firmware'
+  DIFF change_entries: saved-session=1  restored=0
+restored image has the patch? False
+workarea/temp after load: ['.staging', 'firmware.a2l', 'firmware.mac', 'firmware.s19']
+
+# exit: 0
+# finished: 2026-10-26T06:44:01-06:00
