@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 8d7e6160968ff794 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 6e66876ba7876eb4 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1969 unique id(s)
+## family US/HLR/LLR — 1981 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1777,6 +1777,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-172` | batches |
 | `HLR-173` | batches |
 | `HLR-173..178` | batches |
+| `HLR-173..HLR-178` | batches |
 | `HLR-174` | batches |
 | `HLR-175` | batches |
 | `HLR-176` | batches |
@@ -2887,6 +2888,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-163.3` | batches |
 | `LLR-163.4` | batches |
 | `LLR-163.5` | batches |
+| `LLR-163.6` | batches |
 | `LLR-164.1` | batches |
 | `LLR-164.2` | batches |
 | `LLR-164.3` | batches |
@@ -2901,6 +2903,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-167.2` | batches |
 | `LLR-167.3` | batches |
 | `LLR-167.4` | batches |
+| `LLR-167.5` | batches |
+| `LLR-167.6` | batches |
 | `LLR-168.1` | batches |
 | `LLR-168.2` | batches |
 | `LLR-168.3` | batches |
@@ -2911,12 +2915,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-169.5` | batches |
 | `LLR-169.6` | batches |
 | `LLR-169.7` | batches |
+| `LLR-169.8` | batches |
+| `LLR-169.9` | batches |
 | `LLR-170.1` | batches |
 | `LLR-170.2` | batches |
 | `LLR-170.3` | batches |
 | `LLR-171.1` | batches |
 | `LLR-171.2` | batches |
 | `LLR-171.3` | batches |
+| `LLR-171.4` | batches |
 | `LLR-172.1` | batches |
 | `LLR-172.2` | batches |
 | `LLR-172.3` | batches |
@@ -2927,12 +2934,16 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-173.2` | batches |
 | `LLR-173.3` | batches |
 | `LLR-173.4` | batches |
+| `LLR-173.5` | batches |
+| `LLR-173.6` | batches |
+| `LLR-173.7` | batches |
 | `LLR-174.1` | batches |
 | `LLR-174.2` | batches |
 | `LLR-174.3` | batches |
 | `LLR-175.1` | batches |
 | `LLR-175.2` | batches |
 | `LLR-175.3` | batches |
+| `LLR-175.4` | batches |
 | `LLR-176.1` | batches |
 | `LLR-176.2` | batches |
 | `LLR-176.3` | batches |
@@ -2940,6 +2951,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-177.2` | batches |
 | `LLR-178.1` | batches |
 | `LLR-178.2` | batches |
+| `LLR-178.3` | batches |
 | `LLR-85.1` | batches, canon |
 | `LLR-85.2` | batches, canon |
 | `LLR-85.3` | batches, canon |
@@ -3671,7 +3683,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1978 unique id(s)
+## family AT/TC — 1991 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4227,6 +4239,8 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-B100-17` | batches |
 | `AT-B100-18` | batches |
 | `AT-B100-19` | batches |
+| `AT-B100-20` | batches |
+| `AT-B100-21` | batches |
 | `AT-B59-01` | batches, tests |
 | `AT-B59-02` | batches, tests |
 | `AT-B59-03` | batches, canon, tests |
@@ -5373,6 +5387,17 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-54` | batches |
 | `TC-B100-55` | batches |
 | `TC-B100-56` | batches |
+| `TC-B100-57` | batches |
+| `TC-B100-58` | batches |
+| `TC-B100-59` | batches |
+| `TC-B100-60` | batches |
+| `TC-B100-61` | batches |
+| `TC-B100-62` | batches |
+| `TC-B100-63` | batches |
+| `TC-B100-64` | batches |
+| `TC-B100-65` | batches |
+| `TC-B100-66` | batches |
+| `TC-B100-67` | batches |
 | `TC-B77-01` | batches, tests |
 | `TC-B77-02` | batches, tests |
 | `TC-B77-03` | batches, tests |
