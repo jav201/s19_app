@@ -1,0 +1,14 @@
+# Kimi brief — batch-99 Increment 13 · P4 suite fixes (tests only)
+
+Read `BRIEF-COMMON.md` first. Worktree: `C:\Users\jjgh8\Github\s19_app-b99-inc13` (detached at the commit the orchestrator names on launch). Packet: `.dev-flow/2026-10-25-batch-99/03-increments/increment-013.md` (copy the shape of `increment-012.md`, which was also a tests-only unit). **SOURCE files: 0.** Do not edit anything under `s19_app/`.
+
+The full suite on `e7732f6` (`evidence/suite-full-e7732f6.txt`) has two failures that the batch caused on purpose and whose tests were never re-pinned. Neither is a product defect. Each re-pin is recorded as `test::node — old → new — requirement`.
+
+- **F1 — the safe_text import census misses the Split/Join view.** `tests/test_import_census.py::test_tc653_safe_text_import_census` fails: `extra=['s19_app.tui.segment_split_view']`. Inc-6 (`87dcd3a`, LLR-160.2) made `segment_split_view.py` render raw segment names and refusal messages through `safe_text`. That is the C-17 fold the census exists to track. Add `"s19_app.tui.segment_split_view"` to `MEASURED_SAFE_TEXT_CONSUMERS`. Extend the comment above it with one sentence in the style of the batch-94 sentence (batch-99 Inc-6, LLR-160.2, measured in). Do not touch any other set.
+- **F2 — the Patch Editor snapshot still shows the old Bytes placeholder.** `tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]` fails from Inc-11 (`5021bb6`, LLR-161.2) on. That increment changed the Bytes placeholder from `DE AD BE EF` to `hex bytes, e.g. DE AD BE EF`. The cell passes on `c62c842` (bisect transcript: the orchestrator's triage in `evidence/suite-triage-e7732f6.md`). Regenerate only that one cell:
+  `python -m pytest -p no:cacheprovider "tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]" --snapshot-update`
+  Then prove the new SVG differs from the old one only by the placeholder. Extract the visible text of both SVGs (the `<text>` contents, joined per row) and diff them. The only changed row must be the Bytes placeholder row. Save that text diff as `evidence/inc-13/snapshot-text-diff.txt`. If any other row changed, STOP and write it in `HANDOFF.md`. Do not update the snapshot in that case. Never update any other snapshot cell.
+
+**RED/GREEN:** the RED side is the failing transcript of each node on the unmodified worktree (`red-tc653.txt`, `red-snapshot.txt`); GREEN is after. For F1 the negative control is removing the entry again → RED (`mut-F1.txt`). For F2 it is the old SVG restored → RED; the RED transcript serves.
+
+Run `tests/test_import_census.py` and `tests/test_tui_snapshot.py` in full (both green except snapshot cells that also fail on `c62c842`, which there should be none), and `tests/test_id_registry.py`. Save `green-*.txt`. Fill the packet §1–§7 (§4b `pending — orchestrator`). Finish with `HANDOFF.md`, ending with `__KIMI_UNIT_DONE__` and the 5-line summary.
