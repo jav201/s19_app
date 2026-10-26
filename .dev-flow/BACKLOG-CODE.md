@@ -1496,6 +1496,8 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   **What closes it:** route these writers through `copy_into_workarea`, or record that replacing a library entry is their intended behaviour (with a requirement), then drop them from the declared exceptions in `tests/test_b99_staging.py`.
 - **▸ (flake, observed batch-99) `test_b97_flow_execution::test_tc_b97_64_a_new_set_run_restarts_the_dwell`** fails under parallel load and passes alone (3/3 on main). It joins the batch-97 flake list.
 
+- **▸ (test hardening, observed batch-99 P4) Patch Editor v2 nodes read the document one pause early:** `test_tui_patch_editor_v2::test_at030c_directly_dropped_file_is_listed_and_loadable` and `::test_at068b_per_entry_json_popup_edits_only_selected_entry`. Both set a selection, call one `pilot.pause()` and read the result, but the load crosses two message hops. A patient probe always loaded the file, needing 1 pause, or 2 after other tests in the same process (`.dev-flow/2026-10-25-batch-99/evidence/suite-triage-e7732f6.md`). `tc344`, `verify_loud_mismatch`, `verify_quiet`, `save_back_prompt` and `at064c` / `tc345` flake on the pre-batch tree too. **What closes it:** wait on the condition with a bounded pause loop in each such node, then re-run the file 5× with zero failures.
+
 - **▸ (P3, origin batch-99 Inc-6 reviews) Export message and limits:**
   - the status reads "Export failed: Export stopped: … Nothing written.. Already written: X", with a doubled prefix and a seam text that clashes;
   - `_<N>` with N ≥ 100 passes the 200-character basename cap;
