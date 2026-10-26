@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py (GREEN, fix pass 1 — shared destination guard + unresolved-destination callers applied)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (detached e044112 + uncommitted Inc 1 + fix pass 1)
+
+........................                                                 [100%]
+24 passed in 72.55s (0:01:12)

@@ -1,0 +1,5 @@
+GREEN fix-pass-3 — tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (R3-1/R3-2/R3-3 fixes applied; junctioned-base arm staging assertion corrected)
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py
+
+......................................                                   [100%]
+38 passed in 72.31s (0:01:12)

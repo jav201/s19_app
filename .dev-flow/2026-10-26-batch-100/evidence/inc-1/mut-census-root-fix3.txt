@@ -1,0 +1,11 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k app_placements_name  (MUTANT re-run fix pass 3: one app.py call drops workarea_root)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — Inc 1 + fix1 + fix2 + fix3-with-mut-census
+
+E           AssertionError: app.py call copy_into_workarea at line 8711 must pass workarea_root explicitly (LED .50, SEC-1)
+E           assert False
+E            +  where False = any(<generator object test_tc_b100_01_app_placements_name_the_workarea_root.<locals>.<genexpr> at 0x000001578CA60790>)
+
+tests\test_b100_reuse.py:793: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+1 failed, 37 deselected in 0.51s

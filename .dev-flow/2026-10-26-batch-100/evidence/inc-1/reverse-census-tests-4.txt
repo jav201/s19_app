@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_export.py (full file — reverse-census hit)
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (post-change)
+
+.......................                                                  [100%]
+23 passed in 50.63s
+exit: 0

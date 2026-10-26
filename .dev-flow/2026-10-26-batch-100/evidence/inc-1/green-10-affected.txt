@@ -1,0 +1,6 @@
+cmd: pytest -q -p no:cacheprovider tests/test_project_gather.py tests/test_segment_split_window.py tests/test_b99_export.py tests/test_b99_staging.py tests/test_copy_into_workarea_content_dedup.py tests/test_tui_workspace.py  (fix pass 2 — affected files, reverse census)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
+........................................................................ [ 44%]
+........................................................................ [ 89%]
+.................                                                        [100%]
+161 passed in 314.09s (0:05:14)

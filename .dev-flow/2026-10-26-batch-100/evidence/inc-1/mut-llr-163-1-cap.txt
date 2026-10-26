@@ -1,0 +1,26 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_direct_calls_refuse_and_write_nothing (MUTANT cap: the size-cap refusal disabled in place_into_workarea — the contract's second LLR-163.1 mutation)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_01_direct_calls_refuse_and_write_nothing ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27248/test_tc_b100_01_direct_calls_r0')
+
+    def test_tc_b100_01_direct_calls_refuse_and_write_nothing(tmp_path: Path) -> None:
+        """``place_into_workarea`` called directly: a destination outside every
+        work area and an over-cap source are refused before anything is staged
+        or written."""
+        outside = tmp_path / "plain" / "target"
+        with pytest.raises(WorkareaContainmentError):
+            place_into_workarea(CASE01, outside)
+        assert not outside.exists(), "nothing may be created outside a work area"
+    
+        destination = _destination(tmp_path)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:168: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_direct_calls_refuse_and_write_nothing
+1 failed in 0.43s

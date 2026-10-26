@@ -1,0 +1,30 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_62_explicit_root_refuses_another_workarea (MUTANT F2: the contained_in_workarea refusal removed from _guarded_destination)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_62_explicit_root_refuses_another_workarea ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27236/test_tc_b100_62_explicit_root_0')
+
+    def test_tc_b100_62_explicit_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F2: the guard's
+        explicit-root limb — an app-level caller that passes THIS work area's
+        root sees a destination resolving into ANOTHER work area refused by the
+        resolved-pair comparison (``contained_in_workarea``), the check the
+        textual walk alone cannot make.  Removing that refusal writes into the
+        other work area (mutant ``contained``, transcript ``mut-F2.txt``)."""
+        this_root = _workarea(tmp_path / "this")
+        this_root.mkdir(parents=True)
+        other_home = _workarea(tmp_path / "other") / "victim"
+        other_home.mkdir(parents=True)
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:718: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_explicit_root_refuses_another_workarea
+1 failed in 0.45s

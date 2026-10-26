@@ -1,0 +1,155 @@
+mutation: llr-163-3 on s19_app/tui/workspace.py
+hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+hash mutated: 74eb7bc2d4de3e84e8905d44f50a9695192b789f5da4adcf4ff6d0c73064c9ce
+cmd: python -m pytest -q -p no:cacheprovider tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber tests/test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_________________ test_tc018_existing_name_is_dedup_suffixed __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0')
+
+    def test_tc018_existing_name_is_dedup_suffixed(tmp_path: Path) -> None:
+        """TC-018 — re-pinned at batch-100 Inc 1 (G-005 / LLR-163.3).
+    
+        Two saves of the SAME document reuse the one file (byte-identical
+        content dedup): the second save returns the same path and only one file
+        exists. A save of a DIFFERENT document under the same name is
+        dedup-suffixed, never a silent clobber: it lands at ``cs_1.json`` and
+        both files survive on disk.
+        """
+        patches = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "patches"
+    
+        document = change_document_factory()
+        first, _ = write_change_document(document, tmp_path, "cs.json")
+        second, _ = write_change_document(document, tmp_path, "cs.json")
+    
+        assert first is not None and second is not None
+>       assert first == second, (
+            f"identical bytes must reuse the first file, got {first} and {second}"
+        )
+E       AssertionError: identical bytes must reuse the first file, got C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs.json and C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27183\test_tc018_existing_name_is_de0\.s19tool\workarea\patches\cs_1.json
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs.json') == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc018_existing_name_is_de0/.s19tool/workarea/patches/cs_1.json')
+
+tests\test_unified_write.py:388: AssertionError
+________________ test_at031b_two_saves_are_distinct_no_clobber ________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0')
+
+    def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+        """AT-031b (idempotent boundary) — re-pinned at batch-100 Inc 1 (G-005 /
+        LLR-163.3).
+    
+        Two saves of an UNCHANGED document reuse the one on-disk file
+        (byte-identical content dedup) — a repeated save leaves exactly one file.
+        A save after an ADDED entry holds different bytes and must keep both
+        files under distinct ``_<N>``-suffixed names — never one clobbered file
+        and never an error. Counterfactual: dropping the dedup/excl guard makes
+        the differing save clobber or raise → this goes RED.
+        """
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+                unchanged = list(patches.glob("*.json"))
+                assert len(unchanged) == 1, (
+                    f"two saves of an unchanged document reuse one file, found {unchanged}"
+                )
+    
+                _set_entry_inputs(app, address="0x200", bytes_text="CC DD")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                panel.request_action("save_doc")
+                await pilot.pause()
+    
+>       asyncio.run(_drive())
+
+tests\test_tui_patch_editor_v2.py:1344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+            _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+    
+            unchanged = list(patches.glob("*.json"))
+>           assert len(unchanged) == 1, (
+                f"two saves of an unchanged document reuse one file, found {unchanged}"
+            )
+E           AssertionError: two saves of an unchanged document reuse one file, found [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes.json'), WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')]
+E           assert 2 == 1
+E            +  where 2 = len([WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/...ata/Local/Temp/pytest-of-jjgh8/pytest-27183/test_at031b_two_saves_are_dist0/.s19tool/workarea/patches/changes_1.json')])
+
+tests\test_tui_patch_editor_v2.py:1334: AssertionError
+____________ test_tc_b99_31_changed_bytes_take_the_next_free_name _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27183/test_tc_b99_31_changed_bytes_t0')
+
+    def test_tc_b99_31_changed_bytes_take_the_next_free_name(tmp_path: Path) -> None:
+        from s19_app.tui import segment_split_view as ssv
+    
+        home = _home(tmp_path)
+        rows = [SegRow("isle", "manual", 0x1000, 8)]
+        first = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+        assert [p.path.name for p in first] == ["t_isle.s19"]
+        assert read_s19(first[0].path).data == _island_map()
+    
+        # Identical bytes at the requested name: REUSED, no new name appears.
+        again = ssv.write_split_join_export(
+            _island_map(), rows, mode="split", gap="skip", pad_byte=0,
+            fmt="s19", stem="t", dest_dir=home,
+        )
+>       assert [p.path.name for p in again] == ["t_isle.s19"]
+E       AssertionError: assert ['t_isle_1.s19'] == ['t_isle.s19']
+E         
+E         At index 0 diff: 't_isle_1.s19' != 't_isle.s19'
+E         Use -v to get more diff
+
+tests\test_b99_export.py:392: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_unified_write.py::test_tc018_existing_name_is_dedup_suffixed
+FAILED tests/test_tui_patch_editor_v2.py::test_at031b_two_saves_are_distinct_no_clobber
+FAILED tests/test_b99_export.py::test_tc_b99_31_changed_bytes_take_the_next_free_name
+3 failed in 2.68s
+exit: 1
+restore: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+RESTORE OK

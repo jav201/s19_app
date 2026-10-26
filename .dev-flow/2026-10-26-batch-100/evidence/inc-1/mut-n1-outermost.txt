@@ -1,0 +1,27 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k nested_anchor  (MUTANT N1: outermost walk reverted to nearest)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-mut-n1
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_62_nested_anchor_junction_refused_without_root _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27288/test_tc_b100_62_nested_anchor_0')
+
+    def test_tc_b100_62_nested_anchor_junction_refused_without_root(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 (LED .50), review finding N1: with NO explicit root, the
+        derived-root reparse walk runs up to the OUTERMOST ``.s19tool/workarea``
+        anchor — a junction BETWEEN this work area and a NESTED anchor
+        (``<wa>/nest`` -> a folder holding another ``.s19tool/workarea``) is
+        checked and refused, 0 bytes in the victim.  Reverting the walk to the
+        NEAREST anchor accepts the destination (mutation ``mut-n1-outermost.txt``
+        is the RED side).  Windows-only arm."""
+        this_root, destination, victim_home = _nested_anchor_home(tmp_path)
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:921: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_nested_anchor_junction_refused_without_root
+1 failed, 1 passed, 34 deselected in 0.50s

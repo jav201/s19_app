@@ -1,0 +1,136 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py (RED first, fix pass 1 — new F1/F2/F3/F4/F5/F7 arms against the unfixed Inc 1 tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (detached e044112 + uncommitted Inc 1 + fix-pass-1 test arms, source NOT yet fixed)
+
+..............FFFF..F...                                                 [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_62_export_junction_unresolved_destination_refused ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_export_junctio0')
+
+    def test_tc_b100_62_export_junction_unresolved_destination_refused(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F1: the export passes
+        its destination UNRESOLVED through the shared guard — a junction at the
+        destination refuses the WHOLE export (s19 and bin alike), 0 bytes in the
+        victim.  Windows-only arm."""
+        b100_links.require_junctions()
+        base, destination, victim_home = _junctioned_home(
+            tmp_path, "app", "victimbase", "P/exports"
+        )
+    
+        for fmt in ("s19", "bin"):
+>           with pytest.raises(WorkareaContainmentError):
+E           Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:641: Failed
+________ test_tc_b100_62_group_junction_unresolved_destination_refused ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_group_junction0')
+
+    def test_tc_b100_62_group_junction_unresolved_destination_refused(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F1: the group
+        placement (BIN + ``.addr`` sidecar) runs the SAME shared guard on the
+        UNRESOLVED destination — a junction there refuses the group, 0 bytes in
+        the victim.  Windows-only arm."""
+        b100_links.require_junctions()
+        base, destination, victim_home = _junctioned_home(
+            tmp_path, "app", "victimbase", "P/exports"
+        )
+        src_dir = tmp_path / "src"
+        src_dir.mkdir()
+        bin_source = src_dir / "isle.bin"
+        bin_source.write_bytes(b"\x11\x22\x33\x44")
+        addr_source = src_dir / "isle.addr"
+        addr_source.write_text("0x1000\n", encoding="ascii")
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:676: Failed
+_______ test_tc_b100_62_gather_junction_unresolved_destination_refused ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_gather_junctio0')
+
+    def test_tc_b100_62_gather_junction_unresolved_destination_refused(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F1: Save project's
+        gather passes its home UNRESOLVED through the shared guard — a junction
+        at the home refuses the copy, 0 bytes in the victim.  Windows-only arm."""
+        b100_links.require_junctions()
+        base, destination, victim_home = _junctioned_home(
+            tmp_path, "app", "victimbase", "P/patches"
+        )
+        source = _write(tmp_path / "src", "hotfix.json", "{}")
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:696: Failed
+___________ test_tc_b100_62_explicit_root_refuses_another_workarea ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_62_explicit_root_0')
+
+    def test_tc_b100_62_explicit_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F2: the guard's
+        explicit-root limb — an app-level caller that passes THIS work area's
+        root sees a destination resolving into ANOTHER work area refused by the
+        resolved-pair comparison (``contained_in_workarea``), the check the
+        textual walk alone cannot make.  Removing that refusal writes into the
+        other work area (mutant ``contained``, transcript ``mut-F2.txt``)."""
+        this_root = _workarea(tmp_path / "this")
+        this_root.mkdir(parents=True)
+        other_home = _workarea(tmp_path / "other") / "victim"
+        other_home.mkdir(parents=True)
+    
+        with pytest.raises(WorkareaContainmentError):
+>           place_into_workarea(CASE01, other_home, workarea_root=this_root)
+E           TypeError: place_into_workarea() got an unexpected keyword argument 'workarea_root'
+
+tests\test_b100_reuse.py:719: TypeError
+__________ test_tc_b100_68_relative_destination_matches_placed_path ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001725F7EDBD0>
+
+    def test_tc_b100_68_relative_destination_matches_placed_path(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """``predict_placement`` answers in the SAME path FORM the placement
+        returns (resolved — review finding F4): with a relative destination the
+        predicted path equals the landed path exactly, so the Inc 5 save-plan
+        comparison cannot false-mismatch."""
+        monkeypatch.chdir(tmp_path)
+        rel_destination = Path(WORKAREA_DIRNAME) / WORKAREA_SUBDIR / "target"
+        rel_destination.mkdir(parents=True)
+        source = _write(tmp_path / "src", "firmware.s19", _S19_B)
+        payload = source.read_bytes()
+    
+        predicted = predict_placement(
+            hashlib.sha256(payload).hexdigest(),
+            len(payload),
+            rel_destination,
+            "firmware.s19",
+        )
+        placed = place_into_workarea(source, rel_destination)
+>       assert predicted.path == placed.path, (
+            f"predicted {predicted.path}, placed {placed.path}"
+        )
+E       AssertionError: predicted .s19tool\workarea\target\firmware.s19, placed C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27229\test_tc_b100_68_relative_desti0\.s19tool\workarea\target\firmware.s19
+E       assert WindowsPath('.s19tool/workarea/target/firmware.s19') == WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19')
+E        +  where WindowsPath('.s19tool/workarea/target/firmware.s19') = PlacementResult(path=WindowsPath('.s19tool/workarea/target/firmware.s19'), reused=False).path
+E        +  and   WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19') = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27229/test_tc_b100_68_relative_desti0/.s19tool/workarea/target/firmware.s19'), reused=False).path
+
+C:\Users\jjgh8\Github\s19_app-b100-inc1\tests\test_b100_reuse.py:796: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_export_junction_unresolved_destination_refused
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_group_junction_unresolved_destination_refused
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_gather_junction_unresolved_destination_refused
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_explicit_root_refuses_another_workarea
+FAILED tests/test_b100_reuse.py::test_tc_b100_68_relative_destination_matches_placed_path
+5 failed, 19 passed in 72.16s (0:01:12)

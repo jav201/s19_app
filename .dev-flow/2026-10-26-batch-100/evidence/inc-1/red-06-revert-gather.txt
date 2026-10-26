@@ -1,0 +1,28 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_62_gather_junction_unresolved_destination_refused (RED proof: the gather caller change reverted — pre-resolved home through the whole _gather_copy)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 with ONLY the _gather_copy unresolved-destination change reverted)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_62_gather_junction_unresolved_destination_refused ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27235/test_tc_b100_62_gather_junctio0')
+
+    def test_tc_b100_62_gather_junction_unresolved_destination_refused(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .49), review finding F1: Save project's
+        gather passes its home UNRESOLVED through the shared guard — a junction
+        at the home refuses the copy, 0 bytes in the victim.  Windows-only arm."""
+        b100_links.require_junctions()
+        base, destination, victim_home = _junctioned_home(
+            tmp_path, "app", "victimbase", "P/patches"
+        )
+        source = _write(tmp_path / "src", "hotfix.json", "{}")
+    
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:696: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_gather_junction_unresolved_destination_refused
+1 failed in 0.44s

@@ -1,0 +1,4 @@
+cmd: pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_save_back_prompt tests/test_tui_patch_editor_v2.py::test_at032b_clarity_added_action_wiring_unchanged tests/test_tui_patch_editor_v2.py::test_at_batch41_escape_cancels_changeset_json_popup tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry  (isolation re-run of the 4 green-11 flake nodes)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
+....                                                                     [100%]
+4 passed in 9.22s

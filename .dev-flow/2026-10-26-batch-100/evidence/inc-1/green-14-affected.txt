@@ -1,0 +1,6 @@
+GREEN fix-pass-3 affected — tree: C:\Users\jjgh8\Github\s19_app-b100-inc1
+cmd: python -m pytest -q -p no:cacheprovider tests/test_project_gather.py tests/test_segment_split_window.py tests/test_b99_export.py tests/test_b99_staging.py tests/test_copy_into_workarea_content_dedup.py tests/test_tui_workspace.py
+
+........................................................................ [ 89%]
+.................                                                        [100%]
+161 passed in 298.57s (0:04:58)

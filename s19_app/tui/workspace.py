@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
+import re
 import shutil
 import stat
 import sys
 import tempfile
 import time
 from collections import Counter
+from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional, Sequence
@@ -67,6 +70,26 @@ class WorkareaPlacementError(WorkareaContainmentError):
     with no edit. The message leads with the outcome, names the file and the
     folder, gives the cause and the next step, and says nothing was written.
     """
+
+
+@dataclass(frozen=True)
+class PlacementResult:
+    """The outcome of one placement (B100-I13).
+
+    Summary:
+        ``path`` is the file the placement landed on — a pre-existing file
+        when ``reused`` is true (the byte-identical candidate the placement
+        found), or the freshly claimed ``_<N>`` name when false. ``reused``
+        is true only when the returned file existed before the call.
+
+    Args:
+        path (Path): The placed (or reused) file.
+        reused (bool): True when ``path`` existed before the placement and
+            its bytes were reused; nothing was written in that case.
+    """
+
+    path: Path
+    reused: bool
 
 
 S19_EXTENSIONS = {".s19", ".srec"}
@@ -261,38 +284,131 @@ def _path_traverses_reparse_point(path: Path, stop_at: Optional[Path] = None) ->
 def _find_workarea_root(destination: Path) -> Optional[Path]:
     """
     Summary:
-        Return the ``<base>/.s19tool/workarea`` ancestor of ``destination`` if one exists.
+        Return the OUTERMOST ``<base>/.s19tool/workarea`` ancestor of
+        ``destination`` if one exists (review finding N1, LED .50): the
+        reparse walk must run up to the outermost anchor's ``.s19tool`` so a
+        junction BETWEEN the app's work area and a nested anchor is checked
+        — the parts between two anchors lie inside the outer work area, so
+        checking them is correct.
 
     Args:
-        destination (Path): Resolved destination directory.
+        destination (Path): Unresolved destination directory.
 
     Returns:
-        Optional[Path]: The first ancestor (or self) that ends with ``.s19tool/workarea``,
-            or None when no such ancestor exists.
+        Optional[Path]: The outermost ancestor (or self) that ends with
+            ``.s19tool/workarea``, or None when no such ancestor exists.
 
     Raises:
         None.
 
     Data Flow:
         - Walk ``destination`` and each parent looking for the parts pair
-          (``.s19tool``, ``workarea``).
-        - Return the matching ancestor whose final two parts are that pair.
+          (``.s19tool``, ``workarea``), remembering the LAST match — the
+          walk continues to the filesystem root so a nearer (nested) anchor
+          never truncates the reparse check above it.
 
     Dependencies:
         Uses:
             - pathlib.Path
         Used by:
-            - copy_into_workarea
+            - _guarded_destination (LLR-163.1, LED .50)
     """
+    found: Optional[Path] = None
     candidate = destination
+    if sys.platform == "win32":
+        # review finding F8: the anchor parts compare case-insensitively on
+        # Windows (``.S19TOOL\\WORKAREA`` names the same seam), while POSIX
+        # keeps the exact spelling (a differently-cased directory there is a
+        # DIFFERENT directory).
+        dirname = WORKAREA_DIRNAME.casefold()
+        subdir = WORKAREA_SUBDIR.casefold()
+        same_anchor = (
+            lambda parts: len(parts) >= 2
+            and parts[-2].casefold() == dirname
+            and parts[-1].casefold() == subdir
+        )
+    else:
+        same_anchor = (
+            lambda parts: len(parts) >= 2
+            and parts[-2] == WORKAREA_DIRNAME
+            and parts[-1] == WORKAREA_SUBDIR
+        )
     while True:
         parts = candidate.parts
-        if len(parts) >= 2 and parts[-2] == WORKAREA_DIRNAME and parts[-1] == WORKAREA_SUBDIR:
-            return candidate
+        if same_anchor(parts):
+            found = candidate
         parent = candidate.parent
         if parent == candidate:
-            return None
+            return found
         candidate = parent
+
+
+def _find_workarea_root_shortname(destination: Path) -> Optional[Path]:
+    """
+    Summary:
+        8.3 short-name fallback for :func:`_find_workarea_root` (review
+        finding F8): accept a destination whose ``.s19tool`` / ``workarea``
+        anchor survives only in a non-canonical spelling the textual walk
+        cannot match (an 8.3 short-name component such as ``S19TOO~1``) —
+        a form the old resolve-first code accepted.  Every component up to
+        the anchor is reparse-checked BEFORE it is resolved, so a junction
+        or symlink in the chain is still refused and the anchor cannot
+        silently resolve into another work area (the executed S-02 shape).
+
+    Args:
+        destination (Path): The UNRESOLVED, normalised destination whose
+            textual ancestors hold no canonical anchor.
+
+    Returns:
+        Optional[Path]: The TEXTUAL prefix of ``destination`` whose
+            resolution lands on the ``.s19tool/workarea`` anchor — the
+            caller's reparse walk and containment comparison then run
+            exactly as for a textual root.  None when no prefix resolves
+            to the anchor.
+
+    Raises:
+        WorkareaContainmentError: When a component of the unresolved chain
+            is a symbolic link or NTFS reparse point.
+
+    Data Flow:
+        - Extend one component at a time from the drive/root; refuse a
+          reparse component via ``os.lstat`` (S-N01: resolve would follow
+          it silently).
+        - Resolve the prefix and compare its final two parts with the
+          anchor, case-folded on Windows.
+        - The last matching prefix wins (the OUTERMOST anchor), mirroring
+          :func:`_find_workarea_root` (review finding N1, LED .50).
+
+    Dependencies:
+        Uses:
+            - _is_reparse_point
+        Used by:
+            - _guarded_destination (LLR-163.1, LED .49)
+    """
+    fold = str.casefold if sys.platform == "win32" else (lambda text: text)
+    anchor_dirname = fold(WORKAREA_DIRNAME)
+    anchor_subdir = fold(WORKAREA_SUBDIR)
+    found: Optional[Path] = None
+    current = Path(destination.parts[0])  # the drive or filesystem root
+    for part in destination.parts[1:]:
+        current = current / part
+        if _is_reparse_point(current):
+            raise WorkareaContainmentError(
+                "Refusing to place: destination traverses a symbolic link or "
+                f"reparse point: {current}"
+            )
+        try:
+            resolved_prefix = current.resolve()
+        except OSError:
+            return None
+        resolved_parts = resolved_prefix.parts
+        if (
+            len(resolved_parts) >= 2
+            and fold(resolved_parts[-2]) == anchor_dirname
+            and fold(resolved_parts[-1]) == anchor_subdir
+        ):
+            found = current
+    return found
 
 
 def _private_stage_dir(workarea_root: Path) -> Path:
@@ -399,36 +515,461 @@ def _private_stage_dir(workarea_root: Path) -> Path:
     return stage_dir
 
 
-def copy_into_workarea(
+def contained_in_workarea(path: Path, workarea: Path) -> bool:
+    """
+    Summary:
+        True when ``path``, after resolving every link and junction, is
+        inside ``workarea.resolve()`` — THIS work area, never inside some
+        other ``.s19tool/workarea`` (LLR-171.4, B100-I14).
+
+    Args:
+        path (Path): The path to test; need not exist.
+        workarea (Path): The work-area root the path must land inside.
+
+    Returns:
+        bool: True when the resolved path equals the resolved work area or
+            sits below it; False on any ``OSError`` during resolution.
+
+    Raises:
+        None: Missing paths and ``OSError`` from ``Path.resolve`` report
+            False so the caller's guard can refuse for a specific reason.
+
+    Data Flow:
+        - Resolve both sides fully (``Path.resolve`` follows links and
+          junctions, per security finding S-N01 that is exactly what makes
+          the resolved pair the right thing to compare).
+        - Compare with equality-or-descendant (``is_relative_to``).
+
+    Dependencies:
+        Uses:
+            - pathlib.Path.resolve / is_relative_to
+        Used by:
+            - place_into_workarea (LLR-163.1)
+            - write_project_manifest's containment check (LLR-171.4)
+    """
+    try:
+        resolved_path = Path(path).resolve()
+        resolved_workarea = Path(workarea).resolve()
+    except OSError:
+        return False
+    return (
+        resolved_path == resolved_workarea
+        or resolved_path.is_relative_to(resolved_workarea)
+    )
+
+
+def _guarded_destination(
+    destination: Path,
+    workarea_root: Optional[Path] = None,
+) -> tuple[Path, Path]:
+    """
+    Summary:
+        The ONE destination guard both placement kinds run (LLR-163.1 as
+        amended by LED .49/.50, LLR-171.4, review findings F1/N1): the
+        work-area root is taken from the destination AS GIVEN, before any
+        resolution — the OUTERMOST ``.s19tool/workarea`` ancestor of the
+        unresolved path (compared case-insensitively on Windows, with an 8.3
+        short-name fallback for non-canonical anchor spellings), or the
+        explicit root an app-level caller passes when it knows THIS app's
+        work area (B100-I14) — and only THEN are the two sides resolved and
+        compared, so a junction or link anywhere in the destination is
+        caught.  Every caller passes its destination UNRESOLVED.
+
+    Args:
+        destination (Path): The UNRESOLVED destination directory, exactly
+            as the caller's path names it.  A pre-resolved destination
+            hides the junctions this guard exists to refuse (the executed
+            S-02 probe).
+        workarea_root (Optional[Path]): An explicit work-area root an
+            app-level caller passes.  None derives the root from the
+            destination's own textual path.
+
+    Returns:
+        tuple[Path, Path]: ``(resolved_destination, resolved_root)`` — the
+            resolved pair the placement stages and claims under.
+
+    Raises:
+        WorkareaContainmentError: When no ``.s19tool/workarea`` anchor
+            exists, when the destination or any traversed parent of it is
+            a symbolic link or NTFS reparse point, when the resolved
+            destination is not contained inside the resolved root, or when
+            the destination cannot be resolved at all (an invalid path
+            spelling raises THIS class, never a bare ``OSError`` — security
+            finding SEC-2; every caller already catches the class).
+
+    Data Flow:
+        - Normalise textually (``normpath``/``abspath`` collapse ``..``
+          without following a single link); locate the anchor on the
+          UNRESOLVED path.
+        - Walk every parent of the destination from the anchor downwards on
+          the textual path, BEFORE resolving — ``Path.resolve`` silently
+          follows reparse points (security finding S-N01), so a junction
+          anywhere in the chain must be flagged explicitly via
+          ``os.lstat`` + ``FILE_ATTRIBUTE_REPARSE_POINT``.  The walk stops
+          BELOW the OUTERMOST ``.s19tool`` component (review finding N1,
+          LED .50): a junction between this work area and a NESTED anchor
+          lies inside the outer work area and must be checked, not skipped;
+          that seam itself is checked next (a junction there is the
+          executed S-02 shape — the whole work area silently resolving into
+          another one).
+        - Resolve BOTH sides only now and require
+          :func:`contained_in_workarea` for the pair (LLR-171.4): the
+          resolved bytes must land inside THIS work area.  With an
+          explicit root this comparison — not the textual walk — is what
+          refuses a destination that resolves into another work area
+          (review finding F2).
+
+    Dependencies:
+        Uses:
+            - _find_workarea_root / _find_workarea_root_shortname
+            - _path_traverses_reparse_point / _is_reparse_point
+            - contained_in_workarea (LLR-171.4)
+        Used by:
+            - place_into_workarea (LLR-163.1)
+            - place_group_into_workarea (LLR-163.1, the second kind)
+            - s19_app.tui.segment_split_view.write_split_join_export
+              (LLR-160.2, passes its dest_dir UNRESOLVED)
+            - s19_app.tui.services.project_gather_service._check_home_contained
+              (LLR-171.4, the Save-project gather)
+    """
+    textual_destination = Path(os.path.normpath(os.path.abspath(destination)))
+    if workarea_root is None:
+        root = _find_workarea_root(textual_destination)
+        if root is None:
+            # F8's 8.3 short-name fallback: accept the non-canonical anchor
+            # spellings the base accepted, per-component reparse-checked so
+            # they cannot escape.
+            root = _find_workarea_root_shortname(textual_destination)
+        if root is None:
+            raise WorkareaContainmentError(
+                "Refusing to place: destination is not contained inside "
+                f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {textual_destination}"
+            )
+    else:
+        root = Path(os.path.normpath(os.path.abspath(workarea_root)))
+
+    if _path_traverses_reparse_point(textual_destination, stop_at=root.parent):
+        raise WorkareaContainmentError(
+            "Refusing to place: destination traverses a symbolic link or "
+            f"reparse point: {textual_destination}"
+        )
+    if _is_reparse_point(root.parent):
+        raise WorkareaContainmentError(
+            "Refusing to place: destination traverses a symbolic link or "
+            f"reparse point: {root.parent}"
+        )
+
+    try:
+        resolved_destination = Path(destination).resolve()
+        resolved_root = root.resolve()
+    except OSError as exc:
+        # security finding SEC-2: an invalid path spelling (e.g. WinError
+        # 123) raises the containment refusal, never a bare OSError past
+        # callers that only catch the containment class; the message leads
+        # with the outcome.
+        raise WorkareaContainmentError(
+            "Refusing to place: destination cannot be resolved: "
+            f"{textual_destination} ({exc})"
+        ) from exc
+    if not contained_in_workarea(resolved_destination, resolved_root):
+        raise WorkareaContainmentError(
+            "Refusing to place: destination is not contained inside "
+            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
+        )
+    return resolved_destination, resolved_root
+
+
+def _hash_file(path: Path) -> str:
+    """
+    Summary:
+        Return the SHA-256 hex digest of a file's bytes, read in chunks so
+        large candidates never load into memory at once.
+
+    Args:
+        path (Path): An existing regular file.
+
+    Returns:
+        str: The lowercase hex digest.
+
+    Raises:
+        OSError: Propagated from reading; callers treat an unreadable file
+            as untrusted.
+
+    Data Flow:
+        - Stream the file through ``hashlib.sha256`` in 64 KiB chunks.
+
+    Dependencies:
+        Uses:
+            - hashlib / builtins.open
+        Used by:
+            - find_identical (LLR-163.1)
+            - predict_placement (LLR-163.7)
+    """
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+#: A ``_<digits>`` tail between stem and suffix: the reuse-name shape
+#: ``<stem>_<digits><suffix>`` (B100-I6).  Compared case-folded on Windows.
+_REUSE_NUMBERED_RE = re.compile(r"^(?P<head>.+)_(?P<digits>[0-9]+)$")
+
+
+def _reuse_candidate_names(listing: Sequence[str], name: str) -> list[str]:
+    """
+    Summary:
+        Enumerate the reuse candidates for ``name`` from ONE directory
+        listing (B100-I13): ``<name>`` first, then every
+        ``<stem>_<digits><suffix>`` in ascending digit order.  Compared
+        case-insensitively on Windows; duplicates by that comparison are
+        listed once, under their on-disk spelling.
+
+    Args:
+        listing (Sequence[str]): The destination's entries (``os.listdir``).
+        name (str): The requested file name.
+
+    Returns:
+        list: Candidate entry names, requested name first.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - The requested name matches exactly (case-folded on Windows).
+        - Any other entry whose stem is ``<stem>_<digits>`` and whose
+          suffix matches (both case-folded on Windows) is numbered.
+        - Numbered entries sort by their digits; ties keep listing order.
+
+    Dependencies:
+        Uses:
+            - re (the numbered-tail pattern)
+        Used by:
+            - find_identical (LLR-163.1)
+            - predict_placement (LLR-163.7)
+    """
+    target = Path(name)
+    stem = target.stem
+    suffix = target.suffix
+    fold = str.casefold if sys.platform == "win32" else (lambda text: text)
+    folded_name = fold(name)
+    folded_stem = fold(stem)
+    folded_suffix = fold(suffix)
+
+    exact: list = []
+    numbered: list = []
+    seen = set()
+    for entry in listing:
+        entry_path = Path(entry)
+        if entry_path.name != entry:
+            continue  # not a plain file name; never a candidate
+        if fold(entry_path.suffix) != folded_suffix:
+            continue
+        if fold(entry) == folded_name:
+            key = fold(entry)
+            if key not in seen:
+                seen.add(key)
+                exact.append(entry)
+            continue
+        match = _REUSE_NUMBERED_RE.match(entry_path.stem)
+        if match is None or fold(match.group("head")) != folded_stem:
+            continue
+        key = fold(entry)
+        if key in seen:
+            continue
+        seen.add(key)
+        numbered.append((int(match.group("digits")), entry))
+    numbered.sort(key=lambda item: item[0])
+    return exact + [entry for _digits, entry in numbered]
+
+
+def _match_identical(
+    listing: Sequence[str],
+    destination: Path,
+    name: str,
+    size: int,
+    digest: str,
+) -> Optional[Path]:
+    """
+    Summary:
+        Return the first reuse candidate of ``destination`` that is a
+        regular file, not a link or reparse point, non-empty, of ``size``
+        and carrying ``digest`` — else None.  The size check runs before
+        any candidate bytes are read (LLR-163.2), so only same-size
+        candidates are hashed.
+
+    Args:
+        listing (Sequence[str]): ONE ``os.listdir`` of the destination.
+        destination (Path): The directory the candidates live in.
+        name (str): The requested file name.
+        size (int): The staged size, in bytes.
+        digest (str): The staged SHA-256 hex digest.
+
+    Returns:
+        Optional[Path]: The identical candidate, or None.
+
+    Raises:
+        None: an unreadable or vanishing candidate is skipped, never trusted.
+
+    Data Flow:
+        - Enumerate ``_reuse_candidate_names`` from the listing.
+        - Skip links/reparse points (their bytes live outside; S-F4),
+          non-regular files (directories carry no payload) and 0-byte files
+          (another writer's claim placeholder; PDR C1(a)) via ``os.lstat``.
+        - Compare the size first; hash only a same-size candidate.
+
+    Dependencies:
+        Uses:
+            - os.lstat / stat.S_ISREG
+            - _is_reparse_point / _hash_file
+            - _reuse_candidate_names
+        Used by:
+            - find_identical (LLR-163.1)
+            - predict_placement (LLR-163.7)
+    """
+    for entry in _reuse_candidate_names(listing, name):
+        candidate = destination / entry
+        if _is_reparse_point(candidate):
+            continue
+        try:
+            candidate_stat = os.lstat(candidate)
+        except OSError:
+            continue
+        if not stat.S_ISREG(candidate_stat.st_mode):
+            continue
+        if candidate_stat.st_size == 0 or candidate_stat.st_size != size:
+            continue
+        try:
+            if _hash_file(candidate) == digest:
+                return candidate
+        except OSError:
+            continue  # an unreadable candidate is not trusted; claim a name
+    return None
+
+
+def find_identical(destination: Path, name: str, staged: Path) -> Optional[Path]:
+    """
+    Summary:
+        The ONE byte-identity rule (B100-I6 widened, B100-I13): list the
+        destination once and return the first regular, non-link, non-empty,
+        same-size, byte-identical file named ``<name>`` or
+        ``<stem>_<digits><suffix>`` (compared case-insensitively on
+        Windows), else None.
+
+    Args:
+        destination (Path): The directory to search; must exist (callers
+            create it before staging).
+        name (str): The requested file name.
+        staged (Path): The staged payload file to compare against.
+
+    Returns:
+        Optional[Path]: The identical candidate path, or None when no
+            candidate qualifies.
+
+    Raises:
+        None: a missing destination or an unreadable candidate reports None.
+
+    Data Flow:
+        - Stat and hash the staged payload once.
+        - List the destination exactly once and walk
+          :func:`_match_identical` over that listing — size before bytes.
+
+    Dependencies:
+        Uses:
+            - os.listdir
+            - _hash_file / _match_identical
+        Used by:
+            - place_into_workarea (LLR-163.1)
+            - predict_placement (LLR-163.7)
+    """
+    staged = Path(staged)
+    try:
+        size = staged.stat().st_size
+        digest = _hash_file(staged)
+    except OSError:
+        return None
+    try:
+        listing = os.listdir(destination)
+    except OSError:
+        return None
+    return _match_identical(listing, destination, name, size, digest)
+
+
+def _placed_name_candidates(name: str):
+    """
+    Summary:
+        Yield the landing-name walk shared by the placement and its
+        prediction (B100-I22): the requested name first, then the lowest
+        ``_<N>`` upward.  Every yielded name is only a candidate — the
+        caller decides whether the name is taken.
+
+    Args:
+        name (str): The requested file name.
+
+    Returns:
+        Iterator[str]: The requested name, then ``<stem>_1<suffix>``,
+            ``<stem>_2<suffix>``, ... .
+
+    Raises:
+        None.
+
+    Dependencies:
+        Used by:
+            - place_into_workarea (LLR-163.1)
+            - predict_placement (LLR-163.7)
+    """
+    target = Path(name)
+    yield target.name
+    counter = 1
+    while True:
+        yield f"{target.stem}_{counter}{target.suffix}"
+        counter += 1
+
+
+def place_into_workarea(
     source: Path,
     destination: Path,
     max_size_bytes: int = DEFAULT_COPY_SIZE_CAP_BYTES,
-) -> Path:
+    workarea_root: Optional[Path] = None,
+) -> PlacementResult:
     """
     Summary:
-        Copy ``source`` into a workarea-contained ``destination`` after enforcing
-        containment, reparse-point, and size guards.
+        The one placement function (B100-I13): copy ``source`` into a
+        workarea-contained ``destination`` — every guard, the byte-identity
+        reuse decision and the landing name live HERE, and
+        :func:`copy_into_workarea` is the thin ``Path``-returning wrapper.
 
     Args:
-        source (Path): File to copy. Must be a real file (not a symlink/junction) and
-            must not exceed ``max_size_bytes``.
-        destination (Path): Target directory. Must resolve under
-            ``<base>/.s19tool/workarea/`` and must not traverse a symlink or NTFS junction.
-        max_size_bytes (int): Maximum permitted size for ``source`` in bytes. Defaults to
-            256 MB; configurable per call to support regression testing (per security
-            finding S-N02).
+        source (Path): File to copy. Must be a real file (not a
+            symlink/junction) and must not exceed ``max_size_bytes``.
+        destination (Path): Target directory, passed UNRESOLVED — the
+            guard reads the work-area root off its textual path before any
+            resolution, so a pre-resolved destination would hide the
+            junctions the guard exists to refuse (LLR-171.4, LED .49).
+            Must name a destination inside ``<base>/.s19tool/workarea/``
+            and must not traverse a symlink or NTFS junction.
+        max_size_bytes (int): Maximum permitted size for ``source`` in
+            bytes. Defaults to 256 MB; configurable per call to support
+            regression testing (per security finding S-N02).
+        workarea_root (Optional[Path]): An explicit work-area root an
+            app-level caller passes when it knows THIS app's work area
+            (B100-I14). None derives the root from ``destination``'s own
+            textual path.
 
     Returns:
-        Path: Absolute path of the file written inside ``destination``. A
-            byte-identical target is reused as-is (bug B8 content dedup,
-            never of a 0-byte target); a divergent name collision is
-            resolved by claiming the next free ``_<N>`` name.
+        PlacementResult: ``path`` is the file the placement landed on and
+            ``reused`` says whether it existed before the call — a
+            byte-identical target (B100-I6: the requested name or any
+            ``<stem>_<N><suffix>``, case-folded on Windows, never a link,
+            reparse point or 0-byte file) is reused as-is; a divergent name
+            collision is resolved by claiming the next free ``_<N>`` name.
 
     Raises:
-        WorkareaContainmentError: When ``destination`` is not contained inside a
-            ``.s19tool/workarea/`` root, when ``source`` or ``destination`` (or any traversed
-            parent of ``destination``) is a symbolic link or NTFS reparse point, or when
-            ``source`` exceeds ``max_size_bytes``. Closes Phase 2 blockers S-001, S-002.
+        WorkareaContainmentError: When ``source`` or ``destination`` (or any
+            traversed parent of ``destination``) is a symbolic link or NTFS
+            reparse point, when ``destination`` is not contained inside this
+            work area, or when ``source`` exceeds ``max_size_bytes``.
         FileNotFoundError: When ``source`` does not exist.
         WorkareaPlacementError: When the staged copy fails with an
             ``OSError`` (e.g. the source vanishing after the size check —
@@ -442,34 +983,50 @@ def copy_into_workarea(
             outcome and names the file and the next step (LLR-155.2).
 
     Data Flow:
-        - Resolve ``source`` and ``destination`` to absolute paths.
-        - Reject reparse-point sources directly; reject when the destination, or any
-          parent of the destination up to its workarea root, is a reparse point. ``Path.resolve``
-          alone is not sufficient on Windows (per security finding S-N01).
-        - Locate the ``.s19tool/workarea`` ancestor of ``destination``; reject when missing
-          (closes blocker S-001).
-        - Enforce ``max_size_bytes`` on ``source.stat().st_size`` (closes major S-003).
+        - Reject reparse-point sources directly; reject when the resolved
+          source is one either (before resolving, which would follow them).
+        - Run the ONE shared destination guard
+          (:func:`_guarded_destination`, LLR-171.4, LED .49): the
+          work-area root is taken from ``destination`` AS GIVEN — the
+          OUTERMOST textual ``.s19tool/workarea`` ancestor (review finding
+          N1, LED .50; case-folded on
+          Windows, with an 8.3 short-name fallback for non-canonical
+          spellings) or the explicit root the caller passes — the reparse
+          walk runs on the unresolved path BEFORE any resolution
+          (``Path.resolve`` silently follows junctions, security finding
+          S-N01; the executed S-02 probe wrote into another work area
+          through a junction this walk now refuses), and only then are the
+          destination and the root resolved and compared
+          (:func:`contained_in_workarea`): the resolved bytes must land
+          inside THIS work area.
+        - Enforce ``max_size_bytes`` on ``source.stat().st_size``
+          (security finding S-N03) BEFORE any staging, so a refused
+          placement writes nothing at all.
         - Stage privately (LLR-155.1) via :func:`_private_stage_dir`: both
           ``temp`` and ``temp/.staging`` reparse-checked, then copy the
           source into a ``tempfile.mkdtemp`` directory under
-          ``temp/.staging/`` — the source is only read, never
-          moved, renamed or deleted.
-        - Reuse a non-empty byte-identical target (bug B8) that is not a
-            link or reparse point (security finding S-F4); race-freeness
-            rests on the immutability invariant (LLR-155.3 as amended by
-            LED .7) — no in-app writer replaces or deletes a placed file —
-          not on a narrower check window. Otherwise claim the requested
-          name — or the next free ``_<N>`` — with
-          ``os.open(O_CREAT|O_EXCL|O_WRONLY)``, after an ``os.lstat`` of
-          the candidate: a name taken by ANY type — file, directory, link,
-          dangling link or junction — counts as taken on every platform,
-          because on Windows a bare ``O_EXCL`` open FOLLOWS a dangling
-          symlink and would create the claim at the link's target outside
-          the work area (security finding S-F1; review finding F1). The
-          claim is then re-verified with ``os.lstat`` to be a regular file
-          and no reparse point, and filled with
-          ``os.replace``, retrying a ``PermissionError`` up to 5 times within
-          1 s before removing the own claim and raising
+          ``temp/.staging/`` — the source is only read, never moved,
+          renamed or deleted.
+        - Reuse: :func:`find_identical` decides on the ONE listing of the
+          destination; race-freeness rests on the immutability invariant
+          (LLR-155.3 as amended by LED .7) — no in-app writer replaces or
+          deletes a placed file — not on a narrower check window.
+          ``project_gather_service``'s sibling byte-scan is the other known
+          rule (LLR-138.4), declared in the TC-B100-57 census and owned by
+          Inc 5, where ``project_gather_service`` is touched again (review
+          finding N3 — batch-100 has no "Inc 3b").  A reused
+          placement returns the existing path with ``reused=True`` and
+          writes nothing.
+        - Otherwise claim the first free candidate name from
+          :func:`_placed_name_candidates` — a name taken by ANY type —
+          file, directory, link, dangling link or junction — counts as
+          taken on every platform, because on Windows a bare ``O_EXCL``
+          open FOLLOWS a dangling symlink and would create the claim at the
+          link's target outside the work area (security finding S-F1;
+          review finding F1). The claim is re-verified with ``os.lstat``
+          to be a regular file and no reparse point, and filled with
+          ``os.replace``, retrying a ``PermissionError`` up to 5 times
+          within 1 s before removing the own claim and raising
           ``WorkareaPlacementError``.
         - Remove the own staging directory in a ``finally`` tracked by an
           ownership flag set right after ``mkdtemp``.
@@ -478,12 +1035,17 @@ def copy_into_workarea(
         Uses:
             - shutil.copy2 / shutil.rmtree
             - tempfile.mkdtemp
-            - os.open / os.replace / os.unlink
+            - os.open / os.replace / os.unlink / os.lstat
             - _is_reparse_point
-            - _path_traverses_reparse_point
-            - _find_workarea_root
+            - _guarded_destination (the one destination guard, LLR-171.4)
+            - contained_in_workarea (LLR-171.4)
+            - find_identical / _placed_name_candidates
         Used by:
-            - s19_app.tui.app.S19TuiApp (project save and temp-load paths)
+            - copy_into_workarea (the one-line wrapper, B100-I13)
+            - s19_app.tui.app.S19TuiApp._sync_loaded_file_to_project
+              (LLR-163.5)
+            - predict_placement shares the candidate and name walks
+              (LLR-163.7)
     """
     # Reject symlinks/junctions on the source side before resolving (which would follow them).
     if _is_reparse_point(source):
@@ -497,21 +1059,16 @@ def copy_into_workarea(
             f"Refusing to copy: resolved source is a symbolic link or reparse point: {resolved_source}"
         )
 
-    resolved_destination = destination.resolve()
-    workarea_root = _find_workarea_root(resolved_destination)
-    if workarea_root is None or not resolved_destination.is_relative_to(workarea_root):
-        raise WorkareaContainmentError(
-            "Refusing to copy: destination is not contained inside "
-            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
-        )
-
-    # Walk every parent of ``destination`` from the workarea root downwards. Path.resolve()
-    # silently follows reparse points, so a junction anywhere in the chain must be flagged
-    # explicitly via os.lstat() + FILE_ATTRIBUTE_REPARSE_POINT (security finding S-N01).
-    if _path_traverses_reparse_point(resolved_destination, stop_at=workarea_root.parent):
-        raise WorkareaContainmentError(
-            f"Refusing to copy: destination traverses a symbolic link or reparse point: {resolved_destination}"
-        )
+    # The ONE destination guard (LLR-171.4, LED .49, review finding F1):
+    # runs on the destination AS GIVEN, before any resolution — a caller
+    # that pre-resolves hides the junctions this guard exists to refuse
+    # (the executed S-02 probe).  The work-area root is the OUTERMOST
+    # textual ``.s19tool/workarea`` ancestor (review finding N1, LED .50)
+    # or the explicit root an app-level caller passes; both sides are
+    # resolved and compared only afterwards.
+    resolved_destination, resolved_root = _guarded_destination(
+        destination, workarea_root
+    )
 
     size = resolved_source.stat().st_size
     if size > max_size_bytes:
@@ -519,11 +1076,23 @@ def copy_into_workarea(
             f"Refusing to copy: source size {size} bytes exceeds cap {max_size_bytes} bytes: {resolved_source}"
         )
 
-    resolved_destination.mkdir(parents=True, exist_ok=True)
+    try:
+        resolved_destination.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        # security finding SEC-2: an invalid path spelling (WinError 123)
+        # raises the containment refusal, never a bare OSError past callers
+        # that only catch the containment class; the message leads with the
+        # outcome.  (On Python 3.12 the guard's resolve() raises first; on
+        # 3.11 non-strict resolve normalizes textually and the creation is
+        # the first filesystem touch.)
+        raise WorkareaContainmentError(
+            "Refusing to place: destination cannot be created: "
+            f"{resolved_destination} ({exc})"
+        ) from exc
 
     # Private staging (LLR-155.1): the reparse-checked shared staging home,
     # factored into one helper so every work-area writer stages the same way.
-    stage_dir = _private_stage_dir(workarea_root)
+    stage_dir = _private_stage_dir(resolved_root)
     staging_owned = True
     try:
         staged_file = stage_dir / resolved_source.name
@@ -538,50 +1107,26 @@ def copy_into_workarea(
                 f"Not saved: {resolved_source.name} could not be copied: "
                 f"{exc}. Nothing written."
             ) from exc
-        staged_bytes = staged_file.read_bytes()
 
-        # Exclusive, atomic placement (LLR-155.2): claim the final name with
-        # O_CREAT|O_EXCL, taking the next free ``_<N>`` whenever the requested
-        # name is taken, and fill the claim with os.replace. The source is
-        # only ever read, never moved, renamed or deleted.
-        stem = resolved_source.stem
-        suffix = resolved_source.suffix
-        target = resolved_destination / resolved_source.name
+        # Byte-identity reuse (B100-I6 widened, LLR-163.1): ONE listing of
+        # the destination decides — the requested name and every
+        # <stem>_<N><suffix>, size checked before any candidate bytes are
+        # read (LLR-163.2). Race-freeness rests on the immutability
+        # invariant (LLR-155.3), not on a narrower check window.
+        identical = find_identical(
+            resolved_destination, resolved_source.name, staged_file
+        )
+        if identical is not None:
+            return PlacementResult(identical, reused=True)
+
+        # Exclusive, atomic placement (LLR-155.2): claim the first free
+        # candidate name with O_CREAT|O_EXCL and fill the claim with
+        # os.replace. The source is only ever read, never moved, renamed or
+        # deleted.
         claim_path: Optional[Path] = None
         claim_owned = False
-        counter = 0
-        while claim_path is None:
-            candidate = (
-                target
-                if counter == 0
-                else resolved_destination / f"{stem}_{counter}{suffix}"
-            )
-            counter += 1
-            if candidate == target:
-                # Content dedup (bug B8), race-free by an INVARIANT
-                # (LLR-155.3, amended by LED .7 — not by a narrower window:
-                # reading twice cannot close the check-and-reuse race): no
-                # in-app code path replaces or deletes a file at a final
-                # name except this placement claiming a free name, so a
-                # placed file is immutable once placed.
-                # ``project_gather_service``'s delete-and-recopy
-                # (:290-299) is the one known violator of the invariant,
-                # converted by Inc 3b. A 0-byte target is NEVER reused — it
-                # may be another writer's claim placeholder (PDR C1(a)),
-                # and a target that is a link or reparse point is never
-                # reused either — its bytes live outside the work area
-                # (security finding S-F4).
-                try:
-                    if (
-                        not _is_reparse_point(candidate)
-                        and candidate.exists()
-                        and candidate.stat().st_size > 0
-                    ):
-                        if candidate.read_bytes() == staged_bytes:
-                            return candidate
-                except OSError:
-                    # an unreadable target is not trusted; claim a fresh name
-                    pass
+        for candidate_name in _placed_name_candidates(resolved_source.name):
+            candidate = resolved_destination / candidate_name
             # Security finding S-F1: lstat the candidate BEFORE the O_EXCL
             # claim. On Windows, os.open(O_CREAT|O_EXCL) FOLLOWS a dangling
             # symlink: the claim would create a 0-byte file at the link's
@@ -593,7 +1138,6 @@ def copy_into_workarea(
             except OSError:
                 pass  # the name is free
             else:
-                claim_path = None
                 continue
             claim_path = candidate
             try:
@@ -649,6 +1193,10 @@ def copy_into_workarea(
                     "was replaced by a link or special file between the claim "
                     "and the write. Nothing written."
                 )
+            break
+
+        # The name walk is unbounded (``_<N>`` for every N), so the loop
+        # always breaks with a claim; ``claim_path`` is bound here.
 
         deadline = time.monotonic() + 1.0
         attempts = 0
@@ -685,11 +1233,150 @@ def copy_into_workarea(
                     f"Not saved: {claim_path.name} in {resolved_destination} "
                     f"could not be written: {exc}. Nothing written."
                 ) from exc
-        return claim_path
+        return PlacementResult(claim_path, reused=False)
     finally:
         # only ever the staging this call created (LLR-155.1/155.7)
         if staging_owned:
             shutil.rmtree(stage_dir, ignore_errors=True)
+
+
+def predict_placement(
+    digest_or_bytes: "str | bytes",
+    size: int,
+    destination: Path,
+    name: str,
+) -> PlacementResult:
+    """
+    Summary:
+        Answer, WITHOUT writing, where :func:`place_into_workarea` would
+        land a file of this digest (or these bytes) and size (B100-I22,
+        LLR-163.7): the same candidate walk (``find_identical``'s rule) and
+        the same free-name walk (:func:`_placed_name_candidates`), so the
+        save plan's prediction and the placement are one rule.
+
+    Args:
+        digest_or_bytes: The payload's SHA-256 hex digest (str) or the
+            payload bytes themselves (bytes-like; hashed here, never held
+            in memory by the planner).
+        size (int): The payload size, in bytes. Candidates are compared by
+            size first, then by digest.
+        destination (Path): The target directory the placement would use.
+        name (str): The requested file name.
+
+    Returns:
+        PlacementResult: The predicted landing path — in the SAME resolved
+            path FORM :func:`place_into_workarea` returns (review finding
+            F4), so a relative or non-canonical destination cannot produce
+            a false prediction/placement mismatch — and whether the
+            placement would reuse an existing file. Nothing is created,
+            claimed, staged or written.
+
+    Raises:
+        None: a missing destination predicts a fresh placement under the
+            requested name.
+
+    Data Flow:
+        - Normalise the digest (hash ``bytes`` input in one pass).
+        - List the destination once and run the shared
+          :func:`_match_identical` candidate walk (size before digest).
+        - On a match, predict that path with ``reused=True``; otherwise
+          predict the first candidate name free per ``os.lstat`` —
+          directories and links occupy a name exactly as they do for the
+          placement's O_EXCL claim.
+        - A concurrent claim can still make the prediction and the
+          placement diverge; the save-plan handler reports that mismatch
+          naming both paths (B100-I17).
+
+    Dependencies:
+        Uses:
+            - hashlib / os.listdir / os.lstat
+            - _match_identical / _placed_name_candidates
+        Used by:
+            - plan_project_save (B100-I17, LLR-167.6)
+    """
+    if isinstance(digest_or_bytes, str):
+        digest = digest_or_bytes
+    else:
+        digest = hashlib.sha256(bytes(digest_or_bytes)).hexdigest()
+
+    destination = Path(destination).resolve()
+    target_name = Path(name).name
+    try:
+        listing = os.listdir(destination)
+    except OSError:
+        listing = []
+
+    identical = _match_identical(listing, destination, target_name, size, digest)
+    if identical is not None:
+        return PlacementResult(identical, reused=True)
+
+    for candidate_name in _placed_name_candidates(target_name):
+        try:
+            os.lstat(destination / candidate_name)
+        except OSError:
+            return PlacementResult(destination / candidate_name, reused=False)
+    raise AssertionError("unreachable: the name walk is unbounded")  # pragma: no cover
+
+
+def copy_into_workarea(
+    source: Path,
+    destination: Path,
+    max_size_bytes: int = DEFAULT_COPY_SIZE_CAP_BYTES,
+    workarea_root: Optional[Path] = None,
+) -> Path:
+    """
+    Summary:
+        Copy ``source`` into a workarea-contained ``destination`` — the
+        one-line wrapper over :func:`place_into_workarea` (B100-I13,
+        LLR-163.1): every guard — the source and destination reparse
+        checks, this-work-area containment on the UNRESOLVED destination
+        (LLR-171.4, ``_guarded_destination``, LED .49), the size cap,
+        private staging, the byte-identity reuse (:func:`find_identical`,
+        B100-I6) and the ``O_EXCL`` claim of the lowest free ``_<N>`` —
+        lives in the placement function, so all 15 call sites in 7 files
+        (P-34) keep their ``Path`` return and are covered by construction.
+
+    Args:
+        source (Path): File to copy; must be a real file within the size
+            cap (see :func:`place_into_workarea`).
+        destination (Path): Target directory, passed UNRESOLVED; the guard
+            reads the work-area root off its textual path before any
+            resolution (LLR-171.4, LED .49).
+        max_size_bytes (int): Maximum permitted size for ``source`` in
+            bytes; defaults to 256 MB.
+        workarea_root (Optional[Path]): An explicit work-area root an
+            app-level caller passes when it knows THIS app's work area
+            (B100-I14, security finding SEC-1, LED .50). None derives the
+            root from ``destination``'s own textual path.
+
+    Returns:
+        Path: The file the placement landed on — the requested name, an
+            identical file reused as-is, or the claimed lowest free
+            ``_<N>``.
+
+    Raises:
+        WorkareaContainmentError: When ``source`` or ``destination``
+            (or any traversed parent of it) is a symbolic link or NTFS
+            reparse point, when ``destination`` is not contained inside
+            this work area, or when ``source`` exceeds ``max_size_bytes``.
+        FileNotFoundError: When ``source`` does not exist.
+        WorkareaPlacementError: When the staged copy, the claim or the
+            fill fails (see :func:`place_into_workarea`).
+
+    Data Flow:
+        - Exactly ``return place_into_workarea(...).path`` — one
+          statement, so no guard and no second claim loop can live here
+          (the TC-B100-01 AST arm pins this shape).
+
+    Dependencies:
+        Uses:
+            - place_into_workarea (the one placement function, LLR-163.1)
+        Used by:
+            - 15 call sites in 7 product files (P-34), unchanged
+    """
+    return place_into_workarea(
+        source, destination, max_size_bytes, workarea_root
+    ).path
 
 
 def place_group_into_workarea(
@@ -697,6 +1384,7 @@ def place_group_into_workarea(
     destination: Path,
     *,
     max_size_bytes: Optional[int] = None,
+    workarea_root: Optional[Path] = None,
 ) -> list[Path]:
     """
     Summary:
@@ -716,13 +1404,19 @@ def place_group_into_workarea(
         sources (Sequence[Path]): The group's source files, in order. Each
             must be a real file (not a symlink/junction) within the size
             cap; the final name of each member is its own file name.
-        destination (Path): Target directory. Must resolve under
+        destination (Path): Target directory, passed UNRESOLVED — the
+            shared guard reads the work-area root off its textual path
+            before any resolution. Must name a directory inside
             ``<base>/.s19tool/workarea/`` and must not traverse a symlink
             or NTFS junction.
         max_size_bytes (Optional[int]): Maximum permitted size per member,
             in bytes. ``None`` (the default) applies
             :data:`DEFAULT_COPY_SIZE_CAP_BYTES`, matching
             :func:`copy_into_workarea`.
+        workarea_root (Optional[Path]): An explicit work-area root an
+            app-level caller passes when it knows THIS app's work area
+            (B100-I14, security finding SEC-1, LED .50). None derives the
+            root from ``destination``'s own textual path.
 
     Returns:
         list[Path]: The placed paths, aligned with ``sources``. When every
@@ -747,9 +1441,10 @@ def place_group_into_workarea(
             contract; PDR C3(c)).
 
     Data Flow:
-        - Resolve ``destination``, locate its workarea root, and run the
-          reparse-point walk — the exact checks ``copy_into_workarea``
-          runs (LLR-155's seam, C3(e)).
+        - Run the shared destination guard :func:`_guarded_destination` on
+          the UNRESOLVED ``destination`` (LLR-163.1, LED .49) — the same
+          checks :func:`place_into_workarea` runs (LLR-171.4, LLR-155's
+          seam, C3(e)).
         - Validate every member (reparse + size), reject duplicate member
           names, and create the destination on demand.
         - Stage privately (LLR-155.1) via :func:`_private_stage_dir` —
@@ -775,25 +1470,24 @@ def place_group_into_workarea(
             - shutil.copy2 / shutil.rmtree
             - tempfile (via _private_stage_dir)
             - os.open / os.replace / os.unlink / os.lstat
-            - _is_reparse_point / _path_traverses_reparse_point
-            - _find_workarea_root / _private_stage_dir
+            - _is_reparse_point
+            - _guarded_destination (the one destination guard, LLR-171.4)
+            - _private_stage_dir
         Used by:
             - s19_app.tui.segment_split_view.write_split_join_export
               (the BIN/``.addr`` pair; single files ride
               :func:`copy_into_workarea`)
     """
-    resolved_destination = destination.resolve()
-    workarea_root = _find_workarea_root(resolved_destination)
-    if workarea_root is None or not resolved_destination.is_relative_to(workarea_root):
-        raise WorkareaContainmentError(
-            "Refusing to place: destination is not contained inside "
-            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {resolved_destination}"
-        )
-    if _path_traverses_reparse_point(resolved_destination, stop_at=workarea_root.parent):
-        raise WorkareaContainmentError(
-            "Refusing to place: destination traverses a symbolic link or reparse point: "
-            f"{resolved_destination}"
-        )
+    # The ONE shared destination guard (LLR-163.1 as amended by LED .49,
+    # review finding F1) — the same check place_into_workarea runs, on the
+    # UNRESOLVED destination: the root comes off the textual path (the
+    # OUTERMOST anchor, review finding N1, LED .50), the reparse walk runs
+    # before any resolution, and only then are the two sides resolved and
+    # compared (LLR-171.4).  The explicit root an app-level caller passes
+    # (security finding SEC-1) rides through as the containment authority.
+    resolved_destination, group_root = _guarded_destination(
+        destination, workarea_root
+    )
 
     cap = DEFAULT_COPY_SIZE_CAP_BYTES if max_size_bytes is None else max_size_bytes
     resolved_sources: list[Path] = []
@@ -824,11 +1518,21 @@ def place_group_into_workarea(
             "would claim one final name. Nothing written."
         )
 
-    resolved_destination.mkdir(parents=True, exist_ok=True)
+    try:
+        resolved_destination.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        # security finding SEC-2: an invalid path spelling (WinError 123)
+        # raises the containment refusal, never a bare OSError past callers
+        # that only catch the containment class; the message leads with the
+        # outcome.
+        raise WorkareaContainmentError(
+            "Refusing to place: destination cannot be created: "
+            f"{resolved_destination} ({exc})"
+        ) from exc
 
     # Private staging (LLR-155.1): the same reparse-checked staging home
     # copy_into_workarea stages under.
-    stage_dir = _private_stage_dir(workarea_root)
+    stage_dir = _private_stage_dir(group_root)
     staging_owned = True
     try:
         staged: list[tuple[Path, bytes]] = []

@@ -1,0 +1,4 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py  (GREEN, fix pass 2)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2
+....................................                                     [100%]
+36 passed in 72.86s (0:01:12)

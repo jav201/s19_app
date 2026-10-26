@@ -1,0 +1,27 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k export_root  (RED: export drops workarea_root)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-10
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_62_export_root_refuses_another_workarea _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27272/test_tc_b100_62_export_root_re0')
+
+    def test_tc_b100_62_export_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), SEC-1 — the Split/Join export:
+        ``write_split_join_export`` threads the caller's ``workarea_root`` to
+        the guard AND both placements; a destination textually inside ANOTHER
+        work area refuses the WHOLE export (s19 and bin alike), 0 bytes
+        outside.  Dropping the root from the export accepts the destination
+        (RED, transcript ``red-10-export.txt``)."""
+        this_root, destination, victim_home = _other_workarea_home(tmp_path, "P/exports")
+    
+        for fmt in ("s19", "bin"):
+>           with pytest.raises(WorkareaContainmentError):
+E           Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:891: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_export_root_refuses_another_workarea
+1 failed, 35 deselected in 0.49s

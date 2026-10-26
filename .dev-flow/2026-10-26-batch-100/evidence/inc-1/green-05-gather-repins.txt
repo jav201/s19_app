@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_project_gather.py tests/test_unified_write.py tests/test_b99_export.py (fix pass 1 — gather service through the shared guard + the Inc 1 re-pins)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1
+
+.......................................................                  [100%]
+55 passed in 88.95s (0:01:28)

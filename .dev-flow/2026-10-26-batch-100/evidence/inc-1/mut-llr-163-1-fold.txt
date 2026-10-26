@@ -1,0 +1,34 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows (MUTANT fold: case-folding replaced by identity in _reuse_candidate_names)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27237/test_tc_b100_01_upper_case_suf0')
+
+    def test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows(
+        tmp_path: Path,
+    ) -> None:
+        """Boundary catalog (LLR-163.1): an upper-case ``_<N>`` name on Windows
+        names the same file as the requested lower-case name (candidate names
+        compare case-folded) — identical bytes there are reused, nothing new is
+        claimed.  Windows-only arm; the ``fold`` mutant (case-folding replaced
+        by identity) turns it RED."""
+        if sys.platform != "win32":
+            pytest.skip(
+                "case-folding of candidate names is a Windows arm (PDR C-QA-6)"
+            )
+        destination = _destination(tmp_path)
+        existing = _write(destination, "STAGED_2.S19", _S19_B)
+        source = _write(tmp_path / "src", "staged.s19", _S19_B)
+    
+        result = place_into_workarea(source, destination)
+>       assert result.reused
+E       AssertionError: assert False
+E        +  where False = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27237/test_tc_b100_01_upper_case_suf0/.s19tool/workarea/target/staged.s19'), reused=False).reused
+
+tests\test_b100_reuse.py:255: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_upper_case_suffix_name_is_reused_on_windows
+1 failed in 0.45s

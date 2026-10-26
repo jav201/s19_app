@@ -1,0 +1,50 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k "save_copies_root or syncs_root"  (RED: copy_into_workarea drops workarea_root)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 — detached e044112 + inc1 + fix1 + fix2-with-red-08
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_62_save_copies_root_refuses_another_workarea __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27267/test_tc_b100_62_save_copies_ro0')
+
+    def test_tc_b100_62_save_copies_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), SEC-1 — the Save project copies
+        (primary data, attached MAC, A2L): ``copy_into_workarea`` now accepts and
+        forwards ``workarea_root``; a target textually inside ANOTHER work area
+        refuses every copy, 0 bytes outside.  Dropping the root from the wrapper
+        accepts the destination (RED, transcript ``red-08-save-copies.txt``)."""
+        this_root, destination, victim_home = _other_workarea_home(tmp_path, "P")
+        mac_source = _write(tmp_path / "src", "firmware.mac", _S19_SMALL)
+        a2l_source = _write(tmp_path / "src", "firmware.a2l", "ASAP2_VERSION 1 71\n")
+    
+        for source in (CASE01, mac_source, a2l_source):
+>           with pytest.raises(WorkareaContainmentError):
+E           Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:829: Failed
+_____________ test_tc_b100_62_syncs_root_refuses_another_workarea _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27267/test_tc_b100_62_syncs_root_ref0')
+
+    def test_tc_b100_62_syncs_root_refuses_another_workarea(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), SEC-1 — the MAC/A2L sync routes:
+        the same ``copy_into_workarea(..., workarea_root=self.workarea)`` seam
+        refuses a project dir textually inside ANOTHER work area, 0 bytes
+        outside.  RED side: ``red-08-save-copies.txt`` (the same wrapper
+        revert)."""
+        this_root, destination, victim_home = _other_workarea_home(tmp_path, "P")
+        mac_source = _write(tmp_path / "src", "firmware.mac", _S19_SMALL)
+        a2l_source = _write(tmp_path / "src", "firmware.a2l", "ASAP2_VERSION 1 71\n")
+    
+        for source in (mac_source, a2l_source):
+>           with pytest.raises(WorkareaContainmentError):
+E           Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+tests\test_b100_reuse.py:850: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_save_copies_root_refuses_another_workarea
+FAILED tests/test_b100_reuse.py::test_tc_b100_62_syncs_root_refuses_another_workarea
+2 failed, 34 deselected in 0.50s

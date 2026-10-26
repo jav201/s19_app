@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_staging.py (re-run after the LLR-155.3 allow-list re-pin)
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1 (post-change)
+
+...............................                                          [100%]
+31 passed in 99.22s (0:01:39)
+exit: 0

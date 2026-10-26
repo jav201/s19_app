@@ -1,0 +1,43 @@
+mutation: llr-163-7 on s19_app/tui/workspace.py
+hash before: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+hash mutated: a8785098f21ca864942a5a1003c16a4b4905e3dc69bb1738d86da8cf6cdd4558
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py -k tc_b100_68
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F..                                                                      [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_68_prediction_walks_the_same_names_as_the_placement _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27186/test_tc_b100_68_prediction_wal0')
+
+    def test_tc_b100_68_prediction_walks_the_same_names_as_the_placement(
+        tmp_path: Path,
+    ) -> None:
+        """A directory named ``firmware_1.s19`` occupies the name for the
+        prediction exactly as it does for the placement: both walk past it to
+        ``firmware_2.s19``."""
+        destination = _destination(tmp_path)
+        _write(destination, "firmware.s19", _S19_A)
+        (destination / "firmware_1.s19").mkdir()
+        source = _write(tmp_path / "src", "firmware.s19", _S19_B)
+    
+        digest = hashlib.sha256(source.read_bytes()).hexdigest()
+        predicted = predict_placement(
+            digest, source.stat().st_size, destination, "firmware.s19"
+        )
+>       assert predicted.path.name == "firmware_2.s19", predicted
+E       AssertionError: PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27186/test_tc_b100_68_prediction_wal0/.s19tool/workarea/target/firmware_1.s19'), reused=False)
+E       assert 'firmware_1.s19' == 'firmware_2.s19'
+E         
+E         - firmware_2.s19
+E         ?          ^
+E         + firmware_1.s19
+E         ?          ^
+
+tests\test_b100_reuse.py:472: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_68_prediction_walks_the_same_names_as_the_placement
+1 failed, 2 passed, 11 deselected in 0.50s
+exit: 1
+restore: 305e197c1a8d2a94ef077ac6c893c83e0d5449268c43b28df6e73a800acb43d1
+RESTORE OK

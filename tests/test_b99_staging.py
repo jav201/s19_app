@@ -1923,6 +1923,7 @@ def test_tc_b99_13_gather_drift_places_next_free_name(tmp_path: Path) -> None:
             active_document_kind="change",
             common_patches_dir=common,
             common_templates_dir=common,
+            workarea_root=root,
         )
 
     first = _gather()
@@ -1977,6 +1978,7 @@ def test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate(
             active_document_kind="change",
             common_patches_dir=common,
             common_templates_dir=common,
+            workarea_root=root,
         )
 
     first = _gather()
@@ -2023,8 +2025,17 @@ def test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate(
 #: declared exceptions below (review round 2).
 _FINAL_NAME_ALLOWLIST = {
     # Inc 6 added the group placement (B99-I2a) beside the single-file one.
+    # batch-100 Inc 1 (LLR-163.1, B100-I13): the single-file placement moved
+    # into place_into_workarea — every guard, the reuse decision and the
+    # claim/fill live there now; copy_into_workarea is its one-line wrapper
+    # and no longer writes (review finding F10), so only the placement is
+    # allow-listed.
     "s19_app/tui/workspace.py": frozenset(
-        {"copy_into_workarea", "_private_stage_dir", "place_group_into_workarea"}
+        {
+            "_private_stage_dir",
+            "place_group_into_workarea",
+            "place_into_workarea",
+        }
     ),
     "s19_app/tui/app.py": frozenset({"action_dump_a2l_json"}),
     "s19_app/tui/changes/apply.py": frozenset({"save_patched_image"}),

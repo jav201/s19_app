@@ -1,0 +1,29 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_deleted_lower_suffix_reuses_existing_suffix (MUTANT bare-name: the numbered-tail comparison restricted to the bare name — _REUSE_NUMBERED_RE never matches)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc1 (fix pass 1 + mutant)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_01_deleted_lower_suffix_reuses_existing_suffix _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27238/test_tc_b100_01_deleted_lower_0')
+
+    def test_tc_b100_01_deleted_lower_suffix_reuses_existing_suffix(
+        tmp_path: Path,
+    ) -> None:
+        """Boundary catalog (LLR-163.1): with ``_1`` deleted beside an identical
+        ``_2``, the placement reuses the existing ``_2`` — the candidate walk
+        enumerates EVERY ``_<N>``, not only the lowest free one.  The bare-name
+        mutant (comparison restricted to the requested name) turns it RED."""
+        destination = _destination(tmp_path)
+        existing = _write(destination, "staged_2.s19", _S19_B)
+        source = _write(tmp_path / "src", "staged.s19", _S19_B)
+    
+        result = place_into_workarea(source, destination)
+>       assert result.reused
+E       AssertionError: assert False
+E        +  where False = PlacementResult(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27238/test_tc_b100_01_deleted_lower_0/.s19tool/workarea/target/staged.s19'), reused=False).reused
+
+tests\test_b100_reuse.py:272: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_deleted_lower_suffix_reuses_existing_suffix
+1 failed in 0.44s

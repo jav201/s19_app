@@ -45,6 +45,7 @@ limbs · TC-709 the screen wrap audit · TC-710 the negative-control battery).
 from __future__ import annotations
 
 import shutil
+import sys
 from bisect import bisect_right
 from dataclasses import dataclass
 from pathlib import Path
@@ -64,7 +65,6 @@ from .a2l import extract_memory_segments
 from .capped_text_area import CappedTextArea
 from .open_folder_chip import titled_header
 from .services.project_gather_service import (
-    _check_home_contained,
     scoped_home,
     scoped_home_target,
 )
@@ -75,11 +75,11 @@ from .workspace import (
     WORKAREA_SUBDIR,
     WORKAREA_TEMP,
     WorkareaContainmentError,
-    _find_workarea_root,
+    _guarded_destination,
     _is_reparse_point,
     _private_stage_dir,
-    copy_into_workarea,
     place_group_into_workarea,
+    place_into_workarea,
 )
 
 # NOTE (cyclic import): the engine (``s19_app.segment_ops``) imports
@@ -670,22 +670,6 @@ def _refusal_text(reason: str, pairs: Sequence[Tuple[str, str]]) -> Text:
     return text
 
 
-def _export_reuse_target(target: Path, staged: Path) -> bool:
-    """True when placement will REUSE ``target`` (bug B8: it exists, is not
-    a link or reparse point, is non-empty and is byte-identical to the
-    staged payload) — the status word (UX-C11), mirroring the placement
-    seam's own rule; an unreadable target is not trusted."""
-    try:
-        return (
-            not _is_reparse_point(target)
-            and target.exists()
-            and target.stat().st_size > 0
-            and target.read_bytes() == staged.read_bytes()
-        )
-    except OSError:
-        return False
-
-
 def _filter_declared_ranges(
     mem_map: Dict[int, int], declared_ranges: Sequence[Tuple[int, int]]
 ) -> Dict[int, int]:
@@ -724,6 +708,7 @@ def write_split_join_export(
     dest_dir: Path,
     zero_coverage_empty: bool = False,
     declared_ranges: Optional[Sequence[Tuple[int, int]]] = None,
+    workarea_root: Optional[Path] = None,
 ) -> List[PlacedExport]:
     """Write the planned export (LLR-136) — the engine does the bytes.
 
@@ -738,17 +723,20 @@ def write_split_join_export(
 
     Every name is built by :func:`build_export_basename` (LLR-160.1) and
     every file is PLACED — single files through
-    :func:`workspace.copy_into_workarea`, a BIN and its ``.addr`` sidecar as
+    :func:`workspace.place_into_workarea`, a BIN and its ``.addr`` sidecar as
     one group through :func:`workspace.place_group_into_workarea`
     (B99-I2a, LLR-160.4): a changed re-export takes the next free ``_<N>``,
     an identical one is reused, and each returned :class:`PlacedExport`
     carries the action (``placed.action in {"wrote", "reused"}``) for the
-    status (UX-C11).
+    status (UX-C11) — the word comes only from the placement's
+    ``PlacementResult`` (LLR-163.6).
 
     Before any folder or file is created the destination home passes the
-    shipped containment guard ``_check_home_contained`` anchored to the
-    work-area root (LLR-160.2), each final path resolves inside it, and a
-    link or reparse point at a final name refuses the whole export. The
+    one shared workspace destination guard ``_guarded_destination`` with
+    ``dest_dir`` UNRESOLVED (LLR-160.2, LLR-171.4 as amended by LED .49) —
+    the work-area root is read off the textual path, so a junction home is
+    refused instead of resolved away — each final path resolves inside it,
+    and a link or reparse point at a final name refuses the whole export. The
     plan-time pass (LLR-160.5) then checks every path length the bytes will
     travel — each final name with the worst-case ``_<N>`` suffix the
     basename cap reserves room for, and each private staging path, which is
@@ -771,6 +759,12 @@ def write_split_join_export(
     session's placeholder entries are never data, so its export is
     header-only. ``None`` keeps the legacy whole-map behaviour (the engine
     purity contract the shipped tests pin).
+
+    ``workarea_root`` (optional): the explicit work-area root this app's
+    caller passes (B100-I14, security finding SEC-1, LED .50) — threaded to
+    the guard and both placements so "this work area" is THIS app's work
+    area, never one the destination's own text names. ``None`` derives the
+    root from ``dest_dir``'s textual path (the pre-LED-.50 behaviour).
     """
     EXPORT_FORMATS = _engine_attr("EXPORT_FORMATS")
     emit_image = _engine_attr("emit_image")
@@ -838,10 +832,21 @@ def write_split_join_export(
             planned_map, planned_ranges = join_fill(mem_map, ranges, pad_byte)
         limbs.append(_plan_limb("joined", 0, planned_map, planned_ranges))
 
-    # --- LLR-160.2: the destination home passes the shipped containment
-    # guard BEFORE any folder or file is created, anchored to the work-area
-    # root — a junction home resolves outside the root and refuses here.
-    home = _check_home_contained(dest_dir)
+    # --- LLR-160.2 / LLR-171.4 (LED .49, review finding F1; LED .50,
+    # SEC-1): the destination home passes the ONE shared workspace guard
+    # BEFORE any folder or file is created, with dest_dir UNRESOLVED — the
+    # guard reads the work-area root off the textual path (or the explicit
+    # root the caller passes), so a junction home is caught here instead of
+    # being resolved away.  The guard returns the RESOLVED pair; the staging
+    # paths below ride the resolved root, while the placements in Phase B
+    # re-run the guard on the same unresolved dest_dir with the CALLER'S
+    # root kept distinct (review finding R3-1): rebinding the placements'
+    # root to the resolved root made every export refuse when the app's
+    # base folder is itself reached through a junction — the unresolved
+    # destination is not textually under the resolved root, so the guard's
+    # walk climbed past it to the drive root and refused on the base
+    # folder's own junction.
+    home, resolved_root = _guarded_destination(dest_dir, workarea_root)
 
     # Resolve every final path inside the home; refuse a link or reparse
     # point already sitting at a final name (sidecars included) — the write
@@ -864,17 +869,11 @@ def write_split_join_export(
     # name carrying the worst-case ``_<N>`` suffix the basename cap
     # reserves room for (the placement seam may claim ``_<N>``), and the
     # private staging path, which is longer than the final path.
-    workarea_root = _find_workarea_root(home)
-    if workarea_root is None:  # pragma: no cover - _check_home_contained proved it
-        raise WorkareaContainmentError(
-            f"Refusing to export: destination is not contained inside "
-            f"<base>/{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/: {home}"
-        )
     # ``_private_stage_dir`` names its per-write directory ``stage-`` plus
     # the eight random characters ``tempfile.mkdtemp`` appends — the worst
     # case is measured so a path that only fits unstaged is refused here.
     stage_worst = (
-        workarea_root
+        resolved_root
         / WORKAREA_TEMP
         / WORKAREA_STAGING_DIRNAME
         / ("stage-" + "9" * 8)
@@ -920,8 +919,17 @@ def write_split_join_export(
     # .addr`` pair is placed as one group). A part-way failure rolls back
     # inside the seams and surfaces as an ExportWriteError reporting what
     # already happened, split truthfully between written and reused files.
-    home.mkdir(parents=True, exist_ok=True)
-    stage_dir = _private_stage_dir(workarea_root)
+    try:
+        home.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        # security finding SEC-2: an invalid path spelling (WinError 123)
+        # raises the containment refusal, never a bare OSError; the export
+        # caller catches the containment class and renders a refusal.
+        raise WorkareaContainmentError(
+            "Refusing to export: destination cannot be created: "
+            f"{home} ({exc})"
+        ) from exc
+    stage_dir = _private_stage_dir(resolved_root)
     placed: List[PlacedExport] = []
     try:
         for _raw, _part, members in limbs:
@@ -936,22 +944,41 @@ def write_split_join_export(
             try:
                 if len(staged_members) == 1:
                     staged_file, name = staged_members[0]
-                    reused = _export_reuse_target(home / name, staged_file)
-                    final = copy_into_workarea(staged_file, home)
+                    # LLR-163.6: the status word comes ONLY from the
+                    # PlacementResult of the placement this export performs
+                    # — the export holds no byte-identity rule of its own.
+                    # The destination rides through UNRESOLVED (LLR-171.4,
+                    # LED .49): the placement's own guard re-runs the full
+                    # textual-anchor + reparse-walk check on it.
+                    result = place_into_workarea(
+                        staged_file, dest_dir, workarea_root=workarea_root
+                    )
                     placed.append(
-                        PlacedExport(final, "reused" if reused else "wrote")
+                        PlacedExport(
+                            result.path, "reused" if result.reused else "wrote"
+                        )
                     )
                     continue
-                reused = all(
-                    _export_reuse_target(home / name, staged_file)
-                    for staged_file, name in staged_members
-                )
+                # The group placement keeps "requested names only"
+                # (place_group_into_workarea is unchanged, R30); its word
+                # derives from the placement outcome alone — every returned
+                # path that did not exist before the call is a fresh claim.
+                # Same unresolved destination and explicit root as the
+                # single-file limb.  The membership compares case-folded on
+                # Windows (review finding N5): the group returns the
+                # requested spelling, so a reused member whose on-disk name
+                # differs only in case must still read as "reused".
+                fold = str.casefold if sys.platform == "win32" else (lambda text: text)
+                names_before = {fold(p.name) for p in home.iterdir()}
                 finals = place_group_into_workarea(
-                    [staged_file for staged_file, _name in staged_members], home
+                    [staged_file for staged_file, _name in staged_members],
+                    dest_dir,
+                    workarea_root=workarea_root,
                 )
+                group_reused = all(fold(f.name) in names_before for f in finals)
                 for final, (_staged, _name) in zip(finals, staged_members):
                     placed.append(
-                        PlacedExport(final, "reused" if reused else "wrote")
+                        PlacedExport(final, "reused" if group_reused else "wrote")
                     )
             except Exception as exc:
                 wrote_names = [
@@ -2043,6 +2070,7 @@ class SplitJoinWindow(WindowSection):
                 dest_dir=dest_dir,
                 zero_coverage_empty=True,
                 declared_ranges=self._src_ranges(),
+                workarea_root=Path(self._app().workarea),
             )
         except GapConflictError as exc:
             # The plan's ▒ sweep and the engine agreed to disagree (a racing

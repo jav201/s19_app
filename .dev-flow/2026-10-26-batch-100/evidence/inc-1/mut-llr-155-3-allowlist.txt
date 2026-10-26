@@ -1,0 +1,42 @@
+mutation: LLR-155.3 allow-list reverted (place_into_workarea removed)
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b99_13_no_final_name_replace_outside_placement ____________
+
+    def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
+        """LLR-155.3's census arm (TC-B99-13's second arm): across ``s19_app/``
+        no ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
+        ``write_text`` (the ``write_text`` limb is review finding F4a) onto an
+        existing final name exists outside the pinned placement functions and
+        the pinned declared exceptions — in particular
+        ``project_gather_service._gather_copy`` holds none after the Inc-3b
+        conversion. RED at HEAD: ``_gather_copy`` still unlinks and recopies in
+        place (``project_gather_service.py:297/299``).
+        """
+        all_violations: list = []
+        pkg_root = REPO_ROOT / "s19_app"
+        for path in sorted(pkg_root.rglob("*.py")):
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            all_violations.extend(
+                _final_name_census(rel, path.read_text(encoding="utf-8"))
+            )
+>       assert all_violations == [], (
+            "LLR-155.3: a final-name replace/delete/copy outside the placement "
+            f"functions: {all_violations}"
+        )
+E       AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/workspace.py:887 shutil.copy2 outside the pinned placement allow-list (in 'place_into_workarea')", "s19_app/tui/workspace.py:995 os.replace outside the pinned placement allow-list (in 'place_into_workarea')", "s19_app/tui/workspace.py:975 unlink outside the pinned placement allow-list (in 'place_into_workarea')", "s19_app/tui/workspace.py:964 unlink outside the pinned placement allow-list (in 'place_into_workarea')", "s19_app/tui/workspace.py:1019 unlink outside the pinned placement allow-list (in 'place_into_workarea')", "s19_app/tui/workspace.py:1002 unlink outside the pinned placement allow-list (in 'place_into_workarea')"]
+E       assert ["s19_app/tui...o_workarea')"] == []
+E         
+E         Left contains 6 more items, first extra item: "s19_app/tui/workspace.py:887 shutil.copy2 outside the pinned placement allow-list (in 'place_into_workarea')"
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:2157: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+1 failed in 1.12s
+exit: 1
+restore: 46eafb00492e7eec44a5d9da213d2c1582c9406fd8a34e31cb15237abdadee33
+RESTORE OK
