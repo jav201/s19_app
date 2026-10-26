@@ -1,9 +1,9 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 9251e59309c4dfb3 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 8d7e6160968ff794 -->
 
 # ATLAS-IFC — how is the application addressed?
 
-51 FLOW declaration(s) · 22 COMPONENT declaration(s) · 812 declared requirement heading ids — one row per declaration.
+59 FLOW declaration(s) · 26 COMPONENT declaration(s) · 886 declared requirement heading ids — one row per declaration.
 
 ### FLOW `loaded_artifacts_readout` — .dev-flow/2026-08-21-batch-85/01-requirements.md:277
 - node `render_slots` — owner LLR-85.1
@@ -295,6 +295,78 @@
 - node `generate.py (tests/fixtures/synth/)` — owner LLR-152.1
 - node `coverage census` — owner LLR-152.2
 - node `independent_reader (tests/support/)` — owner LLR-152.3
+
+### FLOW `session_to_saved_project` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1162
+- node `reserved-name check, case-folded (app.py _handle_save_dialog)` — owner LLR-164.1
+- node `clash check against other projects (app.py _handle_save_dialog)` — owner LLR-164.2
+- node `name cap and OSError on create (app.py _handle_save_dialog)` — owner LLR-164.3
+- node `parent must be the app work area (app.py _handle_save_dialog)` — owner LLR-171.3
+- node `image_differs_from_source (change_service.py)` — owner LLR-167.1
+- node `emit through save_patched or copy the source (app.py _handle_save_dialog)` — owner LLR-167.2
+- node `entry count in the save status (app.py _handle_save_dialog, save_back_status_suffix)` — owner LLR-167.3
+- node `blocked re-derive refusal (app.py _handle_save_dialog)` — owner LLR-167.4
+- node `byte-identical reuse (workspace.py copy_into_workarea)` — owner LLR-163.1
+- node `size precheck before the byte comparison (workspace.py copy_into_workarea)` — owner LLR-163.2
+- node `place the active document (project_gather_service.py gather_project_artifacts)` — owner LLR-170.2
+- node `copy every sub-folder on save-as (app.py _handle_save_dialog)` — owner LLR-171.1
+- node `compute files digests from disk (app.py _write_and_verify_manifest)` — owner LLR-169.2
+- node `serialize files (manifest_writer.py serialize_manifest)` — owner LLR-169.1
+- node `serialize active_document (manifest_writer.py serialize_manifest)` — owner LLR-170.1
+- node `private staging + os.replace (manifest_writer.py write_project_manifest)` — owner LLR-169.7
+- node `verify with files and active_document in the drift domain (manifest_writer.py verify_written_manifest)` — owner LLR-169.3
+- node `remove a folder this save created (app.py _remove_created_project_dir)` — owner LLR-164.4
+
+### FLOW `project_json_to_session` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1241
+- node `parse files (variant_execution_service.py read_project_manifest)` — owner LLR-169.4
+- node `parse gathered (variant_execution_service.py read_project_manifest)` — owner LLR-168.1
+- node `parse active_document (variant_execution_service.py read_project_manifest)` — owner LLR-170.1
+- node `unsaved-work question before replacing (app.py load guard)` — owner LLR-174.3
+- node `reset the session (app.py _reset_project_session)` — owner LLR-165.1
+- node `rebind the change service (app.py _reset_project_session)` — owner LLR-165.3
+- node `check_project_files (manifest_writer.py)` — owner LLR-169.5
+- node `open the active or the next valid variant (app.py _handle_load_project)` — owner LLR-169.6
+- node `open an A2L-only project (app.py _handle_load_project)` — owner LLR-171.2
+- node `reopen the active document after the A2L (app.py _handle_load_project)` — owner LLR-170.3
+- node `re-home the focus after an image or project load (app.py _step_finalize)` — owner LLR-166.1
+- node `compose the announcement (compose_load_announcement)` — owner LLR-178.1
+- node `write the announcement to the status log, markup off (app.py set_status)` — owner LLR-178.2
+
+### FLOW `a2l_load_to_session` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1300
+- node `re-home the focus after the A2L load (app.py load_a2l_from_path)` — owner LLR-166.2
+- node `clear the parsed A2L on unload (app.py _apply_unload)` — owner LLR-165.4
+
+### FLOW `in_project_write_to_manifest` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1315
+- node `save-back becomes the active variant (app.py on_patch_editor_panel_save_back_decision)` — owner LLR-168.2
+- node `every other in-project writer ends in the seam (app.py _sync_loaded_file_to_project and the MAC/A2L syncs)` — owner LLR-168.3
+- node `name a reused variant instead of reporting it added (app.py _sync_loaded_file_to_project)` — owner LLR-163.5
+
+### FLOW `load_source_to_load_dialog` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1334
+- node `record_recent_source (workspace.py)` — owner LLR-172.1
+- node `read_recent_sources (workspace.py)` — owner LLR-172.2
+- node `keep recent paths out of projects and reports (manifest, report and gather writers)` — owner LLR-172.3
+- node `list_workarea_files (workspace.py)` — owner LLR-172.4
+- node `Workarea Files list rows, markup off (app.py refresh_files)` — owner LLR-172.6
+- node `typed-path routing (app.py _load_path_from_user_input)` — owner LLR-172.5
+- node `the dialog's sources (screens.py Load dialog)` — owner LLR-173.4
+- node `the dialog's rows, markup off (screens.py Load dialog)` — owner LLR-173.3
+- node `the dialog's keys and empty-Load reason (screens.py Load dialog)` — owner LLR-173.2
+- node `LoadChoice router (app.py)` — owner LLR-173.1
+
+### FLOW `typed_name_to_save_dialog` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1381
+- node `preview of the folder and the warning lines (screens.py SaveProjectScreen)` — owner LLR-175.1
+- node `payload with the work area as parent (screens.py SaveProjectScreen)` — owner LLR-175.2
+- node `the dialog's keys and empty-Save reason (screens.py SaveProjectScreen)` — owner LLR-175.3
+
+### FLOW `unsaved_work_to_question` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1400
+- node `the trigger table (app.py load guard)` — owner LLR-174.1
+- node `the confirm modal (screens.py)` — owner LLR-174.2
+
+### FLOW `long_action_to_indicator` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1415
+- node `begin_busy / step_busy / end_busy (app.py)` — owner LLR-176.1
+- node `every set_progress caller routed through the seam (app.py)` — owner LLR-176.2
+- node `main-thread paint before work (app.py call_after_refresh)` — owner LLR-176.3
+- node `worker moves with main-thread installs (app.py @work)` — owner LLR-177.1
+- node `worker failure handling (app.py)` — owner LLR-177.2
 
 ### COMPONENT `loaded_panel` — .dev-flow/2026-08-21-batch-85/01-requirements.md:504
 - inputs : loaded: Optional[LoadedFile] ; project: str
@@ -613,10 +685,50 @@
 |---|---|---|---|---|
 | `patch_entry_bytes_input` | `query("#patch_entry_bytes_input")` | 1 | 6 declared | LLR-161.2 |
 
+### COMPONENT `load_dialog` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1444
+- inputs : projects: list[str] ; workarea_files: list[Path] ; recent_sources: list[RecentSource] ; typed_path: str
+- outputs : 
+- parent : SYSTEM
+- surface : Load dialog
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `load_choice` | `query("#load_dialog")` | 1 | 4 declared | LLR-173.1 |
+
+### COMPONENT `save_project_dialog` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1461
+- inputs : project_name: str ; work_area: Path ; image_differs: bool ; projects: list[str]
+- outputs : 
+- parent : SYSTEM
+- surface : Save project dialog
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `save_payload` | `query("#save_ok")` | 1 | 5 declared | LLR-175.2 |
+
+### COMPONENT `status_log` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1479
+- inputs : message: str
+- outputs : 
+- parent : workspace_shell
+- surface : Workspace status line
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `log_line_4` | `query("#log_line_4"), INDEXED POSITIONALLY` | 4 | 13 declared | LLR-178.2 |
+
+### COMPONENT `busy_indicator` — .dev-flow/2026-10-26-batch-100/01-requirements.md:1505
+- inputs : action_label: str ; step_text: str ; outcome: str
+- outputs : 
+- parent : workspace_shell
+- surface : Workspace status line
+
+| output | address | cardinality | consumers | owner |
+|---|---|---|---|---|
+| `progress_bar` | `query("#progress_bar")` | 1 | 4 declared | LLR-176.1 |
+
 ## STATUS — the real rules, run at derivation
 
-- [-] V10  01-requirements.md: 189 FLOW node(s), every one owned
-- [-] V11  01-requirements.md: 118 OUTPUT(s), each with an address and a declared consumer list
+- [-] V10  01-requirements.md: 245 FLOW node(s), every one owned
+- [-] V11  01-requirements.md: 122 OUTPUT(s), each with an address and a declared consumer list
 - [!] V12  .dev-flow/2026-08-24-batch-87/01-requirements.md:845: COMPONENT workspace_body: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1131: COMPONENT check_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-12-batch-94/01-requirements.md:1153: COMPONENT patch_editor_panel: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
@@ -632,6 +744,8 @@
 - [!] V12  .dev-flow/2026-10-25-batch-99/01-requirements.md:1234: COMPONENT load_project_list: parent `load_project_dialog` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V12  .dev-flow/2026-10-25-batch-99/01-requirements.md:1250: COMPONENT fx_lane_patch_cell: INPUTS is not a `name: type` list on one side, so balancing was NOT checked; containment is a set operation and prose has no members
 - [!] V12  .dev-flow/2026-10-25-batch-99/01-requirements.md:1268: COMPONENT patch_bytes_input: parent `patch_win_script` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-26-batch-100/01-requirements.md:1479: COMPONENT status_log: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
+- [!] V12  .dev-flow/2026-10-26-batch-100/01-requirements.md:1505: COMPONENT busy_indicator: parent `workspace_shell` is not declared in this document, so balancing was NOT checked; this is not a pass
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:509: COMPONENT loaded_panel/panel_handle: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n6-n7-spec.md, prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:519: COMPONENT loaded_panel/slots_container: reached by 1 undeclared file(s) — s19_app/tui/screens_directionb.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-08-21-batch-85/01-requirements.md:540: COMPONENT loaded_panel/artifact_slots: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
@@ -702,6 +816,8 @@
 - [!] V13  .dev-flow/2026-10-25-batch-99/01-requirements.md:1222: COMPONENT workarea_files_list/files_list: reached by 2 undeclared file(s) — .fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md, tests/test_b99_load_project.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-10-25-batch-99/01-requirements.md:1239: COMPONENT load_project_list/project_list: reached by 6 undeclared file(s) — tests/test_b99_crc_region.py, tests/test_b99_export.py, tests/test_b99_load_project.py, tests/test_b99_patch_truth.py, tests/test_b99_staging.py, tests/test_b99_truncation.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  .dev-flow/2026-10-25-batch-99/01-requirements.md:1273: COMPONENT patch_bytes_input/patch_entry_bytes_input: reached by 11 undeclared file(s) — REQUIREMENTS.md, tests/test_b97_chips_help.py, tests/test_b97_flow_execution.py, tests/test_b99_bytes_field.py, tests/test_b99_export.py, tests/test_b99_staging.py, tests/test_before_after_report.py, tests/test_loadfilescreen_input.py, tests/test_tui_patch_glyphs.py, tests/test_tui_patch_layout.py, tests/test_tui_report_filter_surface.py. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-10-26-batch-100/01-requirements.md:1484: COMPONENT status_log/log_line_4: reached by 1 undeclared file(s) — .fast-dev-flow/archive/2026-07-23-n1-n2-spec.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
+- [!] V13  .dev-flow/2026-10-26-batch-100/01-requirements.md:1510: COMPONENT busy_indicator/progress_bar: reached by 1 undeclared file(s) — prototypes/legend_n8.INVENTORY.md. Declare the ones that genuinely depend on this address; grep cannot tell a dependant from a mention
 - [!] V13  01-requirements.md: 9 address(es) carry no quoted literal, so nothing was searched for them — screen_workspace/empty_state, workspace_body/empty_state, C-92-1/hex-rendered rows, C-92-1/layout constants, C-92-2/microbar bar + style constants, C-92-3/markup-safe Text, split_join_engine/output_files, split_join_engine/memory_segment_rows, change_set_wire/resolved_entries. A computed address cannot be followed by grep; recognising those SITES is the project's own rule
-- [-] V14  01-requirements.md: 382 declared consumer(s), every one resolved
-- [-] V19  01-requirements.md: 22 COMPONENT id(s), each declared exactly once
+- [-] V14  01-requirements.md: 408 declared consumer(s), every one resolved
+- [-] V19  01-requirements.md: 26 COMPONENT id(s), each declared exactly once
