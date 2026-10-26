@@ -1,0 +1,33 @@
+{
+  "page": "s19-b100-load-projects",
+  "round": "batch-100 Load + projects",
+  "exported": "2026-10-26T14:26:13.607Z",
+  "items": {
+    "P-A": {
+      "surface": "Diálogo Load",
+      "verdict": "C",
+      "note": "Me gusta la idea de los dos paneles, con el simbolo de cuál es el set que se va a usar como archivos activos en el proyecto para las vistas y funciones en la aplicación."
+    },
+    "P-B": {
+      "surface": "Pregunta antes de perder trabajo",
+      "verdict": "A",
+      "note": "Pregunta corta, hace el trabajo y crea menos dependencias."
+    },
+    "P-C": {
+      "surface": "Diálogo Save project",
+      "verdict": "B",
+      "note": "En este caso creo qu es importante saber que se está guardando en cuestión de proyecto. Se extra cuidadoso con la informaicón que se despliega aquí. Un error aquí podría hacer que el trabajo del usuario se ivnalide o se pierda o se sobreescriba o se renombre. Mucho cuidado al popular esta información."
+    },
+    "P-D": {
+      "surface": "Progreso de acciones largas",
+      "verdict": "A",
+      "note": "El spinner con la acción en progreso debe ser suficiente. asumiendo que la barra de progreso realmente hace su trabajo también, mostrando el progreso."
+    },
+    "P-E": {
+      "surface": "Resultado de Load project",
+      "verdict": "B",
+      "note": ""
+    }
+  },
+  "general_notes": ""
+}
