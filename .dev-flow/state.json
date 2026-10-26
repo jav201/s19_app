@@ -156,6 +156,11 @@
       "station": "PDR",
       "date": "2026-10-26",
       "decision": "asked at the gate — PDR-2026-10-26-batch-100 approved with conditions by architect (5 MINOR), qa-reviewer (3 MAJOR, 5 MINOR), ux-reviewer (5 MAJOR, 4 MINOR); no HIGH. Operator decision at this gate on C-UX-1/C-QA-1: \"Cruce con nombre\" — s19_app/tui/a2l.py gains an optional progress callback (bytes consumed), a named frozen-engine crossing; Inc 12 = 3 files and re-freezes a2l.py in test_engine_unchanged. Orchestrator rulings: C-UX-3 early alt+s closes the dialog and saves on a worker under the status line; C-QA-3 gate = six guard files + -k census; full suite after Inc 5, 8b, 12 and at P4 against evidence/suite-full-75f947a.txt (s19_app/tests identical to 1d677ba). All conditions owned per design/PDR-2026-10-26-batch-100.md. P3 is next: Inc 1 to Kimi K2.8."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — Inc 1 reached the P3 iteration cap (3 corrective passes) and was surfaced to the operator. Root cause: each pass closed one junction-escape route, but the guard mixed resolved and unresolved spellings across callers. Status: security PASS-WITH-NOTES (SEC-1 closed); code-reviewer round 3 BLOCK-UNTIL R3-1 (HIGH regression: the export refuses under a junctioned base). Operator chose \"Pasada 3 acotada\": fix only R3-1 + test, R3-2/SEC-6 (drop .resolve() in _active_project_dir), R3-3 (workarea_root required in gather_project_artifacts); code-reviewer re-reads only that; anything new beyond it stops the increment for a redesign. Routed: SEC-4 to Inc 5 (changes/apply.py staging), SEC-5 to Inc 8b (flow_persistence writers), R3-4 to backlog."
     }
   ],
   "obsidian_synced": false,

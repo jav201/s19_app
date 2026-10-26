@@ -1470,6 +1470,7 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
   - **Why they are covered today:** batch-100 Inc 1 made the app keep its project paths unresolved, and the guard walks to the outermost anchor.
   - **Why still route it:** an explicit root removes the dependence on how a caller spells its path.
   - **What closes it:** each caller takes and passes the app's work-area root; the AST census covers the whole package.
+- **▸ (code-reviewer MINOR, R3-4, batch-100 Inc 1 gate) With the outermost-anchor walk, an app whose base sits inside ANOTHER work area makes the four out-of-cap callers that pass no root stage temp files in the outer work area.** Closes together with the explicit-root threading item above: once each of those callers passes the app's root, the outer anchor no longer matters.
 - **▸ (security MINOR, SEC-3, not run) The 8.3 short-name fallback reparse-checks every component from the drive root.**
   - **Effect:** a legitimate work area whose base sits under a junction is refused on that route.
   - **What closes it:** limit the walk to the anchor and below, plus a test arm with a base under a junction.

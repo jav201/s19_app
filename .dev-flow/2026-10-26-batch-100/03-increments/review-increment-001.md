@@ -148,3 +148,81 @@
 
 - `security-reviewer`: N1 (the nested-anchor S-02 variant, executed escape).
 - Orchestrator: N2 (correct the evidence row before the commit); N3 (who owns `_gather_copy`'s rule); the decision on N1, fix now or ledger.
+
+---
+
+# Round 3 — re-read of corrective pass 2 (LED .50, after security SEC-1)
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer; I did not write the fix |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc1`: `e044112` plus Inc 1, fix pass 1 and fix pass 2, all uncommitted |
+| Contract | main `412de63`, LED .50 (app paths stay unresolved; the 9 `app.py` placement calls pass `workarea_root=self.workarea`; the guard walks to the OUTERMOST anchor; SEC-2) |
+| **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R3-1`** (1 HIGH). N1–N5 and the F9 nit are closed. Fix pass 2 introduced R3-1, a regression: the Split/Join export now refuses whenever the app's base folder is reached through a junction, a case that worked at base and after fix pass 1. The cause is one rebound variable. |
+
+## What I executed in round 3 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| Round-2 probes re-run (`probe/s02_export.py`, `s02_gather.py`, `r2_guard.py`) | export s19/bin, group and gather through a junction: all **REFUSED**, 0 bytes. **(d) nested anchor: now REFUSED** (N1). Short-name, upper-case and explicit-root probes as in round 2 |
+| Gather with a junctioned **project folder** (`probe/r3_gather_projjunction.py`): `<wa>/evil` → another work area's project | with `workarea_root=<wa>` (what `app.py:8278` passes) → **REFUSED**, victim `[]`. With the default `workarea_root=None` → **WROTE** `victim/patches/outside_doc.json` (R3-3) |
+| **Export under a junctioned base folder** (`probe/r3_export_junctioned_base.py`): `base_dir` = junction `linked_home` → `real_home`; `wa = ensure_workarea(base_dir)`; `dest = wa/P/exports` | fixed tree: export with no root → **REFUSED** (`ExportWriteError: Export stopped: … traverses a symbolic link or reparse point`). Export with the app root → **REFUSED**. Direct `place_into_workarea(…, workarea_root=wa)` → writes. **Base `e044112`, same setup: export WROTE `t_isle.s19`** (R3-1) |
+| Project / variant / flow / report / before-after sweep: 60 test files (every `tests/` file that names `current_project_dir`, `_handle_load_project`, `_handle_save_dialog`, `save_project`, `active_project_dir`, `before_after`, `gather_project_artifacts` or `variant_execution`, plus the placement files) | **1580 passed, 5 failed, 1 xfailed** (68 min). Of the 5 failures, 3 fail identically **at base `e044112`** when run in isolation: `test_at_b78_03_the_palette_action_set…`, `test_at_b78_32_app_bindings_block…`, `test_at_056e_a2b_diff_report_byte_identical…`. They are stale frozen artifacts from earlier batches, not caused here. The other 2 (`test_tc024_report_trigger_surfaces_paths`, `test_tc_b94_27_lane_binding_isolation_and_noop`) **pass in isolation** at head, so they are order or timing dependent. No failure is attributable to fix pass 2. |
+| `devflow-evidence.py --root . --check` over all 51 evidence files | 51 rows; the only flags are "index blob — not staged" (nothing is committed, by rule); **0 packet-digest mismatches** |
+| Source cap and CRLF | `git diff --name-only -- s19_app` lists exactly 4 files; all 4 sources plus `test_b100_reuse.py`, `b100_links.py` and `b97_fixtures.py` have 0 bare LF |
+| `tests/b97_fixtures.py` | **docstring only**: 1 sentence in `make_project`'s docstring rewritten. No code changed |
+
+## Closure table — round 2 findings
+
+| id | Status | Evidence |
+|---|---|---|
+| N1 (MAJOR) | **CLOSED** | `_find_workarea_root` and the 8.3 fallback both return the OUTERMOST anchor (`workspace.py:316-345`, `:395-412`); probe (d) is refused; `mut-n1-outermost.txt` KILLED |
+| N2 (MINOR) | **CLOSED** | digests re-derived with the tool; `--check` shows 0 digest mismatches |
+| N3 (MINOR) | **CLOSED** | the census names `_gather_copy`'s rule as owned by Inc 5 (`test_b100_reuse.py:493`, `:522`). The orchestrator should confirm that Inc 5's plan lists it |
+| N4 (MINOR) | **CLOSED (declarations accepted)** | upper-case and 8.3 anchor arms added (`red-12-shortname.txt` KILLED); `anchorcase` declared equivalent; the fallback's stricter-than-textual refusal declared as SEC-3, routed to backlog by LED .50 |
+| N5 (MINOR) | **CLOSED** | case-folded membership on Windows (`segment_split_view.py:964-972`), with an arm; `red-13-n5.txt` |
+| F9 nit | **CLOSED** | `_reuse_candidate_names -> list[str]` (`workspace.py:720`) |
+
+## Item 2 — regression sweep of the unresolved `current_project_dir`
+
+Readers checked across `s19_app/`: 2 writes (`app.py:8224` Save, `:8529` load), `_active_project_dir` and its 22 callers in `app.py`, and every `relative_to` / `is_relative_to` / `samefile` / path `==` site.
+- **No equality or containment relies on the resolved form.** `variant_execution_service.py:477`, `project_gather_service.py:490`, `flow_execution_service.py:1286`, `flow_report_service.py:248`, `before_after_service.py:305` and `folder_open_service.py:289/457` each resolve **both** sides at the comparison point. The `_last_execution` staleness check (`app.py:4790`) compares two values from the same `_active_project_dir()` source, both unresolved. No path is used as a dict key, and there is no `samefile`.
+
+Behaviour that **changed**:
+- (a) Displayed project paths now carry the unresolved spelling: the flow panels' session dir (`app.py:8456`, `str(project_dir)`), and the variant and data-file paths that `validate_project_files` lists under the project. They differ from before only when the base path holds a junction or an 8.3 component.
+- (b) **The export under a junctioned base is refused (R3-1).**
+
+Behaviour that did **not** change in the sweep: manifest relative paths, report attribution and before/after containment. 1580 tests pass; the 5 failures are explained above.
+
+## New findings — round 3
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **R3-1** | **HIGH** | `segment_split_view.py:842`, `:947`, `:969` | **Regression: the export refuses whenever the base folder is reached through a junction or symlink** (e.g. the app started from a junctioned folder, since `Path.cwd()` keeps that spelling, or `base_dir` passed that way). `home, workarea_root = _guarded_destination(dest_dir, workarea_root)` **rebinds** `workarea_root` to the *resolved* root. Both placements then receive the unresolved `dest_dir` together with that resolved root. `dest_dir` is not textually under the resolved root, so the guard's `stop_at=root.parent` never matches. The reparse walk then climbs to the drive root and refuses on the base folder's own junction. This holds with or without the app passing a root. It was fine at base and after fix pass 1, which called the placements without a root. | Probe `r3_export_junctioned_base.py`: base WROTE, fixed tree REFUSED (both limbs). | Keep the caller's root: `home, resolved_root = _guarded_destination(dest_dir, workarea_root)`; use `resolved_root` only for `stage_worst` / `_private_stage_dir`, and pass the **caller's** `workarea_root` to `place_into_workarea` and `place_group_into_workarea`. Add an arm: export with `base_dir` behind a junction and the app root → writes, 1 file. **Recommended hardening (same root cause, can be backlog):** in `_guarded_destination`, when an explicit root is given and the textual destination is not under the textual root, compare the root's resolved and textual forms rather than walking past it to the drive root. |
+| R3-2 | MINOR | `app.py:1911` | `_active_project_dir`'s fallback still returns `(self.workarea / self.current_project).resolve()`, against LED .50 "app paths stay unresolved". It is safe today, because every `app.py` placement passes the explicit root and the resolved-pair comparison catches an escape. But it is the one place where app code still hands out a resolved project path. | Read. | Drop the `.resolve()` (consistent with `:8224` / `:8529`). |
+| R3-3 | MINOR | `project_gather_service.py:406-416`, `:490`, `:563-565` | `gather_project_artifacts` still resolves `project_dir` before the guard, and its `workarea_root` defaults to `None`. With the default, a junctioned project folder escapes. The only caller (`app.py:8278`) passes the root, so this is a default-unsafe API, not a live path. | Probe: no root → WROTE into the victim; with root → REFUSED. | Make `workarea_root` keyword-required on `gather_project_artifacts`, or pass `project_dir / home` unresolved to `_gather_copy`. Either way, add it to the SEC-3 backlog entry. |
+| R3-4 | MINOR | `workspace.py:316-345` with `:925` (callers without a root) | With the derived root now the OUTERMOST anchor, an app whose `base_dir` itself sits inside another work area stages under the **outer** work area's `temp/.staging` for the 4 out-of-cap callers that pass no root (crc, apply, io, flow). The staged files are temporary and removed, but they are written outside this app's work area. Exposure: nested bases only. | Code read. | Add it to the LED .50 backlog entry for threading the root through the 4 out-of-cap callers; that entry closes it. |
+
+## Item 4
+
+- **4 source files** (the LED .50 cap ⚠); CRLF uniform.
+- Evidence check: 0 digest mismatches.
+- `b97_fixtures.py` is comment-only (item 3, confirmed).
+
+## Verdict
+
+**approve-with-fixes**, recorded as **`BLOCK — BLOCK-UNTIL: R3-1`** (open: 1 HIGH, R3-1; 3 MINOR, R3-2 to R3-4).
+- R3-1 is a 1-variable fix plus 1 test arm. It is discharged only by my re-read of the applied fix on the diff together with the junctioned-base probe.
+- R3-2 to R3-4 do not block. R3-3 and R3-4 belong in the LED .50 backlog entry with SEC-3.
+- SEC-1's discharge is security-reviewer's call. From my lane: the app placements, gather and export are refused in every junction probe I ran.
+
+## §4b `Independent review` cell (round 3, for the orchestrator to write)
+
+`code-reviewer` · **BLOCK — BLOCK-UNTIL: R3-1** (1 HIGH; 3 MINOR) · F1 (round 1) remains resolved; N1–N5 (round 2) are resolved and re-read on the diff. The outermost-anchor walk refuses the nested-anchor probe; 0 evidence digest mismatches; N4 and N5 are armed. R3-1 is open: fix pass 2 rebinds the export's `workarea_root` to the resolved root (`segment_split_view.py:842`), so every export refuses when the base folder is reached through a junction (executed; base and fix pass 1 wrote). Discharge: pass the caller's root to both placements plus a junctioned-base arm, re-read by `code-reviewer`. Project/variant/flow/report sweep: 1580 passed; the 5 failures are pre-existing at base (3) or pass in isolation (2).
+
+## Hand-offs (round 3)
+
+- `software-dev`: R3-1 (plus the arm), and R3-2 if it fits the pass.
+- Orchestrator: route R3-3 and R3-4 into the LED .50 / SEC-3 backlog entry; confirm Inc 5 owns `_gather_copy`'s rule (N3).
+- `qa-reviewer`: the 3 stale frozen-artifact failures at base (`at_b78_03`, `at_b78_32`, `at_056e`) and the 2 order-dependent nodes; none of them is from this batch.
+- `security-reviewer`: none new from my lane. R3-3 is your SEC-3 family (a default-unsafe API).

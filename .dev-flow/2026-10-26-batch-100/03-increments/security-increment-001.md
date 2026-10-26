@@ -38,3 +38,54 @@
 - [x] The verdict is explicit: `BLOCK — BLOCK-UNTIL: SEC-1`, and the HIGH carries no applied-and-verified mitigation yet.
 - [x] Probes ran against the worktree with `s19_app.__file__` printed. The worktree was not edited. Both scratch folders and their junctions were removed.
 - [ ] Not tested: per-directory case-sensitive folders (the case-fold anchor) and Python 3.11. My reasoning: the anchor only selects the root to compare against, so with SEC-1's explicit root it cannot widen containment.
+
+---
+
+## Round 2: re-read of fix pass 2 (LED .50, main checkout at `412de63`)
+
+| Field | Value |
+|---|---|
+| **Subject** | The uncommitted fix pass 2 in `C:\Users\jjgh8\Github\s19_app-b100-inc1`, per `HANDOFF.md` §"Fix pass 2" and the packet. Under LED .50: app paths stay unresolved; the 9 `app.py` placement calls pass `workarea_root=self.workarea`; the gather and the export thread the root through; with no root, the guard walks to the outermost anchor; SEC-2 raises the containment refusal. The four out-of-cap callers (apply, crc, flow_execution, flow_persistence) and SEC-3 are routed to the backlog. |
+| **Execution** | Four probes ran against the worktree (`python -I -B`, the worktree first on `sys.path`). Each printed `s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc1\s19_app\__init__.py`. Runtime: Python 3.12.7. Scripts and outputs are in `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\`: `sec_inc1_r2_probe.py`, `sec_inc1_r2_emit_probe.py` and `sec_inc1_r2_flow_probe.py`, each with an `.out`. The main probe drives the **real app routes** in Textual `run_test`, using the worktree's own test helpers read-only. Each probe made one scratch folder and removed its junctions with `rmdir` before the folder. One folder (`inc1r2work`) was left at first because the app's log file was still open; I removed it afterwards by its literal path, and none of these folders remains. The worktree was not edited. |
+| **VERDICT** | **`PASS-WITH-NOTES`**. SEC-1 is discharged by this re-read, and there is no HIGH. Two MAJORs (SEC-4, SEC-5) are in callers outside this increment's files. They go to their owners with their RED probes, and Inc 1 does not wait for them. This verdict authorises nothing beyond the increment gate; it is not the operator's authorization. |
+
+### Closure of Round 1
+
+| id | state | evidence |
+|---|---|---|
+| SEC-1 (HIGH) | **closed (discharged)** | **App routes, driven end to end** (`sec_inc1_r2_probe.out`). Project `evil` is a junction into another work area. It still loads, because the listing and load refusal comes in Inc 8b, and `current_project_dir` is stored unresolved (`equals its resolved form: False`). Then every route below was refused, and the other work area got 0 new files (`new files: []`):<br>- the variant append: `Project sync rejected: Refusing to place: … reparse point`;<br>- the MAC sync: the same refusal;<br>- the A2L sync: `A2L sync rejected: …`;<br>- Save project into `evil`: `Cannot save project: Refusing to place …`.<br>**Gather and export, with the app's root**, were refused for both unresolved and pre-resolved destinations: G1–G3 (`_check_home_contained`, `_gather_copy`) and E1–E3 (the export guard and `place_group_into_workarea`).<br>**Nested anchor:** N1, a `P2/.s19tool` junction with no root, was refused.<br>**Source:** all 9 `app.py` placement calls pass `workarea_root=self.workarea` (`app.py:8183`, `:8191`, `:8197`, `:8621`, `:8670`, `:8681`, `:8706`, `:8809`, `:8880`). `gather_project_artifacts(…, workarea_root=self.workarea)` is at `app.py:8278`. The export passes `workarea_root=Path(self._app().workarea)` (`segment_split_view.py:2066`). |
+| SEC-2 (MINOR) | **closed** | W1 (no root) and W2 (root), both with an invalid spelling, now give `refused (WorkareaContainmentError)`. The wrap re-raises and never falls through. |
+| SEC-3 (MINOR) | **routed** (backlog, LED .50) | Agreed: it is a false refusal, not a bypass. |
+
+### Question 2: do the four routed callers receive only unresolved app paths?
+
+- **`crc.write_crc_image`:** yes. `dest_dir` is `None` from its one caller (`screens.py:2694`), so the target is `ensure_workarea(base_dir) / crc`, which is unresolved.
+- **`flow_execution_service` (`:1108`):** yes. It receives `ctx.project_dir` from `FlowContext(project_dir=self._active_project_dir())`, which is the stored, unresolved `current_project_dir`. With no root it was refused (D1).
+- **`flow_persistence_service.import_flow_file` (`:1106`):** yes. It receives `project_dir / flows`. With no root it was refused (D2).
+- **`changes/apply.save_patched_image`:** it receives the unresolved `self._active_project_dir() or self.workarea` (`app.py`, save-back). Its final `copy_into_workarea` is refused. But the function **resolves the path internally** to choose its staging root (SEC-4).
+- **Latent path:** `_active_project_dir()`'s fallback returns `(self.workarea / self.current_project).resolve()` (`app.py:1911`). I found it unreachable today, because `current_project` and `current_project_dir` are only ever set together (`app.py:8223-8224`, `:8524-8529`). If it were reached, it would hand a resolved path to all four callers, and D3 shows a resolved path with no root is accepted. This is SEC-6.
+
+### Question 3: new bypasses from the outermost-anchor walk or the SEC-2 wrap
+
+None found:
+- the nested-anchor junction is refused (N1);
+- a junction from an app base nested inside an outer work area to an outer sibling is refused, with and without the root (N2, N3);
+- a plain legitimate folder there is accepted (N4).
+
+One semantic note, not a bypass: when the app base itself sits inside another work area, a no-root caller is bounded by the **outer** work area. N5 accepted a textual destination in the outer sibling. Today's routed callers build destinations from app paths plus fixed sub-folder names, so this cannot be reached. It belongs with SEC-6.
+
+### Findings, round 2
+
+| id | severity | location | finding | executed evidence | what closes it |
+|---|---|---|---|---|---|
+| SEC-4 | MAJOR (routed, outside Inc 1's files) | `changes/apply.py:741` (`_find_workarea_ancestor`) and `:885` (`resolved = dest_dir.resolve()`), used by `save_patched_image` (the save-back emit) | The emit picks its staging root by **resolving** `dest_dir` and walking the resolved path. With a junction project open, which can still be loaded until Inc 8b, the staging root is the *other* work area. The emit then creates `temp/` and `temp/.staging/` there and writes the emitted image into a private staging folder there. The final placement is refused (`MF-WRITE-CONTAINMENT`) and the staging folder is removed, but the bytes were transiently written outside this work area and the two folders stay. This is the S-02 class in a routed caller. | `executed` (`sec_inc1_r2_emit_probe.out`): `staging root the emit derives: …\other\.s19tool\workarea`, `staging dirs created by the emit: […\other\.s19tool\workarea\temp\.staging\stage-…]`, and `inside the OTHER work area after the emit: ['T', 'temp', 'temp\\.staging']`. | Take the staging root from `_guarded_destination(dest_dir, workarea_root)`, which runs before any staging, rather than from a resolved walk. Thread the app root from the save-back caller. TC arm: a save-back into a junction project creates 0 entries in the other work area. Route it to the increment that next touches `apply.py`, or to the backlog item LED .50 opened, with this probe as the RED side. |
+| SEC-5 | MAJOR (pre-existing, routed) | `flow_persistence_service.save_flow_json` (`:976-1033`) and the flowset writer (`:1480-1510`) | Both writers use plain `mkdir` and `write_text` into `project_dir / flows` (or `flowsets`), outside the placement seam, with **no containment check at all**. A junction `flows/` inside a normal project sends a saved flow to any folder. A name that already exists is never overwritten (the `_<N>` suffix), but new files land outside the work area. The base has the same gap, LLR-171.4's writer list does not name these writers, and Inc 1 did not touch them. | `executed` (`sec_inc1_r2_flow_probe.out`): `junction P/flows -> outside: True`, then `files in the OUTSIDE folder: ['probe.json']`. | Route both writers through `_guarded_destination(project_dir / flows, workarea_root)` before `mkdir`, or through `place_into_workarea`. Add them to LLR-171.4's writer list by a ledger entry. TC arm: a junction `flows/` gives 0 files outside. Inc 8b's load refusal closes only the junction-*project* route, not a junction *sub-folder*. |
+| SEC-6 | MINOR | `app.py:1911` (`_active_project_dir()` fallback) | The one remaining `.resolve()` on an app project path. It cannot be reached today (see question 2). If a later change sets `current_project` without `current_project_dir`, all four no-root callers would get a resolved path, and D3 shows that form accepted. | `executed` for the consequence: D3 `copy_into_workarea(RESOLVED evil) no root: ACCEPTED`. `not-run` for reachability, which I established from the assignment census: `current_project` and `current_project_dir` are assigned only at `app.py:8223-8224` and `:8524-8529`. | Return `self.workarea / self.current_project` unresolved, matching LED .50. This is a one-line change in `app.py`, a file Inc 1 already touches. |
+
+### Evidence checklist (round 2)
+
+- [x] SEC-1 was re-read on the diff and **executed through the real app routes**: variant append, Save project copies, MAC and A2L syncs, plus gather, export and the nested anchor at API level with the app's own arguments.
+- [x] All four routed callers were traced to their app inputs. The one internal resolution I found is SEC-4.
+- [x] The outermost-anchor walk and the SEC-2 wrap were probed for bypasses (N1–N5, W1–W2): none found.
+- [x] Each finding has what, where, why, a recommendation and a severity: 0 HIGH, 2 MAJOR (routed), 1 MINOR.
+- [x] No secret values or real names appear in the output. The worktree was not edited, and every scratch folder and junction I created was removed.
