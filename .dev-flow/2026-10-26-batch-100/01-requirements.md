@@ -30,17 +30,19 @@ This document states what the Load + projects batch obliges. A saved project res
 ### 1.3 Definitions, acronyms, abbreviations
 | Term | Definition |
 |------|------------|
-| Work area | `<base>/.s19tool/workarea/`, the folder Load lists (`app.py:8519-8524`). "Inside the work area" means inside `self.workarea.resolve()` after every link and junction is resolved (LLR-171.4), never inside some other `.s19tool/workarea`. |
+| Work area | `<base>/.s19tool/workarea/`, the folder Load lists (`app.py:8519-8524`). "Inside the work area" means inside `self.workarea.resolve()` after every link and junction is resolved (`contained_in_workarea`, LLR-171.4), never inside some other `.s19tool/workarea`. |
 | Work copy | The copy of a loaded source in `workarea/temp/` (`WORKAREA_TEMP`, `workspace.py:20`). |
-| Differs from source | `ChangeService.image_differs_from_source(mem_map)` (B100-I5, LLR-167.1): a journaled byte differs from its source byte. It decides, with the document's entry count, whether Save project emits or copies (LLR-167.2). |
-| Unsaved | `ChangeService.differs_from_last_saved(mem_map)` (NEW, LLR-167.5): the image differs from the copy last loaded or written (load, save-back, Save project). It decides the load question (HLR-174) and the Save summary's pending line (HLR-175). The two predicates are never merged. |
+| Data differs | The emit decision (LLR-167.1): the change document's entries, re-derived onto a copy of the source image (the `save_patched` split, LLR-167.7), give data that differs from the source file's data. A check document never counts. It decides whether Save project emits or copies. |
+| Unsaved | `ChangeService.differs_from_last_saved(mem_map)` (NEW, LLR-167.5): the image differs from the copy last loaded or written. With the Patch Editor dirty flag and the Flow Builder dirty flag it decides the load question (HLR-174) and the Save summary's pending line (HLR-175). It never decides emit or copy. |
 | Project | A direct child folder of this work area, not a link or junction, not a reserved home, holding a `project.json` or a data file (Q-2). |
-| Save plan | The one object `plan_project_save` (NEW, LLR-167.6) returns: target folder, every file with its source, final name, action and digest, the image (patched or not), the document, the sub-folders and the manifest keys. The Save dialog paints it and `_handle_save_dialog` executes it (R-PC). |
+| Save plan | The one object `plan_project_save` (NEW, LLR-167.6) returns: target folder and kind, one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`, each with its source, landing name (from `predict_placement`, LLR-163.7) and action word (`new`, `replace`, `keep`, `merge`, `rewrite`). The Save dialog paints it and `_handle_save_dialog` executes it (R-PC). |
+| `derived_from` | The `project.json` per-variant key (NEW, LLR-168.4) naming the variant a patched variant was derived from; written by the save-back and by Save project's emit, carried by every rewrite. |
 | Active set | The image variant, MAC and A2L that a load will install. The Load dialog's preview marks it with `●` (P-A verdict note). |
-| Load-result panel | The P-E B modal that a project load opens: the opened variant and why, how it differs from the base, the other variants, and every problem (HLR-178). |
+| Load-result panel | The P-E B modal that a project load opens: the opened variant and why, how it differs from the variant it derives from, the other variants, and every problem (HLR-178). |
 | Problem (D3) | One entry of the Load-side problem list (LLR-169.5, LLR-169.9), at most one per file. |
-| Recent source | An entry of `<base>/.s19tool/recent_sources.json` (B100-I9, LLR-172.1). |
+| Recent source | An entry of the per-user store `%APPDATA%\s19_app\recent_sources.json`, outside every work area (B100-I9 as amended, LLR-172.1; the operator's S-16 decision). |
 | Refusal token | A fixed, NEW phrase an acceptance test can match: the reason and the next step of every refusal, problem and empty state (§3 preface table). |
+| Image-replacing route | Every user action that replaces the loaded image: the Load dialog, the Workarea Files pick, the variant switch (`v`, the panel's `v`) and a project load. All pass the one load seam (LLR-174.4). |
 
 ### 1.4 References
 - `.dev-flow/design/INVESTIGATION-project-roundtrip-2026-10-23.md` (PH-*, M-*, L-* ids) and `AUDIT-codewire-ui-2026-10-23.md` (CW-U-* ids).
@@ -285,11 +287,19 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 | P-31 | The app binds `v` to `select_variant` and `p` to `load_project`. | premise | ✅ TRUE | `app.py:1437-1439` (`Binding("p", "load_project" …)`, `Binding("v", "select_variant" …)`); `action_select_variant` `app.py:6687` | VS-PE-3, VS-PA-4 |
 | P-32 | The change-document guard is `LoadGuardScreen`, and `ConfirmDiscardScreen` is the flow-discard modal. | premise | ✅ TRUE | `screens_directionb.py:4279` `class LoadGuardScreen`; `:4808` `self._dirty`; `screens.py:902` `ConfirmDiscardScreen` ("Discard unsaved flow edits?", `:922`) | LLR-174.1 (QA-03) |
 | P-33 | `examples/case_06_large_nested_a2l/firmware.a2l` is 37 742 888 bytes, large enough to keep a parse running for several timer ticks. | premise | ✅ TRUE | `ls -la examples/case_06*/` → `37742888 … firmware.a2l`; UX-02's capture: about 5 s to parse | AT-B100-17, AT-B100-18 slow fixture (QA-16) |
-| P-34 | `copy_into_workarea` has 17 call sites in 7 product files, and 15 test files name it. | premise | ✅ TRUE | `git grep -n "copy_into_workarea(" -- s19_app` → `app.py` ×9, `changes/apply.py:781`, `operations/crc.py` ×2, `segment_split_view.py:940`, `flow_execution_service.py:1108`, `flow_persistence_service.py` ×2, `project_gather_service.py:364`; `grep -rl --include=*.py copy_into_workarea tests \| wc -l` → 15 | LLR-163.1 keeps the `Path` return (§6.3) |
+| P-34 | `copy_into_workarea` has 15 call sites in 7 product files (17 grep lines, 2 of them docstrings), and 15 test files name it. | premise | ✅ TRUE | `git grep -n "copy_into_workarea(" -- s19_app` → 17 lines; `operations/crc.py:1443` and `flow_persistence_service.py:1096` are docstring text (B-08), leaving `app.py` ×9, `changes/apply.py:781`, `operations/crc.py:1507`, `segment_split_view.py:940`, `flow_execution_service.py:1108`, `flow_persistence_service.py:1106`, `project_gather_service.py:364`; `grep -rl --include=*.py copy_into_workarea tests \| wc -l` → 15 | LLR-163.1 keeps the `Path` return (§6.3) |
 | P-35 | The B1 trigger set is 35 test sources, not 116 (the 116 counted `.pyc` files). | premise | ✅ TRUE | `grep -rl --include=*.py "LoadFileScreen\|SaveProjectScreen\|LoadProjectScreen\|copy_into_workarea\|_handle_load_project\|_handle_save_dialog" tests \| wc -l` → 35 | §5.4 reverse census |
 | P-36 | Three writers land data files in the open project without the manifest seam. | premise | ✅ TRUE | architect review A-01: `flow_execution_service.py:679`, `:1108`, `variant_execution_service.py:797`; `app.py:2614-2626` (`FlowContext(project_dir=…)`) | the "present, not recorded" kind (LLR-169.5); backlog |
 
-- **Premise evaluation:** 36 premises · ✅ 36 TRUE · ❌ 0 FALSE · ❓ 0 UNDECIDABLE. Every finding the batch closes reproduces on its base.
+| P-37 | A check document with one entry makes `save_patched` refuse (`ok=False`, 1 entry blocked), because the apply gate blocks every entry of a non-change document. | premise | ✅ TRUE | architect probe `checkdoc.py` (P2 round 2, B-01): `save_patched ok: False \| Patched image not saved - 1 entry blocked - see issues`; `apply.py:227` docstring | the emit decision ignores check documents (LLR-167.1) |
+| P-38 | An emit of unchanged data into a folder holding the 16-byte-per-line source lands as a byte-different `_1` file. | premise | ✅ TRUE | QA probe `emit_identity.py` (round 2, R2-01): `firmware_1.s19; data identical: True \| bytes identical: False` | the emit decision is made on data (LLR-167.1) |
+| P-39 | Variants sort by `(name.lower(), name)`, so `firmware-patched.s19` sorts before `firmware.s19`. | premise | ✅ TRUE | `python -I -c "print(sorted(['firmware.s19','firmware-patched.s19','firmware_1.s19']))"` → `['firmware-patched.s19', 'firmware.s19', 'firmware_1.s19']`; `workspace.py:1110-1124` | `derived_from` (LLR-168.4) replaces "first by name" |
+| P-40 | A 1 MiB `project.json` of `batch` entries takes about 15 s to read with the per-entry resolver. | premise | ✅ TRUE | security probe R3 (round 2): `bytes=1048424 batch entries=75677 read_project_manifest=14.92s` | every manifest array capped at 1 000 (LLR-169.4) |
+| P-41 | Tightening `_resolve_manifest_entry` for every caller turns `test_tc_b97_20_hostile_refs_render_literally` red. | premise | ✅ TRUE | architect probe `patch_p8.py` (round 2, B-03): `FAILED tests/test_b97_flow_builder.py::test_tc_b97_20_hostile_refs_render_literally`; on base `1 passed` | the tightening runs in a manifest-key mode only (LLR-169.8) |
+| P-42 | The Workarea Files pick and the variant switch replace the image without passing the Load dialog's route. | premise | ✅ TRUE | `app.py:9021-9031` (`_load_from_item` → `load_selected_file`); `app.py:6736` `_handle_select_variant` → `load_from_path` (`:6789`) | the one load seam (LLR-174.4) |
+| P-43 | The Patch Editor panel's dirty flag has no public reader; it is cleared only by `mark_saved` / `mark_loaded`. | premise | ✅ TRUE | `screens_directionb.py:4808` `self._dirty`; `:5805` `def mark_saved`; `:5815` `def mark_loaded`; `grep -n "def is_dirty" screens_directionb.py` → 0 | Inc 10 adds `screens_directionb.py` (§5.5); Save project calls `mark_saved` (LLR-167.8) |
+
+- **Premise evaluation:** 43 premises · ✅ 43 TRUE · ❌ 0 FALSE · ❓ 0 UNDECIDABLE. Every finding the batch closes reproduces on its base.
 
 ### 2.8 Fork preconditions (C-52) — MANDATORY, and the declared empty when the batch does not fork
 
@@ -325,7 +335,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > |---|---|---|
 > | reserved home as a name | `reserved name` | `choose another name` |
 > | Windows device name | `device name` | `choose another name` |
-> | disguised clash (Q-2) | `already a project` | `type the exact name to add to it` |
+> | disguised clash (Q-2) | `already a project` | `choose another name` |
 > | name over 64 characters | `name too long` | `shorten the name` |
 > | full path over the limit | `path too long` | `shorten the name` |
 > | folder cannot be created or written | `could not save` | `check the folder` |
@@ -334,42 +344,54 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 > | empty Load | `nothing selected` | `pick a row or type a path` |
 > | typed path not found / unsupported | `not found` / `not a supported file` | `check the path` |
 > | typed folder in the work area, not a project | `not a project` | `pick a project in the list` |
-> | typed folder outside the work area | `outside the work area` | `projects open only from the work area` |
+> | typed folder outside the work area | `outside the work area` | `copy the folder into the work area` |
+> | project folder with no data or A2L file | `no data or A2L file` | `load a file and Save project` |
+> | save-as larger than the free space | `not enough free space` | `free disk space or remove files from the project` |
+> | Save target is a link or junction | `link or junction` | `choose another name` |
 > | empty Projects / work-area files / recents | `no projects` / `no work-area files` / `no recent sources` | `ctrl+s saves a project` / `l loads a file` / — |
 > | recent source missing on pick | `not found` | `the entry was removed` |
-> | second request while a worker runs | `busy` + the running action's label | `wait for it to finish` |
-> | problem kinds (LLR-169.9) | `manifest damaged`, `no project.json`, `missing`, `not readable`, `changed on disk`, `not recorded`, `no digests saved` | `Save project records them` (for `no digests saved` and `not recorded`) |
+> | an image-replacing or project action while a worker runs | `busy` + the running action's label | `wait for it to finish` |
+> | quit while a worker runs | `still working` + the running action's label | `wait, or quit after it finishes` |
+> | problem: manifest damaged | `manifest damaged` + what is wrong in user terms | `Save project rewrites it` |
+> | problem: no `project.json` | `no project.json` | `Save project writes it` |
+> | problem: missing | `missing` | `restore the file, or Save project to drop it` |
+> | problem: not readable | `not readable` + the reason in user terms | `replace the file, or Save project to drop it` |
+> | problem: changed on disk | `changed on disk` | `Save project records the new state` |
+> | problem: not recorded | `not recorded` | `Save project records it` |
+> | problem: no digests saved | `no digests saved` | `Save project records them` |
+>
+> **An exception to "no private access", declared:** AT-B100-21 reads the save plan the Save dialog holds (one public accessor, `SaveProjectScreen.plan`, NEW) to compare its rows with the written tree by full path and action, because the painted summary may be cut at 118 columns (dispositions r2, UX-32). It also checks the painted rows' action words at 220 columns.
 
 ### HLR-163 — Byte-identical copies are reused
 - **Traceability:** US-153
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.9
-- **Statement:** When a file is placed in the work area or a project, and an existing regular, non-link, non-empty file named `<name>` or `<stem>_<N><suffix>` in the destination holds the same bytes, the system shall reuse that file and write nothing new. Otherwise it shall place the file under the lowest free `_<N>`, as before. One function shall decide byte-identity for every placement and for the Split/Join export. Every status that reports a placement shall say whether the file was reused: a load into an open project that reuses a file already there shall name the existing variant and shall not report a variant as added, and an export shall report a reused file as reused.
-- **Rationale (informative):** identical copies and duplicate variants accumulate (P-6). The reuse widens B99-I2 (B100-I6). The export keeps a second copy of the B8 rule (QA-05).
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.9, LED-2026-10-26-batch-100.20
+- **Statement:** When a file is placed in the work area or a project, and an existing regular, non-link, non-empty file named `<name>` or `<stem>_<N><suffix>` in the destination holds the same bytes, the system shall reuse that file and write nothing new. Otherwise it shall place the file under the lowest free `_<N>`, as before. One placement function shall decide byte-identity and the landing name for every placement, for the Split/Join export and for the save plan's prediction. The two statuses that claim a file was added or written — the variant append into an open project and the Split/Join export — shall say whether the file was reused: the variant append shall name the existing variant and not report a variant as added, and the export shall report a reused file as reused.
+- **Rationale (informative):** identical copies and duplicate variants accumulate (P-6). The reuse widens B99-I2 (B100-I6). The export keeps a second copy of the B8 rule (QA-05). The other placement statuses ("Saved change-set to X", the save-back suffix) are true either way and are not changed (B-09, QA R2-10).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_reuse.py`, plus the re-pinned nodes of LLR-163.3 and LLR-163.4.
 - **Numeric pass threshold:** the `p02` C sequence (5 loads of two distinct `firmware.s19` sources) → 2 files in `temp/`, 2 data files in P's folder on disk; 0 status lines reporting an added variant for a reused file; a re-export of identical bytes → 1 `reused` status, 0 new files.
 - **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
   - **Observable outcome:** with project P open, the engineer loads `examples/case_01_basic_valid/firmware.s19`, then `examples/case_02_gaps_and_patch_targets/firmware.s19`, then each again. The work area holds two image files, P's folder on disk holds two data files (listed from disk, QA-25), and the status for each repeated load names the existing variant.
-  - **Shipped surface:** Load (`l`, `#load_path`, `#load_ok`; the ids survive Inc 9b, P-30), the status log, the work area on disk.
+  - **Shipped surface:** Load (`l`, `#load_path`, `#load_ok`; the path field has the focus when the dialog opens, P-30 as corrected by UX-05), the status log, the work area on disk.
   - **Acceptance test(s):** AT-B100-01
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: a 0-byte candidate is never reused; boundary: a same-size candidate with one differing byte (new `_<N>`), a deleted `_1` beside an identical `_2` (reused). Invalid/error: N/A — no input grammar changes.
   - **Negative control:** executed on `1d677ba` (P-6): `firmware_2.s19 310 a9e114d56077` beside an identical `firmware_1` → AT-B100-01 is RED today.
 
 ### HLR-164 — Save project refuses unsafe names and leaves nothing behind
 - **Traceability:** US-154
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5
-- **Statement:** When Save project receives a project name, the system shall refuse it, painting the reason token and the next-step token, if its sanitised form (a) is a disguised clash — it equals an existing project's folder name compared case-folded while the typed name differs from that folder name — in which case the refusal names both; (b) equals, compared case-folded, a reserved work-area home; (c) equals, compared case-folded, a Windows device name, with or without an extension or a superscript digit; (d) is longer than 64 characters; or (e) would make a project file path longer than the path limit. A name equal to an existing project that is not open shall save into that project as a merge, and a name equal to the open project, typed or as its unsanitised form, shall save into the open project. If any operating-system error occurs after the folder is created, then the system shall report it with its tokens, remove the folder the save created, and keep running. Every refused or failed save shall leave no folder that the save created. The project list shall omit every reserved home compared case-folded.
-- **Rationale (informative):** silent merges (P-10), hidden reserved projects (P-14), device names (S-04), a crash on a long name (P-13), escaping `OSError`s (S-05). Q-1 sets the cap at 64 with the full-path check (A-10). Q-2 with QA-04's definitions and A-09's merge decides the existing-project cases.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22
+- **Statement:** When Save project receives a project name, the system shall refuse it, painting the reason token and the next-step token, if (a) it is a disguised clash — its sanitised form equals an existing project's folder name compared case-folded while the typed name differs from that folder name — in which case the refusal names both and tells the engineer to choose another name; (b) its sanitised form equals, compared case-folded, a reserved work-area home; (c) the typed name or its sanitised form, compared case-folded, is a Windows device name, with or without an extension or a superscript digit; (d) its sanitised form is longer than 64 characters; (e) it would make a project file path longer than the path limit; or (f) the target folder exists and is a link or junction. A name equal to an existing project that is not open shall save into that project as a merge, shown as a merge in the summary; a name equal to the open project, typed or as its unsanitised form, shall save into the open project. If any operating-system error occurs after the folder is created or after a merge has placed files, then the system shall report it with its tokens, remove the folder the save created or the files the merge placed, and keep running. Every refused or failed save shall leave the work area as it was. The project list shall omit every reserved home compared case-folded.
+- **Rationale (informative):** silent merges (P-10), hidden reserved projects (P-14), device names (S-04), a crash on a long name (P-13), escaping `OSError`s (S-05). Q-1 sets the cap at 64 with the full-path check (A-10). Q-2 with QA-04's definitions and A-09's merge decides the existing-project cases; the refusal never suggests a merge (UX-35). Device names are checked on the raw name too (dispositions r2, R2-04/05).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_save_guards.py`
-- **Numeric pass threshold:** 5 reserved spellings (`reports`, `CRC`, `Splits`, `FLOWS`, `Temp`) and 4 device names (`nul`, `CON`, `com1`, `LPT¹`) → 9 refusals with tokens, 0 folders created; `a b` with project `ab` existing and not open → 1 refusal naming `a b` and `ab`; `ab` exactly → 1 merge; 64 characters → saved, 65 and 300 → refused, app running, 0 folders; a forced `OSError` at each post-creation stage → 0 folders left, 0 raises; `list_projects` over `Splits` and `Reports` folders → 0 listed.
+- **Numeric pass threshold:** 5 reserved spellings (`reports`, `CRC`, `Splits`, `FLOWS`, `Temp`) and 6 device names (`nul`, `CON`, `com1`, `LPT¹`, `con.txt`, `C O N`) → 11 refusals with tokens, 0 folders created; `a b` with project `ab` existing and not open → 1 refusal naming `a b` and `ab` with `choose another name`; `ab` exactly → 1 merge; 64 characters → saved, 65 and 300 → refused, app running, 0 folders; a forced `OSError` at each stage → 0 folders left, 0 raises; a forced `OSError` mid-merge → the target's file set and `project.json` unchanged; `list_projects` over `Splits` and `Reports` folders → 0 listed.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** in the Save project dialog the engineer types `Reports` and saves: the status carries `reserved name` and `choose another name`, and no `Reports` folder appears. `CON` is refused the same way with `device name`. A 300-character name gives `name too long` and the app keeps running. With project `ab` saved and P2 open, saving as `a b` is refused naming `ab`.
+  - **Observable outcome:** in the Save project dialog the engineer types `Reports` and saves: the status carries `reserved name` and `choose another name`, and no `Reports` folder appears. `CON` is refused the same way with `device name`. A 300-character name gives `name too long` and the app keeps running. With project `ab` saved and P2 open, saving as `a b` is refused naming `ab`, with `choose another name`.
   - **Shipped surface:** Save project (`ctrl+s`, `#project_name`, `alt+s` / `#save_ok`, P-30), the status log, the work area on disk.
   - **Acceptance test(s):** AT-B100-02
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: an empty name (`name is empty`); boundary: 64 (saved) and 65 (refused), the full-path limit; invalid: reserved and device names in mixed case, a disguised clash; error: a forced `OSError` after creation.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: an empty name (`name is empty`); boundary: 64 (saved) and 65 (refused), the full-path limit met and exceeded by 1; invalid: reserved and device names in mixed case, a disguised clash, a junction target; error: a forced `OSError` after creation and mid-merge.
   - **Negative control:** executed on `1d677ba` (P-14): `dialog Save 'reports' -> … Saved project` → AT-B100-02 is RED today.
 
 ### HLR-165 — A project load starts from an empty session
@@ -404,52 +426,52 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: a cancelled load (`esc` in the dialog); boundary: a load while the Split/Join window is shown (its table is the target). Invalid/error: N/A — a failed load leaves the focus where it was.
   - **Negative control:** executed on `1d677ba` (P-16): `focused region area: 0`, `` `p` -> Screen `` → AT-B100-04 is RED today.
 
-### HLR-167 — Save project saves the source plus the document, verified
+### HLR-167 — Save project saves the source plus the change document, verified, and copies when nothing changed
 - **Traceability:** US-157
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13
-- **Statement:** When Save project runs while the loaded image differs from its source or the change document holds at least one entry, the system shall write the source plus every entry the document holds into the project through `ChangeService.save_patched` (`change_service.py:2009`), the same rule the save-back uses, with 32 bytes per line and the source's S0 header, verify the written file, and update the view's image in place so that it equals what was saved. The status shall say how many document entries the image carries and how many of them this save applied. Otherwise the system shall copy the source byte for byte. If the re-derive blocks any entry, then the system shall refuse the whole save, name the blocked entries with their tokens, and leave no folder it created. MAC and A2L files stay byte copies. When the target folder already holds a different file with the source's name, the image shall land as `<stem>_<N>` and become the project's active variant. Every file a Save project writes shall be the one its save plan names (HLR-175, R-PC). A successful Save project and a successful save-back shall record the saved state that the unsaved predicate compares against.
-- **Rationale (informative):** the save copies the work copy and drops the patch (P-1). D1 = `imagen`; A-06 keeps one rule for one fact (B99-I7, no amendment); O-5 sets the save-back defaults with no prompt; O-6 refuses a partial save; UX-01 and A-08 keep two predicates.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13, LED-2026-10-26-batch-100.14
+- **Statement:** When Save project runs, the system shall re-derive the change document's entries onto a copy of the source image; a check document never counts. If the re-derived data differs from the source file's data, the system shall emit that image into the project through `save_patched`'s emit-and-verify half (the save-back's rule, B99-I7), with 32 bytes per line and the source's S0 header, record its `derived_from`, and update the view's image in place so that it equals what was saved; the status shall say how many document entries the image carries and how many this save applied. Otherwise the system shall copy the source byte for byte and create no new variant. A check document is saved to `checks/` and never blocks the save. If the re-derive blocks any entry of a change document, then the system shall refuse the whole save, name the blocked entries with their tokens, and leave no folder it created. MAC and A2L files stay byte copies. When the target folder already holds a different file with the image's name, the image shall land as the save plan predicts (`<stem>_<N>`) and become the project's active variant. Every file a Save project writes shall be the one its save plan names (HLR-175, R-PC). A successful Save project shall record the saved image state and clear the Patch Editor's dirty flag once the document is written.
+- **Rationale (informative):** the save copies the work copy and drops the patch (P-1). D1 = `imagen`; A-06 keeps one rule for one fact. B-01 / QA R2-01 move the emit decision onto data (P-37, P-38): the round-2 rule ("differs from source or the document holds an entry") made a check document refuse every save and wrote byte-different copies of unchanged data — §6.3 records it as a round-2 deviation corrected here. UX-27: the dirty flag is cleared like the save-back clears it.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_save_image.py`
-- **Numeric pass threshold:** the `p01` sequence → the project image read by the independent reader equals source + document (0 differing addresses), every S19 data record ≤ 32 data bytes, the S0 equal to the source's; an entry added after the apply → written, and the status names 1 applied by the save; an entry removed after the apply → absent from file and view; only unapplied entries → emitted (0 dropped); an unpatched save with an empty document → 0 differing bytes against the source; a blocked document → 0 files, 0 folders left; save-back then Save project → the project image holds the patch (A-08).
+- **Numeric pass threshold:** the `p01` sequence → the project image read by the independent reader equals source + change document (0 differing addresses), every S19 data record ≤ 32 data bytes, the S0 equal to the source's; a check-document-only session → byte copy (0 differing bytes) and the document written under `checks/`, 0 refusals; an unchanged change document (an entry that writes the bytes already there) → byte copy, 0 new variants; a real change → emit; an entry added after the apply → written; only unapplied entries → emitted; a blocked change document → 0 files, 0 folders left; save-back then Save project → the patch in the project image; after Save project → the Patch Editor dirty flag clear (1 assertion).
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer loads `case_01` `firmware.s19`, applies `0x8000007C DE AD BE EF` in the Patch Editor without a save-back, saves project P1, and reopens P1 in a fresh app. The independent reader finds `DE AD BE EF` at `0x8000007C` in `P1/firmware.s19`; the save status names 1 entry; after the reopen, the Loaded panel names `firmware.s19` and (from Inc 6) the Load-result panel names it as patched, 4 B differ (the consumer oracle, QA-09).
+  - **Observable outcome:** the engineer loads `case_01` `firmware.s19`, applies `0x8000007C DE AD BE EF` in the Patch Editor without a save-back, saves project P1, and reopens P1 in a fresh app. The independent reader finds `DE AD BE EF` at `0x8000007C` in `P1/firmware.s19`; the save status names 1 entry; after the reopen, the Loaded panel names `firmware.s19` and (from Inc 6) the Load-result panel names it as patched (the consumer oracle, QA-09). A session holding only a check document saves `firmware.s19` byte-identical to the source.
   - **Shipped surface:** Patch Editor (Add, Apply), Save project (`ctrl+s`, `alt+s`), Load (`p`), the Loaded panel, the Load-result panel, the project folder.
   - **Acceptance test(s):** AT-B100-05
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☒ error — empty: no entry and an unchanged image (byte copy); boundary: an entry that writes the bytes already there, an entry added after the apply, a folder that already holds `firmware.s19` (lands as `firmware_1.s19`); error: a blocked entry (whole save refused). Invalid: N/A — the entry grammar is unchanged.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no entry and an unchanged image (byte copy); boundary: an entry that writes the bytes already there (byte copy, no variant), an entry added after the apply, a folder that already holds `firmware.s19` (lands as `firmware_1.s19`); invalid: a check document (never an emit, never a refusal); error: a blocked change-document entry (whole save refused).
   - **Negative control:** executed on `1d677ba` (P-1): `project firmware.s19 == in-memory patched image? False` → AT-B100-05 is RED today.
 
 ### HLR-168 — A save-back into the project becomes the active variant
 - **Traceability:** US-158
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7
-- **Statement:** When a Patch Editor save-back writes an image into the open project, the system shall make that image the project's active variant in the session and in `project.json`, and shall keep `current_file.path` on the source the image was loaded from. When any write lands a file in the open project — Save project, the save-back, the Load-file variant append, the MAC sync or the A2L sync — the system shall rewrite `project.json` through the manifest seam, carrying every key it does not own (`batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `files` records of untouched files) unchanged and project-relative. A Load file that makes the loaded file the project's active variant shall say so in a status line naming the project and the file it now opens. When the project is loaded, the system shall open the active variant `project.json` records.
-- **Rationale (informative):** the save-back adds a variant that Load never opens (P-3). D2 = `ultima`; O-1; O-10. A-02 (carry `active_document`), A-03 (the reader's absolute paths go back to relative), UX-14 (the append's consequence is named).
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.23
+- **Statement:** When a Patch Editor save-back writes an image into the open project, the system shall make that image the project's active variant in the session and in `project.json`, record the variant it derives from as `derived_from`, and keep `current_file.path` on the source the image was loaded from. When any write lands a file in the open project — Save project, the save-back, the Load-file variant append, the MAC sync or the A2L sync — the system shall rewrite `project.json` through the manifest seam, carrying every key it does not own (`batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `derived_from`, `files` records of untouched files) unchanged and project-relative. A Load file that makes the loaded file the project's active variant shall say so in a status line naming the project and the file it now opens. When the project is loaded, the system shall open the active variant `project.json` records.
+- **Rationale (informative):** the save-back adds a variant that Load never opens (P-3). D2 = `ultima`; O-1; O-10. A-02, A-03, UX-14; UX-26 (`derived_from`).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_active_variant.py`
-- **Numeric pass threshold:** `p02` A and B → the reload opens the patched variant (2 of 2 arms); 4 in-project writers → 4 manifest rewrites, each with 0 changed keys it does not own and 0 absolute paths; a document recorded, then a variant append, then reopen → the document reopened (1 arm); the append → 1 status line naming the project and the file.
+- **Numeric pass threshold:** `p02` A and B → the reload opens the patched variant (2 of 2 arms); 4 in-project writers → 4 manifest rewrites, each with 0 changed keys it does not own and 0 absolute paths; a document recorded, then a variant append, then reopen → the document reopened (1 arm); the append → 1 status line naming the project and the file; a save-back → `derived_from` names the source variant (1 arm).
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** with project P open, the engineer applies a patch and saves back as `firmware.s19` (placed as `firmware_1.s19`). Reopening P in a fresh app loads `firmware_1.s19`: the status log's summary line names it, and the independent reader finds the patch in it. `project.json` on disk names `firmware_1` as `active_variant`.
-  - **Shipped surface:** Patch Editor save-back (`#patch_saveback_*`), Load (`p`), the status log, `project.json` on disk.
+  - **Observable outcome:** (AT-B100-06) with project P open, the engineer applies a patch and saves back as `firmware.s19` (placed as `firmware_1.s19`). Reopening P in a fresh app loads `firmware_1.s19`: the status log's summary line names it, and the independent reader finds the patch in it. `project.json` on disk names `firmware_1` as `active_variant` and `firmware` as its `derived_from`. (AT-B100-20) With P open and `batch`, `assignments`, `declared_regions`, `gathered` and `active_document` all set, the engineer (1) loads a new S19, (2) loads a MAC, (3) loads an A2L through Load. After each, `project.json` on disk keeps those five keys equal (JSON compare) with 0 absolute paths, and after (1) it names the new `active_variant`. A fresh app opening P shows the new variant in the Load-result panel, the document in the Patch Editor ledger, and the batch documents in the Execute-scope list.
+  - **Shipped surface:** Patch Editor save-back (`#patch_saveback_*`), Load (`l`, `p`), the status log, the Load-result panel, the Patch Editor ledger, the Flow Execution Execute-scope list, `project.json` on disk.
   - **Acceptance test(s):** AT-B100-06, AT-B100-20
   - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: the default save-back name (`firmware-patched.s19`, `p02` B) and a reused identical name (M-1); error: a manifest rewrite whose verify fails (the existing mismatch notice, `app.py:8416-8423`). Empty/invalid: N/A.
-  - **Negative control:** executed on `1d677ba` (P-3): `RELOAD -> file=firmware.s19 … image_is_patched=False` → AT-B100-06 is RED today; A-03's executed carry probe (`serialize_manifest` refuses the reader's absolute `batch`) → AT-B100-20 RED for a carry written without the conversion.
+  - **Negative control:** executed on `1d677ba` (P-3): `RELOAD -> file=firmware.s19 … image_is_patched=False` → AT-B100-06 is RED today; A-03's executed carry probe (`serialize_manifest` refuses the reader's absolute `batch`) → AT-B100-20 RED for a carry written without the conversion: 3 arms, each with 5 key comparisons.
 
 ### HLR-169 — Load opens what is valid and lists every problem
 - **Traceability:** US-159
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.7
-- **Statement:** When the manifest seam writes `project.json`, the system shall record under `files` the size and SHA-256 of every top-level file with a project data or A2L suffix and of the active document, computed from disk after every copy has landed, and shall stage the manifest in a private directory. When a project is loaded, the system shall open every valid file, open the next valid variant when the active one is missing or unreadable, and report at most one problem per file, its highest by this precedence: manifest damaged or no `project.json` > missing > not readable > changed on disk > not recorded > no digests saved. It shall read at most 1 MiB of `project.json` and at most 1 000 `files` records, reporting the excess as a damaged manifest. The status log shall carry one summary line; the Load-result panel shall carry the full list (HLR-178). Every malformed or unsafe manifest record shall be reported and skipped, never trusted.
-- **Rationale (informative):** damaged manifests, corrupt images and edited images load as success (P-4); a missing image gives a misleading status (P-5). D3 = `abre_y_reporta`; O-2; O-11. QA-07 sets the precedence; A-01 restores "not recorded"; A-18 adds "no `project.json`"; S-08 sets the caps; A-05 takes "not readable" from the load result.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.20
+- **Statement:** When the manifest seam writes `project.json`, the system shall record under `files` the size and SHA-256 of every top-level file with a project data or A2L suffix and of the active document, computed from disk after every copy has landed, and shall stage the manifest in a private directory. When a project is loaded, the system shall open every valid file, open the next valid variant when the active one is missing or unreadable, and report at most one problem per file, its highest by this precedence: manifest damaged or no `project.json` > missing > not readable > changed on disk > not recorded > no digests saved. It shall read at most 1 MiB of `project.json` and at most 1 000 entries in each of `batch`, `assignments`, `declared_regions`, `gathered` and `files`, reporting the excess as a damaged manifest; the same cap applies to `derived_from`. Problems shall be painted in user terms with their next step; internal issue codes go to the log only. The status log shall carry one summary line; the Load-result panel shall carry the full list (HLR-178). Every malformed or unsafe manifest record shall be reported and skipped, never trusted.
+- **Rationale (informative):** damaged manifests, corrupt images and edited images load as success (P-4); a missing image gives a misleading status (P-5). D3; O-2; O-11; QA-07; A-01; A-18; S-08 and security R2-03 (P-40: every array is capped); A-05; QA R2-09 (user terms).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_project_check.py`
-- **Numeric pass threshold:** the `p04` cases 2, 5, 6, 7, 9, a legacy project and a hand-copied data file → exactly 1 problem each, of the matching kind, naming the file (case 6: `not readable` only; case 7: `manifest damaged` only); a clean project → 0 problems; every case → the project opens (a file loaded or the A2L attached); a 1 001-record manifest → 1 `manifest damaged`, load under 1 s.
+- **Numeric pass threshold:** the `p04` cases 2, 5, 6, 7, 9, a legacy project and a hand-copied data file → exactly 1 problem each, of the matching kind, naming the file (case 6: `not readable` only; case 7: `manifest damaged` only); a clean project → 0 problems; every case → the project opens; a manifest with 1 001 entries in any one array → 1 `manifest damaged`, load under 1 s.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer saves project P, a byte of `P/firmware.s19` changes on disk, and P is reopened in a fresh app: P opens, the summary line (`#log_line_4`, read at 118 columns) carries `1 problem` inside the painted width, and the panel names `firmware.s19` as `changed on disk`. A hand-edited `project.json` whose `files` names `../outside.s19` opens P, reports `MANIFEST-PATH-ESCAPE` as a damaged record, and reads nothing outside P.
+  - **Observable outcome:** the engineer saves project P, a byte of `P/firmware.s19` changes on disk, and P is reopened in a fresh app: P opens, the summary line (`#log_line_4`, read at 118 columns) carries `1 problem` inside the painted width, and the panel names `firmware.s19` as `changed on disk` with `Save project records the new state`. A hand-edited `project.json` whose `files` names `../outside.s19` opens P; the panel paints `manifest damaged` naming that record in user terms ("a file path points outside the project"), the internal code appears only in the log, and nothing outside P is read.
   - **Shipped surface:** Save project, Load (`p`), the status log, the Load-result panel, `project.json` on disk.
   - **Acceptance test(s):** AT-B100-07
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no `files` key (legacy), no `project.json`; boundary: an equal size with a different digest, exactly 1 000 records; invalid: hostile `files` keys and values (LLR-169.4); error: a `project.json` that is not JSON.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no `files` key (legacy), no `project.json`; boundary: an equal size with a different digest, exactly 1 000 entries in an array; invalid: hostile `files` keys and values (LLR-169.4); error: a `project.json` that is not JSON.
   - **Negative control:** executed on `1d677ba` (P-4): `[2 image edited on disk] … notices=[]` → AT-B100-07 is RED today.
 
 ### HLR-170 — The change document is saved and reopened with the project
@@ -470,99 +492,99 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-171 — Projects live in this work area and reopen complete
 - **Traceability:** US-161
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6
-- **Statement:** When Save project saves the open project under a new name, the system shall copy every sub-folder of the open project, with its regular files, into the new project, without following any directory link or junction, and listing each link it skipped; before the new folder is created it shall refuse the save when the copy's total size exceeds the free space of the work area's volume. When a project holds an A2L and no data file, Load shall open its A2L. Every project path the batch lists, loads or writes shall be inside this app's work area after links and junctions are resolved, and a project folder that is itself a link or junction shall not be listed, loaded or written. When Save project is given a parent folder that does not resolve to this work area, the system shall refuse the save before creating any folder.
-- **Rationale (informative):** "save as" leaves flows, patches and reports behind (P-9); an A2L-only project cannot be loaded (P-12); a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02); a junction inside a sub-folder copies an outside tree (S-03); a large copy can fill the disk (S-15). D5 with O-4; D6; D7 (the dialog half is HLR-175).
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22
+- **Statement:** When Save project saves the open project under a new name, the system shall copy every sub-folder of the open project, with its regular files, into the new project, without following any directory link or junction, and listing each link it skipped; one link-pruned walk shall produce both the file list and the total, and the save shall be refused before the new folder is created when that total exceeds the free space of the work area's volume. When a project holds an A2L and no data file, Load shall open its A2L. Every placement — every file any writer lands in the work area, the save-back and Save project's emit included — shall be refused unless its destination is inside this app's work area after links and junctions are resolved; this check lives in the one placement function, so no writer is left off a list. A project folder that is itself a link or junction shall not be listed, loaded or written, and Save project shall check its target for a link or junction before resolving it. When Save project is given a parent folder that does not resolve to this work area, the system shall refuse the save before creating any folder.
+- **Rationale (informative):** "save as" leaves flows, patches and reports behind (P-9); an A2L-only project cannot be loaded (P-12); a save elsewhere is never listed (P-11); a junction in the work area escapes every containment check (S-02, security R2-01); a junction inside a sub-folder copies an outside tree (S-03, security R2-06); a large copy can fill the disk (S-15).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_project_homes.py`
-- **Numeric pass threshold:** `p06` C → Q holds every file of P's sub-folders (0 missing, 0 differing bytes); a top-level directory junction, a nested junction and a file symlink in P → 0 files copied through them, 3 skips listed; `p04` 10 → the A2L-only project opens with 3 A2L tags; a junction project folder pointing into another work area → 0 listed, 0 loads, 0 bytes written outside `self.workarea`; a foreign parent → refused, 0 folders.
+- **Numeric pass threshold:** `p06` C → Q holds every file of P's sub-folders (0 missing, 0 differing bytes); a top-level directory junction, a nested junction and a file symlink in P → 0 files copied through them, 3 skips listed, 0 bytes added to the total; `p04` 10 → the A2L-only project opens with 3 A2L tags; a junction project folder pointing into another work area → 0 listed, 0 loads, and 0 bytes written outside `self.workarea` by Save project (new name and merge), the save-back, the variant append and the MAC and A2L syncs; a foreign parent → refused, 0 folders.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** (AT-B100-09) the engineer opens P (with `flows/f1.json`, `patches/boost.json`, `reports/r.md`) and saves it as Q: Q's folder holds those files, and Q's flow list shows `f1`. (AT-B100-10) An A2L-only project saved and reopened shows its A2L in the Loaded panel. (AT-B100-11) A project folder in the work area that is a junction into another work area is not listed in the Load dialog, while a project saved through the dialog is listed.
+  - **Observable outcome:** (AT-B100-09) the engineer opens P (with `flows/f1.json`, `patches/boost.json`, `reports/r.md`) and saves it as Q: Q's folder holds those files, and Q's flow list shows `f1`. (AT-B100-10) An A2L-only project saved and reopened shows its A2L in the Loaded panel. (AT-B100-11) A project folder in the work area that is a junction into another work area is not listed in the Load dialog, and typing its name in Save project is refused with `link or junction`, while a project saved through the dialog is listed.
   - **Shipped surface:** Save project, Load, the Loaded panel, the Flow Execution import list, the project folders on disk.
   - **Acceptance test(s):** AT-B100-09, AT-B100-10, AT-B100-11
   - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: a project with no sub-folder; boundary: a nested sub-folder, a copy exactly at the free space; invalid: links and junctions; error: a foreign parent, a copy over the free space.
-  - **Negative control:** executed on `1d677ba`: P-9 `Q tree: ['firmware.a2l', 'firmware.s19', 'project.json']` → AT-B100-09 RED; P-12 `No supported files in project: P` → AT-B100-10 RED; S-02's executed probe (a junction folder is listed and written through) → AT-B100-11 RED.
+  - **Negative control:** executed on `1d677ba`: P-9 → AT-B100-09 RED; P-12 → AT-B100-10 RED; S-02's executed probe (a junction folder is listed and written through) → AT-B100-11 RED.
 
 ### HLR-172 — Recent sources, typed project paths and literal file names
 - **Traceability:** US-162
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10
-- **Statement:** When a file from outside the work area loads successfully through Load or the A2L load, the system shall record it in `<base>/.s19tool/recent_sources.json`, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique name. Reading that file shall return only safe entries and shall never raise; an unparseable file shall read as empty, and an oversized one as empty with a `too large` problem. The Workarea Files list and the Load dialog shall enumerate the work-area files through one function. When a typed path resolves to a project in this work area, or to its `project.json`, the system shall load that project; a reserved home shall never load as a project; any other folder inside the work area shall be answered with the `not a project` tokens, and a folder outside it with the `outside the work area` tokens. The Workarea Files list shall render file names through `safe_text`.
-- **Rationale (informative):** L-2 (P-15); the unified dialog needs its data sources (ARQ §6); file names are parsed as markup (P-24); `temp` loads as a project (S-01); store entries can reach the network or carry control characters (S-06, S-07, S-12); QA-12's oversize arm.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.21
+- **Statement:** When a file from outside the work area loads successfully through Load or the A2L load, the system shall record it in the per-user store `%APPDATA%\s19_app\recent_sources.json`, outside every work area and every `.s19tool` folder, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique name. Reading that store shall return only safe entries and shall never raise; an unparseable file shall read as empty, and an oversized one as empty with a `too large` problem. The Workarea Files list and the Load dialog shall enumerate the work-area files through one function. When a typed path resolves to a project in this work area, or to its `project.json`, the system shall load that project; a reserved home shall never load as a project; any other folder inside the work area shall be answered with the `not a project` tokens, and a folder outside it with the `outside the work area` tokens. The Workarea Files list shall render file names through `safe_text`.
+- **Rationale (informative):** L-2 (P-15); the unified dialog needs its data sources (ARQ §6); file names are parsed as markup (P-24); `temp` loads as a project (S-01); store entries could reach the network or carry control characters (S-06, S-07, S-12). The operator's S-16 decision moves the store per user, which also removes the planted-store route S-07 started from.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_recents.py`
-- **Numeric pass threshold:** 25 outside loads → 20 entries, newest first; the hostile store set (LLR-172.2) → 0 raises, 0 unsafe entries returned; `ab` and `ab/project.json` typed → 2 project loads of `ab`; `temp`, `TEMP`, `patches` typed → 0 project loads, 0 files written; 4 hostile file names → 4 literal rows, 0 markup spans, 0 control characters.
+- **Numeric pass threshold:** 25 outside loads → 20 entries, newest first, in the per-user store; 0 files named `recent_sources.json` under the base folder; the hostile store set (LLR-172.2) → 0 raises, 0 unsafe entries returned; `ab` and `ab/project.json` typed → 2 project loads of `ab`; `temp`, `TEMP`, `patches` typed → 0 project loads, 0 files written; 4 hostile file names → 4 literal rows, 0 markup spans, 0 control characters.
 - **Priority:** medium
 - **Acceptance (black-box):**
-  - **Observable outcome:** (AT-B100-12) the engineer loads `examples/case_01_basic_valid/firmware.s19` through Load, then types the work-area path of project `ab`: `recent_sources.json` on disk lists the example's absolute path, and the status log names project `ab` loaded. (AT-B100-13) Files named `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19` and one with U+009B in the work area appear in the Workarea Files list exactly as named, with no style and no control character.
-  - **Shipped surface:** Load (`l`, `#load_path`), the Workarea Files list (`#files_list`), the status log, `recent_sources.json` on disk.
+  - **Observable outcome:** (AT-B100-12) the engineer loads `examples/case_01_basic_valid/firmware.s19` through Load, then types the work-area path of project `ab`: the per-user store on disk (the test points `APPDATA` at a temporary folder) lists the example's absolute path, nothing is written under the base folder, and the status log names project `ab` loaded. (AT-B100-13) Files named `[bold]x.s19`, `[link=x]a.s19`, `[@click=app.bell]x.s19` and one with U+009B in the work area appear in the Workarea Files list exactly as named, with no style and no control character.
+  - **Shipped surface:** Load (`l`, `#load_path`), the Workarea Files list (`#files_list`), the status log, the per-user store on disk.
   - **Acceptance test(s):** AT-B100-12, AT-B100-13
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no store file (an empty list); boundary: the 20th and 21st entry, exactly 65 536 bytes; invalid: hostile store entries and markup-shaped names; error: an unreadable store file.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no store file (an empty list); boundary: the 20th and 21st entry, exactly 65 536 bytes; invalid: hostile store entries and markup-shaped names; error: an unreadable store file, `APPDATA` unset.
   - **Negative control:** executed on `1d677ba` (P-15): `Load file 'ab' -> status=['Unsupported file type: ']` → AT-B100-12 RED today. AT-B100-13: with today's `Label(item.name)` (`app.py:6559`, markup on) `[bold]x.s19` paints 1 span (QA-02 probe) → RED.
 
 ### HLR-173 — One Load dialog
 - **Traceability:** US-163
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.10
-- **Statement:** When the engineer opens Load, the system shall show one two-pane dialog: on the left the work area's projects, the work-area files, the recent sources and a typed-path field; on the right a preview of the highlighted item that marks with `●` the active set — the image variant, MAC and A2L that loading it will install. The panes shall stack below 100 columns. In that dialog: `enter` and `alt+l` shall load; with the path field focused the typed text wins, and with the list focused the highlighted row wins; `tab` shall move path → list → preview → buttons; `escape` shall close it and change nothing; a Load with nothing selected or typed, or with a typed path that is invalid, shall keep the dialog open, keep the typed text and paint the reason and next-step tokens in `#load_reason`; a click shall select a row and not load it. Every name read from disk or from the store shall render through `safe_text`, and the dialog shall touch the filesystem for a recent entry only after the engineer presses Enter on it. The dialog shall dismiss with `LoadChoice(kind, value)`, routed by one app handler, and a work-area pick shall load that file in place, with no second copy. The files installed by a load shall be the files the preview marked.
-- **Variant slots (filled by the P-A verdict C, LED-2026-10-26-batch-100.2):** VS-PA-1 = two panes, preview on the right. VS-PA-2 = a click selects; Enter loads; a double-click is not bound. VS-PA-3 = the `pa_C` ids (`#load_dialog`, `#load_list`, `#load_path`, `#load_preview`, `#load_reason`, `#load_ok`, `#load_cancel`); `#project_list` and the separate Load project dialog retire. VS-PA-4 = `l`, `ctrl+l` and `p` open this dialog (`p` with the Projects section highlighted). VS-PA-5 = the preview marks the active set with `●` and lists, for a project, its variants, MAC, A2L, sub-folders, manifest state and problems. VS-PA-6 = the focus and `tab` order above.
-- **Rationale (informative):** the dialog has no list, ignores `escape`, and an empty or Enter-only Load does nothing (P-18..P-20). The operator's P-A note asks for the active-set symbol.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.18
+- **Statement:** When the engineer opens Load, the system shall show one two-pane dialog: on the left a typed-path field and the work area's projects, the work-area files and the recent sources; on the right a preview of the highlighted item that marks with `●` the active set — the image variant, MAC and A2L that loading it will install, including what the session keeps and, with a project open, the note that a loaded file becomes its active variant. The panes shall stack below 100 columns. In that dialog: the focus shall start on the path field; `tab` shall move path → list → preview → buttons; a printable key typed while the list has the focus shall move to the path field and type there, never reaching an app binding; `enter`, `alt+l` and `#load_ok` shall load the highlighted row when the list has the focus and the typed path otherwise; `escape` shall close it and change nothing; a Load with nothing selected or typed, or with a typed path that is invalid, shall keep the dialog open, keep the typed text and paint the reason and next-step tokens in `#load_reason`; a click shall select a row and not load it. Every name read from disk or from the store shall render through `safe_text`. A recent row shall show only its path, size and when it was last seen, say that it is checked when loaded, and touch the filesystem only after Enter. A project row's preview shall read the manifest on a worker with a bounded read, so a highlight never blocks the dialog. The dialog shall dismiss with `LoadChoice(kind, value)`, routed through the one load seam (LLR-174.4), and a work-area pick shall load that file in place, with no second copy. The files installed by a load shall be the files the preview marked.
+- **Variant slots (filled by the P-A verdict C, LED-2026-10-26-batch-100.2; corrected by LED-2026-10-26-batch-100.18):** VS-PA-1 = two panes, preview on the right. VS-PA-2 = a click selects; Enter loads; a double-click is not bound. VS-PA-3 = the `pa_C` ids (`#load_dialog`, `#load_list`, `#load_path`, `#load_preview`, `#load_reason`, `#load_ok`, `#load_cancel`); `#project_list` and the separate Load project dialog retire. VS-PA-4 = `l` and `ctrl+l` open this dialog with the focus on the path field; `p` opens it with the open project's row highlighted, else the first project; the key bar labels them "Load" and "Projects". VS-PA-5 = the preview marks the active set with `●` for every row kind (project, file, work-area, recent). VS-PA-6 = the focus order above (path field first, which corrects `pa_C`'s start on the list).
+- **Rationale (informative):** the dialog has no list, ignores `escape`, and an empty or Enter-only Load does nothing (P-18..P-20). The operator's P-A note asks for the active-set symbol. UX-05 / QA R2-06 (focus), UX-36 (marks for every row kind), UX-37 (`p`), security R2-03 (the preview never blocks).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_load_dialog.py`
-- **Numeric pass threshold:** 4 `LoadChoice` kinds → 4 routes to their handlers; `enter` on each section → 1 load; for a project load, the `●` rows = the installed image, MAC and A2L paths (3 of 3); `escape` → 0 changes to the session; an empty Load and 3 invalid typed paths → 4 painted token pairs, the dialog open, the typed text kept; 4 hostile names → 0 markup spans, 0 control characters; a recent entry rendered → 0 filesystem calls before Enter; a work-area pick → 0 new files in `temp/`; at 99 columns → panes stacked, at 118 → side by side.
+- **Numeric pass threshold:** 4 `LoadChoice` kinds → 4 routes; `enter` on each section → 1 load; for a project, a file and a file with a project open, the `●` rows = the installed image, MAC and A2L paths (3 of 3 each); `escape` → 0 changes to the session; an empty Load and 3 invalid typed paths → 4 painted token pairs, the dialog open, the typed text kept; `p` typed while the list has the focus → the path field holds `p`, 0 app actions; 4 hostile names → 0 markup spans, 0 control characters; a recent entry rendered → 0 filesystem calls before Enter; highlighting a project with an over-cap manifest → a key answered within 200 ms; a work-area pick → 0 new files in `temp/`; at 99 columns → panes stacked, at 118 → side by side.
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** the engineer loads an example through Load (which records it), restarts the app, opens Load, moves to the recent source and presses Enter: that file loads. Highlighting a project, the preview marks `●` on its active image, MAC and A2L, and after Enter the Loaded panel names exactly those three. `escape` closes the dialog with the session unchanged. An empty Load paints `nothing selected`. A project named `[b]P` is listed as written.
-  - **Shipped surface:** the Load dialog (`l`, `p`; `#load_list`, `#load_path`, `#load_preview`, `#load_reason`, `alt+l`), the Loaded panel, the status log, the screen stack.
+  - **Shipped surface:** the Load dialog (`l`, `p`; `#load_path`, `#load_list`, `#load_preview`, `#load_reason`, `alt+l`), the Loaded panel, the status log, the screen stack.
   - **Acceptance test(s):** AT-B100-14
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no project, no file, no recent (each section shows its tokens); boundary: one item per section, 99 and 100 columns; invalid: hostile names, a hostile `recent_sources.json`, an invalid typed path; error: a recent source missing on pick (`not found`, the entry removed).
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: no project, no file, no recent (each section shows its tokens); boundary: one item per section, 99 and 100 columns; invalid: hostile names, a hostile store, an invalid typed path, an over-cap manifest; error: a recent source missing on pick (`not found`, the entry removed).
   - **Negative control:** executed on `1d677ba` (P-18, P-19): `escape on LoadFileScreen -> screen: LoadFileScreen`; `Enter with a typed path -> current_file before/after: firmware_1.s19 / firmware_1.s19` → AT-B100-14 RED today.
 
-### HLR-174 — One short question before unsaved work is lost
+### HLR-174 — One short question before unsaved work is lost, on every route
 - **Traceability:** US-164
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.3
-- **Statement:** When a load would lose unsaved work, the system shall ask once before loading. Unsaved work is: an image that differs from the copy last loaded or saved (lost by any load), Patch Editor entries the dirty flag marks (lost by a project load), and Flow Builder edits not saved (lost by a project load). The question shall be short and name what would be lost, all items in one question. `y` shall replace and continue; `n` and `escape` shall cancel and leave the session unchanged; the focus shall start on `n`, and `enter` shall act on the focused button. A load that would lose nothing shall not ask, whether or not a project is open. The question shall be answered before the project-session reset runs. It shall sit in the Load dialog's route, not inside `_handle_load_project`.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17
+- **Statement:** When an image-replacing route — the Load dialog, the Workarea Files pick, the variant switch (`v`, the panel's `v`) or a project load — would lose unsaved work, the system shall ask once before loading, in the one load seam every such route passes. Unsaved work is: an image that differs from the copy last loaded or saved (lost by any image replacement and any project load), Patch Editor entries the dirty flag marks (lost by a project load), and Flow Builder edits not saved (lost by a project load). Loading a MAC or an A2L only attaches it, loses nothing and never asks. The question shall be short and name what would be lost, all items in one question. `y` shall replace and continue; `n` and `escape` shall cancel and leave the session unchanged; the focus shall start on `n`, and `enter` shall act on the focused button. A load that would lose nothing shall not ask, whether or not a project is open. The question shall be answered before the project-session reset runs, and never inside `_handle_load_project`.
 - **Variant slots (filled by the P-B verdict A, LED-2026-10-26-batch-100.2):** VS-PB-1 = the short question. VS-PB-2 = no "save first" key. VS-PB-3 = the `pb_A` ids (`#confirm_yes`, `#confirm_no`).
-- **Rationale (informative):** a patched image is replaced with no question (P-17). UX-01 (unsaved means since the last save), UX-11 (ask only when something would be lost), QA-03 (the Patch Editor dirty flag; the existing question is `LoadGuardScreen`, P-32), UX-12 (one question, safe focus), O-3.
+- **Rationale (informative):** a patched image is replaced with no question (P-17). UX-01, UX-11, QA-03, UX-12, O-3. B-02 / QA R2-03: the Workarea pick and the variant switch bypassed the dialog's route (P-42). QA R2-02: an attach loses nothing. UX-27: Save project clears the document flag (LLR-167.8).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_confirm.py`
-- **Numeric pass threshold:** the 16-cell trigger table (LLR-174.1) → 16 of 16 cells as tabulated (11 ask, 5 load); patched → Save project → load = 0 questions; patched → save-back → load = 0 questions; patched → saved → patched again → load = 1 question; `n`, `escape` and an immediate `enter` → 0 changes to the image digest, the file path and the project; `y` → 1 load; 2 items unsaved → 1 question listing both.
+- **Numeric pass threshold:** the 24-cell trigger table (LLR-174.1) → 24 of 24 cells as tabulated (11 ask, 13 load); 4 routes with an unsaved patch → 4 questions; patched → Save project → load = 0 questions; patched + entries → Save project → project load = 0 questions; patched → save-back → load = 0 questions; patched → saved → patched again → load = 1 question; an unsaved patch, then an A2L load → 0 questions, the patch kept; `n`, `escape` and an immediate `enter` → 0 changes to the image digest, the file path and the project; `y` → 1 load; 2 items unsaved → 1 question listing both.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer applies a patch and loads another file: a question appears naming the patched image, with the focus on No; `enter` keeps the patched image (the hex view still shows the patch); repeating with `y` loads the new file. After Save project, the same load asks nothing.
-  - **Shipped surface:** Load, the question (`#confirm_yes`, `#confirm_no`, `y` / `n` / `escape`), the hex view, the status log.
+  - **Observable outcome:** the engineer applies a patch and loads another file: a question appears naming the patched image, with the focus on No; `enter` keeps the patched image (the hex view still shows the patch); repeating with `y` loads the new file. A Workarea Files pick with an unsaved patch asks the same question. After Save project, the same load asks nothing.
+  - **Shipped surface:** Load, the Workarea Files list, `v`, the question (`#confirm_yes`, `#confirm_no`, `y` / `n` / `escape`), the hex view, the status log.
   - **Acceptance test(s):** AT-B100-15
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: nothing unsaved, with or without a project open (no question); boundary: a patch that writes the bytes already there (no question), saved-then-patched-again (asks). Invalid/error: N/A — the answer keys are a closed set.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☐ invalid ☐ error — empty: nothing unsaved, with or without a project open (no question); boundary: a patch that writes the bytes already there (no question), saved-then-patched-again (asks), an A2L or MAC attach (no question). Invalid/error: N/A — the answer keys are a closed set.
   - **Negative control:** executed on `1d677ba` (P-17): `Load file over patched image -> stack: ['Screen'] … image still patched? False` → AT-B100-15 RED today.
 
 ### HLR-175 — The Save project dialog shows exactly what the save will do
 - **Traceability:** US-165
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.4
-- **Statement:** While the engineer types a project name in the Save project dialog, the system shall paint, from the same save plan `_handle_save_dialog` executes, a summary of what will be saved: the target folder and whether it is new, the open project or an existing project it merges into; each file with its source, its landing name and its action (new, reused, renamed to `_<N>`, kept); the image as "source + N document entries (K of them added since the last apply, applied by this save)" or as an unchanged copy; the document; the sub-folders; and the manifest keys written. A row that renames or keeps a file shall be painted as such, never omitted, and nothing shall be overwritten. When the name would be refused (HLR-164), the summary shall paint the refusal tokens, and Save shall stay focusable and refuse with the reason painted. When the name is over 64 characters or would update the open project, the summary shall say so. The dialog shall offer no parent folder field and no Browse… button, and the save shall go to this work area. `escape` shall close the dialog and save nothing; a Save with an empty name shall keep the dialog open and paint `name is empty`; Save is `alt+s` and plain letters stay in the name field; names read from disk shall render through `safe_text`.
-- **Variant slots (filled by the P-C verdict B, LED-2026-10-26-batch-100.2):** VS-PC-1 = the name plus the "what will be saved" summary. VS-PC-2 = during a refusal, Save stays focusable and refuses with the reason painted. VS-PC-3 = the `pc_B` ids (`#project_name`, `#save_summary`, `#save_where`, `#save_ok`, `#save_cancel`).
-- **Rationale (informative):** no preview, no `escape`, a silent empty Save (P-18, P-19); D7's dialog half removes the parent field. The operator's P-C note: "Un error aquí podría hacer que el trabajo del usuario se invalide o se pierda o se sobreescriba o se renombre. Mucho cuidado al popular esta información." — hence R-PC: one plan, painted and executed.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15
+- **Statement:** While the engineer types a project name in the Save project dialog, the system shall paint, from the same save plan `_handle_save_dialog` executes, a summary at the plan's granularity: the target folder and its kind (new, the open project, a merge); one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`; each row with its source, its landing name and its action word (`new`, `replace`, `keep`, `merge`, `rewrite`); the image as "source + N change entries (K of them applied by this save)" or as an unchanged copy; the document; skipped links. Nothing is overwritten silently: every `replace` or `rewrite` is a row that says so, and in a merge the target's active-variant change is its own row. When the name would be refused (HLR-164), the summary shall paint the refusal tokens, and Save shall stay focusable and refuse with the reason painted. When the name is over 64 characters or would update the open project, the summary shall say so. A long summary shall scroll with Save and Cancel pinned. The image digest shall be computed once per dialog open, and the name-dependent rows recomputed at most every 150 ms of typing, with no hashing per keystroke. The dialog shall offer no parent folder field and no Browse… button, and the save shall go to this work area. `escape` shall close the dialog and save nothing; a Save with an empty name shall keep the dialog open and paint `name is empty`; Save is `alt+s` and plain letters stay in the name field; names read from disk shall render through `safe_text`.
+- **Variant slots (filled by the P-C verdict B, LED-2026-10-26-batch-100.2):** VS-PC-1 = the name plus the "what will be saved" summary, at the row granularity above. VS-PC-2 = during a refusal, Save stays focusable and refuses with the reason painted. VS-PC-3 = the `pc_B` ids (`#project_name`, `#save_summary`, `#save_where`, `#save_ok`, `#save_cancel`).
+- **Rationale (informative):** no preview, no `escape`, a silent empty Save (P-18, P-19); D7's dialog half removes the parent field. The operator's P-C note: "Un error aquí podría hacer que el trabajo del usuario se invalide o se pierda o se sobreescriba o se renombre. Mucho cuidado al popular esta información." — hence R-PC: one plan, painted and executed. UX-32 / QA R2-05 (granularity), UX-33 / B-04 (cost), UX-35 (merge row).
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_save_dialog.py`
-- **Numeric pass threshold:** 5 scenarios (fresh; exact name of an existing project; save-as with sub-folders; pending patch; reserved and clash refused) → summary rows = files written, by path and digest (0 differences), refused scenarios → 0 files; `a b` → the folder line shows `ab`; 0 widgets `#project_parent_path` / `#save_browse`; `escape` → 0 folders; an empty Save → 1 token pair; typing `s` → the name field holds `s`.
+- **Numeric pass threshold:** 5 scenarios (fresh; exact name of an existing project; save-as with sub-folders; pending patch; reserved and clash refused) → the plan's rows equal the written tree at the plan's granularity, by full path and action (0 differences), refused scenarios → 0 files; `a b` → the folder line shows `ab`; 0 widgets `#project_parent_path` / `#save_browse`; `escape` → 0 folders; an empty Save → 1 token pair; typing `s` → the name field holds `s`; 20 keystrokes on the case_06 project → 0 digest computations, each echoed within one frame; a 300-row summary at 118×54 → Save and Cancel visible.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** (AT-B100-16) the engineer opens Save project, types `a b` and sees `ab` as the folder; types the disguised name of another project and sees `already a project` before pressing Save; presses `escape`, and no folder appears. (AT-B100-21) For each of the 5 scenarios, the rows the summary painted equal, by path and digest, the files found on disk after `alt+s`.
-  - **Shipped surface:** the Save project dialog (`ctrl+s`, `#project_name`, `#save_summary`, `alt+s`), the work area on disk.
+  - **Observable outcome:** (AT-B100-16) the engineer opens Save project, types `a b` and sees `ab` as the folder; types the disguised name of another project and sees `already a project` and `choose another name` before pressing Save; presses `escape`, and no folder appears. (AT-B100-21) For each of the 5 scenarios, the rows of the dialog's save plan equal the tree found on disk after `alt+s`, at the plan's granularity, by full path and action; at 220 columns the painted rows carry the same action words.
+  - **Shipped surface:** the Save project dialog (`ctrl+s`, `#project_name`, `#save_summary`, `alt+s`; the plan through `SaveProjectScreen.plan`, the exception declared in the §3 preface), the work area on disk.
   - **Acceptance test(s):** AT-B100-16, AT-B100-21
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: an empty name; boundary: a name of 64 and 65 characters, a target holding the source's name; invalid: reserved, device and clashing names; error: a refused save (0 files).
-  - **Negative control:** executed on `1d677ba` (P-18, P-19): `escape on SaveProjectScreen -> screen: SaveProjectScreen`; `empty name Save click -> … new status: []` → AT-B100-16 RED today. AT-B100-21: a mutation painting the summary from a second computation that omits renamed rows → 1 row missing → RED.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☒ error — empty: an empty name; boundary: a name of 64 and 65 characters, a target holding the source's name, a 300-row summary; invalid: reserved, device and clashing names; error: a refused save (0 files).
+  - **Negative control:** executed on `1d677ba` (P-18, P-19): `escape on SaveProjectScreen -> screen: SaveProjectScreen`; `empty name Save click -> … new status: []` → AT-B100-16 RED today. AT-B100-21: a mutation where the handler places a file the plan did not name → 1 tree row without a plan row → RED.
 
 ### HLR-176 — Worker actions show real progress in the status line
 - **Traceability:** US-166
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11
-- **Statement:** When an action that runs on a worker starts — a file or project load, an A2L parse, Save project, a report, a diff report, a before/after run — the system shall paint in `#status_text` a spinner, the action's label, the step `n/m` and the elapsed time, and shall advance the progress bar with the steps. While the action runs, the elapsed time and the spinner shall advance. When it ends, by success, failure or exception, the system shall paint its outcome and stop showing it as working. A step that cannot leave the main thread — the A2L tag-table build — shall have its step name painted before it starts; during it the indicator stays frozen, and this freeze is declared and not covered by the elapsed-time clause.
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
+- **Statement:** When an action that runs on a worker starts — a file or project load, an A2L parse, Save project, a report, a diff report, a before/after run — the system shall paint in `#status_text` a spinner, the action's label, the step `n/m` and the elapsed time, and shall show the progress bar from 0. The bar shall advance within a step wherever progress is measurable (bytes copied, read or parsed) and by step only for an indivisible step. While the action runs, the spinner and the elapsed time shall advance, and `#status_text` shall have one owner, the progress line. When it ends, by success, failure or exception, one final writer shall paint, in this order, the outcome, then the project and file line, then the file state, and the bar shall be hidden — never left at a stale `100%`; when idle the bar is hidden. A step that cannot leave the main thread — the A2L tag-table build — shall have its step name painted before it starts; during it the indicator stays frozen, and this freeze is declared and not covered by the elapsed-time clause.
 - **Variant slots (filled by the P-D verdict A, LED-2026-10-26-batch-100.2):** VS-PD-1 = the status line (`#status_text`), with the progress bar kept working. VS-PD-2 = no cancel.
-- **Rationale (informative):** N5. The operator's P-D note: "El spinner con la acción en progreso debe ser suficiente. asumiendo que la barra de progreso realmente hace su trabajo también, mostrando el progreso." — hence R-PD: the indicator reflects real progress, and the blocking actions move to workers (HLR-177).
+- **Rationale (informative):** N5. The operator's P-D note: "El spinner con la acción en progreso debe ser suficiente. asumiendo que la barra de progreso realmente hace su trabajo también, mostrando el progreso." — hence R-PD and UX-30: the bar moves within the long steps. UX-29 / B-11: one owner of `#status_text`.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_busy.py`
-- **Numeric pass threshold:** every action key → exactly 1 begin and 1 end on its success, failure and exception exits (0 indicators left showing); the case_06 A2L parse → the elapsed text changes ≥ 1 time and the bar value increases ≥ 1 time before the end; the tag-table step → its name painted before it starts.
+- **Numeric pass threshold:** every action key → exactly 1 begin and 1 end on its success, failure and exception exits (0 indicators left showing); the case_06 A2L parse → the bar value increases ≥ 2 times within the parse step and the elapsed text changes ≥ 1 time before the end; after a project load ends → `#status_text` holds the project and file line, the bar hidden (2 assertions); the tag-table step → its name painted before it starts.
 - **Priority:** medium
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer loads the case_06 A2L: `#status_text` shows a spinner, the label and a running elapsed time while it parses, the bar moves, and at the end the status names the outcome.
+  - **Observable outcome:** the engineer loads the case_06 A2L: `#status_text` shows a spinner, the label and a running elapsed time while it parses, the bar moves during the parse, and at the end the status names the outcome and the bar is gone.
   - **Shipped surface:** Load (`l`), `#status_text`, `#progress_bar`, the status log.
   - **Acceptance test(s):** AT-B100-17
   - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: an action shorter than one timer tick (shown and cleared); error: an action that raises (the indicator ends with the failure). Empty/invalid: N/A — no input.
@@ -570,53 +592,53 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-177 — Project load, Save project and the A2L parse run off the main thread
 - **Traceability:** US-167
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11
-- **Statement:** The system shall run project load, Save project and the A2L parse on worker threads and install their results on the main thread only. Save project shall re-derive the image on the main thread before its worker starts, and the worker shall write from a copy. While one of these actions runs, the indicator's elapsed time shall advance, and a request for another of them, or a Patch apply or undo, shall be refused with the `busy` token naming the running action, leaving the session and the focus unchanged. Flow runs stay on the main thread.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
+- **Statement:** The system shall run project load, Save project and the A2L parse on worker threads and install their results on the main thread only. Save project shall re-derive the image on the main thread before its worker starts, and the worker shall write from a copy. While one of these actions runs, the indicator's elapsed time shall advance, and every action that replaces or changes the image or the project — a load on any route, an unload, `v`, a save-back, Save project, a Patch apply or undo — shall be refused with the `busy` token naming the running action, leaving the session and the focus unchanged. Quit shall ask first, with the focus on No; if the engineer confirms, the app shall wait for the worker to finish or roll back, so no partial folder is left. Flow runs stay on the main thread.
 - **Variant slots (filled by the P-D verdict A, LED-2026-10-26-batch-100.2):** VS-PD-3 = a second request is refused with a status naming the running action.
-- **Rationale (informative):** these three block the main thread, so no indicator can tick (ARQ §7). R-PD makes 12b unconditional; O-7 leaves flow runs, which keeps the batch-97 D14 Run/Confirm surface (I-7) untouched; A-17 keeps the worker off the live image.
+- **Rationale (informative):** these three block the main thread (ARQ §7). R-PD makes 12b unconditional; O-7 leaves flow runs; A-17 keeps the worker off the live image; UX-34 lists the refused set and the quit rule.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_workers.py`
-- **Numeric pass threshold:** the project holding the case_06 A2L → the elapsed text changes ≥ 1 time before the load ends; 0 writes to the session outside the main thread (thread-id probe); the same final snapshot as a main-thread load (0 differing names, LLR-165.2); a second request and a Patch apply during a save → 2 `busy` refusals, 0 changes.
+- **Numeric pass threshold:** the project holding the case_06 A2L → the elapsed text changes ≥ 1 time before the load ends (the worker share measured above one timer tick at P3); 0 writes to the session outside the main thread (thread-id probe); the same final snapshot as a main-thread load (0 differing names, LLR-165.2); `l`, `v`, an unload, a save-back and a Patch apply during a Save project → 5 `busy` refusals, 0 changes; `q` during a Save project → 1 question; confirmed → 0 partial folders.
 - **Priority:** medium
 - **Acceptance (black-box):**
-  - **Observable outcome:** the engineer loads a project holding the case_06 A2L: the elapsed time advances during the load, and the status log then names the project loaded; pressing `l` during it paints `busy`.
-  - **Shipped surface:** Load, `#status_text`, the status log.
+  - **Observable outcome:** the engineer loads a project holding the case_06 A2L: the elapsed time advances during the load, and the status log then names the project loaded. During a Save project, pressing `l` (after the worker step is painted) paints `busy` naming Save project, and `q` asks first.
+  - **Shipped surface:** Load, Save project, `#status_text`, the status log, the quit question.
   - **Acceptance test(s):** AT-B100-18
-  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: a load that finishes inside one tick; error: a worker that raises (the app keeps running, the indicator ends). Empty/invalid: N/A.
+  - **Boundary catalog (QC-3):** ☐ empty ☒ boundary ☐ invalid ☒ error — boundary: a load that finishes inside one tick; error: a worker that raises (the app keeps running, the indicator ends, 0 folders left). Empty/invalid: N/A.
   - **Negative control:** code-read on `1d677ba`: `_handle_load_project → load_selected_file` runs synchronously (`app.py:8510`, `:10731`), so the elapsed text cannot advance during it → AT-B100-18 RED today (executed at Phase 3).
 
 ### HLR-178 — The Load-result panel says which variant opened and lists the problems
 - **Traceability:** US-168
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7
-- **Statement:** When a project load completes, the system shall open the Load-result panel, which names the variant it opened, the number of variants the project holds and why that one opened — recorded as active; first by name because the manifest records none; first by name because the manifest is damaged or absent; or the next valid one because the recorded one is missing or not readable — and how it differs from the project's first variant by name ("patched, N bytes differ" or "identical"), the other variants, the MAC and A2L that loaded, and every problem of HLR-169 with its file, with no truncation. The word "latest" shall be used only when the opened variant is the newest file written. The panel holds the focus; `enter` and `escape` close it, and `v` opens the existing variant selector. The status log shall carry one summary line naming the opened variant, the variant count and the problem count, ending with a pointer to the panel, and `#status_text` shall name the project and the opened file. Problems shall be worded in user terms, never as an exception class. Every name read from disk shall render through `safe_text`. The same information shall stay reachable for the session in the Load dialog's preview of the open project.
-- **Variant slots (filled by the P-E verdict B, LED-2026-10-26-batch-100.2):** VS-PE-1 = the result panel to dismiss. VS-PE-2 = the wording above, using this HLR's reason vocabulary. VS-PE-3 = `v` opens the existing variant selector (`select_variant`, `app.py:6687`).
-- **Rationale (informative):** the operator's D2 note asks that the switch to the latest saved image never goes unnoticed; D3 asks for the problem list. UX-08 (line budget), UX-09 (relation to the base, reachable for the session), UX-19, UX-20, A-16 (the composer lives in `variant_execution_service.py`), A-18.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Statement:** When a project load completes, the system shall open the Load-result panel, which names the variant it opened, the number of variants the project holds and why that one opened — recorded as active; first by name because the manifest records none; first by name because the manifest is damaged or absent; or the next valid one because the recorded one is missing or not readable — and, from the `derived_from` record (from Inc 7), how it relates to its base — "patched, N bytes differ from `<base>`" when the base is a file of the project, "patched from `<base>` (not in this project); N bytes differ from it" when it is not; a variant with a record is always called patched, never identical — the other variants, the MAC and A2L that loaded, and every problem of HLR-169 with its file and next step, with no truncation. The word "latest" shall be used only for the variant the app's last recorded write made active, never from file times. The focus shall start on the problem list (↑, ↓, PgUp, PgDn scroll it); `tab` moves to OK; `enter` on OK and `escape` dismiss it; `v` opens the existing variant selector. The status log shall carry one summary line naming the opened variant, the variant count and the problem count, ending with "details: p", and the progress line's final writer shall set `#status_text` to the project and the opened file. Problems shall be worded in user terms, never as an exception class or an internal code. Every name read from disk shall render through `safe_text`. The same information shall stay reachable for the session in the Load dialog's preview of the open project.
+- **Variant slots (filled by the P-E verdict B, LED-2026-10-26-batch-100.2):** VS-PE-1 = the result panel to dismiss. VS-PE-2 = the wording above. VS-PE-3 = `v` opens the existing variant selector (`select_variant`, `app.py:6687`).
+- **Rationale (informative):** the operator's D2 note; D3; UX-26 (the default `firmware-patched.s19` sorts before `firmware.s19`, P-39, so "first by name" compared the patched image with itself; `derived_from` is written from Inc 7, ARQ §8.1); UX-31 / UX-39 (keyboard reach); UX-38; UX-40; A-16; A-18.
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_b100_announce.py`
-- **Numeric pass threshold:** the 5-reason truth table (LLR-178.1) → 5 of 5; a 2-variant project after a save-back → the panel names `firmware_1`, "patched, 4 B differ" and the count 2; 30 problems → 30 panel rows, 1 summary line in `#log_line_4` inside 118 columns; a hostile variant name → 0 markup spans; 0 exception class names in the panel.
+- **Numeric pass threshold:** the 5-reason truth table (LLR-178.1) → 5 of 5; from Inc 7: a save-back named `firmware_1.s19` and one with the default `firmware-patched.s19` → each panel says "patched, 4 bytes differ from `firmware.s19`" (2 of 2); a base not in the project → "patched from `firmware.s19` (not in this project); 4 bytes differ from it"; 0 panels containing "identical"; 30 problems at 118×54 → the last row reaches a visible region by keyboard; 1 summary line in `#log_line_4` inside 118 columns ending "details: p"; a hostile variant name → 0 markup spans; 0 exception class names and 0 internal codes in the panel.
 - **Priority:** high
 - **Acceptance (black-box):**
-  - **Observable outcome:** after a save-back into P (two variants), reopening P opens the panel naming `firmware_1` as opened, recorded as active, "patched, 4 B differ" from `firmware.s19`, and P's 2 variants. With `firmware_1.s19` deleted on disk, reopening names `firmware` as opened because the recorded one is missing, and lists `firmware_1.s19` as `missing`. `enter` closes the panel.
+  - **Observable outcome:** after a default save-back into P (`firmware-patched.s19`), reopening P opens the panel naming `firmware-patched.s19` as opened, recorded as active, "patched, 4 bytes differ from `firmware.s19`" (from Inc 7), and P's 2 variants. With the opened file deleted on disk, reopening names `firmware.s19` as opened because the recorded one is missing, and lists the file as `missing`. `end` scrolls to the last problem; `tab`, then `enter`, closes the panel.
   - **Shipped surface:** Load (`p`), the Load-result panel (`#result_body`, `#result_variant`, `#result_ok`), the status log.
   - **Acceptance test(s):** AT-B100-19
-  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☐ error — empty: a one-variant project; boundary: a project whose every image is unreadable (A2L or MAC only), 30 problems; invalid: a hostile variant name. Error: N/A — problems are data, covered by HLR-169.
-  - **Negative control:** executed on `1d677ba` (P-3): the reload status is `Loaded project 'P' -> firmware.s19`, with no panel, no count and no reason → AT-B100-19 RED today.
+  - **Boundary catalog (QC-3):** ☒ empty ☒ boundary ☒ invalid ☐ error — empty: a one-variant project, no `derived_from`; boundary: a project whose every image is unreadable (A2L or MAC only), 30 problems, the default save-back name, a base not in the project; invalid: a hostile variant name. Error: N/A — problems are data, covered by HLR-169.
+  - **Negative control:** executed on `1d677ba` (P-3): the reload status is `Loaded project 'P' -> firmware.s19`, with no panel, no count and no reason → AT-B100-19 RED today; P-39: a composer comparing with the first variant by name says "identical" for the default name → RED.
 
 ---
 
 ## 4. Low-level requirements (LLR)
 
-> Ids `LLR-<HLR>.<M>`. TC ids are `TC-B100-NN`. Each LLR's mutation (Negative control) is run at Phase 3 (C-40) and described by position and operation, never pasted (C-56). Symbols marked NEW are created in Phase 3. Round 2 added LLR-163.6, LLR-167.5, LLR-167.6, LLR-169.8, LLR-169.9, LLR-171.4, LLR-173.5, LLR-173.6, LLR-175.4 and LLR-178.3; no requirement was retired.
+> Ids `LLR-<HLR>.<M>`. TC ids are `TC-B100-NN`. Each LLR's mutation (Negative control) is run at Phase 3 (C-40) and described by position and operation, never pasted (C-56). Symbols marked NEW are created in Phase 3. Round 2 added LLR-163.6, LLR-167.5, LLR-167.6, LLR-169.8, LLR-169.9, LLR-171.4, LLR-173.5, LLR-173.6, LLR-175.4 and LLR-178.3 (and LLR-173.7); round 3 added LLR-163.7, LLR-167.7, LLR-167.8, LLR-168.4 and LLR-174.4; no requirement was retired.
 
-### LLR-163.1 — Reuse any identical `<name>` or `<stem>_<N><suffix>`, through one function
+### LLR-163.1 — One placement function holds every guard and decides reuse
 - **Traceability:** HLR-163
-- **Ledger:** LED-2026-10-26-batch-100.9
-- **Statement:** `find_identical(destination, name, staged)` (NEW, `workspace.py`) shall enumerate the reuse candidates from a listing of the destination — `<name>` and every `<stem>_<digits><suffix>`, compared case-insensitively on Windows — and return the first that is a regular file, not a link or reparse point, non-empty, of the staged size and byte-identical. `place_into_workarea(source, destination, …) -> PlacementResult(path, reused)` (NEW, `workspace.py`) shall reuse that file or claim the lowest free `_<N>`. `copy_into_workarea` (`workspace.py:402`) shall wrap it and keep its `Path` return, so its 17 call sites in 7 files (P-34) are unchanged; this widens B100-I6.
+- **Ledger:** LED-2026-10-26-batch-100.9, LED-2026-10-26-batch-100.20
+- **Statement:** `find_identical(destination, name, staged)` (NEW, `workspace.py`) shall enumerate the reuse candidates from a listing of the destination — `<name>` and every `<stem>_<digits><suffix>`, compared case-insensitively on Windows — and return the first that is a regular file, not a link or reparse point, non-empty, of the staged size and byte-identical. `place_into_workarea(source, destination, …) -> PlacementResult(path, reused)` (NEW, `workspace.py`) shall hold every guard `copy_into_workarea` holds today — the source and destination reparse checks, the size cap, private staging — plus containment in this work area (`contained_in_workarea`, LLR-171.4), and shall reuse the identical file or claim the lowest free `_<N>`. `copy_into_workarea` (`workspace.py:402`) shall be `return place_into_workarea(...).path`, with no second claim loop, so its 15 call sites in 7 files (P-34) are unchanged; this widens B100-I6.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-01 — `pytest tests/test_b100_reuse.py -k tc_b100_01`
-- **Numeric pass threshold:** the S7 sequence (case_01, case_02, case_02, case_01, case_02) → names `firmware.s19`, `firmware_1.s19`, `firmware_1.s19`, `firmware.s19`, `firmware_1.s19` with `reused` False, False, True, True, True; 2 files in the destination; `copy_into_workarea` returns a `Path` (1 type assertion).
-- **Negative control:** executed on `1d677ba` (`ui_load_dialogs_probe` S7): `copy case_02 again -> firmware_2.s19` → RED. Mutation at Phase 3: restrict the comparison to the bare name → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — empty: a 0-byte candidate (not reused); boundary: `_1` deleted beside an identical `_2` (reused), an upper-case `_2` name on Windows (reused); invalid: a link candidate (not reused).
+- **Numeric pass threshold:** the S7 sequence (case_01, case_02, case_02, case_01, case_02) → names `firmware.s19`, `firmware_1.s19`, `firmware_1.s19`, `firmware.s19`, `firmware_1.s19` with `reused` False, False, True, True, True; 2 files in the destination; `copy_into_workarea` returns a `Path` (1 type assertion); `place_into_workarea` called directly with a destination outside every work area, through a junction, and with a source over the cap → 3 refusals, 0 bytes written; an AST check → 1 claim loop in `workspace.py`.
+- **Negative control:** executed on `1d677ba` (`ui_load_dialogs_probe` S7): `copy case_02 again -> firmware_2.s19` → RED. Mutation at Phase 3: restrict the comparison to the bare name → RED; move the size cap back into the wrapper only → the direct over-cap arm writes → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — empty: a 0-byte candidate (not reused); boundary: `_1` deleted beside an identical `_2` (reused), an upper-case `_2` name on Windows (reused); invalid: a link candidate (not reused), a junction destination, an over-cap source.
 
 ### LLR-163.2 — Size before bytes
 - **Traceability:** HLR-163
@@ -658,55 +680,65 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation always emitting the added-variant status → RED.
 - **Boundary catalog:** ☒ boundary — a first load (added) and a repeated load (existing).
 
-### LLR-163.6 — The export reports reuse from the placement outcome
+### LLR-163.6 — The export reports reuse from the placement it performed
 - **Traceability:** HLR-163
-- **Ledger:** LED-2026-10-26-batch-100.9
-- **Statement:** The Split/Join export (`segment_split_view.py:939-946`) shall decide reuse through `find_identical` (`place_into_workarea` for single files) and set its status word from `PlacementResult.reused`; `_export_reuse_target` (`segment_split_view.py:673`) shall no longer hold its own byte-identity rule. `place_group_into_workarea` keeps "requested names only".
+- **Ledger:** LED-2026-10-26-batch-100.9, LED-2026-10-26-batch-100.20
+- **Statement:** The Split/Join export (`segment_split_view.py:939-946`) shall place each single file through `place_into_workarea` and take its status word only from that call's `PlacementResult.reused`; `_export_reuse_target` (`segment_split_view.py:673`) shall no longer hold its own byte-identity rule, and no separate `find_identical` call shall decide the word. `place_group_into_workarea` keeps "requested names only".
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-57 — `pytest tests/test_b100_reuse.py -k tc_b100_57`
-- **Numeric pass threshold:** identical re-export to an existing `_1` → action `reused`, 0 new files; changed bytes → `wrote`, 1 new file; a census over `s19_app/` → 1 byte-identity function.
+- **Numeric pass threshold:** identical re-export to an existing `_1` → action `reused`, 0 new files; changed bytes → `wrote`, 1 new file; a census over `s19_app/` → 1 byte-identity function and 0 status words computed outside a `PlacementResult`.
 - **Negative control:** a mutation restoring the requested-name-only check in the export → the `_1` arm reports `wrote` → RED.
 - **Boundary catalog:** ☒ boundary — reuse at the bare name and at `_1`.
 
+### LLR-163.7 — `predict_placement` uses the placement code itself
+- **Traceability:** HLR-163
+- **Ledger:** LED-2026-10-26-batch-100.15
+- **Statement:** `predict_placement(digest_or_bytes, size, destination, name) -> PlacementResult` (NEW, `workspace.py`) shall share `find_identical` and the free-name walk with `place_into_workarea` and write nothing. The save plan (LLR-167.6) shall predict every landing name with it, and `_handle_save_dialog` shall check each landed `PlacementResult` against its planned row; a mismatch is an error naming both paths, never silent.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-68 — `pytest tests/test_b100_reuse.py -k tc_b100_68`
+- **Numeric pass threshold:** a directory named `firmware_1.s19` in the target → predicted `firmware_2.s19`, placed `firmware_2.s19` (1 equality); identical bytes present → predicted `reused`, placed `reused`; a concurrent claim between prediction and placement (forced) → 1 mismatch error naming both paths; 0 bytes written by a prediction.
+- **Negative control:** a mutation giving the prediction its own free-name walk that skips directories → the directory arm predicts `firmware_1.s19` → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a directory and a link at a `_<N>` name; a forced concurrent claim.
+
 ### LLR-164.1 — Reserved homes and device names, compared case-folded
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.5
-- **Statement:** `_handle_save_dialog` (`app.py:8087`) shall refuse, before creating any folder and with the `reserved name` or `device name` tokens, a sanitised name whose case-fold equals that of an entry of `RESERVED_WORKAREA_HOMES` (`workspace.py:40`), or of a Windows device name (`CON`, `PRN`, `AUX`, `NUL`, `COM0`–`COM9`, `LPT0`–`LPT9`, the superscript-digit forms `COM¹²³`, `LPT¹²³`, `CONIN$`, `CONOUT$`), with or without an extension. `list_projects` (`app.py:8519`) shall omit every folder whose case-folded name is a reserved home.
+- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20
+- **Statement:** `_handle_save_dialog` (`app.py:8087`) shall refuse, before creating any folder and with the `reserved name` or `device name` tokens, a sanitised name whose case-fold equals that of an entry of `RESERVED_WORKAREA_HOMES` (`workspace.py:40`), and a typed name or sanitised name for which `is_windows_device_name` (NEW, one shared predicate in `workspace.py`, also used by LLR-169.8 and LLR-172.2) is true: `CON`, `PRN`, `AUX`, `NUL`, `COM0`–`COM9`, `LPT0`–`LPT9`, the superscript-digit forms, `CONIN$`, `CONOUT$`, with or without an extension, compared case-folded. `list_projects` (`app.py:8519`) shall omit every folder whose case-folded name is a reserved home. The two existing device lists (`changes/apply.py:107`, `segment_split_view.py:524`) stay and are filed in the backlog.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-04 — `pytest tests/test_b100_save_guards.py -k tc_b100_04`
-- **Numeric pass threshold:** every tuple entry in 3 casings (the set derived from the imported tuple, ≥ 9 entries) and `nul`, `CON`, `com1`, `LPT¹`, `con.txt` → refused with tokens, 0 folders; folders `Splits` and `Reports` → 0 listed.
-- **Negative control:** executed on `1d677ba` (P-14): `Splits` saved and listed → RED; (S-04) `CON` saved → RED.
-- **Boundary catalog:** ☒ invalid — every reserved and device name in mixed case.
+- **Numeric pass threshold:** every tuple entry in 3 casings (the set derived from the imported tuple, ≥ 9 entries) and `nul`, `CON`, `com1`, `LPT¹`, `con.txt` (raw), `CONIN$` (raw) and `C O N` (sanitised `CON`) → refused with tokens, 0 folders; folders `Splits` and `Reports` → 0 listed.
+- **Negative control:** executed on `1d677ba` (P-14): `Splits` saved and listed → RED; (S-04) `CON` saved → RED; a mutation checking only the sanitised name → `con.txt` saved as `contxt` → RED.
+- **Boundary catalog:** ☒ invalid — every reserved and device name in mixed case, raw and sanitised.
 
 ### LLR-164.2 — Q-2: clash, merge and the open project
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5
-- **Statement:** `_handle_save_dialog` shall decide by Q-2. A project is a direct child of this work area holding a `project.json` or a data file, not a reserved home and not a link. (a) A disguised clash — the sanitised name equals a project's folder name compared case-folded while the typed name differs from it — shall be refused before writing, with the `already a project` tokens naming both names. (b) A name equal to a project that is not open shall merge: it keeps the target's `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` and other variants, adds the new files as variants (LLR-005.1), rewrites `project.json` through the seam, and sets `active_variant` per D2; sub-folders and the target's document are untouched. (c) A name equal to the open project, typed exactly or as its unsanitised form, shall save into the open project. The completed save's status shall name the folder written.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.23
+- **Statement:** `_handle_save_dialog` shall decide by Q-2. A project is a direct child of this work area holding a `project.json` or a data file, not a reserved home and not a link. (a) A disguised clash — the sanitised name equals a project's folder name compared case-folded while the typed name differs from it — shall be refused before writing, with the `already a project` and `choose another name` tokens naming both names. (b) A name equal to a project that is not open shall merge: it keeps the target's other keys and variants, adds the new files as variants (LLR-005.1), rewrites `project.json` through the seam carrying every key it does not own (the LLR-168.3 rule), and sets `active_variant` per D2; sub-folders and the target's document are untouched; if the merge fails, the files it placed are removed and listed in the status. (c) A name equal to the open project, typed exactly or as its unsanitised form, shall save into the open project. A target folder that is a link or junction is refused before `resolve()` with the `link or junction` tokens. The completed save's status shall name the folder written.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-05 — `pytest tests/test_b100_save_guards.py -k tc_b100_05`
-- **Numeric pass threshold:** `ab` existing and not open, `a b` typed → 1 refusal naming both, `ab/` with 0 changed digests; `AB` typed → 1 refusal (case-only); `ab` typed → merge, the target's 5 carried keys unchanged, 1 variant added; `a b` typed while `ab` is open → saved into `ab`; `tests/test_tui_variants.py::test_save_second_s19_into_project_appends_variant` → passed.
+- **Numeric pass threshold:** `ab` existing and not open, `a b` typed → 1 refusal naming both, `ab/` with 0 changed digests; `AB` typed → 1 refusal (case-only); `ab` typed → merge, 1 variant added; the carried keys: `batch`, `assignments`, `declared_regions` from Inc 2, `gathered` from Inc 6, `active_document` from Inc 8a (0 changed at each); `a b` typed while `ab` is open → saved into `ab`; a forced `OSError` mid-merge → the target's file set and `project.json` unchanged; a junction `evil` typed → refused, 0 bytes written; `tests/test_tui_variants.py::test_save_second_s19_into_project_appends_variant` → passed.
 - **Negative control:** executed on `1d677ba` (P-10): `'a b' -> project='ab'` saved silently → RED; a mutation passing the session's `batch` in the merge → the carried-key arm RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — boundary: the open project's name typed both ways, an exact-name merge; invalid: a case-only and a sanitised clash.
+- **Boundary catalog:** ☒ boundary ☒ invalid ☒ error — boundary: the open project's name typed both ways, an exact-name merge; invalid: a case-only and a sanitised clash, a junction target; error: a failed merge.
 
 ### LLR-164.3 — Name cap, path limit and `OSError`
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.5
-- **Statement:** `_handle_save_dialog` shall refuse, before creating any folder, a sanitised name longer than `PROJECT_NAME_MAX_CHARS = 64` (NEW, `workspace.py`) with the `name too long` tokens, and a name for which `len(str(self.workarea / name)) + 53 > 259` (the longest fixed in-project file, `\reports\<ts>-NN-before-after-report.html`; the `_MAX_FULL_PATH` idiom, `segment_split_view.py:544`) with the `path too long` tokens.
+- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.22
+- **Statement:** `_handle_save_dialog` shall refuse, before creating any folder, a sanitised name longer than `PROJECT_NAME_MAX_CHARS = 64` (NEW, `workspace.py`) with the `name too long` tokens, and a name for which `len(str(self.workarea)) + 1 + len(name) + 53 > 259` (the longest fixed in-project file, `\reports\<ts>-NN-before-after-report.html`; the `_MAX_FULL_PATH` idiom, `segment_split_view.py:544`) with the `path too long` tokens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-06 — `pytest tests/test_b100_save_guards.py -k tc_b100_06`
-- **Numeric pass threshold:** 64 characters → saved; 65 and 300 → 2 refusals, 0 folders, app running; a work area of length 207 with a 0-character overflow (`207 + 1 + 0 + 53 = 261 > 259` for any name) → refused with `path too long`.
+- **Numeric pass threshold:** 64 characters → saved; 65 and 300 → 2 refusals, 0 folders, app running; with a work area of length L = 150: a 55-character name (`150 + 1 + 55 + 53 = 259`) → saved, a 56-character name (`= 260`) → refused with `path too long`.
 - **Negative control:** executed on `1d677ba` (P-13): `RAISED FileNotFoundError` → RED.
-- **Boundary catalog:** ☒ boundary — 64 and 65; the path limit exactly met and exceeded by 1.
+- **Boundary catalog:** ☒ boundary — 64 and 65; the path limit exactly met (259) and exceeded by 1 (260).
 
 ### LLR-164.4 — A refused or failed save leaves no folder it created
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.5
-- **Statement:** Every statement of `_handle_save_dialog` after the folder's creation — validation, the copies, the save-as walk, the emit and the manifest write — shall run under one `OSError` handler that reports the error with the `could not save` tokens and calls `_remove_created_project_dir` (`app.py:8076`), which removes only a folder this call created; every `return` after the creation that does not complete the save shall also call it.
+- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.19
+- **Statement:** Every statement of `_handle_save_dialog` and of the Save worker body (LLR-177.1) after the folder's creation — validation, the copies, the save-as walk, the emit and the manifest write — shall run under one `OSError` handler that reports the error with the `could not save` tokens and calls `_remove_created_project_dir` (`app.py:8076`) in the path where the failure happens, removing only a folder this call created; every `return` after the creation that does not complete the save shall also call it.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B100-07 — `pytest tests/test_b100_save_guards.py -k tc_b100_07` (an AST census over the handler's returns and exception exits, plus one behavioural arm per stage)
-- **Numeric pass threshold:** the census derives the post-creation returns from the AST (≥ 3 at `1d677ba`, `app.py:8148-8170`) → 0 without the removal; a forced `OSError` at each of 5 stages → 0 folders left, 0 raises, app running.
-- **Negative control:** a mutation deleting one removal call → the census names that return → RED; S-05's executed probe (a 262-character path) → `FileNotFoundError` escapes and the folder stays → RED.
-- **Boundary catalog:** ☒ error — every stage after creation; a pre-existing folder is never removed.
+- **Executed verification:** TC-B100-07 — `pytest tests/test_b100_save_guards.py -k tc_b100_07` (an AST census over the handler's and the worker body's returns and exception exits, plus one behavioural arm per stage)
+- **Numeric pass threshold:** the census derives the post-creation returns and exception exits from the AST of both functions (≥ 3 returns at `1d677ba`, `app.py:8148-8170`) → 0 without the removal; a forced `OSError` at each of 5 stages, on the worker → 0 folders left, 0 raises, app running.
+- **Negative control:** a mutation deleting one removal call → the census names that exit → RED; S-05's executed probe (a 262-character path) → `FileNotFoundError` escapes and the folder stays → RED.
+- **Boundary catalog:** ☒ error — every stage after creation, on the main thread and on the worker; a pre-existing folder is never removed.
 
 ### LLR-165.1 — One reset seam, before the first install
 - **Traceability:** HLR-165
@@ -720,13 +752,13 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-165.2 — The session snapshot, derived from the live app (C-31)
 - **Traceability:** HLR-165
-- **Ledger:** LED-2026-10-26-batch-100.8
-- **Statement:** `S19TuiApp._session_snapshot() -> dict` (NEW, `app.py`) shall return, for every attribute name that `S19TuiApp`'s own source assigns (`self.<name> =`, derived by a census at test time), minus a declared exclusion list of Textual internals, each with its reason, a normalised value: paths relative to the base, the `current_*` objects as `(type, relative path, image digest)`, the change service as its public counts, other objects as counts or keys. The leak check shall compare the snapshot of a cold load of P2 with that of a load of P2 over P1, allow-listing K1 and K2.
+- **Ledger:** LED-2026-10-26-batch-100.8, LED-2026-10-26-batch-100.23
+- **Statement:** `S19TuiApp._session_snapshot() -> dict` (NEW, `app.py`) shall return, for every attribute name that `S19TuiApp`'s own source assigns (`self.<name> =`, derived by a census at test time), minus a declared exclusion list of Textual internals, each with its reason, a normalised value: paths relative to the base, the `current_*` objects as `(type, relative path, image digest)`, the change service as its public counts, stat-keyed caches (such as `_mac_view_cache_key`) without their mtime and with relative paths, other objects as counts or keys. The leak check shall compare the snapshot of a cold load of P2 with that of a load of P2 over P1, allow-listing K1 and K2.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-09 — `pytest tests/test_b100_session_reset.py -k tc_b100_09`
-- **Numeric pass threshold:** cold vs cold → 0 differing names; P2-over-P1 vs cold P2 → 0 differing names outside the allow-list; the derived domain holds ≥ 60 names (source census 67), and every name the census finds is either in the domain or in the exclusion list with a reason (0 unclassified).
-- **Negative control:** a code mutation dropping one reset line (`current_a2l_path`) → 1 differing name → RED; a set mutation dropping one census name from the domain without an exclusion → the classification arm RED.
-- **Boundary catalog:** ☒ boundary — the K1 counters differ by design and are allow-listed.
+- **Numeric pass threshold:** cold vs cold → 0 differing names; P2-over-P1 vs cold P2 → 0 differing names outside the allow-list; the derived domain holds ≥ 60 names (source census 67), and every name the census finds is in the domain or in the exclusion list with a reason (0 unclassified).
+- **Negative control:** a code mutation dropping one reset line (`current_a2l_path`) → 1 differing name → RED; a set mutation dropping one census name without an exclusion → the classification arm RED; QA's probe without the stat-key normaliser → cold vs cold differs in `_mac_view_cache_key` → RED for an un-normalised snapshot.
+- **Boundary catalog:** ☒ boundary — the K1 counters differ by design and are allow-listed; a stat-keyed cache.
 
 ### LLR-165.3 — The change service is rebound
 - **Traceability:** HLR-165
@@ -750,11 +782,11 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-166.1 — The load tails and the modal closes put the focus on the window's target
 - **Traceability:** HLR-166
-- **Ledger:** LED-2026-10-26-batch-100.10
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.23
 - **Statement:** Each window shall declare its focus target, a non-text widget (NEW, a per-window table in `app.py`, derived at Phase 3 from the window registry and checked by TC-B100-12 against every window). The load tail `_step_finalize` (`app.py:11191`), the dismiss of the Load dialog, of the load question and of the Load-result panel, and a cancelled load shall move the focus to the displayed window's target when the focused widget has region area 0, belongs to a window that is not displayed, or is an `Input` / `TextArea`. While the Load-result panel is open, the focus stays in it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-12 — `pytest tests/test_b100_focus.py -k tc_b100_12`
-- **Numeric pass threshold:** every window in the registry → 1 declared target, 0 of type `Input` / `TextArea`; 3 load paths (Load dialog file, Load dialog project, Workarea Files pick) and 4 closes (panel `enter`, panel `esc`, question `n`, dialog `esc`) → the focus on the target each time; then `p` → the Load dialog opens (7 of 7).
+- **Numeric pass threshold:** every window in the registry → 1 declared target, 0 of type `Input` / `TextArea`; written at Inc 4: 3 load paths (Load file, Load project, Workarea Files pick) → the focus on the target, then `p` → a dialog opens (3 of 3); extended at Inc 6 (panel `enter`, panel `esc`), Inc 9b (dialog `esc`, cancelled load) and Inc 10 (question `n`) → the focus on the target each time.
 - **Negative control:** executed on `1d677ba` (P-16): `focused region area: 0` → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary — a cancelled load; the Split/Join window displayed (its table is the target).
 
@@ -768,25 +800,25 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation removing the re-home from the A2L tail → area 0 → RED.
 - **Boundary catalog:** ☒ boundary — an A2L load with no image loaded.
 
-### LLR-167.1 — `image_differs_from_source`
+### LLR-167.1 — The emit decision is made on data
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.3
-- **Statement:** `ChangeService.image_differs_from_source(mem_map) -> bool` (NEW, B100-I5) shall return true iff the journal is bound to this dict (`_image_map is mem_map`, `change_service.py:895`, bound at `:1814`) and some journaled address (`_journal`, `:887`) holds a byte other than its source byte. It shall be read-only, shall not iterate `mem_map`, and shall be used only for Save project's emit-or-copy decision (LLR-167.2), never for the load question or the Save summary's pending line.
+- **Ledger:** LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.14
+- **Statement:** Save project shall decide emit or copy by re-deriving the change document's entries onto a copy of the source image (`rederive_for_save`, LLR-167.7) and comparing the result with the source file's data: emit iff they differ. A check-kind document never counts and never triggers an emit. `ChangeService.image_differs_from_source(mem_map)` (B100-I5, `change_service.py:895`, `:887`) is not the emit trigger; whether it survives as a cheap pre-check of this comparison is decided at PDR (§6.3). The load question and the Save summary's pending line never use this decision.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-14 — `pytest tests/test_b100_save_image.py -k tc_b100_14`
-- **Numeric pass threshold:** unpatched → False; applied → True; applied then undone → False; a same-byte patch → False; an unbound map → False; after a save-back → still True (the source is unpatched); 0 iterations of `mem_map` (a counting subclass).
-- **Negative control:** a mutation returning true whenever the map is bound → the unpatched arm → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary — an empty journal; a same-byte patch; an unbound map; after a save-back.
+- **Numeric pass threshold:** no entry → copy; a change entry writing new bytes → emit; a change entry writing the bytes already there → copy; a check document with 1 entry → copy; applied then undone → copy; only unapplied change entries that write new bytes → emit; 0 writes to `mem_map` while deciding.
+- **Negative control:** the round-2 rule (emit when the document holds any entry) → the check-document arm emits and is refused (P-37), and the same-byte arm emits a byte-different file (P-38) → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — an empty document; a same-byte entry; a check document.
 
-### LLR-167.2 — Save project emits through `save_patched` or copies the source
+### LLR-167.2 — Save project emits through the split or copies the source
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13
-- **Statement:** `_handle_save_dialog` shall execute the save plan (LLR-167.6). When `image_differs_from_source(current_file.mem_map)` is true or the document holds at least one entry, it shall call `ChangeService.save_patched` with the in-memory map and ranges, `project_dir`, the plan's landing name, the source kind, `bytes_per_line=32`, the source's S0 as `s0_header`, `source_image_path=current_file.path` and the MAC records and A2L tags; `save_patched` restores the journal and re-applies the current document in place, so the view equals the file. Otherwise it shall call `copy_into_workarea(current_file.path, project_dir)` (`app.py:8173`). MAC and A2L stay `copy_into_workarea` copies. The landed image becomes `active_variant`.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13, LED-2026-10-26-batch-100.14
+- **Statement:** `_handle_save_dialog` shall execute the save plan (LLR-167.6). When the emit decision (LLR-167.1) is emit, it shall apply the re-derived image to the session map in place on the main thread and call `emit_and_verify` (LLR-167.7) with the plan's landing name, the source kind, `bytes_per_line=32`, the source's S0, `source_image_path=current_file.path` and the MAC records and A2L tags, then record `derived_from` (LLR-168.4); the landed image becomes `active_variant`. Otherwise it shall call `copy_into_workarea(current_file.path, project_dir)` (`app.py:8173`) and add no variant. A check document is placed under `checks/` through the gather and never blocks the save. MAC and A2L stay `copy_into_workarea` copies.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-15 — `pytest tests/test_b100_save_image.py -k tc_b100_15`
-- **Numeric pass threshold:** a patched S19 → 0 differing addresses between the file (independent reader) and source + document, every data record ≤ 32 bytes, the S0 equal to the source's; an entry added after the apply → written; an entry removed after the apply → absent; only unapplied entries → emitted with 0 dropped; a patched HEX → 0 differing addresses; unpatched with an empty document → 0 differing bytes against the source; MAC and A2L → 0 differing bytes; save-back then Save project → the patch in the project image; a target holding a different `firmware.s19` → `firmware_1.s19`, `active_variant` = `firmware_1`.
+- **Numeric pass threshold:** a patched S19 → 0 differing addresses between the file (independent reader) and source + change document, every data record ≤ 32 bytes, the S0 equal to the source's; check document only → byte copy (0 differing bytes) + the document under `checks/`, 0 refusals; unchanged change document → byte copy, 0 new variants; real change → emit; an entry removed after the apply → absent; a patched HEX → 0 differing addresses; MAC and A2L → 0 differing bytes; save-back then Save project → the patch in the project image; a target holding a different `firmware.s19` → `firmware_1.s19`, `active_variant` = `firmware_1`; `tests/test_project_gather.py::test_tc700_active_editor_document_is_gathered_by_kind` → passed.
 - **Negative control:** executed on `1d677ba` (P-1): `== in-memory patched image? False` → RED; a mutation deciding emit-or-copy on `differs_from_last_saved` → the save-back-then-Save arm copies the unpatched source → RED (A-08).
-- **Boundary catalog:** ☒ boundary — S19 and HEX sources; an S19 with no S0; only unapplied entries; a clashing landing name.
+- **Boundary catalog:** ☒ boundary ☒ invalid — S19 and HEX sources; an S19 with no S0; a same-byte entry; a check document; a clashing landing name.
 
 ### LLR-167.3 — The status names the entries the image carries
 - **Traceability:** HLR-167
@@ -820,13 +852,33 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6 — One save plan, painted and executed (R-PC)
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.4
-- **Statement:** `plan_project_save(...) -> SavePlan` (NEW, a pure function in `services/project_gather_service.py`) shall compute, without writing, the target folder and its kind (new, open project, merge), every file with its source, landing name, action (new, reused, renamed to `_<N>`, kept) and SHA-256 — for an emitted image, of the bytes the emitter would write, derived on a copy — the image description (source + N entries, K applied by this save, or an unchanged copy), the document, the sub-folders and the manifest keys, or the refusal with its tokens. `_handle_save_dialog` shall execute exactly that plan, and the Save dialog shall paint it (LLR-175.4). Inc 5 lands the function and its use by the handler.
+- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.23
+- **Statement:** `plan_project_save(...) -> SavePlan` (NEW, a pure function in `services/project_gather_service.py`) shall compute, without writing, the target folder and its kind (new, open project, merge), one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`, each with its source, landing name (from `predict_placement`, LLR-163.7) and action word (`new`, `replace`, `keep`, `merge`, `rewrite`), plus the image description (source + N change entries, K applied by this save, or an unchanged copy), the document, skipped links and the manifest keys, or the refusal with its tokens. The emitted image's bytes and digest are computed by the app once per dialog open (LLR-167.7) and passed in, so `project_gather_service` gains no import of `change_service` or `changes`. `_handle_save_dialog` shall execute exactly that plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
-- **Numeric pass threshold:** 5 scenarios (fresh, exact-name merge, save-as with sub-folders, pending patch, refused) → the plan's rows equal the files on disk after the save, by path and SHA-256 (0 differences); the refused scenario → 0 files; computing a plan writes 0 bytes and leaves `mem_map` unchanged (1 digest equality).
-- **Negative control:** a mutation where the handler recomputes a landing name instead of using the plan's → the clashing-name scenario differs → RED.
+- **Numeric pass threshold:** written at Inc 5: fresh, open-project, pending patch and refused scenarios → the plan's rows equal the written tree at the plan's granularity, by full path and action (0 differences), the refused scenario → 0 files; extended at Inc 8a (the document row) and Inc 8b (save-as with sub-folders); computing a plan writes 0 bytes, leaves `mem_map` unchanged and computes 0 digests; 0 new imports from `project_gather_service`.
+- **Negative control:** a mutation where the handler places a file the plan did not name → 1 tree row without a plan row → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☒ error — a fresh empty folder; a clashing landing name; a refused name.
+
+### LLR-167.7 — `save_patched` split into re-derive and emit-and-verify
+- **Traceability:** HLR-167
+- **Ledger:** LED-2026-10-26-batch-100.14
+- **Statement:** `ChangeService` shall expose `rederive_for_save(copy) -> (map, summary)` (NEW), which re-derives the source plus the current change document onto the given copy without touching the session map, and `emit_and_verify(map, ranges, dest_dir, filename, …) -> ChangeActionResult` (NEW), which emits and verifies. `save_patched` (`change_service.py:2009`) shall be composed of the two, so the save-back's rule (B99-I7) is unchanged. Inc 5 lands the split.
+- **Validation:** `test (unit)`
+- **Executed verification:** TC-B100-69 — `pytest tests/test_b100_save_image.py -k tc_b100_69`
+- **Numeric pass threshold:** `rederive_for_save` → 0 writes to the session map; `save_patched` before and after the split → byte-identical files for 4 documents (applied, undone, added after apply, blocked); `tests/test_b99_editor_image.py` → 0 new failures.
+- **Negative control:** a mutation where `rederive_for_save` writes the session map → the 0-writes arm RED.
+- **Boundary catalog:** ☒ boundary ☒ error — the 4 documents, the blocked one included.
+
+### LLR-167.8 — Save project clears the Patch Editor's dirty flag
+- **Traceability:** HLR-167
+- **Ledger:** LED-2026-10-26-batch-100.17
+- **Statement:** After a Save project that wrote the change or check document into the project, `_handle_save_dialog` shall call the Patch Editor panel's `mark_saved` (`screens_directionb.py:5805`) and `ChangeService.mark_saved`, so neither the document flag nor the image predicate reports unsaved work that is on disk.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-70 — `pytest tests/test_b100_save_image.py -k tc_b100_70`
+- **Numeric pass threshold:** an entry added → Save project → a project load → 0 questions; a refused Save project → the flag still set (1 assertion).
+- **Negative control:** a mutation skipping the panel's `mark_saved` → the load asks → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a check document; a refused save.
 
 ### LLR-168.1 — The reader parses `gathered`
 - **Traceability:** HLR-168
@@ -850,13 +902,23 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-168.3 — Every in-project writer rewrites the manifest, carrying every key it does not own
 - **Traceability:** HLR-168
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7
-- **Statement:** The Load-file variant append and the MAC and A2L syncs (`app.py:8591`, `:8622`, `:8630`, `:8652`) shall each end in `_write_and_verify_manifest`, passing every key of the existing manifest they do not change — `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` — converted from the reader's absolute paths back to project-relative POSIX strings. The variant append shall make the appended file active and paint a status line naming the project and the file it now opens.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Statement:** The Load-file variant append and the MAC and A2L syncs (`app.py:8591`, `:8622`, `:8630`, `:8652`) shall place their files through `place_into_workarea` and each end in `_write_and_verify_manifest`, passing every key of the existing manifest they do not change — `batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `derived_from` — converted from the reader's absolute paths back to project-relative POSIX strings. The variant append shall make the appended file active and paint a status line naming the project and the file it now opens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-20 — `pytest tests/test_b100_active_variant.py -k tc_b100_20`
-- **Numeric pass threshold:** 4 writers → 4 rewrites; each → 0 changed keys it does not own and 0 absolute paths in the written file; a recorded document → still recorded after the append; the append → `active_variant` = the appended id and 1 status line naming project and file.
+- **Numeric pass threshold:** 4 writers → 4 rewrites; each → 0 changed keys it does not own and 0 absolute paths in the written file; a recorded document and a `derived_from` → still recorded after the append; the append → `active_variant` = the appended id and 1 status line naming project and file.
 - **Negative control:** a mutation removing the seam call from the variant append → `active_variant` stale → RED; a mutation passing the reader's absolute `batch` → `serialize_manifest` refuses and no manifest is written (A-03 probe) → RED.
 - **Boundary catalog:** ☒ boundary — a manifest with every key filled.
+
+### LLR-168.4 — `derived_from` records what a patched variant derives from
+- **Traceability:** HLR-168
+- **Ledger:** LED-2026-10-26-batch-100.16
+- **Statement:** `serialize_manifest` shall emit an additive per-variant `derived_from` map (B100-I16), only when non-empty: for each patched variant file (project-relative, through `_reject_unsafe_entry`), the base's file name, the base's SHA-256 and the number of bytes that differ from it, all computed at the write, when both images are in hand. `read_project_manifest` shall parse it in the manifest-keys mode, an unsafe or malformed value giving one issue and no entry, capped at 1 000 entries. The save-back into a project and Save project's emit shall set it from Inc 7 on; an emit before Inc 7 records nothing. Every rewrite carries it (LLR-168.3). The base need not be in the project: when no project file has the recorded name and digest, the record still names the base and its byte count.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-71 — `pytest tests/test_b100_active_variant.py -k tc_b100_71`
+- **Numeric pass threshold:** a save-back to `firmware_1.s19` and one to `firmware-patched.s19` → `derived_from` names `firmware.s19` with its SHA-256 and `4` differing bytes in both (2 of 2); a Save project emit of a session loaded from outside the project → the base's name and digest recorded, the base absent from the project (1 arm); a byte copy → not set; `../x.s19` as a value → 1 issue, 0 entries; a manifest with no key → output byte-identical to `1d677ba`'s.
+- **Negative control:** a mutation dropping the key from the carry → after a variant append the panel loses the "patched" line → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — no key; a base not in the project; hostile and malformed values.
 
 ### LLR-169.1 — The `files` envelope
 - **Traceability:** HLR-169
@@ -890,13 +952,13 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.4 — The reader treats `project.json` as untrusted (C6)
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** `read_project_manifest` shall read at most 1 MiB of `project.json` (an excess gives one `MANIFEST-SIZE-CAP`), parse at most 1 000 `files` records (an excess gives one `MANIFEST-BAD-STRUCTURE`), and parse `files` into `dict[Path, FileRecord]`. A key is accepted only if it is a top-level name with a project data or A2L suffix, or equals `active_document`, and it passes the shared path predicate (LLR-169.8); an unsafe key gives one `MANIFEST-PATH-ESCAPE`. A record whose `size` is not an `int` ≥ 0 (a `bool` included) or whose `sha256` is not 64 hex characters gives one `MANIFEST-BAD-STRUCTURE`. Every refused record is skipped; an absent key gives an empty dict and no issue.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20
+- **Statement:** `read_project_manifest` shall read at most 1 MiB of `project.json` (an excess gives one `MANIFEST-SIZE-CAP`), parse at most 1 000 entries in each of `batch`, `assignments`, `declared_regions`, `gathered`, `files` and `derived_from` (an excess gives one `MANIFEST-BAD-STRUCTURE`), and parse `files` into `dict[Path, FileRecord]`. A `files` key passes the manifest-key predicate (LLR-169.8) or gives one `MANIFEST-PATH-ESCAPE`; a contained key outside the scope (not a top-level name with a project data or A2L suffix, and not `active_document`) gives one `MANIFEST-BAD-STRUCTURE`. A record whose `size` is not an `int` ≥ 0 (a `bool` included) or whose `sha256` is not 64 hex characters gives one `MANIFEST-BAD-STRUCTURE`. Every refused record is skipped; an absent key gives an empty dict and no issue. These codes go to the log; the panel words them in user terms (LLR-169.9).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-24 — `pytest tests/test_b100_project_check.py -k tc_b100_24`
-- **Numeric pass threshold:** per arm, the code asserted: `../x.s19`, an absolute path, `C:x`, a UNC path, `x.s19:ads`, `sub/x.s19`, `CON`, `x.s19.` → 8 × `MANIFEST-PATH-ESCAPE` (or the scope refusal), 0 records; `size: true`, `size: -1`, `size: "1"`, `sha256: "XYZ"`, 63 and 65 hex → 6 × `MANIFEST-BAD-STRUCTURE`; 1 001 records → 1 issue; a 1 MiB + 1 byte file → 1 `MANIFEST-SIZE-CAP`, read under 1 s; a valid record → 1 record.
-- **Negative control:** a mutation accepting a `bool` size → 0 issues on that arm → RED; S-09's executed probe: `C:x.s19` → 0 issues at `1d677ba` → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — an absent key; exactly 1 000 records and 1 MiB; the hostile set.
+- **Numeric pass threshold:** per arm, the code asserted: `../x.s19`, an absolute path, `C:x`, a UNC path, `x.s19:ads`, `CON`, `x.s19.`, `patches/NUL.json` → 8 × `MANIFEST-PATH-ESCAPE`; `sub/x.s19` → 1 × `MANIFEST-BAD-STRUCTURE`; `size: true`, `size: -1`, `size: "1"`, `sha256: "XYZ"`, 63 and 65 hex → 6 × `MANIFEST-BAD-STRUCTURE`; 1 001 entries in `batch` (and separately in `files`) → 1 issue each, read under 1 s; a 1 MiB + 1 byte file → 1 `MANIFEST-SIZE-CAP`; a valid record → 1 record.
+- **Negative control:** a mutation accepting a `bool` size → 0 issues on that arm → RED; P-40: an uncapped `batch` of 75 677 entries takes 14.92 s → RED for the timing arm.
+- **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid — an absent key; exactly 1 000 entries and 1 MiB; the hostile set.
 
 ### LLR-169.5 — `check_project_files`: manifest and disk problems
 - **Traceability:** HLR-169
@@ -928,24 +990,24 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** executed on `1d677ba` by the QA race probe: `ok=3 cross-content=12 failed-writes=60` → RED; the source predicate → 1 hit at `:509` → RED.
 - **Boundary catalog:** ☒ boundary — 1 and 8 writers.
 
-### LLR-169.8 — One path predicate refuses drive-relative and stream names (S-09)
+### LLR-169.8 — A manifest-key mode refuses drive-relative, stream and device names (S-09)
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** `_resolve_manifest_entry` (`variant_execution_service.py:205`) shall refuse, with `MANIFEST-PATH-ESCAPE`, an entry that has a drive or a root (`PureWindowsPath(entry).drive or .root`), a `:` anywhere, a trailing dot or space, or a Windows device name. It is shared, so the change reaches `batch`, `assignments`, `gathered`, `active_document` and `files` in `read_project_manifest`, and the flow references of `flow_persistence_service.py` (`:82-85`); the reverse census (§5.4) names their tests.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20
+- **Statement:** `_resolve_manifest_entry` (`variant_execution_service.py:205`) shall gain a manifest-key mode, used by `read_project_manifest` and `_reject_unsafe_entry` only, that refuses with `MANIFEST-PATH-ESCAPE` an entry with a drive or a root (`PureWindowsPath(entry).drive or .root`), a `:` anywhere, or a path component that ends in a dot or a space or for which `is_windows_device_name` is true, with or without an extension. Both flow-reference callers — `flow_persistence_service.py` (`:84`, `:582`, `:619`, `:780`, `:1433`) and `flow_execution_service.py` (`:117`, `:315`, `:345`, `:427`, `:448`, `:734`, `:798`, `:942`, `:1695`) — keep the default mode, so `tests/test_b97_flow_builder.py::test_tc_b97_20_hostile_refs_render_literally` stays green.
 - **Validation:** `test (unit)`
-- **Executed verification:** TC-B100-60 — `pytest tests/test_b100_project_check.py -k tc_b100_60`
-- **Numeric pass threshold:** `C:x.s19`, `c:sub/x.s19`, `x.s19:ads`, `x.s19.`, `x.s19 `, `CON`, `../x.s19`, `C:/x.s19`, `\\host\share\x.s19`, `\\?\C:\x.s19` → 10 × `MANIFEST-PATH-ESCAPE`; `x.s19` and `patches/a.json` → accepted; the flow-reference tests (`tests/test_flow_persistence.py`) → 0 new failures.
-- **Negative control:** executed (S-09): `'C:x.s19' -> …\workarea\P\x.s19 0` at `1d677ba` → RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — a nested relative path (accepted); the hostile set.
+- **Executed verification:** TC-B100-60 — `pytest tests/test_b100_project_check.py -k tc_b100_60` and `pytest tests/test_b97_flow_builder.py tests/test_flow_persistence.py tests/test_flow_execution_service.py`
+- **Numeric pass threshold:** in manifest-key mode: `C:x.s19`, `c:sub/x.s19`, `x.s19:ads`, `x.s19.`, `x.s19 `, `CON`, `patches/NUL.json`, `nul.s19`, `sub./x.s19`, `patches/x.json `, `../x.s19`, `C:/x.s19`, `\\host\share\x.s19`, `\\?\C:\x.s19` → 14 × `MANIFEST-PATH-ESCAPE`; `x.s19` and `patches/a.json` → accepted; the flow tests → 0 new failures.
+- **Negative control:** executed (S-09): `'C:x.s19' -> …\workarea\P\x.s19 0` at `1d677ba` → RED; P-41: the same tightening applied to every caller → `test_tc_b97_20_hostile_refs_render_literally` RED, so the mode is required.
+- **Boundary catalog:** ☒ boundary ☒ invalid — a nested relative path (accepted); the hostile set, per path component.
 
-### LLR-169.9 — The load result adds `not readable`, and one problem per file wins
+### LLR-169.9 — The load result adds `not readable`, one problem per file wins, worded for the user
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.7
-- **Statement:** `_handle_load_project` shall add `not readable` for an image whose install reports load errors or an empty `mem_map`, merge it with `check_project_files`' list, and keep for each file only its highest problem by the precedence `manifest damaged` / `no project.json` > `missing` > `not readable` > `changed on disk` > `not recorded` > `no digests saved`; at most one manifest-level problem is kept. Problems are worded in user terms ("not an S19 or HEX file", "0 data bytes"), never as an exception class.
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.22
+- **Statement:** `_handle_load_project` shall add `not readable` for an image whose install reports load errors or an empty `mem_map`, merge it with `check_project_files`' list, and keep for each file only its highest problem by the precedence `manifest damaged` / `no project.json` > `missing` > `not readable` > `changed on disk` > `not recorded` > `no digests saved`; at most one manifest-level problem is kept. Each problem is painted with its reason in user terms ("not an S19 or HEX file", "0 data bytes", "a file path points outside the project") and its next-step token (§3 table); internal issue codes and exception class names go to the log only.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-61 — `pytest tests/test_b100_project_check.py -k tc_b100_61`
-- **Numeric pass threshold:** `p04` case 6 (corrupted after the save) → 1 problem, `not readable`; case 7 → 1 problem, `manifest damaged`; a file both changed and unrecorded → 1, `changed on disk`; 0 exception class names in any problem text.
-- **Negative control:** a mutation keeping every kind per file → case 6 gives 2 problems → RED.
+- **Numeric pass threshold:** `p04` case 6 → 1 problem, `not readable`; case 7 → 1, `manifest damaged`; a file both changed and unrecorded → 1, `changed on disk`; 7 kinds → 7 next-step tokens; 0 exception class names and 0 `MANIFEST-` codes in painted problem text.
+- **Negative control:** a mutation keeping every kind per file → case 6 gives 2 problems → RED; a mutation painting the issue code → 1 `MANIFEST-` code painted → RED.
 - **Boundary catalog:** ☒ boundary — a file matching three kinds.
 
 ### LLR-170.1 — The `active_document` key
@@ -980,12 +1042,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.1 — Save as copies every sub-folder, never through a link
 - **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6
-- **Statement:** When `_handle_save_dialog` saves an open project to a new folder, it shall first total the size of what will be copied and refuse, before creating the folder, when it exceeds `shutil.disk_usage` free space of the work area's volume; then copy every sub-folder of `current_project_dir`, regular files only, each through `copy_into_workarea` into the same relative path, pruning every directory entry for which `_is_reparse_point` (`workspace.py:172`) is true before descending, at every depth including the top-level sub-folder, and skipping file links; each skipped link is listed in the summary and the status.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20
+- **Statement:** When `_handle_save_dialog` saves an open project to a new folder, one walk of `current_project_dir` shall prune every directory entry for which `_is_reparse_point` (`workspace.py:172`) is true before descending, at every depth including the top-level sub-folder, and skip file links; that walk's file list gives both the total and the copy. The save shall be refused, before the folder is created and with the `not enough free space` tokens, when the total exceeds `shutil.disk_usage` free space of the work area's volume; otherwise each file is copied through `place_into_workarea` into the same relative path, and each skipped link is listed in the summary and the status.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-31 — `pytest tests/test_b100_project_homes.py -k tc_b100_31`
-- **Numeric pass threshold:** P with `flows/`, `flowsets/`, `patches/`, `checks/`, `reports/`, `templates/`, `splits/` (one file each; the expected set derived from P's listing) → 0 missing and 0 differing files in Q; P → 0 changed digests; a top-level directory junction, a nested junction and a file symlink → 0 files copied through them, 3 skips listed; a total over the free space (simulated free space) → refused, 0 folders.
-- **Negative control:** executed on `1d677ba` (P-9): Q lacks the sub-folders → RED; S-03's executed probe: `os.walk(P)` lists `flows\secret.txt` through a junction → RED.
+- **Numeric pass threshold:** P with `flows/`, `flowsets/`, `patches/`, `checks/`, `reports/`, `templates/`, `splits/` (one file each; the expected set derived from P's listing) → 0 missing and 0 differing files in Q; P → 0 changed digests; a top-level directory junction, a nested junction and a file symlink → 0 files copied through them, 3 skips listed, 0 bytes added to the total; a total over the free space (simulated) → refused with tokens, 0 folders.
+- **Negative control:** executed on `1d677ba` (P-9): Q lacks the sub-folders → RED; S-03's executed probe: `os.walk(P)` lists `flows\secret.txt` through a junction → RED; security R2-06's probe: a plain walk descends a junction → the total arm RED.
 - **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid ☒ error — no sub-folder; a nested sub-folder; links and junctions; a copy over the free space.
 
 ### LLR-171.2 — An A2L-only project opens
@@ -1008,43 +1070,43 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** executed on `1d677ba` (P-11): the other work area accepted, not listed → RED.
 - **Boundary catalog:** ☒ boundary ☒ invalid — equivalent spellings; foreign parents.
 
-### LLR-171.4 — Containment means this work area, after links are resolved (S-02)
+### LLR-171.4 — Containment means this work area, checked inside the placement (S-02)
 - **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** `contained_in_workarea(path, workarea) -> bool` (NEW, `workspace.py`) shall be true iff the path, after resolving every link and junction, is inside `workarea.resolve()`. `list_projects`, `_handle_load_project` (picked or typed) and every writer this batch adds or widens — the manifest seam, document placement, the save-back into a project, the save-as walk — shall require it, and shall refuse a project folder for which `_is_reparse_point` is true, checked before `resolve()`.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20
+- **Statement:** `contained_in_workarea(path, workarea) -> bool` (NEW, `workspace.py`, B100-I14, frozen before Inc 1) shall be true iff the path, after resolving every link and junction, is inside `workarea.resolve()`. `place_into_workarea` (LLR-163.1) shall require it for every destination, so every writer — Save project's image, MAC, A2L and sub-folder copies, its emit (`save_patched_image` places through `copy_into_workarea`, `changes/apply.py:781`), the save-back, the variant append, the MAC and A2L syncs, document placement and the manifest seam — is covered by construction. `list_projects` and `_handle_load_project` (picked or typed) shall require it too, and `_handle_save_dialog`, `list_projects` and `_handle_load_project` shall refuse a project folder for which `_is_reparse_point` is true, checked before `resolve()`, for new and merge targets alike.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62`
-- **Numeric pass threshold:** a junction `workarea/evil` into another work area's project → 0 listed, 0 loads (picked and typed), 0 bytes written outside `self.workarea` by 4 writers; a junction to a plain outside folder → the same; a normal project → listed and loaded.
+- **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62` (the placement guard and its junction arm are written at Inc 1 with `place_into_workarea`; the listing and load uses at Inc 8b)
+- **Numeric pass threshold:** at Inc 1: `place_into_workarea` into a junction pointing at another work area and at a plain outside folder → 2 refusals, 0 bytes written; at Inc 8b: a junction `workarea/evil` into another work area's project → 0 listed, 0 loads (picked and typed), and 0 bytes written outside `self.workarea` by 7 writers (Save project new name, Save project merge, Save project emit, the save-back, the variant append, the MAC sync, the A2L sync); a junction to a plain outside folder → the same; a normal project → listed, loaded and saved.
 - **Negative control:** executed (S-02 probe): `_check_destination_contained PASSED (no raise)` and `copy_into_workarea WROTE …\other\.s19tool\workarea\target\src.s19` at `1d677ba` → RED.
-- **Boundary catalog:** ☒ boundary ☒ invalid — a normal folder; junctions into another work area and outside.
+- **Boundary catalog:** ☒ boundary ☒ invalid — a normal folder; junctions into another work area and outside, for each writer.
 
-### LLR-172.1 — The recent-sources store is written
+### LLR-172.1 — The recent-sources store is written per user
 - **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** `record_recent_source(base_dir, path)` (NEW, `workspace.py`) shall write `{"schema_version": 1, "sources": [{"path", "kind"}]}` to `<base>/.s19tool/recent_sources.json`, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique `tempfile.mkstemp` name in `.s19tool/` and placed with `os.replace` after an `_is_reparse_point` check (`workspace.py:172`) on `.s19tool`. `load_from_path` (`app.py:8710`) and `load_a2l_from_path` (`:8789`) shall call it after a successful copy, for sources outside the work area only.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21
+- **Statement:** `recent_store_path() -> Path` (NEW, `workspace.py`) shall return `%APPDATA%\s19_app\recent_sources.json` (from the `APPDATA` environment variable; when it is unset, the store is disabled and nothing is written). `record_recent_source(path)` (NEW) shall write `{"schema_version": 1, "sources": [{"path", "kind"}]}` there, newest first, de-duplicated by resolved path, at most 20 entries, staged under a unique `tempfile.mkstemp` name in the same folder and placed with `os.replace` after an `_is_reparse_point` check on that folder. `load_from_path` (`app.py:8710`) and `load_a2l_from_path` (`:8789`) shall call it after a successful copy, for sources outside the work area only. No file of the store is written under the base folder or any `.s19tool`.
 - **Validation:** `test (integration)`
-- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34`
-- **Numeric pass threshold:** 25 distinct outside loads → 20 entries, newest first; the same file twice → 1 entry; a source inside the work area → 0 entries; a failed load → 0 entries; `.s19tool` as a junction → 0 writes; 2 concurrent writers → a valid file, 0 fixed staging names.
-- **Negative control:** a mutation dropping the de-duplication → 2 entries → RED.
-- **Boundary catalog:** ☒ boundary ☒ error — the 20th and 21st entry; a junctioned `.s19tool`.
+- **Executed verification:** TC-B100-34 — `pytest tests/test_b100_recents.py -k tc_b100_34` (`APPDATA` pointed at a temporary folder)
+- **Numeric pass threshold:** 25 distinct outside loads → 20 entries, newest first; the same file twice → 1 entry; a source inside the work area → 0 entries; a failed load → 0 entries; the store folder as a junction → 0 writes; 2 concurrent writers → a valid file, 0 fixed staging names; `APPDATA` unset → 0 files written; 0 `recent_sources.json` under the base folder.
+- **Negative control:** a mutation dropping the de-duplication → 2 entries → RED; a mutation writing to `<base>/.s19tool/` (round-2 location) → the base-folder arm RED.
+- **Boundary catalog:** ☒ boundary ☒ error — the 20th and 21st entry; a junctioned store folder; `APPDATA` unset.
 
 ### LLR-172.2 — The store is read as untrusted input (C6)
 - **Traceability:** HLR-172
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** `read_recent_sources(base_dir) -> RecentSources(entries, problem)` (NEW, `workspace.py`) shall read with `read(65 536 + 1)`; a file over 65 536 bytes gives no entries and the problem `too large`; an unparseable or wrongly shaped file gives no entries. It shall return only entries whose `path` is an absolute local drive path (not UNC, not `\\?\` or `\\.\`, not drive-relative, no device name) with no C0 or C1 control character, and whose `kind` is one of `s19`, `hex`, `mac`, `a2l` and matches the path's suffix, at most 20, in order. It shall never raise.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.21
+- **Statement:** `read_recent_sources() -> RecentSources(entries, problem)` (NEW, `workspace.py`) shall read the per-user store with `read(65 536 + 1)`; a file over 65 536 bytes gives no entries and the problem `too large`; an unparseable or wrongly shaped file gives no entries. It shall return only entries whose `path` has a drive letter and a root (not UNC, not `\\?\` or `\\.\`, not drive-relative), no path component for which `is_windows_device_name` is true, no C0 or C1 control character, and whose `kind` is one of `s19`, `hex`, `mac`, `a2l` and matches the path's suffix, at most 20, in order. It shall never raise. A mapped network drive letter cannot be told from a local one by syntax; the guard against touching it is that a recent is never touched before Enter (LLR-173.4).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-35 — `pytest tests/test_b100_recents.py -k tc_b100_35`
-- **Numeric pass threshold:** 1 900 valid entries (< 64 KiB) → exactly 20, the first 20 in order; exactly 65 536 bytes → parsed; 65 537 → 0 entries and `too large`; `{not json`, a top-level list, `schema_version: 2` → 0 entries; `kind: exe`, a relative path, a NUL, `\x1b[2J` in a path, U+009B, `\\host\share\x.s19`, `\\?\GLOBALROOT\x.s19`, `C:x.s19`, a `.s19` path with `kind: a2l` → 0 returned; 0 raises.
+- **Numeric pass threshold:** 1 000 distinct valid entries (`C:\NNN.s19`, about 41 KB) → exactly the first 20, in order; exactly 65 536 bytes → parsed; 65 537 → 0 entries and `too large`; `{not json`, a top-level list, `schema_version: 2` → 0 entries; `kind: exe`, a relative path, a NUL, `\x1b[2J` in a path, U+009B, `\\host\share\x.s19`, `\\?\GLOBALROOT\x.s19`, `C:x.s19`, `C:\x\NUL.s19`, `C:\x\a.s19:ads`, `C:\x\a.s19.`, a `.s19` path with `kind: a2l` → 0 returned; 0 raises.
 - **Negative control:** a mutation removing the size cap → the 65 537-byte arm returns entries → RED; S-07's executed probe: `\\host\share\x.s19 … is_absolute = True` → RED for an absolute-only filter.
 - **Boundary catalog:** ☒ empty ☒ boundary ☒ invalid ☒ error — no file; 65 536 and 65 537 bytes; hostile entries; an unreadable file.
 
-### LLR-172.3 — Recent paths stay local
+### LLR-172.3 — Recent paths stay out of projects, reports and every work area
 - **Traceability:** HLR-172
-- **Ledger:** none
-- **Statement:** No writer of `project.json`, of a report or of a project folder shall copy an entry of the recent-sources store.
+- **Ledger:** LED-2026-10-26-batch-100.21
+- **Statement:** No writer of `project.json`, of a report, of a project folder or of any file under the base folder or a `.s19tool` shall copy an entry of the recent-sources store.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-36 — `pytest tests/test_b100_recents.py -k tc_b100_36`
-- **Numeric pass threshold:** after an outside load, Save project and a report → 0 occurrences of the recent path's unique marker directory in the project folder's files.
+- **Numeric pass threshold:** after an outside load, Save project and a report → 0 occurrences of the recent path's unique marker directory in any file under the base folder.
 - **Negative control:** a mutation adding the recents to the manifest → 1 occurrence → RED.
 - **Boundary catalog:** none — no input class; the arm is one end-to-end save and report.
 
@@ -1090,13 +1152,13 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-173.2 — Keys, focus order and the empty Load
 - **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.2
-- **Statement:** The Load dialog shall start with the focus on `#load_list`; bind `enter` and `alt+l` to load (the typed text when `#load_path` has the focus, the highlighted row when `#load_list` has it), `escape` to dismiss with `None`, and `tab` to the order `#load_path` → `#load_list` → `#load_preview` → buttons; a click selects a row and does not load. A Load with no selection and no typed text shall paint `nothing selected` and `pick a row or type a path` in `#load_reason` and stay open. Plain letters typed in `#load_path` stay text.
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18
+- **Statement:** The Load dialog shall start with the focus on `#load_path`; bind `tab` to the order `#load_path` → `#load_list` → `#load_preview` → buttons; move a printable key typed while `#load_list` has the focus to `#load_path` and type it there, so it never reaches an app binding; bind `enter` and `alt+l`, and make `#load_ok`, load the highlighted row when `#load_list` had the focus last and the typed text otherwise; bind `escape` to dismiss with `None`; a click selects a row and does not load. A Load with no selection and no typed text shall paint `nothing selected` and `pick a row or type a path` in `#load_reason` and stay open. `p` opens the dialog with the open project's row highlighted, else the first project.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-41 — `pytest tests/test_b100_load_dialog.py -k tc_b100_41`
-- **Numeric pass threshold:** `enter` in each section → 1 dismiss with the item; `alt+l` → the same; typed text with `#load_path` focused vs a highlighted row → the typed path wins (1 arm), and the reverse (1 arm); `escape` → 1 dismiss with `None`; an empty Load → 1 token pair, 0 dismisses; 1 click → 0 loads; `l` typed in `#load_path` → the field holds `l`; every shown key pressed → its action (5 of 5).
-- **Negative control:** executed on `1d677ba` (P-18, P-19) → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary — an empty Load; both precedence cases.
+- **Numeric pass threshold:** on open → the focus on `#load_path` (1 assertion); `enter` in each section → 1 dismiss with the item; `#load_ok` after a list highlight vs after typing → the row and the typed path respectively (2 arms); `p` typed with the list focused → `#load_path` holds `p`, 0 app actions; `escape` → 1 dismiss with `None`; an empty Load → 1 token pair, 0 dismisses; 1 click → 0 loads; `p` with project P open → P's row highlighted; every shown key pressed → its action (5 of 5).
+- **Negative control:** executed on `1d677ba` (P-18, P-19) → RED; a mutation starting the focus on `#load_list` (`pa_C`'s start) → the open arm RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — an empty Load; both precedence cases; no project open for `p`.
 
 ### LLR-173.3 — Every list renders names through `safe_text` (C8)
 - **Traceability:** HLR-173
@@ -1108,15 +1170,15 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** today's `Label(name)` paints 1 span for `[b]P` (QA-02 probe) → RED.
 - **Boundary catalog:** ☒ invalid — hostile names.
 
-### LLR-173.4 — The dialog's sources and empty sections
+### LLR-173.4 — The dialog's sources, empty sections and recent rows
 - **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.6
-- **Statement:** The Load dialog shall take projects from `list_projects`, files from `list_workarea_files` and recents from `read_recent_sources`; each empty section shall paint its tokens; a recent entry shall not be stat-ed, previewed or read before the engineer presses Enter on it, and a recent source missing on pick shall paint `not found` and drop the entry.
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.18
+- **Statement:** The Load dialog shall take projects from `list_projects`, files from `list_workarea_files` and recents from `read_recent_sources`; each empty section shall paint its tokens. A recent row shall show only its path, size and last-seen time from the store, and "checked when loaded"; a recent entry shall not be stat-ed, previewed or read before the engineer presses Enter on it, and a recent source missing on pick shall paint `not found` and drop the entry. A project row's preview shall read its manifest on a worker with the LLR-169.4 caps, cancelled when the highlight moves.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-43 — `pytest tests/test_b100_load_dialog.py -k tc_b100_43`
-- **Numeric pass threshold:** 2 projects + 1 reserved folder + 1 junction, 2 files, 3 recents → 2 + 2 + 3 rows; empty sources → 3 token lines; rendering and highlighting 3 recents → 0 filesystem calls (a counting probe on `os.stat` / `open`); a missing recent picked → 1 `not found`, the store without it.
-- **Negative control:** a mutation listing folders without `list_projects` → the reserved folder listed → RED; a mutation previewing a recent on highlight → 1 filesystem call → RED.
-- **Boundary catalog:** ☒ empty ☒ error — every section empty; a missing recent.
+- **Numeric pass threshold:** 2 projects + 1 reserved folder + 1 junction, 2 files, 3 recents → 2 + 2 + 3 rows; empty sources → 3 token lines; rendering and highlighting 3 recents → 0 filesystem calls (a counting probe on `os.stat` / `open`); a missing recent picked → 1 `not found`, the store without it; highlighting a project with a 1 MiB manifest → a key answered within 200 ms.
+- **Negative control:** a mutation listing folders without `list_projects` → the reserved folder listed → RED; a mutation previewing a recent on highlight → 1 filesystem call → RED; a main-thread preview read → the 200 ms arm RED.
+- **Boundary catalog:** ☒ empty ☒ invalid ☒ error — every section empty; an over-cap manifest; a missing recent.
 
 ### LLR-173.5 — An invalid typed path is explained inside the dialog (UX-06)
 - **Traceability:** HLR-173
@@ -1128,15 +1190,15 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation dismissing with the path → the dialog closes → RED.
 - **Boundary catalog:** ☒ invalid — the four invalid kinds.
 
-### LLR-173.6 — The preview marks the active set, and the load installs it
+### LLR-173.6 — The preview marks the active set for every row kind, and the load installs it
 - **Traceability:** HLR-173
-- **Ledger:** LED-2026-10-26-batch-100.2
-- **Statement:** For a highlighted project, `#load_preview` shall list its variants, MAC, A2L, sub-folders, manifest state and problems, and mark with `●` the image variant, MAC and A2L that loading it will install; for a file, the file and what it pairs with. The marks shall be computed by the same function that chooses what `_handle_load_project` installs. The panes shall stack below 100 columns, and no row shall wrap.
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.18
+- **Statement:** `#load_preview` shall mark with `●` the files a load of the highlighted row installs, computed by `choose_install_set` (NEW, a pure function used by `_handle_load_project`; it lives in `services/variant_execution_service.py` when PDR takes ARQ §8's bracketed Inc 9b file, otherwise in `app.py`): for a project, its variant, MAC and A2L, with its variants, sub-folders, manifest state and problems listed; for a file or work-area row, the file plus the MAC and A2L the session keeps, and, with a project open, the note that the file becomes that project's active variant; for a recent row, nothing beyond LLR-173.4's fields. The panes shall stack below 100 columns, and no row shall wrap.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-64 — `pytest tests/test_b100_load_dialog.py -k tc_b100_64`
-- **Numeric pass threshold:** 4 projects (clean, after a save-back, active variant missing, A2L-only) → the `●` rows equal the installed paths after Enter (4 of 4); at 99 columns → stacked, at 100 and 118 → side by side; 0 wrapped rows at 118.
+- **Numeric pass threshold:** 4 projects (clean, after a save-back, active variant missing, A2L-only), a file row and a file row with a project open → the `●` rows equal the installed paths after Enter (6 of 6); the project-open file row carries the active-variant note; at 99 columns → stacked, at 100 and 118 → side by side; 0 wrapped rows at 118.
 - **Negative control:** a mutation computing the mark from the first variant by name → the save-back project's mark differs from the install → RED.
-- **Boundary catalog:** ☒ boundary — 99 and 100 columns; the four project kinds.
+- **Boundary catalog:** ☒ boundary — 99 and 100 columns; the six row kinds.
 
 ### LLR-173.7 — Painted text carries no internal decision id
 - **Traceability:** HLR-173
@@ -1150,12 +1212,12 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-174.1 — The trigger truth table
 - **Traceability:** HLR-174
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.3
-- **Statement:** The load guard (NEW, in the Load dialog's router) shall decide over unsaved image (D, `differs_from_last_saved`) × Flow Builder dirty (F, `is_dirty`, `flow_screens.py:1354`) × Patch Editor document dirty (W, the batch-94 flag, `screens_directionb.py:4808`) × load kind (file, project): a file load asks iff D; a project load asks iff D or F or W. Of the 16 cells, 11 ask and 5 load. A project open with nothing unsaved does not ask.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.3, LED-2026-10-26-batch-100.17
+- **Statement:** The load guard (NEW, in the one load seam, LLR-174.4) shall decide over unsaved image (D, `differs_from_last_saved`) × Flow Builder dirty (F, `is_dirty`, `flow_screens.py:1354`) × Patch Editor document dirty (W, a public accessor added to the panel, `screens_directionb.py:4808`) × load kind (image replace, attach, project): an image replace asks iff D; an attach (MAC or A2L) never asks; a project load asks iff D or F or W. Of the 24 cells, 11 ask and 13 load. A project open with nothing unsaved does not ask.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-44 — `pytest tests/test_b100_confirm.py -k tc_b100_44`
-- **Numeric pass threshold:** 16 of 16 cells as tabulated (executed: `cells 16 ask 11 load 5`); patched → Save project → file load → load; patched → save-back → file load → load.
-- **Negative control:** a mutation dropping the F term → 1 cell wrong (executed: `drop-F wrong 1`); dropping W → 1 cell wrong → RED.
+- **Numeric pass threshold:** 24 of 24 cells as tabulated (executed: `cells 24 ask 11 load 13`); patched → Save project → image replace → load; patched + entries → Save project → project load → load; patched → save-back → image replace → load.
+- **Negative control:** dropping D → 5 cells wrong, dropping F → 1, dropping W → 1 (executed); making an attach ask on D (the round-2 table) → 4 cells wrong → RED.
 - **Boundary catalog:** ☒ boundary — every cell is one; the saved-then-patched cell.
 
 ### LLR-174.2 — One short question, safe focus, keys
@@ -1177,6 +1239,16 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Numeric pass threshold:** cancel → 0 reset calls; replace → 1 reset call after the answer.
 - **Negative control:** a mutation resetting before asking → the cancelled session is empty → RED.
 - **Boundary catalog:** ☒ boundary — re-loading the open project.
+
+### LLR-174.4 — One load seam for every image-replacing route
+- **Traceability:** HLR-174
+- **Ledger:** LED-2026-10-26-batch-100.17
+- **Statement:** `_confirm_then_load(kind, go)` (NEW, `app.py`) shall be the one seam through which every image-replacing route passes before it changes the session: the `LoadChoice` router (LLR-173.1), the Workarea Files pick (`_load_from_item`, `app.py:9021`, before `load_selected_file`), the variant switch (`_handle_select_variant`, `app.py:6736`, before `load_from_path`, reached by `v` and by the panel's `v`) and a project load from the dialog. It runs the guard (LLR-174.1) and the worker refusal (LLR-177.1). `_handle_project_load` called directly by tests is not a route and meets no modal.
+- **Validation:** `test (integration)`
+- **Executed verification:** TC-B100-72 — `pytest tests/test_b100_confirm.py -k tc_b100_72`
+- **Numeric pass threshold:** with an unsaved patch: the Load dialog, a Workarea pick, `v` and the panel's `v` → 4 questions; `n` on each → 0 changes; a direct `_handle_load_project` call → 0 questions; an AST census of `load_selected_file` / `load_from_path` / `_handle_load_project` callers reachable from a binding or a list event → each passes the seam (0 bypasses).
+- **Negative control:** executed on `1d677ba` (P-42): the Workarea pick and `v` replace the image with no question → RED.
+- **Boundary catalog:** ☒ boundary — the four routes; a direct test call.
 
 ### LLR-175.1 — The dialog's lines follow the name rules
 - **Traceability:** HLR-175
@@ -1210,31 +1282,31 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-175.4 — The summary is the save plan (R-PC)
 - **Traceability:** HLR-175
-- **Ledger:** LED-2026-10-26-batch-100.4
-- **Statement:** `#save_summary` shall be painted only from `plan_project_save` (LLR-167.6) — the target, each file with its source, landing name and action, the image as source + N entries (K applied by this save) or an unchanged copy, the pending line when `differs_from_last_saved` is true, the document, the sub-folders and skipped links, and the manifest keys — through `safe_text`; a renamed or kept file is painted as such, and no row is omitted.
+- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15
+- **Statement:** `#save_summary` shall be painted only from `plan_project_save` (LLR-167.6), at the plan's granularity — one row per top-level file, one per sub-folder with its file count, one for `project.json` — each with its action word, the image as source + N change entries (K applied by this save) or an unchanged copy, the pending line when `differs_from_last_saved` is true, the document, skipped links, and, in a merge, the target's active-variant change as its own row, through `safe_text`; no row is omitted, and every `replace` or `rewrite` says so. The summary scrolls with Save and Cancel pinned. The dialog shall compute the emitted image's digest once on open and recompute the name-dependent rows at most every 150 ms of typing, with no hashing per keystroke. `SaveProjectScreen.plan` (NEW, read-only) exposes the plan the summary paints.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-65 — `pytest tests/test_b100_save_dialog.py -k tc_b100_65`
-- **Numeric pass threshold:** for the 5 scenarios of LLR-167.6, the painted rows equal the plan's rows (0 differences); 0 rows painted from any other source (an AST check that the dialog calls no placement or listing function).
-- **Negative control:** a mutation dropping `kept` rows from the painter → 1 row missing in the merge scenario → RED.
-- **Boundary catalog:** ☒ boundary — the 5 scenarios.
+- **Numeric pass threshold:** for the 5 scenarios, the painted rows equal the plan's rows (0 differences at 220 columns); 0 rows painted from any other source (an AST check that the dialog calls no placement or listing function); 20 keystrokes → ≤ 3 recomputations and 0 digests; a 300-row plan at 118×54 → Save and Cancel visible, the last row reachable by scrolling; a merge → 1 active-variant row.
+- **Negative control:** a mutation dropping `keep` rows from the painter → 1 row missing in the merge scenario → RED; a mutation recomputing the plan with digests per keystroke → the 0-digests arm RED.
+- **Boundary catalog:** ☒ boundary — the 5 scenarios; a 300-row plan.
 
-### LLR-176.1 — The busy seam paints `#status_text` and moves the bar
+### LLR-176.1 — The busy seam owns `#status_text` and moves the bar within steps
 - **Traceability:** HLR-176
-- **Ledger:** LED-2026-10-26-batch-100.11
-- **Statement:** `begin_busy(key, label, steps)`, `step_busy(key, text)` and `end_busy(key, outcome)` (NEW, `app.py`) shall widen `set_progress` (`app.py:13615`): they paint the spinner, label, step `n/m` and elapsed time in `#status_text` (the `pd_A` form) and set `#progress_bar` from the step index; one `set_interval` timer on the main thread drives the spinner and elapsed time; worker calls go through `call_from_thread`; `end_busy` runs on every exit of the action, an exception included.
+- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
+- **Statement:** `begin_busy(key, label, steps)`, `step_busy(key, text, done=None, total=None)` and `end_busy(key, outcome, final_lines)` (NEW, `app.py`) shall widen `set_progress` (`app.py:13615`). `begin_busy` takes ownership of `#status_text` (no other writer, `set_file_status` included, paints it until `end_busy`) and shows `#progress_bar` from 0; `step_busy` paints the step and sets the bar from `done/total` when the step reports bytes (copy, read, parse) and from the step index otherwise; one `set_interval` timer on the main thread drives the spinner and elapsed time; worker calls go through `call_from_thread`. `end_busy` runs on every exit, an exception included, paints in order the outcome, then the project and file line, then the file state, and hides the bar; when idle the bar is hidden.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-50 — `pytest tests/test_b100_busy.py -k tc_b100_50`
-- **Numeric pass threshold:** begin → 1 indicator in `#status_text`; each step → the bar value increases; end → 0 shown and the outcome painted; a raising action → 0 indicators left.
-- **Negative control:** a mutation dropping `end_busy` on the exception path → 1 indicator left → RED.
-- **Boundary catalog:** ☒ boundary ☒ error — an action shorter than a tick; an exception.
+- **Numeric pass threshold:** begin → 1 indicator in `#status_text`, the bar at 0 and shown; a byte-reporting step of 1 MiB in 4 chunks → the bar increases 4 times within the step; a `set_file_status` call during the action → 0 changes to `#status_text`; end → the 3 final lines in order, the bar hidden; a raising action → 0 indicators left, the bar hidden.
+- **Negative control:** a mutation dropping `end_busy` on the exception path → 1 indicator left → RED; a mutation setting the bar from the step index only → the within-step arm RED.
+- **Boundary catalog:** ☒ boundary ☒ error — an action shorter than a tick; an exception; an indivisible step.
 
 ### LLR-176.2 — Every progress caller maps to one action (C-31)
 - **Traceability:** HLR-176
-- **Ledger:** LED-2026-10-26-batch-100.11
-- **Statement:** A table of actions (NEW, keyed, in `app.py`) shall list, for each action, its begin site and its end sites on success, failure and exception; every `set_progress` site at `1d677ba` (P-29: 24 calls in 12 functions) shall map to exactly one action's begin or end.
+- **Ledger:** LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
+- **Statement:** A table of actions (NEW, keyed, in `app.py`) shall list, for each action, its begin site, its step sites and its end sites on success, failure and exception; every `set_progress` site at `1d677ba` (P-29: 24 calls in 12 functions) shall map to exactly one action's begin, step or end.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-51 — `pytest tests/test_b100_busy.py -k tc_b100_51` (an AST derivation over `app.py`)
-- **Numeric pass threshold:** the derivation maps 24 of 24 sites (≥ 24, derived) to exactly one action; each action → ≥ 1 begin and an end on its success, failure and exception exits.
+- **Numeric pass threshold:** the derivation maps 24 of 24 sites (≥ 24, derived) to exactly one action's begin, step or end (≥ 4 steps: `app.py:4951`, `:6210`, `:8769`, `:8841`); each action → ≥ 1 begin and an end on its success, failure and exception exits.
 - **Negative control:** a mutation removing one action's failure-path end → the census names that action → RED.
 - **Boundary catalog:** none — the census has no input classes; its set is derived from the code.
 
@@ -1248,15 +1320,15 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 - **Negative control:** a mutation starting the work before the refresh → the callback reads the previous text → RED.
 - **Boundary catalog:** ☒ boundary — a step on a 1-byte image.
 
-### LLR-177.1 — Three actions on workers, installs on the main thread
+### LLR-177.1 — Three actions on workers, installs on the main thread, everything else refused
 - **Traceability:** HLR-177
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.11
-- **Statement:** Project load, Save project and the A2L parse shall run under `@work(thread=True)`. Every write of `current_file`, `current_a2l_path`, `current_a2l_data`, the variant set and the change service shall run on the main thread through `call_from_thread`. Save project shall run `save_patched`'s re-derive on the main thread before its worker starts, and the worker shall emit, copy, hash and write the manifest from a copy. While one runs, another of them, a Patch apply and a Patch undo shall be refused with the `busy` tokens naming the running action.
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.11, LED-2026-10-26-batch-100.19
+- **Statement:** Project load, Save project and the A2L parse shall run under `@work(thread=True)`. Every write of `current_file`, `current_a2l_path`, `current_a2l_data`, the variant set and the change service shall run on the main thread through `call_from_thread`. Save project shall run `rederive_for_save` and apply the result on the main thread before its worker starts, and the worker shall emit, copy, hash and write the manifest from a copy, under LLR-164.4's handler. While one runs, the one load seam (LLR-174.4), unload, `v`, the save-back, Save project, Patch apply and undo shall be refused with the `busy` tokens naming the running action. Quit shall ask with the focus on No; confirmed, it shall wait for the worker to finish or roll back before exiting.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-53 — `pytest tests/test_b100_workers.py -k tc_b100_53`
-- **Numeric pass threshold:** the project holding the case_06 A2L → the elapsed text changes ≥ 1 time before the end; a thread-id probe on the listed writes → 0 off-main writes; a second load, a Patch apply and an undo during a save → 3 refusals, 0 changes.
-- **Negative control:** today's synchronous load (`app.py:8510`) → 0 changes → RED.
-- **Boundary catalog:** ☒ boundary — a load inside one tick.
+- **Numeric pass threshold:** the project holding the case_06 A2L → the elapsed text changes ≥ 1 time before the end; a thread-id probe on the listed writes → 0 off-main writes; during a Save project: `l`, a Workarea pick, `v`, `U`, a save-back, Patch apply and undo → 7 `busy` refusals, 0 changes; `q` → 1 question with the focus on No; confirmed during a forced slow save → 0 partial folders after exit.
+- **Negative control:** today's synchronous load (`app.py:8510`) → 0 changes → RED; a mutation omitting `v` from the refused set → the image changes during the save → RED.
+- **Boundary catalog:** ☒ boundary ☒ error — a load inside one tick; quit during a save.
 
 ### LLR-177.2 — Worker failures keep the app running
 - **Traceability:** HLR-177
@@ -1270,32 +1342,32 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-178.1 — The announcement composer
 - **Traceability:** HLR-178
-- **Ledger:** LED-2026-10-26-batch-100.7
-- **Statement:** `compose_load_announcement(...)` (NEW, a pure function in `services/variant_execution_service.py`) shall return the opened variant, the variant count, the reason — recorded active; first by name, none recorded; first by name, manifest damaged; first by name, no `project.json`; next valid, the recorded one missing or not readable — the relation to the first variant by name ("patched, N bytes differ" or "identical"), whether the opened variant is the newest file written, and the problem list.
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Statement:** `compose_load_announcement(...)` (NEW, a pure function in `services/variant_execution_service.py`) shall return the opened variant, the variant count, the reason — recorded active; first by name, none recorded; first by name, manifest damaged; first by name, no `project.json`; next valid, the recorded one missing or not readable — the relation recorded in `derived_from` — "patched, N bytes differ from `<base>`" when the base is a file of the project (name and SHA-256 match), "patched from `<base>` (not in this project); N bytes differ from it" when it is not, and no relation line when nothing is recorded (a variant with a `derived_from` record is always described as patched, never as identical) — whether the opened variant is the one the app's last recorded write made active, and the problem list.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-55 — `pytest tests/test_b100_announce.py -k tc_b100_55`
-- **Numeric pass threshold:** 5 reason cases → 5 of 5 reasons; 2 variants after a save-back → count 2, "patched, 4 B differ"; 3 problems → 3 entries in precedence order; "newest" true only for the newest-written variant (2 arms).
-- **Negative control:** a mutation reporting "recorded active" for the fallback case → RED.
-- **Boundary catalog:** ☒ empty ☒ boundary — 1 variant; no openable image.
+- **Numeric pass threshold:** 5 reason cases → 5 of 5 reasons; a save-back to `firmware_1.s19` and to `firmware-patched.s19` → "patched, 4 bytes differ from `firmware.s19`" in both (2 of 2); a base not in the project → "patched from `firmware.s19` (not in this project); 4 bytes differ from it"; no `derived_from` → 0 relation lines; 0 announcements containing "identical"; 3 problems → 3 entries in precedence order; "latest" true only for the variant the last recorded write made active, false for a touched file (2 arms).
+- **Negative control:** a mutation reporting "recorded active" for the fallback case → RED; a mutation comparing with the first variant by name → the `firmware-patched.s19` arm compares the image with itself (P-39) → RED.
+- **Boundary catalog:** ☒ empty ☒ boundary — 1 variant; no openable image; no `derived_from`; a base not in the project.
 
-### LLR-178.2 — The summary line and `#status_text`
+### LLR-178.2 — The summary line and the final `#status_text`
 - **Traceability:** HLR-178
-- **Ledger:** LED-2026-10-26-batch-100.7
-- **Statement:** `_handle_load_project` shall write the announcement's summary line to the status log through `set_status` (opened variant, `k of n`, problem count, a pointer to the panel) and set `#status_text` to the project and the opened file; both render names through `safe_text`.
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Statement:** `_handle_load_project` shall write the announcement's summary line to the status log through `set_status` (opened variant, `k of n`, problem count, then "details: p"), and pass the project and opened-file line to `end_busy` as its final lines, so `#status_text` shows them once the progress line releases it; both render names through `safe_text`.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-56 — `pytest tests/test_b100_announce.py -k tc_b100_56`
-- **Numeric pass threshold:** a 2-variant load → 1 summary line in `#log_line_4` naming the opened variant and the count 2 inside 118 columns; `#status_text` names project and file; a variant named `[b]x.s19` → 0 spans.
+- **Numeric pass threshold:** a 2-variant load → 1 summary line in `#log_line_4` naming the opened variant and the count 2, ending "details: p", inside 118 columns; after the load ends, `#status_text` names project and file (1 assertion); a variant named `[b]x.s19` → 0 spans.
 - **Negative control:** a mutation painting with markup on → 1 span → RED.
 - **Boundary catalog:** ☒ invalid — a hostile variant name.
 
-### LLR-178.3 — The Load-result panel
+### LLR-178.3 — The Load-result panel, reachable by keyboard
 - **Traceability:** HLR-178
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7
-- **Statement:** After a project load, the app shall push the Load-result panel (NEW, `screens.py`, on the `pe_B` ids `#result_body`, `#result_variant`, `#result_ok`) with the composed announcement and every problem in a scrolling body with no truncation, rendered through `safe_text`, the focus on `#result_ok`; `enter` and `escape` dismiss it and `v` dismisses it and runs `select_variant` (`app.py:6687`). The Load dialog's preview of the open project shows the same announcement for the session.
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Statement:** After a project load, the app shall push the Load-result panel (NEW, `screens.py`, on the `pe_B` ids `#result_body`, `#result_variant`, `#result_ok`) with the composed announcement and every problem in a scrolling list with no truncation, rendered through `safe_text`. The focus starts on the list (↑, ↓, PgUp, PgDn, Home, End scroll it); `tab` moves to `#result_ok`; `enter` on `#result_ok` and `escape` dismiss it; `v` dismisses it and runs `select_variant` (`app.py:6687`) through the one load seam. The Load dialog's preview of the open project shows the same announcement for the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-67 — `pytest tests/test_b100_announce.py -k tc_b100_67`
-- **Numeric pass threshold:** 30 problems → 30 rows in `#result_body`; `enter`, `escape` → dismissed (2 arms); `v` → the variant selector open (1 arm); 0 exception class names; 0 internal decision ids; the preview of the open project lists the same 30.
-- **Negative control:** a mutation truncating the body at 10 rows → 20 missing → RED.
+- **Numeric pass threshold:** 30 problems at 118×54 → after `end`, the last row has a visible region (a geometry read after layout); an immediate `enter` → the panel still open; `tab`, `enter` → dismissed; `escape` → dismissed; `v` → the variant selector open; 0 exception class names; 0 internal decision ids; the preview of the open project lists the same 30.
+- **Negative control:** a mutation starting the focus on `#result_ok` → the immediate `enter` closes the panel unread → RED; a mutation truncating the list at 10 rows → 20 missing → RED.
 - **Boundary catalog:** ☒ empty ☒ boundary — 0 problems; 30 problems at 118×54.
 
 ### Information Flow Contract (IFC) — C-54
@@ -1346,6 +1418,22 @@ FLOW: session_to_saved_project
       owner : LLR-163.2
       in    : candidate sizes
       out   : candidates worth reading
+    - fn    : predict the landing name with the placement code (workspace.py predict_placement)
+      owner : LLR-163.7
+      in    : digest + size + destination listing
+      out   : the predicted PlacementResult
+    - fn    : re-derive onto a copy, then emit and verify (change_service.py rederive_for_save, emit_and_verify)
+      owner : LLR-167.7
+      in    : source image copy + change document
+      out   : the re-derived map; the written, verified image
+    - fn    : clear the Patch Editor dirty flag after the document is written (app.py _handle_save_dialog)
+      owner : LLR-167.8
+      in    : a successful Save project
+      out   : the flag and the saved-state record cleared
+    - fn    : record derived_from (manifest_writer.py serialize_manifest)
+      owner : LLR-168.4
+      in    : the patched variant, its base name, digest and byte count
+      out   : the derived_from key
     - fn    : the save plan, painted and executed (project_gather_service.py plan_project_save)
       owner : LLR-167.6
       in    : session + typed name + target folder
@@ -1586,8 +1674,12 @@ FLOW: unsaved_work_to_question
   NODES  :
     - fn    : the trigger table (app.py load guard)
       owner : LLR-174.1
-      in    : image differs, flow dirty, project open, load kind
+      in    : unsaved image, flow dirty, document dirty, load kind
       out   : ask or load
+    - fn    : the one load seam for every image-replacing route (app.py _confirm_then_load)
+      owner : LLR-174.4
+      in    : the Load dialog, the Workarea pick, the variant switch, a project load
+      out   : the guard run once, then the load
     - fn    : the confirm modal (screens.py)
       owner : LLR-174.2
       in    : what would be lost
@@ -1775,7 +1867,7 @@ COMPONENT: load_result_panel
 
 ### 5.1 Methods
 
-- **Layer A — white-box / functional:** TC-B100-01 through TC-B100-67 (`test (unit)` / `test (integration)`), each named in its LLR, plus the re-pinned nodes TC-018, AT-031b and `test_tc_b99_31_changed_bytes_take_the_next_free_name` (LLR-163.3, LLR-163.4). Each declared mutation runs at Phase 3 (C-40). The AST censuses derive their sets from the code (C-31: TC-B100-07, -09, -37, -51, -59, -65, -66).
+- **Layer A — white-box / functional:** TC-B100-01 through TC-B100-72 (`test (unit)` / `test (integration)`), each named in its LLR, plus the re-pinned nodes TC-018, AT-031b and `test_tc_b99_31_changed_bytes_take_the_next_free_name` (LLR-163.3, LLR-163.4). Each declared mutation runs at Phase 3 (C-40). The AST censuses derive their sets from the code (C-31: TC-B100-07, -09, -37, -51, -59, -65, -66).
 - **Layer B — black-box acceptance:** AT-B100-01 through AT-B100-21, one node each, marked `at_b100_NN`, in the `tests/test_b100_*.py` file of their story. Each drives the shipped surface (§3 preface), runs at 118×54 and 220×60 with notifications on, and observes files on disk, painted text or the screen stack.
 - **Expert inspection (Phase 4, UX-16):** the Load-result panel and the Save project summary are inspected in a real Windows Terminal at 118×54 and 220×60 by the `ux-reviewer`: a cognitive walkthrough of reopening a project after a save-back, after damage, and of saving into a new, the open and an existing project, each checked against HLR-175 and HLR-178. It is recorded in `04-validation.md` beside the ATs and does not replace them. Evaluation with users: not performed (one operator).
 - **Oracles:** image bytes through `tests/support/independent_reader.py`; digests through `hashlib` in the test; never through the app's own loader.
@@ -1789,33 +1881,42 @@ COMPONENT: load_result_panel
 - The Phase-4 expert inspection (§5.1) is recorded with no open HIGH.
 - 0 blocker findings open at Phase 4; the full suite and the whole-tree guards with no new failure against the baseline.
 
-### 5.3 AT-by-increment index (QA-14)
+### 5.3 AT-by-increment index (QA-14, B-06)
 
-ATs drive through the ids the verdict fixed (P-30). An AT written before Inc 9b drives Load through `l` and `#load_path` / `#load_ok`, which `pa_C` keeps; its project loads go through `p`, re-pinned at Inc 9b from `#project_list` / `#project_ok` to `#load_list` + `enter`. An AT that loads over unsaved work is re-pinned at Inc 10 to answer `y`.
+ATs drive through the ids the verdict fixed (P-30), with the Load dialog's focus starting on the path field (LLR-173.2). An AT written before Inc 9b that types a path into `#load_path` and presses Enter keeps working after 9b, because the path field has the focus and the typed path wins. Its project loads go through `p`, re-pinned at Inc 9b from `#project_list` / `#project_ok` to the highlighted row + `enter`. An AT that loads over unsaved work is re-pinned at Inc 10 to answer `y`. TC arms that need a later increment are written at that increment (ARQ §8.1).
 
-| AT | Story | Written at | Re-pinned at | Output-then-consume (C-12) |
+| AT | Story | Written at | Extended or re-pinned at | Output-then-consume (C-12) |
 |---|---|---|---|---|
-| AT-B100-01 | US-153 | Inc 1 | — (`#load_path` kept) | — |
+| AT-B100-01 | US-153 | Inc 1 | — (typed path, path field focused) | — |
 | AT-B100-02 | US-154 | Inc 2 | Inc 11 (`alt+s`; no parent field) | — |
 | AT-B100-03 | US-155 | Inc 3 | Inc 9b (project pick), Inc 10 (answers `y`: the P1 entry is unsaved) | Save project → project folder |
-| AT-B100-04 | US-156 | Inc 4 | Inc 9b (`p` opens the Load dialog), Inc 6 (dismiss the panel first) | — |
-| AT-B100-05 | US-157 | Inc 5 | Inc 6 (panel oracle added), Inc 9b | Save project → `P1/firmware.s19` → Load |
-| AT-B100-06 | US-158 | Inc 6 | Inc 9b | save-back → `project.json` → Load |
+| AT-B100-04 | US-156 | Inc 4 | Inc 6 (dismiss the panel first), Inc 9b (`p` opens the Load dialog) | — |
+| AT-B100-05 | US-157 | Inc 5 | Inc 6 (panel oracle), Inc 7 (the "patched" line against `derived_from`), Inc 9b | Save project → `P1/firmware.s19` → Load |
+| AT-B100-06 | US-158 | Inc 6 | Inc 7 (`derived_from` on disk), Inc 9b | save-back → `project.json` → Load |
 | AT-B100-07 | US-159 | Inc 7 | Inc 9b | Save project → `files` → Load |
 | AT-B100-08 | US-160 | Inc 8a | Inc 9b | Save project → `active_document` → Load |
 | AT-B100-09 | US-161 | Inc 8b | Inc 9b, Inc 11 | save-as → Q folder → flow list |
 | AT-B100-10 | US-161 | Inc 8b | Inc 9b | A2L-only Save → Load |
-| AT-B100-11 | US-161 | Inc 8b | Inc 9b (reads `#load_list`) | — |
-| AT-B100-12 | US-162 | Inc 9a | — | Load → `recent_sources.json` |
+| AT-B100-11 | US-161 | Inc 8b (listing and Save refusal; the placement guard's junction arm is TC-B100-62 at Inc 1) | Inc 9b (reads `#load_list`) | — |
+| AT-B100-12 | US-162 | Inc 9a | — (typed path, path field focused) | Load → per-user store |
 | AT-B100-13 | US-162 | Inc 9a | — | — |
 | AT-B100-14 | US-163 | Inc 9b | — | Load → store → Load dialog; preview marks → install |
-| AT-B100-15 | US-164 | Inc 10 | — | — |
+| AT-B100-15 | US-164 | Inc 10 (all four routes) | — | — |
 | AT-B100-16 | US-165 | Inc 11 | — | — |
 | AT-B100-17 | US-166 | Inc 12a+12b | — | — |
 | AT-B100-18 | US-167 | Inc 12a+12b | — | — |
-| AT-B100-19 | US-168 | Inc 6 (panel), Inc 7 (problems) | Inc 9b | save-back → `project.json` → Load |
-| AT-B100-20 | US-158 | Inc 6 | Inc 9b | variant append / MAC / A2L sync → `project.json` → fresh Load and Execute scope |
-| AT-B100-21 | US-165 | Inc 11 | — | Save dialog summary → files on disk |
+| AT-B100-19 | US-168 | Inc 6 (panel, reasons) | Inc 7 (problems; the `derived_from` line, default-name arm), Inc 9b | save-back → `project.json` → Load |
+| AT-B100-20 | US-158 | Inc 6 | Inc 7 (`derived_from` carried), Inc 8a (`active_document` carried), Inc 9b | variant append / MAC / A2L sync → `project.json` → fresh Load and Execute scope |
+| AT-B100-21 | US-165 | Inc 11 (fresh, pending patch, refused, `files`, document, merge, save-as) | — | save plan → files on disk |
+
+| TC arm | Written at | Extended at |
+|---|---|---|
+| TC-B100-05 (LLR-164.2) | Inc 2: refusals, open-project save, an exact-name save that adds a variant | Inc 8a: the merge carry of `gathered` and `active_document` |
+| TC-B100-12 (LLR-166.1) | Inc 4: the load tails | Inc 6: panel closes; Inc 9b: dialog `esc`, cancelled load; Inc 10: question `n` |
+| TC-B100-59 (LLR-167.6) | Inc 5: fresh, open project, pending patch, refused | Inc 7: the `files` row; Inc 8a: the document row and the merge; Inc 8b: save-as with sub-folders |
+| TC-B100-62 (LLR-171.4) | Inc 1: the placement guard, junction arms | Inc 8b: listing, load, the 7 writers |
+| TC-B100-71 (LLR-168.4) | Inc 7 | — |
+| TC-B100-72 (LLR-174.4) | Inc 10: all four routes | — |
 
 ### 5.4 Reverse census (QA-15, trigger B1)
 
@@ -1828,7 +1929,10 @@ Executed at `1d677ba` with `grep -rl --include=*.py <symbol> tests` (35 test sou
 | `Added variant` (Inc 1) | `test_tui_variants.py:274` | the first-load arm stays green |
 | `_handle_save_dialog` exact-name merge (Inc 2, Inc 5) | `test_tui_variants.py::test_save_second_s19_into_project_appends_variant` (`:354`) | kept green (A-09) |
 | `_handle_load_project` direct callers (Inc 3, Inc 7) | 13: `b97_fixtures.py`, `test_b97_load_project_dialog.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`, `test_report_progress.py`, `test_tui_commandbar.py`, `test_tui_manifest_save.py`, `test_tui_patch_variant.py` (`:338`, `:343`, `:782`, `:788`), `test_tui_report_filter_surface.py`, `test_tui_report_seam.py`, `test_tui_report_view.py`, `test_tui_variants.py`, `test_variant_execution.py` | the load question sits in the dialog router, so a direct call meets no modal; status-text assertions re-pinned at Inc 7 where the summary line replaces `Loaded project '` (4 files: `test_b99_export.py`, `test_b99_load_project.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`) |
-| manifest API (Inc 6, 7, 8a) | 9 | additive keys, no `schema_version` bump; pins `test_manifest_writer.py:99`, `:216`, `:481` hold; `_resolve_manifest_entry` tightened (LLR-169.8): `test_flow_persistence.py` re-run |
+| manifest API (Inc 6, 7, 8a) | 9 | additive keys (`files`, `active_document`, `derived_from`), no `schema_version` bump; pins `test_manifest_writer.py:99`, `:216`, `:481` hold |
+| `_resolve_manifest_entry` (Inc 7, LLR-169.8) | `test_b97_flow_builder.py`, `test_flow_persistence.py`, `test_flow_execution_service.py`, `test_manifest_writer.py`, `test_variant_execution.py` | the manifest-keys mode is used by `read_project_manifest` and `_reject_unsafe_entry` only; both flow-reference callers, `flow_persistence_service.py` and `flow_execution_service.py`, stay on the default mode, so `test_tc_b97_20_hostile_refs_render_literally` stays green (B-03) |
+| `_handle_save_dialog` (Inc 2, 5, 8a, 8b, 11) | 7: `test_b99_staging.py`, `test_project_gather.py`, `test_tui_app.py`, `test_tui_evidence_packs.py`, `test_tui_manifest_save.py`, `test_tui_report_seam.py`, `test_tui_variants.py` | under the emit decision on data (LLR-167.1) an unpatched session still byte-copies, so `test_save_project_creates_project_folder_on_disk` and the evidence-pack saves keep their files; `test_project_gather.py::test_tc700_active_editor_document_is_gathered_by_kind` (a check document) keeps a byte copy and its `checks/` placement; AT-B99-05 (save-back, then Save project) now emits and keeps `status.startswith("Project saved")` on `#log_line_4` with the entry-count suffix (LLR-167.3); the plan execution and the refusals are re-checked per file at each listed increment |
+| `_load_from_item`, `_handle_select_variant` (Inc 10) | callers through the Workarea Files list and `v` in `test_tui_directionb.py`, `test_tui_variants.py` | the one load seam asks only when something unsaved would be lost; tests without unsaved work meet no modal |
 | `#project_parent_path` (Inc 11, D7) | `test_b99_staging.py` (6 nodes: `test_tc_b99_14_save_project_missing_source`, `test_tc_b99_14_placement_failure_removes_created_folder`, `test_tc_b99_14_preexisting_folder_survives_placement_failure`, `test_at_b99_05_save_project_after_same_name_save_back`, `test_tc_b99_ux_c10_save_project_filename_renders_literally`, `test_tc_b99_ux_c10_placement_error_path_renders_literally`), `test_loadfilescreen_input.py:898`, `test_tui_directionb.py:3090` | re-pinned at Inc 11 with the same expectations and no parent typing (the payload's parent is the work area); AT-B99-05 keeps its outcome (LED-2026-10-26-batch-100.12) |
 | `LoadFileScreen` / `#load_path` / `#load_ok` (Inc 9b) | 4 / 10 | the ids survive in `pa_C`; class-name references re-pinned to the new dialog class |
 | `LoadProjectScreen` / `#project_list` / `#project_ok` (Inc 9b) | 7 / 7: `test_b97_load_project_dialog.py`, `test_b99_crc_region.py`, `test_b99_export.py`, `test_b99_load_project.py`, `test_b99_patch_truth.py`, `test_b99_staging.py`, `test_b99_truncation.py` | the dialog retires (VS-PA-3); project picks re-pinned to `#load_list` + `enter` |
@@ -1838,6 +1942,29 @@ Executed at `1d677ba` with `grep -rl --include=*.py <symbol> tests` (35 test sou
 
 ---
 
+### 5.5 Per-increment source files (ARQ §8, B-07)
+
+Taken from `design/ARQ-batch-100.md` §8 / §8.1 as amended for round 2. A bracketed file is conditional; PDR decides it and the increment packet records the decision. Interfaces by name: B100-I13 (`find_identical`, `place_into_workarea`), B100-I14 (`contained_in_workarea`), B100-I15 (the `save_patched` split), B100-I16 (`derived_from`), B100-I17 (the save plan), B100-I18 (the unsaved predicate), B100-I19 (`_session_snapshot`), B100-I20 (the one load seam), B100-I21 (the manifest-keys mode), B100-I22 (`predict_placement`).
+
+| Inc | Source files | # |
+|---|---|---|
+| 1 | `workspace.py` (B100-I13, I14, I22), `segment_split_view.py`, `app.py` | 3 |
+| 2 | `app.py`, `workspace.py` (device-name predicate, `PROJECT_NAME_MAX_CHARS`) | 2 |
+| 3 | `app.py` | 1 |
+| 4 | `app.py` | 1 |
+| 5 | `app.py`, `change_service.py` (B100-I15, I18), `project_gather_service.py` (B100-I17) | 3 |
+| 6 | `app.py`, `variant_execution_service.py`, `screens.py` (+ `styles.tcss`) | 3–4 |
+| 7 | `manifest_writer.py`, `variant_execution_service.py`, `app.py` (+ `project_gather_service.py` for the plan's `files` row); `derived_from` (B100-I16) lands here | 3–4 |
+| 8a | `app.py`, `manifest_writer.py`, `variant_execution_service.py`, `project_gather_service.py` | 4 (at cap) |
+| 8b | `app.py`, `project_gather_service.py`, `workspace.py` (`contained_in_workarea` uses for listing and load) | 3 |
+| 9a | `workspace.py`, `app.py` | 2 |
+| 9b | `screens.py`, `app.py`, `styles.tcss` (+ `variant_execution_service.py` for `choose_install_set`) | 3–4 |
+| 10 | `screens.py`, `app.py` (B100-I20), `styles.tcss` (+ `screens_directionb.py` for the public dirty-flag reader) | 3–4 |
+| 11 | `screens.py`, `app.py`, `styles.tcss` | 3 |
+| 12a + 12b | `app.py`, `styles.tcss` (+ `screens.py`) | 2–3 |
+
+No increment exceeds 4 source files; Inc 8a is at the cap.
+
 ## 6. Appendices (optional)
 
 ### 6.1 Extended glossary
@@ -1845,28 +1972,33 @@ Executed at `1d677ba` with `grep -rl --include=*.py <symbol> tests` (35 test sou
 D1–D7 and O-1..O-11 are mapped to the requirements they shape in LED-2026-10-26-batch-100.1.
 ### 6.3 Open risks
 
-**Security questions (trigger family C; the `devflow-scan-spec.py` verdict is recorded in LED-2026-10-26-batch-100.1 and re-run in LED-2026-10-26-batch-100.13):**
-- **Input surface (C6).** Four untrusted inputs: the typed project name (HLR-164: sanitised, case-folded, reserved and device names refused, capped at 64 and by path length), the typed load path (LLR-172.5: resolved, contained in this work area, reserved homes refused), `project.json` (LLR-169.4, LLR-169.8, LLR-170.1, LLR-168.1: 1 MiB and 1 000-record caps, one shared path predicate that refuses drive-relative, stream and device names), and `recent_sources.json` (LLR-172.2: size-capped, parse-guarded, local drive paths only, kind matching the suffix, no control characters, never touched before Enter). Every writer requires containment in this work area after links are resolved (LLR-171.4), and save-as never follows a directory link (LLR-171.1).
-- **Markup and control-character injection (C8).** Every name from disk or the store renders through `safe_text` (`utils.py:44`): LLR-172.6, LLR-173.3, LLR-174.2, LLR-175.4, LLR-178.2, LLR-178.3. The fixtures are names that can exist on disk and paint a span with markup on, plus a U+009B arm (QA-02, S-13).
-- **Privacy.** `recent_sources.json` holds absolute local paths, as the log already does (`app.py:10820-10825`); it is bounded to 20 entries and never copied into a project or report (LLR-172.3). It sits in `.s19tool/`, so zipping or syncing `.s19tool` shares those paths (S-16). **Open: the operator accepts this risk or asks for a per-user location.**
+**Security questions (trigger family C; the `devflow-scan-spec.py` verdict is recorded in LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.13 and LED-2026-10-26-batch-100.23):**
+- **Input surface (C6).** Four untrusted inputs: the typed project name (HLR-164: sanitised, case-folded, reserved and device names refused on the raw and sanitised name, capped at 64 and by path length, a junction target refused), the typed load path (LLR-172.5: resolved, contained in this work area, reserved homes refused), `project.json` (LLR-169.4, LLR-169.8, LLR-170.1, LLR-168.1, LLR-168.4: 1 MiB, 1 000 entries per array, a manifest-keys mode that refuses drive-relative, stream and device names per path component), and the per-user recent store (LLR-172.2: size-capped, parse-guarded, drive-rooted paths only, kind matching the suffix, no control characters, never touched before Enter). Every placement requires containment in this work area inside `place_into_workarea` (LLR-163.1, LLR-171.4), so no writer can be left off a list; save-as never follows a directory link (LLR-171.1).
+- **Markup and control-character injection (C8).** Every name from disk or the store renders through `safe_text` (`utils.py:44`): LLR-172.6, LLR-173.3, LLR-174.2, LLR-175.4, LLR-178.2, LLR-178.3.
+- **Privacy (S-16, decided).** The operator chose a per-user store: `%APPDATA%\s19_app\recent_sources.json`, outside every work area and every `.s19tool` (LLR-172.1). Zipping or syncing a work area no longer carries absolute local paths, and a shared folder can no longer plant a store. The store holds the same paths the log already holds (`app.py:10820-10825`), bounded to 20.
+- **Known gap.** A mapped network drive letter cannot be told from a local one by syntax; the protection is that a recent entry is never touched before Enter (LLR-173.4), and pressing Enter is the engineer's own action.
 - **"token", "session", "form", "escape", "expose", "permission", "hash"** mean a refusal phrase or name token, a TUI editing session, a dialog form, the keyboard key, a method on a service API, a file a test makes unreadable, and the SHA-256 digest used only to detect that a project file changed on disk; `secret.txt` is the name of the probe file behind a junction in the S-03 test. No credential, network access or secret value is involved.
 
-**Rulings written into the contract (the author's round-1 questions):** Q-1 → `PROJECT_NAME_MAX_CHARS = 64` plus the path-length check (LLR-164.3). Q-2 → HLR-164 (a) and LLR-164.2 with QA-04's definitions and A-09's merge. Q-3 → `_session_snapshot()` derived from the live app (LLR-165.2). Q-4 → moot: every UI story is READY. Q-5 → `patches/changes.json`, written by the app (LLR-170.2). Q-6 → VS-PD-3 = refuse (HLR-177). Q-7 → recorded as an amendment of LLR-015.3 (LED-2026-10-26-batch-100.13).
+**Rulings written into the contract (the author's round-1 questions):** Q-1 → `PROJECT_NAME_MAX_CHARS = 64` plus the path-length check (LLR-164.3). Q-2 → HLR-164 (a) and LLR-164.2 with QA-04's definitions and A-09's merge; a clash now tells the engineer to choose another name (UX-35). Q-3 → `_session_snapshot()` derived from the live app (LLR-165.2). Q-4 → moot: every UI story is READY. Q-5 → `patches/changes.json`, written by the app (LLR-170.2). Q-6 → VS-PD-3 = refuse (HLR-177). Q-7 → recorded as an amendment of LLR-015.3 (LED-2026-10-26-batch-100.13).
 
-**Open items and deviations, each stated rather than closed silently:**
-- **QA-05 return shape.** The ruling asks `copy_into_workarea` to return a result that tells reuse apart. A changed return type reaches its 17 call sites in 7 product files (P-34), past Inc 1's 3-file budget, so the contract keeps the `Path` return and adds `place_into_workarea(...) -> PlacementResult(path, reused)`, which `copy_into_workarea` wraps and the two reuse-reporting callers use (LLR-163.1). The P2 round-2 reviewers confirm this, or the ruling is re-opened.
+**Deviations, stated rather than closed silently:**
+- **The Save-project emit rule (introduced in round 2, corrected in round 3).** Round 2 made Save project emit when "the image differs from its source or the document holds at least one entry" (LED .4). That rule made a check document refuse every Save project (B-01, P-37) and wrote byte-different copies of unchanged data as new active variants (QA R2-01, P-38). Round 3 decides on data: the change document is re-derived onto a copy, and Save project emits only if that data differs from the source's; a check document never counts (LLR-167.1, LED .14). R-TUI-012's restatement ("otherwise copies byte for byte") holds again.
+- **QA-05 return shape.** `copy_into_workarea` keeps its `Path` return and is exactly `return place_into_workarea(...).path`, with every guard in `place_into_workarea` and no second claim loop (LLR-163.1); a changed return type would reach 15 call sites in 7 files (P-34).
 - **S-15 count cap.** Save-as refuses a copy larger than the volume's free space; no file-count cap was ruled, so none is set.
-- **S-16.** Pending the operator (above).
-- **VS-PA-4 `p`.** The verdict fixes `pa_C`'s bindings; `pa_C` replaced the Load file dialog only. The contract has `p` open the same dialog with the Projects section highlighted, so that there is one Load dialog (US-163).
-- **The P-B trigger per load kind.** The ruling lists three triggers (UX-01, QA-03, O-3) and asks only when something would be lost (UX-11). A file load loses only the image, so a file load asks on D only, and a project load on D, F or W (LLR-174.1).
+- **VS-PA-4 `p` and the initial focus.** `p` opens the one Load dialog with the open project's row highlighted, and the dialog opens with the focus on the path field, correcting `pa_C`'s start on the list (UX-05, UX-37).
+- **Device names on the raw name.** The dispositions check device names on the raw and the sanitised name, so `con.txt` is refused (LLR-164.1); the security reviewer's round-2 closure would have saved it as `contxt`. The ruling governs.
+- **AT-B100-21 reads the save plan** through `SaveProjectScreen.plan`, an exception to "no private access" declared in the §3 preface, because the painted summary may be cut at 118 columns (dispositions r2, UX-32).
+
+**Open for PDR:** keep or drop the `image_differs_from_source` pre-check of the emit decision (B100-I5); the bracketed conditional files of §5.5.
 
 **Other risks:**
 - `app.py` is in 14 of 15 increments: sequential merges, one worktree each (ARQ §9).
-- Additive manifest keys: an older build re-saving a project drops `files` and `active_document`; the next Load shows `no digests saved` (ARQ §3.2).
-- Hash cost: estimated, not measured (ARQ §3.1); from Inc 12b it runs on the worker.
-- Reuse widening (Inc 1): every status that says "added", "wrote" or "saved as" must stay true (LLR-163.5, LLR-163.6).
+- Additive manifest keys: an older build re-saving a project drops `files`, `active_document` and `derived_from`; the next Load shows `no digests saved`, and the panel has no "patched" line (ARQ §3.2).
+- Hash cost: estimated, not measured (ARQ §3.1); from Inc 12b it runs on the worker; the Save dialog computes the image digest once per open.
+- Reuse widening (Inc 1): the variant append and the export must stay true about reuse (LLR-163.5, LLR-163.6).
 - Re-pinned tests (§5.4) could hide a regression: each re-pin names the old value, the new value and the requirement that changes it in its increment's reverse census.
 - Three writers still bypass the manifest writer (A-01); their files show as `not recorded` until the backlog item lands.
+
 ### 6.4 Phase-1 reconciliation log — moved to the ledger (§7)
 
 ### 6.5 Requirement amendments — moved to the ledger (§7)

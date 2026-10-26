@@ -153,3 +153,79 @@ Each checklist is in its reviewer file, section *Evidence checklist*: `design/P2
 
 ## Round 2 — re-review pending
 The P1 author applied the dispositions as round 2 of `01-requirements.md` (ledger entries LED-2026-10-26-batch-100.2 to .13). The four reviewers re-read the round-2 contract; their verdicts land here as round 2.
+
+## Round 2 — re-review results and round-3 closures
+
+The four round-2 reviews (`design/P2-security-r2.md`, `P2-ux-r2.md`, `P2-qa-r2.md`, `P2-architect-r2.md`) re-read the contract at `0c7ca1d`. Every reviewer returned `iterate-to-refine`. Of the 86 round-1 findings, 77 closed; the rest are carried below with the round-2 findings. The P2 iteration cap was reached, and the operator chose a **bounded round 3**: the author applies `design/P2-dispositions-r2.md`, then each reviewer verifies only the closure of its own open findings. The operator also decided S-16 (the recent list per user at `%APPDATA%\s19_app\recent_sources.json`).
+
+| Reviewer | Round-2 verdict | Open after round 2 (HIGH · MAJOR · MINOR) |
+|---|---|---|
+| security-reviewer | `iterate-to-refine` | 0 · 3 new + S-02, S-08 carried · 6 new + S-16 |
+| ux-reviewer | `iterate-to-refine` | 1 · 10 (incl. UX-05 carried) · 7 (incl. UX-07, UX-22 residuals) |
+| qa-reviewer | `iterate-to-refine` | 0 · 6 · 8 (QA-12, QA-14, QA-20 continue as R2-08, R2-06, R2-14) |
+| architect | `iterate-to-refine` | 1 · 6 · 7 |
+
+**Open findings closed in round 3:** 58 (2 blocker · 27 major · 29 minor). Ids: security round-2 findings are written `S-R2-NN` and QA round-2 findings `QA-R2-NN` to keep the two `R2-` sequences apart. The coordinator's alignment with the architect's B-07 rows (ARQ §8 / §8.1, `docs/architecture.md` B100-I13..I22) is applied in the same round: containment ships with the placement at Inc 1, `derived_from` is written at Inc 7, the base-not-in-project wording, the B100-I5 pre-check left to PDR, both flow callers on the default path mode, and Inc 10's optional `screens_directionb.py`.
+
+| ID | Reviewer | Severity | Origin | Disposition | Where closed | Ledger | Status |
+|----|----------|----------|--------|-------------|--------------|--------|--------|
+| S-R2-01 | security-reviewer | major | new | accepted; the guard ships with the placement at Inc 1 (coordinator alignment) | LLR-171.4, LLR-163.1, LLR-164.2 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-02 | security-reviewer | major | new | accepted — reviewer's closure | LLR-163.1 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-03 | security-reviewer | major | new | accepted — reviewer's closure | LLR-169.4, LLR-173.4 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-04 | security-reviewer | minor | new | accepted with the ruling: device names checked on the raw name too (`con.txt` refused, unlike the reviewer's closure) | LLR-164.1 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-05 | security-reviewer | minor | new | accepted — reviewer's closure | LLR-169.8, LLR-172.2 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-06 | security-reviewer | minor | new | accepted — reviewer's closure | LLR-171.1 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-07 | security-reviewer | minor | new | accepted — reviewer's closure | LLR-164.2 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-R2-08 | security-reviewer | minor | new | accepted — reviewer's closure | LLR-172.2, §6.3 | LED-2026-10-26-batch-100.21 | fixed (round 3, bounded verification pending) |
+| S-R2-09 | security-reviewer | minor | new | accepted — reviewer's closure | LLR-164.4, LLR-177.1 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| S-02 | security-reviewer | major | carried | accepted — reviewer's closure | LLR-171.4 (inside `place_into_workarea`) | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-08 | security-reviewer | major | carried | accepted — reviewer's closure | LLR-169.4 (every array capped) | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| S-16 | security-reviewer | minor | carried (operator) | operator decision: per-user store `%APPDATA%\s19_app\recent_sources.json` | LLR-172.1, §6.3 (per-user store) | LED-2026-10-26-batch-100.21 | fixed (round 3, bounded verification pending) |
+| UX-05 | ux-reviewer | major | carried | accepted — reviewer's closure | LLR-173.2 | LED-2026-10-26-batch-100.18 | fixed (round 3, bounded verification pending) |
+| UX-07 | ux-reviewer | minor | residual | accepted — reviewer's closure | §3 token table | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| UX-22 | ux-reviewer | minor | residual | accepted — reviewer's closure | §3 token table | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| UX-26 | ux-reviewer | blocker | new | accepted; `derived_from` written at Inc 7, base-not-in-project wording (coordinator alignment) | LLR-168.4, LLR-178.1 | LED-2026-10-26-batch-100.16 | fixed (round 3, bounded verification pending) |
+| UX-27 | ux-reviewer | major | new | accepted — reviewer's closure | LLR-167.8, LLR-174.1 | LED-2026-10-26-batch-100.17 | fixed (round 3, bounded verification pending) |
+| UX-29 | ux-reviewer | major | new | accepted — reviewer's closure | LLR-176.1 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| UX-30 | ux-reviewer | major | new | accepted — reviewer's closure | HLR-176, LLR-176.1 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| UX-31 | ux-reviewer | major | new | accepted — reviewer's closure | LLR-178.3 | LED-2026-10-26-batch-100.16 | fixed (round 3, bounded verification pending) |
+| UX-32 | ux-reviewer | major | new | accepted; AT-B100-21 reads the plan (declared exception, §3 preface) | HLR-175, LLR-175.4 | LED-2026-10-26-batch-100.15 | fixed (round 3, bounded verification pending) |
+| UX-33 | ux-reviewer | major | new | accepted — reviewer's closure | LLR-175.4, LLR-167.6 | LED-2026-10-26-batch-100.15 | fixed (round 3, bounded verification pending) |
+| UX-34 | ux-reviewer | major | new | accepted — reviewer's closure | HLR-177, LLR-177.1 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| UX-35 | ux-reviewer | major | new | accepted — reviewer's closure | HLR-164, §3 token table | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| UX-36 | ux-reviewer | major | new | accepted — reviewer's closure | LLR-173.6, LLR-173.4 | LED-2026-10-26-batch-100.18 | fixed (round 3, bounded verification pending) |
+| UX-37 | ux-reviewer | minor | new | accepted — reviewer's closure | LLR-173.2 | LED-2026-10-26-batch-100.18 | fixed (round 3, bounded verification pending) |
+| UX-38 | ux-reviewer | minor | new | accepted — reviewer's closure | LLR-178.2 | LED-2026-10-26-batch-100.16 | fixed (round 3, bounded verification pending) |
+| UX-39 | ux-reviewer | minor | new | accepted — reviewer's closure | LLR-178.3 | LED-2026-10-26-batch-100.16 | fixed (round 3, bounded verification pending) |
+| UX-40 | ux-reviewer | minor | new | accepted — reviewer's closure | LLR-178.1 | LED-2026-10-26-batch-100.16 | fixed (round 3, bounded verification pending) |
+| UX-41 | ux-reviewer | minor | new | accepted — reviewer's closure | §3 token table, LLR-171.1 | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| QA-R2-01 | qa-reviewer | major | new | accepted (with B-01): the emit decision on data | LLR-167.1, LLR-167.2, §6.3 | LED-2026-10-26-batch-100.14 | fixed (round 3, bounded verification pending) |
+| QA-R2-02 | qa-reviewer | major | new | accepted — reviewer's closure | LLR-174.1 | LED-2026-10-26-batch-100.17 | fixed (round 3, bounded verification pending) |
+| QA-R2-03 | qa-reviewer | major | new | accepted — reviewer's closure | LLR-174.4 | LED-2026-10-26-batch-100.17 | fixed (round 3, bounded verification pending) |
+| QA-R2-04 | qa-reviewer | major | new | accepted — reviewer's closure | HLR-168 (AT-B100-20) | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| QA-R2-05 | qa-reviewer | major | new | accepted; AT-B100-21 reads the plan (declared exception, §3 preface) | HLR-175, LLR-167.6, LLR-175.4 | LED-2026-10-26-batch-100.15 | fixed (round 3, bounded verification pending) |
+| QA-R2-06 | qa-reviewer | major | new | accepted — reviewer's closure | LLR-173.2, §5.3 | LED-2026-10-26-batch-100.18 | fixed (round 3, bounded verification pending) |
+| QA-R2-07 | qa-reviewer | minor | new | accepted — reviewer's closure | LLR-165.2 | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| QA-R2-08 | qa-reviewer | minor | new | accepted — reviewer's closure | LLR-172.2 | LED-2026-10-26-batch-100.21 | fixed (round 3, bounded verification pending) |
+| QA-R2-09 | qa-reviewer | minor | new | accepted — reviewer's closure | HLR-169 (AT-B100-07), LLR-169.9 | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| QA-R2-10 | qa-reviewer | minor | new | accepted — reviewer's closure | HLR-163 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| QA-R2-11 | qa-reviewer | minor | new | accepted — reviewer's closure | §5.4 | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| QA-R2-12 | qa-reviewer | minor | new | accepted — reviewer's closure | HLR-177, HLR-176 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| QA-R2-13 | qa-reviewer | minor | new | accepted — reviewer's closure | LLR-164.3 | LED-2026-10-26-batch-100.22 | fixed (round 3, bounded verification pending) |
+| QA-R2-14 | qa-reviewer | minor | new | closed by the orchestrator (PLAN) | PLAN (orchestrator, `322bbab`) | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| B-01 | architect | blocker | new | accepted — reviewer's closure | LLR-167.1, LLR-167.2, §6.3 | LED-2026-10-26-batch-100.14 | fixed (round 3, bounded verification pending) |
+| B-02 | architect | major | new | accepted — reviewer's closure | LLR-174.4 | LED-2026-10-26-batch-100.17 | fixed (round 3, bounded verification pending) |
+| B-03 | architect | major | new | accepted — reviewer's closure | LLR-169.8, §5.4 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| B-04 | architect | major | new | accepted — reviewer's closure | LLR-167.7, LLR-167.6 | LED-2026-10-26-batch-100.14 | fixed (round 3, bounded verification pending) |
+| B-05 | architect | major | new | accepted — reviewer's closure | LLR-163.7 | LED-2026-10-26-batch-100.15 | fixed (round 3, bounded verification pending) |
+| B-06 | architect | major | new | accepted — reviewer's closure | §5.3 (TC rows), ARQ §8.1 | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| B-07 | architect | major | new | accepted; the map rows are the architect's, referenced by name | §5.5; ARQ §8 and `docs/architecture.md` rows B100-I13..I22 (architect) | LED-2026-10-26-batch-100.23 | fixed (round 3, bounded verification pending) |
+| B-08 | architect | minor | new | accepted — reviewer's closure | P-34 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| B-09 | architect | minor | new | accepted — reviewer's closure | HLR-163 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| B-10 | architect | minor | new | accepted — reviewer's closure | LLR-176.2 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| B-11 | architect | minor | new | accepted — reviewer's closure | HLR-176, LLR-176.1, LLR-178.2 | LED-2026-10-26-batch-100.19 | fixed (round 3, bounded verification pending) |
+| B-12 | architect | minor | new | accepted — reviewer's closure | LLR-164.1, BACKLOG-CODE | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| B-13 | architect | minor | new | accepted — reviewer's closure | LLR-169.4 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+| B-14 | architect | minor | new | accepted — reviewer's closure | LLR-163.6 | LED-2026-10-26-batch-100.20 | fixed (round 3, bounded verification pending) |
+
+**Round 3 bounded verification pending:** each reviewer reads only the rows of its own open findings above and marks each closed or open. A new defect noticed there is recorded and goes to PDR as a condition unless it is a HIGH.

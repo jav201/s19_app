@@ -1466,6 +1466,7 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 ### 🆕 Routed 2026-10-26 — batch-100 P2 round 1 (Load + projects)
 
 - **▸ (P2, origin batch-100 P2 architect A-01) Route the three writers that land images in the open project through the manifest writer.** The flow WRITE-OUT block (`flow_execution_service.py:679`), the external-step copy (`:1108`) and variant execution (`variant_execution_service.py:797`) write data files into the open project without `_write_and_verify_manifest`. So `project.json` does not record them: no `files` digest, and no `active_variant` update. Batch-100 reports them at Load as "not recorded" (LLR-169.5) and leaves the routing out of its file budget (`2026-10-26-batch-100/01-requirements-ledger.md` LED .7). **What closes it:** after each run returns, rewrite the manifest through the one seam, carrying every key it does not own, with an output-then-consume AT per writer.
+- **▸ (P3, origin batch-100 P2 architect B-12) Two older Windows device-name lists.** `changes/apply.py:107` (`COM1–9` / `LPT1–9`) and `segment_split_view.py:524` (adds `CONIN$` / `CONOUT$`) keep their own lists. Batch-100 adds one shared predicate in `workspace.py` for its three new uses (LLR-164.1, LLR-169.8, LLR-172.2) and leaves these two alone. **What closes it:** both call the shared predicate, each with an arm per name form.
 
 ### 🆕 Routed 2026-10-26 — Code-Wire audit of flow F6 "Comparison" (diff reports)
 

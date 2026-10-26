@@ -251,3 +251,144 @@ above this line is ever edited._
 - **Closes:** A-11.
 - **Why:** dispositions §4 (A-11) and the D1 and A-06 rulings.
 - **Evidence:** `2026-06-23-batch-14/01-requirements.md:222-225`; `tests/test_changes_apply.py:926-929`; `REQUIREMENTS.md:1244-1245`.
+
+### LED-2026-10-26-batch-100.14 — Round 3: the emit decision is made on data; `save_patched` is split (corrects round 2)
+- **Requirement:** HLR-167
+- **Requirement:** LLR-167.1, LLR-167.2, LLR-167.7
+- **Date:** 2026-10-26
+- **What changed:**
+  - **B-01, QA R2-01:** the round-2 trigger ("the image differs from its source or the document holds at least one entry", LED .4) is withdrawn. Save project now re-derives the **change** document onto a copy of the source image and emits only if the resulting data differs from the source data; a check document never counts and is saved to `checks/` without blocking (LLR-167.1, LLR-167.2). Three arms: check document only → byte copy plus `checks/` written; unchanged change document → byte copy and no new variant; a real change → emit. §6.3 lists the round-2 rule as a deviation that this round corrects; R-TUI-012's restatement in LED .13 ("otherwise copies byte for byte") holds again.
+  - **B-04:** `save_patched` is split into `rederive_for_save` and `emit_and_verify` (B100-I15, LLR-167.7) as Inc 5's API, and is composed of the two, so B99-I7 stays one rule.
+  - **Coordinator alignment (4):** whether `image_differs_from_source` (B100-I5) survives as a pre-check is left to PDR (§6.3).
+- **Closes:** B-01, QA-R2-01, B-04.
+- **Why:** dispositions r2 (the B-01 + QA R2-01 and UX-33 + B-04 rows) and the coordinator's alignment with ARQ §8.
+- **Evidence:** P-37 (architect `checkdoc.py`: `save_patched ok: False`), P-38 (QA `emit_identity.py`: data identical, bytes different).
+
+### LED-2026-10-26-batch-100.15 — Round 3: the save plan's granularity, cost and prediction (R-PC)
+- **Requirement:** HLR-175
+- **Requirement:** LLR-163.7, LLR-167.6, LLR-175.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **UX-32, QA R2-05:** the plan has one row per top-level file, one per sub-folder with its file count, and one for `project.json`, each with an action word (`new`, `replace`, `keep`, `merge`, `rewrite`). AT-B100-21 compares the plan's rows with the written tree at that granularity by full path and action, read from the plan the dialog holds (`SaveProjectScreen.plan`, declared as an exception in the §3 preface), and checks the painted action words at 220 columns. A long summary scrolls with its buttons pinned. "Nothing is overwritten silently": every `replace` or `rewrite` is a row that says so.
+  - **UX-33, B-04:** the image digest is computed once per dialog open; the name-dependent rows are recomputed at most every 150 ms, with no hashing per keystroke; `project_gather_service` gains no import of the change service.
+  - **B-05:** the new `predict_placement` (B100-I22, LLR-163.7) predicts every landing name with the placement code itself; the handler checks each landed path against its planned row, and a mismatch is an error naming both.
+- **Closes:** UX-32, QA-R2-05, UX-33, B-05.
+- **Why:** dispositions r2 (the UX-32 + QA R2-05, UX-33 + B-04 and B-05 rows); the operator's P-C note.
+- **Evidence:** the architect's code read `workspace.py:546-620` (the claim loop decides names); `png/pc_B.pc.118.png` (grouped sub-folders).
+
+### LED-2026-10-26-batch-100.16 — Round 3: `derived_from` and the Load-result panel
+- **Requirement:** HLR-168, HLR-178
+- **Requirement:** LLR-168.3, LLR-168.4, LLR-178.1, LLR-178.2, LLR-178.3
+- **Date:** 2026-10-26
+- **What changed:**
+  - **UX-26:** a new per-variant `derived_from` key (B100-I16, LLR-168.4) records the base's name, its SHA-256 and the byte count, computed at the write. It is set by the save-back and by Save project's emit from Inc 7; emits before Inc 7 record nothing. Every rewrite carries it. The panel compares against it, never against the first variant by name (P-39). When the base is not in the project, the panel says "patched from `<base>` (not in this project); N bytes differ from it"; a variant with a record is never called identical (coordinator alignment 2 and 3, ARQ §8.1).
+  - **UX-31, UX-39:** the focus starts on the problem list (↑, ↓, PgUp, PgDn), `tab` moves to OK, and `enter` on OK or `escape` dismisses; the test reaches the last row by geometry.
+  - **UX-38:** the summary line ends "details: p".
+  - **UX-40:** "latest" comes from the app's own recorded write, never file times.
+  - **B-11 (panel part):** `#status_text` gets the project and file line through the progress line's final writer (LLR-178.2).
+- **Closes:** UX-26, UX-31, UX-38, UX-39, UX-40.
+- **Why:** dispositions r2 (the UX-26 and UX-31 rows, MINOR rows) and the coordinator's alignment points 2 and 3.
+- **Evidence:** P-39 (`sorted(...)` puts `firmware-patched.s19` first).
+
+### LED-2026-10-26-batch-100.17 — Round 3: one load seam, the 24-cell table, and Save project clears the document flag
+- **Requirement:** HLR-174
+- **Requirement:** LLR-167.8, LLR-174.1, LLR-174.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **B-02, QA R2-03:** every image-replacing route — the Load dialog, the Workarea Files pick, the variant switch (`v` and the panel's `v`), a project load — passes one seam, `_confirm_then_load` (B100-I20, LLR-174.4), with one test arm per route (P-42).
+  - **QA R2-02:** a MAC or A2L load only attaches, loses nothing and never asks. The table now has three kinds (image replace, attach, project): 24 cells, 11 ask, 13 load; dropping D → 5 wrong, F → 1, W → 1; the round-2 rule of asking on an attach → 4 wrong (executed).
+  - **UX-27:** Save project calls the Patch Editor panel's `mark_saved` once the document is written (LLR-167.8); cell added: patched + entries → Save project → project load = no question.
+- **Closes:** B-02, QA-R2-02, QA-R2-03, UX-27.
+- **Why:** dispositions r2 (the QA R2-03 + B-02, QA R2-02 and UX-27 rows).
+- **Evidence:** `itertools.product` enumeration → `cells 24 ask 11 load 13`, `drop-D wrong 5`, `drop-F wrong 1`, `drop-W wrong 1`, `attach-asks-on-D wrong 4`; P-42; P-43.
+
+### LED-2026-10-26-batch-100.18 — Round 3: the Load dialog's focus, rows and preview
+- **Requirement:** HLR-173
+- **Requirement:** LLR-173.2, LLR-173.4, LLR-173.6
+- **Date:** 2026-10-26
+- **What changed:**
+  - **UX-05, QA R2-06:** the dialog opens with the focus on the path field, correcting `pa_C`'s start on the list. The order is path → list → preview → buttons. A printable key typed while the list has the focus moves to the path field and types there, never reaching an app binding. `#load_ok`, `enter` and `alt+l` load the highlighted row when the list had the focus and the typed path otherwise. ATs 01 and 12 therefore need no re-pin at Inc 9b (§5.3).
+  - **UX-36:** `●` marks the installed set for every row kind; a file row with a project open says it becomes the project's active variant; a recent row shows only path, size and last seen, says "checked when loaded", and is never read before Enter.
+  - **UX-37:** `p` highlights the open project's row, else the first project; the key bar labels the keys "Load" and "Projects".
+  - **Security R2-03 (preview part):** a project row's preview reads its manifest on a worker, capped, cancelled when the highlight moves; a key is answered within 200 ms.
+- **Closes:** UX-05, QA-R2-06, UX-36, UX-37.
+- **Why:** dispositions r2 (the UX-05 + QA R2-06, UX-36, UX-37 and security R2-03 rows).
+- **Evidence:** P-30 (`pa_C` `AUTO_FOCUS = "#load_list"`); security probe R3 (P-40).
+
+### LED-2026-10-26-batch-100.19 — Round 3: the status line's owner, real progress, and the worker refusal set
+- **Requirement:** HLR-176, HLR-177
+- **Requirement:** LLR-164.4, LLR-176.1, LLR-176.2, LLR-177.1
+- **Date:** 2026-10-26
+- **What changed:**
+  - **UX-29, B-11:** while an action is busy, `#status_text` has one owner, the progress line. At the end, a single final writer paints, in order: the outcome, the project and file line, then the file state. The bar starts at 0, is hidden when idle, and is never left at a stale `100%`.
+  - **UX-30:** the bar moves within a step wherever progress is measurable (bytes copied, read or parsed), and by step only for indivisible steps; the A2L tag-table build stays declared out of scope.
+  - **B-10:** the census maps each `set_progress` site to an action's begin, **step** or end.
+  - **QA R2-12:** the worker share is measured above one timer tick at P3, and AT-18 presses `l` after the worker step is painted.
+  - **UX-34:** while a worker runs, the refused set is the load seam, unload, `v`, the save-back, Save project, Patch apply and undo; quit asks first (focus on No) and, if confirmed, waits for the worker to finish or roll back.
+  - **Security R2-09:** the `OSError` handler and the census cover the Save worker body, and the folder removal runs on the worker.
+- **Closes:** UX-29, B-11, UX-30, B-10, QA-R2-12, UX-34, S-R2-09.
+- **Why:** dispositions r2 (the UX-29 + B-11, UX-30, UX-34 and MINOR rows); the operator's P-D note.
+- **Evidence:** `png/pd_A.pd.118.png` (stale `100%` bar); the architect's `sed` of the 24 sites (`:4951`, `:6210`, `:8769`, `:8841` are steps).
+
+### LED-2026-10-26-batch-100.20 — Round 3: containment inside the placement, caps on every array, the manifest-keys mode, device names
+- **Requirement:** HLR-163, HLR-164, HLR-169, HLR-171
+- **Requirement:** LLR-163.1, LLR-163.6, LLR-164.1, LLR-164.2, LLR-169.4, LLR-169.8, LLR-171.1, LLR-171.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **Security R2-01 (S-02 carried):** the this-work-area check (`contained_in_workarea`, B100-I14) lives inside `place_into_workarea`, so every writer is covered by construction, Save project's own copies and its emit included (`save_patched_image` places through `copy_into_workarea`, `changes/apply.py:781`). The Save target gets a link/junction check before `resolve()`, for new and merge targets. Per the coordinator's alignment (1), the guard and its junction arm ship at Inc 1; only the listing and load uses stay at Inc 8b.
+  - **Security R2-02:** every guard lives in `place_into_workarea`; `copy_into_workarea` is exactly `return place_into_workarea(...).path`, with no second claim loop; the export uses the placement's `reused` (B-14).
+  - **Security R2-03 (S-08 carried):** every manifest array (`batch`, `assignments`, `declared_regions`, `gathered`, `files`, `derived_from`) is capped at 1 000 entries (P-40).
+  - **Security R2-04, R2-05, B-12:** one device-name predicate in `workspace.py`, applied to the raw and the sanitised name and to every path component; the two older lists go to the backlog.
+  - **Security R2-06:** one link-pruned walk gives both the total and the copy.
+  - **Security R2-07:** a failed merge removes what it placed.
+  - **B-03:** the path tightening is a manifest-keys mode (B100-I21), used only by `read_project_manifest` and `_reject_unsafe_entry`. Both flow-reference callers, `flow_persistence_service.py` and `flow_execution_service.py`, stay on the default mode, so `test_tc_b97_20_hostile_refs_render_literally` stays green (P-41, §5.4; coordinator alignment 5).
+  - **B-13:** a contained but out-of-scope key gives `MANIFEST-BAD-STRUCTURE`.
+  - **B-08:** P-34 is restated as 15 calls plus 2 docstring lines.
+  - **B-09, QA R2-10:** HLR-163's status clause is narrowed to the variant append and the export.
+- **Closes:** S-02, S-08, S-R2-01, S-R2-02, S-R2-03, S-R2-04, S-R2-05, S-R2-06, S-R2-07, B-03, B-08, B-09, B-12, B-13, B-14, QA-R2-10.
+- **Why:** dispositions r2 (the security R2-01, R2-02, R2-03, B-03 and MINOR rows) and the coordinator's alignment points 1 and 5.
+- **Evidence:** the security probes R1–R5 (round 2); P-40; P-41; `git grep -n "copy_into_workarea("` (P-34).
+
+### LED-2026-10-26-batch-100.21 — Round 3: the recent-sources store is per user (S-16, operator decision)
+- **Requirement:** HLR-172
+- **Requirement:** LLR-172.1, LLR-172.2, LLR-172.3
+- **Date:** 2026-10-26
+- **What changed:**
+  - **S-16:** the operator answered: the recent list is kept per user at `%APPDATA%\s19_app\recent_sources.json`, outside any work area (dispositions r2, operator decisions; the coordinator's round-3 brief). LLR-172.1 writes there, through the new `recent_store_path()`; when `APPDATA` is unset, nothing is written. The arms check that no store file appears under the base folder. LLR-172.3 widens "stays local" to every file under the base folder. §6.3's privacy item is now decided and leaves the open list.
+  - **QA R2-08:** the cap arm uses 1 000 distinct entries (about 41 KB) and expects exactly the first 20 in order.
+  - **Security R2-08:** mapped drives are not claimed "local"; §6.3 names the gap. The stream and trailing-dot entries are refused by the kind-to-suffix match, and `C:\x\NUL.s19` is refused as a device-name component.
+- **Closes:** S-16, QA-R2-08, S-R2-08.
+- **Why:** the operator's S-16 decision; dispositions r2 (MINOR rows).
+- **Evidence:** the QA `recents_size.py` (1 900 distinct entries take 70 332 bytes); the security probe R5.
+
+### LED-2026-10-26-batch-100.22 — Round 3: names, tokens and the path-limit arms
+- **Requirement:** HLR-164, HLR-171
+- **Requirement:** LLR-164.2, LLR-164.3, LLR-169.9
+- **Date:** 2026-10-26
+- **What changed:**
+  - **UX-35:** a disguised clash tells the engineer to choose another name; it never suggests a merge. A merge happens only on the exact name, shown as a merge row.
+  - **UX-07 residual:** every problem kind has a next-step token (§3 table), and "outside the work area" now says `copy the folder into the work area`.
+  - **UX-22 residual:** a `no data or A2L file` row.
+  - **UX-41:** a `not enough free space` row.
+  - **QA R2-09:** problems are painted in user terms ("manifest damaged: a file path points outside the project"); the internal code goes to the log only (LLR-169.9, HLR-169's AT).
+  - **QA R2-13:** LLR-164.3 arms with L = 150: a 55-character name gives 259 and is saved; a 56-character name gives 260 and is refused.
+- **Closes:** UX-35, UX-07, UX-22, UX-41, QA-R2-09, QA-R2-13.
+- **Why:** dispositions r2 (the UX-35, QA R2-09 and MINOR rows).
+- **Evidence:** the §3 preface token table; `before_after_service.py:78-85` (the 53-character suffix, QA's check).
+
+### LED-2026-10-26-batch-100.23 — Round 3: the validation plan — arm moves, AT-20, census rows, file sets
+- **Requirement:** HLR-168
+- **Requirement:** LLR-164.2, LLR-165.2, LLR-166.1, LLR-167.6
+- **Date:** 2026-10-26
+- **What changed:**
+  - **B-06 (with ARQ §8.1):** each arm runs at the increment that makes it possible. LLR-164.2(b)'s merge carry runs at Inc 8a. TC-B100-59's `files` row runs at Inc 7, its document and merge at Inc 8a, and its sub-folders at Inc 8b. TC-B100-12's modal closes are split across Inc 6, 9b and 10. The `derived_from` comparison runs at Inc 7. The containment junction arm runs at Inc 1. §5.3 lists the AT and TC rows.
+  - **QA R2-04:** AT-B100-20 is written in HLR-168's acceptance block, with its surface, observable and threshold.
+  - **QA R2-07:** the snapshot normalises stat-keyed caches (`_mac_view_cache_key`) (LLR-165.2).
+  - **QA R2-11:** §5.4 gains the `_handle_save_dialog` row (7 files: TC-700, AT-B99-05), plus the `_resolve_manifest_entry` and load-seam rows.
+  - **B-07:** the per-increment file sets come from ARQ §8 as amended (§5.5); the interfaces are named B100-I13..I22. The ARQ record and `docs/architecture.md` are the architect's.
+  - **Coordinator alignment (6, 7):** Inc 10 may add `screens_directionb.py` for a public dirty-flag reader.
+  - **QA R2-14:** PLAN's `vars(app)` row was corrected by the orchestrator (`322bbab`); `grep -n "vars(app)" PLAN.md` → 0.
+  - The security pattern scan was re-run on the round-3 contract; its result is recorded in `02-review.md` round 2.
+- **Closes:** B-06, B-07, QA-R2-04, QA-R2-07, QA-R2-11, QA-R2-14.
+- **Why:** dispositions r2 (the B-06, B-07, QA R2-04, QA R2-11 and MINOR rows) and the coordinator's alignment points 6 and 7.
+- **Evidence:** `design/ARQ-batch-100.md` §8, §8.1; `docs/ARCHITECTURE.md` §11 rows B100-I13..I22; `grep -rl --include=*.py _handle_save_dialog tests` → 7.

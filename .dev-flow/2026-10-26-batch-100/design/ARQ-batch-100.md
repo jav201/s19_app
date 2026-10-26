@@ -3,6 +3,12 @@
 Author role: `architect`. Station: ARQ (`p1-arq.md`). Base `1d677ba` (`git diff --stat 1d677ba HEAD -- s19_app tests docs` is empty and `git status --short s19_app tests docs` is clean, so every `file:line` below holds at `1d677ba`). Status: **for operator approval**; nothing landed.
 The standing-map residue is in `docs/ARCHITECTURE.md` §10 *Batch-100 declarations* and §11 *Batch-100 interface amendments* (B100-I1..I12). This file holds what the map does not: the session-state inventory (§2), the `project.json` reader census (§3), the reuse rule (§5), the per-increment file sets and re-cuts (§8), the parallelisation matrix (§9) and the open decisions (§10).
 
+> **P2 round 2 (2026-10-26).** This record has been amended for the P2 round-2 dispositions (`P2-dispositions-r2.md`, B-07):
+> - §8 holds the re-derived per-increment file table, and §8.1 the test-arm moves.
+> - The interface changes live in `docs/ARCHITECTURE.md` §11: B100-I2..I9, I11 and I12 are amended, and B100-I13..I22 are new (placement, containment, the `save_patched` split, `derived_from`, the save plan, the unsaved predicate, the session snapshot, the one load seam, the manifest-keys mode, `predict_placement`).
+> - Rationale R25a, R26a, R31a and R34–R37 are added there.
+> - Sections §2–§7 and §10 keep their ARQ-gate text, and §11 of the map supersedes them where the two differ: R25 → B100-I19; R26 → B100-I15; R31 → `%APPDATA%`; the §3.3 problem kinds → B100-I3.
+
 ## 1. BLUF
 
 - **Boundary:** no module created, no boundary moved. Every path is under `s19_app/**` (product) or `tests/**`. **A1 stays not fired:** the recent-sources store is two functions in `tui/workspace.py`, which already owns the `.s19tool/` layout (§6). No frozen-engine file (§7: `core.py`, `hexfile.py`, `tui/a2l.py`) is touched.
@@ -194,29 +200,40 @@ Contract (C6 / C8 / privacy):
 
 ## 8. Per-increment source files vs the 4-file cap
 
-`styles.tcss` is counted as a source file, as batch-97 counted it.
+`styles.tcss` is counted as a source file, as batch-97 counted it. **Round 2 (P2):** this table is the architect's round-2 re-derivation from the amended LLRs (`P2-architect-r2.md` §3), with the dispositions of `P2-dispositions-r2.md` applied. The ARQ-gate table is in git at `11763af`. A bracketed file is conditional; PDR decides it, and the increment packet records the decision.
 
 | Inc | Story / finding | Source files (planned) | # | Cap |
 |---|---|---|---|---|
-| 1 | M-1, G-005 | `tui/workspace.py` (+ `tui/app.py` under C-1) | 1–2 | ok |
-| 2 | M-4 notice, M-7, reserved names, L-3 rest | `tui/app.py`, `tui/workspace.py` | 2 | ok |
-| 3 | PH-2 | `tui/app.py` | 1 | ok (**correction:** the plan named `change_service.py`; not needed, §2.3) |
-| 4 | CW-U-2 | `tui/app.py` (the load tail `_step_finalize` `:11191`, and the A2L load tail) | 1 | ok |
-| 5 | PH-1, D1 | `tui/app.py`, `tui/services/change_service.py` | 2 | ok (**correction:** `manifest_writer.py` → `change_service.py`, §4) |
-| 6 | PH-4, D2 (+ P-E announcement; + O-1 if confirmed) | `tui/app.py`, `tui/services/variant_execution_service.py` (parse `gathered`, so the manifest can be rewritten with its composition carried) | 2 | ok |
-| 7 | PH-5, L-4, D3 | `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/app.py` | 3 | ok |
-| 8 | M-2/M-3/M-5/M-6, D4–D7 | `app.py`, `manifest_writer.py`, `variant_execution_service.py`, `project_gather_service.py`, `screens.py` (Browse…) | **5** | **over → split** |
-| 8a | M-2, D4 | `tui/app.py`, `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/services/project_gather_service.py` (`GatherOutcome` names where the active document landed) | 4 | at cap |
-| 8b | M-3 D5, M-6 D6, M-5 D7 (handler half) | `tui/app.py`, `tui/services/project_gather_service.py` (copy the project homes) | 2 | ok; the D7 **dialog** half (remove Browse… and the parent field) moves to Inc 11 |
-| 9 | Load dialog | `screens.py`, `app.py`, `workspace.py`, `styles.tcss` | 4 | at cap, prototype-gated → **split** |
-| 9a | recents store + recording, L-2 routing, shared work-area lister | `tui/workspace.py`, `tui/app.py` | 2 | ok; **not** prototype-gated |
-| 9b | P-A dialog, D10, CW-U-12/13 (esc), C8 labels | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` | 3 | ok |
-| 10 | CW-U-5, P-B | `tui/screens.py` (confirm modal on the `ConfirmDiscardScreen` pattern `:902`), `tui/app.py` (+ `styles.tcss`) | 2–3 | ok |
-| 11 | M-4 preview, D7 dialog half, CW-U-12/13, P-C | `tui/screens.py`, `tui/app.py` (+ `styles.tcss`) | 2–3 | ok |
-| 12a | N5, P-D | `tui/app.py`, `tui/styles.tcss` (+ `tui/screens.py` if P-D = modal) | 2–3 | ok |
-| 12b | worker moves (O-7) | `tui/app.py` (+ `tui/flow_screens.py` if the run enable state moves) | 1–2 | ok, conditional |
+| 1 | M-1, G-005 | `tui/workspace.py` (`find_identical`, `place_into_workarea`, `predict_placement`, containment inside the placement: B100-I13, I14, I22), `tui/segment_split_view.py` (the export's word from `PlacementResult`), `tui/app.py` (no "added" for a reused variant) | 3 | ok |
+| 2 | M-4, M-7, reserved and device names, L-3 rest | `tui/app.py`, `tui/workspace.py` (one device-name predicate, `PROJECT_NAME_MAX_CHARS`) | 2 | ok |
+| 3 | PH-2 | `tui/app.py` (`_reset_project_session`, `_session_snapshot`) | 1 | ok |
+| 4 | CW-U-2 | `tui/app.py` (focus targets, the load tails) | 1 | ok |
+| 5 | PH-1, D1, R-PC | `tui/app.py`, `tui/services/change_service.py` (the `save_patched` split B100-I15; `mark_saved` / `differs_from_last_saved` B100-I18), `tui/services/project_gather_service.py` (`plan_project_save` B100-I17) | 3 | ok |
+| 6 | PH-4, D2, O-1, P-E | `tui/app.py`, `tui/services/variant_execution_service.py` (`gathered`, `compose_load_announcement`), `tui/screens.py` (the Load-result panel) (+ `tui/styles.tcss`) | 3–4 | ok; at the cap with styles |
+| 7 | PH-5, L-4, D3, O-2, O-11, UX-26 | `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/app.py` (+ `tui/services/project_gather_service.py` for the plan's `files` row) | 3–4 | ok; `derived_from` (B100-I16) lands here, not at 5 or 6, which would add `manifest_writer.py` to those increments |
+| 8a | M-2, D4, Q-5 | `tui/app.py`, `tui/services/manifest_writer.py`, `tui/services/variant_execution_service.py`, `tui/services/project_gather_service.py` | **4** | **at cap, no slack**: any further file needs a re-cut |
+| 8b | M-3 D5, M-6 D6, M-5 D7 (handler), S-02 | `tui/app.py`, `tui/services/project_gather_service.py`, `tui/workspace.py` (`contained_in_workarea` uses for listing and load) | 3 | ok |
+| 9a | recents store (per-user, S-16), lister, L-2 routing | `tui/workspace.py`, `tui/app.py` | 2 | ok |
+| 9b | P-A C dialog, D10, CW-U-12/13, C8 | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` (+ `tui/services/variant_execution_service.py` if the shared "what installs" function lives there) | 3–4 | ok |
+| 10 | CW-U-5, P-B A, B-02 | `tui/screens.py`, `tui/app.py` (the one load seam B100-I20), `tui/styles.tcss` (+ `tui/screens_directionb.py` for a public dirty-flag accessor) | 3–4 | ok |
+| 11 | M-4 preview, D7 dialog half, P-C B | `tui/screens.py`, `tui/app.py`, `tui/styles.tcss` | 3 | ok |
+| 12a + 12b (one unit, R-PD) | N5, P-D A, O-7 | `tui/app.py`, `tui/styles.tcss` (+ `tui/screens.py`) | 2–3 | ok; the `save_patched` split is already in Inc 5, so `change_service.py` is not needed here |
 
-Hard order: 1 → 6 (save-back naming relies on the reuse rule); 2 → 11 (the preview uses the name rules); 3 → 8a and 3 → 10 (reopen and confirm sit around the reset); 5 → 10 → 11 (the predicate); 6 → 7 → 8a (the manifest seam, then `files`, then `active_document` inside `files`); 9a → 9b; 12a → 12b. Prototype gate: 9b, 10, 11, 12a wait for P-A..P-D. **6 waits for P-E** (the D2 note asks that the switch be announced, O-8).
+**No increment exceeds 4 source files.** Inc 8a is at 4. Inc 6, 7, 9b and 10 reach 4 only through their bracketed conditional.
+
+Hard order: 1 → 6 (save-back naming relies on the reuse rule); 2 → 11 (the summary uses the name rules); 3 → 8a and 3 → 10 (reopen and confirm sit around the reset); 5 → 10 → 11 (the unsaved predicate and the save plan land at 5); 6 → 7 → 8a (the manifest seam, then `files` and `derived_from`, then `active_document`); 9a → 9b; 12a and 12b as one unit. The prototype verdict is in, so no increment is prototype-gated any more.
+
+### 8.1 Round-2 test-arm moves (B-06)
+
+Each arm runs at the increment that makes it possible. An arm is written there; it is not left failing in an earlier increment.
+
+| Arm | From | To | Why |
+|---|---|---|---|
+| LLR-164.2 (b): exact-name merge with the target's `batch`, `assignments`, `declared_regions`, `gathered`, `active_document` carried | Inc 2 | **Inc 8a** | the reader parses `gathered` from Inc 6 and `active_document` from Inc 8a, and the carry conversion is LLR-168.3 (Inc 6). Inc 2 keeps the refusal arms and an exact-name save that still adds a variant (LLR-005.1, `test_save_second_s19_into_project_appends_variant` green) |
+| TC-B100-59 / AT-B100-21: plan rows | Inc 5 (all 5 scenarios) | Inc 5: fresh, pending patch, refused; **Inc 7**: the `files` row; **Inc 8a**: the document row and the merge scenario; **Inc 8b**: the save-as-with-sub-folders scenario | each row type exists only from its increment |
+| TC-B100-12: modal closes | Inc 4 (all 4 closes) | Inc 4: the load tails (Load file, project load, Workarea Files pick) and TC-B100-13 (A2L); **Inc 6**: panel `enter` / `esc`; **Inc 9b**: dialog `esc`; **Inc 10**: question `n` | each modal is introduced by that increment |
+| B100-I16: the panel's "patched, N bytes differ" against `derived_from` | Inc 6 | **Inc 7** | `derived_from` is written and read from Inc 7 |
+| B100-I20: one arm per image-replacing route (dialog, rail pick, variant switch, project load) | — | **Inc 10** | the seam lands at Inc 10; the dialog arm needs Inc 9b, already landed |
 
 ## 9. Parallelisation verdict (mechanical rule, `p1-arq.md`)
 

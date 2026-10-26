@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: 6e66876ba7876eb4 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 76 requirement files | corpus digest: afcc7daa77f21835 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1981 unique id(s)
+## family US/HLR/LLR — 1986 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2889,6 +2889,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-163.4` | batches |
 | `LLR-163.5` | batches |
 | `LLR-163.6` | batches |
+| `LLR-163.7` | batches |
 | `LLR-164.1` | batches |
 | `LLR-164.2` | batches |
 | `LLR-164.3` | batches |
@@ -2905,9 +2906,12 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-167.4` | batches |
 | `LLR-167.5` | batches |
 | `LLR-167.6` | batches |
+| `LLR-167.7` | batches |
+| `LLR-167.8` | batches |
 | `LLR-168.1` | batches |
 | `LLR-168.2` | batches |
 | `LLR-168.3` | batches |
+| `LLR-168.4` | batches |
 | `LLR-169.1` | batches |
 | `LLR-169.2` | batches |
 | `LLR-169.3` | batches |
@@ -2940,6 +2944,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-174.1` | batches |
 | `LLR-174.2` | batches |
 | `LLR-174.3` | batches |
+| `LLR-174.4` | batches |
 | `LLR-175.1` | batches |
 | `LLR-175.2` | batches |
 | `LLR-175.3` | batches |
@@ -3683,7 +3688,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `R-VAR-002` | batches, canon |
 | `R-VAR-003` | batches |
 
-## family AT/TC — 1992 unique id(s)
+## family AT/TC — 1997 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -5399,6 +5404,11 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-65` | batches |
 | `TC-B100-66` | batches |
 | `TC-B100-67` | batches |
+| `TC-B100-68` | batches |
+| `TC-B100-69` | batches |
+| `TC-B100-70` | batches |
+| `TC-B100-71` | batches |
+| `TC-B100-72` | batches |
 | `TC-B77-01` | batches, tests |
 | `TC-B77-02` | batches, tests |
 | `TC-B77-03` | batches, tests |
