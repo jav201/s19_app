@@ -48,7 +48,7 @@
       "reason": "batch 2026-10-26-batch-100 opened by rollover from 2026-10-25-batch-99 (closed at P6, synced); mode full, as batch-99, by the operator's kickoff answers of 2026-10-26"
     }
   ],
-  "current_station": "ARQ",
+  "current_station": "P1",
   "phase_status": "not-started",
   "stations_active": [
     "P0",
@@ -126,6 +126,11 @@
       "station": "P0",
       "date": "2026-10-26",
       "decision": "asked at the gate — operator verdict on design/plan-b100.html (design/veredicto-b100.json, exported 2026-10-26): D1 imagen, D2 ultima, D3 abre_y_reporta, D4 reabrir, D5 copiar, D6 abrir, D7 solo_workarea, every recommended option. D2 note: the switch to the latest saved image must be announced so it does not pass unnoticed; routed to the prototype round as surface P-E (Load project result: which variant opened and why, plus the D3 problem list). Triggers evaluated (PLAN.md#triggers). P0 intake closed; ARQ is next, and the prototype round is built in parallel."
+    },
+    {
+      "station": "ARQ",
+      "date": "2026-10-26",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header). ARQ approved with conditions (design/ARQ-batch-100.md; docs/architecture.md batch-100 rows R24-R33, B100-I1..I12): no module created, no boundary moved (A1 stays not fired); increments 8, 9, 12 split into 8a/8b, 9a/9b, 12a/12b (15 increments, sequential); P-E in the prototype round; orchestrator rulings O-1..O-11 recorded in ARQ section 10.1. P1 is next."
     }
   ],
   "obsidian_synced": false,

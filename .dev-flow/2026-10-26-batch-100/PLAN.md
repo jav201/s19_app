@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-10-26-batch-100 |
 | Objective | The Load + projects batch: one Load dialog that offers what is already loaded and opens projects, and a project that restores what was saved or says what it could not. Scope: the project round-trip findings of INVESTIGATION-project-roundtrip-2026-10-23 still open (PH-1 Save project drops a pending patch, PH-2 load over a project leaks its A2L/MAC/patches, PH-4 save-back opens the unpatched original, PH-5 manifest problems ignored; M-1..M-7, L-2..L-4), the Load dialog requests (a picker of work-area files and recent sources, Load opens projects, Enter-to-load D10), the G-005 save naming (byte-identical reuse, tests re-pinned), the Code-Wire UI items CW-U-2, CW-U-5, CW-U-12, CW-U-13, the reserved project name, and the progress indicator for long actions (N5 reopened). UI changes go through a prototype round with the operator's verdict before implementation. |
-| Last updated | P0 · 2026-10-26 |
+| Last updated | P1 · 2026-10-26 |
 | Standing authorization | Asked at the kickoff, 2026-10-26; the operator chose, quoted from the answers: autonomy "Igual que b99" (autonomous with exceptions: stop on a HIGH finding or an operator decision; the orchestrator plans and Kimi K2.8 implements in an isolated worktree; commit and push to main at each close; max 4 source files per increment; the prototype round waits for the operator's verdict before implementation); merge "Push directo a main" (each increment lands on main after independent review, no PR); G-005 "Reusar + re-pinear tests"; the 13 local `b99-*` branches "Borrarlas" (done, after checking their content is on main). Carried batch rules from the operator's standing instructions: chat in Spanish, records in English; no operator name in the repo; region extraction described only as memory-region extraction; do not commit `prototypes/`. Every decision the orchestrator takes instead of asking is recorded in this plan's decision log, `state.json.decisions_log` and the post-mortem, and reaches the vault at sync. |
 | First gate | `devflow-validate.py --brief .` at P0 open → exit 0, `0 block · 609 notice · 43 not applicable`; `V7` reports the bundle identical to its manifest at `2026-10-12-rev102`. |
 | Premises / RC-1 | RC-1 (a): `git fetch origin`; `origin/main` = `HEAD` = merge-base = `1d677ba39d2c6aaf09f1ca7e623197065f0b8958`, so `base_ref` is that commit. RC-2: `git ls-remote --exit-code --heads origin main` answered `1d677ba…`. RC-1 (b): every finding in scope is re-executed at `1d677ba` before it becomes a story (`evidence/p0-premises/`), because batch-99 closed some neighbours (PH-3, L-1, CW-U-1, CW-U-3). |
@@ -53,43 +53,86 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 
 ## Where we are
 
-P0 intake (2026-10-26). The batch was opened by rollover from batch-99 (`rollover_batch100.py`), and the kickoff answers are in the header. The P0 premises were re-executed at `1d677ba` on a `git archive` snapshot by qa-reviewer (`evidence/p0-premises/`). PH-3, L-1 and L-3 are already closed by batch-99. PH-1, PH-2, PH-4, PH-5, M-1..M-7 (M-5 partly), L-2, L-4, CW-U-2/5/12/13, the Load-dialog request, the reserved project name and the G-005 pins all still reproduce. The plan and its decisions page are `design/plan-b100.html`: 12 increments. 1–4 are free, 5–8 wait for D1–D7, and 9–12 wait for the prototype round (P-A Load dialog, P-B confirm before losing work, P-C Save project dialog, P-D progress). Owed next: the operator's verdict on D1–D7, the prototype round (built in `prototypes/load_projects/`, not committed), then ARQ and P1.
+ARQ (2026-10-26). P0 closed on the operator's verdict (`design/veredicto-b100.json`). D1–D7 all took the recommended option. The D2 note, "the switch to the latest saved image must be announced", became prototype surface P-E.
+
+ARQ (`design/ARQ-batch-100.md`, the batch-100 rows in `docs/architecture.md`) is approved with conditions:
+- Increments 8, 9 and 12 are split, which gives 15 increments, run sequentially.
+- P-E is in the round.
+- The orchestrator ruled on O-1..O-11 (ARQ §10.1).
+
+The prototype round (P-A..P-E) is being built in `prototypes/load_projects/`, which is not committed. Owed next: P1 requirements. The UI stories stay REFINE until the round's verdict.
 
 ## Objective
 
-<the batch objective, restated>
+A project restores exactly what was saved, or names what it could not. Load offers what is already loaded and opens projects. Nothing the user has not saved is replaced without a question, and long actions show that they are working.
 
 ## Per-story / per-station status
 
 | Story / station | Status | Notes |
 |---|---|---|
-| <US-NNN / station> | <status> | <notes> |
+| P0 | done | premises at `1d677ba`; verdict D1–D7 |
+| ARQ | done | `design/ARQ-batch-100.md`; approve with conditions (splits, P-E, O-1..O-11 ruled) |
+| P1 | next | stories, HLR/LLR; UI stories REFINE until the prototype verdict |
+| Prototype round | building | P-A Load dialog · P-B confirm · P-C Save project · P-D progress · P-E Load result |
 
 ## Roadmap + increment plan
 
-<the increments this batch expects, in order>
+Sequential, one Kimi K2.8 worktree per increment, ≤4 SOURCE files each (ARQ §8). The hard order is ARQ §8: 1→6, 2→11, 3→8a/10, 5→10→11, 6→7→8a, 9a→9b, 12a→12b. Inc 6 and Inc 7's display wait for the P-E verdict.
+
+| Inc | What | Findings | Source files | Gate |
+|---|---|---|---|---|
+| 1 | byte-identical reuse in `copy_into_workarea`; G-005 re-pin tc018/at031b | M-1, G-005 | workspace (+ app) | free |
+| 2 | Save project guards: sanitised-name clash refused with a notice, long name, reserved names case-folded, cleanup | M-4, M-7, reserved, L-3 rest | app, workspace | free |
+| 3 | `_reset_project_session()` seam: a project load starts clean | PH-2 | app | free |
+| 4 | focus lands on a visible window after a load | CW-U-2 | app | free |
+| 5 | Save project writes the in-memory image (emitter + verify) | PH-1, D1, O-5, O-6 | app, change_service | D1 ✓ |
+| 6 | save-back becomes `active_variant`; every project writer rewrites the manifest | PH-4, D2, O-1, O-10 | app, variant_execution_service | D2 ✓ + P-E |
+| 7 | `files` digests, Load lists every problem, private manifest staging | PH-5, L-4, D3, O-2, O-11 | manifest_writer, variant_execution_service, app | D3 ✓ (+ P-E display) |
+| 8a | active change document recorded and reopened | M-2, D4 | app, manifest_writer, variant_execution_service, project_gather_service | D4 ✓ |
+| 8b | save-as copies every project sub-folder; A2L-only opens; save only inside the work area (handler) | M-3, M-6, M-5, D5–D7, O-4 | app, project_gather_service | D5–D7 ✓ |
+| 9a | recent-sources store, shared work-area lister, project path routing | L-2 | workspace, app | free |
+| 9b | the Load dialog | Load request, D10, CW-U-12/13, markup off | screens, app, styles | P-A |
+| 10 | confirm before replacing unsaved work (image, project, dirty flow) | CW-U-5, O-3 | screens, app (+ styles) | P-B |
+| 11 | Save project dialog: real name, clash/reserved/pending lines, no Browse… | M-4, D7 dialog, CW-U-12/13, O-9 | screens, app (+ styles) | P-C |
+| 12a | progress indicator (begin/step/end, elapsed) | N5 | app, styles (+ screens) | P-D |
+| 12b | project load, Save project, A2L parse on workers | N5, O-7 | app (+ flow_screens) | P-D |
 
 ## Key decisions
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-10-26 | <decision> | <reason> |
+| 2026-10-26 | Kickoff: autonomy as batch-99, push to main, G-005 reuse, delete `b99-*` | operator answers (header) |
+| 2026-10-26 | D1–D7 all recommended; D2 announcement → P-E | operator verdict `design/veredicto-b100.json` |
+| 2026-10-26 | ARQ conditions accepted; O-1..O-11 ruled by the orchestrator | standing authorization; ARQ §10.1 gives each reason |
+| 2026-10-26 | Sequential increments, no parallel lanes | batch-99 lesson (registry conflicts); A4 not fired |
 
 ## Risks / watch-items
 
-- <risk · likelihood · mitigation>
+- `app.py` is in 14 of 15 increments · certain · sequential merges, one worktree each.
+- `project.json` gains keys read by 3 modules · medium · additive keys only, no `schema_version` bump, old projects open with a notice (ARQ §3).
+- Whole-tree guards (import census, snapshot cells, id registry) missed at increment gates in batch-99 · high · run them at EVERY increment gate, plus `devflow-validate --brief` at every gate.
+- `current_a2l_data` is never cleared (ARQ §2, code-read) · medium · covered by Inc 3's `vars(app)` comparison AT.
 
 ## Conventions honored
 
-- <convention>
+- Max 4 SOURCE files per increment; Kimi K2.8 implements, an independent reviewer checks.
+- Chat in Spanish, records in English; no operator name in the repo; `prototypes/` never committed.
+- Tests in a worktree run with `PYTHONPATH=<worktree>` (pip -e imports the main checkout).
 
 ## Out-of-scope carries
 
-- <what this batch deliberately does not do, and where it is tracked>
+- Code-Wire F6 findings (diff report): `BACKLOG-CODE.md` §Routed 2026-10-26 F6, proposed for batch-98.
+- Integrity mediums/lows and Code-Wire mediums: `BACKLOG-CODE.md`.
 
 ## Gate notices and runtime absences
 
-<per gate: each NOTICE it printed and why it stands (`stations/core-runbook.md` §*Expected NOTICEs*); once: each mechanism `SKILL.md`'s gate step 5 found unavailable on this runtime, and each rule recorded `not-run`, with the reason>
+- **P0 gate run** (`devflow-validate.py --brief .`, exit 0, 0 block · 609 notice). The NOTICEs are the template-placeholder families of artifacts not yet written (V34, V36–V38, V41, V43–V51, V54), each closed when its station writes the artifact. Also: V42 deferral markers in sealed historical records, V53 as a census count, and V62 for this section's seed text, which is now filled.
+- **ARQ gate run:** exit 0, 0 block · 604 notice, the same families. The atlases were regenerated before the commit (batch-99 lesson, `BACKLOG-PROCESS.md`).
+- **Every later gate runs the validator before its `--decision`.** This is the batch-99 carry: its close found 99 record BLOCKs, unread since P0.
+- **Runtime absences:**
+  - The named reviewer roles (`architect`, `qa-reviewer`, `security-reviewer`, `code-reviewer`, `ux-reviewer`) are available as sub-agents, so the reviews are independent.
+  - The implementer is Kimi CLI (`kimi-code/kimi-for-coding`, K2.8), an external runtime. No Kimi session reviews its own work.
+  - V15, V16 and V17 are `not-run`, because they cannot run from a bundle (no canon tree, no checkout table, no hook in a bundle `settings.json`). V30 runs half.
 
 ## Test ledger
 
