@@ -171,6 +171,11 @@
       "station": "P3",
       "date": "2026-10-26",
       "decision": "asked at the gate — Inc 2 reached the P3 iteration cap (3 corrective passes) and was surfaced to the operator. Pattern as in Inc 1: each filesystem fix opens a new junction case; round 3 R3-1 HIGH — the recursive rollback (rglob) walks into NTFS junctions on Python 3.11 and deleted a file outside the work area (executed). Operator chose \"Pasada 3 acotada\": one reusable walker that never descends into a reparse point (snapshot and removal), junction-out and loop tests RED first; security and code-reviewer re-read only that; anything new beyond it stops the increment for a redesign. The walker is reused by Inc 8b save-as (LLR-171.1)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-26",
+      "decision": "asked at the gate — Inc 2 stopped by the operator's bounded-pass rule: code-reviewer round 4 PASS-WITH-NOTES (R3-1 closed), security round 3 found SEC2-5 MAJOR (an incomplete snapshot led the rollback to delete pre-existing user files; executed) and SEC2-6. Operator chose \"Lista exacta\" (LED .53): a failed save removes exactly what it created (non-reused placements + the gather's written files + created empty folders); no folder walk decides deletion; Inc 2 = 3 files (adds project_gather_service.py); walk_tree_no_links kept for Inc 8b."
     }
   ],
   "obsidian_synced": false,

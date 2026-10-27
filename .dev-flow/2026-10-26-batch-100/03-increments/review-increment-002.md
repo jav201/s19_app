@@ -224,3 +224,50 @@ It is discharged only when a re-read of the applied fix shows one non-following 
 
 - `security-reviewer`: R3-1. It is a deletion through a reparse point, the reverse of the S-02 class, and it reaches outside the work area.
 - Orchestrator: `HANDOFF.md` is still at the worktree root.
+
+---
+
+# Round 4: bounded re-read of fix pass 3 (R3-1, R3-2 only)
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1–3. I did not write the fix. |
+| Scope | BOUNDED by the operator at the iteration cap: the fixes for R3-1 and R3-2, plus a check that R2-1 has not regressed. Anything new beyond those would stop the increment for a redesign. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, fix pass 3 uncommitted. `app.py` sha256 `fee2d17a6876…` and `workspace.py` `2f6dbdb4cf04…` both equal `pre-mutation-hashes-fix3.txt`. |
+| Interpreter proof | `…\scratchpad\fix3\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
+| **Verdict** | **PASS-WITH-NOTES.** 0 HIGH, 0 MAJOR open. **R3-1 is discharged by re-read and by probe.** R3-2 is closed. R2-1 has not regressed. No new finding. |
+
+## What I executed in round 4 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| R3-1 probe `rollback_deletes_through_junction`. A junction `ab\ext` → `<tmp>\victim` sits outside the work area. A concurrent writer drops `victim\user-work.txt`, then the save fails. | **Victim after: `['keep.txt', 'user-work.txt']`. The outside file SURVIVES.** (Round 3: it was deleted.) |
+| A junction-loop project: `ab\loop` → `ab`, exact-name merge, nothing forced | **`Saved project to …\ab`**. Tree `['a.s19', 'firmware.s19', 'loop@', 'project.json']`. The loop is kept, there is no `[WinError 3]`, and the save is no longer blocked. |
+| The same junction loop with a refused manifest | Tree before = after `['a.s19', 'loop@']`. |
+| R2-1 regression check (my R2-1 probe and both trap probes) | R2-1: before = after `['a.s19']`. Identical pre-existing `patches/hotfix.json`: it survives. Different pre-existing content (`{"v": 0}`): kept, and the gather's `hotfix_1.json` is removed. ✓ |
+| Walker mutants on the scratch copy, run against the 18 TC-B100-07 nodes, with both hashes restored after each | **W1** (the `_is_reparse_point` re-check dropped, so junctions are followed) → **KILLED**: `rollback_never_touches_junction_target` + `walk_tree_no_links_yields_reparse_point_as_leaf`. **W3** (the removal walk reverted to `rglob` while the snapshot keeps the walker) → **KILLED**: `rollback_never_touches_junction_target`. **W4** (no descent into sub-folders) → **KILLED**: `failed_save_removes_every_placed_path[merge-gathered]` + the walker unit arm. |
+| GREEN on the fix-pass-3 tree: `test_b100_save_guards.py` (34, ATs included) + the A-09 node + the 2 re-pinned `test_b99_staging.py` nodes | **37 passed** (284 s). The merge-gathered arms are in that count. |
+| LED .50 sweep | 0 added `.resolve()`. `workspace.py` adds only `walk_tree_no_links` and the `Iterator` import beyond the earlier Inc 2 changes. Placements are unchanged. ✓ |
+| Evidence and CRLF | The 69 digests in the packet match disk; the 4 files without a digest are the ones already declared superseded. `app.py` 14050/14050 and `workspace.py` 2002/2002 CRLF. ✓ |
+
+## Closure table: round-3 findings
+
+| id | State | How it was resolved (re-read on the diff) |
+|---|---|---|
+| **R3-1** (HIGH) | **CLOSED** | `walk_tree_no_links` (`workspace.py:255-309`) walks with an explicit stack and `os.scandir`. It pushes a child only when `entry.is_dir(follow_symlinks=False) and not _is_reparse_point(child)`, so a symlink or junction is yielded as a leaf and never entered. A folder that cannot be listed is skipped. Both `_project_tree_snapshot` (`app.py:8130`) and the removal walk in `_abort_save` (`:8180`) use it; `rglob` is gone from the rollback. A pre-existing junction is in the snapshot, so it is never removed, and its target is never walked. My through-junction probe and the loop probe are clean, and W1, W3 and W4 are killed. One note: W1 alone does not turn the loop arm RED, because the walker swallows the over-long-path `OSError`. The unit arm catches it, so this is not a finding. |
+| R3-2 (MINOR) | **CLOSED** | `self._last_manifest_verify_result: Optional[ManifestVerifyResult] = None` is now set in `__init__` (`app.py:1641`). |
+
+## Verdict
+
+**PASS-WITH-NOTES.** 0 HIGH, 0 MAJOR open in my lane. Every HIGH of rounds 1–3 has been applied and re-read on the diff. The one remaining note is housekeeping for the orchestrator: move `HANDOFF.md` from the worktree root into `kimi/`.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH, 0 MAJOR open; note: move `HANDOFF.md` into `kimi/`) · Every HIGH was resolved and re-read on the diff:
+- **F1** (round 1; the app state pointed at the deleted folder after a failed save): the one `_abort_save` rollback restores the state, and the success line paints after the manifest. Probe re-run; MF1 and MR6 killed.
+- **F2** (round 1, record): the trace is now `HLR-164`.
+- **R2-1** (round 2; the gather's copies survived a failed merge): a recursive relative-path snapshot drives the rollback, which removes only new paths, deepest first. The probe and both trap probes are clean; MR1, MR2 and MR3 killed.
+- **R2-2** (round 2, record): §2 now has the `tests/test_b99_staging.py` row.
+- **R3-1** (round 3; the rollback deleted through a junction outside the work area): the one non-following `walk_tree_no_links` is used by both the snapshot and the removal. The outside file survives, a junction-loop project saves, and W1, W3 and W4 are killed.
+
+37 passed on the fix-pass-3 tree (`review-increment-002.md` §Round 4).

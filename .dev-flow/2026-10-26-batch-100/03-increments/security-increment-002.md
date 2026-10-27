@@ -66,3 +66,43 @@
 - **Junctions:** `evil` and `EVIL` were refused as a link or junction, and the other work area was unchanged.
 - **Forced `OSError`:** at `validate_project_files` and at `copy_into_workarea`, each gave `could not save` and left no folder.
 - **Inc 1:** the stored `current_project_dir` is the built path. I did not re-test the 259/260 path limit: it ran in round 1, and fix pass 1 does not touch that check.
+
+---
+
+## Round 3: fix pass 3, the rollback walker (bounded, operator decision at the iteration cap)
+
+| Field | Value |
+|---|---|
+| **Subject** | `walk_tree_no_links` in `workspace.py`, the one tree walk that never follows a link. The pre-save snapshot (`_project_tree_snapshot`) and the rollback (`_abort_save`) both use it. It replaces the `rglob` walk that code-reviewer R3-1 (HIGH) showed descending into junctions on Python 3.11. The worktree is uncommitted. |
+| **Execution** | The probe ran on **Python 3.11.15** (`C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`, `os.path.isjunction present: False`, Textual 8.2.8) against the worktree, which was first on `sys.path`. It printed `s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py`. It drives the real `_handle_save_dialog` inside `run_test`. The forced failure sits at the manifest write, which comes after the snapshot and the image placement. Just before that failure, a hook plants links and files to simulate changes made during the save. Script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\sec_inc2_r3_probe.py` / `.out`. At the end the probe removed its junctions (`rmdir`) and symlinks and lifted the ACL deny. The scratch folder `scratchpad\inc2r3work` was held back only by the app's open log file. I confirmed it held no link, then removed it by its literal path. I did not edit the worktree. |
+| **VERDICT** | **`PASS-WITH-NOTES`** (0 HIGH). R3-1's class is closed on 3.11: in every probe the rollback neither entered a reparse point nor touched its target. **One MAJOR (SEC2-5)** remains in the rollback's design. It is not a reparse-point problem: the rollback can delete pre-existing user files **inside** the project. It goes to the operator for a decision under the bounded round. This verdict authorises nothing beyond the increment gate and is not the operator's authorization. |
+
+### The five probes asked for (Python 3.11, executed)
+
+| case | result |
+|---|---|
+| **Walker unit test** (loop, outbound junction, dangling junction, file symlink, directory symlink) | The walk gave `['a', 'a/b', 'a/b/f.txt', 'dang', 'dlink', 'ext', 'flink.s19', 'loop']`. Each link is yielded as a leaf and never entered (`entered a link target: False`). The walk ends on the loop. |
+| **1. Junction out of the project; a file appears outside during the save** | The pre-existing `ab/ext` junction to `outside` was **kept**, still as a junction. The junction `newj`, also to `outside` and created during the save, was **removed as a link only**. `outside` kept `victim.txt` and `appeared.txt`. |
+| **2. Symlink to a file outside** | The pre-existing `pre_link.s19` was kept. The file symlink `new_link.s19` and the directory symlink `new_dlink`, both created during the save, were removed. The target `victim_file.s19` was intact. |
+| **3. Junction loop** | The pre-existing `ab/loop → ab` was kept. The loop `patches/loop2 → ab`, created during the save, was removed. The rollback finished, and `patches` still held `keep.json`. |
+| **4. Dangling junction** | The pre-existing `dang_pre` was kept. `dang_new`, created during the save, was removed. |
+| **5. Deep tree** | A pre-existing 20-level tree kept its file. A 20-level tree created during the save was removed bottom-up. A 70-level tree was cut off at MAX_PATH (264 characters, `LongPathsEnabled = 0`). The walker listed the 61 entries that exist and skips anything it cannot list, the same way in the snapshot and in the rollback. |
+| **Created-folder rollback** (the `rmtree` path) | A junction to `outside`, planted inside the new folder `fresh` during the save, did not stop `fresh` being removed, and `outside` was intact. Python 3.11's `rmtree` unlinks a directory junction without entering it. |
+
+**Can the rollback delete *through* a reparse point, or delete its target?** No. A new reparse point is removed with `rmdir()` (directory or junction, through `is_dir()`) or with `unlink()` (a file symlink, or a dangling junction). On Windows both remove only the link. Reparse points are never pushed onto the walk stack, so nothing under a link target is ever a removal candidate. One edge was not probed: a pre-existing real directory swapped for a junction during the save. Its path is in the snapshot, so it is skipped and not removed; only new entries under it could be candidates, and the walker does not enter it.
+
+### Findings, round 3
+
+| id | severity | location | finding | executed evidence | what closes it |
+|---|---|---|---|---|---|
+| SEC2-5 | **MAJOR** | `workspace.walk_tree_no_links` (`except OSError: continue` on `os.scandir`), used by `_project_tree_snapshot` and by the rollback in `_abort_save` | **If the snapshot cannot list a folder, the rollback can delete the pre-existing files in it.** The snapshot silently skips any folder it cannot list. The rollback then treats *everything* it can list but the snapshot did not record as written by this save, and deletes it. If a folder in an existing project could not be listed when the snapshot ran but can be listed by rollback time, every pre-existing file in it is deleted. Examples: an ACL change, a transient antivirus or sync lock, a cloud-placeholder folder. Those are the user's own patches, checks and reports, deleted with no confirmation and no trace. | `executed` (R7): `deny on ab/patches: True`, the deny was lifted in the hook before the failure, and the result was `ab/patches/keep.json after rollback: False`. | Delete only what **this save wrote**: the paths the placements and the gather actually **wrote** (`PlacementResult.reused` false, `GatherOutcome` written), each skipped if it appears in a full-path snapshot. Never treat the difference between the snapshot and the current tree as "written by this save". If the diff design stays, the snapshot must fail closed: `walk_tree_no_links` reports listing errors, and the save refuses with the `could not save` tokens **before** placing anything when the snapshot is incomplete. TC arm: R7 (a read-denied `patches/` at snapshot time, then lifted) leaves `keep.json` present. |
+| SEC2-6 | MINOR | the same diff-based rollback | A file that another writer creates inside the project during the save is deleted by the rollback. Examples: a second app instance, the user copying a file in, a flow run. The window is short, and the file is inside the work area. | `executed` (R8): `user_added.json after rollback: False`. | The same change closes it: delete only the paths this save wrote. |
+| SEC2-4 (round 2) | **closed** | — | The rollback now covers gather placements and keeps pre-existing identical files by full relative path. R1–R5 show pre-existing entries in sub-folders kept and new ones removed. The full-path snapshot is how it is done; SEC2-5 is the caveat on how that snapshot is taken. | R5 (pre-existing deep file kept, new deep tree removed). | — |
+
+### Evidence checklist (round 3)
+
+- [x] Executed on Python 3.11.15, where `is_junction` is missing, against the worktree, with `s19_app.__file__` printed.
+- [x] All five requested cases, plus the created-folder `rmtree` path, the read-denied snapshot (R7) and a concurrent writer (R8).
+- [x] No file outside the project was deleted in any probe (`outside final: ['appeared.txt', 'appeared2.txt', 'victim.txt', 'victim_file.s19']`).
+- [x] Each finding has what, where, why, a recommendation and a severity: 0 HIGH, 1 MAJOR, 1 MINOR.
+- [x] The worktree was not edited. Junctions, symlinks and the ACL deny were removed or lifted, and the scratch folder was removed.

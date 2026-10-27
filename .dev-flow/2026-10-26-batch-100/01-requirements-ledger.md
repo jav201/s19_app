@@ -658,3 +658,21 @@ above this line is ever edited._
 - **Why:** the operator's rule is that nothing is lost or altered silently. A failed save must leave the app and the disk exactly as they were. These are orchestrator rulings under the batch's standing authorization.
 - **Evidence:** `03-increments/review-increment-002.md` F1, F4, F5, F7; `03-increments/security-increment-002.md` SEC2-3.
 
+### LED-2026-10-26-batch-100.53 — Inc 2 redesign: a failed save removes exactly what it created, never "what the snapshot lacks"
+- **Requirement:** LLR-164.4
+- **Date:** 2026-10-26
+- **What changed:** LED .52 (b) is narrowed. A failed Save project removes exactly the files THIS save created and nothing else:
+  - the placements whose `PlacementResult.reused` is False;
+  - the files the gather wrote. `GatherOutcome` gains the list of files it actually wrote, not those it reused.
+  - It also removes the folders this save created, if they end up empty.
+  - The rollback walks no folder to decide what to delete. The recursive tree snapshot is dropped from the rollback.
+  - `walk_tree_no_links` stays in `workspace.py` for Inc 8b's save-as (LLR-171.1).
+  - The app-state restore of LED .52 (b) is unchanged.
+  - Inc 2's file set adds `project_gather_service.py`, for 3 files.
+- **Closes:**
+  - security-reviewer Inc 2 round 3 SEC2-5 (MAJOR): an incomplete snapshot (an unreadable folder) led the rollback to delete pre-existing user files. Executed: `ab/patches/keep.json` was deleted.
+  - SEC2-6: a file another writer added during the save was deleted.
+  - Both close by construction.
+- **Why:** the operator's decision at the stop that the bounded pass triggered ("Lista exacta"). It was asked at the gate on 2026-10-26.
+- **Evidence:** `03-increments/security-increment-002.md` Round 3; `03-increments/review-increment-002.md` Round 4.
+
