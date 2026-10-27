@@ -714,7 +714,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-164.2 — Q-2: clash, merge and the open project
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.23
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.52
 - **Statement:** `_handle_save_dialog` shall decide by Q-2. A project is a direct child of this work area holding a `project.json` or a data file, not a reserved home and not a link. (a) A disguised clash — the sanitised name equals a project's folder name compared case-folded while the typed name differs from it — shall be refused before writing, with the `already a project` and `choose another name` tokens naming both names. (b) A name equal to a project that is not open shall merge: it keeps the target's other keys and variants, adds the new files as variants (LLR-005.1), rewrites `project.json` through the seam carrying every key it does not own (the LLR-168.3 rule), and sets `active_variant` per D2; sub-folders and the target's document are untouched; if the merge fails, the files it placed are removed and listed in the status. (c) A name equal to the open project, typed exactly or as its unsanitised form, shall save into the open project. A target folder that is a link or junction is refused before `resolve()` with the `link or junction` tokens. The completed save's status shall name the folder written.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-05 — `pytest tests/test_b100_save_guards.py -k tc_b100_05`
@@ -734,7 +734,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-164.4 — A refused or failed save leaves no folder it created
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.19
+- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.52
 - **Statement:** Every statement of `_handle_save_dialog` and of the Save worker body (LLR-177.1) after the folder's creation — validation, the copies, the save-as walk, the emit and the manifest write — shall run under one `OSError` handler that reports the error with the `could not save` tokens and calls `_remove_created_project_dir` (`app.py:8076`) in the path where the failure happens, removing only a folder this call created; every `return` after the creation that does not complete the save shall also call it.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-07 — `pytest tests/test_b100_save_guards.py -k tc_b100_07` (an AST census over the handler's and the worker body's returns and exception exits, plus one behavioural arm per stage)

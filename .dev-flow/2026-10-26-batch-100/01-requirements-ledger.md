@@ -647,3 +647,14 @@ above this line is ever edited._
 - **Why:** this is the orchestrator's ruling under the batch's standing authorization ("never lose silently"). The status line already exists, and no new glyph or pane is added.
 - **Evidence:** `02-review.md` QA-03; ARQ §2.3.
 
+### LED-2026-10-26-batch-100.52 — Inc 2 gate: the open project's name ignores case; a failed save removes the files it placed; "P2 open" means another project
+- **Requirement:** LLR-164.2, LLR-164.4
+- **Date:** 2026-10-26
+- **What changed:**
+  - **(a)** When a project is open, a typed name equal to its on-disk folder name ignoring case, or to its unsanitised form, is a save into that open project under its ON-DISK name. `current_project` keeps the on-disk spelling and no folder is renamed. A case-only match against ANOTHER project is still a disguised clash.
+  - **(b)** A failed Save project removes every file it placed during that save, including in a folder that already existed. It also restores the app's variant set and current variant to their state before the save. Only the full merge carry of `gathered` and `active_document` stays at Inc 8a.
+  - **(c)** HLR-164's acceptance phrase "P2 open" means another project (E4's P2, `prg.s19`) is open. AT-B100-02 drives that case by keys.
+- **Closes:** code-reviewer Inc 2 F1 (HIGH: app state points at the deleted folder after a failed save), F4, F5 and F7, and security-reviewer Inc 2 SEC2-3.
+- **Why:** the operator's rule is that nothing is lost or altered silently. A failed save must leave the app and the disk exactly as they were. These are orchestrator rulings under the batch's standing authorization.
+- **Evidence:** `03-increments/review-increment-002.md` F1, F4, F5, F7; `03-increments/security-increment-002.md` SEC2-3.
+
