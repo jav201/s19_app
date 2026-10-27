@@ -1,0 +1,4 @@
+cmd: python -m pytest -q -p no:cacheprovider -k census tests (fix pass 2)
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed, 3784 deselected in 92.28s (0:01:32)

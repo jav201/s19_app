@@ -1,0 +1,117 @@
+pre-mutation sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
+mutant sha256: 0792ab871dd5246af57e1161fe4de481141b555408d97918a397431fb64249ce
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+ below starts with the rail key ``1``.
+                assert await pilot.click("#patch_tab_inspector"), (
+                    "click missed #patch_tab_inspector"
+                )
+                await pilot.pause()
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's paste buffer —
+                # P1's draft must not survive into P2's session.
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).text == "",
+                    "the paste buffer cleared by the reset",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●. The
+                # marker repaint is deferred until after the buffer's change
+                # message, so it is polled, not read once.
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "0 entries"
+                        in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                        and "●"
+                        not in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                    ),
+                    "the clean '0 entries' subtitle after the load-over",
+                )
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line. This pins HLR-165's
+                # observable, NOT LLR-165.1's repaint clause: deleting the
+                # seam's refresh_entries call is an EQUIVALENT mutant (the
+                # reviewer's R8b survives) because the install's deferred
+                # chain repaints the ledger anyway.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:915: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_03_project_load_over_unsaved_work_saves_only_p2.<locals>._drive.<locals>.<lambda> at 0x00000149969BBE20>
+description = 'the P2 save success line', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the P2 save success line
+
+tests\test_b100_session_reset.py:128: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+4 failed, 13 passed in 96.53s (0:01:36)
+mutant run exit: 1
+restored sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
+RESTORE OK

@@ -1,0 +1,83 @@
+pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+mutant sha256: 1302e85dd12d04a1078e4c8f95b97ceb6f13605050ea0de41094b0a63b7f2264
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+....FF...........                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_09_two_cold_loads_have_equal_snapshots _____________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-14/test_tc_b100_09_two_cold_loads0')
+
+    def test_tc_b100_09_two_cold_loads_have_equal_snapshots(tmp_path: Path) -> None:
+        """Two cold loads of the SAME project -> 0 differing names. This arm
+        is the stat-key normaliser proof (QA R2-07): an un-normalised snapshot
+        differs here in ``_mac_view_cache_key`` / ``_a2l_enriched_key``
+        (id-keyed) — QA's probe — and in ``_a2l_cache_key`` (mtime-keyed)."""
+    
+        base = tmp_path / "app"
+        _seed_project_p1(_workarea(base))
+        first = _cold_snapshot(base, P1_NAME)
+        second = _cold_snapshot(base, P1_NAME)
+        differing = {
+            name for name in first if first[name] != second.get(name)
+        } | (set(second) - set(first))
+>       assert not differing, f"cold-vs-cold differing names: {sorted(differing)}"
+E       AssertionError: cold-vs-cold differing names: ['_a2l_enriched_key', '_mac_view_cache_key']
+E       assert not {'_a2l_enriched_key', '_mac_view_cache_key'}
+
+tests\test_b100_session_reset.py:343: AssertionError
+________ test_tc_b100_09_load_over_matches_cold_outside_the_allow_list ________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-14/test_tc_b100_09_load_over_matc0')
+
+    def test_tc_b100_09_load_over_matches_cold_outside_the_allow_list(
+        tmp_path: Path,
+    ) -> None:
+        """A load of P2 over P1 differs from a cold P2 load ONLY in the
+        declared K1/K2 allow-list — 0 LEAK names outside it (the p03
+        sequence; A-07's derived-domain check). P1's session is first given
+        non-default values for every S5-S12 name the scenario does not touch
+        (F1): the comparison must see the reset of the CRC template, the
+        comparison/check spec, the flow run, the execution and the report
+        filter — deleting those reset lines surfaces here (reviewer R6)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                # Non-default S5-S12 + A-07 state, then outgoing unsaved
+                # work, then the load-over.
+                _seed_p1_derived_state(app, workarea)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                return app._session_snapshot()
+    
+        warm = asyncio.run(_drive())
+        cold = _cold_snapshot(base, P2_NAME)
+        differing = {
+            name
+            for name in cold
+            if cold[name] != warm.get(name)
+        } | (set(warm) - set(cold))
+        leaks = differing - SNAPSHOT_ALLOW_LIST
+>       assert not leaks, (
+            "LEAK " + ", ".join(f"{n}: cold={cold.get(n)!r} warm={warm.get(n)!r}" for n in sorted(leaks))
+        )
+E       AssertionError: LEAK _mac_view_cache_key: cold=[1189554705680, 0, 140707802639056, 's19', [[6112, 6113], [6120, 6122], [6128, 6138], [60160, 60162], [60164, 60167], [60168, 64046], [64688, 64748], [64760, 64768], [65469, 65470], [65471, 65472], [65534, 65536]], 3968] warm=[1189554306000, 0, 140707802639056, 's19', [[6112, 6113], [6120, 6122], [6128, 6138], [60160, 60162], [60164, 60167], [60168, 64046], [64688, 64748], [64760, 64768], [65469, 65470], [65471, 65472], [65534, 65536]], 3968]
+E       assert not {'_mac_view_cache_key'}
+
+tests\test_b100_session_reset.py:384: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_two_cold_loads_have_equal_snapshots
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+2 failed, 15 passed in 92.93s (0:01:32)
+mutant run exit: 1
+restored sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+RESTORE OK

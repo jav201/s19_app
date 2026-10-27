@@ -1,0 +1,4 @@
+cmd: base dad6423 — test_at078b_zero_total up to 15x until the pre-existing single-pause race fires
+tree: BASE via 'git show'
+
+run 1: 1 failed in 1.96s

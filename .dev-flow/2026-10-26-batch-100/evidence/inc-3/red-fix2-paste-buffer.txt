@@ -1,0 +1,402 @@
+RED fix pass 2 — command: python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2
+tree: worktree s19_app-b100-inc3 @ dad6423 + Inc 3 + fix pass 1 (app.py pre-fix2 sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e)
+expect: both sizes FAIL on 'timed out waiting for the paste buffer cleared by the reset' (review finding R2-1: mark_loaded does not clear the buffer)
+===
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28776/test_at_b100_03_project_load_o0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # A P1 draft in the paste buffer, typed through the panel's
+                # own TextArea (writer w2 marks the panel dirty). The buffer
+                # lives in the panel's JSON view, so the JSON tab chip is
+                # clicked first — the shipped surface a user takes. LED
+                # .55(b) says the reset clears the buffer too: without the
+                # pre-load non-empty assertion the post-load empty assertion
+                # would pass even if the buffer had never held the draft.
+                assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).region.width > 0,
+                    "the JSON view's paste buffer to become visible",
+                )
+                assert await pilot.click("#patch_paste_text"), (
+                    "click missed #patch_paste_text"
+                )
+                await pilot.press(*"P1 DRAFT")
+                paste_buffer = app.query_one("#patch_paste_text", TextArea)
+                assert "P1 DRAFT" in paste_buffer.text, repr(paste_buffer.text)
+                # Back to the Inspector tab: the TextArea holds the keyboard,
+                # and the load-over below starts with the rail key ``1``.
+                assert await pilot.click("#patch_tab_inspector"), (
+                    "click missed #patch_tab_inspector"
+                )
+                await pilot.pause()
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's paste buffer —
+                # P1's draft must not survive into P2's session.
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).text == "",
+                    "the paste buffer cleared by the reset",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●. The
+                # marker repaint is deferred until after the buffer's change
+                # message, so it is polled, not read once.
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "0 entries"
+                        in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                        and "●"
+                        not in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                    ),
+                    "the clean '0 entries' subtitle after the load-over",
+                )
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line. This pins HLR-165's
+                # observable, NOT LLR-165.1's repaint clause: deleting the
+                # seam's refresh_entries call is an EQUIVALENT mutant (the
+                # reviewer's R8b survives) because the install's deferred
+                # chain repaints the ledger anyway.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:870: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_03_project_load_over_unsaved_work_saves_only_p2.<locals>._drive.<locals>.<lambda> at 0x0000020225E3FD80>
+description = 'the paste buffer cleared by the reset', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the paste buffer cleared by the reset
+
+tests\test_b100_session_reset.py:128: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28776/test_at_b100_03_project_load_o1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # A P1 draft in the paste buffer, typed through the panel's
+                # own TextArea (writer w2 marks the panel dirty). The buffer
+                # lives in the panel's JSON view, so the JSON tab chip is
+                # clicked first — the shipped surface a user takes. LED
+                # .55(b) says the reset clears the buffer too: without the
+                # pre-load non-empty assertion the post-load empty assertion
+                # would pass even if the buffer had never held the draft.
+                assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).region.width > 0,
+                    "the JSON view's paste buffer to become visible",
+                )
+                assert await pilot.click("#patch_paste_text"), (
+                    "click missed #patch_paste_text"
+                )
+                await pilot.press(*"P1 DRAFT")
+                paste_buffer = app.query_one("#patch_paste_text", TextArea)
+                assert "P1 DRAFT" in paste_buffer.text, repr(paste_buffer.text)
+                # Back to the Inspector tab: the TextArea holds the keyboard,
+                # and the load-over below starts with the rail key ``1``.
+                assert await pilot.click("#patch_tab_inspector"), (
+                    "click missed #patch_tab_inspector"
+                )
+                await pilot.pause()
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's paste buffer —
+                # P1's draft must not survive into P2's session.
+                await _wait_for(
+                    pilot,
+                    lambda: app.query_one("#patch_paste_text", TextArea).text == "",
+                    "the paste buffer cleared by the reset",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●. The
+                # marker repaint is deferred until after the buffer's change
+                # message, so it is polled, not read once.
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "0 entries"
+                        in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                        and "●"
+                        not in (
+                            app.query_one("#patch_win_script", Container).border_subtitle
+                            or ""
+                        )
+                    ),
+                    "the clean '0 entries' subtitle after the load-over",
+                )
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line. This pins HLR-165's
+                # observable, NOT LLR-165.1's repaint clause: deleting the
+                # seam's refresh_entries call is an EQUIVALENT mutant (the
+                # reviewer's R8b survives) because the install's deferred
+                # chain repaints the ledger anyway.
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:870: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_03_project_load_over_unsaved_work_saves_only_p2.<locals>._drive.<locals>.<lambda> at 0x0000020228F72480>
+description = 'the paste buffer cleared by the reset', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the paste buffer cleared by the reset
+
+tests\test_b100_session_reset.py:128: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+2 failed in 47.77s

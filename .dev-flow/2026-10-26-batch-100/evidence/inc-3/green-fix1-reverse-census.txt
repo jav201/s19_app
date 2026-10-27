@@ -1,0 +1,4 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b97_patch_editor.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_variant.py
+tree: fix-pass worktree; reverse census of the files that own the panel the seam now mark_loaded()s + the §5.4 population
+..................................................................       [100%]
+66 passed in 357.75s (0:05:57)

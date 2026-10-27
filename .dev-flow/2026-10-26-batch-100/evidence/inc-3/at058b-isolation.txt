@@ -1,0 +1,15 @@
+# tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent, 5 runs alone per tree; env PYTHONPATH=tree, NO_COLOR unset
+== tree /c/Users/jjgh8/Github/s19_app-b100-inc3 (dad6423, inc3 working changes if worktree)
+1 passed in 1.93s
+1 passed in 2.03s
+1 passed in 2.13s
+1 passed in 2.03s
+1 passed in 2.04s
+== tree /c/Users/jjgh8/Github/s19_app (a1fbfe0, inc3 working changes if worktree)
+1 passed in 2.24s
+1 passed in 2.11s
+1 passed in 2.03s
+1 passed in 2.12s
+1 passed in 2.42s
+== census sweep again on inc3 tree
+87 passed, 3784 deselected in 86.61s (0:01:26)

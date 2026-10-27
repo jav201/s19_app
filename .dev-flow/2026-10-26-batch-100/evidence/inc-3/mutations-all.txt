@@ -1,0 +1,402 @@
+=== m1-order ===
+pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+mutant sha256: 57cad0d8400f84243e34d34519fe1cc30184f378b4646e9b8d0c946bb9c9ddcf
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_08 or tc_b100_09_load_over
+F...F                                                                    [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_08_reset_runs_once_before_the_first_install ___________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-6/test_tc_b100_08_reset_runs_onc0')
+
+    def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> None:
+        """One call per project load, ordered before the first install; P1's
+        two installs (S19 then MAC) both follow it. A load of the SAME project
+        again is a load-over — still exactly one reset."""
+    
+        async def _drive() -> list[str]:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            events: list[str] = []
+            original_reset = getattr(app, "_reset_project_session", None)
+            original_load = app.load_selected_file
+    
+            def _recording_reset() -> int:
+                events.append("reset")
+                if original_reset is None:
+                    return 0
+                return original_reset()
+    
+            def _recording_load(path, a2l_files=None) -> None:
+                events.append("install")
+                original_load(path, a2l_files)
+    
+            app._reset_project_session = _recording_reset
+            app.load_selected_file = _recording_load
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+            return events
+    
+        events = asyncio.run(_drive())
+        assert events.count("reset") == 2, events
+>       assert events[0] == "reset", events
+E       AssertionError: ['install', 'reset', 'install', 'install', 'reset', 'install']
+E       assert 'install' == 'reset'
+E         
+E         - reset
+E         + install
+
+tests\test_b100_session_reset.py:194: AssertionError
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-6/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names, asserted directly: after P2 loads over
+        P1 (+1 unsaved entry), the session holds none of P1's attachments,
+        parsed A2L, change entries or declared regions. RED at base: every one
+        of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+>       assert loaded is not None and loaded.path.name == "prg.s19"
+E       assert (None is not None)
+
+tests\test_b100_session_reset.py:370: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+2 failed, 3 passed, 11 deselected in 25.31s
+mutant run exit: 1
+restored sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+RESTORE OK
+harness exit: 0
+=== m2-reset-line ===
+pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+mutant sha256: 89b535962a8744eafc5ae14f3140454dab9585cb66ac547a4813e82ff8830d42
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_load_over
+on_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual'], ['access', 'address', 'axis_meta', 'bit_org', 'byte_size', 'char_type', 'compu_method_name', 'compu_method_unit', 'conversion', 'conversion_error', 'conversion_status', 'datatype', 'decode_endian', 'decode_error', 'decode_type', 'deposit', 'description', 'display_identifier', 'effective_byte_order', 'element_count', 'endian', 'function_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual'], ['access', 'address', 'axis_meta', 'bit_org', 'byte_size', 'char_type', 'compu_method_name', 'compu_method_unit', 'conversion', 'conversion_error', 'conversion_status', 'datatype', 'decode_endian', 'decode_error', 'decode_type', 'deposit', 'description', 'display_identifier', 'effective_byte_order', 'element_count', 'endian', 'function_group', 'in_memory', 'length', 'link_map', 'lower_limit', 'matrix_dim', 'max_diff', 'memory_checked', 'memory_region', 'missing_ranges', 'name', 'overlap_conflict', 'physical_value', 'raw_available', 'raw_bytes', 'raw_value', 'reason', 'record_layout_name', 'schema_ok', 'section', 'source', 'symbol_link', 'unit', 'upper_limit', 'valid', 'value_outside_limits', 'virtual']], _a2l_row_key_to_tag: cold=[] warm=['a2l:0', 'a2l:1', 'a2l:2'], _a2l_summary_lines: cold=[] warm=['A2L Sections:', '- PROJECT CASE01 "Synthetic project for S19Tool stress testing" (lines 1-53)', '  - HEADER (lines 2-5)', '  - MODULE BASIC "Synthetic ECU module" (lines 7-52)', '    - MOD_COMMON "" (lines 8-14)', '    - MOD_PAR "" (lines 16-18)', '    - RECORD_LAYOUT RL_U8 (lines 20-22)', '    - RECORD_LAYOUT RL_U16 (lines 24-26)', '    - RECORD_LAYOUT RL_U32 (lines 28-30)', '    - COMPU_METHOD CM_IDENT "%6.2" IDENTICAL "%6.2" "" (lines 32-34)', '    - CHARACTERISTIC CAL_BLOCK_A "CAL_BLOCK_A synthetic characteristic" (lines 36-38)', '    - CHARACTERISTIC CAL_BLOCK_B "CAL_BLOCK_B synthetic characteristic" (lines 39-41)', '    - MEASUREMENT MEAS_STATUS "MEAS_STATUS synthetic measurement" (lines 42-45)', '    - GROUP GRP_BASIC "GRP_BASIC group" (lines 46-51)', '      - REF_CHARACTERISTIC (lines 47-50)', '', 'A2L Tags:', '- CHARACTERISTIC CAL_BLOCK_A: 0x80000010 len=1 mem=unknown OUT(image)', '- CHARACTERISTIC CAL_BLOCK_B: 0x80000040 len=1 mem=unknown OUT(image)', '- MEASUREMENT MEAS_STATUS: 0x80000000 len=1 mem=unknown OUT(image)'], _validation_issues: cold=[] warm=['ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue', 'ValidationIssue'], current_a2l_data: cold=None warm=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'], current_a2l_path: cold=None warm='.s19tool/workarea/P1/firmware.a2l'
+E       assert not {'_a2l_enriched_key', '_a2l_enriched_tags', '_a2l_filtered_tags', '_a2l_row_key_to_tag', '_a2l_summary_lines', '_validation_issues', ...}
+
+tests\test_b100_session_reset.py:341: AssertionError
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-7/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names, asserted directly: after P2 loads over
+        P1 (+1 unsaved entry), the session holds none of P1's attachments,
+        parsed A2L, change entries or declared regions. RED at base: every one
+        of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+        assert loaded is not None and loaded.path.name == "prg.s19"
+        assert loaded.mac_path is None, "LEAK mac_path"
+        assert loaded.mac_records == [], "LEAK mac_records"
+>       assert loaded.a2l_path is None, "LEAK a2l_path"
+E       AssertionError: LEAK a2l_path
+E       assert WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-7/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/firmware.a2l') is None
+E        +  where WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-7/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/firmware.a2l') = LoadedFile(path=WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-7/test_tc_b100_09_load_over_leav0/app/.s19tool/w...=65534, end=65536, sample_count=2, entropy=1.0, band='low', low_confidence=True)], out_of_order_count=4, entry_point=0).a2l_path
+
+tests\test_b100_session_reset.py:373: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+2 failed, 14 deselected in 16.49s
+mutant run exit: 1
+restored sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+RESTORE OK
+harness exit: 0
+=== m3-domain ===
+pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+mutant sha256: c9e933d78b50bd108a71968a47741136b3c7fa7970e4f1e1514c5bfdeea3621f
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_09_domain
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_09_domain_matches_the_live_source_census ____________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-8/test_tc_b100_09_domain_matches0')
+
+    def test_tc_b100_09_domain_matches_the_live_source_census(tmp_path: Path) -> None:
+        """The snapshot domain is the source census minus the declared
+        exclusions: >= 60 names, 0 unclassified (every census name is in the
+        snapshot or in the exclusion list, each with a reason)."""
+    
+        census = _source_census()
+        assert len(census) >= 60, len(census)
+        for name, reason in SNAPSHOT_EXCLUSIONS.items():
+            assert reason.strip(), f"exclusion {name!r} needs its reason"
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                return app._session_snapshot()
+    
+        snapshot = asyncio.run(_drive())
+        covered = set(snapshot) | set(SNAPSHOT_EXCLUSIONS)
+        unclassified = census - covered
+>       assert not unclassified, f"unclassified census names: {sorted(unclassified)}"
+E       AssertionError: unclassified census names: ['_last_template_path']
+E       assert not {'_last_template_path'}
+
+tests\test_b100_session_reset.py:276: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+1 failed, 15 deselected in 2.68s
+mutant run exit: 1
+restored sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+RESTORE OK
+harness exit: 0
+=== m4-service ===
+pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+mutant sha256: 7c1721d76cbfac0474053cb7fe6f8ec0740322b6d0087c682087f7031edb25fd
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_10 or tc_b100_09_load_over
+ for name in cold
+            if cold[name] != warm.get(name)
+        } | (set(warm) - set(cold))
+        leaks = differing - SNAPSHOT_ALLOW_LIST
+>       assert not leaks, (
+            "LEAK " + ", ".join(f"{n}: cold={cold.get(n)!r} warm={warm.get(n)!r}" for n in sorted(leaks))
+        )
+E       AssertionError: LEAK _change_service: cold=('ChangeService', 0, 0, 0) warm=('ChangeService', 1, 1, 0)
+E       assert not {'_change_service'}
+
+tests\test_b100_session_reset.py:341: AssertionError
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-9/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names, asserted directly: after P2 loads over
+        P1 (+1 unsaved entry), the session holds none of P1's attachments,
+        parsed A2L, change entries or declared regions. RED at base: every one
+        of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+        assert loaded is not None and loaded.path.name == "prg.s19"
+        assert loaded.mac_path is None, "LEAK mac_path"
+        assert loaded.mac_records == [], "LEAK mac_records"
+        assert loaded.a2l_path is None, "LEAK a2l_path"
+        assert loaded.a2l_data is None, "LEAK a2l_data"
+        assert app.current_a2l_path is None, "LEAK current_a2l_path"
+        assert app.current_a2l_data is None, "LEAK current_a2l_data"
+>       assert len(app._change_service.document.entries) == 0, "LEAK change_entries"
+E       AssertionError: LEAK change_entries
+E       assert 1 == 0
+E        +  where 1 = len([ChangeEntry(entry_type='bytes', address=2147483772, encoded_bytes=(222, 173, 190, 239), value=None, status=<MemoryStatus.OUTSIDE: 'outside'>, symbol=None)])
+E        +    where [ChangeEntry(entry_type='bytes', address=2147483772, encoded_bytes=(222, 173, 190, 239), value=None, status=<MemoryStatus.OUTSIDE: 'outside'>, symbol=None)] = ChangeDocument(format='s19app-changeset', version='2.0', kind='change', encoding='utf-8', value_mode='text', entries=[...(222, 173, 190, 239), value=None, status=<MemoryStatus.OUTSIDE: 'outside'>, symbol=None)], issues=[], source_path=None).entries
+E        +      where ChangeDocument(format='s19app-changeset', version='2.0', kind='change', encoding='utf-8', value_mode='text', entries=[...(222, 173, 190, 239), value=None, status=<MemoryStatus.OUTSIDE: 'outside'>, symbol=None)], issues=[], source_path=None) = <s19_app.tui.services.change_service.ChangeService object at 0x0000020D143BB450>.document
+E        +        where <s19_app.tui.services.change_service.ChangeService object at 0x0000020D143BB450> = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._change_service
+
+tests\test_b100_session_reset.py:377: AssertionError
+__________________ test_tc_b100_10_change_service_is_rebound __________________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-9/test_tc_b100_10_change_service0')
+
+    def test_tc_b100_10_change_service_is_rebound(tmp_path: Path) -> None:
+        """After a load over P1: a DIFFERENT service object, 0 document
+        entries, 0 undo steps, 0 redo steps, and an image generation equal to
+        the app's (re-pushed, not stale from the outgoing service)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            _seed_project_p1(_workarea(tmp_path / "app"))
+            _seed_project_p2(_workarea(tmp_path / "app"))
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                outgoing = app._change_service
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                depths = app._change_service.history_depths()
+                return (
+                    outgoing,
+                    app._change_service,
+                    len(app._change_service.document.entries),
+                    depths["back"],
+                    depths["forward"],
+                    app._change_service.image_generation,
+                    app._image_generation,
+                )
+    
+        (
+            outgoing,
+            rebound,
+            entries,
+            undo,
+            redo,
+            service_generation,
+            app_generation,
+        ) = asyncio.run(_drive())
+>       assert rebound is not outgoing, "the reset kept the old ChangeService"
+E       AssertionError: the reset kept the old ChangeService
+E       assert <s19_app.tui.services.change_service.ChangeService object at 0x0000020D143BB150> is not <s19_app.tui.services.change_service.ChangeService object at 0x0000020D143BB150>
+
+tests\test_b100_session_reset.py:447: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_change_service_is_rebound
+3 failed, 3 passed, 10 deselected in 38.90s
+mutant run exit: 1
+restored sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+RESTORE OK
+harness exit: 0
+=== m5-unload ===
+pre-mutation sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+mutant sha256: eeb079640c5840b1ff4b547e70ba05a709f9ca822523c86159a64e64d70c3cfe
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py -k tc_b100_11
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+______________ test_tc_b100_11_unload_all_clears_the_parsed_a2l _______________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-10/test_tc_b100_11_unload_all_cle0')
+
+    def test_tc_b100_11_unload_all_clears_the_parsed_a2l(tmp_path: Path) -> None:
+        """``_apply_unload("all")`` clears ``current_a2l_data`` beside the
+        path (P-25: at base the path alone is cleared, so the parsed payload
+        survives)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                assert app.current_a2l_data is not None, "arm setup: P1's A2L parsed"
+                app._apply_unload("all")
+                await _flush(pilot)
+                return app.current_a2l_path, app.current_a2l_data
+    
+        a2l_path, a2l_data = asyncio.run(_drive())
+        assert a2l_path is None, "unload all kept current_a2l_path"
+>       assert a2l_data is None, "unload all kept current_a2l_data (P-25)"
+E       AssertionError: unload all kept current_a2l_data (P-25)
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ndows\\Temp\\pytest-of-unknown\\pytest-10\\test_tc_b100_11_unload_all_cle0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:527: AssertionError
+___________ test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l ____________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-10/test_tc_b100_11_unload_a2l_alo0')
+
+    def test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l(tmp_path: Path) -> None:
+        """The ``"a2l"`` kind clears the parsed payload too — the boundary arm
+        (LLR-165.4's catalogue marks it)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                app._apply_unload("a2l")
+                await _flush(pilot)
+                return app.current_a2l_path, app.current_a2l_data
+    
+        a2l_path, a2l_data = asyncio.run(_drive())
+        assert a2l_path is None, "unload a2l kept current_a2l_path"
+>       assert a2l_data is None, "unload a2l kept current_a2l_data"
+E       AssertionError: unload a2l kept current_a2l_data
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ndows\\Temp\\pytest-of-unknown\\pytest-10\\test_tc_b100_11_unload_a2l_alo0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:547: AssertionError
+_______ test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags ________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-10/test_tc_b100_11_bare_s19_reloa0')
+
+    def test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags(
+        tmp_path: Path,
+    ) -> None:
+        """The contract threshold: load S19 + A2L, unload ``all``, load an S19
+        with no A2L -> 0 A2L tags. At base the surviving payload is attached
+        to the bare S19 through the parse fallback (``else
+        self.current_a2l_data``), so the tags survive -> RED."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                app._apply_unload("all")
+                await _flush(pilot)
+                app.load_selected_file(P2_SOURCE)
+                await _flush(pilot)
+                loaded = app.current_file
+                tags = 0 if loaded is None else len(loaded.a2l_data or {})
+                return app.current_a2l_data, tags
+    
+        a2l_data, tags = asyncio.run(_drive())
+>       assert a2l_data is None, "the bare S19 reload re-attached the stale A2L"
+E       AssertionError: the bare S19 reload re-attached the stale A2L
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ndows\\Temp\\pytest-of-unknown\\pytest-10\\test_tc_b100_11_bare_s19_reloa0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:574: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_unload_all_clears_the_parsed_a2l
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags
+3 failed, 13 deselected in 17.71s
+mutant run exit: 1
+restored sha256: ca8e539b4c8c3c812e9460ac88d72c32e62e9a79c180646d29c3f6d9b62f6c45
+RESTORE OK
+harness exit: 0

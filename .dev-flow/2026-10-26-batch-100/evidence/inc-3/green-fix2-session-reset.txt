@@ -1,0 +1,4 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py (FULL module, fix pass 2 tree)
+app.py sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
+.................                                                        [100%]
+17 passed in 107.65s (0:01:47)

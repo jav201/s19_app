@@ -1,0 +1,679 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3 python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3 (base dad6423, app.py UNMODIFIED — RED run)
+
+F.FFFFFFF.FFFFFF                                                         [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_08_reset_runs_once_before_the_first_install ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_08_reset_runs_onc0')
+
+    def test_tc_b100_08_reset_runs_once_before_the_first_install(tmp_path: Path) -> None:
+        """One call per project load, ordered before the first install; P1's
+        two installs (S19 then MAC) both follow it. A load of the SAME project
+        again is a load-over — still exactly one reset."""
+    
+        async def _drive() -> list[str]:
+            app = S19TuiApp(base_dir=tmp_path)
+            events: list[str] = []
+            original_reset = getattr(app, "_reset_project_session", None)
+            original_load = app.load_selected_file
+    
+            def _recording_reset() -> int:
+                events.append("reset")
+                if original_reset is None:
+                    return 0
+                return original_reset()
+    
+            def _recording_load(path, a2l_files=None) -> None:
+                events.append("install")
+                original_load(path, a2l_files)
+    
+            app._reset_project_session = _recording_reset
+            app.load_selected_file = _recording_load
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+            return events
+    
+        events = asyncio.run(_drive())
+>       assert events.count("reset") == 2, events
+E       AssertionError: []
+E       assert 0 == 2
+E        +  where 0 = <built-in method count of list object at 0x000002599ADDC580>('reset')
+E        +    where <built-in method count of list object at 0x000002599ADDC580> = [].count
+
+tests\test_b100_session_reset.py:192: AssertionError
+______________________ test_tc_b100_08_call_site_census _______________________
+
+    def test_tc_b100_08_call_site_census() -> None:
+        """Exactly one ``_reset_project_session`` call site in ``s19_app/`` —
+        inside ``_handle_load_project`` (an AST census over every product
+        module, so a second caller cannot hide in another file)."""
+    
+        import s19_app
+    
+        product_root = Path(s19_app.__file__).resolve().parent
+        callers = []
+        for source in sorted(product_root.rglob("*.py")):
+            tree = ast.parse(source.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+>               func = node.func
+                       ^^^^^^^^^
+E               AttributeError: 'Module' object has no attribute 'func'
+
+tests\test_b100_session_reset.py:240: AttributeError
+____________ test_tc_b100_09_domain_matches_the_live_source_census ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_domain_matches0')
+
+    def test_tc_b100_09_domain_matches_the_live_source_census(tmp_path: Path) -> None:
+        """The snapshot domain is the source census minus the declared
+        exclusions: >= 60 names, 0 unclassified (every census name is in the
+        snapshot or in the exclusion list, each with a reason)."""
+    
+        census = _source_census()
+        assert len(census) >= 60, len(census)
+        for name, reason in SNAPSHOT_EXCLUSIONS.items():
+            assert reason.strip(), f"exclusion {name!r} needs its reason"
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                return app._session_snapshot()
+    
+>       snapshot = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:271: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+>           return app._session_snapshot()
+                   ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'S19TuiApp' object has no attribute '_session_snapshot'
+
+tests\test_b100_session_reset.py:269: AttributeError
+_____________ test_tc_b100_09_two_cold_loads_have_equal_snapshots _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_two_cold_loads0')
+
+    def test_tc_b100_09_two_cold_loads_have_equal_snapshots(tmp_path: Path) -> None:
+        """Two cold loads of the SAME project -> 0 differing names. This arm
+        is the stat-key normaliser proof (QA R2-07): an un-normalised snapshot
+        differs here in ``_mac_view_cache_key`` / ``_a2l_enriched_key``
+        (id-keyed) — QA's probe — and in ``_a2l_cache_key`` (mtime-keyed)."""
+    
+        base = tmp_path / "app"
+        _seed_project_p1(_workarea(base))
+>       first = _cold_snapshot(base, P1_NAME)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_session_reset.py:288: in _cold_snapshot
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project(project)
+            await _flush(pilot)
+>           return app._session_snapshot()
+                   ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'S19TuiApp' object has no attribute '_session_snapshot'
+
+tests\test_b100_session_reset.py:286: AttributeError
+________ test_tc_b100_09_load_over_matches_cold_outside_the_allow_list ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_load_over_matc0')
+
+    def test_tc_b100_09_load_over_matches_cold_outside_the_allow_list(
+        tmp_path: Path,
+    ) -> None:
+        """A load of P2 over P1 differs from a cold P2 load ONLY in the
+        declared K1/K2 allow-list — 0 LEAK names outside it (the p03
+        sequence; A-07's derived-domain check)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                # Outgoing unsaved work, then the load-over.
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                return app._session_snapshot()
+    
+>       warm = asyncio.run(_drive())
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project(P1_NAME)
+            await _flush(pilot)
+            # Outgoing unsaved work, then the load-over.
+            app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+            app._handle_load_project(P2_NAME)
+            await _flush(pilot)
+>           return app._session_snapshot()
+                   ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'S19TuiApp' object has no attribute '_session_snapshot'
+
+tests\test_b100_session_reset.py:329: AttributeError
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names, asserted directly: after P2 loads over
+        P1 (+1 unsaved entry), the session holds none of P1's attachments,
+        parsed A2L, change entries or declared regions. RED at base: every one
+        of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+        assert loaded is not None and loaded.path.name == "prg.s19"
+>       assert loaded.mac_path is None, "LEAK mac_path"
+E       AssertionError: LEAK mac_path
+E       assert WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/firmware.mac') is None
+E        +  where WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/firmware.mac') = LoadedFile(path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_09_load_over_...=65534, end=65536, sample_count=2, entropy=1.0, band='low', low_confidence=True)], out_of_order_count=4, entry_point=0).mac_path
+
+tests\test_b100_session_reset.py:369: AssertionError
+__________________ test_tc_b100_10_change_service_is_rebound __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_10_change_service0')
+
+    def test_tc_b100_10_change_service_is_rebound(tmp_path: Path) -> None:
+        """After a load over P1: a DIFFERENT service object, 0 document
+        entries, 0 undo steps, 0 redo steps, and an image generation equal to
+        the app's (re-pushed, not stale from the outgoing service)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            _seed_project_p1(_workarea(tmp_path / "app"))
+            _seed_project_p2(_workarea(tmp_path / "app"))
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                outgoing = app._change_service
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                depths = app._change_service.history_depths()
+                return (
+                    outgoing,
+                    app._change_service,
+                    len(app._change_service.document.entries),
+                    depths["back"],
+                    depths["forward"],
+                    app._change_service.image_generation,
+                    app._image_generation,
+                )
+    
+        (
+            outgoing,
+            rebound,
+            entries,
+            undo,
+            redo,
+            service_generation,
+            app_generation,
+        ) = asyncio.run(_drive())
+>       assert rebound is not outgoing, "the reset kept the old ChangeService"
+E       AssertionError: the reset kept the old ChangeService
+E       assert <s19_app.tui.services.change_service.ChangeService object at 0x000002599EDC9B50> is not <s19_app.tui.services.change_service.ChangeService object at 0x000002599EDC9B50>
+
+tests\test_b100_session_reset.py:445: AssertionError
+___________________ test_tc_b100_10_interim_discard_notice ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_10_interim_discar0')
+
+    def test_tc_b100_10_interim_discard_notice(tmp_path: Path) -> None:
+        """LED-2026-10-26-batch-100.51: with N > 0 unsaved entries outgoing,
+        the project load's status names them — ``Discarded N unsaved Patch
+        Editor entries`` — so the reset's discard is never silent (Inc 10's
+        question replaces this line and re-pins this arm)."""
+    
+        app = _load_p1_add_entry_load_p2(tmp_path, entries=1)
+>       assert app.log_lines[-1] == "Discarded 1 unsaved Patch Editor entries", (
+            list(app.log_lines)
+        )
+E       AssertionError: ['Loaded firmware.mac (S19+MAC)', "Loaded project 'P1' -> firmware.s19 + firmware.mac", 'Loaded prg.s19 (S19+MAC: firmware.mac)', "Loaded project 'P2' -> prg.s19"]
+E       assert "Loaded proje...2' -> prg.s19" == 'Discarded 1 ...ditor entries'
+E         
+E         - Discarded 1 unsaved Patch Editor entries
+E         + Loaded project 'P2' -> prg.s19
+
+tests\test_b100_session_reset.py:460: AssertionError
+_____________ test_tc_b100_10_notice_names_every_discarded_entry ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_10_notice_names_e0')
+
+    def test_tc_b100_10_notice_names_every_discarded_entry(tmp_path: Path) -> None:
+        """The count is exact: 3 outgoing entries -> ``Discarded 3 ...``."""
+    
+        app = _load_p1_add_entry_load_p2(tmp_path, entries=3)
+>       assert app.log_lines[-1] == "Discarded 3 unsaved Patch Editor entries", (
+            list(app.log_lines)
+        )
+E       AssertionError: ['Loaded firmware.mac (S19+MAC)', "Loaded project 'P1' -> firmware.s19 + firmware.mac", 'Loaded prg.s19 (S19+MAC: firmware.mac)', "Loaded project 'P2' -> prg.s19"]
+E       assert "Loaded proje...2' -> prg.s19" == 'Discarded 3 ...ditor entries'
+E         
+E         - Discarded 3 unsaved Patch Editor entries
+E         + Loaded project 'P2' -> prg.s19
+
+tests\test_b100_session_reset.py:492: AssertionError
+______________ test_tc_b100_11_unload_all_clears_the_parsed_a2l _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_11_unload_all_cle0')
+
+    def test_tc_b100_11_unload_all_clears_the_parsed_a2l(tmp_path: Path) -> None:
+        """``_apply_unload("all")`` clears ``current_a2l_data`` beside the
+        path (P-25: at base the path alone is cleared, so the parsed payload
+        survives)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                assert app.current_a2l_data is not None, "arm setup: P1's A2L parsed"
+                app._apply_unload("all")
+                await _flush(pilot)
+                return app.current_a2l_path, app.current_a2l_data
+    
+        a2l_path, a2l_data = asyncio.run(_drive())
+        assert a2l_path is None, "unload all kept current_a2l_path"
+>       assert a2l_data is None, "unload all kept current_a2l_data (P-25)"
+E       AssertionError: unload all kept current_a2l_data (P-25)
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ocal\\Temp\\pytest-of-jjgh8\\pytest-28635\\test_tc_b100_11_unload_all_cle0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:525: AssertionError
+___________ test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_11_unload_a2l_alo0')
+
+    def test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l(tmp_path: Path) -> None:
+        """The ``"a2l"`` kind clears the parsed payload too — the boundary arm
+        (LLR-165.4's catalogue marks it)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                app._apply_unload("a2l")
+                await _flush(pilot)
+                return app.current_a2l_path, app.current_a2l_data
+    
+        a2l_path, a2l_data = asyncio.run(_drive())
+        assert a2l_path is None, "unload a2l kept current_a2l_path"
+>       assert a2l_data is None, "unload a2l kept current_a2l_data"
+E       AssertionError: unload a2l kept current_a2l_data
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ocal\\Temp\\pytest-of-jjgh8\\pytest-28635\\test_tc_b100_11_unload_a2l_alo0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:545: AssertionError
+_______ test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_tc_b100_11_bare_s19_reloa0')
+
+    def test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags(
+        tmp_path: Path,
+    ) -> None:
+        """The contract threshold: load S19 + A2L, unload ``all``, load an S19
+        with no A2L -> 0 A2L tags. At base the surviving payload is attached
+        to the bare S19 through the parse fallback (``else
+        self.current_a2l_data``), so the tags survive -> RED."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                _load_p1(app)
+                await _flush(pilot)
+                app._apply_unload("all")
+                await _flush(pilot)
+                app.load_selected_file(P2_SOURCE)
+                await _flush(pilot)
+                loaded = app.current_file
+                tags = 0 if loaded is None else len(loaded.a2l_data or {})
+                return app.current_a2l_data, tags
+    
+        a2l_data, tags = asyncio.run(_drive())
+>       assert a2l_data is None, "the bare S19 reload re-attached the stale A2L"
+E       AssertionError: the bare S19 reload re-attached the stale A2L
+E       assert {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'compu_tab_re...ocal\\Temp\\pytest-of-jjgh8\\pytest-28635\\test_tc_b100_11_bare_s19_reloa0\\.s19tool\\workarea\\P1\\firmware.a2l', ...} is None
+
+tests\test_b100_session_reset.py:572: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_at_b100_03_project_load_o0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog, add ONE Patch Editor entry through
+        the panel's own inputs, load P2 through the dialog (the interim
+        discard notice names the entry, LED .51), Save project as P2 — P2's
+        folder holds ``prg.s19`` + ``project.json`` ONLY (P-2's re-save at
+        base also wrote P1's ``firmware.mac`` / ``firmware.a2l``), the Loaded
+        panel shows no MAC and no A2L. Both reference sizes, notifications on.
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # The load-over: P2 replaces P1 and the discard is named.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Discarded 1 unsaved Patch Editor entries" in _status_text(app),
+                    "the interim discard notice (LED .51)",
+                )
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:708: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:654: in _drive
+    await _open_project_through_dialog(pilot, app, P1_NAME)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+name = 'P1'
+
+    async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
+        """Open an existing project through the shipped Load project surface
+        (rail key ``1`` to the Workspace, then the real click on
+        ``#ws_load_project_button`` — the documented drive; ``p`` is bound by
+        the Segment Split window once a file is loaded)."""
+        from s19_app.tui.screens import LoadProjectScreen
+    
+        await pilot.press("1")
+        await _flush(pilot, 4)
+>       assert await pilot.click("#ws_load_project_button"), (
+            "click missed #ws_load_project_button"
+        )
+E       AssertionError: click missed #ws_load_project_button
+E       assert False
+
+tests\test_b100_session_reset.py:590: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28635/test_at_b100_03_project_load_o1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog, add ONE Patch Editor entry through
+        the panel's own inputs, load P2 through the dialog (the interim
+        discard notice names the entry, LED .51), Save project as P2 — P2's
+        folder holds ``prg.s19`` + ``project.json`` ONLY (P-2's re-save at
+        base also wrote P1's ``firmware.mac`` / ``firmware.a2l``), the Loaded
+        panel shows no MAC and no A2L. Both reference sizes, notifications on.
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # The load-over: P2 replaces P1 and the discard is named.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Discarded 1 unsaved Patch Editor entries" in _status_text(app),
+                    "the interim discard notice (LED .51)",
+                )
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:708: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:654: in _drive
+    await _open_project_through_dialog(pilot, app, P1_NAME)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+name = 'P1'
+
+    async def _open_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
+        """Open an existing project through the shipped Load project surface
+        (rail key ``1`` to the Workspace, then the real click on
+        ``#ws_load_project_button`` — the documented drive; ``p`` is bound by
+        the Segment Split window once a file is loaded)."""
+        from s19_app.tui.screens import LoadProjectScreen
+    
+        await pilot.press("1")
+        await _flush(pilot, 4)
+>       assert await pilot.click("#ws_load_project_button"), (
+            "click missed #ws_load_project_button"
+        )
+E       AssertionError: click missed #ws_load_project_button
+E       assert False
+
+tests\test_b100_session_reset.py:590: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_call_site_census - A...
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_domain_matches_the_live_source_census
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_two_cold_loads_have_equal_snapshots
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_change_service_is_rebound
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_unload_all_clears_the_parsed_a2l
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_unload_a2l_alone_clears_the_parsed_a2l
+FAILED tests/test_b100_session_reset.py::test_tc_b100_11_bare_s19_reload_after_unload_shows_no_a2l_tags
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+14 failed, 2 passed in 82.06s (0:01:22)
+exit: 1

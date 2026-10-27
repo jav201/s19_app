@@ -1,0 +1,108 @@
+pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+mutant sha256: 4b958a07501a39b363f33b4277f9eb3773ec270cfc2fe128a238693fafed6267
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+.....FF..........                                                        [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_09_load_over_matches_cold_outside_the_allow_list ________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-13/test_tc_b100_09_load_over_matc0')
+
+    def test_tc_b100_09_load_over_matches_cold_outside_the_allow_list(
+        tmp_path: Path,
+    ) -> None:
+        """A load of P2 over P1 differs from a cold P2 load ONLY in the
+        declared K1/K2 allow-list — 0 LEAK names outside it (the p03
+        sequence; A-07's derived-domain check). P1's session is first given
+        non-default values for every S5-S12 name the scenario does not touch
+        (F1): the comparison must see the reset of the CRC template, the
+        comparison/check spec, the flow run, the execution and the report
+        filter — deleting those reset lines surfaces here (reviewer R6)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                # Non-default S5-S12 + A-07 state, then outgoing unsaved
+                # work, then the load-over.
+                _seed_p1_derived_state(app, workarea)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+                return app._session_snapshot()
+    
+        warm = asyncio.run(_drive())
+        cold = _cold_snapshot(base, P2_NAME)
+        differing = {
+            name
+            for name in cold
+            if cold[name] != warm.get(name)
+        } | (set(warm) - set(cold))
+        leaks = differing - SNAPSHOT_ALLOW_LIST
+>       assert not leaks, (
+            "LEAK " + ", ".join(f"{n}: cold={cold.get(n)!r} warm={warm.get(n)!r}" for n in sorted(leaks))
+        )
+E       AssertionError: LEAK _diff_check_spec: cold=None warm=['p1-check-spec', 2], _diff_check_spec_name: cold='' warm='p1-check-spec', _diff_last_result: cold=None warm=['p1-comparison', 1], _last_execution: cold=None warm=['p1-execution', 4], _last_flow_run: cold=None warm=['p1-flow-run', 3], _last_template_path: cold=None warm='.s19tool/workarea/P1/templates/crc.tpl'
+E       assert not {'_diff_check_spec', '_diff_check_spec_name', '_diff_last_result', '_last_execution', '_last_flow_run', '_last_template_path'}
+
+tests\test_b100_session_reset.py:384: AssertionError
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-13/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names AND the full S5-S12 / A-07 inventory,
+        asserted directly: P1's session is seeded with non-default values
+        (F1) before P2 loads over it (+1 unsaved entry); afterwards the
+        session holds none of P1's attachments, parsed A2L, change entries,
+        declared regions, CRC template, comparison/check spec, flow run,
+        execution, report filter, A2L views or probe names. RED at base:
+        every one of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                _seed_p1_derived_state(app, workarea)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+        assert loaded is not None and loaded.path.name == "prg.s19"
+        assert loaded.mac_path is None, "LEAK mac_path"
+        assert loaded.mac_records == [], "LEAK mac_records"
+        assert loaded.a2l_path is None, "LEAK a2l_path"
+        assert loaded.a2l_data is None, "LEAK a2l_data"
+        assert app.current_a2l_path is None, "LEAK current_a2l_path"
+        assert app.current_a2l_data is None, "LEAK current_a2l_data"
+        assert len(app._change_service.document.entries) == 0, "LEAK change_entries"
+        assert app._declared_regions == (), "LEAK declared_regions"
+>       assert app._last_template_path is None, "LEAK last_template_path"
+E       AssertionError: LEAK last_template_path
+E       assert WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-13/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/templates/crc.tpl') is None
+E        +  where WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-13/test_tc_b100_09_load_over_leav0/app/.s19tool/workarea/P1/templates/crc.tpl') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._last_template_path
+
+tests\test_b100_session_reset.py:426: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+2 failed, 15 passed in 94.38s (0:01:34)
+mutant run exit: 1
+restored sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+RESTORE OK

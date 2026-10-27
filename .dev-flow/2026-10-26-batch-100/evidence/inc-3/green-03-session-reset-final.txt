@@ -1,0 +1,6 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3 python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3 (Inc 3 final — all test fixes in)
+
+................                                                         [100%]
+16 passed in 121.15s (0:02:01)
+exit: 0
