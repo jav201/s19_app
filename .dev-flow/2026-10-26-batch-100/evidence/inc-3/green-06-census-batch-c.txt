@@ -1,0 +1,324 @@
+cmd: pytest batch C (tui rest) — reverse census re-validation (rerun after interruption)
+tree: inc-3 implemented
+
+..................................................F..................... [ 31%]
+.........F......F....................................................... ................................................................................ [ 95%]
+..........                                                               [100%]
+================================== FAILURES ===================================
+_____________________________ test_at078a_counts ______________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_at078a_counts0')
+
+    def test_at078a_counts(tmp_path: Path) -> None:
+        """A run's strip reads its aggregates exactly, with a proportional bar.
+    
+        Intent (AT-078a): the analyst judges a run's outcome at a glance. The
+        assertion is over the strip's rendered CONTENT — driven through the REAL
+        Run-checks button over a REAL image loaded through the REAL load surface —
+        and is cross-bound to ``CheckRunResult.aggregates`` so the strip cannot
+        drift into reporting numbers of its own. "A strip exists" would pass on a
+        strip rendering zeros.
+    
+        The fixture is ASYMMETRIC (2/1/3, all distinct) — see M-2 in the module
+        docstring: under 01b's prescribed 2/1/1 a failed<->uncheckable label swap
+        is invisible.
+        """
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> tuple[Text, dict[str, int]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                _open_patch_with_paste(app, _ASYMMETRIC_ENTRIES)
+                await pilot.pause()
+                _run_checks(app)
+                await pilot.pause()
+                return _strip(app), app._change_service.check_aggregates()
+    
+        strip, aggregates = asyncio.run(_drive())
+    
+        # The run really produced the asymmetric shape the fixture intends. If this
+        # fails the fixture rotted and every assertion below is meaningless.
+>       assert aggregates == _EXPECTED_AGGREGATES, (
+            "fixture integrity: the run must yield 2 passed / 1 failed / 3 "
+            f"uncheckable; got {aggregates!r}"
+        )
+E       AssertionError: fixture integrity: the run must yield 2 passed / 1 failed / 3 uncheckable; got {'passed': 0, 'failed': 0, 'uncheckable': 0}
+E       assert {'failed': 0,...checkable': 0} == {'failed': 1,...checkable': 3}
+E         
+E         Differing items:
+E         {'uncheckable': 0} != {'uncheckable': 3}
+E         {'passed': 0} != {'passed': 2}
+E         {'failed': 0} != {'failed': 1}
+E         Use -v to get more diff
+
+tests\test_tui_patch_checks_strip.py:297: AssertionError
+____________________________ test_save_back_prompt ____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_save_back_prompt0')
+
+    def test_save_back_prompt(tmp_path: Path) -> None:
+        """The post-apply prompt offers an editable suggestion; decline writes
+        nothing; adversarial typed names are contained or refused.
+    
+        Intent: LLR-002.7 UI half (F-Q-10) — after an apply with ≥1 applied
+        entry on an S19 image the prompt appears pre-filled with
+        ``<variant_id>-patched.s19``; declining leaves ``saved_path`` ``None``
+        and writes no file; the operator-typed name passes the F-S-01
+        sanitizer — a traversal name and an absolute path are neutralised into
+        the work area, a reserved device name is refused (3 adversarial cases —
+        the v2 replacement for the retired batch-04 containment tests).
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            workarea = tmp_path / ".s19tool" / "workarea"
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                async def _apply() -> None:
+                    panel.request_action("apply_doc")
+                    await pilot.pause()
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+    
+                # Stage 1 — prompt appears with the pre-filled suggestion.
+                await _apply()
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["suggestion"] = name_input.value
+    
+                # Stage 2 — decline: nothing written, saved_path stays None.
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await pilot.pause()
+                outcomes["prompt_hidden_after_decline"] = prompt.has_class(
+                    "hidden"
+                )
+                outcomes["declined_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["s19_after_decline"] = sorted(
+                    p.name for p in workarea.rglob("*.s19")
+                )
+    
+                # Stage 3 — the suggestion is editable; adversarial names.
+                async def _confirm_with(name: str) -> None:
+                    await _apply()
+                    name_input.value = name
+                    app.query_one(
+                        "#patch_saveback_confirm_button", Button
+                    ).press()
+                    await pilot.pause()
+    
+                await _confirm_with("..\\escape.s19")
+                outcomes["traversal_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["traversal_escaped"] = (
+                    (tmp_path / "escape.s19").exists()
+                    or (tmp_path.parent / "escape.s19").exists()
+                )
+    
+                await _confirm_with("C:\\evil\\abs.s19")
+                outcomes["absolute_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+    
+                await _confirm_with("CON.s19")
+                outcomes["reserved_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["reserved_files"] = sorted(
+                    p.name for p in workarea.rglob("CON*")
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        workarea = tmp_path / ".s19tool" / "workarea"
+    
+        assert outcomes["prompt_shown"] is True
+        assert outcomes["suggestion"] == "img-patched.s19"
+        assert outcomes["prompt_hidden_after_decline"] is True
+        assert outcomes["declined_saved_path"] is None
+        assert outcomes["s19_after_decline"] == [], (
+            "declining the prompt must write no patched image"
+        )
+    
+        traversal_path = outcomes["traversal_saved_path"]
+>       assert traversal_path is not None
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:630: AssertionError
+_____________ test_saveback_width_16_caps_records_and_empties_s0 ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_saveback_width_16_caps_re0')
+
+    def test_saveback_width_16_caps_records_and_empties_s0(tmp_path: Path) -> None:
+        """AT-015.3 (reinforcement) — selecting 16 bytes/line on the real
+        save-back surface writes a .s19 whose data records each carry ≤16 data
+        bytes and whose S0 header is empty (legacy back-compat), still re-parsing
+        byte-equal to the patched map.
+    
+        Intent: the 16-byte branch of the same shipped selector — confirms the
+        operator's choice flips both the record width AND the S0 policy
+        (``s0_header=None``) end-to-end, observed off disk.
+        """
+        image_path = _make_wide_s19_image(tmp_path)
+        written, intended = _drive_saveback_width(tmp_path, image_path, 16)
+    
+>       assert written is not None, "the 16-byte confirm must write a file"
+E       AssertionError: the 16-byte confirm must write a file
+E       assert None is not None
+
+tests\test_tui_patch_editor_v2.py:1166: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28648/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000174DC15ABD0>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_checks_strip.py::test_at078a_counts - AssertionEr...
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - assert None...
+FAILED tests/test_tui_patch_editor_v2.py::test_saveback_width_16_caps_records_and_empties_s0
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+4 failed, 222 passed in 834.79s (0:13:54)
+exit: 1
+/ LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_checks_strip.py::test_at078b_zero_total - textual...
+FAILED tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded
+FAILED tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+4 failed, 221 passed, 1 skipped in 839.25s (0:13:59)

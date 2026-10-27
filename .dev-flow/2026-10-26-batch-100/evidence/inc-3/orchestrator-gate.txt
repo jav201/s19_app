@@ -1,0 +1,12 @@
+# orchestrator gate re-run, tree: main dad6423 + Inc 3 working changes (worktree s19_app-b100-inc3); env PYTHONPATH=worktree, NO_COLOR unset
+# started: 2026-10-27T05:21:29-06:00
+# s19_app from C:\Users\jjgh8\Github\s19_app-b100-inc3\s19_app\__init__.py
+## inc-3 files
+.....................................                                    [100%]
+109 passed in 459.23s (0:07:39)
+## guards
+29 snapshots passed.
+75 passed in 142.58s (0:02:22)
+## census sweep
+FAILED tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent
+1 failed, 86 passed, 3784 deselected in 88.73s (0:01:28)

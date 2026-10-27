@@ -1,0 +1,9 @@
+=== r8b (reviewer's round-2 mutant: seam refresh_entries deleted — EQUIVALENT mutant expected)
+pre-mutation sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
+mutant sha256: 2653ce527794420c9bd44bea68d957952a7a43358f35c629375753616a226913
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+.................                                                        [100%]
+17 passed in 104.76s (0:01:44)
+mutant run exit: 0
+restored sha256: ddc64e1803eef450b1dd17d20bda1e518d027d89f59ea14b946ef1587710a20b
+RESTORE OK

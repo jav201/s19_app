@@ -1,0 +1,4 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3 python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3 (fix-pass tree: LED .55(a) notice + mark_loaded seam + F9 normaliser)
+.................                                                        [100%]
+17 passed in 94.11s (0:01:34)

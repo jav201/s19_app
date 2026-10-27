@@ -1,0 +1,39 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3 python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3 (Inc 3 sources implemented, corrected test file)
+
+..F.............                                                         [100%]
+================================== FAILURES ===================================
+______________________ test_tc_b100_08_call_site_census _______________________
+
+    def test_tc_b100_08_call_site_census() -> None:
+        """Exactly one ``_reset_project_session`` call site in ``s19_app/`` —
+        inside ``_handle_load_project`` (an AST census over every product
+        module, so a second caller cannot hide in another file)."""
+    
+        import s19_app
+    
+        product_root = Path(s19_app.__file__).resolve().parent
+        callers = []
+        for source in sorted(product_root.rglob("*.py")):
+            tree = ast.parse(source.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                func = node.func
+                if (
+                    isinstance(func, ast.Attribute)
+                    and func.attr == "_reset_project_session"
+                ):
+                    callers.append(str(source.relative_to(product_root)))
+>       assert callers == ["tui/app.py"], callers
+E       AssertionError: ['tui\\app.py']
+E       assert ['tui\\app.py'] == ['tui/app.py']
+E         
+E         At index 0 diff: 'tui\\app.py' != 'tui/app.py'
+E         Use -v to get more diff
+
+tests\test_b100_session_reset.py:249: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_call_site_census - A...
+1 failed, 15 passed in 115.89s (0:01:55)
+exit: 1

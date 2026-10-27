@@ -1,0 +1,418 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3 python -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3 (round-1 app.py, fix-pass test file — RED-first for the re-pinned notice arms and the LED .55(b) dirty-marker arm)
+......F..F.F...FF                                                        [100%]
+================================== FAILURES ===================================
+________________ test_tc_b100_09_load_over_leaves_no_p1_state _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28760/test_tc_b100_09_load_over_leav0')
+
+    def test_tc_b100_09_load_over_leaves_no_p1_state(tmp_path: Path) -> None:
+        """The executed P-2 leak names AND the full S5-S12 / A-07 inventory,
+        asserted directly: P1's session is seeded with non-default values
+        (F1) before P2 loads over it (+1 unsaved entry); afterwards the
+        session holds none of P1's attachments, parsed A2L, change entries,
+        declared regions, CRC template, comparison/check spec, flow run,
+        execution, report filter, A2L views or probe names. RED at base:
+        every one of these leaked (the p03 probe's LEAK lines)."""
+    
+        base = tmp_path / "app"
+        workarea = _workarea(base)
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> S19TuiApp:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                _seed_p1_derived_state(app, workarea)
+                app._change_service.add_entry("0x8000007C", "", "DE AD BE EF")
+                app._handle_load_project(P2_NAME)
+                await _flush(pilot)
+            return app
+    
+        app = asyncio.run(_drive())
+        loaded = app.current_file
+        assert loaded is not None and loaded.path.name == "prg.s19"
+        assert loaded.mac_path is None, "LEAK mac_path"
+        assert loaded.mac_records == [], "LEAK mac_records"
+        assert loaded.a2l_path is None, "LEAK a2l_path"
+        assert loaded.a2l_data is None, "LEAK a2l_data"
+        assert app.current_a2l_path is None, "LEAK current_a2l_path"
+        assert app.current_a2l_data is None, "LEAK current_a2l_data"
+        assert len(app._change_service.document.entries) == 0, "LEAK change_entries"
+        assert app._declared_regions == (), "LEAK declared_regions"
+        assert app._last_template_path is None, "LEAK last_template_path"
+        assert app._diff_last_result is None, "LEAK diff_last_result"
+        assert app._diff_check_spec is None, "LEAK diff_check_spec"
+        assert app._diff_check_spec_name == "", "LEAK diff_check_spec_name"
+        assert app._last_flow_run is None, "LEAK last_flow_run"
+        assert app._last_execution is None, "LEAK last_execution"
+        assert app._report_filter_path is None, "LEAK report_filter_path"
+        assert app._a2l_enriched_tags == [], "LEAK a2l_enriched_tags"
+        assert app._a2l_filtered_tags == [], "LEAK a2l_filtered_tags"
+        assert app._a2l_window_start == 0, "LEAK a2l_window_start"
+        assert app._a2l_summary_lines == [], "LEAK a2l_summary_lines"
+        assert app._a2l_summary_start == 0, "LEAK a2l_summary_start"
+        assert app._a2l_tag_find_query == "", "LEAK a2l_tag_find_query"
+        assert app._a2l_tag_find_last_index == -1, "LEAK a2l_tag_find_last_index"
+>       assert app._validation_report is None, "LEAK validation_report"
+E       AssertionError: LEAK validation_report
+E       assert ValidationReport(issues=[], coverage=CoverageMetrics(mac_total=0, mac_in_s19=0, a2l_total=0, a2l_in_s19=0, a2l_mac_intersection=0, a2l_mac_address_matches=0)) is None
+E        +  where ValidationReport(issues=[], coverage=CoverageMetrics(mac_total=0, mac_in_s19=0, a2l_total=0, a2l_in_s19=0, a2l_mac_intersection=0, a2l_mac_address_matches=0)) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})._validation_report
+
+tests\test_b100_session_reset.py:440: AssertionError
+___________________ test_tc_b100_10_interim_discard_notice ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28760/test_tc_b100_10_interim_discar0')
+
+    def test_tc_b100_10_interim_discard_notice(tmp_path: Path) -> None:
+        """LED-2026-10-26-batch-100.55(a): with N > 0 entries outgoing, the
+        project load's status names the closed document — ``Closed the Patch
+        Editor document (N entries); unsaved changes were not kept`` — so the
+        reset's discard is never silent. The line states only what Inc 3 can
+        know (the document held N entries); it does not call them unsaved —
+        the panel's dirty flag has no public reader until Inc 10 (Inc 10's
+        question replaces this line and re-pins this arm)."""
+    
+        app = _load_p1_add_entry_load_p2(tmp_path, entries=1)
+>       assert app.log_lines[-1] == (
+            "Closed the Patch Editor document (1 entries); "
+            "unsaved changes were not kept"
+        ), list(app.log_lines)
+E       AssertionError: ["Loaded project 'P1' -> firmware.s19 + firmware.mac", 'Loaded prg.s19 (S19 only)', "Loaded project 'P2' -> prg.s19", 'Discarded 1 unsaved Patch Editor entries']
+E       assert 'Discarded 1 ...ditor entries' == 'Closed the P...were not kept'
+E         
+E         - Closed the Patch Editor document (1 entries); unsaved changes were not kept
+E         + Discarded 1 unsaved Patch Editor entries
+
+tests\test_b100_session_reset.py:589: AssertionError
+_____________ test_tc_b100_10_notice_names_every_discarded_entry ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28760/test_tc_b100_10_notice_names_e0')
+
+    def test_tc_b100_10_notice_names_every_discarded_entry(tmp_path: Path) -> None:
+        """The count is exact: 3 outgoing entries -> ``(3 entries)``."""
+    
+        app = _load_p1_add_entry_load_p2(tmp_path, entries=3)
+>       assert app.log_lines[-1] == (
+            "Closed the Patch Editor document (3 entries); "
+            "unsaved changes were not kept"
+        ), list(app.log_lines)
+E       AssertionError: ["Loaded project 'P1' -> firmware.s19 + firmware.mac", 'Loaded prg.s19 (S19 only)', "Loaded project 'P2' -> prg.s19", 'Discarded 3 unsaved Patch Editor entries']
+E       assert 'Discarded 3 ...ditor entries' == 'Closed the P...were not kept'
+E         
+E         - Closed the Patch Editor document (3 entries); unsaved changes were not kept
+E         + Discarded 3 unsaved Patch Editor entries
+
+tests\test_b100_session_reset.py:622: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28760/test_at_b100_03_project_load_o0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●.
+                subtitle = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "0 entries" in subtitle and "●" not in subtitle, subtitle
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line (the reviewer's R8
+                # probe shape: the ledger holds the outgoing rows without the
+                # seam's repaint, so this is load-bearing even though today's
+                # install chain would repaint it anyway).
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:874: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:831: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_03_project_load_over_unsaved_work_saves_only_p2.<locals>._drive.<locals>.<lambda> at 0x000001D7D9C6A200>
+description = 'the interim closed-document notice (LED .55(a)) as the freshest line'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the interim closed-document notice (LED .55(a)) as the freshest line
+
+tests\test_b100_session_reset.py:128: AssertionError
+_____ test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28760/test_at_b100_03_project_load_o1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-165's acceptance scene, by keys only: load P1 (S19 + MAC + A2L)
+        through the Load project dialog (``p``), add ONE Patch Editor entry
+        through the panel's own inputs, load P2 through the dialog (the
+        interim closed-document notice names the entry, LED .55(a)), Save
+        project as P2 — P2's folder holds ``prg.s19`` + ``project.json`` ONLY
+        (P-2's re-save at base also wrote P1's ``firmware.mac`` /
+        ``firmware.a2l``), the Loaded panel shows no MAC and no A2L. Both
+        reference sizes, notifications on. After the load-over the AT also
+        asserts the painted Patch Editor observables: the ledger is empty
+        (0 rows + the empty-state line) and the SCRIPT window subtitle shows
+        ``0 entries`` with no dirty ``●`` (LED .55(b)).
+    
+        RED (executed at base): ``P2 files after save: ['firmware.a2l',
+        'firmware.mac', 'prg.s19', 'project.json']`` — the p03/P-2 shape."""
+    
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        workarea = app.workarea
+        _seed_project_p1(workarea)
+        _seed_project_p2(workarea)
+    
+        async def _drive() -> tuple:
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    "the painted line naming the opened project P1",
+                )
+                # One Patch Editor entry through the panel's own inputs.
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_entry_add_button")) > 0,
+                    "the Patch Editor panel",
+                )
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x8000007C")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"DE AD BE EF")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "Patch Editor: entry added." in _status_text(app),
+                    "the painted confirmation of the added entry",
+                )
+                # LED .55(b) vacuity guard: the entry went in through the
+                # panel's own inputs, so the dirty marker is painted BEFORE
+                # the load-over (without this the no-marker assertion below
+                # would pass even if the marker had never existed).
+                marked = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "●" in marked, marked
+                # The load-over: P2 replaces P1. The closed-document notice is
+                # the freshest painted line (LED .55(a)); the loaded-project
+                # line stays in the log history and both are asserted on the
+                # captured log below.
+                await _open_project_through_dialog(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: (
+                        "Closed the Patch Editor document (1 entries); "
+                        "unsaved changes were not kept" in _status_text(app)
+                    ),
+                    "the interim closed-document notice (LED .55(a)) as the freshest line",
+                )
+                # LED .55(b): the reset cleared the panel's dirty marker — the
+                # SCRIPT window subtitle is painted "0 entries" with no ●.
+                subtitle = (
+                    app.query_one("#patch_win_script", Container).border_subtitle
+                    or ""
+                )
+                assert "0 entries" in subtitle and "●" not in subtitle, subtitle
+                # HLR-165's painted observable: the Patch Editor ledger is
+                # empty — 0 rows and the empty-state line (the reviewer's R8
+                # probe shape: the ledger holds the outgoing rows without the
+                # seam's repaint, so this is load-bearing even though today's
+                # install chain would repaint it anyway).
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:874: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_session_reset.py:831: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_03_project_load_over_unsaved_work_saves_only_p2.<locals>._drive.<locals>.<lambda> at 0x000001D7D9A36520>
+description = 'the interim closed-document notice (LED .55(a)) as the freshest line'
+attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the interim closed-document notice (LED .55(a)) as the freshest line
+
+tests\test_b100_session_reset.py:128: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_interim_discard_notice
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_notice_names_every_discarded_entry
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+5 failed, 12 passed in 116.50s (0:01:56)

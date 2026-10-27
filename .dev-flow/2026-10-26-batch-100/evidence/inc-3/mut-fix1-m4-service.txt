@@ -1,0 +1,122 @@
+pre-mutation sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+mutant sha256: 23f54ec7965ea9f9a00fa39b0a8ec941b2fce0320f94a62e541bfa32c3822623
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_session_reset.py
+r's R8
+                # probe shape: the ledger holds the outgoing rows without the
+                # seam's repaint, so this is load-bearing even though today's
+                # install chain would repaint it anyway).
+                table = app.query_one("#patch_doc_entries_table", DataTable)
+                assert table.row_count == 0, table.row_count
+                empty_state = app.query_one("#patch_doc_empty_state", Static)
+                assert not empty_state.has_class("hidden")
+                assert str(empty_state.render()) == PatchEditorPanel.EMPTY_STATE_TEXT
+                # The Loaded panel: no MAC, no A2L in any slot.
+                loaded_text = " ".join(
+                    str(static.render())
+                    for static in app.query("#loaded_slots Static")
+                )
+                assert "firmware.mac" not in loaded_text, loaded_text
+                assert "firmware.a2l" not in loaded_text, loaded_text
+                # Save project as P2 (the open project).
+                await _save_project_as(pilot, app, P2_NAME)
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _flush(pilot)
+            p2_files = sorted(item.name for item in (workarea / P2_NAME).iterdir())
+            return p2_files, list(app.log_lines)
+    
+>       p2_files, log_lines = asyncio.run(_drive())
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_session_reset.py:878: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> tuple:
+        async with app.run_test(size=size, notifications=True) as pilot:
+            await pilot.pause()
+            await _open_project_through_dialog(pilot, app, P1_NAME)
+            await _wait_for(
+                pilot,
+                lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                "the painted line naming the opened project P1",
+            )
+            # One Patch Editor entry through the panel's own inputs.
+            await pilot.press("6")
+            await _wait_for(
+                pilot,
+                lambda: len(app.query("#patch_entry_add_button")) > 0,
+                "the Patch Editor panel",
+            )
+            assert await pilot.click("#patch_entry_address_input"), (
+                "click missed #patch_entry_address_input"
+            )
+            await pilot.press(*"0x8000007C")
+            assert await pilot.click("#patch_entry_bytes_input"), (
+                "click missed #patch_entry_bytes_input"
+            )
+            await pilot.press(*"DE AD BE EF")
+            assert await pilot.click("#patch_entry_add_button"), (
+                "click missed #patch_entry_add_button"
+            )
+            await _wait_for(
+                pilot,
+                lambda: "Patch Editor: entry added." in _status_text(app),
+                "the painted confirmation of the added entry",
+            )
+            # LED .55(b) vacuity guard: the entry went in through the
+            # panel's own inputs, so the dirty marker is painted BEFORE
+            # the load-over (without this the no-marker assertion below
+            # would pass even if the marker had never existed).
+            marked = (
+                app.query_one("#patch_win_script", Container).border_subtitle
+                or ""
+            )
+            assert "●" in marked, marked
+            # The load-over: P2 replaces P1. The closed-document notice is
+            # the freshest painted line (LED .55(a)); the loaded-project
+            # line stays in the log history and both are asserted on the
+            # captured log below.
+            await _open_project_through_dialog(pilot, app, P2_NAME)
+            await _wait_for(
+                pilot,
+                lambda: (
+                    "Closed the Patch Editor document (1 entries); "
+                    "unsaved changes were not kept" in _status_text(app)
+                ),
+                "the interim closed-document notice (LED .55(a)) as the freshest line",
+            )
+            # LED .55(b): the reset cleared the panel's dirty marker — the
+            # SCRIPT window subtitle is painted "0 entries" with no ●.
+            subtitle = (
+                app.query_one("#patch_win_script", Container).border_subtitle
+                or ""
+            )
+>           assert "0 entries" in subtitle and "●" not in subtitle, subtitle
+E           AssertionError: 1 entry
+E           assert ('0 entries' in '1 entry')
+
+tests\test_b100_session_reset.py:849: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_matches_cold_outside_the_allow_list
+FAILED tests/test_b100_session_reset.py::test_tc_b100_09_load_over_leaves_no_p1_state
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_change_service_is_rebound
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_outgoing_service_finishes_after_rebind
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+6 failed, 11 passed in 89.35s (0:01:29)
+mutant run exit: 1
+restored sha256: 18ee4d450529d0cb0fb7f33a274cd7295d9051cbc620414c22bb4c3868201c1e
+RESTORE OK

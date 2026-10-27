@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter, deque
 from dataclasses import dataclass, field, replace
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -1414,6 +1415,91 @@ _SAVE_REPORT_SUFFIX_CHARS = 53
 #: ``_MAX_FULL_PATH`` idiom): ``len(workarea) + 1 + len(name) + 53`` must
 #: stay at or under this bound.
 _SAVE_FULL_PATH_LIMIT = 259
+
+
+#: The session-snapshot domain (HLR-165, LLR-165.2): every attribute name
+#: ``S19TuiApp``'s own source assigns via ``self.<name> =``. The TEST
+#: census re-derives the same set from the live source at run time and
+#: fails the classification arm when the two drift (C-31: the domain is
+#: derived, never trusted) — a new self-assignment lands here, or in the
+#: test's declared exclusion list with its reason, never in neither.
+#: Two Inc-era names carry an explicit classification because ARQ §2.2
+#: has no row for them: ``_last_manifest_verify_result`` is INSTALL-OWNED
+#: — every manifest verify rewrites it before its only reader consumes
+#: it, so the reset seam must NOT clear it — and ``_variant_set_value``
+#: is the backing store of the ``_variant_set`` property (row S5 covers
+#: it: the seam assigns ``None`` through the setter, then the caller
+#: adopts the manifest's set).
+_SESSION_SNAPSHOT_NAMES: Tuple[str, ...] = (
+    "_a2l_cache_data",
+    "_a2l_cache_key",
+    "_a2l_enriched_key",
+    "_a2l_enriched_tags",
+    "_a2l_filter_debounce_token",
+    "_a2l_filtered_tags",
+    "_a2l_row_key_to_tag",
+    "_a2l_summary_lines",
+    "_a2l_summary_start",
+    "_a2l_tag_find_last_index",
+    "_a2l_tag_find_query",
+    "_a2l_tag_hex_highlight",
+    "_a2l_window_start",
+    "_active_screen_key",
+    "_alt_first_visible_address",
+    "_alt_goto_focus_address",
+    "_change_service",
+    "_declared_regions",
+    "_diff_check_spec",
+    "_diff_check_spec_name",
+    "_diff_compare_generation",
+    "_diff_last_result",
+    "_goto_focus_address",
+    "_hex_window_start",
+    "_image_generation",
+    "_last_execution",
+    "_last_flow_run",
+    "_last_manifest_verify_result",
+    "_last_template_path",
+    "_mac_first_visible_address",
+    "_mac_goto_focus_address",
+    "_mac_row_key_to_address",
+    "_mac_view_cache_cell_rows",
+    "_mac_view_cache_cell_styles",
+    "_mac_view_cache_coverage_line",
+    "_mac_view_cache_key",
+    "_mac_view_cache_meta",
+    "_mac_view_cache_rows",
+    "_mac_view_cache_summary",
+    "_mac_view_cache_widths",
+    "_mac_window_start",
+    "_pending_variant_id",
+    "_report_filter_path",
+    "_split_join_return_screen",
+    "_validation_issues",
+    "_validation_issues_window_start",
+    "_validation_report",
+    "_variant_set",
+    "_variant_set_value",
+    "a2l_tags_filter_field",
+    "a2l_tags_filter_mode",
+    "a2l_tags_filter_text",
+    "a2l_tags_page_size",
+    "base_dir",
+    "current_a2l_data",
+    "current_a2l_path",
+    "current_file",
+    "current_project",
+    "current_project_dir",
+    "hex_rows_page_size",
+    "last_search_address",
+    "last_search_text",
+    "load_path",
+    "log_lines",
+    "logger",
+    "mac_records_page_size",
+    "validation_issue_filter_mode",
+    "workarea",
+)
 
 
 class S19TuiApp(App):
@@ -8892,6 +8978,291 @@ class S19TuiApp(App):
                 continue
             panel.set_session_dir(value)
 
+    def _reset_project_session(self) -> int:
+        """
+        Summary:
+            Reset every piece of session state a project load must not
+            carry over from the outgoing session (HLR-165 / LLR-165.1,
+            the PH-2 seam): the loaded image with its MAC and A2L
+            attachments (ARQ §2.2 S1), the A2L path and parsed data
+            (S2/S3), the variant ids (S5), the declared regions (S6), the
+            last CRC template (S7), the last comparison and check spec
+            (S8), the last flow run and execution (S9/S10), the report
+            filter (S11), the A2L derived views (S12), the MAC view
+            caches, the validation report and issues and the row-key maps
+            (S13 plus A-07's eleven probe names). The change service is
+            REBOUND to a new object (S4) — nothing outside this module
+            holds the old one (P-26), so a new ``ChangeService()`` is
+            complete by construction — and the monotonic image generation
+            the app owns is re-pushed into it (LLR-165.3). The monotonic
+            counters ``_image_generation`` / ``_diff_compare_generation``
+            (K1) and the view preferences, the log deque, the active
+            rail screen and the path-keyed A2L parse cache (K2) are KEPT.
+
+        Args:
+            None
+
+        Returns:
+            int: How many entries the outgoing Patch Editor document
+                held. The caller paints the interim closed-document
+                notice with it (LED-2026-10-26-batch-100.55(a)) so the
+                rebind's discard is never silent until Inc 10's question
+                replaces the notice.
+
+        Data Flow:
+            - Read the outgoing document's entry count BEFORE the rebind
+              discards it.
+            - Reset S1-S13 in place (S4 last but for the rebind, S13
+              through ``_invalidate_mac_view_cache`` plus the four probe
+              names the invalidator does not own).
+            - Repaint the Patch panel through ``refresh_entries`` — the
+              reset is the one place a load can leave the panel holding a
+              previous project's document, and the panel's retain
+              semantics keep the stale rows without this render. A
+              not-yet-mounted tree (headless unit tests) is tolerated,
+              matching ``_apply_empty_state`` / the load install tail.
+            - The panel's public ``mark_loaded()`` (LED .55(b)): the
+              reset discards the outgoing document — including entries
+              the panel's dirty marker or paste buffer still describe —
+              so the marker is cleared with it; otherwise the panel
+              would paint ``0 entries ●`` over the empty ledger and the
+              Load guard would ask about nothing.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService`` / ``_invalidate_mac_view_cache`` /
+                  ``_strip_source_map`` / ``_patch_document_view``
+            Used by:
+                - ``_handle_load_project`` — the ONE caller (LLR-165.1).
+        """
+        discarded_unsaved = len(self._change_service.document.entries)
+        # S1: the loaded image (carries mac_path / mac_records / a2l_* /
+        # mem_map). ``None`` before the first install, so the primary
+        # parse's MAC merge sees no existing file (P-2's ``LEAK
+        # mac_records``).
+        self.current_file = None
+        # S2/S3: the A2L path and parsed payload — the two parse
+        # fallbacks a loose-S19 reload would otherwise re-attach (P-2's
+        # ``LEAK a2l_tags``; ``current_a2l_data``'s clearing writer is
+        # LLR-165.4's unload arm, :meth:`_apply_unload`).
+        self.current_a2l_path = None
+        self.current_a2l_data = None
+        # S5: variant ids — the caller adopts the manifest's set after
+        # the reset.
+        self._variant_set = None
+        self._pending_variant_id = None
+        # S6: declared regions — the caller adopts the manifest's value
+        # after the reset.
+        self._declared_regions = ()
+        # S7: the last CRC template (a latent cross-project gather, ARQ
+        # §2.2 row S7).
+        self._last_template_path = None
+        # S8: the last comparison and check spec.
+        self._diff_last_result = None
+        self._diff_check_spec = None
+        self._diff_check_spec_name = ""
+        # S9/S10: the last flow run and execution.
+        self._last_flow_run = None
+        self._last_execution = None
+        # S11: the sticky report-filter selection.
+        self._report_filter_path = None
+        # S12: the A2L derived views (enriched/filtered tags, summary,
+        # window, find state).
+        self._a2l_enriched_tags = []
+        self._a2l_enriched_key = None
+        self._a2l_filtered_tags = []
+        self._a2l_window_start = 0
+        self._a2l_summary_lines = []
+        self._a2l_summary_start = 0
+        self._a2l_tag_find_query = ""
+        self._a2l_tag_find_last_index = -1
+        # S13 + A-07's probe names: the MAC view caches (all eight
+        # ``_mac_view_cache_*`` rows the invalidator already owns — the
+        # ARQ §2.2 inventory text still says "seven"; it predates
+        # ``_mac_view_cache_widths``), the validation report and issues,
+        # and the per-DataTable row-key maps.
+        self._invalidate_mac_view_cache()
+        self._validation_report = None
+        self._validation_issues = []
+        self._mac_row_key_to_address = {}
+        self._a2l_row_key_to_tag = {}
+        # S4: the change service. A rebind, not a ``reset()`` method
+        # (the rejected alternative would add change_service.py to this
+        # increment and stay complete only until the next field is
+        # added): the new object carries an empty document, empty
+        # undo/redo, no journal and no saved-state stamps by
+        # construction. The app's monotonic image generation — a K1
+        # counter the seam must NOT reset — is pushed into the new
+        # service exactly as the install point does (LLR-165.3).
+        self._change_service = ChangeService()
+        self._change_service.set_image_generation(self._image_generation)
+        # Repaint the Patch panel through refresh_entries (LLR-165.1) —
+        # the empty-session call shape ``_refresh_patch_history_view``
+        # uses; without it the panel would keep painting the outgoing
+        # project's document until the next install's deferred chain.
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            # App not mounted (headless unit tests drive the load
+            # pipeline on a bare tree) — the same tolerance the load
+            # install tail documents; the service-side rebind above is
+            # set either way.
+            pass
+        else:
+            panel.refresh_entries(
+                self._change_service.rows(None),
+                mem_map=self._strip_source_map(None),
+                document=self._patch_document_view(),
+            )
+            # LED .55(b): the outgoing document is gone — entries AND the
+            # dirty marker / paste buffer that described it. The buffer
+            # is cleared through its own widget (screens_directionb.py
+            # is NOT edited); clearing it posts a TextArea.Changed whose
+            # panel handler re-sets the dirty flag (writer w2), so the
+            # public mark_loaded is deferred until after that message
+            # has been handled — an immediate call would be undone and
+            # the panel would paint "0 entries ●" over the empty ledger.
+            self.query_one("#patch_paste_text", TextArea).text = ""
+            self.call_after_refresh(panel.mark_loaded)
+            self.refresh_bindings()
+        return discarded_unsaved
+
+    def _session_snapshot(self) -> dict:
+        """
+        Summary:
+            The normalised projection of the session state this class's
+            own source assigns (HLR-165 / LLR-165.2, the B100-I19 seam):
+            one comparable entry per name in
+            :data:`_SESSION_SNAPSHOT_NAMES` — the source census the test
+            re-derives at run time (C-31), minus the test's declared
+            exclusion list. Values are normalised so that two sessions
+            over the same facts compare equal: paths become relative to
+            ``base_dir``; the ``current_file`` payload becomes
+            ``(type, relative path, image digest)`` whose digest feeds
+            ``address:byte`` pairs; the change service becomes its public
+            counts; plain dicts reduce to ``(len, sorted keys, digest of
+            the normalised values)`` so two payloads over the same key
+            set never compare equal; the stat-/identity-keyed caches drop
+            their mtime / ``id()`` components (QA R2-07); every other
+            object becomes a count, a key list or a type name.
+
+        Args:
+            None
+
+        Returns:
+            dict: ``name -> normalised value`` for every name in the
+                domain. Nothing here is a live reference: mutating the
+                returned dict touches no app state.
+
+        Data Flow:
+            - Walk the declared domain with ``getattr(self, name, None)``.
+            - Normalise by value kind (see Summary); the three keyed
+              caches (``_mac_view_cache_key``, ``_a2l_cache_key``,
+              ``_a2l_enriched_key``) get named reductions whose shapes
+              are documented at their builders
+              (``_mac_view_cache_key_for`` / ``_load_a2l_data_with_cache``
+              / ``_compute_a2l_enriched_tags``).
+
+        Dependencies:
+            Used by:
+                - ``tests/test_b100_session_reset.py`` (TC-B100-09): the
+                  cold-load vs load-over leak comparison.
+        """
+        base = self.base_dir
+
+        def _rel(path: Path) -> str:
+            try:
+                return path.relative_to(base).as_posix()
+            except ValueError:
+                return path.as_posix()
+
+        def _image_digest(mem_map: dict) -> str:
+            # Address AND byte: hashing the bytes in address order alone
+            # cannot see WHICH addresses hold them (the reviewer's F9:
+            # two images that differ only in placement would compare
+            # equal).
+            digest = hashlib.sha256()
+            for address in sorted(mem_map):
+                digest.update(str(address).encode("utf-8"))
+                digest.update(b":")
+                digest.update(bytes((mem_map[address] & 0xFF,)))
+            return digest.hexdigest()
+
+        def _norm(value: Any) -> Any:
+            if value is None or isinstance(value, (bool, int)):
+                return value
+            if isinstance(value, Path):
+                return _rel(value)
+            if isinstance(value, str):
+                base_text = str(base)
+                if base_text in value:
+                    return value.replace(base_text, ".")
+                return value
+            if isinstance(value, LoadedFile):
+                return ("LoadedFile", _rel(value.path), _image_digest(value.mem_map))
+            if isinstance(value, ChangeService):
+                depths = value.history_depths()
+                return (
+                    "ChangeService",
+                    len(value.document.entries),
+                    depths["back"],
+                    depths["forward"],
+                )
+            if isinstance(value, dict):
+                # Content reduction, not keys alone (the reviewer's F9):
+                # the A2L payloads (``current_a2l_data``,
+                # ``_a2l_cache_data``) are dicts with FIXED section keys,
+                # so a keys-only reduction compared two different
+                # payloads EQUAL. Reduce to the length, the sorted keys
+                # and a digest of the normalised values in key order.
+                keys = sorted(value, key=str)
+                payload = repr([_norm(value[key]) for key in keys]).encode(
+                    "utf-8"
+                )
+                return (
+                    len(value),
+                    [str(key) for key in keys],
+                    hashlib.sha256(payload).hexdigest(),
+                )
+            if isinstance(value, (deque, list, tuple, set, frozenset)):
+                return [_norm(item) for item in value]
+            return type(value).__name__
+
+        snapshot: dict[str, Any] = {}
+        for name in _SESSION_SNAPSHOT_NAMES:
+            value = getattr(self, name, None)
+            if name == "_mac_view_cache_key":
+                # Identity-keyed cache (shape: ``(records_identity,
+                # len(records), id(a2l_data), file_type, ranges_tuple,
+                # mem_map_len)`` — ``_mac_view_cache_key_for``): the
+                # id() components carry no comparable state; the counts
+                # and kinds are the leak signal (QA R2-07).
+                snapshot[name] = (
+                    None
+                    if value is None
+                    else ("mac-view-cache", value[1], value[3], _norm(value[4]), value[5])
+                )
+            elif name == "_a2l_cache_key":
+                # Stat-keyed cache (shape: ``(resolved path, mtime_ns,
+                # size)`` — ``_load_a2l_data_with_cache``): the mtime is
+                # filesystem noise between two loads of one file; keep
+                # the path and size (QA R2-07).
+                snapshot[name] = (
+                    None
+                    if value is None
+                    else ("a2l-cache", _norm(value[0]), value[2])
+                )
+            elif name == "_a2l_enriched_key":
+                # Identity-keyed cache (shape: ``(id(current_a2l_data),
+                # mem_size)`` — ``_compute_a2l_enriched_tags``): keep the
+                # comparable half.
+                snapshot[name] = (
+                    None if value is None else ("a2l-enriched", value[1])
+                )
+            else:
+                snapshot[name] = _norm(value)
+        return snapshot
+
     def _handle_load_project(self, name: Optional[str]) -> None:
         if name is None:
             self.logger.info("Load project canceled.")
@@ -8910,6 +9281,12 @@ class S19TuiApp(App):
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No data files in project: %s", name)
             return
+        # HLR-165 / LLR-165.1: the ONE reset seam — after the project
+        # validates, before the first install — so the primary parse's
+        # MAC merge and the A2L fallbacks see an empty session. The
+        # outgoing document's entry count returns for the interim
+        # closed-document notice below (LED .55(a)).
+        discarded_unsaved = self._reset_project_session()
         # Multi-variant model (LLR-005.6, completed at E6): the manifest's
         # recorded ``active_variant`` wins when present AND valid; otherwise
         # the FIRST variant in the deterministic ``(name.lower(), name)``
@@ -8967,6 +9344,17 @@ class S19TuiApp(App):
             self.load_selected_file(mac_file, a2l_files)
         status_target = f"{selected_file.name} + {mac_file.name}" if primary_file and mac_file else selected_file.name
         self.set_status(f"Loaded project '{name}' -> {status_target}")
+        if discarded_unsaved:
+            # LED-2026-10-26-batch-100.55(a): until Inc 10 lands the load
+            # question (LLR-174.x), the closed Patch Editor document is
+            # named here — never closed silently. Inc 3 cannot read the
+            # panel's dirty flag (its public reader arrives at Inc 10), so
+            # the line states only what is known: the outgoing document
+            # held N entries and unsaved changes were not kept.
+            self.set_status(
+                f"Closed the Patch Editor document ({discarded_unsaved} entries); "
+                "unsaved changes were not kept"
+            )
         self.logger.info("Project loaded. name=%s file=%s mac=%s", name, selected_file, mac_file)
         self.update_project_labels()
         self._publish_flow_session_dir()
@@ -10735,6 +11123,13 @@ class S19TuiApp(App):
         # and only hides the symptom.
         if kind in ("all", "a2l"):
             self.current_a2l_path = None
+            # LLR-165.4 (P-25): the PARSED payload is the other half of
+            # the artifact being unloaded — it is the fallback the next
+            # S19/HEX/MAC parse re-attaches (`else self.current_a2l_data`
+            # at the parse branches), so clearing the path alone left the
+            # tags alive after an unload. Cleared beside the path, for
+            # the kinds that drop the artifact.
+            self.current_a2l_data = None
         # Mirror the load-path install: the MAC cache is keyed on the previous
         # records, and the empty-state panels key on `current_file is None`.
         self._invalidate_mac_view_cache()

@@ -1,0 +1,176 @@
+cmd: pytest -q -p no:cacheprovider tests/test_tui_patch_checks_strip.py::test_at078b_zero_total tests/test_tui_patch_editor_v2.py::test_paste_parse_then_apply_matches_file_loaded tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+tree: inc-3 implemented — flake isolation run
+
+F.FF                                                                     [100%]
+================================== FAILURES ===================================
+___________________________ test_at078b_zero_total ____________________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at078b_zero_total0')
+
+    def test_at078b_zero_total(tmp_path: Path) -> None:
+        """A 0-entry run renders 0/0/0 with a 0-filled bar and does not crash.
+    
+        Intent (AT-078b, C-10(b) fourth branch — the empty class): the strip's bar
+        is ``passed / (passed + failed + uncheckable)``, which divides by zero on a
+        0-entry run. The guard is a short-circuit to ``frac = 0.0``, asserted here
+        through the shipped surface.
+    
+        ⚠ **This test does NOT discriminate ``floor=True``, contrary to 01b**,
+        which claims "a floored bar would show 1 filled cell and fail" here.
+        MEASURED (M-1): it shows 0 and PASSES, because ``microbar``'s floor is
+        gated on ``clamped > 0.0``. The floor's real oracle is TC-078.4's
+        small-but-nonzero arm. What this test does own is the divide-by-zero
+        boundary — ``passed / total`` on a 0-entry run — which is real.
+        """
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> tuple[Text, dict[str, int]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                _open_patch_with_paste(app, [])
+                await pilot.pause()
+                _run_checks(app)
+                await pilot.pause()
+                return _strip(app), app._change_service.check_aggregates()
+    
+        strip, aggregates = asyncio.run(_drive())
+    
+        assert aggregates == {"passed": 0, "failed": 0, "uncheckable": 0}, (
+            f"a 0-entry run must aggregate to all-zero; got {aggregates!r}"
+        )
+>       assert strip.plain == _expect(0, 0, 0, _EMPTY_BAR), (
+            "a 0-total run must render 0/0/0 with an EMPTY bar — a floored bar "
+            f"would fill one cell and claim a pass that never happened; got "
+            f"{strip.plain!r}"
+        )
+E       AssertionError: a 0-total run must render 0/0/0 with an EMPTY bar — a floored bar would fill one cell and claim a pass that never happened; got ''
+E       assert '' == '✓0 ✗0 ◐0\n░░░░░░░░'
+E         
+E         - ✓0 ✗0 ◐0
+E         - ░░░░░░░░
+
+tests\test_tui_patch_checks_strip.py:370: AssertionError
+__________ test_at030c_directly_dropped_file_is_listed_and_loadable ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at030c_directly_dropped_f0')
+
+    def test_at030c_directly_dropped_file_is_listed_and_loadable(
+        tmp_path: Path,
+    ) -> None:
+        """AT-030c (GUARD, not the gate) — a hand-dropped file lists + loads.
+    
+        Intent: pins the SCAN contract independently of the save handler. A valid
+        v2 change file dropped DIRECTLY into ``patches/`` (bypassing ``save_doc``)
+        must be listed in the dropdown and loadable. This stays green even under a
+        reverted save handler, so it is structurally a guard, NOT the C-12 gate.
+        """
+        from textual.widgets import Select
+    
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+        patches.mkdir(parents=True, exist_ok=True)
+        _write_v2_document(
+            patches / "dropped.json",
+            [{"type": "bytes", "address": "0x300", "bytes": "EE FF"}],
+        )
+    
+        async def _drive() -> tuple[list[str], int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                select = app.query_one("#patch_doc_file_select", Select)
+                options = _select_option_values(select)
+    
+                select.value = "dropped.json"
+                await pilot.pause()
+                active = [
+                    entry.address
+                    for entry in app._change_service.document.entries
+                ]
+                return options, active[0] if active else -1
+    
+        options, loaded_address = asyncio.run(_drive())
+        assert options == ["dropped.json"], (
+            f"a directly-dropped change file must be listed, got {options}"
+        )
+>       assert loaded_address == 0x300, (
+            f"selecting the dropped file must load its 0x300 entry, "
+            f"got {loaded_address:#x}"
+        )
+E       AssertionError: selecting the dropped file must load its 0x300 entry, got -0x1
+E       assert -1 == 768
+
+tests\test_tui_patch_editor_v2.py:1595: AssertionError
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28649/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F561593490>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_checks_strip.py::test_at078b_zero_total - Asserti...
+FAILED tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+3 failed, 1 passed in 22.16s
+exit: 1
