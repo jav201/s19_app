@@ -1483,6 +1483,72 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 - **▸ (P2, origin batch-100 P2 architect A-01) Route the three writers that land images in the open project through the manifest writer.** The flow WRITE-OUT block (`flow_execution_service.py:679`), the external-step copy (`:1108`) and variant execution (`variant_execution_service.py:797`) write data files into the open project without `_write_and_verify_manifest`. So `project.json` does not record them: no `files` digest, and no `active_variant` update. Batch-100 reports them at Load as "not recorded" (LLR-169.5) and leaves the routing out of its file budget (`2026-10-26-batch-100/01-requirements-ledger.md` LED .7). **What closes it:** after each run returns, rewrite the manifest through the one seam, carrying every key it does not own, with an output-then-consume AT per writer.
 - **▸ (P3, origin batch-100 P2 architect B-12) Two older Windows device-name lists.** `changes/apply.py:107` (`COM1–9` / `LPT1–9`) and `segment_split_view.py:524` (adds `CONIN$` / `CONOUT$`) keep their own lists. Batch-100 adds one shared predicate in `workspace.py` for its three new uses (LLR-164.1, LLR-169.8, LLR-172.2) and leaves these two alone. **What closes it:** both call the shared predicate, each with an arm per name form.
 
+### 🆕 Routed 2026-10-26 — controlled and scale test audit (check engine, change-document reader)
+
+> **Source and status.** Independent audit agents ran on 2026-10-26 against `412de63`. The evidence lives outside the repo, in the Code-Wire project's vault folder `07 - Demos y Evidencia/` (`s19-defects-from-tests-2026-10-26.md`, `prueba-control/<run>/tests/`, `prueba-escala/<run>/tests/`). The orchestrator re-ran all 13 at main `b6722bc` (Inc 1 merged) on 2026-10-26, and **every one still fails**. Planted (seeded) defects of the audit are not listed here.
+>
+> **Routing.**
+> - T-01..T-04 and the suspects go to the Checks-window batch (R-049, with CW-U-9 / M-6), since they are the same engine.
+> - T-05..T-10 and T-13 form a change-document reader hardening unit; it can join "read/write integrity II".
+> - **T-11 goes into batch-100 Inc 9a.** It is the placement naming rule (`place_into_workarea`, B100-I13) that Inc 1 rewrote.
+> - T-02, T-03/T-04 and T-12 need an operator ruling against batch-95's "no implicit A2L" and LLR-050.1(a)'s fail-safe.
+
+- **▸ (T-01, MAJOR) `run_checks` taints from load-time collision issues.** After an editor remove, the healthy survivor stays `entry-fault`. A collision added after load checks as `pass`/`pass`.
+  - Where: `change_service.py` `ChangeService.run_checks`. It never refreshes `collision_issues`, unlike `apply` and `validate`.
+  - Requirement: the R-CHK-001 amendment; batch-33 HLR-050(b).
+  - Test: `prueba-control/B-clean/tests/test_audit_check_engine.py::test_d1a_*` and `test_d1b_*`.
+- **▸ (T-02, needs a ruling) One `CHG-SYMBOL-UNRESOLVED` / `CHG-SYMBOL-VALUE` entry blocks the whole check run (`doc-fault`).**
+  - Where: `check.py` `_CHECK_NON_BLOCKING_CODES` never received the batch-95 codes.
+  - The conflict: batch-95 LLR-141.1 says the entry is skipped, while LLR-050.1(a)'s fail-safe says unknown codes block.
+  - Test: `::test_d2_*`.
+- **▸ (T-03, needs a ruling) `run_checks_for_project` reads the check document with no `a2l_context`.** Every symbol entry is refused even when `a2l_path` is given.
+  - Where: `change_service.py` ≈2800.
+  - The conflict: batch-95's "no implicit A2L".
+  - Test: `::test_d3_*`.
+- **▸ (T-04, as T-03) Variant execution reads check files without the project A2L.**
+  - Where: `variant_execution_service.py` ≈773.
+  - Test: `prueba-control/A-clean/…::test_d4_*`.
+- **▸ (T-05) The reader raises `ValueError` on a JSON integer longer than 4300 digits,** on both the file and paste paths.
+  - Where: `io.py` `parse_change_document` catches only JSONDecodeError, RecursionError and UnicodeDecodeError.
+  - Requirement: HLR-001(3) "without raising"; R-PATCH-PASTE-001.
+  - Test: `prueba-escala/S3a::test_huge_integer_literal_is_a_finding_not_a_raise`.
+- **▸ (T-06) The reader raises `TypeError` when `kind` or `value_mode` is a list or an object.** Frozenset membership fails at `io.py` ≈754 and ≈776.
+  - Requirement: LLR-001.3.
+  - Test: `S3a::test_unhashable_metadata_value_is_one_metadata_error`.
+- **▸ (T-07) The reader raises on an encoding name containing NUL (`ValueError`) or a lone surrogate (`UnicodeEncodeError`).**
+  - Where: `_is_text_encoding` catches only LookupError.
+  - Requirement: LLR-001.3 `CHG-ENCODING-UNKNOWN`.
+  - Test: `S3b::test_a09_*`.
+- **▸ (T-08) `read_change_document` raises on a path containing NUL.**
+  - Where: an unguarded `resolve_input_path`.
+  - Requirement: LLR-001.7 `MF-PATH-UNRESOLVED`.
+  - Test: `S3a::test_unresolvable_nul_path_is_path_unresolved`.
+- **▸ (T-09) The address `"0x100
+"` is accepted.** `_parse_address` uses `re.match`, and `$` matches before a final newline.
+  - Requirement: LLR-001.2's strict grammar.
+  - Test: `S3a::test_address_with_trailing_newline_is_rejected`.
+- **▸ (T-10, LOW) A folder named `*.json` is listed as a change document.**
+  - Where: `list_change_documents` does not check `is_file()`.
+  - Requirement: batch-94 LLR-010.1.
+  - Test: `S3a::test_listing_names_files_only`.
+- **▸ (T-11 → batch-100 Inc 9a) A second save under the same check-spec name gives `baseline.chk_1.json`, which no longer reads as a check spec.**
+  - Cause: the `_<N>` suffix goes before the last suffix instead of before `.chk.json`.
+  - Fix: the placement treats `.chk.json` as one compound suffix.
+  - Requirement: batch-94 LLR-009.1.
+  - Test: `S4b::test_d13_second_check_spec_save_keeps_check_suffix`.
+- **▸ (T-12, needs a ruling) Confirming the unchanged seed of a symbol entry fails (`CHG-SYMBOL-UNRESOLVED`).** The per-entry edit parses with no `a2l_context`.
+  - Where: `change_service.py` ≈1507 `edit_entry_json`.
+  - Requirement: R-TUI-058, against "no implicit A2L".
+  - Test: `S4b::test_d16_*`.
+- **▸ (T-13, LOW) Typed text can override the document header (e.g. `encoding`) through the spliced envelope.**
+  - Where: `change_service.py` ≈1506.
+  - Requirement: R-TUI-058, LLR-001.2.
+  - Test: `S4b::test_d17_*`.
+- **▸ (suspects, no failing test yet)**
+  - The flow CHECK block reports a blocked check run as OK and drops `run_blocked_reason` (`flow_execution_service.py` ≈754-775; R-CHK-002 "loud run-level reason").
+  - `ChangeService.rows()` marks a healthy entry `/ fault` when a skipped declaration shares its address.
+  - `write_change_document` calls `ensure_workarea` outside its `try`.
+
 ### 🆕 Routed 2026-10-26 — Code-Wire audit of flow F6 "Comparison" (diff reports)
 
 > An independent agent audited the comparison flow with Code-Wire on 2026-10-25, at `d62b0c1`. The evidence lives outside the repo, in the Code-Wire project's vault folder `prueba-f6/`: the findings note, `REPORT.md`, the probe and `test_f6_findings.py`. **Re-verified at `1d677ba` on 2026-10-26: all 6 regression tests fail** (`6 failed in 0.45s`). batch-99 changed only `flow_execution_service.py` among the flow's files, and F6-2 still reproduces. The line numbers below are HEAD's. The audit's own numbers run 4–9 lines high, because its worktree carried inserted `# node:` marks (10 in `diff_report_service.py`).
