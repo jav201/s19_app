@@ -690,3 +690,13 @@ above this line is ever edited._
 - **Why:** this is the operator's rule that nothing is lost silently. The exposure between Inc 2 and Inc 7 needs a save failure followed by a restore failure in the same save.
 - **Evidence:** `03-increments/security-increment-002.md` Round 5; `03-increments/review-increment-002.md` Round 6.
 
+### LED-2026-10-26-batch-100.55 — Inc 3 gate: the interim notice states only what is known; the reset clears the panel's dirty marker
+- **Requirement:** LLR-165.3
+- **Date:** 2026-10-27
+- **What changed:**
+  - **(a)** LED .51's interim wording becomes `Closed the Patch Editor document (N entries); unsaved changes were not kept`, painted when the outgoing document holds N > 0 entries. Inc 3 cannot read the panel's dirty flag: it is private, and its public reader arrives at Inc 10 (`screens_directionb.py`). So until then the line never claims that the N entries were unsaved. Inc 10 replaces it with the question, keyed on the dirty flag.
+  - **(b)** The reset seam calls the panel's public `mark_loaded()`. This clears the dirty marker and the paste buffer, so after a project load the Patch panel no longer shows `0 entries ●` and no later guard asks about nothing.
+- **Closes:** code-reviewer Inc 3 F2 (MAJOR: N counted saved entries as unsaved; executed) and F3 (MAJOR: the panel stayed dirty on an empty ledger; probed by keys).
+- **Why:** the operator's rule that nothing is said or lost falsely. These are orchestrator rulings under the batch's standing authorization.
+- **Evidence:** `03-increments/review-increment-003.md` F2, F3.
+
