@@ -700,3 +700,11 @@ above this line is ever edited._
 - **Why:** the operator's rule that nothing is said or lost falsely. These are orchestrator rulings under the batch's standing authorization.
 - **Evidence:** `03-increments/review-increment-003.md` F2, F3.
 
+### LED-2026-10-26-batch-100.56 — Inc 5 file set: the save-back emit stages inside this work area (SEC-4)
+- **Requirement:** LLR-167.7
+- **Date:** 2026-10-27
+- **What changed:** Inc 5 adds `s19_app/tui/changes/apply.py`, which brings it to 4 files (⚠ at the cap). `save_patched_image` currently resolves `dest_dir` internally to choose its staging root (`apply.py` ≈741, ≈885). The staging root must come from `_guarded_destination(dest_dir, workarea_root)`, and the emit passes `workarea_root`. A save-back or Save project emit with a junction project open then creates no `temp/` or `temp/.staging/` in another work area. Arm: with a junction project open, a save-back leaves 0 entries in the other work area.
+- **Closes:** security-reviewer Inc 1 round 2 SEC-4 (MAJOR, executed), routed to Inc 5 at the Inc 1 gate.
+- **Why:** Inc 5 already splits `save_patched` (LLR-167.7), so the emit path is open there.
+- **Evidence:** `03-increments/security-increment-001.md` Round 2 SEC-4.
+

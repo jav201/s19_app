@@ -864,7 +864,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.7 — `save_patched` split into re-derive and emit-and-verify
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.14
+- **Ledger:** LED-2026-10-26-batch-100.14, LED-2026-10-26-batch-100.56
 - **Statement:** `ChangeService` shall expose `rederive_for_save(copy) -> (map, summary)` (NEW), which re-derives the source plus the current change document onto the given copy without touching the session map, and `emit_and_verify(map, ranges, dest_dir, filename, …) -> ChangeActionResult` (NEW), which emits and verifies. `save_patched` (`change_service.py:2009`) shall be composed of the two, so the save-back's rule (B99-I7) is unchanged. Inc 5 lands the split.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-69 — `pytest tests/test_b100_save_image.py -k tc_b100_69`
@@ -1970,7 +1970,7 @@ Taken from `design/ARQ-batch-100.md` §8 / §8.1 as amended for round 2. Every c
 | 2 | `app.py`, `workspace.py` (device-name predicate, `PROJECT_NAME_MAX_CHARS`) | 2 |
 | 3 | `app.py` | 1 |
 | 4 | `app.py` | 1 |
-| 5 | `app.py`, `change_service.py` (B100-I15, I18), `project_gather_service.py` (B100-I17) | 3 |
+| 5 | `app.py`, `change_service.py` (B100-I15, I18), `project_gather_service.py` (B100-I17), `changes/apply.py` (SEC-4 staging, LED .56) | 4 ⚠ |
 | 6 | `app.py`, `variant_execution_service.py`, `screens.py`, `styles.tcss` (the panel needs its layout rules) | 4 (at cap) |
 | 7 | `manifest_writer.py`, `variant_execution_service.py`, `app.py` (`derived_from` B100-I16; `choose_install_set`; the plan's `files` row takes its key list from `app.py`, so `project_gather_service.py` is not touched) | 3 |
 | 8a | `app.py`, `manifest_writer.py`, `variant_execution_service.py`, `project_gather_service.py` | 4 (at cap) |
