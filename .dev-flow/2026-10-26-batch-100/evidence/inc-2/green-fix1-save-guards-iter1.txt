@@ -1,0 +1,490 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1 GREEN — sources fixed)
+
+.........F....F......FF..FF                                              [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_tc_b100_05_open_project_c0')
+
+    def test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name(
+        tmp_path: Path,
+    ) -> None:
+        """LED .52(a) / F4: project ``ab`` is OPEN; ``AB`` typed saves INTO
+        the open project under its ON-DISK name — ``current_project`` keeps
+        the on-disk spelling, ``current_project_dir`` names the on-disk
+        folder and no ``AB`` folder appears."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("ab")
+                await _flush(pilot)
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "AB"))
+                await _flush(pilot)
+                status = probe.last
+                names = sorted(p.name for p in project_dir.iterdir())
+                folded_folder_exists = (app.workarea / "AB").exists()
+                current = app.current_project
+                current_dir_name = app.current_project_dir.name
+            return status, names, folded_folder_exists, current, current_dir_name
+    
+        status, names, folded_folder_exists, current, current_dir_name = asyncio.run(
+            _drive()
+        )
+        assert "Saved project" in status, status
+>       assert not folded_folder_exists
+E       assert not True
+
+tests\test_b100_save_guards.py:533: AssertionError
+________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_tc_b100_07_ast_census_eve0')
+
+    def test_tc_b100_07_ast_census_every_post_creation_return_removes(
+        tmp_path: Path,
+    ) -> None:
+        """The census: every ``return`` after the folder's creation sits in a
+        block that first calls ``_abort_save`` (or ``_remove_created_project_dir``);
+        exactly one ``except OSError`` handler exists and it rolls back too;
+        the one ``_abort_save`` helper removes the folder, unlinks the placed
+        files and restores the pre-save app state."""
+        tree = _app_module_ast()
+        handler = _save_handler_ast(tree)
+        parent_of: dict = {}
+        for node in ast.walk(handler):
+            for child in ast.iter_child_nodes(node):
+                parent_of[child] = node
+    
+        mkdir_lines = [
+            node.lineno
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "mkdir"
+        ]
+        assert mkdir_lines, "the handler must create the project folder"
+        first_mkdir = min(mkdir_lines)
+    
+        post_creation_returns = [
+            node
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Return) and node.lineno > first_mkdir
+        ]
+        assert len(post_creation_returns) >= 3, (
+            f"expected at least 3 post-creation returns, "
+            f"found {len(post_creation_returns)}"
+        )
+        for node in post_creation_returns:
+            block = parent_of.get(node)
+            siblings = getattr(block, "body", None)
+            assert siblings is not None, node.lineno
+            index = next(
+                i for i, stmt in enumerate(siblings) if stmt is node
+            )
+            assert any(
+                _contains_abort_call(stmt) for stmt in siblings[:index]
+            ), (
+                f"return at line {node.lineno} leaves without rolling back "
+                f"the failed save"
+            )
+    
+        oSError_handlers = [
+            node
+            for node in ast.walk(handler)
+            if isinstance(node, ast.ExceptHandler)
+            and node.type is not None
+            and getattr(node.type, "id", "") == "OSError"
+        ]
+>       assert len(oSError_handlers) == 1, (
+            f"exactly one OSError handler, found {len(oSError_handlers)}"
+        )
+E       AssertionError: exactly one OSError handler, found 2
+E       assert 2 == 1
+E        +  where 2 = len([<ast.ExceptHandler object at 0x0000023A7A139270>, <ast.ExceptHandler object at 0x0000023A7A2DA9B0>])
+
+tests\test_b100_save_guards.py:784: AssertionError
+_____ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_tc_b100_07_failed_merge_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023A7AA15610>
+target = 'exact', typed = 'ab', stage = 'gather'
+
+    @pytest.mark.parametrize(
+        "target,typed,stage",
+        [
+            ("exact", "ab", "gather"),
+            ("exact", "ab", "manifest-refused"),
+            ("open-case", "AB", "gather"),
+        ],
+    )
+    def test_tc_b100_07_failed_merge_removes_placed_files(
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        target: str,
+        typed: str,
+        stage: str,
+    ) -> None:
+        """LED .52(b) / F5 / SEC2-3: a failed save into a folder that already
+        existed (the exact-name merge, or the open project typed in another
+        case) removes every file it placed — the target's file set and its
+        digest are exactly as before — while a byte-identical file the
+        placement reused is kept, and the app's state returns to its
+        pre-save snapshot."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                if target == "open-case":
+                    app._handle_load_project("ab")
+                    await _flush(pilot)
+                # The patch goes down only AFTER the optional project load,
+                # so the load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                digest_before = _digest_manifest(project_dir)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+                digest_after = _digest_manifest(project_dir)
+                names = sorted(p.name for p in project_dir.iterdir())
+                state_after = _snapshot_app_state(app)
+            return status, names, digest_before, digest_after, state_before, state_after
+    
+        status, names, digest_before, digest_after, state_before, state_after = (
+            asyncio.run(_drive())
+        )
+>       assert "could not save" in status, f"{target}/{stage}: {status}"
+E       AssertionError: exact/gather: Nothing to save: load a data file or A2L first.
+E       assert 'could not save' in 'Nothing to save: load a data file or A2L first.'
+
+tests\test_b100_save_guards.py:975: AssertionError
+_ test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_tc_b100_07_failed_merge_r1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023A7CDBD990>
+target = 'exact', typed = 'ab', stage = 'manifest-refused'
+
+    @pytest.mark.parametrize(
+        "target,typed,stage",
+        [
+            ("exact", "ab", "gather"),
+            ("exact", "ab", "manifest-refused"),
+            ("open-case", "AB", "gather"),
+        ],
+    )
+    def test_tc_b100_07_failed_merge_removes_placed_files(
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        target: str,
+        typed: str,
+        stage: str,
+    ) -> None:
+        """LED .52(b) / F5 / SEC2-3: a failed save into a folder that already
+        existed (the exact-name merge, or the open project typed in another
+        case) removes every file it placed — the target's file set and its
+        digest are exactly as before — while a byte-identical file the
+        placement reused is kept, and the app's state returns to its
+        pre-save snapshot."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                if target == "open-case":
+                    app._handle_load_project("ab")
+                    await _flush(pilot)
+                # The patch goes down only AFTER the optional project load,
+                # so the load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                digest_before = _digest_manifest(project_dir)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+                digest_after = _digest_manifest(project_dir)
+                names = sorted(p.name for p in project_dir.iterdir())
+                state_after = _snapshot_app_state(app)
+            return status, names, digest_before, digest_after, state_before, state_after
+    
+        status, names, digest_before, digest_after, state_before, state_after = (
+            asyncio.run(_drive())
+        )
+>       assert "could not save" in status, f"{target}/{stage}: {status}"
+E       AssertionError: exact/manifest-refused: Nothing to save: load a data file or A2L first.
+E       assert 'could not save' in 'Nothing to save: load a data file or A2L first.'
+
+tests\test_b100_save_guards.py:975: AssertionError
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_at_b100_02_name_refusals_0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        then HLR-164's acceptance scene (LED .52(c)): projects ``prg`` (P2)
+        and ``ab`` are built by REAL saves, P2 is opened through the Load
+        project dialog by keys — the durable line names ``prg.s19`` — and
+        ``a b`` is refused naming ``ab`` with ``choose another name``,
+        ``ab`` byte-identical afterwards. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. HLR-164's acceptance scene: P2 (prg) and ab are built by
+                #    real saves; P2 is opened through the Load project dialog
+                #    by keys, so ANOTHER project is open; the disguised name
+                #    a b is refused naming ab.
+                await _save_project_as(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _save_project_as(pilot, app, "ab")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the ab save success line",
+                )
+                await _open_project_through_dialog(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "prg.s19" in _file_status_text(app),
+                    "the durable line naming P2's file",
+                )
+                ab_dir = app.workarea / "ab"
+                ab_digest_before = _digest_manifest(ab_dir)
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                ab_digest_after = _digest_manifest(ab_dir)
+            return ab_digest_before, ab_digest_after
+    
+>       ab_digest_before, ab_digest_after = asyncio.run(_drive())
+                                            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:1192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:1173: in _drive
+    await _open_project_through_dialog(pilot, app, "prg")
+tests\test_b100_save_guards.py:1084: in _open_project_through_dialog
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_through_dialog.<locals>.<lambda> at 0x0000023A7B283560>
+description = 'the Load project dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load project dialog
+
+tests\test_b100_save_guards.py:122: AssertionError
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27507/test_at_b100_02_name_refusals_1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        then HLR-164's acceptance scene (LED .52(c)): projects ``prg`` (P2)
+        and ``ab`` are built by REAL saves, P2 is opened through the Load
+        project dialog by keys — the durable line names ``prg.s19`` — and
+        ``a b`` is refused naming ``ab`` with ``choose another name``,
+        ``ab`` byte-identical afterwards. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. HLR-164's acceptance scene: P2 (prg) and ab are built by
+                #    real saves; P2 is opened through the Load project dialog
+                #    by keys, so ANOTHER project is open; the disguised name
+                #    a b is refused naming ab.
+                await _save_project_as(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _save_project_as(pilot, app, "ab")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the ab save success line",
+                )
+                await _open_project_through_dialog(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "prg.s19" in _file_status_text(app),
+                    "the durable line naming P2's file",
+                )
+                ab_dir = app.workarea / "ab"
+                ab_digest_before = _digest_manifest(ab_dir)
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                ab_digest_after = _digest_manifest(ab_dir)
+            return ab_digest_before, ab_digest_after
+    
+>       ab_digest_before, ab_digest_after = asyncio.run(_drive())
+                                            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:1192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:1173: in _drive
+    await _open_project_through_dialog(pilot, app, "prg")
+tests\test_b100_save_guards.py:1084: in _open_project_through_dialog
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_project_through_dialog.<locals>.<lambda> at 0x0000023A7D947560>
+description = 'the Load project dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load project dialog
+
+tests\test_b100_save_guards.py:122: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_ast_census_every_post_creation_return_removes
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-gather]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[exact-ab-manifest-refused]
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size0]
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]
+6 failed, 21 passed in 186.67s (0:03:06)

@@ -1,0 +1,82 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "failed_merge_removes_placed_files and open-case" (MUTANT (a): the rollback removes the reused placements too)
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (a))
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28491/test_tc_b100_07_failed_merge_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017D84FF2F90>
+target = 'open-case', typed = 'AB', stage = 'gather'
+
+    @pytest.mark.parametrize(
+        "target,typed,stage",
+        [
+            ("exact", "ab", "gather"),
+            ("exact", "ab", "manifest-refused"),
+            ("open-case", "AB", "gather"),
+        ],
+    )
+    def test_tc_b100_07_failed_merge_removes_placed_files(
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        target: str,
+        typed: str,
+        stage: str,
+    ) -> None:
+        """LED .52(b) / F5 / SEC2-3: a failed save into a folder that already
+        existed (the exact-name merge, or the open project typed in another
+        case) removes every file it placed — the target's file set and its
+        digest are exactly as before — while a byte-identical file the
+        placement reused is kept, and the app's state returns to its
+        pre-save snapshot."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                if target == "open-case":
+                    app._handle_load_project("ab")
+                    await _flush(pilot)
+                    # the current file is the open project's own a.s19 — its
+                    # placement into ab is a byte-identical reuse
+                else:
+                    app.load_selected_file(src)
+                    await _flush(pilot)
+                # The patch goes down only AFTER the optional project load,
+                # so the load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                digest_before = _digest_manifest(project_dir)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+                digest_after = _digest_manifest(project_dir)
+                names = sorted(p.name for p in project_dir.iterdir())
+                state_after = _snapshot_app_state(app)
+            return status, names, digest_before, digest_after, state_before, state_after
+    
+        status, names, digest_before, digest_after, state_before, state_after = (
+            asyncio.run(_drive())
+        )
+        assert "could not save" in status, f"{target}/{stage}: {status}"
+        assert "check the folder" in status, f"{target}/{stage}: {status}"
+>       assert digest_after == digest_before, (
+            f"{target}/{stage}: the failed save changed the target's bytes"
+        )
+E       AssertionError: open-case/gather: the failed save changed the target's bytes
+E       assert {} == {'a.s19': 'b1...7f25e97b65e0'}
+E         
+E         Right contains 1 more item:
+E         {'a.s19': 'b19ffe6f259e42818d1d9c66ad6eb16c4e116b5af677816393d57f25e97b65e0'}
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1059: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_merge_removes_placed_files[open-case-AB-gather]
+1 failed, 35 deselected in 4.03s

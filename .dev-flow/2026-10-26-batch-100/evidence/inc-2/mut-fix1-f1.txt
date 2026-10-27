@@ -1,0 +1,137 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[gather]' 'tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused]'
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F1 — the state restore removed from _abort_save)
+
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_07_forced_oserror_leaves_no_folder[gather] ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27521/test_tc_b100_07_forced_oserror0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000262ED5E4FD0>
+stage = 'gather'
+
+    @pytest.mark.parametrize(
+        "stage",
+        [
+            "validation",
+            "copies",
+            "variant-rebuild",
+            "gather",
+            "manifest",
+            "manifest-refused",
+        ],
+    )
+    def test_tc_b100_07_forced_oserror_leaves_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
+    ) -> None:
+        """A forced failure at each post-creation stage, with a project
+        ALREADY open: the handler paints the ``could not save`` tokens,
+        removes the folder this call created, restores the app's variant set,
+        current variant and current project to their pre-save state (F1 /
+        LED .52(b)), raises nothing and the app keeps running."""
+        base = tmp_path / "app"
+        name = f"stage-{stage}"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            _make_project(app, "pre", {"a.s19": _S19_A})
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("pre")
+                await _flush(pilot)
+                # The patch goes down only AFTER the project is open, so the
+                # load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, name))
+                await _flush(pilot)
+                status = probe.last
+                state_after = _snapshot_app_state(app)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, folders, state_before, state_after
+    
+        status, folders, state_before, state_after = asyncio.run(_drive())
+        assert "could not save" in status, f"{stage}: {status}"
+        assert "check the folder" in status, f"{stage}: {status}"
+        assert folders == ["patches", "pre", "temp"], f"{stage}: {folders}"
+>       assert state_after == state_before, (
+            f"{stage}: the failed save left app state behind — "
+            f"before {state_before!r}, after {state_after!r}"
+        )
+E       AssertionError: gather: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'], 'a', None, 'pre')
+E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
+E         
+E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-gather\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:936: AssertionError
+______ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27521/test_tc_b100_07_forced_oserror1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000262EDD12690>
+stage = 'manifest-refused'
+
+    @pytest.mark.parametrize(
+        "stage",
+        [
+            "validation",
+            "copies",
+            "variant-rebuild",
+            "gather",
+            "manifest",
+            "manifest-refused",
+        ],
+    )
+    def test_tc_b100_07_forced_oserror_leaves_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
+    ) -> None:
+        """A forced failure at each post-creation stage, with a project
+        ALREADY open: the handler paints the ``could not save`` tokens,
+        removes the folder this call created, restores the app's variant set,
+        current variant and current project to their pre-save state (F1 /
+        LED .52(b)), raises nothing and the app keeps running."""
+        base = tmp_path / "app"
+        name = f"stage-{stage}"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            _make_project(app, "pre", {"a.s19": _S19_A})
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("pre")
+                await _flush(pilot)
+                # The patch goes down only AFTER the project is open, so the
+                # load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, name))
+                await _flush(pilot)
+                status = probe.last
+                state_after = _snapshot_app_state(app)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, folders, state_before, state_after
+    
+        status, folders, state_before, state_after = asyncio.run(_drive())
+        assert "could not save" in status, f"{stage}: {status}"
+        assert "check the folder" in status, f"{stage}: {status}"
+        assert folders == ["patches", "pre", "temp"], f"{stage}: {folders}"
+>       assert state_after == state_before, (
+            f"{stage}: the failed save left app state behind — "
+            f"before {state_before!r}, after {state_after!r}"
+        )
+E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
+E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
+E         
+E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27521\\test_tc_b100_07_forced_oserror1\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:936: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[gather]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused]
+2 failed in 6.49s

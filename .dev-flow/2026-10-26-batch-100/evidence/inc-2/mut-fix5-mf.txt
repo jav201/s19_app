@@ -1,0 +1,61 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_empty_preexisting_home_survives_failed_save  (MUTANT mf, fix-pass-5 tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant mf)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_07_empty_preexisting_home_survives_failed_save _________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-4/test_tc_b100_07_empty_preexist0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029C6CFE2950>
+
+    def test_tc_b100_07_empty_preexisting_home_survives_failed_save(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R5-2 (review round 5): ``ab/patches/`` exists and is EMPTY before
+        the save; the gather writes a document into it, then the save
+        fails — the pre-existing home must survive (only the file the
+        gather wrote is removed). Kills mutant Mf, which drops the
+        ``home_preexisted`` guard and would rmdir the pre-existing empty
+        home."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            common = app.workarea / WORKAREA_PATCHES
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "boost.json").write_text(_CHANGE_DOC, encoding="utf-8")
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            home = project_dir / "patches"
+            home.mkdir()
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                _force_stage(monkeypatch, "manifest-refused")
+                payload = app_module.SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="ab",
+                    batch=("boost.json",),
+                )
+                app._handle_save_dialog(payload)
+                await _flush(pilot)
+                status = probe.last
+                home_exists = home.is_dir()
+                home_names = (
+                    sorted(p.name for p in home.iterdir()) if home_exists else None
+                )
+            return status, home_exists, home_names
+    
+        status, home_exists, home_names = asyncio.run(_drive())
+        assert "could not save" in status, status
+        assert "check the folder" in status, status
+>       assert home_exists, "the pre-existing empty home must survive the failed save"
+E       AssertionError: the pre-existing empty home must survive the failed save
+E       assert False
+
+tests\test_b100_save_guards.py:1823: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_empty_preexisting_home_survives_failed_save
+1 failed in 3.60s

@@ -1,0 +1,3 @@
+cmd: pytest -q -p no:cacheprovider tests/test_tui_variants.py::test_save_second_s19_into_project_appends_variant
+.                                                                        [100%]
+1 passed in 3.43s

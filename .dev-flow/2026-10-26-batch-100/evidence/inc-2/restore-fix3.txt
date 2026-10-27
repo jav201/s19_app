@@ -1,0 +1,7 @@
+cmd: sha256sum of both SOURCE files after the 3 rollback-mutant reverts, compared with pre-mutation-hashes-fix3.txt
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3)
+
+fee2d17a687634023b94efcbf9b202f5b1111f6d4ce853aa464f64328b4132bf *s19_app/tui/app.py
+2f6dbdb4cf047c323403cf3478198abeaeb822b491ca9f02a2c17a08244d19fa *s19_app/tui/workspace.py
+
+RESTORE OK - all 3 fix-pass-3 rollback mutants reverted

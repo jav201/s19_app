@@ -1,0 +1,8 @@
+cmd: pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py (guards, fix pass 5)
+tree: fix pass 5
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 161.33s (0:02:41)

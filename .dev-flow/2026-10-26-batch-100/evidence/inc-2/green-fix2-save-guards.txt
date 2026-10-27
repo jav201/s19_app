@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — R2-1 recursive-snapshot rollback, R2-3 committed block, R2-5 mismatch repaint)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+...............................                                          [100%]
+31 passed in 194.33s (0:03:14)

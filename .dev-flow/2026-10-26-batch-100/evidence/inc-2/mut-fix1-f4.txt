@@ -1,0 +1,63 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F4 — the LED .52(a) on-disk-spelling adoption bypassed)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27523/test_tc_b100_05_open_project_c0')
+
+    def test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name(
+        tmp_path: Path,
+    ) -> None:
+        """LED .52(a) / F4: project ``ab`` is OPEN; ``AB`` typed saves INTO
+        the open project under its ON-DISK name — ``current_project`` keeps
+        the on-disk spelling, ``current_project_dir`` names the on-disk
+        folder and the work-area folder list gains no new folder (on a
+        case-insensitive volume ``workarea / "AB"`` IS the ``ab`` folder, so
+        the oracle is the folder-name list, compared case-sensitively)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("ab")
+                await _flush(pilot)
+                app.load_selected_file(src)
+                await _flush(pilot)
+                folders_before = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+                app._handle_save_dialog(_payload(app, "AB"))
+                await _flush(pilot)
+                status = probe.last
+                names = sorted(p.name for p in project_dir.iterdir())
+                folders_after = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+                current = app.current_project
+                current_dir_name = app.current_project_dir.name
+            return status, names, folders_before, folders_after, current, current_dir_name
+    
+        status, names, folders_before, folders_after, current, current_dir_name = asyncio.run(
+            _drive()
+        )
+        assert "Saved project" in status, status
+        assert folders_after == folders_before, (
+            f"the case-variant save changed the work-area folders: "
+            f"{folders_before} -> {folders_after}"
+        )
+>       assert current == "ab", f"current_project must keep the on-disk spelling: {current!r}"
+E       AssertionError: current_project must keep the on-disk spelling: 'AB'
+E       assert 'AB' == 'ab'
+E         
+E         - ab
+E         + AB
+
+tests\test_b100_save_guards.py:544: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_open_project_case_variant_saves_under_on_disk_name
+1 failed in 4.48s

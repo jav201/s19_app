@@ -1,0 +1,6 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1)
+
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed, 3753 deselected in 83.29s (0:01:23)

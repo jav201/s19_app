@@ -1,0 +1,299 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k 'census or removes_every_placed_path or forced_oserror and manifest-refused' (MUTANT R2-4: the manifest-not-ok exit rolls back with a bare _remove_created_project_dir — no state restore, no placed-path removal)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+FFFF.                                                                    [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_ast_census_eve0')
+
+    def test_tc_b100_07_ast_census_every_post_creation_return_removes(
+        tmp_path: Path,
+    ) -> None:
+        """The census: every ``return`` after the folder's creation sits in a
+        block that first calls the one ``_abort_save`` rollback (a bare
+        ``_remove_created_project_dir`` exit does NOT count — R2-4);
+        exactly one ``except OSError`` handler exists AFTER the folder's
+        creation and it rolls back too (the pre-creation clash scan keeps its
+        own skip-handler, SEC2-1); the one ``_abort_save`` helper removes the
+        folder, unlinks the placed paths and restores the pre-save app
+        state."""
+        tree = _app_module_ast()
+        handler = _save_handler_ast(tree)
+        parent_of: dict = {}
+        for node in ast.walk(handler):
+            for child in ast.iter_child_nodes(node):
+                parent_of[child] = node
+    
+        mkdir_lines = [
+            node.lineno
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "mkdir"
+        ]
+        assert mkdir_lines, "the handler must create the project folder"
+        first_mkdir = min(mkdir_lines)
+    
+        post_creation_returns = [
+            node
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Return) and node.lineno > first_mkdir
+        ]
+        assert len(post_creation_returns) >= 3, (
+            f"expected at least 3 post-creation returns, "
+            f"found {len(post_creation_returns)}"
+        )
+        for node in post_creation_returns:
+            block = parent_of.get(node)
+            siblings = getattr(block, "body", None)
+            assert siblings is not None, node.lineno
+            index = next(
+                i for i, stmt in enumerate(siblings) if stmt is node
+            )
+>           assert any(
+                _contains_abort_call(stmt) for stmt in siblings[:index]
+            ), (
+                f"return at line {node.lineno} leaves without rolling back "
+                f"the failed save"
+            )
+E           AssertionError: return at line 8543 leaves without rolling back the failed save
+E           assert False
+E            +  where False = any(<generator object test_tc_b100_07_ast_census_every_post_creation_return_removes.<locals>.<genexpr> at 0x000002FADF8144A0>)
+
+tests\test_b100_save_guards.py:826: AssertionError
+______ test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_forced_oserror0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE13001D0>
+stage = 'manifest-refused'
+
+    @pytest.mark.parametrize(
+        "stage",
+        [
+            "validation",
+            "copies",
+            "variant-rebuild",
+            "gather",
+            "manifest",
+            "manifest-refused",
+        ],
+    )
+    def test_tc_b100_07_forced_oserror_leaves_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
+    ) -> None:
+        """A forced failure at each post-creation stage, with a project
+        ALREADY open: the handler paints the ``could not save`` tokens,
+        removes the folder this call created, restores the app's variant set,
+        current variant and current project to their pre-save state (F1 /
+        LED .52(b)), raises nothing and the app keeps running."""
+        base = tmp_path / "app"
+        name = f"stage-{stage}"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            _make_project(app, "pre", {"a.s19": _S19_A})
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("pre")
+                await _flush(pilot)
+                # The patch goes down only AFTER the project is open, so the
+                # load path itself keeps the real functions.
+                _force_stage(monkeypatch, stage)
+                state_before = _snapshot_app_state(app)
+                app._handle_save_dialog(_payload(app, name))
+                await _flush(pilot)
+                status = probe.last
+                state_after = _snapshot_app_state(app)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, folders, state_before, state_after
+    
+        status, folders, state_before, state_after = asyncio.run(_drive())
+        assert "could not save" in status, f"{stage}: {status}"
+        assert "check the folder" in status, f"{stage}: {status}"
+        assert folders == ["patches", "pre", "temp"], f"{stage}: {folders}"
+>       assert state_after == state_before, (
+            f"{stage}: the failed save left app state behind — "
+            f"before {state_before!r}, after {state_after!r}"
+        )
+E       AssertionError: manifest-refused: the failed save left app state behind — before (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19'], 'a', None, 'pre'), after (['a'], ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'], 'a', None, 'pre')
+E       assert (['a'], ['C:\..., None, 'pre') == (['a'], ['C:\..., None, 'pre')
+E         
+E         At index 1 diff: ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\stage-manifest-refused\\a.s19'] != ['C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27567\\test_tc_b100_07_forced_oserror0\\app\\.s19tool\\workarea\\pre\\a.s19']
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:981: AssertionError
+____ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_failed_save_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE2C6E690>
+case = 'merge-gathered'
+
+    @pytest.mark.parametrize(
+        "case",
+        ["merge-gathered", "merge-gathered-reused", "fresh-gathered"],
+    )
+    def test_tc_b100_07_failed_save_removes_every_placed_path(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+    ) -> None:
+        """R2-1 / SEC2-4 (LED .52(b)): a failed save removes EVERY file and
+        folder it placed — the copies AND the change/check documents the
+        gather copied into ``patches/`` with the home folder it created —
+        leaving the target's RECURSIVE tree (files AND folders) exactly as
+        the pre-save snapshot. A byte-identical file the gather REUSED at a
+        pre-existing path must survive (SEC2-4's trap: a bare-name skip
+        test would delete it). A fresh-folder save that fails leaves no
+        folder behind."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            common = app.workarea / WORKAREA_PATCHES
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "hotfix.json").write_text(_CHANGE_DOC, encoding="utf-8")
+            merge = case != "fresh-gathered"
+            if merge:
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                if case == "merge-gathered-reused":
+                    # the gather finds a byte-identical sibling at the same
+                    # path and REUSES it — nothing is written there
+                    reused_home = project_dir / "patches"
+                    reused_home.mkdir()
+                    (reused_home / "hotfix.json").write_text(
+                        _CHANGE_DOC, encoding="utf-8"
+                    )
+            else:
+                project_dir = app.workarea / "freshp"
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                # The patch goes down only AFTER the load, so the load path
+                # itself keeps the real writer.
+                _force_stage(monkeypatch, "manifest-refused")
+                tree_before = _tree_listing(project_dir)
+                payload = app_module.SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="ab" if merge else "freshp",
+                    batch=("hotfix.json",),
+                )
+                app._handle_save_dialog(payload)
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing(project_dir)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, tree_before, tree_after, folders
+    
+        status, tree_before, tree_after, folders = asyncio.run(_drive())
+        assert "could not save" in status, f"{case}: {status}"
+        assert "check the folder" in status, f"{case}: {status}"
+>       assert tree_after == tree_before, (
+            f"{case}: the failed save left placed files or folders behind — "
+            f"before {sorted(tree_before)}, after {sorted(tree_after)}"
+        )
+E       AssertionError: merge-gathered: the failed save left placed files or folders behind — before ['a.s19'], after ['a.s19', 'firmware.s19', 'patches', 'patches\\hotfix.json']
+E       assert {'a.s19': 'b1...279367b1fb4e'} == {'a.s19': 'b1...7f25e97b65e0'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 3 more items:
+E         {'firmware.s19': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51',
+E          'patches': 'dir',
+E          'patches\\hotfix.json': '247767fa2b72e3e2918961ecb83d5a8590125932e6afbfa026af279367b1fb4e'}
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1115: AssertionError
+_ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered-reused] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27567/test_tc_b100_07_failed_save_re1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002FAE389A250>
+case = 'merge-gathered-reused'
+
+    @pytest.mark.parametrize(
+        "case",
+        ["merge-gathered", "merge-gathered-reused", "fresh-gathered"],
+    )
+    def test_tc_b100_07_failed_save_removes_every_placed_path(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+    ) -> None:
+        """R2-1 / SEC2-4 (LED .52(b)): a failed save removes EVERY file and
+        folder it placed — the copies AND the change/check documents the
+        gather copied into ``patches/`` with the home folder it created —
+        leaving the target's RECURSIVE tree (files AND folders) exactly as
+        the pre-save snapshot. A byte-identical file the gather REUSED at a
+        pre-existing path must survive (SEC2-4's trap: a bare-name skip
+        test would delete it). A fresh-folder save that fails leaves no
+        folder behind."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            common = app.workarea / WORKAREA_PATCHES
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "hotfix.json").write_text(_CHANGE_DOC, encoding="utf-8")
+            merge = case != "fresh-gathered"
+            if merge:
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                if case == "merge-gathered-reused":
+                    # the gather finds a byte-identical sibling at the same
+                    # path and REUSES it — nothing is written there
+                    reused_home = project_dir / "patches"
+                    reused_home.mkdir()
+                    (reused_home / "hotfix.json").write_text(
+                        _CHANGE_DOC, encoding="utf-8"
+                    )
+            else:
+                project_dir = app.workarea / "freshp"
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                # The patch goes down only AFTER the load, so the load path
+                # itself keeps the real writer.
+                _force_stage(monkeypatch, "manifest-refused")
+                tree_before = _tree_listing(project_dir)
+                payload = app_module.SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="ab" if merge else "freshp",
+                    batch=("hotfix.json",),
+                )
+                app._handle_save_dialog(payload)
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing(project_dir)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, tree_before, tree_after, folders
+    
+        status, tree_before, tree_after, folders = asyncio.run(_drive())
+        assert "could not save" in status, f"{case}: {status}"
+        assert "check the folder" in status, f"{case}: {status}"
+>       assert tree_after == tree_before, (
+            f"{case}: the failed save left placed files or folders behind — "
+            f"before {sorted(tree_before)}, after {sorted(tree_after)}"
+        )
+E       AssertionError: merge-gathered-reused: the failed save left placed files or folders behind — before ['a.s19', 'patches', 'patches\\hotfix.json'], after ['a.s19', 'firmware.s19', 'patches', 'patches\\hotfix.json']
+E       assert {'a.s19': 'b1...279367b1fb4e'} == {'a.s19': 'b1...279367b1fb4e'}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'firmware.s19': '8a35f3808f25ff85a9ce1100bbce23783a7031b82c6f3d14cc1f749a0df40e51'}
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1115: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_ast_census_every_post_creation_return_removes
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_forced_oserror_leaves_no_folder[manifest-refused]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered-reused]
+4 failed, 1 passed, 26 deselected in 14.03s

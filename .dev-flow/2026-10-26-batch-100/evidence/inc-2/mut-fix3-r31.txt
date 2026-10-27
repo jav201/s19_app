@@ -1,0 +1,71 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_rollback_never_touches_junction_target  (MUTANT M-R3-1: walk_tree_no_links follows reparse points — the _is_reparse_point guard deleted)
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2 + fix pass 3 WITH THE MUTANT)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_07_rollback_never_touches_junction_target ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27604/test_tc_b100_07_rollback_never0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E35D2BD250>
+
+    def test_tc_b100_07_rollback_never_touches_junction_target(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R3-1 (LED .50, security finding): the rollback's snapshot and removal
+        walks never follow a junction that pre-exists inside the project. A
+        concurrent writer — simulated inside the gather — drops a file into the
+        TARGET of ``ab\\ext`` (outside the work area) and the save then fails;
+        the outside file must SURVIVE, and the project tree must equal its
+        pre-save snapshot. On the unfixed tree the ``rglob`` removal walk enters
+        the junction and unlinks the outside file — this arm is RED there."""
+        b100_links.require_junctions()
+        victim = tmp_path / "victim"
+        base = tmp_path / "app"
+    
+        def _concurrent_writer_then_fail(*args, **kwargs):
+            (victim / "user-work.txt").write_text(
+                "written by another program", encoding="utf-8"
+            )
+            raise OSError("forced gather failure")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                victim.mkdir()
+                (victim / "keep.txt").write_text("victim", encoding="utf-8")
+                b100_links.create_junction(project_dir / "ext", victim)
+                app.load_selected_file(src)
+                await _flush(pilot)
+                tree_before = _tree_listing_no_links(project_dir)
+                monkeypatch.setattr(
+                    app_module, "gather_project_artifacts", _concurrent_writer_then_fail
+                )
+                app._handle_save_dialog(
+                    app_module.SaveProjectPayload(
+                        parent_folder=str(app.workarea), project_name="ab"
+                    )
+                )
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing_no_links(project_dir)
+                victim_names = sorted(entry.name for entry in victim.iterdir())
+            return status, tree_before, tree_after, victim_names
+    
+        status, tree_before, tree_after, victim_names = asyncio.run(_drive())
+        assert "could not save" in status, status
+>       assert "user-work.txt" in victim_names, (
+            "the rollback deleted through the junction — outside the work area: "
+            f"victim now {victim_names}"
+        )
+E       AssertionError: the rollback deleted through the junction — outside the work area: victim now ['keep.txt']
+E       assert 'user-work.txt' in ['keep.txt']
+
+tests\test_b100_save_guards.py:1295: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_never_touches_junction_target
+1 failed in 3.90s

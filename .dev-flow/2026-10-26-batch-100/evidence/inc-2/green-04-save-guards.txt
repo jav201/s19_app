@@ -1,0 +1,4 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (Inc 2, scenario fixes)
+..................                                                       [100%]
+18 passed in 152.08s (0:02:32)

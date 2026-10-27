@@ -1,0 +1,91 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_57_export_holds_no_byte_identity_rule (RED, pre-pass tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_57_export_holds_no_byte_identity_rule ______________
+
+    def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
+        """Census: the export module decides its ``reused``/``wrote`` word only
+        from the placement outcome — its own byte-identity rule is gone — and
+        the package holds its byte-identity census BY BEHAVIOUR (a
+        ``read_bytes() ==`` comparison or a ``_hash_file`` digest compare), not
+        by the name ``find_identical``: the single-file rule is
+        ``_match_identical``/``find_identical`` in ``workspace.py``; the only
+        other rule is the declared one — the group's frozen rule (R30,
+        ``place_group_into_workarea``). Inc 2 fix pass 5 (security finding
+        SEC2-7, round 4) re-pinned this census: the gather's sibling byte-scan
+        is RETIRED — ``project_gather_service`` places through
+        ``place_into_workarea`` and translates only its ``reused`` flag, so the
+        placement's rule is the sole judge and no second rule can disagree
+        with it (the case-variant deletion SEC2-7's probe executed). A new
+        rule under any other name, or a deleted declared one, fails the
+        census.
+        """
+        package = ROOT / "s19_app"
+        export_source = (package / "tui" / "segment_split_view.py").read_text(
+            encoding="utf-8"
+        )
+        assert "_export_reuse_target" not in export_source, (
+            "the export's own byte-identity rule is retired (LLR-163.6)"
+        )
+        assert "read_bytes" not in export_source, (
+            "the export must not compare file bytes itself"
+        )
+        assert "find_identical" not in export_source, (
+            "no separate find_identical call may decide the export's word"
+        )
+        assert ".reused" in export_source, (
+            "the status word must come from the PlacementResult the placement returned"
+        )
+        the_single_file_rule = {
+            ("s19_app/tui/workspace.py", "_match_identical"),
+            ("s19_app/tui/workspace.py", "find_identical"),
+        }
+        declared_other_rules = {
+            # The group's frozen reuse rule (R30, B99-I2a) — converted by no
+            # increment; it stays "requested names only".
+            ("s19_app/tui/workspace.py", "place_group_into_workarea"),
+        }
+        found: set = set()
+        for path in sorted(package.rglob("*.py")):
+            rel = path.relative_to(ROOT).as_posix()
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                for sub in ast.walk(node):
+                    compares_bytes = (
+                        isinstance(sub, ast.Compare)
+                        and isinstance(sub.left, ast.Call)
+                        and isinstance(sub.left.func, ast.Attribute)
+                        and sub.left.func.attr == "read_bytes"
+                    )
+                    hashes_file = (
+                        isinstance(sub, ast.Call)
+                        and isinstance(sub.func, ast.Name)
+                        and sub.func.id == "_hash_file"
+                    )
+                    if compares_bytes or hashes_file:
+                        found.add((rel, node.name))
+        assert the_single_file_rule <= found, (
+            f"the single-file byte-identity rule is gone: missing "
+            f"{the_single_file_rule - found}"
+        )
+>       assert found - the_single_file_rule == declared_other_rules, (
+            f"byte-identity census drifted: unexpected "
+            f"{found - the_single_file_rule - declared_other_rules}, "
+            f"declared-but-missing "
+            f"{declared_other_rules - (found - the_single_file_rule)}"
+        )
+E       AssertionError: byte-identity census drifted: unexpected {('s19_app/tui/services/project_gather_service.py', '_gather_copy')}, declared-but-missing set()
+E       assert {('s19_app/tu...to_workarea')} == {('s19_app/tu...to_workarea')}
+E         
+E         Extra items in the left set:
+E         ('s19_app/tui/services/project_gather_service.py', '_gather_copy')
+E         Use -v to get more diff
+
+tests\test_b100_reuse.py:553: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_57_export_holds_no_byte_identity_rule
+1 failed in 1.05s

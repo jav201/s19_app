@@ -1,0 +1,56 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_failed_verify_leaves_no_folder_fresh  (MUTANT sec2-8, fix-pass-5 tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant sec2-8)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_07_failed_verify_leaves_no_folder_fresh _____________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-0/test_tc_b100_07_failed_verify_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000228A7392910>
+
+    def test_tc_b100_07_failed_verify_leaves_no_folder_fresh(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SEC2-8 (security round 4): a FRESH save whose manifest WRITE
+        succeeds but whose VERIFY re-read raises — this save created
+        ``project.json``, so the rollback must remove it and leave no
+        folder behind. The old rollback unlinked the placements and then
+        ``rmdir``ed the project folder while ``project.json`` was still
+        inside — the folder stayed, holding only the manifest (this arm is
+        RED there)."""
+    
+        def _raise(*args, **kwargs):
+            raise OSError("forced verify re-read failure")
+    
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+                app._handle_save_dialog(_payload(app, "freshv"))
+                await _flush(pilot)
+                status = probe.last
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, folders
+    
+        status, folders = asyncio.run(_drive())
+        assert "could not save" in status, status
+        assert "check the folder" in status, status
+>       assert "freshv" not in folders, (
+            f"the failed save left the folder it created behind: {folders}"
+        )
+E       AssertionError: the failed save left the folder it created behind: ['freshv', 'patches', 'temp']
+E       assert 'freshv' not in ['freshv', 'patches', 'temp']
+
+tests\test_b100_save_guards.py:1664: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_verify_leaves_no_folder_fresh
+1 failed in 3.90s

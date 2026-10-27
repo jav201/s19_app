@@ -1,0 +1,26 @@
+cmd: grep -rln "_handle_save_dialog\|list_projects\|sanitize_project_name\|_remove_created_project_dir" tests/ --include=*.py
+tests/test_b100_reuse.py
+tests/test_b100_save_guards.py
+tests/test_b99_load_project.py
+tests/test_b99_staging.py
+tests/test_crc_designer_view.py
+tests/test_diff_report_service.py
+tests/test_flow_a2b_b94.py
+tests/test_flow_persistence.py
+tests/test_project_gather.py
+tests/test_tui_app.py
+tests/test_tui_evidence_packs.py
+tests/test_tui_helpers.py
+tests/test_tui_manifest_save.py
+tests/test_tui_report_seam.py
+tests/test_tui_variants.py
+tests/test_tui_workspace.py
+
+cmd: grep -n "return" on the post-creation window of _handle_save_dialog (app.py)
+8308:                self._remove_created_project_dir(project_dir, created_project_dir)
+8321:                    self._remove_created_project_dir(project_dir, created_project_dir)
+8326:                self._remove_created_project_dir(project_dir, created_project_dir)
+8421:                self._remove_created_project_dir(project_dir, created_project_dir)
+8441:            self._remove_created_project_dir(project_dir, created_project_dir)
+8446:            self._remove_created_project_dir(project_dir, created_project_dir)
+8462:            self._remove_created_project_dir(project_dir, created_project_dir)

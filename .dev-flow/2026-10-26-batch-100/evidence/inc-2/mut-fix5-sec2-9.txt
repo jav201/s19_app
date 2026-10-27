@@ -1,0 +1,69 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_failed_verify_restores_previous_manifest  (MUTANT sec2-9, fix-pass-5 tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, mutant sec2-9)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_07_failed_verify_restores_previous_manifest ___________
+
+tmp_path = WindowsPath('C:/Windows/Temp/pytest-of-unknown/pytest-1/test_tc_b100_07_failed_verify_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000197E6372AD0>
+
+    def test_tc_b100_07_failed_verify_restores_previous_manifest(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SEC2-9 (security round 4): a MERGE whose manifest write succeeds
+        but whose verify raises — the save REPLACED a pre-existing
+        ``project.json``; the rollback must put the previous bytes back
+        atomically (staged, then ``os.replace``), leaving the project's
+        tree byte-identical to its pre-save state. The old rollback kept
+        the new manifest — the pre-save bytes were lost (this arm is RED
+        there)."""
+    
+        def _raise(*args, **kwargs):
+            raise OSError("forced verify re-read failure")
+    
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                # the first save creates ab WITH its manifest
+                app._handle_save_dialog(_payload(app, "ab"))
+                await _flush(pilot)
+                project_dir = app.workarea / "ab"
+                before_bytes = (project_dir / "project.json").read_bytes()
+                tree_before = _digest_manifest(project_dir)
+                # a merging second save loads another image
+                src_b = tmp_path / "sources" / "b.s19"
+                src_b.write_text(_S19_B, encoding="ascii")
+                app.load_selected_file(src_b)
+                await _flush(pilot)
+                monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+                app._handle_save_dialog(_payload(app, "ab"))
+                await _flush(pilot)
+                status = probe.last
+                after_bytes = (project_dir / "project.json").read_bytes()
+                tree_after = _digest_manifest(project_dir)
+            return status, before_bytes, after_bytes, tree_before, tree_after
+    
+        status, before_bytes, after_bytes, tree_before, tree_after = asyncio.run(_drive())
+        assert "could not save" in status, status
+        assert "check the folder" in status, status
+>       assert after_bytes == before_bytes, (
+            "the failed merge must restore project.json to its pre-save bytes"
+        )
+E       AssertionError: the failed merge must restore project.json to its pre-save bytes
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{\r\n  "sch...nts": {}\r\n}'
+E         
+E         At index 48 diff: b'b' != b'f'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1715: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_verify_restores_previous_manifest
+1 failed in 5.59s

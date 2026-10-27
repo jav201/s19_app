@@ -1,0 +1,5 @@
+cmd: pytest tests/test_tui_helpers.py tests/test_tui_manifest_save.py tests/test_tui_report_seam.py tests/test_tui_variants.py tests/test_tui_workspace.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (Inc 2 fixed tree)
+........................................................................ [ 62%]
+............................................                             [100%]
+116 passed in 251.21s (0:04:11)

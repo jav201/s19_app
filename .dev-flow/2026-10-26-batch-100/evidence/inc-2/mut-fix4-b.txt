@@ -1,0 +1,169 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k "r7 or r8" (MUTANT (b): the rollback back to the snapshot-difference tree walk)
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign + mutant (b))
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_07_rollback_keeps_denied_folder_content_r7 ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018EB7BD1F90>
+
+    def test_tc_b100_07_rollback_keeps_denied_folder_content_r7(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SEC2-5 / LED .53 (R7): ``ab/patches/keep.json`` already exists and
+        ``ab/patches`` is read-denied (``icacls /deny …:(RD)``) when the save
+        starts; the deny is lifted DURING the save (inside the forced
+        manifest writer) and the save is then refused — ``keep.json`` must
+        SURVIVE and the file this save placed must still be removed. The
+        fix-pass-3 snapshot-diff rollback was blind to the denied folder and
+        DELETED ``keep.json`` (this arm is RED there). On non-Windows hosts
+        the arm skips (PDR C-QA-6)."""
+        if sys.platform != "win32":
+            pytest.skip("icacls deny-read is a Windows-only test arm (PDR C-QA-6)")
+        user = os.environ.get("USERNAME")
+        assert user, "USERNAME is required for the icacls deny arm"
+        base = tmp_path / "app"
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+        patches = project_dir / "patches"
+        patches.mkdir()
+        (patches / "keep.json").write_text("{}", encoding="ascii")
+        src = _copy_source(tmp_path)
+    
+        def _lift_deny_then_refuse(*args, **kwargs):
+            subprocess.run(
+                ["icacls", str(patches), "/remove:d", user], check=False
+            )
+            return None, [SimpleNamespace(message="forced manifest refusal")]
+    
+        async def _drive() -> tuple:
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                subprocess.run(
+                    ["icacls", str(patches), "/deny", f"{user}:(RD)"], check=True
+                )
+                monkeypatch.setattr(
+                    app_module, "write_project_manifest", _lift_deny_then_refuse
+                )
+                try:
+                    app._handle_save_dialog(_payload(app, "ab"))
+                    await _flush(pilot)
+                finally:
+                    subprocess.run(
+                        ["icacls", str(patches), "/remove:d", user], check=False
+                    )
+                status = probe.last
+                names = sorted(p.name for p in project_dir.iterdir())
+                patch_names = sorted(p.name for p in patches.iterdir())
+            return status, names, patch_names
+    
+        status, names, patch_names = asyncio.run(_drive())
+        assert "could not save" in status, status
+        assert "check the folder" in status, status
+>       assert patch_names == ["keep.json"], (
+            f"the rollback deleted the pre-existing file inside the "
+            f"once-denied folder: {patch_names}"
+        )
+E       AssertionError: the rollback deleted the pre-existing file inside the once-denied folder: []
+E       assert [] == ['keep.json']
+E         
+E         Right contains one more item: 'keep.json'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1194: AssertionError
+---------------------------- Captured stdout call -----------------------------
+processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+Successfully processed 1 files; Failed processing 0 files
+processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+Successfully processed 1 files; Failed processing 0 files
+processed file: C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-28494\test_tc_b100_07_rollback_keeps0\app\.s19tool\workarea\ab\patches
+Successfully processed 1 files; Failed processing 0 files
+__________ test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8 ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000018EB640B650>
+
+    def test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SEC2-6 / LED .53 (R8): another writer creates ``ab/notes.txt``
+        DURING the save (inside the forced manifest writer); the save is
+        then refused — ``notes.txt`` must SURVIVE, byte for byte, while the
+        file this save placed is still removed. The fix-pass-3 snapshot-diff
+        rollback deleted it (this arm is RED there)."""
+        base = tmp_path / "app"
+    
+        def _concurrent_writer_then_refuse(_variant_set, project_dir, *args, **kwargs):
+            (project_dir / "notes.txt").write_text(
+                "user notes from another writer", encoding="utf-8"
+            )
+            return None, [SimpleNamespace(message="forced manifest refusal")]
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                monkeypatch.setattr(
+                    app_module,
+                    "write_project_manifest",
+                    _concurrent_writer_then_refuse,
+                )
+                app._handle_save_dialog(_payload(app, "ab"))
+                await _flush(pilot)
+                status = probe.last
+                names = sorted(p.name for p in project_dir.iterdir())
+                notes = (project_dir / "notes.txt").read_text(encoding="utf-8")
+            return status, names, notes
+    
+>       status, names, notes = asyncio.run(_drive())
+                               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:1240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:1237: in _drive
+    notes = (project_dir / "notes.txt").read_text(encoding="utf-8")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28494/test_tc_b100_07_rollback_keeps1/app/.s19tool/workarea/ab/notes.txt')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-28494\\test_tc_b100_07_rollback_keeps1\\app\\.s19tool\\workarea\\ab\\notes.txt'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_denied_folder_content_r7
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_keeps_concurrent_writer_file_r8
+2 failed, 34 deselected in 8.47s

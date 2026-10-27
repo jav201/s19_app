@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b99_staging.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — reverse census chunk 2 of 3)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+...............................                                          [100%]
+31 passed in 103.07s (0:01:43)

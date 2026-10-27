@@ -1,0 +1,57 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_manifest_mismatch_is_the_newest_status_line (MUTANT R2-5: the mismatch re-paint after the success line is skipped)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — MUTANT, reverted after the run)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_07_manifest_mismatch_is_the_newest_status_line _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27568/test_tc_b100_07_manifest_misma0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FA0B53F6D0>
+
+    def test_tc_b100_07_manifest_mismatch_is_the_newest_status_line(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R2-5 (LLR-004.2): a manifest write that verifies with a MISMATCH
+        is reported, not a failure — and the drift report stays the NEWEST
+        painted status line: ``Saved project to …`` paints first, then
+        ``Manifest verify MISMATCH`` re-paints over it, so the success line
+        never buries the mismatch (the notice fires once, inside the verify
+        surfacing). Without the re-paint the success line is the newest
+        line and this arm fails."""
+    
+        def _forced_mismatch(*args, **kwargs):
+            return ManifestVerifyResult(
+                status=MANIFEST_MISMATCH,
+                drift=["active_variant"],
+            )
+    
+        base = tmp_path / "app"
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                monkeypatch.setattr(
+                    app_module, "verify_written_manifest", _forced_mismatch
+                )
+                app._handle_save_dialog(_payload(app, "proj"))
+                await _flush(pilot)
+            return probe.messages
+    
+        messages = asyncio.run(_drive())
+>       assert messages[-1] == "Manifest verify MISMATCH", messages
+E       AssertionError: ['Manifest verify MISMATCH', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27568\\test_tc_b100_07_manifest_misma0\\app\\.s19tool\\workarea\\proj (variant 'firmware')"]
+E       assert "Saved projec...t 'firmware')" == 'Manifest verify MISMATCH'
+E         
+E         - Manifest verify MISMATCH
+E         + Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27568\test_tc_b100_07_manifest_misma0\app\.s19tool\workarea\proj (variant 'firmware')
+
+tests\test_b100_save_guards.py:1158: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_manifest_mismatch_is_the_newest_status_line
+1 failed in 3.68s

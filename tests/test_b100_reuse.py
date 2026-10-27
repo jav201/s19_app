@@ -490,12 +490,15 @@ def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
     ``read_bytes() ==`` comparison or a ``_hash_file`` digest compare), not
     by the name ``find_identical``: the single-file rule is
     ``_match_identical``/``find_identical`` in ``workspace.py``; the only
-    other rules are the declared ones — the group's frozen rule (R30,
-    ``place_group_into_workarea``) and the gather's sibling scan
-    (``project_gather_service._gather_copy``, owned by Inc 5, where
-    ``project_gather_service`` is touched again — review finding N3;
-    batch-100 has no "Inc 3b").  A new
-    rule under any other name, or a deleted declared one, fails the census.
+    other rule is the declared one — the group's frozen rule (R30,
+    ``place_group_into_workarea``). Inc 2 fix pass 5 (security finding
+    SEC2-7, round 4) re-pinned this census: the gather's sibling byte-scan
+    is RETIRED — ``project_gather_service`` places through
+    ``place_into_workarea`` and translates only its ``reused`` flag, so the
+    placement's rule is the sole judge and no second rule can disagree
+    with it (the case-variant deletion SEC2-7's probe executed). A new
+    rule under any other name, or a deleted declared one, fails the
+    census.
     """
     package = ROOT / "s19_app"
     export_source = (package / "tui" / "segment_split_view.py").read_text(
@@ -521,10 +524,6 @@ def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
         # The group's frozen reuse rule (R30, B99-I2a) — converted by no
         # increment; it stays "requested names only".
         ("s19_app/tui/workspace.py", "place_group_into_workarea"),
-        # The gather's sibling byte-compare (LLR-138.4) — owned by Inc 5,
-        # where project_gather_service.py is touched again (review finding
-        # N3; batch-100 has no "Inc 3b").
-        ("s19_app/tui/services/project_gather_service.py", "_gather_copy"),
     }
     found: set = set()
     for path in sorted(package.rglob("*.py")):

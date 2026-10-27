@@ -13,7 +13,7 @@ from collections import Counter
 from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Iterator, Optional, Sequence
 
 from .models import ProjectVariantSet, VariantDescriptor
 
@@ -51,6 +51,18 @@ RESERVED_WORKAREA_HOMES = (
     "splits",
     "reports",
 )
+#: Maximum length of a sanitised project name (HLR-164 / LLR-164.3, ruling
+#: Q-1): a longer name is refused before any folder is created.
+PROJECT_NAME_MAX_CHARS = 64
+#: Windows device-name bases refused as project names (HLR-164 / LLR-164.1):
+#: the console family, the CON streams and the COM/LPT ports. Compared
+#: case-folded, with or without an extension or a superscript digit.
+_WINDOWS_DEVICE_BASES = frozenset(
+    {"con", "prn", "aux", "nul", "conin$", "conout$"}
+)
+#: The Windows file namespace maps the superscript digits onto plain digits,
+#: so ``COM¹`` names the same device as ``COM1`` (LLR-164.1).
+_DEVICE_DIGIT_TRANSLATION = str.maketrans({"¹": "1", "²": "2", "³": "3"})
 # Default size cap for ``copy_into_workarea``. Cap rationale (per security
 # Finding S-N02): realistic A2L upper end is ~100 MB per
 # ``tests/conftest.py`` generators; 256 MB leaves ~2.5x headroom. The cap is
@@ -238,6 +250,64 @@ def _is_reparse_point(path: Path) -> bool:
         if attrs & reparse_flag:
             return True
     return False
+
+
+def walk_tree_no_links(root: Path) -> Iterator[Path]:
+    """
+    Summary:
+        Yield every file and folder under ``root`` as a path RELATIVE to
+        ``root``, never descending into a symbolic link or a Windows
+        reparse point (junction). A reparse-point entry is yielded as a
+        leaf and its target is never entered, so the walk cannot escape
+        ``root`` and cannot loop on a junction cycle.
+
+    Args:
+        root (Path): Existing directory to walk.
+
+    Returns:
+        Iterator[Path]: Relative paths of all files and folders below ``root``,
+            reparse points included as leaves.
+
+    Raises:
+        None: A folder that cannot be listed (``OSError`` from ``os.scandir``)
+            is skipped, the same as ``list_projects`` treats it.
+
+    Data Flow:
+        - Iterate with ``os.scandir`` using ``entry.is_dir(follow_symlinks=False)``
+          so symbolic links are never entered.
+        - Re-check each directory child with ``_is_reparse_point`` (lstat-based)
+          because on Python 3.11 a junction reads as a plain directory to
+          ``DirEntry.is_dir(follow_symlinks=False)`` — this is the ONE
+          non-following tree walk (review finding R3-1), kept for
+          save-as (LLR-171.1); the Save project rollback no longer
+          consumes it (LED .53: it walks no folder at all).
+        - Depth-first via an explicit stack; reparse points are never pushed,
+          so the walk terminates even on ``loop -> root`` cycles.
+
+    Dependencies:
+        Uses:
+            - os.scandir
+            - _is_reparse_point
+        Used by:
+            - save-as (LLR-171.1)
+            - tests (the walker's unit arm)
+    """
+    stack = [root]
+    while stack:
+        current = stack.pop()
+        try:
+            with os.scandir(current) as iterator:
+                entries = sorted(iterator, key=lambda entry: entry.name)
+        except OSError:
+            continue
+        for entry in entries:
+            child = current / entry.name
+            yield child.relative_to(root)
+            try:
+                if entry.is_dir(follow_symlinks=False) and not _is_reparse_point(child):
+                    stack.append(child)
+            except OSError:
+                continue
 
 
 def _path_traverses_reparse_point(path: Path, stop_at: Optional[Path] = None) -> bool:
@@ -1011,10 +1081,11 @@ def place_into_workarea(
           destination; race-freeness rests on the immutability invariant
           (LLR-155.3 as amended by LED .7) — no in-app writer replaces or
           deletes a placed file — not on a narrower check window.
-          ``project_gather_service``'s sibling byte-scan is the other known
-          rule (LLR-138.4), declared in the TC-B100-57 census and owned by
-          Inc 5, where ``project_gather_service`` is touched again (review
-          finding N3 — batch-100 has no "Inc 3b").  A reused
+          Since security finding SEC2-7 (round 4) this rule is the ONLY
+          byte-identity judge: the project gather places through this
+          function and translates only the ``reused`` flag — its former
+          sibling byte-scan is retired, so no second rule can disagree
+          with this one (the TC-B100-57 census).  A reused
           placement returns the existing path with ``reused=True`` and
           writes nothing.
         - Otherwise claim the first free candidate name from
@@ -1727,6 +1798,39 @@ def place_group_into_workarea(
         # only ever the staging this call created (LLR-155.1/155.7)
         if staging_owned:
             shutil.rmtree(stage_dir, ignore_errors=True)
+
+
+def is_windows_device_name(name: str) -> bool:
+    """
+    Summary:
+        The one shared Windows device-name predicate (HLR-164 / LLR-164.1,
+        B-12 — later reused by LLR-169.8 and LLR-172.2): true when ``name``
+        is a reserved device name — ``CON``, ``PRN``, ``AUX``, ``NUL``,
+        ``COM0``-``COM9``, ``LPT0``-``LPT9``, ``CONIN$`` / ``CONOUT$`` —
+        compared case-folded, with or without an extension (``con.txt``)
+        or a superscript digit (``LPT¹``). Windows matches the part of
+        the name before the FIRST dot, ignoring trailing spaces and dots,
+        so ``NUL.tar.gz`` names ``NUL`` (review finding F3 / SEC2-2).
+
+    Args:
+        name (str): The name to check — the raw typed name, the sanitised
+            name or one path component of either.
+
+    Returns:
+        bool: True when the name's stem (the part before the first dot,
+            trailing spaces and dots stripped) is a reserved device name.
+    """
+    if not name:
+        return False
+    folded = name.translate(_DEVICE_DIGIT_TRANSLATION).casefold()
+    stem = folded.partition(".")[0].rstrip(" .")
+    if stem in _WINDOWS_DEVICE_BASES:
+        return True
+    return (
+        len(stem) == 4
+        and stem[:3] in {"com", "lpt"}
+        and stem[3] in "0123456789"
+    )
 
 
 def sanitize_project_name(name: str) -> Optional[str]:

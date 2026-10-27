@@ -1,0 +1,7 @@
+cmd: python -m pytest -q -p no:cacheprovider -k census tests
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — census sweep, PDR C-QA-3)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed, 3757 deselected in 113.04s (0:01:53)

@@ -1,0 +1,88 @@
+cmd: pytest tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised
+mutation LLR-164.1: device-name check restricted to the sanitised name only (raw name and components unchecked)
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_04_device_names_refused_raw_and_sanitised ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27410/test_tc_b100_04_device_names_r0')
+
+    def test_tc_b100_04_device_names_refused_raw_and_sanitised(tmp_path: Path) -> None:
+        """``nul``, ``CON``, ``com1``, ``LPT¹`` (superscript), ``con.txt`` (raw
+        only — the sanitised name is ``contxt``), ``CONIN$`` (raw) and
+        ``C O N`` (sanitises to ``CON``): 7 refusals with the ``device name``
+        and ``choose another name`` tokens, 0 folders."""
+        device_names = ["nul", "CON", "com1", "LPT¹", "con.txt", "CONIN$", "C O N"]
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                for typed in device_names:
+                    app._handle_save_dialog(_payload(app, typed))
+                    await _flush(pilot)
+                    status = probe.last
+                    assert "device name" in status, (
+                        f"{typed!r}: expected the device-name refusal, "
+                        f"got {status!r}"
+                    )
+                    assert "choose another name" in status, (
+                        f"{typed!r}: expected the next-step token, got {status!r}"
+                    )
+                    leftovers = [
+                        item.name
+                        for item in app.workarea.iterdir()
+                        if item.is_dir() and item.name != "temp"
+                    ]
+                    leftovers = [
+                        name
+                        for name in leftovers
+                        if name.casefold() not in {h.casefold() for h in RESERVED_WORKAREA_HOMES}
+                    ]
+                    assert leftovers == [], (
+                        f"{typed!r}: folders appeared for a refused name: {leftovers}"
+                    )
+            return probe.messages
+    
+>       messages = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        probe = _StatusProbe(app)
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            for typed in device_names:
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+>               assert "device name" in status, (
+                    f"{typed!r}: expected the device-name refusal, "
+                    f"got {status!r}"
+                )
+E               AssertionError: 'con.txt': expected the device-name refusal, got 'Project saved + manifest verified'
+E               assert 'device name' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:227: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised
+1 failed in 7.41s
