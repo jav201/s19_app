@@ -106,3 +106,48 @@
 - [x] No file outside the project was deleted in any probe (`outside final: ['appeared.txt', 'appeared2.txt', 'victim.txt', 'victim_file.s19']`).
 - [x] Each finding has what, where, why, a recommendation and a severity: 0 HIGH, 1 MAJOR, 1 MINOR.
 - [x] The worktree was not edited. Junctions, symlinks and the ACL deny were removed or lifted, and the scratch folder was removed.
+
+---
+
+## Round 4: the exact-list rollback (LED .53)
+
+| Field | Value |
+|---|---|
+| **Subject** | The redesign in the worktree, uncommitted, per `HANDOFF.md` §"Redesign (LED .53)". `_abort_save` restores the app state. It then unlinks exactly `placed_files`: the image, MAC and A2L placements with `reused == False`, plus `GatherOutcome.written`. Finally it removes `created_dirs` (the gather's `created_homes`, plus the project folder if this save created it), deepest first and only while empty. There is no folder walk and no snapshot. |
+| **Execution** | The probe ran on **Python 3.11.15** (`C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`) against the worktree, which was first on `sys.path`. It printed `s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py`. It drives the real `_handle_save_dialog` in `run_test`, forcing a failure at the manifest write or at the verify. The batch named `boost.json` from the common `workarea/patches/` library so that the gather runs. Script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\sec_inc2_r4_probe.py` / `.out`. Afterwards the ACL deny was lifted and the junctions removed. The scratch folder `scratchpad\inc2r4work` was held back only by the app's open log file. I confirmed it held no link, then removed it by its literal path. I did not edit the worktree. |
+| **VERDICT** | **`BLOCK — BLOCK-UNTIL: SEC2-7`** (1 HIGH). The exact-list rollback still deletes a **pre-existing** user file when the gather's reuse check and the placement's reuse check disagree about letter case. The verdict authorises nothing, and it is not the operator's authorization. |
+
+### Requested checks (Python 3.11, executed)
+
+| check | result |
+|---|---|
+| **R7: pre-existing file in a folder unreadable at save start** | `keep.json survives: True`. SEC2-5 is **closed**. |
+| **R8: a file another writer adds during the save** | `user_added.json survives: True`. SEC2-6 is **closed**. |
+| **Junctions: out of the project, a loop, and a new junction created during the save** | `outside: ['victim.txt']`, untouched. `ext`, `loop` and `newj` were all left in place: under the exact-list rule nothing that this save did not create is removed. No link was entered and no target was touched. |
+| **Q3: the gather reused an identical file of the same name** | `ab/patches/boost.json survives: True`. |
+| **Q4: a "created" entry this save did not create** | **Found** (SEC2-7). Also found: two gaps around `project.json` (SEC2-8, SEC2-9). |
+
+**Race between check and claim (Q4).** The top-level placements report `reused` from `place_into_workarea` itself. A path with `reused == False` was claimed with `O_CREAT|O_EXCL` (after an `lstat`), so this call created it, even when another writer races the claim (the claim then takes the next `_<N>`). One residual window remains: another writer could replace *our* placed file between the placement and the rollback, and the unlink would then remove their bytes. That needs a second writer aiming at a name we just claimed, so I record it as a note, not a finding.
+
+### Findings, round 4
+
+| id | severity | location | finding | executed evidence | what closes it |
+|---|---|---|---|---|---|
+| SEC2-7 | **HIGH** | `services/project_gather_service.py` `_gather_copy` (`copied` is set to True whenever it calls `copy_into_workarea`) and `_same_artifact_name` (case-sensitive `stem` and `suffix` compare); `workspace.find_identical` (case-insensitive on Windows) | **A pre-existing user file is deleted by a failed save.** `_gather_copy` first runs its own reuse check, which compares names case-sensitively, then calls `copy_into_workarea`. `copy_into_workarea` reuses a byte-identical file under a **case-variant** name (`BOOST.json`, `boost.JSON`), because `find_identical` compares case-insensitively on Windows. It returns that existing path. But `copy_into_workarea` hides the `reused` flag, so `_gather_copy` reports `copied=True`, the existing file goes into `GatherOutcome.written`, and `_abort_save` unlinks it. The trigger is a fixed project state (a case-variant identical file in `patches/`, `checks/` or `templates/`) plus **any** failure after the gather, such as a manifest write error, a full disk or a lock. The deletion is silent and cannot be undone: exactly the class LED .53 exists to remove. | `executed` (Q4a): pre-existing `ab/patches/BOOST.json`, batch `boost.json`, manifest write raises, result `ab/patches after: ['keep.json', 'user_added.json'] \| pre-existing BOOST.json survives: False`. (Q4b) `boost.JSON`: `survives: False`. | Make the placement the only judge. `_gather_copy` calls `place_into_workarea(source, home, workarea_root=…)` and records `written` only when `PlacementResult.reused` is False. Its own name-based pre-check is removed or made advisory, never the decision. Keep the LLR-155.3 census happy by listing the call. TC arms: a pre-existing case-variant identical file (`BOOST.json`, and `boost.JSON`) survives a failure after the gather. A census arm asserts that no `GatherOutcome.written` path came from a `reused == True` placement. |
+| SEC2-8 | **MAJOR** | `app.py` `_handle_save_dialog`; `_write_and_verify_manifest` writes `project.json` before the verify, and `project.json` is in neither `placed_files` nor `created_dirs` | **The project folder this save created is left behind when the failure comes after the manifest was written.** If the verify raises (an `OSError` while re-reading), the rollback unlinks the image and then calls `rmdir` on the project folder. That fails, because `project.json` is still inside, and the error is swallowed. A half project, holding only a manifest, stays in the work area and is listed by Load. That breaks HLR-164's "every refused or failed save shall leave no folder that the save created" (S-05). | `executed` (Q4c): `freshv left on disk: True \| contents: ['project.json']`. | When this save created `project.json` (it did not exist before the write), add it to `placed_files` as soon as the write returns. TC arm: the verify raises, and no folder is left. |
+| SEC2-9 | **MAJOR** | the same path, in a merge into an existing project | **A merge that fails after the manifest write leaves the existing project's `project.json` replaced.** The rollback does not restore the previous manifest. The bytes from before the save are lost, and with them any keys the failed save's manifest did not carry. The full carry of those keys lands only in Inc 8a. | `executed` (Q4d): `ab/project.json restored to its pre-save content: False`. | Before the write, keep the previous `project.json` (bytes in memory, or a private staged copy). If the save then fails, `os.replace` it back. If there was no previous manifest, treat the file as SEC2-8 does. TC arm: a merge whose verify raises leaves `project.json` byte-equal to its pre-save content. |
+
+### Closure summary
+
+- **SEC2-5 (MAJOR): closed** (R7).
+- **SEC2-6 (MINOR): closed** (R8).
+- **Junction safety: holds.** Nothing outside was touched, and no link was entered or removed.
+- **New this round:** **SEC2-7 (HIGH)**, which blocks; SEC2-8 and SEC2-9 (MAJOR), which belong in the same corrective pass.
+
+### Evidence checklist (round 4)
+
+- [x] Executed on Python 3.11.15 against the worktree, with `s19_app.__file__` printed.
+- [x] R7, R8, the junction cases (out of the project, a loop, a new junction during the save), same-name gather reuse, and the Q4 search, including the check-and-claim race, the case-variant reuse, and the manifest-written failure in a new folder and in a merge.
+- [x] `outside final: ['victim.txt']`: no file outside the project was touched.
+- [x] Each finding has what, where, why, a recommendation and a severity: 1 HIGH, 2 MAJOR.
+- [x] The worktree was not edited. The ACL deny was lifted, the junctions removed, and the scratch folder removed.

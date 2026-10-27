@@ -271,3 +271,73 @@ It is discharged only when a re-read of the applied fix shows one non-following 
 - **R3-1** (round 3; the rollback deleted through a junction outside the work area): the one non-following `walk_tree_no_links` is used by both the snapshot and the removal. The outside file survives, a junction-loop project saves, and W1, W3 and W4 are killed.
 
 37 passed on the fix-pass-3 tree (`review-increment-002.md` §Round 4).
+
+---
+
+# Round 5: re-read of the rollback redesign (LED .53, "Lista exacta")
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1–4. I did not write the redesign. |
+| Why this round | Security found SEC2-5 (MAJOR): an incomplete snapshot made the rollback delete pre-existing user files. SEC2-6 is a concurrent writer's file deleted the same way. The operator stopped the increment and ruled "Lista exacta" (LED .53, main `4a4533b`): a failed save removes exactly what it created. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `fcb1bf400645…`, `workspace.py` `8ef1763e180c…` and `services/project_gather_service.py` `c2d8cc2864a1…`, all equal to `restore-fix4.txt`. |
+| Inputs | `kimi/BRIEF-inc-2-fix4.md`; `HANDOFF.md` §"Redesign (LED .53)"; packet §1, §2, §4, §5, §6; `evidence/inc-2/` (82 files, 78 hashed). |
+| Interpreter proof | `…\scratchpad\fix4\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 6 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
+| **Verdict** | **PASS-WITH-NOTES.** 0 HIGH. **1 MAJOR open (R5-1)**: a recorded note that does not block, the same way N1 was handled in Inc 1 round 2. It must be fixed in this increment (a one-line fix in the gather) or scheduled in the ledger. 1 MINOR (R5-2). Every earlier probe still passes on the redesign. |
+
+## The design, as I re-read it
+
+- **Placements** (`app.py:8445-8471`): the image, the MAC and the A2L now go through `place_into_workarea(..., workarea_root=self.workarea)`. Only results with `reused == False` enter `placed_files`.
+- **Gather** (`project_gather_service.py:588-612`): `GatherOutcome.written` gets `destination` only when `_gather_copy` returns `copied=True`. A reused byte-identical sibling returns `(False, sibling)` and never appears. `created_homes` gets the home only when it did not exist before the copy and the copy wrote. The app extends its two lists with these (`app.py:8528-8529`).
+- **Rollback** (`_abort_save`, `app.py:8104-8167`):
+  - restores the app state, unchanged from LED .52(b);
+  - unlinks exactly `placed_files`;
+  - `rmdir`s `created_dirs`, plus the project folder when this call created it, deepest first and only while empty;
+  - walks no folder and keeps no snapshot. `_project_tree_snapshot` and `_remove_created_project_dir` (with its `rmtree`) are gone.
+- **The walker** stays only for Inc 8b's save-as.
+
+This is simpler than rounds 3–4, and it is correct by construction for SEC2-5 and SEC2-6: a path that was never recorded can never be deleted. The manifest write that would leave a committed `project.json` behind cannot raise after it has written. `write_project_manifest` stages the file, moves it in place with an atomic `os.replace`, and returns findings instead of raising. `verify_written_manifest` is collect-don't-abort. So no failure exit exists after `project.json` is on disk.
+
+## What I executed in round 5 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| GREEN on the redesign tree: `test_b100_save_guards.py` (36, ATs included) + the A-09 node + all of `test_b99_staging.py` + all of `test_project_gather.py` (the reverse census of `GatherOutcome` / `gather_project_artifacts`, along with `test_b100_reuse.py`, which is in Kimi's census chunk) | **83 passed** (379 s) |
+| Earlier probes re-run on the redesign (`scratchpad\fix4\tests\test_zz_review_r3.py`, `test_zz_review_r2.py`) | **R2-1 merge-gathered:** tree before = after `['a.s19']`. **Trap, identical pre-existing `patches/hotfix.json`:** survives. **Trap, different content:** `{"v": 0}` kept and the tree unchanged. **Junction `ab\ext` → outside:** tree unchanged, victim untouched. **Through-junction with a concurrent writer:** `user-work.txt` **survives**. **Junction loop, refused manifest:** tree unchanged. **Junction loop, normal save:** `Saved project to …`. **F1 state:** before = after `(['…\ab\a.s19'], None, 'ab')`. **F4:** `A B` saves into `ab` under its on-disk name. All pass. |
+| **New probe: the gather home is created, then its copy fails, then the save fails** (the disk-full shape). The gather's `copy_into_workarea` is patched to `mkdir` the home and then raise `OSError(28, "No space left on device")`, which is what happens when the staging copy runs out of disk after the placement's `mkdir` (`workspace.py:1150` then `:1170`). The manifest is then refused. Target: a fresh folder `freshp`. | Status `could not save`. **`freshp` is LEFT on disk, holding an empty `patches\`.** → R5-1 |
+| Mutants on the created-list logic, run on the scratch copy against the 20 TC-B100-07 nodes, with both hashes restored after each | **Ma** (reused placements recorded too) → **KILLED** (`open-case-AB-gather`). **Mc** (`written` includes reused files) → **KILLED** (`merge-gathered-reused`). **Md** (`created_homes` not consumed) → **KILLED** (`merge-gathered`, `fresh-gathered`). **Me** (the created project folder not listed for removal) → **KILLED**, 7 failed: all 6 forced stages + `fresh-gathered`. **Mg** (`written` not consumed) → **KILLED**, 2 failed. **Mf** (the `home_preexisted` guard dropped, so pre-existing homes are listed as created) → **SURVIVED**, 20 passed. → R5-2 |
+| Kimi's mutants (a), (b) and (c), read from the cited transcripts | (a) 1 failed, (b) 2 failed (R7 + R8), (c) 1 failed. Each is consistent with my Ma and Mc. |
+| Census | Still requires every post-creation exit to go through `_abort_save` only (`_ABORT_HELPERS = {"_abort_save"}`). `_abort_save` must restore `_variant_set`, `unlink`, and now `rmdir` (re-pinned from `_remove_created_project_dir`, which no longer exists). Me kills the 6 behavioural arms; the census rule is unchanged. ✓ |
+| The two re-pins in `test_b100_save_guards.py` | (1) The `copies` stage now patches `app_module.place_into_workarea`. **Justified**: the save body no longer calls `copy_into_workarea`, so patching the old seam would make the stage a silent no-op. (2) The census's folder-removal pin becomes "`_abort_save` contains `rmdir`". **Justified**: the `rmtree` helper is gone by design. "Remove only while empty" is LED .53's rule, and Me shows the behavioural arms still pin that the created folder disappears. |
+| LED .50 sweep | 0 added `.resolve()`. The three new `place_into_workarea` calls keep `workarea_root=self.workarea`, and the gather keeps its root. ✓ |
+| Packet | §2: 3/4 SOURCE files. `project_gather_service.py` row: `source · LLR-164.4 (LED .53) · LLR-138.4` ✓ (V59). The 6 rows all use closed-set Kinds with real ids. V56: 36 ✓, 2 failed (RED, cited) ✓, 369 + 1 xfailed ✓, 31 ✓, 75 ✓, 85 ✓, and 436 = 369 + 31 + 36 ✓. Evidence: the 78 digests match disk; the 4 without a digest are the ones already declared superseded. CRLF ✓ (per the handoff counts; `app.py` checked). |
+
+## Closure
+
+| id | State |
+|---|---|
+| R3-1, R3-2 (round 4) | Still closed. The walker is no longer in the rollback at all, which is stronger: there is nothing to follow. The junction probes still pass. |
+| SEC2-5 / SEC2-6 (security, LED .53) | Closed by construction in my lane: no recorded path means no deletion. R7 and R8 are RED first (`red-fix4-r7-r8.txt`) and GREEN now. The security verdict itself is `security-reviewer`'s. |
+| F1, R2-1, F4 | Not regressed (probes above). |
+
+## New findings: round 5
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| R5-1 | **MAJOR** | `project_gather_service.py:588-612` (`created_homes` appended only `if copied`); `workspace.py:1150` (the placement `mkdir`s the home before staging) | **A home the gather created stays unrecorded when its copy then fails, so a failed fresh save leaves its folder behind.** `place_into_workarea` creates the home, then the staging copy can fail (disk full, the source vanishing): the gather collects an issue and continues. When the save then fails too, which is likely under the same disk-full condition, the empty `patches\` is not in `created_homes`. The project folder is therefore not empty and its `rmdir` fails. The result is a leftover `freshp\patches\`, which goes against HLR-164's "every refused or failed save shall leave the work area as it was" and TC-B100-07's "0 folders left". It is only empty folders, with no data loss, which is why it is MAJOR rather than HIGH. It is new with the redesign: the round-4 `rmtree` of a created project folder covered it. | Probe `r5_gather_home_created_then_copy_fails`: `freshp tree: ['patches']` after `could not save`. | Record the home from whether it now exists, not from whether the copy wrote: after the `try`/`except`, on both paths, `if not home_preexisted and home_dir.is_dir() and home_dir not in outcome.created_homes: outcome.created_homes.append(home_dir)`. This is safe because the rollback removes a folder only while it is empty. Add an arm: the gather copy fails after the `mkdir` on a fresh save, then the save fails, and the folder must be gone. |
+| R5-2 | MINOR | `project_gather_service.py:610`; tests | No arm discriminates the `home_preexisted` guard: mutant Mf survives. If the guard regressed, a pre-existing EMPTY `patches\` in an existing project would be removed by a failed save. That alters the work area, but only by deleting an empty folder. | Mf: 20 passed | Add an arm: `ab\patches\` exists and is empty, a gathered document is written there, the save fails, and `ab\patches\` must still exist. |
+
+## Verdict
+
+**PASS-WITH-NOTES.** 0 HIGH open. R5-1 (MAJOR) is a recorded note that does not block, the same way N1 was handled in Inc 1 round 2; it must be fixed in this increment or scheduled in the ledger before the gate. R5-2 is MINOR. Every HIGH from rounds 1–4 stays resolved under the redesign. The orchestrator note stands: move `HANDOFF.md` into `kimi/`.
+
+## §4b `Independent review` cell (round 5, final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH; open: **R5-1 MAJOR**, a gather home created before a failed copy stays unrecorded and leaves a fresh folder behind (fix it here or schedule it by ledger), and R5-2 MINOR; note: `HANDOFF.md` into `kimi/`) · Every HIGH was resolved and re-read on the diff:
+- **F1:** the one `_abort_save` restores the app state.
+- **F2:** the trace is `HLR-164`.
+- **R2-1, now under the LED .53 redesign:** the exact created list (non-reused placements, `GatherOutcome.written`, created homes) is removed, and empty created folders go deepest first. The merge-gathered probe is clean.
+- **R2-2:** the §2 `test_b99_staging.py` row.
+- **R3-1:** no folder walk is left in the rollback; the outside file survives a concurrent write and a junction-loop project saves.
+
+SEC2-5 and SEC2-6 are closed by construction (R7 and R8 RED first, then GREEN). Mutants Ma, Mc, Md, Me and Mg are killed; Mf survives (R5-2). 83 passed on the redesign tree (`review-increment-002.md` §Round 5).
