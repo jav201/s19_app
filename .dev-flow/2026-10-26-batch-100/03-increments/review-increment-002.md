@@ -158,3 +158,69 @@ Each is discharged only when a re-read of the applied fix shows a recursive pre-
 - `security-reviewer`: none new. F3 and SEC2-2 were verified by probe and by MF3.
 - `ux-reviewer`: R2-5.
 - Orchestrator: move `HANDOFF.md` from the worktree root into `kimi/` (as Inc 1 did).
+
+---
+
+# Round 3: re-read of corrective pass 2
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1 and 2. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix passes 1 and 2 uncommitted. `app.py` sha256 `52b5f9495107…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix2.txt`. |
+| Inputs | `kimi/BRIEF-inc-2-fix2.md`; `HANDOFF.md` §"Fix pass 2"; packet §1, §2, §4, §6; `evidence/inc-2/` (54 files, 50 hashed). |
+| Interpreter proof | `…\scratchpad\fix2\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with hashes equal to the worktree. `NO_COLOR` was unset. The worktree was never edited. |
+| **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R3-1`** (1 HIGH). **R2-1 and R2-2 are discharged by re-read.** R2-3, R2-4 and R2-5 are closed. The new HIGH, R3-1, is in the same rollback: it walks INTO junctions that already exist in the project, and it deleted a file outside the work area (executed probe). |
+
+## What I executed in round 3 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| GREEN on the scratch copy of the fix-pass-2 tree: `test_b100_save_guards.py` (31, ATs included) + the A-09 node + the 2 re-pinned `test_b99_staging.py` nodes + `test_tui_report_seam.py` | **62 passed** (371 s) |
+| The R2-1 probe re-run (`scratchpad\fix2\tests\test_zz_review_r3.py`). `ab` exists and is not open, the payload has `batch=("hotfix.json",)`, `ab` is typed exactly, and the manifest is refused. | `could not save`. Tree before `['a.s19']`, after `['a.s19']`, **equal**. ✓ |
+| The security trap: a pre-existing **byte-identical** `ab\patches\hotfix.json` | before = after = `['a.s19', 'patches', 'patches/hotfix.json']`. **The file survives.** ✓ |
+| The trap with **different** pre-existing content (`{"v": 0}`) | Tree unchanged (the gather's `hotfix_1.json` was removed); the original content `{"v": 0}` is kept. ✓ |
+| **A junction that already exists inside the project**: `ab\ext` → `<tmp>\victim` (outside the work area), which holds `keep.txt`. The gather is patched to stand in for another program that writes `victim\user-work.txt` during the save, and then fails with `OSError`. | Status `could not save`. **Victim after: `['keep.txt']`. `user-work.txt` was DELETED by the rollback**, outside the work area. → R3-1 |
+| A junction cycle inside the project: `ab\loop` → `ab` | Every save into `ab` fails. The snapshot's `rglob` recurses `loop\loop\…` until `FileNotFoundError [WinError 3]`. The status shows the `could not save` tokens followed by a path of about 260 characters. Nothing is deleted, because a failed snapshot skips the removal; the project simply can no longer be saved into. → R3-1 (same cause) |
+| Rollback mutants on the scratch copy, run against the 15 TC-B100-07 nodes, with the hash restored to `52b5f949…` after each | **MR1** (the snapshot reduced to the top level, `iterdir`) → **KILLED** (`merge-gathered-reused`). **MR2** (the `if rel in preexisting_paths: continue` guard removed) → **KILLED**, 5 failed. **MR3** (sorted shallowest first, not deepest first) → **KILLED** (`merge-gathered`: `patches/` stays). **MR4** (the R2-5 re-paint removed) → **KILLED** (the mismatch node). **MR6** (the `_variant_set` restore removed) → **KILLED**, 6 failed, the census included. |
+| LED .50 sweep of the fix-pass-2 diff | 0 added `.resolve()`; no placement call added or changed; `workarea_root=self.workarea` kept on every placement and on the gather. ✓ No Inc 1 regression. |
+| Evidence: `devflow-evidence.py --check` on all 54 files | The 50 digests in the packet match disk. The 4 files without a digest are the ones already declared superseded. ✓ |
+| CRLF | `app.py` 14038/14038. ✓ |
+
+## Closure table: round-2 findings
+
+| id | State | How it was resolved (re-read on the diff) |
+|---|---|---|
+| **R2-1** (HIGH) | **CLOSED** | `_project_tree_snapshot` (`app.py:8112-8123`) records every file and folder as a relative POSIX path before any placement (`:8415`). `_abort_save` (`:8125-8183`) removes only paths absent from that set, deepest first, and removes a folder only when it is empty. `placed_paths` and the bare-name set are gone. New arms: `merge-gathered`, `merge-gathered-reused` and `fresh-gathered`. Verified by my probe and by MR1, MR2 and MR3. Note: the walk itself causes R3-1. |
+| **R2-2** (HIGH, record) | **CLOSED** | §2 now has the row `tests/test_b99_staging.py · test · LLR-164.4 · LLR-155.3`, with both re-pins named, and the test-file count is 3. |
+| R2-3 | CLOSED | The committed block (the success line, the MISMATCH re-paint, `current_project` / `_dir`, labels, refresh) now runs after the `try`/`except` chain (`:8603-8627`), outside the rollback. |
+| R2-4 | CLOSED | `_ABORT_HELPERS = {"_abort_save"}` (test `:761`). The census still requires `_abort_save` to restore `_variant_set`. MR6 turns the census RED. |
+| R2-5 | CLOSED | `_write_and_verify_manifest` records `_last_manifest_verify_result`. The handler re-paints `Manifest verify MISMATCH` after `Saved project to …` (`:8612-8621`). The new arm asserts `messages[-1]`; MR4 kills it. |
+
+## New findings: round 3
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **R3-1** | **HIGH** | `app.py:8120-8123` (`project_dir.rglob("*")` in the snapshot) and `:8166-8181` (`project_dir.rglob("*")` in the removal) | **The rollback follows junctions inside an existing project, so it can delete files outside the work area.** On Python 3.11, `Path.rglob` skips symlinks but descends into NTFS junctions: `os.DirEntry.is_symlink()` is False for a junction, and `is_junction` only arrives in 3.12. Both walks therefore enumerate the junction's TARGET. During a failed save, any file that appears in that target between the snapshot and the abort is unlinked, along with any folder that is new and empty. That breaks the rule the whole batch keeps since Inc 1 and LED .50: never follow a reparse point, and never write or delete outside this work area. The same cause has two smaller effects. A junction cycle inside a project (`ab\loop` → `ab`) makes the snapshot fail, so every save into that project is refused with a path of about 260 characters in the status. A junction to a large tree is walked in full on every save into that project. | Probe `rollback_deletes_through_junction`: `victim\user-work.txt`, written by "another program" during the save, is **deleted**; the victim goes from `['keep.txt', 'user-work.txt']` to `['keep.txt']`. Probe `junction_cycle_inside_project`: `could not save — [WinError 3] … ab\loop\loop\…`. | Use ONE non-following walker for both the snapshot and the removal. It descends only into real directories (`child.is_dir() and not _is_reparse_point(child)`), records a reparse point as a leaf path, and never descends into one. In the removal, never unlink or `rmdir` a path the snapshot recorded (already true), and never descend into a reparse point. Add a Windows-only arm with `b100_links`: a junction inside `ab` to an outside folder, a forced failure that writes a file into the target first, and the target file surviving. It must be RED first with the current `rglob`. Add a cycle arm: `ab\loop` → `ab` and an exact-name merge saves. Route to `security-reviewer`. |
+| R3-2 | MINOR | `app.py:8712`, `:8743`, `:8616` | `_last_manifest_verify_result` is first assigned inside `_write_and_verify_manifest`, not in `__init__`. It works, because the handler always calls the writer before it reads the attribute, but it breaks the class's convention that instance state is declared up front. | code read | Initialise `self._last_manifest_verify_result = None` in `__init__`, next to `_variant_set`. |
+
+## Verdict
+
+**approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R3-1`** (1 HIGH open). R2-1 and R2-2 are discharged by re-read; R2-3, R2-4 and R2-5 are closed; R3-2 is MINOR. Earlier MINOR notes still stand as recorded (`HANDOFF.md` location).
+
+## §4b `Independent review` cell (round 3, for the orchestrator to write)
+
+`code-reviewer` · **BLOCK — BLOCK-UNTIL: R3-1** (1 HIGH, 0 MAJOR, 1 MINOR open) · How every earlier HIGH was resolved:
+- **F1:** the one `_abort_save` rollback restores the app state, and the success line paints after the manifest. Re-read; probe; MF1 and MR6 kill it.
+- **F2:** the trace is `HLR-164`.
+- **R2-1:** a recursive relative-path snapshot drives the rollback, which removes only new paths, deepest first, and keeps pre-existing ones. Re-read; the R2-1 probe and both trap probes are clean; MR1, MR2 and MR3 kill it.
+- **R2-2:** §2 now has the `tests/test_b99_staging.py` row.
+
+Still open:
+- **R3-1:** the snapshot and removal walks use `rglob`, which on Python 3.11 descends into NTFS junctions. The rollback deleted a file outside the work area (`victim\user-work.txt`, executed probe), and a junction cycle blocks every save into that project.
+
+It is discharged only when a re-read of the applied fix shows one non-following walker, plus a RED-first junction arm and a cycle arm.
+
+## Hand-offs (round 3)
+
+- `security-reviewer`: R3-1. It is a deletion through a reparse point, the reverse of the S-02 class, and it reaches outside the work area.
+- Orchestrator: `HANDOFF.md` is still at the worktree root.
