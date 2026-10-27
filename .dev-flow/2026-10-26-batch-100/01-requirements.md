@@ -734,7 +734,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-164.4 — A refused or failed save leaves no folder it created
 - **Traceability:** HLR-164
-- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.52, LED-2026-10-26-batch-100.53
+- **Ledger:** LED-2026-10-26-batch-100.5, LED-2026-10-26-batch-100.19, LED-2026-10-26-batch-100.52, LED-2026-10-26-batch-100.53, LED-2026-10-26-batch-100.54
 - **Statement:** Every statement of `_handle_save_dialog` and of the Save worker body (LLR-177.1) after the folder's creation — validation, the copies, the save-as walk, the emit and the manifest write — shall run under one `OSError` handler that reports the error with the `could not save` tokens and calls `_remove_created_project_dir` (`app.py:8076`) in the path where the failure happens, removing only a folder this call created; every `return` after the creation that does not complete the save shall also call it.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-07 — `pytest tests/test_b100_save_guards.py -k tc_b100_07` (an AST census over the handler's and the worker body's returns and exception exits, plus one behavioural arm per stage)
@@ -984,7 +984,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.7 — The manifest is staged privately
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.54
 - **Statement:** `write_project_manifest` (`manifest_writer.py:414`) shall stage `project.json` in a private directory from `_private_stage_dir` (`workspace.py:298`) and place it with `os.replace`, never through the fixed `temp/project.json` (`:509`).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-27 — `pytest tests/test_b100_project_check.py -k tc_b100_27`

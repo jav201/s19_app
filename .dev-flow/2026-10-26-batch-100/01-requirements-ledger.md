@@ -676,3 +676,17 @@ above this line is ever edited._
 - **Why:** the operator's decision at the stop that the bounded pass triggered ("Lista exacta"). It was asked at the gate on 2026-10-26.
 - **Evidence:** `03-increments/security-increment-002.md` Round 3; `03-increments/review-increment-002.md` Round 4.
 
+### LED-2026-10-26-batch-100.54 — Inc 2 gate: a failed manifest restore must never lose the previous project.json (→ Inc 7); the gather reuse rule moved into Inc 2
+- **Requirement:** LLR-164.4, LLR-169.7
+- **Date:** 2026-10-27
+- **What changed:**
+  - **(a) The manifest restore never loses the previous bytes (lands at Inc 7, which already rewrites manifest staging under O-11).** When a failed save's rollback cannot restore the previous `project.json`, the previous bytes are never lost silently. Example causes: another process holds the file, or the disk is full.
+    - The restore retries `os.replace` on `PermissionError`, the same way placement does.
+    - If the retry also fails, the previous bytes are written to a claimed `project.json.previous-<UTC timestamp>` beside the manifest.
+    - The status names the change and the location of that copy.
+    - Arms: a held `project.json` during the rollback, and staging out of space. Each one is RED first.
+  - **(b) The gather's byte-identity rule moved into Inc 2.** The ARQ census had assigned it to Inc 5. It was converted in Inc 2: `_gather_copy` places through `place_into_workarea`, which is the only judge of reuse, and `_same_artifact_name` is retired. Inc 5 no longer owns it.
+- **Closes:** security-reviewer Inc 2 round 5 SEC2-10 (MAJOR, needs two failures in one save, executed) is routed by (a). code-reviewer Inc 2 round 6 R6-2 is closed by (b).
+- **Why:** this is the operator's rule that nothing is lost silently. The exposure between Inc 2 and Inc 7 needs a save failure followed by a restore failure in the same save.
+- **Evidence:** `03-increments/security-increment-002.md` Round 5; `03-increments/review-increment-002.md` Round 6.
+

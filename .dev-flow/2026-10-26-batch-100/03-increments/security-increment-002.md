@@ -151,3 +151,51 @@
 - [x] `outside final: ['victim.txt']`: no file outside the project was touched.
 - [x] Each finding has what, where, why, a recommendation and a severity: 1 HIGH, 2 MAJOR.
 - [x] The worktree was not edited. The ACL deny was lifted, the junctions removed, and the scratch folder removed.
+
+---
+
+## Round 5: re-read of the redesign fix pass (SEC2-7, SEC2-8, SEC2-9)
+
+| Field | Value |
+|---|---|
+| **Subject** | Kimi's corrective pass in the worktree, uncommitted, per `HANDOFF.md` §"Redesign fix pass" and `kimi/BRIEF-inc-2-fix5.md`. `_gather_copy` places through `place_into_workarea` and records a file in `written` only when `reused` is False. An `on_written` hook adds a created `project.json` to `placed_files`, or arms `(path, previous bytes)` for a merge, and `_abort_save` restores those bytes first: staged, then put back with `os.replace`. |
+| **Execution** | **Python 3.11.15** (`C:\Users\jjgh8\anaconda3\envs\s19env\python.exe`) against the worktree, which was first on `sys.path`. The probe printed `s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py`. Script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\sec_inc2_r5_probe.py` / `.out`. It is the full round-4 probe plus two restore-failure arms (Q5a, Q5b). **The first run crashed in my own probe code.** A check I added for "are the previous bytes kept anywhere" walked the project with `rglob`, and on 3.11 `rglob` followed the probe's own junction loop until it ran out of path length. That code only reads, and I found nothing deleted (`outside` intact). I replaced it with the project's `walk_tree_no_links` and ran the probe again; the results below are from that second run. After each run the ACL deny was lifted and the junctions removed. The scratch folder `scratchpad\inc2r5work` was held back only by the app's open log file. I confirmed it held no link, then removed it by its literal path. I did not edit the worktree. |
+| **VERDICT** | **`PASS-WITH-NOTES`** (0 HIGH). **SEC2-7 is discharged by this re-read.** SEC2-8 and SEC2-9 are closed. One MAJOR (SEC2-10) remains in a **double fault**: the save fails after the manifest write *and* the restore also fails. In that case the previous `project.json` is lost silently. It is routed, and it does not block. This verdict authorises nothing beyond the increment gate and is not the operator's authorization. |
+
+### Closure
+
+| id | state | executed evidence |
+|---|---|---|
+| SEC2-7 (HIGH) | **closed (discharged)** | Q4a: `ab/patches after: ['BOOST.json', …] \| pre-existing BOOST.json survives: True`. Q4b: `boost.JSON survives: True`. A case-variant identical file is now reused by the placement and never recorded in `written`. |
+| SEC2-8 (MAJOR) | **closed** | Q4c: `freshv left on disk: False`. The `project.json` this save created is removed and the folder goes with it. |
+| SEC2-9 (MAJOR) | **closed** | Q4d: `ab/project.json restored BYTE-identical: True` after a merge whose verify raised. |
+
+### Regression set (re-run, Python 3.11)
+
+- **R7:** `keep.json survives: True`.
+- **R8:** `user_added.json survives: True`.
+- **Junctions** (an outbound junction, a loop, and a new junction created during the save): `outside: ['victim.txt']`, and every junction was left in place.
+- **Same-name gather reuse:** `boost.json survives: True`.
+
+No regression.
+
+### Can the keep/restore lose the previous `project.json`? (question 3)
+
+- **Reading the previous bytes:** done before the write and inside the save's `OSError` handler. If `project.json` exists but cannot be read, the save is refused before anything is written, so this fails closed.
+- **The restore is atomic** (`os.replace` from a private staging folder on the same volume) **when it succeeds**.
+- **When the restore itself fails, the previous bytes are lost.** See SEC2-10, executed in two ways.
+- **Note, not a finding:** another writer could change `project.json` between the read and the restore, and the restore would then put back stale bytes. That needs a second writer inside a sub-second window.
+
+### Findings, round 5
+
+| id | severity | location | finding | executed evidence | what closes it |
+|---|---|---|---|---|---|
+| SEC2-10 | **MAJOR** (routed; a double fault) | `app.py` `_abort_save`, the `manifest_restores` loop (`except (OSError, WorkareaContainmentError): pass`) | **If the restore fails, the previous `project.json` is lost without notice.** The previous bytes live only in memory. If the stage-and-replace fails, the exception is swallowed, the bytes are dropped, the replaced manifest stays, and the status still says only `could not save … check the folder`. The engineer is not told that `project.json` was changed, and no copy of the old one survives. Two ways the restore can fail: another process holds `project.json` open without share-delete (an antivirus scan or sync client touching the newly written file), or the private staging home cannot be used (full disk, or containment). Losing the previous manifest loses its composition keys (`batch`, `assignments`, `declared_regions`, …). | `executed` Q5a (another process held `project.json` open during the rollback): `previous project.json restored: False \| previous bytes kept anywhere in the project: False`. Q5b (staging raises `ENOSPC`): `previous project.json restored: False`. In both, the status was `could not save — … check the folder`. | When the restore fails, never drop the bytes. Retry the `os.replace` on `PermissionError`, the way placement does (5 tries within 1 s). If it still fails, write the previous bytes to a claimed `project.json.previous-<timestamp>` in the project folder (`O_EXCL`), falling back to the work-area `temp/`. Paint a status that says `project.json` was changed and names where the previous copy is. TC arms: Q5a and Q5b each end with the previous bytes on disk, byte-identical, and a status naming that file. |
+
+### Evidence checklist (round 5)
+
+- [x] The full round-4 probe was re-run on Python 3.11.15 against the worktree, with `s19_app.__file__` printed: both case variants, a new folder whose verify raises, and a merge whose verify raises (byte-identical restore).
+- [x] R7, R8, the junctions and same-name reuse were re-run: no regression.
+- [x] The keep/restore was probed for loss: a restore blocked by an open handle (Q5a) and unusable staging (Q5b).
+- [x] Each finding has what, where, why, a recommendation and a severity: 0 HIGH, 1 MAJOR (routed).
+- [x] The worktree was not edited. The ACL deny was lifted, junctions removed, and the scratch folder removed. The `rglob` mistake in my own probe is disclosed above.

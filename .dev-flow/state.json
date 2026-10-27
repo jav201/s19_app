@@ -176,6 +176,11 @@
       "station": "P3",
       "date": "2026-10-26",
       "decision": "asked at the gate — Inc 2 stopped by the operator's bounded-pass rule: code-reviewer round 4 PASS-WITH-NOTES (R3-1 closed), security round 3 found SEC2-5 MAJOR (an incomplete snapshot led the rollback to delete pre-existing user files; executed) and SEC2-6. Operator chose \"Lista exacta\" (LED .53): a failed save removes exactly what it created (non-reused placements + the gather's written files + created empty folders); no folder walk decides deletion; Inc 2 = 3 files (adds project_gather_service.py); walk_tree_no_links kept for Inc 8b."
+    },
+    {
+      "station": "P3",
+      "date": "2026-10-27",
+      "decision": "standing authorization — operator kickoff 2026-10-26 (PLAN header); operator decisions at the cap (bounded pass 3) and at the stop it triggered (\"Lista exacta\", LED .53). P3 increment 002 (US-154 / HLR-164; app.py, workspace.py, project_gather_service.py — 3 SOURCE) approved and merged: implemented by Kimi K2.8 in six sessions (implementation, 3 corrective passes, the LED .53 redesign, its corrective pass); code-reviewer r1 BLOCK-UNTIL F1/F2 HIGH -> r2 BLOCK-UNTIL R2-1/R2-2 -> r3 BLOCK-UNTIL R3-1 HIGH -> r4/r5 PASS-WITH-NOTES -> r6 PASS; security-reviewer r1-r3 PASS-WITH-NOTES (SEC2-1, SEC2-5 MAJOR) -> r4 BLOCK-UNTIL SEC2-7 HIGH -> r5 PASS-WITH-NOTES; orchestrator re-run 130 passed + guards 75/29 snapshots + census 85 (evidence/inc-2/orchestrator-gate.txt). Rulings LED .52-.54; SEC2-10 routed to Inc 7; the gather reuse rule moved from Inc 5 to Inc 2."
     }
   ],
   "obsidian_synced": false,

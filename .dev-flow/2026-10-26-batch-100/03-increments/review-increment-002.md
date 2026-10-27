@@ -341,3 +341,71 @@ This is simpler than rounds 3–4, and it is correct by construction for SEC2-5 
 - **R3-1:** no folder walk is left in the rollback; the outside file survives a concurrent write and a junction-loop project saves.
 
 SEC2-5 and SEC2-6 are closed by construction (R7 and R8 RED first, then GREEN). Mutants Ma, Mc, Md, Me and Mg are killed; Mf survives (R5-2). 83 passed on the redesign tree (`review-increment-002.md` §Round 5).
+
+---
+
+# Round 6: re-read of the redesign fix pass (SEC2-7/8/9, R5-1, R5-2)
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1–5. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2`, uncommitted. `app.py` sha256 `e30805c44126…`, `workspace.py` `2ab2ba749fb5…`, `services/project_gather_service.py` `bc8b6eeacac4…`. |
+| Inputs | `kimi/BRIEF-inc-2-fix5.md`; `HANDOFF.md` §"Redesign fix pass"; `security-increment-002.md` Round 4 (SEC2-7 HIGH, SEC2-8, SEC2-9); packet §1, §2, §4, §6; `evidence/inc-2/` (105 files, 101 hashed). |
+| Interpreter proof | `…\scratchpad\fix5\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 7 changed files, with identical hashes. `NO_COLOR` was unset. The worktree was never edited. |
+| **Verdict** | **PASS.** 0 HIGH, 0 MAJOR open. **R5-1 and R5-2 are closed, and Mf now dies.** Two MINOR notes on the record (R6-1, R6-2). |
+
+## What I executed in round 6 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| GREEN on the fix5 tree: `test_b100_save_guards.py` (43, ATs included) + the A-09 node + all of `test_b99_staging.py` + `test_project_gather.py` + `test_b100_reuse.py` (TC-B100-57 re-pinned) + `test_copy_into_workarea_content_dedup.py` | **130 passed** (549 s). The gather-reuse behaviour (LLR-138.4, TC-B99-13's reuse and drift arms), the `_gather_copy` containment and root-threading arms, and the census all stay green. |
+| Every earlier probe re-run (`scratchpad\fix5\tests\test_zz_review_r3.py`, `test_zz_review_r2.py`) | R2-1 merge-gathered: tree unchanged. Identical pre-existing `patches/hotfix.json`: survives. Different content: kept. Junction `ab\ext`: tree unchanged, victim untouched. Through-junction with a concurrent writer: `user-work.txt` survives. Junction loop, refused manifest: tree unchanged. Junction loop, normal save: saved. F1 state: before = after. F4: saves under the on-disk name. All pass. |
+| **R5-1 probe** (the gather home `mkdir`ed, then the copy fails with disk full, then the manifest is refused, on a fresh `freshp`) | `freshp` tree: **None**, so no folder is left behind. (Round 5: `['patches']`.) |
+| **SEC2-7 probe, two cases**: a pre-existing byte-identical `ab\patches\HOTFIX.json` or `hotfix.JSON`, a gathered `hotfix.json`, then a failed save | Both trees are unchanged, and **the case-variant file survives**. |
+| **SEC2-8 probe**: a fresh `freshv` where `verify_written_manifest` raises `OSError` after the write | `freshv exists: False`. |
+| **SEC2-9 probe**: a merge into `ab`, whose existing `project.json` carries `custom_key`, where verify raises | `project.json` is **restored byte-identical**; tree `['a.s19', 'project.json']`. |
+| Mutants on the scratch copy, run against the 27 TC-B100-07 nodes, with both hashes restored after each | **Mf** (both `home_preexisted` guards → `True`) → **KILLED** (`empty_preexisting_home_survives_failed_save` + `gather_reuse_never_ends_in_written`). **Mf1** (no home recorded on the copy-failure path) → **KILLED** (`gather_home_created_then_copy_fails_no_folder_left`). **M7** (`_gather_copy` returns `copied=True` always, so reused files land in `written`) → **KILLED**, 4 failed: both case-variant arms, `merge-gathered-reused` and the census/unit arm. **M8** (the created `project.json` not added to `placed_files`) → **KILLED** (`failed_verify_leaves_no_folder_fresh`). **M9** (the `os.replace` of the kept manifest removed) → **KILLED** (`failed_verify_restores_previous_manifest`). |
+| LED .50 sweep | 0 added `.resolve()`. `_gather_copy` passes the UNRESOLVED home plus the explicit `workarea_root` to `place_into_workarea`, after `_check_home_contained`. ✓ |
+| Packet | §2: 3/4 SOURCE files; 7 rows, each with a closed-set Kind and a real id (V59 ✓), including the new `tests/test_b100_reuse.py · test · LLR-163.1` row; test-file count 4. V56: 43 ✓ · 75 ✓ · 85 ✓ · census 38 + 48 + 29 ✓ · each RED and mutant transcript fails ✓. Digests: the 101 recorded in the packet match disk, and the 4 without a digest are the ones declared superseded. CRLF: `app.py` 14116/14116, `workspace.py` 2004/2004, gather service 682/682, `test_b100_reuse.py` 1358/1358 ✓. |
+
+## Design checks the coordinator named
+
+- **"The placement is the sole reuse judge"** (`project_gather_service.py` `_gather_copy`): `_check_home_contained(home, workarea_root)`, then `place_into_workarea(source, home, workarea_root=…)`, then `return not placed.reused, placed.path`. `_same_artifact_name` and the gather's own byte scan are deleted (`grep` finds 0 references in `s19_app/` and `tests/`).
+  - **Simple and correct**: there is one rule, `find_identical` (case-folded on Windows, LLR-163.1), so no second rule can disagree with it. That disagreement was SEC2-7.
+  - **Behaviour change versus the retired scan**: a case-variant identical file is now reused, which is wanted. A 0-byte or linked sibling is never reused, the placement's own rule; a 0-byte JSON document is not a valid change document anyway.
+  - **LLR-138.4** ("skip when an identical destination exists, otherwise the next free name") is preserved, and `test_project_gather.py` and TC-B99-13 are green.
+- **TC-B100-57 re-pin** (`test_b100_reuse.py`): the declared byte-identity rules shrink from {the group's R30, `_gather_copy`} to {R30}. The census is **stronger**: any new rule, including one re-added in the gather, fails it. Kimi's `red-fix5-census57.txt` shows the census RED on the old tree ("gather rule unexpected"). This pulls Inc 5's planned conversion of the gather rule into Inc 2 → R6-2.
+- **The `on_written` hook** (`app.py` `_write_and_verify_manifest`): it is called once, right after `write_project_manifest` returns a path and before the verify. The closure in the handler appends to `placed_files` (no previous manifest, so SEC2-8) or to `manifest_restores` (a previous manifest, so SEC2-9). That is the minimal shape for this need: the window it covers comes after the write but before the method returns, so a return value could not carry it. Both branches are killed by M8 and M9.
+- **The manifest keep and restore** in `_abort_save`: the previous bytes are read before the write, inside the rollback `try`. The restore runs FIRST in `_abort_save`: it writes a staged copy into `_private_stage_dir(self.workarea)`, which is on the same volume, then calls `os.replace`, then removes the stage folder in `finally`, and never raises. ✓ As security noted, `verify_written_manifest` cannot raise today, because it collects problems instead of aborting. So SEC2-8 and SEC2-9 are defence in depth, pinned by monkeypatched arms.
+
+## Closure
+
+| id | State |
+|---|---|
+| R5-1 (MAJOR) | **CLOSED.** The home is recorded from `not home_preexisted and home_dir.is_dir()` on both the success path and the copy-failure path. Probe clean; Mf1 killed. |
+| R5-2 (MINOR) | **CLOSED.** The arm `empty_preexisting_home_survives_failed_save` kills Mf. |
+| SEC2-7 / SEC2-8 / SEC2-9 | Closed in my lane (probes and M7, M8, M9). The security verdict is `security-reviewer`'s. |
+| F1, R2-1, R3-1, F4 and the junction arms | Not regressed. |
+
+## New findings: round 6
+
+| id | Severity | file:line | Finding | Fix |
+|---|---|---|---|---|
+| R6-1 | MINOR (record) | `evidence/inc-2/*-fix5*.txt` headers | The fix-pass-5 transcripts' `cmd:` lines dropped the `PYTHONPATH=<worktree> (NO_COLOR unset)` environment line that F10 restored at fix pass 1. `import-proof-fix5.txt` does show `s19_app.__file__` resolving into the worktree, so the runs are attributable. | Restore the environment line in later transcript headers. No re-run is needed. |
+| R6-2 | MINOR (plan) | `test_b100_reuse.py` TC-B100-57 docstring; design §5 (Inc 5) | Converting the gather's reuse rule was planned for Inc 5 (review finding N3, recorded in the census's own comment). It has now landed in Inc 2, so Inc 5's plan still lists work that is done. | The orchestrator drops that item from Inc 5's plan or records the move in the ledger. |
+
+## Verdict
+
+**PASS.** 0 HIGH, 0 MAJOR open in my lane. R6-1 and R6-2 are MINOR record and plan notes. The housekeeping note stands: move `HANDOFF.md` into `kimi/`.
+
+## §4b `Independent review` cell (round 6, final, for the orchestrator to write)
+
+`code-reviewer` · **PASS** (0 HIGH, 0 MAJOR open; MINOR notes R6-1, the fix-pass-5 transcript headers lack the environment line, and R6-2, Inc 5's gather-rule item is now done in Inc 2; housekeeping: `HANDOFF.md` into `kimi/`) · Every HIGH and MAJOR was resolved and re-read on the diff:
+- **F1:** the one `_abort_save` restores the app state.
+- **F2:** the trace is `HLR-164`.
+- **R2-1:** under LED .53, the exact created list is removed. Probe clean.
+- **R2-2:** the §2 row.
+- **R3-1:** no folder walk is left in the rollback. The junction probes are clean.
+- **R5-1:** the gather home is recorded on both the success and the failure path. The disk-full probe leaves no folder; Mf1 killed.
+
+R5-2 is closed and Mf is killed. SEC2-7, SEC2-8 and SEC2-9 are pinned by the case-variant, fresh-verify and merge-restore arms, with M7, M8 and M9 killed. 130 passed on the fix5 tree (`review-increment-002.md` §Round 6).
