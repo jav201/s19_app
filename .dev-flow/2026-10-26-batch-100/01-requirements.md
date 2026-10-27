@@ -764,8 +764,8 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-165.3 — The change service is rebound
 - **Traceability:** HLR-165
-- **Ledger:** none
-- **Statement:** The reset shall assign a new `ChangeService()` and re-push `set_image_generation(self._image_generation)` (`change_service.py:2494`); it shall not add a reset method to the service.
+- **Ledger:** LED-2026-10-26-batch-100.51
+- **Statement:** The reset shall assign a new `ChangeService()` and re-push `set_image_generation(self._image_generation)` (`change_service.py:2494`); it shall not add a reset method to the service. **Interim, until Inc 10 lands the question (LLR-174.x):** when the outgoing Patch Editor document holds N > 0 unsaved entries, the project load's status names them — `Discarded N unsaved Patch Editor entries` — so the discard is never silent; Inc 10 replaces this line with the question, and its test arm is re-pinned there.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-10 — `pytest tests/test_b100_session_reset.py -k tc_b100_10`
 - **Numeric pass threshold:** after a load over P1: a different service object, 0 document entries, 0 undo steps, an image generation equal to the app's.

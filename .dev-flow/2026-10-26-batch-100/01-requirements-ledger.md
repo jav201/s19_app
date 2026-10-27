@@ -639,3 +639,11 @@ above this line is ever edited._
 - **Why:** the guard can only know "this app's work area" if it is told the root or sees the path before resolution. The orchestrator ruled under the batch's standing authorization to do both within the 4-file cap. Making the root mandatory in all 8 calling files would break the cap.
 - **Evidence:** `03-increments/security-increment-001.md` SEC-1..3; `03-increments/review-increment-001.md` Round 2 N1.
 
+### LED-2026-10-26-batch-100.51 — Interim notice: a project load names the unsaved Patch Editor entries it discards (Inc 3 → Inc 10)
+- **Requirement:** LLR-165.3
+- **Date:** 2026-10-26
+- **What changed:** From Inc 3 until Inc 10, a project load whose outgoing Patch Editor document holds N > 0 unsaved entries writes this status line: `Discarded N unsaved Patch Editor entries`. Inc 10's question (LLR-174.x) replaces the line, and its test arm is re-pinned there.
+- **Closes:** the interim exposure of QA-03 (P2 round 1). Inc 3's reset rebinds the change service, and every increment lands on `main`, so between Inc 3 and Inc 10 unsaved editor entries would be dropped with no trace. Before the batch they leaked into the next project.
+- **Why:** this is the orchestrator's ruling under the batch's standing authorization ("never lose silently"). The status line already exists, and no new glyph or pane is added.
+- **Evidence:** `02-review.md` QA-03; ARQ §2.3.
+
