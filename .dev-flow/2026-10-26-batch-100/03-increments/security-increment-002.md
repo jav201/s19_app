@@ -33,3 +33,36 @@
 - [x] No secret values or real names appear in the output. The probe reads the account name from `USERNAME` only to apply and lift the ACL, and the account name is not printed.
 - [x] The worktree was not edited. The scratch folder, its junctions and the ACL deny were all removed.
 - [ ] Not tested: Python 3.11, and Windows 10 device semantics.
+
+---
+
+## Round 2: re-check after Kimi's fix pass 1 (LED .52)
+
+| Field | Value |
+|---|---|
+| **Subject** | The same worktree, still uncommitted: fix pass 1 per `HANDOFF.md` §"Fix pass 1". It adds the `_abort_save` rollback, the first-dot device predicate and the clash scan that skips unreadable folders. |
+| **Execution** | One probe ran against the worktree (`python -I -B`, worktree first on `sys.path`). It printed `s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py` on Python 3.12.7 and drove the real `_handle_save_dialog` inside Textual `run_test`. Script and output: `C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\probes\sec_inc2_r2_probe.py` / `.out`. The probe ended with `ACL lifted: 2 \| junctions removed: 1`. The scratch folder `scratchpad\inc2r2work` was held back only by the app's open log file. I confirmed it held no junction or deny ACL, then removed it by its literal path. I did not edit the worktree. |
+| **VERDICT** | **`PASS-WITH-NOTES`** (0 HIGH, 0 MAJOR). SEC2-1 and SEC2-2 are closed. SEC2-3 is closed for the top-level placements and app state, but not for files the gather places (SEC2-4, MINOR). This verdict authorises nothing beyond the increment gate and is not the operator's authorization. |
+
+### Closure
+
+| id | state | executed evidence |
+|---|---|---|
+| SEC2-1 (MAJOR) | **closed** | I denied read access to the folder `locked`. Saving `fresh1` then **succeeded**, with no exception. I also denied read access to `Clashme`, a folder holding project data. Typing `clashme` or `Clashme` gave `could not save — [WinError 5] Access is denied` from inside the save body. Nothing was raised and no folder was created. The scan now compares the name first and lists inside only the folder that matches. |
+| SEC2-2 (MINOR) | **closed** | These are now refused as device names: `nul.tar.gz`, `CON .txt`, `com1.a.b`, `CON.`, `CON `, `LPT¹.s19`, `conin$.x`, `Aux.` and `prn.txt.bak`. These are no longer refused, so there is no false refusal: `console`, `contents.s19`, `auxdata`, `nullable`, `com10`, `lpt` and `COM⁴`. |
+| SEC2-3 / LED .52 (b) (MINOR) | **partly closed** | The test was a merge into the existing project `ab`, which was not open and already held `firmware.mac` and `patches/keep.json`, with a forced failure. When the manifest write raised, the image copy placed by this save was removed, and every piece of app state was restored: `current_project`, `current_project_dir`, `variant_id` and the variant set (`restored: True`). When the gather raised after the image copy, the image was again removed. A pre-existing identical `patches/boost.json` **survived** a rollback, so there was no data loss. But the file the **gather** placed, `patches/boost.json` from the common library, was **left behind** after the failed manifest write (`ab after: [… 'patches\\boost.json' …] \| unchanged: False`). See SEC2-4. |
+
+### New findings, round 2
+
+| id | severity | location | finding | executed evidence | what closes it |
+|---|---|---|---|---|---|
+| SEC2-4 | MINOR | `app.py` `_handle_save_dialog`: `placed_paths` collects only the image, MAC and A2L copies; the `_abort_save` skip test is `placed.name in preexisting_names`, a top-level name set | (a) Files placed by `gather_project_artifacts` in `patches/`, `checks/` and `templates/` are not tracked. A save that fails after the gather leaves them in a folder that already existed, against LED .52 (b). A later Load would see them as unrecorded files. Nothing is overwritten (`O_EXCL`), and everything stays inside the work area. (b) **A hazard for the fix:** the skip test compares bare names against the **top-level** listing. If gather placements were simply appended to `placed_paths`, a pre-existing identical file in a sub-folder would be reused by the gather (same path), would not appear in the top-level name set, and would be **deleted** on rollback. That would destroy a pre-existing user file. | `executed`: `[merge 'ab', batch=boost.json, manifest raises]` gave `ab after: ['firmware.mac', 'patches\\boost.json', 'patches\\keep.json'] \| unchanged: False`. Part (b) is reasoned from the code; I did not run it as a mutation. | Track what the gather writes through `GatherOutcome` (written versus reused) and add only the **written** paths to the rollback list. Take the pre-save snapshot as a set of full relative paths (including sub-folders), not top-level names, and skip any path in it. TC arms: (1) a merge with a failure after the gather leaves the target's digest unchanged; (2) a pre-existing identical `patches/x.json` survives the rollback. |
+
+### Regression set (re-run)
+
+- **Device and reserved names:** `CON`, `NUL`, `COM¹`, `con.txt`, `nul.json`, `C O N`, `x\CON`, `Splits`, `REPORTS` and `crc` were all refused, with 0 folders created.
+- **Name length:** 64 characters saved; 65 were refused.
+- **Clash:** `a b` and `AB` were refused against `ab`.
+- **Junctions:** `evil` and `EVIL` were refused as a link or junction, and the other work area was unchanged.
+- **Forced `OSError`:** at `validate_project_files` and at `copy_into_workarea`, each gave `could not save` and left no folder.
+- **Inc 1:** the stored `current_project_dir` is the built path. I did not re-test the 259/260 path limit: it ran in round 1, and fix pass 1 does not touch that check.

@@ -78,3 +78,83 @@
 - `security-reviewer`: F3. The shared device predicate freezes here and LLR-169.8 and LLR-172.2 consume it. Also decide the trailing-space question.
 - Orchestrator: F5 (is the mid-merge `OSError` arm Inc 2 or Inc 8a? There is no ledger entry either way). F4 (refuse a case variant of the open project, or accept it under the on-disk spelling). F7 (the literal "P2 open" reading). F11 (an Inc 11 dependency).
 - `qa-reviewer`: F6 and F9 (oracle gaps), and the F1 state assertions in the forced-failure arms.
+
+---
+
+# Round 2: re-read of corrective pass 1
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc2` at `2edfee2`, with Inc 2 and fix pass 1 uncommitted. `app.py` sha256 `b2dcf23c1f9a…` and `workspace.py` `d2137e1d5b5d…` both equal `pre-mutation-hashes-fix1.txt`. |
+| Contract | main `3bafa06`: LED .52 (a) the open project's name ignores case and the save uses the on-disk name; (b) a failed save removes every file it placed and restores the app state; (c) "P2 open" means another project is open. Plus `kimi/BRIEF-inc-2-fix1.md` and `security-increment-002.md` SEC2-1..3. |
+| Inputs | `HANDOFF.md` §"Fix pass 1"; packet `increment-002.md` §1, §2, §4, §5, §6; 36 transcripts in `evidence/inc-2/`. |
+| Interpreter proof | `…\scratchpad\fix1\s19_app\__init__.py`. That scratch copy holds `git archive 2edfee2` plus the 5 changed files, with hashes equal to the worktree. `NO_COLOR` was unset. The worktree was never edited. |
+| **Verdict** | **approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R2-1, R2-2`** (2 HIGH). **F1 and F2 are discharged**: I re-read both fixes on the diff, and for F1 I re-ran the probe myself. R2-1 is the same class as F1 and F5, but it hits the gather's copies. A save into an existing project that fails still leaves those copies behind, which contradicts LED .52(b). R2-2 is the same record class as F2. |
+
+## What I executed in round 2 (evidence state: `executed`)
+
+| Run | Result |
+|---|---|
+| GREEN on the scratch copy of the fix-pass tree: `test_b100_save_guards.py` (27 nodes, both ATs included) + the A-09 node + the 2 re-pinned `test_b99_staging.py` nodes | **30 passed** (196 s) |
+| Round-1 probes re-run (`scratchpad\fix1\tests\test_zz_review_r2.py`) | **F1:** open `ab`, save `newp`, writer refuses. Variant paths, current variant and `current_project` are equal before and after (`['…\ab\a.s19'], None, 'ab'` both times); the log tail is `Manifest write failed` → `could not save`, with no `Saved` line. **F3:** `con.tar.gz`, `NUL.tar.gz`, `com1.a.b`, `CON .txt`, `CON.`, `nul ` and `conin$.x` → True; `COM⁴`, `console` and `con\xa0.txt` → False. **F4:** open `ab`, type `A B` → saved into `ab`; `current_project` and the folder name are both `ab`; no new folder. |
+| **New probe: gather copies after a failed merge.** `ab` exists and is not open. `<wa>\patches\hotfix.json` exists, the payload has `batch=("hotfix.json",)`, `ab` is typed exactly, and the manifest writer refuses. | Status `could not save … check the folder`. **`ab` before: `['a.s19']`; `ab` after: `['a.s19', 'patches', 'patches\hotfix.json']`.** Control, the same save with no forced failure: `['a.s19', 'firmware.s19', 'patches', 'patches\hotfix.json', 'project.json']`. → R2-1 |
+| Mutants on the scratch copy, each run against the module's 25 non-AT nodes, with both source hashes restored after each | **M6** (empty-name status, first branch) → **KILLED** by `test_tc_b100_04_empty_names_refused`. **M7** (second branch, no usable characters) → **KILLED**, same node. **MF1** (the state-restore lines removed from `_abort_save`) → **KILLED**, 6 failed: the census, forced `gather`, `manifest` and `manifest-refused`, and merge `exact-ab-gather` and `exact-ab-manifest-refused`. **MF3** (`rpartition` restored) → **KILLED**, 2 failed: the device node and the predicate unit. **MF4** (`cleaned = item.name` removed) → **KILLED** by the case-variant node. **MF5** (`placed.unlink()` removed) → **KILLED**, 3 failed: the census and both `exact` merge arms. |
+| LED .50 sweep: `git diff -U0 -- s19_app/` searched for added `resolve(` or placement calls | 0 added `.resolve()`; 0 new placement calls. The 3 copies and the gather still pass `workarea_root=self.workarea`. ✓ |
+| Evidence: `devflow-evidence.py --root . --check` on all 36 transcripts | The 32 digests in the packet match disk. The 4 files without a digest (`green-01`, `green-03`, `green-fix1-save-guards-iter1` and `-iter2`) are declared in the packet as superseded and kept unhashed. ✓ |
+| V56: claimed figures read against the cited bytes | 27 ✓ · 1 ✓ · 150 + 2 failed ✓ (the 2 failures in `reverse-census-fix1-1.txt` are the two pre-re-pin nodes; `repin-b99-staging.txt` shows them passing, 2 passed) · 132 + 1 xfailed ✓ · 116 ✓ · 75 ✓ · 85 ✓ · RED 14 failed / 13 passed ✓ · each `mut-fix1-*` transcript fails ✓ |
+| Transcript headers | Every `*-fix1*` header carries `PYTHONPATH=<worktree> (NO_COLOR unset)` and the tree. ✓ |
+| CRLF | `app.py` 13987/13987, `workspace.py` 1945/1945, `test_b99_staging.py` 2277/2277. ✓ |
+
+## Closure table: round-1 findings
+
+| id | State | How it was resolved (re-read on the diff) |
+|---|---|---|
+| **F1** (HIGH) | **CLOSED** | `_abort_save` (`app.py:8112-8151`) restores `_variant_set`, `_report_filter_path`, `current_file.variant_id`, `current_project` and `current_project_dir` from the snapshot taken right after `mkdir` (`:8359-8365`). Every post-creation exit calls it (`:8382`, `:8401`, `:8412`, `:8510`, `:8545`, `:8556`, `:8579`). The `Saved project to …` line moved after `manifest_ok` (`:8518-8526`). The forced-failure arms now assert the app state, and the `manifest-refused` stage is new. Verified by my probe and by MF1 (6 nodes go RED). |
+| **F2** (HIGH, record) | **CLOSED** | The §2 row now reads `HLR-164 (registry hygiene for the Inc 2 test file)`, and the 4 rows that §2 lists all carry a Kind from the closed set and a real id. **But** §2 omits a touched file → R2-2. |
+| F3 | CLOSED | `workspace.py:1766-1774`: `folded.partition(".")[0].rstrip(" .")`; the digit is limited to `0`–`9` after the `¹²³` fold. Raw arms added for the multi-dot and trailing-space names, plus a predicate unit arm. MF3 kills both. |
+| F4 | CLOSED per LED .52(a) | `app.py:8278-8284`: when a case variant matches the open project, the save adopts `item.name`. A case-only match against ANOTHER project is still refused (new arm). MF4 kills the case-variant node. |
+| F5 | **PARTLY CLOSED** | Placed data, MAC and A2L files are unlinked unless their name existed before the save (`app.py:8144-8150`, `:8377`); MF5 kills that. The files the gather places are not covered → R2-1. |
+| F6 | CLOSED | `test_tc_b100_04_empty_names_refused`; M6 and M7 both killed. The supersession claim is corrected. |
+| F7 | CLOSED per LED .52(c) | The AT builds `prg` and `ab` by real saves. It opens P2 with rail key `1`, then clicks `#ws_load_project_button`, the row and `#project_ok`; that is the documented drive from `test_b99_load_project`. It waits for `Loaded project 'prg'`, then refuses `a b` naming `ab`, and `ab`'s digest is unchanged. §6 is rewritten. |
+| F8 | CLOSED | The name comparison now comes first (`app.py:8259`). Only the matching folder is listed inside, under `except OSError` (`:8265-8275`). The `icacls` deny-read arm passes (in my 30). Residue: the outer `self.workarea.iterdir()` is still unguarded, but a work area the app cannot list breaks everything else too, so this is not a finding. |
+| F9 | CLOSED | Folder-list oracle added; the phantom `sPlItS` folder dropped. |
+| F10 | CLOSED | 32 hashed, 4 declared superseded; environment lines in the headers; behavioural RED `red-fix1` (14 failed / 13 passed); `HANDOFF.md` is still at the root, for the orchestrator to move. |
+| F11 | CLOSED (note) | Recorded in §5 as an Inc 11 dependency. |
+
+**The two NEW re-pins in `tests/test_b99_staging.py` are justified. Neither hides a regression.**
+- `test_at_b99_05…`: the newest painted line changes from `Project saved + manifest verified` to `Saved project to …`. This is the direct effect of the status move that F1 asked for. The re-pin is stronger, not weaker: it now also asserts that the manifest-verify line is painted.
+- `test_tc_b99_13…`: `_abort_save` joins the LLR-155.3 unlink allow-list. LED .52(b) requires the removal. Each unlink is limited to a path this call placed whose name did not exist before the save, and the same file's census pins the allow-list, so a new unlink site elsewhere still fails.
+- A side effect worth a look: see R2-5.
+
+## New findings: round 2
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **R2-1** | **HIGH** | `app.py:8484-8493` (the gather), `:8144-8150` (`_abort_save` unlinks only `placed_paths`), `:8366`, `:8377`; packet §5 bullet 2; the docstring of `test_tc_b100_07_failed_merge_removes_placed_files` | **A failed save into an existing project still leaves the gather's copies behind.** `placed_paths` records only the 3 `copy_into_workarea` results. `gather_project_artifacts` copies change and check documents into `<project>\patches\`, `checks\` and `templates\` before the manifest write. When the manifest is refused, or an `OSError` hits the manifest, the labels or the file refresh, those copies survive, including the home folders the gather created. LED .52(b) is explicit: "removes every file it placed during that save, including in a folder that already existed"; only the merge **carry** of the `gathered` key stays at 8a. Packet §5 and the merge-arm docstring both claim the target's file set is "exactly as before". Their arms pass only because the gather has nothing to copy in them, so they give false confidence here. The leftover copy is not recorded in `project.json`, so the next load can raise it as a `not recorded` problem. | Probe `gather_copy_left_after_failed_merge`: **`ab` after = `['a.s19', 'patches', 'patches\hotfix.json']`**, against `['a.s19']` before. | Take the pre-save snapshot as the RECURSIVE set of files and folders under `project_dir`, relative to it, not just its top-level names. On abort, unlink every file absent from that snapshot, then remove every folder absent from it, deepest first, when empty. That covers the copies, the MAC and A2L files and the gather alike, and `placed_paths` can go. Keep the byte-identical reuse rule: a reused file has a pre-existing path, so it is kept. Add a merge arm with a gathered composition document (`batch=("hotfix.json",)`) at the `manifest-refused` stage, asserting the tree is unchanged by both files and folders. It must be RED first with the current `_abort_save`. |
+| **R2-2** | **HIGH** (record; same class as F2) | `increment-002.md` §2 | **`tests/test_b99_staging.py` is touched but has no row in §2.** It carries 2 re-pins, and the count table still says "Test files 2". The reverse trace for that file is therefore missing; it is recorded only in §4's re-pin list. This is the defect class Inc 1 corrected after its gate (`cdd2ea5`). | `git status`: ` M tests/test_b99_staging.py`; §2 has 4 rows. | Add the row `tests/test_b99_staging.py · test · LLR-164.4 · LLR-155.3 · (LED .52(b)) · 2 re-pins: AT-B99-05 status order, the LLR-155.3 allow-list gains _abort_save`, and set the test-file count to 3. |
+| R2-3 | MINOR | `app.py:8518-8530` | The steps after the commit (the success status, `current_project`, `update_project_labels()`, `refresh_files()`) are inside the rollback `try`. If any of them raised `OSError` after `project.json` was written, `_abort_save` would unlink the new variant while the new `project.json` still lists it, leaving a manifest that names a missing file. I did not find a raising path; this is from reading the code. | code read | Move those 4 statements into a `try … else:` block, or after the `try`, so that an error once the save is committed is never rolled back. |
+| R2-4 | MINOR | `tests/test_b100_save_guards.py:718` | The census accepts `_remove_created_project_dir` as a rollback (`_ABORT_HELPERS`, "for a transitional exit"). A future exit that only removes the folder, restoring no state and leaving placed files, would pass the census. Today the behavioural arms still catch it. | code read | Accept only `_abort_save` for post-creation exits in `_handle_save_dialog`. |
+| R2-5 | MINOR (UX) | `app.py:8496-8526` | Because the success line now paints after the verify result, a manifest **verify MISMATCH** (LLR-004.2, reported but not a failure) is no longer the newest status line. `Saved project to …` follows it. The mismatch still raises a notification (`_surface_manifest_verify_result`) and stays in the 4-line log. | code read | Route to `ux-reviewer`: is the toast enough, or should the success line carry `(manifest MISMATCH)` when the verify fails? |
+
+## Verdict
+
+**approve-with-fixes.** Recorded token: **`BLOCK — BLOCK-UNTIL: R2-1, R2-2`** (2 HIGH open: R2-1 in the code, R2-2 in the record). F1 and F2 are discharged by re-read. F3–F11 are closed, apart from F5's gather remainder, which is carried as R2-1. R2-3, R2-4 and R2-5 are MINOR notes.
+
+## §4b `Independent review` cell (round 2, for the orchestrator to write)
+
+`code-reviewer` · **BLOCK — BLOCK-UNTIL: R2-1, R2-2** (2 HIGH, 0 MAJOR, 3 MINOR open) · How the round-1 HIGHs were resolved:
+- **F1:** the one `_abort_save` rollback restores the variant set, the current variant, the report filter and the current project, and the success line now paints after the manifest. Re-read on the diff, my probe re-run (state equal before and after), MF1 kills 6 nodes.
+- **F2:** the trace is now `HLR-164`.
+
+Still open:
+- **R2-1:** a failed save into an existing project leaves the gather's copies (probe: `ab\patches\hotfix.json` survives a refused manifest), against LED .52(b).
+- **R2-2:** §2 has no row for the touched `tests/test_b99_staging.py`.
+
+Each is discharged only when a re-read of the applied fix shows a recursive pre-save snapshot rollback, with a gathered-document merge arm that is RED first (R2-1), and the added §2 row (R2-2).
+
+## Hand-offs (round 2)
+
+- `security-reviewer`: none new. F3 and SEC2-2 were verified by probe and by MF3.
+- `ux-reviewer`: R2-5.
+- Orchestrator: move `HANDOFF.md` from the worktree root into `kimi/` (as Inc 1 did).
