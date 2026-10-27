@@ -3,10 +3,11 @@ from __future__ import annotations
 from collections import Counter, deque
 from dataclasses import dataclass, field, replace
 import json
+import os
 from pathlib import Path
 import shutil
 import time
-from typing import Any, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
 
 from textual import events, work
 from textual.app import App, ComposeResult
@@ -179,10 +180,14 @@ from .services.variant_execution_service import (
     read_project_manifest,
 )
 from .workspace import (
+    _is_reparse_point,
+    _private_stage_dir,
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
     MAC_EXTENSIONS,
+    PROJECT_DATA_EXTENSIONS,
     PROJECT_PRIMARY_DATA_EXTENSIONS,
+    PROJECT_NAME_MAX_CHARS,
     RESERVED_WORKAREA_HOMES,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
@@ -195,6 +200,7 @@ from .workspace import (
     build_variant_set,
     copy_into_workarea,
     ensure_workarea,
+    is_windows_device_name,
     place_into_workarea,
     resolve_input_path,
     sanitize_project_name,
@@ -1400,6 +1406,16 @@ def _unload_primary(loaded: LoadedFile) -> Optional[LoadedFile]:
     return None
 
 
+#: The longest fixed in-project file name suffix (LLR-164.3): the
+#: before/after report ``\reports\<ts>-NN-before-after-report.html`` costs
+#: 53 characters beyond the project folder path.
+_SAVE_REPORT_SUFFIX_CHARS = 53
+#: The full-path limit the Save project name check guards (LLR-164.3, the
+#: ``_MAX_FULL_PATH`` idiom): ``len(workarea) + 1 + len(name) + 53`` must
+#: stay at or under this bound.
+_SAVE_FULL_PATH_LIMIT = 259
+
+
 class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
 
@@ -1620,6 +1636,10 @@ class S19TuiApp(App):
         #: active. Built by ``workspace.build_variant_set`` on project
         #: load/save and updated on variant switch / variant append.
         self._variant_set: Optional[ProjectVariantSet] = None
+        #: Most recent manifest verify outcome (LLR-004.2), published by
+        #: ``_write_and_verify_manifest`` so the save handler can re-paint a
+        #: MISMATCH as the newest status line after the success line.
+        self._last_manifest_verify_result: Optional[ManifestVerifyResult] = None
         #: Most recent A↔B comparison result, retained so the diff-report
         #: trigger (LLR-005.4) can report the same comparison the panel shows.
         self._diff_last_result: Optional[Any] = None
@@ -8083,17 +8103,92 @@ class S19TuiApp(App):
         """Invoke the A2L tag find-next scan (same as the Find-next button)."""
         self._handle_a2l_tag_find_next()
 
-    @staticmethod
-    def _remove_created_project_dir(project_dir: Path, created: bool) -> None:
-        """Remove the project folder a failed Save project created (F6(a)).
+    def _abort_save(
+        self,
+        project_dir: Path,
+        created_project_dir: bool,
+        placed_files: Sequence[Path],
+        created_dirs: Sequence[Path],
+        save_state: Tuple,
+        manifest_restores: Sequence[Tuple[Path, bytes]] = (),
+    ) -> None:
+        """Roll a failed Save project back to its pre-save state (LED
+        .52(b)'s state restore unchanged; LED .53's exact-removal
+        redesign of the file/folder rollback; security findings
+        SEC2-3..SEC2-9).
 
-        Only ever the folder THIS call created — a pre-existing project
-        folder is never touched, and its content (if a partial save placed
-        anything) is removed with it so no partial project survives.
+        Restores the variant set, the current variant, the report filter
+        and the current project to the snapshot taken before the save
+        body ran. Then removes EXACTLY what THIS save created and
+        nothing else: every file in ``placed_files`` — the placements
+        whose reuse flag was false plus the files the gather actually
+        wrote — and, deepest first, every folder in ``created_dirs``
+        (the project homes the gather created on demand) plus the
+        project folder itself when THIS call created it, each only
+        while empty. SEC2-9 first restores a pre-existing
+        ``project.json`` a merge had replaced: each entry of
+        ``manifest_restores`` carries the manifest path and the bytes it
+        held before this save, staged privately and put back with
+        ``os.replace`` — never a torn write. The rollback walks NO
+        folder and diffs against NO tree snapshot (LED .53): a
+        pre-existing file the snapshot design was blind to (an
+        unreadable folder, SEC2-5) and a file another writer added
+        during the save (SEC2-6) are never touched, and a byte-identical
+        file the placement or the gather REUSED survives because it
+        never entered ``placed_files``. Never raises: LLR-164.4 keeps
+        the app running.
         """
-        if not created:
-            return
-        shutil.rmtree(project_dir, ignore_errors=True)
+        (
+            variant_set,
+            variant_id,
+            report_filter_path,
+            current_project,
+            current_project_dir,
+        ) = save_state
+        self._variant_set = variant_set
+        self._report_filter_path = report_filter_path
+        if self.current_file is not None:
+            self.current_file.variant_id = variant_id
+        self.current_project = current_project
+        self.current_project_dir = current_project_dir
+        # SEC2-9 (security round 4): a merge's manifest write replaced a
+        # pre-existing project.json before the save failed — put the
+        # previous bytes back, staged privately then os.replace'd, so the
+        # restore is atomic and the work area is exactly as it was.
+        for manifest_path, previous_bytes in manifest_restores:
+            staged_dir: Optional[Path] = None
+            try:
+                staged_dir = _private_stage_dir(self.workarea)
+                staged = staged_dir / PROJECT_MANIFEST_NAME
+                staged.write_bytes(previous_bytes)
+                os.replace(staged, manifest_path)
+            except (OSError, WorkareaContainmentError):
+                pass  # the rollback must never raise
+            finally:
+                if staged_dir is not None:
+                    shutil.rmtree(staged_dir, ignore_errors=True)
+        # LED .53: unlink only the files THIS save created — each path
+        # was recorded the moment its placement claim or gather copy
+        # wrote it. A reused byte-identical file and anything a
+        # concurrent writer created survive by construction.
+        for path in placed_files:
+            try:
+                path.unlink()
+            except OSError:
+                pass  # the rollback must never raise
+        # The folders THIS save created go deepest first, each removed
+        # only while empty: a folder a concurrent writer left non-empty
+        # (or a pre-existing one, never listed) stays on disk.
+        created_folders = list(created_dirs)
+        if created_project_dir:
+            created_folders.append(project_dir)
+        for folder in sorted(
+            set(created_folders), key=lambda item: len(item.parts), reverse=True
+        ):
+            try:
+                folder.rmdir()
+            except OSError:
+                pass  # not empty or already gone — the rollback must never raise
 
     def _handle_save_dialog(self, payload: Optional[SaveProjectPayload]) -> None:
         if payload is None:
@@ -8108,11 +8203,139 @@ class S19TuiApp(App):
             self.set_status("Parent folder not found or not a directory.")
             self.logger.warning("Invalid parent folder: %s", payload.parent_folder)
             return
-        cleaned = sanitize_project_name(payload.project_name)
-        if not cleaned:
-            self.set_status("Invalid project name.")
-            self.logger.warning("Invalid project name: %s", payload.project_name)
+        typed_name = payload.project_name
+        # HLR-164: the name guards run BEFORE any folder is created, in the
+        # contract's order — empty, device, reserved, the 64-character cap,
+        # the full-path limit, the disguised clash, the link/junction target.
+        # Every refusal paints its fixed token and a next step (UX-07).
+        if not typed_name.strip():
+            self.set_status(
+                "Project NOT saved: name is empty — type a project name."
+            )
+            self.logger.info("Save project refused: empty project name.")
             return
+        cleaned = sanitize_project_name(typed_name)
+        if not cleaned:
+            # A name with no usable characters is empty as a project name.
+            self.set_status(
+                "Project NOT saved: name is empty — type a project name."
+            )
+            self.logger.info(
+                "Save project refused: project name has no usable characters: %s",
+                typed_name,
+            )
+            return
+        # LLR-164.1: Windows device names are refused on the RAW typed name,
+        # on every path component of it and on the sanitised name — all
+        # case-folded, so ``con.txt`` is refused rather than saved as
+        # ``contxt``, and ``LPT¹`` names the same device as ``LPT1``.
+        raw_components = [
+            part
+            for part in typed_name.replace("/", "\\").split("\\")
+            if part
+        ]
+        if any(
+            is_windows_device_name(part)
+            for part in (typed_name, *raw_components, cleaned)
+        ):
+            self.set_status(
+                f"Project NOT saved: '{typed_name}' is a device name — "
+                "choose another name."
+            )
+            self.logger.warning(
+                "Save project refused: device name: %s", typed_name
+            )
+            return
+        reserved_folded = {
+            home.casefold() for home in RESERVED_WORKAREA_HOMES
+        }
+        if cleaned.casefold() in reserved_folded:
+            self.set_status(
+                f"Project NOT saved: '{cleaned}' is a reserved name — "
+                "choose another name."
+            )
+            self.logger.warning(
+                "Save project refused: reserved name: %s", cleaned
+            )
+            return
+        if len(cleaned) > PROJECT_NAME_MAX_CHARS:
+            self.set_status(
+                "Project NOT saved: name too long "
+                f"(at most {PROJECT_NAME_MAX_CHARS} characters) — "
+                "shorten the name."
+            )
+            self.logger.warning(
+                "Save project refused: name too long: %d characters", len(cleaned)
+            )
+            return
+        if (
+            len(str(self.workarea)) + 1 + len(cleaned) + _SAVE_REPORT_SUFFIX_CHARS
+            > _SAVE_FULL_PATH_LIMIT
+        ):
+            self.set_status(
+                "Project NOT saved: path too long — shorten the name."
+            )
+            self.logger.warning(
+                "Save project refused: path too long: %s", cleaned
+            )
+            return
+        # LLR-164.2 (Q-2): a project is a direct child of this work area
+        # holding a ``project.json`` or a data file, not a reserved home and
+        # not a link. A sanitised name equal to a project's folder name
+        # case-folded is a disguised clash when the typed name differs from
+        # that folder name — refused naming both, never suggesting a merge
+        # (UX-35). The open project is exempt: its name typed exactly or as
+        # its unsanitised form saves into it (LLR-164.2(c)); its on-disk
+        # name typed in ANOTHER case saves into it under the on-disk
+        # spelling (LED .52(a)) — while a case-only match against ANOTHER
+        # project stays a clash.
+        open_project_folded = (self.current_project or "").casefold()
+        project_file_suffixes = PROJECT_DATA_EXTENSIONS | A2L_EXTENSIONS
+        for item in sorted(self.workarea.iterdir()):
+            if not item.is_dir():
+                continue
+            # F8: the cheap name comparison comes first — a non-matching
+            # folder is never listed inside.
+            if item.name.casefold() != cleaned.casefold():
+                continue
+            if item.name.casefold() in reserved_folded:
+                continue
+            if _is_reparse_point(item):
+                continue
+            try:
+                holds_project_file = (item / "project.json").is_file() or any(
+                    child.is_file()
+                    and child.suffix.lower() in project_file_suffixes
+                    for child in item.iterdir()
+                )
+            except OSError:
+                # SEC2-1: a folder that cannot be read is skipped, the
+                # same as ``list_projects`` treats it — it never crashes
+                # the save.
+                continue
+            if not holds_project_file:
+                continue
+            if item.name.casefold() == open_project_folded:
+                if item.name != cleaned:
+                    # LED .52(a): adopt the on-disk spelling — the save
+                    # merges into the open project and ``current_project``
+                    # keeps the spelling its folder has.
+                    cleaned = item.name
+                continue
+            if typed_name != item.name:
+                self.set_status(
+                    f"Project NOT saved: '{typed_name}' is already a project "
+                    f"as '{item.name}' — choose another name."
+                )
+                self.logger.warning(
+                    "Save project refused: disguised clash: %r vs project %r",
+                    typed_name,
+                    item.name,
+                )
+                return
+            # The exact name against a project that is not open: the save
+            # merges — the files land as variants below (LLR-005.1); the
+            # full merge carry arrives at Inc 8a.
         # LLR-155.4: a source that vanished since the load (e.g. a same-name
         # save-back used to delete the work copy) refuses BEFORE the project
         # folder is created — no empty folder is left behind, the status
@@ -8147,63 +8370,239 @@ class S19TuiApp(App):
         # (or the explicit root every app placement passes), so any junction
         # under the parent is seen instead of resolved away.
         project_dir = parent_resolved / cleaned
+        # LLR-164.2 / HLR-164(f): a target that exists and is a link or
+        # junction is refused BEFORE any resolve or write.
+        if _is_reparse_point(project_dir):
+            self.set_status(
+                f"Project NOT saved: '{cleaned}' is a link or junction — "
+                "choose another name."
+            )
+            self.logger.warning(
+                "Save project refused: link/junction target: %s", project_dir
+            )
+            return
         # Review findings F6(a)/S-F5: remember whether THIS call creates the
-        # folder, so a later placement failure can remove exactly what it
-        # created — a pre-existing project folder is never touched. The
-        # ownership decision comes from mkdir itself (exist_ok=False +
-        # FileExistsError), not a racy ``not exists()`` probe: a folder
-        # that appears between the probe and the mkdir would wrongly be
-        # claimed as ours and destroyed on a later failure.
+        # folder, so a later failure can remove exactly what it created — a
+        # pre-existing project folder is never touched. The ownership
+        # decision comes from mkdir itself (exist_ok=False + FileExistsError),
+        # not a racy ``not exists()`` probe: a folder that appears between
+        # the probe and the mkdir would wrongly be claimed as ours and
+        # destroyed on a later failure.
         try:
             project_dir.mkdir(parents=True, exist_ok=False)
         except FileExistsError:
             created_project_dir = False
         else:
             created_project_dir = True
-        data_files, a2l_files, error = validate_project_files(project_dir)
-        if error:
-            self.set_status(error)
-            self.logger.warning("Project validation failed: %s", error)
-            return
-        existing_suffixes = {item.suffix.lower() for item in data_files}
-        # Multi-variant model (E5b, US-005): saving an S19/HEX into a project
-        # that already holds primaries is a legitimate variant addition — the
-        # pre-batch cross-suffix rejection is retired. Filename collisions are
-        # deduplicated by ``copy_into_workarea`` (`_<N>` suffix); the single-MAC
-        # and single-A2L guards below are preserved (LLR-005.1).
-        if self.current_file and self.current_file.mac_path:
-            has_mac = ".mac" in existing_suffixes
-            if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
-                self.set_status("Project already has a MAC file.")
-                self.logger.warning("Project already has MAC file: %s", project_dir)
-                return
-        if a2l_files and self.current_a2l_path and self.current_a2l_path.suffix.lower() in A2L_EXTENSIONS:
-            self.set_status("Project already has an A2L file.")
-            self.logger.warning("Project already has A2L file: %s", project_dir)
-            return
+        # LED .52(b) / review finding F1: snapshot the app state the save
+        # body is about to mutate — every failure exit below restores it.
+        save_state = (
+            self._variant_set,
+            self.current_file.variant_id if self.current_file else None,
+            self._report_filter_path,
+            self.current_project,
+            self.current_project_dir,
+        )
+        placed_files: list[Path] = []
+        created_dirs: list[Path] = []
+        # SEC2-9 (security round 4): at most one (manifest path, previous
+        # bytes) pair — armed the moment a merge's manifest write returns,
+        # consumed by the one ``_abort_save`` rollback.
+        manifest_restores: list[Tuple[Path, bytes]] = []
+        # R2-3: initialized before the try — the committed block below the
+        # excepts reads them once the save has succeeded.
         saved_variant_id: Optional[str] = None
         saved_primary_name: Optional[str] = None
+        # LLR-164.4: from the folder's creation on, EVERY statement of this
+        # body runs under one OSError handler — it reports the error with
+        # the ``could not save`` tokens and rolls the failed save back
+        # through the one ``_abort_save`` helper; every early return after
+        # the creation does the same.
         try:
+            # LED .53: NO pre-save tree snapshot — the rollback removes
+            # exactly what THIS save creates, recorded per placement and
+            # per gather copy below, never "what the snapshot lacks"
+            # (SEC2-5's unreadable folder, SEC2-6's concurrent writer).
+            data_files, a2l_files, error = validate_project_files(project_dir)
+            if error:
+                self.set_status(error)
+                self.logger.warning("Project validation failed: %s", error)
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                )
+                return
+            existing_suffixes = {item.suffix.lower() for item in data_files}
+            # Multi-variant model (E5b, US-005): saving an S19/HEX into a project
+            # that already holds primaries is a legitimate variant addition — the
+            # pre-batch cross-suffix rejection is retired. Filename collisions are
+            # deduplicated by the placement (`_<N>` suffix); the single-MAC
+            # and single-A2L guards below are preserved (LLR-005.1).
+            if self.current_file and self.current_file.mac_path:
+                has_mac = ".mac" in existing_suffixes
+                if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
+                    self.set_status("Project already has a MAC file.")
+                    self.logger.warning("Project already has MAC file: %s", project_dir)
+                    self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        save_state,
+                        manifest_restores,
+                    )
+                    return
+            if a2l_files and self.current_a2l_path and self.current_a2l_path.suffix.lower() in A2L_EXTENSIONS:
+                self.set_status("Project already has an A2L file.")
+                self.logger.warning("Project already has A2L file: %s", project_dir)
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                )
+                return
+            # LED .53: each placement runs through ``place_into_workarea``
+            # so the reuse flag is known — a byte-identical file the
+            # placement REUSED is never recorded, so the rollback removes
+            # exactly what THIS save created.
             if self.current_file:
-                saved = copy_into_workarea(
+                placed_image = place_into_workarea(
                     self.current_file.path, project_dir,
                     workarea_root=self.workarea,
                 )
+                saved = placed_image.path
+                if not placed_image.reused:
+                    placed_files.append(placed_image.path)
                 self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
                 if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
                     saved_primary_name = saved.name
                 if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
-                    saved_mac = copy_into_workarea(
+                    placed_mac = place_into_workarea(
                         self.current_file.mac_path, project_dir,
                         workarea_root=self.workarea,
                     )
+                    saved_mac = placed_mac.path
+                    if not placed_mac.reused:
+                        placed_files.append(placed_mac.path)
                     self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
             if self.current_a2l_path:
-                saved_a2l = copy_into_workarea(
+                placed_a2l = place_into_workarea(
                     self.current_a2l_path, project_dir,
                     workarea_root=self.workarea,
                 )
+                saved_a2l = placed_a2l.path
+                if not placed_a2l.reused:
+                    placed_files.append(placed_a2l.path)
                 self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
+            # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
+            # without reloading a file (no ``_apply_prepared_load`` pass), so
+            # the sticky report-filter selection resets here.
+            self._report_filter_path = None
+            # Rebuild the variant inventory from the on-disk project so the saved
+            # image becomes the active variant (multi-variant model, E5b). The id
+            # is resolved AFTER the build by filename match because a stem
+            # collision makes the id the full filename (E6 duplicate-id rule).
+            saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
+            if variant_error is None:
+                self._variant_set = build_variant_set(cleaned, saved_data_files)
+                if saved_primary_name:
+                    saved_variant_id = next(
+                        (
+                            variant.variant_id
+                            for variant in self._variant_set.variants
+                            if variant.path.name == saved_primary_name
+                        ),
+                        None,
+                    )
+                if saved_variant_id:
+                    self._variant_set.active_id = saved_variant_id
+                    if self.current_file:
+                        self.current_file.variant_id = saved_variant_id
+            else:
+                self._variant_set = None
+                self.logger.warning(
+                    "Variant set not built after save: %s", variant_error
+                )
+            # Change 1 (HLR-138 / LLR-138.1..138.3): the save-gather — COPY the
+            # JSON artifacts the project USES (the recorded predicate lives in
+            # ``project_gather_service``) into their per-artifact project homes,
+            # leaving the COMMON originals untouched. The gather is best-effort:
+            # its per-artifact findings are logged, never save-blocking.
+            composition_names = list(payload.batch) + [
+                name
+                for entries in payload.assignments.values()
+                for name in entries
+            ]
+            gather_outcome = gather_project_artifacts(
+                project_dir,
+                composition_names=composition_names,
+                active_document=self._change_service.document.source_path,
+                active_document_kind=self._change_service.document.kind,
+                active_template=self._last_template_path,
+                common_patches_dir=self.workarea / WORKAREA_PATCHES,
+                common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
+                workarea_root=self.workarea,
+            )
+            for issue in gather_outcome.issues:
+                self.logger.warning("Project gather: %s", issue.message)
+            # LED .53: the gather reports exactly what IT created — the
+            # files it wrote and the homes it created on demand — so the
+            # rollback removes those and never a reused byte-identical
+            # file or a pre-existing home.
+            placed_files.extend(gather_outcome.written)
+            created_dirs.extend(gather_outcome.created_homes)
+            # SEC2-8 / SEC2-9 (security round 4): the manifest write is the
+            # last post-creation stage. Keep the previous project.json
+            # bytes BEFORE the write — when no manifest existed, the write
+            # CREATES it and the new file joins the placed list the moment
+            # the write returns (a failure after that point, such as the
+            # verify re-read raising, leaves no folder behind); when a
+            # merge REPLACES a pre-existing manifest, the rollback puts
+            # the kept bytes back atomically.
+            manifest_path = project_dir / PROJECT_MANIFEST_NAME
+            manifest_previous: Optional[bytes] = None
+            if manifest_path.is_file():
+                manifest_previous = manifest_path.read_bytes()
+
+            def _manifest_written(written: Path) -> None:
+                # Invoked by ``_write_and_verify_manifest`` the moment the
+                # manifest write returns, before the verify can raise.
+                if manifest_previous is None:
+                    placed_files.append(written)
+                else:
+                    manifest_restores.append((written, manifest_previous))
+
+            manifest_ok = self._write_and_verify_manifest(
+                project_dir,
+                batch=payload.batch,
+                assignments=payload.assignments,
+                declared_regions=self._declared_regions,
+                gathered=gather_outcome.gathered,
+                on_written=_manifest_written,
+            )
+            if not manifest_ok:
+                message = (
+                    "Project NOT saved: could not save — project.json was "
+                    "not written. check the folder."
+                )
+                self.set_status(message)
+                self.logger.warning("Project save failed at the manifest write.")
+                self._abort_save(
+                    project_dir,
+                    created_project_dir,
+                    placed_files,
+                    created_dirs,
+                    save_state,
+                    manifest_restores,
+                )
+                return
         except WorkareaPlacementError as exc:
             # HLR-155: the locked-target refusal. The exception text already
             # leads with the outcome and names the file, the cause and the
@@ -8218,79 +8617,75 @@ class S19TuiApp(App):
                 markup=False,
             )
             self.logger.warning("Project save placement failed: %s", exc)
-            self._remove_created_project_dir(project_dir, created_project_dir)
+            self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                save_state,
+                manifest_restores,
+            )
             return
         except WorkareaContainmentError as exc:
             self.set_status(f"Cannot save project: {exc}")
             self.logger.warning("Project save rejected by workarea guard: %s", exc)
-            self._remove_created_project_dir(project_dir, created_project_dir)
-            return
-        self.current_project = cleaned
-        self.current_project_dir = project_dir
-        # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
-        # without reloading a file (no ``_apply_prepared_load`` pass), so
-        # the sticky report-filter selection resets here.
-        self._report_filter_path = None
-        # Rebuild the variant inventory from the on-disk project so the saved
-        # image becomes the active variant (multi-variant model, E5b). The id
-        # is resolved AFTER the build by filename match because a stem
-        # collision makes the id the full filename (E6 duplicate-id rule).
-        saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
-        if variant_error is None:
-            self._variant_set = build_variant_set(cleaned, saved_data_files)
-            if saved_primary_name:
-                saved_variant_id = next(
-                    (
-                        variant.variant_id
-                        for variant in self._variant_set.variants
-                        if variant.path.name == saved_primary_name
-                    ),
-                    None,
-                )
-            if saved_variant_id:
-                self._variant_set.active_id = saved_variant_id
-                if self.current_file:
-                    self.current_file.variant_id = saved_variant_id
-        else:
-            self._variant_set = None
-            self.logger.warning(
-                "Variant set not built after save: %s", variant_error
+            self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                save_state,
+                manifest_restores,
             )
+            return
+        except OSError as exc:
+            # LLR-164.4: any operating-system error after the folder was
+            # created reports the ``could not save`` tokens and rolls the
+            # failed save back — the placed files, the created folder and
+            # the in-memory state — so the app keeps running as it was.
+            message = f"Project NOT saved: could not save — {exc}. check the folder."
+            self.set_status(message)
+            self.notify(
+                message,
+                title="Project not saved",
+                severity="error",
+                timeout=10.0,
+                markup=False,
+            )
+            self.logger.warning("Project save failed with an OS error: %s", exc)
+            self._abort_save(
+                project_dir,
+                created_project_dir,
+                placed_files,
+                created_dirs,
+                save_state,
+                manifest_restores,
+            )
+            return
+        # R2-3: the save is COMMITTED — the statements below run OUTSIDE
+        # the rollback try: once ``project.json`` is on disk, an error
+        # here must never roll the save back (the rollback would unlink
+        # a variant the manifest now lists).
+        # F1: the success line paints only after the manifest is on
+        # disk — a save that is about to fail must not have said
+        # "Saved".
         if saved_variant_id:
             self.set_status(
                 f"Saved project to {project_dir} (variant '{saved_variant_id}')"
             )
         else:
             self.set_status(f"Saved project to {project_dir}")
-        # Change 1 (HLR-138 / LLR-138.1..138.3): the save-gather — COPY the
-        # JSON artifacts the project USES (the recorded predicate lives in
-        # ``project_gather_service``) into their per-artifact project homes,
-        # leaving the COMMON originals untouched. The gather is best-effort:
-        # its per-artifact findings are logged, never save-blocking.
-        composition_names = list(payload.batch) + [
-            name
-            for entries in payload.assignments.values()
-            for name in entries
-        ]
-        gather_outcome = gather_project_artifacts(
-            project_dir,
-            composition_names=composition_names,
-            active_document=self._change_service.document.source_path,
-            active_document_kind=self._change_service.document.kind,
-            active_template=self._last_template_path,
-            common_patches_dir=self.workarea / WORKAREA_PATCHES,
-            common_templates_dir=self.base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES,
-            workarea_root=self.workarea,
-        )
-        for issue in gather_outcome.issues:
-            self.logger.warning("Project gather: %s", issue.message)
-        self._write_and_verify_manifest(
-            project_dir,
-            batch=payload.batch,
-            assignments=payload.assignments,
-            declared_regions=self._declared_regions,
-            gathered=gather_outcome.gathered,
-        )
+        # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
+        # failure) stays the NEWEST status line: the drift report is
+        # re-painted after the success line, never buried beneath it.
+        verify_result = self._last_manifest_verify_result
+        if (
+            verify_result is not None
+            and verify_result.status != MANIFEST_VERIFIED
+        ):
+            self.set_status("Manifest verify MISMATCH")
+        self.current_project = cleaned
+        self.current_project_dir = project_dir
         self.update_project_labels()
         self.refresh_files()
 
@@ -8302,7 +8697,8 @@ class S19TuiApp(App):
         assignments: Optional[Mapping[str, Sequence[str]]] = None,
         declared_regions: Sequence[DeclaredRegion] = (),
         gathered: Optional[Mapping[str, Sequence[str]]] = None,
-    ) -> None:
+        on_written: Optional[Callable[[Path], None]] = None,
+    ) -> bool:
         """
         Summary:
             Persist the active project's ``project.json`` and verify-check the
@@ -8339,12 +8735,30 @@ class S19TuiApp(App):
                 ``write_project_manifest`` ONLY (the reader ignores the
                 additive key, so the verify oracle is unchanged); ``None`` /
                 empty ⇒ the serializer omits the key (back-compat).
+            on_written (Optional[Callable[[Path], None]]): A hook the save
+                handler passes — invoked with the written manifest path
+                the MOMENT the write returns, before the verify can raise
+                (security findings SEC2-8/SEC2-9, round 4): the handler
+                records the created manifest for the exact-list rollback,
+                or arms the previous-bytes restore for a merge. ``None``
+                (every other caller) ⇒ the hook is not invoked.
 
         Returns:
-            None
+            bool: True when no manifest write was needed (no variant set) or
+                the write + verify ran; False when ``project.json`` could not
+                be written — the caller (``_handle_save_dialog``, LLR-164.4)
+                then reports the ``could not save`` tokens and removes the
+                folder the save created.
+
+        Side effects:
+            Sets ``self._last_manifest_verify_result`` to the verify outcome
+            (``None`` when no verify ran or the write failed) — the save
+            handler re-paints a MISMATCH as the NEWEST status line after its
+            success line (R2-5, LLR-004.2).
 
         Data Flow:
-            - No ``_variant_set`` (an empty / failed save) → no manifest write.
+            - No ``_variant_set`` (an empty / failed save) → no manifest write,
+              reported as success (nothing was owed).
             - ``write_project_manifest`` returns ``(None, issues)`` on a refused
               serialize or a containment / IO failure (collect-don't-abort);
               that is surfaced as an error notice, never raised.
@@ -8364,8 +8778,13 @@ class S19TuiApp(App):
                 - _handle_save_dialog
         """
         variant_set = self._variant_set
+        # R2-5: the verify outcome is handed to the caller on this
+        # channel — the save handler re-paints a MISMATCH as the NEWEST
+        # status line after its success line (LLR-004.2: the mismatch is
+        # reported, never buried).
+        self._last_manifest_verify_result = None
         if variant_set is None:
-            return
+            return True
         written, issues = write_project_manifest(
             variant_set,
             project_dir,
@@ -8386,7 +8805,12 @@ class S19TuiApp(App):
                 markup=False,
             )
             self.logger.warning("Manifest write refused: %s", detail)
-            return
+            return False
+        # SEC2-8 / SEC2-9 (security round 4): the write has landed — give
+        # the save handler the moment-before-verify so it can record the
+        # created manifest or arm the previous-bytes restore.
+        if on_written is not None:
+            on_written(written)
         result = verify_written_manifest(
             project_dir,
             variant_set,
@@ -8394,7 +8818,9 @@ class S19TuiApp(App):
             batch=batch,
             assignments=assignments,
         )
+        self._last_manifest_verify_result = result
         self._surface_manifest_verify_result(result)
+        return True
 
     def _surface_manifest_verify_result(
         self, result: ManifestVerifyResult
@@ -8546,9 +8972,10 @@ class S19TuiApp(App):
         self._publish_flow_session_dir()
 
     def list_projects(self) -> List[str]:
+        reserved_folded = {home.casefold() for home in RESERVED_WORKAREA_HOMES}
         projects = []
         for item in sorted(self.workarea.iterdir()):
-            if item.is_dir() and item.name not in RESERVED_WORKAREA_HOMES:
+            if item.is_dir() and item.name.casefold() not in reserved_folded:
                 projects.append(item.name)
         return projects
 

@@ -1,0 +1,39 @@
+cmd: pytest tests/test_b100_save_guards.py::test_tc_b100_05_disguised_clash_refused_naming_both
+mutation LLR-164.2: the disguised-clash refusal bypassed (clash branch never taken)
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_tc_b100_05_disguised_clash_refused_naming_both _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27416/test_tc_b100_05_disguised_clas0')
+
+    def test_tc_b100_05_disguised_clash_refused_naming_both(tmp_path: Path) -> None:
+        """Project ``ab`` exists and is not open; ``a b`` is refused BEFORE any
+        write, the refusal names both names with ``already a project`` and
+        ``choose another name``, and ``ab/`` is byte-identical afterwards."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            before = _digest_manifest(project_dir)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "a b"))
+                await _flush(pilot)
+                status = probe.last
+                after = _digest_manifest(project_dir)
+                names = sorted(p.name for p in project_dir.iterdir())
+            return status, before, after, names
+    
+        status, before, after, names = asyncio.run(_drive())
+>       assert "already a project" in status, status
+E       AssertionError: Project saved + manifest verified
+E       assert 'already a project' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:307: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_disguised_clash_refused_naming_both
+1 failed in 4.06s

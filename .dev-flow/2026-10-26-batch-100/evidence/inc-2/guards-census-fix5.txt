@@ -1,0 +1,6 @@
+cmd: pytest -q -p no:cacheprovider -k census tests (guards census sweep, fix pass 5)
+tree: fix pass 5
+
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed, 3769 deselected in 112.95s (0:01:52)

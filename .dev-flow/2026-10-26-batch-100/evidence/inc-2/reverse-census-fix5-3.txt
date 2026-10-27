@@ -1,0 +1,5 @@
+cmd: pytest -q -p no:cacheprovider tests/test_tui_report_seam.py tests/test_tui_variants.py::test_save_second_s19_into_project_appends_variant (reverse census + A-09, fix pass 5)
+tree: fix pass 5
+
+.............................                                            [100%]
+29 passed in 168.82s (0:02:48)

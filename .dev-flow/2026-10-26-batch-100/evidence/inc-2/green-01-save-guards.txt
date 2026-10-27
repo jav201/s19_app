@@ -1,0 +1,517 @@
+cmd: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (Inc 2 sources implemented)
+F....FF.FFF.....FF                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_04_reserved_homes_refused_in_every_casing ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_04_reserved_homes0')
+
+    def test_tc_b100_04_reserved_homes_refused_in_every_casing(tmp_path: Path) -> None:
+        """Every ``RESERVED_WORKAREA_HOMES`` entry in 3 casings: refused before
+        any folder is created or written, with the ``reserved name`` and
+        ``choose another name`` tokens; the work area's file manifest is
+        untouched by every refusal."""
+        casings = [str.islower, str.title, str.upper]
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            before = _digest_manifest(app.workarea)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                for home in RESERVED_WORKAREA_HOMES:
+                    for fold in casings:
+                        typed = fold(home)
+                        app._handle_save_dialog(_payload(app, typed))
+                        await _flush(pilot)
+                        status = probe.last
+                        assert "reserved name" in status, (
+                            f"{typed!r}: expected the reserved-name refusal, "
+                            f"got {status!r}"
+                        )
+                        assert "choose another name" in status, (
+                            f"{typed!r}: expected the next-step token, "
+                            f"got {status!r}"
+                        )
+                        assert _digest_manifest(app.workarea) == before, (
+                            f"{typed!r}: a refused save wrote into the work area"
+                        )
+            return probe.messages
+    
+>       messages = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:189: in _drive
+    app._handle_save_dialog(_payload(app, typed))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+payload = SaveProjectPayload(parent_folder='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27400\\test_tc_b100_04_reserved_homes0\\app\\.s19tool\\workarea', project_name=True, batch=(), assignments={})
+
+    def _handle_save_dialog(self, payload: Optional[SaveProjectPayload]) -> None:
+        if payload is None:
+            self.logger.info("Save project canceled.")
+            return
+        if not self.current_file and not self.current_a2l_path:
+            self.set_status("Nothing to save: load a data file or A2L first.")
+            self.logger.info("Save project dismissed: no loaded file or A2L.")
+            return
+        parent_resolved = resolve_input_path(Path(payload.parent_folder), self.base_dir)
+        if not parent_resolved or not parent_resolved.is_dir():
+            self.set_status("Parent folder not found or not a directory.")
+            self.logger.warning("Invalid parent folder: %s", payload.parent_folder)
+            return
+        typed_name = payload.project_name
+        # HLR-164: the name guards run BEFORE any folder is created, in the
+        # contract's order — empty, device, reserved, the 64-character cap,
+        # the full-path limit, the disguised clash, the link/junction target.
+        # Every refusal paints its fixed token and a next step (UX-07).
+>       if not typed_name.strip():
+               ^^^^^^^^^^^^^^^^
+E       AttributeError: 'bool' object has no attribute 'strip'
+
+s19_app\tui\app.py:8130: AttributeError
+__________________ test_tc_b100_05_exact_name_adds_a_variant __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_05_exact_name_add0')
+
+    def test_tc_b100_05_exact_name_adds_a_variant(tmp_path: Path) -> None:
+        """``ab`` typed exactly against project ``ab`` (not open): no refusal —
+        the save merges, adding the loaded image as one new variant."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = tmp_path / "sources" / "firmware.s19"
+            src.parent.mkdir(parents=True, exist_ok=True)
+            src.write_text(_S19_B, encoding="ascii")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "ab"))
+                await _flush(pilot)
+                names = sorted(p.name for p in project_dir.iterdir())
+                variant_ids = [v.variant_id for v in app._variant_set.variants]
+            return probe.messages, names, variant_ids
+    
+        messages, names, variant_ids = asyncio.run(_drive())
+        assert "already a project" not in " ".join(messages), messages
+>       assert names == ["a.s19", "firmware.s19"], names
+E       AssertionError: ['a.s19', 'firmware.s19', 'project.json']
+E       assert ['a.s19', 'fi...project.json'] == ['a.s19', 'firmware.s19']
+E         
+E         Left contains one more item: 'project.json'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:363: AssertionError
+_________ test_tc_b100_05_open_project_unsanitised_name_saves_into_it _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_05_open_project_u0')
+
+    def test_tc_b100_05_open_project_unsanitised_name_saves_into_it(
+        tmp_path: Path,
+    ) -> None:
+        """Project ``ab`` is OPEN; ``a b`` typed: saved INTO the open project
+        (the unsanitised form of its name), not refused, no folder ``a b``."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app._handle_load_project("ab")
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "a b"))
+                await _flush(pilot)
+                status = probe.last
+                names = sorted(p.name for p in project_dir.iterdir())
+                a_b_exists = (app.workarea / "a b").exists()
+            return status, names, a_b_exists
+    
+        status, names, a_b_exists = asyncio.run(_drive())
+>       assert "Saved project" in status, status
+E       AssertionError: Project saved + manifest verified
+E       assert 'Saved project' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:390: AssertionError
+______________________ test_tc_b100_06_name_cap_boundary ______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_06_name_cap_bound0')
+
+    def test_tc_b100_06_name_cap_boundary(tmp_path: Path) -> None:
+        """64 characters → saved; 65 and 300 → refused with ``name too long``
+        and ``shorten the name``, 0 folders, the app keeps running."""
+        cap = PROJECT_NAME_MAX_CHARS
+        assert cap == 64
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            saved_64 = refused_65 = refused_300 = ""
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "n" * 64))
+                await _flush(pilot)
+                saved_64 = probe.last
+                app._handle_save_dialog(_payload(app, "n" * 65))
+                await _flush(pilot)
+                refused_65 = probe.last
+                app._handle_save_dialog(_payload(app, "n" * 300))
+                await _flush(pilot)
+                refused_300 = probe.last
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return saved_64, refused_65, refused_300, folders
+    
+        saved_64, refused_65, refused_300, folders = asyncio.run(_drive())
+>       assert "Saved project" in saved_64, saved_64
+E       AssertionError: Project saved + manifest verified
+E       assert 'Saved project' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:462: AssertionError
+_________________ test_tc_b100_06_path_limit_met_and_exceeded _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_06_path_limit_met0')
+
+    def test_tc_b100_06_path_limit_met_and_exceeded(tmp_path: Path) -> None:
+        """L = 150: a 55-character name gives 150 + 1 + 55 + 53 = 259 (saved);
+        a 56-character name gives 260 — refused with ``path too long`` and
+        ``shorten the name``, 0 folders."""
+        base = _padded_base(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            assert len(str(app.workarea)) == 150, len(str(app.workarea))
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "a" * 55))
+                await _flush(pilot)
+                saved = probe.last
+                app._handle_save_dialog(_payload(app, "a" * 56))
+                await _flush(pilot)
+                refused = probe.last
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return saved, refused, folders
+    
+        saved, refused, folders = asyncio.run(_drive())
+>       assert "Saved project" in saved, saved
+E       AssertionError: Project saved + manifest verified
+E       assert 'Saved project' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:506: AssertionError
+________ test_tc_b100_07_ast_census_every_post_creation_return_removes ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_tc_b100_07_ast_census_eve0')
+
+    def test_tc_b100_07_ast_census_every_post_creation_return_removes(
+        tmp_path: Path,
+    ) -> None:
+        """The census: every ``return`` after the folder's creation sits in a
+        block that first calls ``_remove_created_project_dir``; exactly one
+        ``except OSError`` handler exists and it removes the folder too."""
+        handler = _save_handler_ast()
+        parent_of: dict = {}
+        for node in ast.walk(handler):
+            for child in ast.iter_child_nodes(node):
+                parent_of[child] = node
+    
+        mkdir_lines = [
+            node.lineno
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "mkdir"
+        ]
+        assert mkdir_lines, "the handler must create the project folder"
+        first_mkdir = min(mkdir_lines)
+    
+        post_creation_returns = [
+            node
+            for node in ast.walk(handler)
+            if isinstance(node, ast.Return) and node.lineno > first_mkdir
+        ]
+        assert len(post_creation_returns) >= 3, (
+            f"expected at least 3 post-creation returns, "
+            f"found {len(post_creation_returns)}"
+        )
+        for node in post_creation_returns:
+            block = parent_of.get(node)
+>           assert block is not None and isinstance(block, ast.stmt), node.lineno
+E           AssertionError: 8442
+E           assert (<ast.ExceptHandler object at 0x000001D87D788940> is not None and False)
+E            +  where False = isinstance(<ast.ExceptHandler object at 0x000001D87D788940>, <class 'ast.stmt'>)
+E            +    where <class 'ast.stmt'> = ast.stmt
+
+tests\test_b100_save_guards.py:570: AssertionError
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_at_b100_02_name_refusals_0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        with project ``ab`` open, ``a b`` → ``already a project`` naming ``ab``
+        with ``choose another name``. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. open project ab; the disguised name a b is refused.
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                row = next(
+                    item
+                    for item in app.screen.query("#project_list ListItem")
+                    if str(item.query_one(Label).render()) == "ab"
+                )
+                await pilot.click(row)
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'ab'" in _status_text(app),
+                    "the status naming the loaded project ab",
+                )
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                names = sorted(p.name for p in project_dir.iterdir())
+            return names
+    
+>       names = asyncio.run(_drive())
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:784: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:756: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_02_name_refusals_through_the_save_dialog.<locals>._drive.<locals>.<lambda> at 0x000001D878ABF420>
+description = 'the Load project dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load project dialog
+
+tests\test_b100_save_guards.py:103: AssertionError
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27400/test_at_b100_02_name_refusals_1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        with project ``ab`` open, ``a b`` → ``already a project`` naming ``ab``
+        with ``choose another name``. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. open project ab; the disguised name a b is refused.
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                row = next(
+                    item
+                    for item in app.screen.query("#project_list ListItem")
+                    if str(item.query_one(Label).render()) == "ab"
+                )
+                await pilot.click(row)
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'ab'" in _status_text(app),
+                    "the status naming the loaded project ab",
+                )
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                names = sorted(p.name for p in project_dir.iterdir())
+            return names
+    
+>       names = asyncio.run(_drive())
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:784: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:756: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_b100_02_name_refusals_through_the_save_dialog.<locals>._drive.<locals>.<lambda> at 0x000001D87C2320C0>
+description = 'the Load project dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the Load project dialog
+
+tests\test_b100_save_guards.py:103: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_04_reserved_homes_refused_in_every_casing
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_exact_name_adds_a_variant
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_open_project_unsanitised_name_saves_into_it
+FAILED tests/test_b100_save_guards.py::test_tc_b100_06_name_cap_boundary - As...
+FAILED tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_ast_census_every_post_creation_return_removes
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size0]
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]
+8 failed, 10 passed in 141.97s (0:02:21)

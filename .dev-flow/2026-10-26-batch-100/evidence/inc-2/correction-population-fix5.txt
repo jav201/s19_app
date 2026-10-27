@@ -1,0 +1,31 @@
+cmd: reverse-census greps (fix pass 5)
+tree: fix pass 5
+
+== _gather_copy / _same_artifact_name / created_homes / home_preexisted
+tests/test_b100_reuse.py
+tests/test_b100_save_guards.py
+tests/test_b99_staging.py
+tests/test_copy_into_workarea_content_dedup.py
+
+== _abort_save / manifest_restores / on_written / _write_and_verify_manifest
+tests/test_b100_save_guards.py
+tests/test_b99_staging.py
+tests/test_tui_report_seam.py
+
+== place_into_workarea / copy_into_workarea / GatherOutcome / gather_project_artifacts
+tests/test_b100_reuse.py
+tests/test_b100_save_guards.py
+tests/test_b99_staging.py
+tests/test_copy_into_workarea_content_dedup.py
+tests/test_crc_designer_view.py
+tests/test_crc_operation.py
+tests/test_flow_external_step_b96.py
+tests/test_flow_persistence.py
+tests/test_id_registry.py
+tests/test_manifest_writer.py
+tests/test_project_gather.py
+tests/test_tui_directionb.py
+tests/test_tui_helpers.py
+tests/test_tui_public_api.py
+tests/test_tui_workspace.py
+tests/test_unified_write.py

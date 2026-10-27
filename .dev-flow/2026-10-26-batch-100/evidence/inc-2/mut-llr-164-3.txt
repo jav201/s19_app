@@ -1,0 +1,44 @@
+cmd: pytest tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded
+mutation LLR-164.3: the full-path limit disabled (bound raised to 99999)
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b100_06_path_limit_met_and_exceeded _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27417/test_tc_b100_06_path_limit_met0')
+
+    def test_tc_b100_06_path_limit_met_and_exceeded(tmp_path: Path) -> None:
+        """L = 150: a 55-character name gives 150 + 1 + 55 + 53 = 259 (saved);
+        a 56-character name gives 260 — refused with ``path too long`` and
+        ``shorten the name``, 0 folders."""
+        base = _padded_base(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            assert len(str(app.workarea)) == 150, len(str(app.workarea))
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "a" * 55))
+                await _flush(pilot)
+                app._handle_save_dialog(_payload(app, "a" * 56))
+                await _flush(pilot)
+                refused = probe.last
+                messages = list(probe.messages)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return messages, refused, folders
+    
+        messages, refused, folders = asyncio.run(_drive())
+        assert any("Saved project" in message for message in messages), messages
+>       assert "path too long" in refused, refused
+E       AssertionError: Project saved + manifest verified
+E       assert 'path too long' in 'Project saved + manifest verified'
+
+tests\test_b100_save_guards.py:508: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_06_path_limit_met_and_exceeded
+1 failed in 4.70s

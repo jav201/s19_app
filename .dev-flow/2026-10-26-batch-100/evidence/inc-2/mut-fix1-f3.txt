@@ -1,0 +1,122 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised tests/test_b100_save_guards.py::test_tc_b100_04_device_predicate_stem_before_first_dot
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M-F3 — the predicate back to the LAST-dot split)
+
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_04_device_names_refused_raw_and_sanitised ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27524/test_tc_b100_04_device_names_r0')
+
+    def test_tc_b100_04_device_names_refused_raw_and_sanitised(tmp_path: Path) -> None:
+        """``nul``, ``CON``, ``com1``, ``LPT¹`` (superscript), ``con.txt`` (raw
+        only — the sanitised name is ``contxt``), ``CONIN$`` (raw),
+        ``C O N`` (sanitises to ``CON``) and the multi-dot / trailing-space
+        arms ``con.tar.gz``, ``NUL.tar.gz``, ``com1.a.b``, ``CON .txt``
+        (F3 / SEC2-2 — Windows matches the stem before the FIRST dot): 11
+        refusals with the ``device name`` and ``choose another name`` tokens,
+        0 folders."""
+        device_names = [
+            "nul",
+            "CON",
+            "com1",
+            "LPT¹",
+            "con.txt",
+            "CONIN$",
+            "C O N",
+            "con.tar.gz",
+            "NUL.tar.gz",
+            "com1.a.b",
+            "CON .txt",
+        ]
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                for typed in device_names:
+                    app._handle_save_dialog(_payload(app, typed))
+                    await _flush(pilot)
+                    status = probe.last
+                    assert "device name" in status, (
+                        f"{typed!r}: expected the device-name refusal, "
+                        f"got {status!r}"
+                    )
+                    assert "choose another name" in status, (
+                        f"{typed!r}: expected the next-step token, got {status!r}"
+                    )
+                    leftovers = [
+                        item.name
+                        for item in app.workarea.iterdir()
+                        if item.is_dir() and item.name != "temp"
+                    ]
+                    leftovers = [
+                        name
+                        for name in leftovers
+                        if name.casefold() not in {h.casefold() for h in RESERVED_WORKAREA_HOMES}
+                    ]
+                    assert leftovers == [], (
+                        f"{typed!r}: folders appeared for a refused name: {leftovers}"
+                    )
+            return probe.messages
+    
+>       messages = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:335: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        probe = _StatusProbe(app)
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            for typed in device_names:
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+>               assert "device name" in status, (
+                    f"{typed!r}: expected the device-name refusal, "
+                    f"got {status!r}"
+                )
+E               AssertionError: 'con.tar.gz': expected the device-name refusal, got "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
+E               assert 'device name' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27524\\test_tc_b100_04_device_names_r0\\app\\.s19tool\\workarea\\contargz (variant 'firmware')"
+
+tests\test_b100_save_guards.py:313: AssertionError
+___________ test_tc_b100_04_device_predicate_stem_before_first_dot ____________
+
+    def test_tc_b100_04_device_predicate_stem_before_first_dot() -> None:
+        """The one shared predicate (F3 / SEC2-2, frozen at B100-I11): the
+        stem up to the FIRST dot, with trailing spaces and dots stripped,
+        decides — ``con.tar.gz`` / ``NUL.tar.gz`` / ``com1.a.b`` /
+        ``CON .txt`` / ``CON.`` are device names, ``COM⁴`` is not, and the
+        superscript digits ¹²³ stay refused (they fold to 123)."""
+        refused = ["con.tar.gz", "NUL.tar.gz", "com1.a.b", "CON .txt", "CON.", "LPT¹"]
+        accepted = ["COM⁴", "console", "lpt10x", "normal.txt", ""]
+        for name in refused:
+>           assert is_windows_device_name(name), f"{name!r} must be a device name"
+E           AssertionError: 'con.tar.gz' must be a device name
+E           assert False
+E            +  where False = is_windows_device_name('con.tar.gz')
+
+tests\test_b100_save_guards.py:348: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_04_device_names_refused_raw_and_sanitised
+FAILED tests/test_b100_save_guards.py::test_tc_b100_04_device_predicate_stem_before_first_dot
+2 failed in 8.80s

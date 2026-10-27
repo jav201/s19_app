@@ -1,0 +1,5 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_reuse.py (reverse census, fix pass 5)
+tree: fix pass 5
+
+......................................                                   [100%]
+38 passed in 68.02s (0:01:08)

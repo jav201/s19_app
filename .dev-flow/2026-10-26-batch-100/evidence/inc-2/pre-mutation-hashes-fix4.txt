@@ -1,0 +1,4 @@
+pre-mutation hashes — LED .53 fixed state (fix pass 4)
+fcb1bf40064502bab5c3a48e75047402d2c2b04aafaf99c63cd606a646105a0e *s19_app/tui/app.py
+8ef1763e180c639787258f88e69d518ff046113d2597a0990d8912d19f0db8a4 *s19_app/tui/workspace.py
+c2d8cc2864a1cc4e287f678a7834da00cc1dc207862fc416bf29dac1594e5f74 *s19_app/tui/services/project_gather_service.py

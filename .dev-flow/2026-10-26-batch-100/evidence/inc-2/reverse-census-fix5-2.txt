@@ -1,0 +1,5 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b99_staging.py tests/test_project_gather.py tests/test_copy_into_workarea_content_dedup.py (reverse census, fix pass 5)
+tree: fix pass 5
+
+................................................                         [100%]
+48 passed in 134.84s (0:02:14)

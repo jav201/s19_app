@@ -1,0 +1,4 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -c "import s19_app; print(s19_app.__file__)"
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1)
+
+C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py

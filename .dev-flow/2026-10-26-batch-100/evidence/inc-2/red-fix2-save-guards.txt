@@ -1,0 +1,140 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2 — extended module against the fix-pass-1 tree, BEFORE the fix-pass-2 source changes)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+
+........................F..F...                                          [100%]
+================================== FAILURES ===================================
+____ test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27549/test_tc_b100_07_failed_save_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027CBCA55F50>
+case = 'merge-gathered'
+
+    @pytest.mark.parametrize(
+        "case",
+        ["merge-gathered", "merge-gathered-reused", "fresh-gathered"],
+    )
+    def test_tc_b100_07_failed_save_removes_every_placed_path(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+    ) -> None:
+        """R2-1 / SEC2-4 (LED .52(b)): a failed save removes EVERY file and
+        folder it placed — the copies AND the change/check documents the
+        gather copied into ``patches/`` with the home folder it created —
+        leaving the target's RECURSIVE tree (files AND folders) exactly as
+        the pre-save snapshot. A byte-identical file the gather REUSED at a
+        pre-existing path must survive (SEC2-4's trap: a bare-name skip
+        test would delete it). A fresh-folder save that fails leaves no
+        folder behind."""
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            common = app.workarea / WORKAREA_PATCHES
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "hotfix.json").write_text(_CHANGE_DOC, encoding="utf-8")
+            merge = case != "fresh-gathered"
+            if merge:
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                if case == "merge-gathered-reused":
+                    # the gather finds a byte-identical sibling at the same
+                    # path and REUSES it — nothing is written there
+                    reused_home = project_dir / "patches"
+                    reused_home.mkdir()
+                    (reused_home / "hotfix.json").write_text(
+                        _CHANGE_DOC, encoding="utf-8"
+                    )
+            else:
+                project_dir = app.workarea / "freshp"
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                # The patch goes down only AFTER the load, so the load path
+                # itself keeps the real writer.
+                _force_stage(monkeypatch, "manifest-refused")
+                tree_before = _tree_listing(project_dir)
+                payload = app_module.SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="ab" if merge else "freshp",
+                    batch=("hotfix.json",),
+                )
+                app._handle_save_dialog(payload)
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing(project_dir)
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, tree_before, tree_after, folders
+    
+        status, tree_before, tree_after, folders = asyncio.run(_drive())
+        assert "could not save" in status, f"{case}: {status}"
+        assert "check the folder" in status, f"{case}: {status}"
+>       assert tree_after == tree_before, (
+            f"{case}: the failed save left placed files or folders behind — "
+            f"before {sorted(tree_before)}, after {sorted(tree_after)}"
+        )
+E       AssertionError: merge-gathered: the failed save left placed files or folders behind — before ['a.s19'], after ['a.s19', 'patches', 'patches\\hotfix.json']
+E       assert {'a.s19': 'b1...279367b1fb4e'} == {'a.s19': 'b1...7f25e97b65e0'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Left contains 2 more items:
+E         {'patches': 'dir',
+E          'patches\\hotfix.json': '247767fa2b72e3e2918961ecb83d5a8590125932e6afbfa026af279367b1fb4e'}
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1115: AssertionError
+_________ test_tc_b100_07_manifest_mismatch_is_the_newest_status_line _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27549/test_tc_b100_07_manifest_misma0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027CBF0A6A10>
+
+    def test_tc_b100_07_manifest_mismatch_is_the_newest_status_line(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R2-5 (LLR-004.2): a manifest write that verifies with a MISMATCH
+        is reported, not a failure — and the drift report stays the NEWEST
+        painted status line: ``Saved project to …`` paints first, then
+        ``Manifest verify MISMATCH`` re-paints over it, so the success line
+        never buries the mismatch (the notice fires once, inside the verify
+        surfacing). Without the re-paint the success line is the newest
+        line and this arm fails."""
+    
+        def _forced_mismatch(*args, **kwargs):
+            return ManifestVerifyResult(
+                status=MANIFEST_MISMATCH,
+                drift=["active_variant"],
+            )
+    
+        base = tmp_path / "app"
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                monkeypatch.setattr(
+                    app_module, "verify_written_manifest", _forced_mismatch
+                )
+                app._handle_save_dialog(_payload(app, "proj"))
+                await _flush(pilot)
+            return probe.messages
+    
+        messages = asyncio.run(_drive())
+>       assert messages[-1] == "Manifest verify MISMATCH", messages
+E       AssertionError: ['Manifest verify MISMATCH', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27549\\test_tc_b100_07_manifest_misma0\\app\\.s19tool\\workarea\\proj (variant 'firmware')"]
+E       assert "Saved projec...t 'firmware')" == 'Manifest verify MISMATCH'
+E         
+E         - Manifest verify MISMATCH
+E         + Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27549\test_tc_b100_07_manifest_misma0\app\.s19tool\workarea\proj (variant 'firmware')
+
+tests\test_b100_save_guards.py:1158: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_failed_save_removes_every_placed_path[merge-gathered]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_manifest_mismatch_is_the_newest_status_line
+2 failed, 29 passed in 189.05s (0:03:09)

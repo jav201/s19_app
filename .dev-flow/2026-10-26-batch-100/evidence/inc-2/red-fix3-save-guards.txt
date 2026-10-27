@@ -1,0 +1,135 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py -k 'junction_target or junction_cycle or walk_tree_no_links'  (RED run against the fix-pass-2 tree, BEFORE the fix-pass-3 source changes)
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-2)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+
+.FFF                                                                     [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_07_rollback_never_touches_junction_target ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_rollback_never0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2C6E348D0>
+
+    def test_tc_b100_07_rollback_never_touches_junction_target(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R3-1 (LED .50, security finding): the rollback's snapshot and removal
+        walks never follow a junction that pre-exists inside the project. A
+        concurrent writer — simulated inside the gather — drops a file into the
+        TARGET of ``ab\\ext`` (outside the work area) and the save then fails;
+        the outside file must SURVIVE, and the project tree must equal its
+        pre-save snapshot. On the unfixed tree the ``rglob`` removal walk enters
+        the junction and unlinks the outside file — this arm is RED there."""
+        b100_links.require_junctions()
+        victim = tmp_path / "victim"
+        base = tmp_path / "app"
+    
+        def _concurrent_writer_then_fail(*args, **kwargs):
+            (victim / "user-work.txt").write_text(
+                "written by another program", encoding="utf-8"
+            )
+            raise OSError("forced gather failure")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                victim.mkdir()
+                (victim / "keep.txt").write_text("victim", encoding="utf-8")
+                b100_links.create_junction(project_dir / "ext", victim)
+                app.load_selected_file(src)
+                await _flush(pilot)
+                tree_before = _tree_listing_no_links(project_dir)
+                monkeypatch.setattr(
+                    app_module, "gather_project_artifacts", _concurrent_writer_then_fail
+                )
+                app._handle_save_dialog(
+                    app_module.SaveProjectPayload(
+                        parent_folder=str(app.workarea), project_name="ab"
+                    )
+                )
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing_no_links(project_dir)
+                victim_names = sorted(entry.name for entry in victim.iterdir())
+            return status, tree_before, tree_after, victim_names
+    
+        status, tree_before, tree_after, victim_names = asyncio.run(_drive())
+        assert "could not save" in status, status
+>       assert "user-work.txt" in victim_names, (
+            "the rollback deleted through the junction — outside the work area: "
+            f"victim now {victim_names}"
+        )
+E       AssertionError: the rollback deleted through the junction — outside the work area: victim now ['keep.txt']
+E       assert 'user-work.txt' in ['keep.txt']
+
+tests\test_b100_save_guards.py:1291: AssertionError
+_____________ test_tc_b100_07_junction_cycle_does_not_block_save ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_junction_cycle0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2C87E13D0>
+
+    def test_tc_b100_07_junction_cycle_does_not_block_save(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R3-1 (the same cause, second effect): a junction cycle inside the
+        project (``ab\\loop`` -> ``ab``) must not make every save into ``ab``
+        fail — the unfixed ``rglob`` snapshot recurses ``loop\\loop\\…`` until
+        a ~260-character path raises, so the save is refused with a long-path
+        error. The non-following walker records the junction as a leaf and the
+        exact-name merge saves."""
+        b100_links.require_junctions()
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                project_dir = _make_project(app, "ab", {"a.s19": _S19_A})
+                b100_links.create_junction(project_dir / "loop", project_dir)
+                app.load_selected_file(src)
+                await _flush(pilot)
+                tree_before = _tree_listing_no_links(project_dir)
+                app._handle_save_dialog(
+                    app_module.SaveProjectPayload(
+                        parent_folder=str(app.workarea), project_name="ab"
+                    )
+                )
+                await _flush(pilot)
+                status = probe.last
+                tree_after = _tree_listing_no_links(project_dir)
+            return status, tree_before, tree_after
+    
+        status, tree_before, tree_after = asyncio.run(_drive())
+>       assert "Saved project" in status, (
+            f"a junction cycle must not block the save, got {status!r}"
+        )
+E       AssertionError: a junction cycle must not block the save, got "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\jjgh8\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-jjgh8\\\\pytest-27598\\\\test_tc_b100_07_junction_cycle0\\\\app\\\\.s19tool\\\\workarea\\\\ab\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
+E       assert 'Saved project' in "Project NOT saved: could not save — [WinError 3] The system cannot find the path specified: 'C:\\\\Users\\\\jjgh8\\\\...op\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop\\\\loop'. check the folder."
+
+tests\test_b100_save_guards.py:1336: AssertionError
+_______ test_tc_b100_07_walk_tree_no_links_yields_reparse_point_as_leaf _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27598/test_tc_b100_07_walk_tree_no_l0')
+
+    def test_tc_b100_07_walk_tree_no_links_yields_reparse_point_as_leaf(
+        tmp_path: Path,
+    ) -> None:
+        """R3-1 / LLR-171.1's reusable walker: ``walk_tree_no_links`` yields
+        every file and folder as a path relative to the root, records a reparse
+        point (a junction here) as a LEAF, never yields anything inside it —
+        and never loops on a junction cycle."""
+        b100_links.require_junctions()
+>       from s19_app.tui.workspace import walk_tree_no_links
+E       ImportError: cannot import name 'walk_tree_no_links' from 's19_app.tui.workspace' (C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\tui\workspace.py)
+
+tests\test_b100_save_guards.py:1354: ImportError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_rollback_never_touches_junction_target
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_junction_cycle_does_not_block_save
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_walk_tree_no_links_yields_reparse_point_as_leaf
+3 failed, 1 passed, 30 deselected in 10.66s

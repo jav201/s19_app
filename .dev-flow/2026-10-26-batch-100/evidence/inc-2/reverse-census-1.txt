@@ -1,0 +1,6 @@
+cmd: pytest tests/test_b100_reuse.py tests/test_b99_load_project.py tests/test_b99_staging.py tests/test_crc_designer_view.py tests/test_diff_report_service.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (Inc 2 fixed tree)
+........................................................................ [ 47%]
+........................................................................ [ 94%]
+........                                                                 [100%]
+152 passed in 352.05s (0:05:52)

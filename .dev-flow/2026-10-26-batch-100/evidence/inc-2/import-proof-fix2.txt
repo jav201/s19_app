@@ -1,0 +1,5 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 2)
+interpreter: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe
+3.11.15 | packaged by Anaconda, Inc. | (main, Jun 11 2026, 15:12:53) [MSC v.1942 64 bit (AMD64)]
+C:\Users\jjgh8\Github\s19_app-b100-inc2\s19_app\__init__.py

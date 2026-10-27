@@ -1,0 +1,174 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1)
+
+.............................................................F.........F [ 47%]
+........................................................................ [ 94%]
+........                                                                 [100%]
+================================== FAILURES ===================================
+____________ test_at_b99_05_save_project_after_same_name_save_back ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27513/test_at_b99_05_save_project_af0')
+
+    def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> None:
+        """Load -> patch -> save back as firmware.s19 -> Save project: the app is
+        running, the project folder holds the image and the status names it.
+        Driven entirely by keys and clicks through the real Load file dialog,
+        the Patch Editor (rail key ``6``) and the real ``SaveProjectScreen``
+        (review finding F5) — inputs are clicked and typed, buttons are clicked,
+        and every wait observes the painted status line (``#log_line_4``) or the
+        painted screen; assertions read the painted status and the files on disk.
+    
+        RED at HEAD (P-15): the save-back deletes the work copy and the next Save
+        project exits the app with code 1.
+        """
+        from textual.widgets import Label
+    
+        image = tmp_path / "firmware.s19"
+        image.write_text(_emit_two(0x11, 0x00), encoding="ascii")
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            # 260x54: the Patch Editor's docked save-back row sits at the foot
+            # of the JSON pane and is only clickable/painted at the taller
+            # viewport (the b97 ATs and AT-B99-02 drive the panel at 120x54);
+            # the extra width keeps the "Saved project to …" success line
+            # unpainted-clipped in the four-line log strip (review finding
+            # LOW-2).
+            async with app.run_test(size=(260, 54)) as pilot:
+                await pilot.pause()
+                # 1. Load through the Load file dialog (rail key ``l``).
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(image))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _poll(
+                    pilot, lambda: "Loaded firmware.s19" in _painted_status(app)
+                )
+                work_copy = tmp_path / ".s19tool" / "workarea" / "temp" / "firmware.s19"
+                outcomes["pre_save_bytes"] = work_copy.read_bytes()
+                # 2. Patch Editor (rail key ``6``): one entry at 0x2000.
+                await pilot.press("6")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#patch_entry_address_input"), (
+                    "click missed #patch_entry_address_input"
+                )
+                await pilot.press(*"0x2000")
+                assert await pilot.click("#patch_entry_bytes_input"), (
+                    "click missed #patch_entry_bytes_input"
+                )
+                await pilot.press(*"AA")
+                assert await pilot.click("#patch_entry_add_button"), (
+                    "click missed #patch_entry_add_button"
+                )
+                await _poll(pilot, lambda: "entry added" in _painted_status(app))
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _poll(pilot, lambda: "Apply:" in _painted_status(app))
+                # 3. Save-back under the loaded image's own name: the prompt
+                #    renders in the editor's JSON pane — pick that tab by
+                #    clicking its chip, then wait for the prompt to be PAINTED.
+                assert await pilot.click("#patch_tab_json"), (
+                    "click missed #patch_tab_json"
+                )
+                await _poll(pilot, lambda: "patched" in _painted_text(app))
+                assert await pilot.click("#patch_saveback_name_input"), (
+                    "click missed #patch_saveback_name_input"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*"firmware.s19")
+                assert await pilot.click("#patch_saveback_confirm_button"), (
+                    "click missed #patch_saveback_confirm_button"
+                )
+                await _poll(
+                    pilot,
+                    lambda: (
+                        tmp_path / ".s19tool" / "workarea" / "firmware.s19"
+                    ).is_file(),
+                )
+                outcomes["work_copy_exists"] = work_copy.is_file()
+                outcomes["work_copy_bytes"] = (
+                    work_copy.read_bytes() if work_copy.is_file() else None
+                )
+                # 4. Save project through the real dialog (key ``s``).
+                await pilot.press("s")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#project_parent_path"), (
+                    "click missed #project_parent_path"
+                )
+                await pilot.press("ctrl+shift+a")
+                await pilot.press(*str(tmp_path / ".s19tool" / "workarea"))
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"proj")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                # the save's success paints as "Saved project to … (variant
+                # 'firmware')" and is superseded by the manifest line within
+                # the same tick, so it never survives as the NEWEST line —
+                # but the four-line painted log keeps it on screen as an older
+                # line. Wait for the final line, then read the PAINTED log
+                # lines (review finding LOW-2: the wait and the assertion are
+                # consistent, and the painted status names the image file).
+                await _poll(
+                    pilot, lambda: _painted_status(app).startswith("Project saved")
+                )
+                outcomes["status"] = _painted_status(app)
+                outcomes["log_lines"] = [
+                    str(app.query_one(f"#log_line_{i}", Label).render())
+                    for i in (1, 2, 3, 4)
+                ]
+                outcomes["app_running"] = bool(
+                    app.query_one("#status_text", Label).render()
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        assert outcomes["work_copy_exists"] is True, "the save-back deleted the work copy"
+        assert outcomes["work_copy_bytes"] == outcomes["pre_save_bytes"]
+        assert outcomes["app_running"] is True
+>       assert outcomes["status"].startswith("Project saved"), outcomes["status"]
+E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-27513\test_at_b99_05_save_project_af0\.s19tool\workarea\proj (variant 'firmware')
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x00000177EAFFDB00>('Project saved')
+E        +    where <built-in method startswith of str object at 0x00000177EAFFDB00> = "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-27513\\test_at_b99_05_save_project_af0\\.s19tool\\workarea\\proj (variant 'firmware')".startswith
+
+tests\test_b99_staging.py:1431: AssertionError
+___________ test_tc_b99_13_no_final_name_replace_outside_placement ____________
+
+    def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
+        """LLR-155.3's census arm (TC-B99-13's second arm): across ``s19_app/``
+        no ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
+        ``write_text`` (the ``write_text`` limb is review finding F4a) onto an
+        existing final name exists outside the pinned placement functions and
+        the pinned declared exceptions — in particular
+        ``project_gather_service._gather_copy`` holds none after the Inc-3b
+        conversion. RED at HEAD: ``_gather_copy`` still unlinks and recopies in
+        place (``project_gather_service.py:297/299``).
+        """
+        all_violations: list = []
+        pkg_root = REPO_ROOT / "s19_app"
+        for path in sorted(pkg_root.rglob("*.py")):
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            all_violations.extend(
+                _final_name_census(rel, path.read_text(encoding="utf-8"))
+            )
+>       assert all_violations == [], (
+            "LLR-155.3: a final-name replace/delete/copy outside the placement "
+            f"functions: {all_violations}"
+        )
+E       AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/app.py:8148 unlink outside the pinned placement allow-list (in '_abort_save')"]
+E       assert ["s19_app/tui...abort_save')"] == []
+E         
+E         Left contains one more item: "s19_app/tui/app.py:8148 unlink outside the pinned placement allow-list (in '_abort_save')"
+E         Use -v to get more diff
+
+tests\test_b99_staging.py:2161: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+FAILED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+2 failed, 150 passed in 340.84s (0:05:40)

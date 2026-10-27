@@ -1,0 +1,2 @@
+b2dcf23c1f9a7aaf915fdd938c69c67c894eb2b32dbac65d004ca2efb3847fc1 *s19_app/tui/app.py
+d2137e1d5b5db71343d2487dfd70b97b42a093cc203d2f66f304b3c96e1a15e7 *s19_app/tui/workspace.py

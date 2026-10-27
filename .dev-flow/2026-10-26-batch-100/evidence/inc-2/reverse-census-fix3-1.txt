@@ -1,0 +1,11 @@
+cmd: C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py tests/test_b100_save_guards.py tests/test_b99_load_project.py tests/test_crc_designer_view.py tests/test_diff_report_service.py tests/test_flow_a2b_b94.py tests/test_flow_persistence.py tests/test_project_gather.py tests/test_tui_app.py tests/test_tui_evidence_packs.py tests/test_tui_helpers.py tests/test_tui_manifest_save.py tests/test_tui_variants.py tests/test_tui_workspace.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, Inc 2 + fix passes 1-3)
+env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc2 (NO_COLOR unset)
+
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+..............................................................x......... [ 76%]
+........................................................................ [ 95%]
+................                                                         [100%]
+375 passed, 1 xfailed in 692.64s (0:11:32)

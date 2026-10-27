@@ -1,0 +1,14 @@
+{
+  "s19_app/tui/app.py": {
+    "sha256": "e30805c4412635c8a6362e7b9ea742605793e43ef0bc8424fecb0bc70dbfaa9c",
+    "crlf": 14116
+  },
+  "s19_app/tui/workspace.py": {
+    "sha256": "2ab2ba749fb5600db0a0a9cdfb78dbdf3c0b585212dce805960a4cbf7573b6d4",
+    "crlf": 2004
+  },
+  "s19_app/tui/services/project_gather_service.py": {
+    "sha256": "bc8b6eeacac40b22edc7a8b6ecda1c300b0809f5f615a3b9ec97889fd2059e02",
+    "crlf": 682
+  }
+}

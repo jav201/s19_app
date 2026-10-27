@@ -1,0 +1,79 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_04_empty_names_refused
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (MUTANT M7 — 'no usable characters' status reverted to 'Invalid project name.')
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________________ test_tc_b100_04_empty_names_refused _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27520/test_tc_b100_04_empty_names_re0')
+
+    def test_tc_b100_04_empty_names_refused(tmp_path: Path) -> None:
+        """``""``, ``"   "`` and ``"!!!"`` (no usable characters): every
+        empty-name refusal paints the ``name is empty`` and
+        ``type a project name`` tokens, 0 folders appear, the app keeps
+        running (review finding F6 — without this arm reverting the
+        empty-name statuses leaves the module green)."""
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            probe = _StatusProbe(app)
+            src = _copy_source(tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                for typed in ["", "   ", "!!!"]:
+                    app._handle_save_dialog(_payload(app, typed))
+                    await _flush(pilot)
+                    status = probe.last
+                    assert "name is empty" in status, (
+                        f"{typed!r}: expected the empty-name refusal, "
+                        f"got {status!r}"
+                    )
+                    assert "type a project name" in status, (
+                        f"{typed!r}: expected the next-step token, got {status!r}"
+                    )
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return probe.messages, folders
+    
+>       messages, folders = asyncio.run(_drive())
+                            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        probe = _StatusProbe(app)
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            for typed in ["", "   ", "!!!"]:
+                app._handle_save_dialog(_payload(app, typed))
+                await _flush(pilot)
+                status = probe.last
+>               assert "name is empty" in status, (
+                    f"{typed!r}: expected the empty-name refusal, "
+                    f"got {status!r}"
+                )
+E               AssertionError: '!!!': expected the empty-name refusal, got 'Invalid project name.'
+E               assert 'name is empty' in 'Invalid project name.'
+
+tests\test_b100_save_guards.py:262: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_04_empty_names_refused - ...
+1 failed in 5.14s

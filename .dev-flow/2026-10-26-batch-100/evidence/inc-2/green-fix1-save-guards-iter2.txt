@@ -1,0 +1,257 @@
+cmd: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc2 (NO_COLOR unset) python -m pytest -q -p no:cacheprovider tests/test_b100_save_guards.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 1 GREEN — sources fixed, tests corrected)
+
+.........................FF                                              [100%]
+================================== FAILURES ===================================
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27508/test_at_b100_02_name_refusals_0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        then HLR-164's acceptance scene (LED .52(c)): projects ``prg`` (P2)
+        and ``ab`` are built by REAL saves, P2 is opened through the Load
+        project dialog by keys — the durable line names ``prg.s19`` — and
+        ``a b`` is refused naming ``ab`` with ``choose another name``,
+        ``ab`` byte-identical afterwards. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. HLR-164's acceptance scene: P2 (prg) and ab are built by
+                #    real saves; P2 is opened through the Load project dialog
+                #    by keys, so ANOTHER project is open; the disguised name
+                #    a b is refused naming ab.
+                await _save_project_as(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _save_project_as(pilot, app, "ab")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the ab save success line",
+                )
+                await _open_project_through_dialog(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "prg.s19" in _file_status_text(app),
+                    "the durable line naming P2's file",
+                )
+                ab_dir = app.workarea / "ab"
+                ab_digest_before = _digest_manifest(ab_dir)
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                ab_digest_after = _digest_manifest(ab_dir)
+            return ab_digest_before, ab_digest_after
+    
+>       ab_digest_before, ab_digest_after = asyncio.run(_drive())
+                                            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:1222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:1204: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b100_02_name_refusals_through_the_save_dialog.<locals>._drive.<locals>.<lambda> at 0x000001D5DD82A020>
+description = "the durable line naming P2's file", attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the durable line naming P2's file
+
+tests\test_b100_save_guards.py:122: AssertionError
+________ test_at_b100_02_name_refusals_through_the_save_dialog[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-27508/test_at_b100_02_name_refusals_1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_02_name_refusals_through_the_save_dialog(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """Through the shipped dialog by keys: ``Reports`` → ``reserved name`` /
+        ``choose another name`` and no folder; ``CON`` → ``device name``;
+        a 300-character name → ``name too long`` and the app keeps running;
+        then HLR-164's acceptance scene (LED .52(c)): projects ``prg`` (P2)
+        and ``ab`` are built by REAL saves, P2 is opened through the Load
+        project dialog by keys — the durable line names ``prg.s19`` — and
+        ``a b`` is refused naming ``ab`` with ``choose another name``,
+        ``ab`` byte-identical afterwards. Both sizes, notifications on."""
+        base = tmp_path / "app"
+        src = _copy_source(tmp_path)
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                # 1. a reserved home, mixed case.
+                await _save_project_as(pilot, app, "Reports")
+                await _wait_for(
+                    pilot,
+                    lambda: "reserved name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the reserved-name refusal tokens",
+                )
+                assert not (app.workarea / "Reports").exists(), (
+                    "a reserved-name refusal created a folder"
+                )
+                # 2. a Windows device name.
+                await _save_project_as(pilot, app, "CON")
+                await _wait_for(
+                    pilot,
+                    lambda: "device name" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the device-name refusal tokens",
+                )
+                assert not (app.workarea / "CON").exists(), (
+                    "a device-name refusal created a folder"
+                )
+                # 3. a 300-character name: refused, the app keeps running.
+                await _save_project_as(pilot, app, "x" * 300)
+                await _wait_for(
+                    pilot,
+                    lambda: "name too long" in _status_text(app)
+                    and "shorten the name" in _status_text(app),
+                    "the name-too-long refusal tokens",
+                )
+                assert not any(
+                    len(item.name) > 64 for item in app.workarea.iterdir()
+                ), "a too-long name created a folder"
+                # 4. HLR-164's acceptance scene: P2 (prg) and ab are built by
+                #    real saves; P2 is opened through the Load project dialog
+                #    by keys, so ANOTHER project is open; the disguised name
+                #    a b is refused naming ab.
+                await _save_project_as(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the P2 save success line",
+                )
+                await _save_project_as(pilot, app, "ab")
+                await _wait_for(
+                    pilot,
+                    lambda: "Saved project" in _status_text(app),
+                    "the ab save success line",
+                )
+                await _open_project_through_dialog(pilot, app, "prg")
+                await _wait_for(
+                    pilot,
+                    lambda: "prg.s19" in _file_status_text(app),
+                    "the durable line naming P2's file",
+                )
+                ab_dir = app.workarea / "ab"
+                ab_digest_before = _digest_manifest(ab_dir)
+                await _save_project_as(pilot, app, "a b")
+                await _wait_for(
+                    pilot,
+                    lambda: "already a project" in _status_text(app)
+                    and "'ab'" in _status_text(app)
+                    and "choose another name" in _status_text(app),
+                    "the disguised-clash refusal naming ab",
+                )
+                ab_digest_after = _digest_manifest(ab_dir)
+            return ab_digest_before, ab_digest_after
+    
+>       ab_digest_before, ab_digest_after = asyncio.run(_drive())
+                                            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_save_guards.py:1222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_save_guards.py:1204: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_b100_02_name_refusals_through_the_save_dialog.<locals>._drive.<locals>.<lambda> at 0x000001D5DF73AAC0>
+description = "the durable line naming P2's file", attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            await pilot.pause()
+            if predicate():
+                return
+>       raise AssertionError(f"did not settle: {description}")
+E       AssertionError: did not settle: the durable line naming P2's file
+
+tests\test_b100_save_guards.py:122: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size0]
+FAILED tests/test_b100_save_guards.py::test_at_b100_02_name_refusals_through_the_save_dialog[size1]
+2 failed, 25 passed in 191.02s (0:03:11)

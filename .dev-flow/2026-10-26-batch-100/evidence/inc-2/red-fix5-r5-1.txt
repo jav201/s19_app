@@ -1,0 +1,76 @@
+cmd: pytest -q -p no:cacheprovider tests/test_b100_save_guards.py::test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left (RED, pre-pass tree)
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc2 (fix pass 5, pre-pass reconstruction)
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28617/test_tc_b100_07_gather_home_cr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000278682059D0>
+
+    def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R5-1 (review round 5, the disk-full shape): the placement mkdirs
+        the gather home and then the staging copy fails (``OSError(28)``,
+        no space left); the manifest is refused and the save fails — the
+        home the gather created must be recorded and removed, so no folder
+        is left behind. Before the fix ``freshp/patches`` stayed on disk,
+        holding nothing (this arm is RED there)."""
+    
+        def _mkdir_home_then_raise(source, home, **kwargs):
+            Path(home).mkdir(parents=True, exist_ok=True)
+            raise OSError(28, "No space left on device")
+    
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            probe = _StatusProbe(app)
+            common = app.workarea / WORKAREA_PATCHES
+            common.mkdir(parents=True, exist_ok=True)
+            (common / "boost.json").write_text(_CHANGE_DOC, encoding="utf-8")
+            src = _copy_source(tmp_path)
+            # the seam the gather's placement calls — ``place_into_workarea``
+            # since fix pass 5, ``copy_into_workarea`` before it (the arm runs
+            # RED on both trees)
+            seam = getattr(gather_module, "place_into_workarea", None)
+            if seam is None:
+                seam = gather_module.copy_into_workarea
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(src)
+                await _flush(pilot)
+                # the gather's placement mkdirs the home, then the copy dies
+                monkeypatch.setattr(gather_module, seam.__name__, _mkdir_home_then_raise)
+                _force_stage(monkeypatch, "manifest-refused")
+                payload = app_module.SaveProjectPayload(
+                    parent_folder=str(app.workarea),
+                    project_name="freshp",
+                    batch=("boost.json",),
+                )
+                app._handle_save_dialog(payload)
+                await _flush(pilot)
+                status = probe.last
+                folders = sorted(
+                    item.name for item in app.workarea.iterdir() if item.is_dir()
+                )
+            return status, folders
+    
+        status, folders = asyncio.run(_drive())
+        assert "could not save" in status, status
+        assert "check the folder" in status, status
+>       assert folders == ["patches", "temp"], (
+            f"the failed save left the folder its gather created behind: {folders}"
+        )
+E       AssertionError: the failed save left the folder its gather created behind: ['freshp', 'patches', 'temp']
+E       assert ['freshp', 'patches', 'temp'] == ['patches', 'temp']
+E         
+E         At index 0 diff: 'freshp' != 'patches'
+E         Left contains one more item: 'temp'
+E         Use -v to get more diff
+
+tests\test_b100_save_guards.py:1775: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left
+1 failed in 3.87s

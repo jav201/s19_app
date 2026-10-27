@@ -1403,15 +1403,16 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
             assert await pilot.click("#project_name"), "click missed #project_name"
             await pilot.press(*"proj")
             assert await pilot.click("#save_ok"), "click missed #save_ok"
-            # the save's success paints as "Saved project to … (variant
-            # 'firmware')" and is superseded by the manifest line within
-            # the same tick, so it never survives as the NEWEST line —
-            # but the four-line painted log keeps it on screen as an older
-            # line. Wait for the final line, then read the PAINTED log
-            # lines (review finding LOW-2: the wait and the assertion are
-            # consistent, and the painted status names the image file).
+            # the manifest line paints FIRST and the save's success —
+            # "Saved project to … (variant 'firmware')" — is the NEWEST
+            # line (batch-100 Inc 2 fix pass 1, F1 / LED .52(b): a save
+            # that can still fail must not have said "Saved"), so the
+            # success line survives as the newest line. Wait for the final
+            # line, then read the PAINTED log lines (review finding LOW-2:
+            # the wait and the assertion are consistent, and the painted
+            # status names the image file).
             await _poll(
-                pilot, lambda: _painted_status(app).startswith("Project saved")
+                pilot, lambda: _painted_status(app).startswith("Saved project to")
             )
             outcomes["status"] = _painted_status(app)
             outcomes["log_lines"] = [
@@ -1428,13 +1429,19 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
     assert outcomes["work_copy_exists"] is True, "the save-back deleted the work copy"
     assert outcomes["work_copy_bytes"] == outcomes["pre_save_bytes"]
     assert outcomes["app_running"] is True
-    assert outcomes["status"].startswith("Project saved"), outcomes["status"]
+    assert outcomes["status"].startswith("Saved project to"), outcomes["status"]
     save_lines = [line for line in outcomes["log_lines"] if line.startswith("Saved project to")]
     assert save_lines, (
         f"the 'Saved project to' success line must be painted: {outcomes['log_lines']}"
     )
     assert "firmware" in save_lines[-1], (
         f"the painted status must name the image file: {save_lines[-1]}"
+    )
+    manifest_lines = [
+        line for line in outcomes["log_lines"] if "manifest verified" in line
+    ]
+    assert manifest_lines, (
+        f"the manifest-verify line must be painted: {outcomes['log_lines']}"
     )
     placed = tmp_path / ".s19tool" / "workarea" / "proj" / "firmware.s19"
     assert placed.is_file(), "the project folder must hold the image"
@@ -2037,7 +2044,13 @@ _FINAL_NAME_ALLOWLIST = {
             "place_into_workarea",
         }
     ),
-    "s19_app/tui/app.py": frozenset({"action_dump_a2l_json"}),
+    # batch-100 Inc 2 fix pass 1 + the LED .53 redesign (review finding
+    # F5; security findings SEC2-5/SEC2-6): the Save project abort removes
+    # exactly the files and folders THIS save created — each unlink is one
+    # path of the placed-files list recorded at placement/gather time, so
+    # nothing pre-existing and nothing a concurrent writer added is ever
+    # removed; the exact inverse of the placement claim.
+    "s19_app/tui/app.py": frozenset({"_abort_save", "action_dump_a2l_json"}),
     "s19_app/tui/changes/apply.py": frozenset({"save_patched_image"}),
     "s19_app/tui/changes/io.py": frozenset({"write_change_document"}),
     "s19_app/tui/operations/crc.py": frozenset({"write_crc_image"}),

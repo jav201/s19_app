@@ -33,21 +33,23 @@ Classification into homes rides the v2 wire's own ``kind`` discriminator
 (``"check"`` → ``checks/``, anything else → ``patches/``), so a check run
 never lands in the change-set home and vice versa.
 
-Snapshot semantics (LLR-138.4): every gather is a COPY stamped at save time.
-A destination whose bytes already equal the source is skipped — the compare
-runs against the requested name and every existing ``_<N>`` sibling the
-placement produced, so an idempotent re-save stays duplicate-free even
-after drifts (an unchanged re-save reuses the placed ``_<N>`` copy instead
-of stacking another one); a destination that drifted from the source is
-never overwritten in place — since Inc 3b (LLR-155.3, amended by
-LED-2026-10-25-batch-99.7) the changed copy is placed through HLR-155's
-placement (LLR-155.1/.2, :func:`copy_into_workarea`) and takes the next
-free ``_<N>`` name, so a placed artifact is immutable once placed.
+Snapshot semantics (LLR-138.4): every gather is a COPY stamped at save
+time, placed through HLR-155's placement (LLR-155.1/.2,
+:func:`place_into_workarea`). The placement's byte-identity reuse decision
+(its ``PlacementResult.reused`` flag, case-folded on Windows, the requested
+name and every existing ``_<N>`` sibling) is the SOLE judge of "already
+there" (security finding SEC2-7, round 4): a destination whose bytes
+already equal the source is reused as-is, so an idempotent re-save stays
+duplicate-free even after drifts (an unchanged re-save reuses the placed
+``_<N>`` copy instead of stacking another one); a destination that drifted
+from the source is never overwritten in place — since Inc 3b (LLR-155.3,
+amended by LED-2026-10-25-batch-99.7) the changed copy takes the next free
+``_<N>`` name, so a placed artifact is immutable once placed.
 Divergence from later COMMON edits is accepted — the same semantics as the
 shipped binaries copy-in.
 
 Containment (the shipped law): every gathered byte resolves under
-``<base>/.s19tool/workarea/`` — the destination re-runs ``copy_into_workarea``'s
+``<base>/.s19tool/workarea/`` — the destination re-runs ``place_into_workarea``'s
 own checks (workarea-root ancestry + reparse-point walk) before any byte is
 written; an escape attempt is a per-artifact refusal finding
 (collect-don't-abort), never an uncaught exception and never a partial write.
@@ -70,7 +72,7 @@ from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     WorkareaContainmentError,
     _guarded_destination,
-    copy_into_workarea,
+    place_into_workarea,
 )
 from .variant_execution_service import MANIFEST_ARTIFACT
 
@@ -248,57 +250,23 @@ def _check_home_contained(home: Path, workarea_root: Optional[Path] = None) -> P
     return resolved
 
 
-def _same_artifact_name(source_name: str, candidate_name: str) -> bool:
-    """
-    Summary:
-        The sibling-name shape one artifact's placements can take:
-        ``<name>`` itself or a ``_<N>`` suffix of it (the house placement
-        idiom) — ``hotfix.json``, ``hotfix_1.json``, … . Names that merely
-        share the stem prefix (``hotfix_extra.json``) are a different
-        artifact and never match.
-
-    Args:
-        source_name (str): The artifact's file name (e.g. ``hotfix.json``).
-        candidate_name (str): A sibling candidate in the destination home.
-
-    Returns:
-        bool: ``True`` when ``candidate_name`` is ``<name>`` or one of its
-            ``_<N>`` placements.
-
-    Data Flow:
-        - Pure string comparison — no IO, no parse.
-
-    Dependencies:
-        Used by:
-            - _gather_copy
-    """
-    source = Path(source_name)
-    candidate = Path(candidate_name)
-    if candidate.suffix != source.suffix:
-        return False
-    if candidate.stem == source.stem:
-        return True
-    prefix = source.stem + "_"
-    return candidate.stem.startswith(prefix) and candidate.stem[
-        len(prefix):
-    ].isdigit()
-
-
 def _gather_copy(
     source: Path, home: Path, workarea_root: Optional[Path] = None
 ) -> tuple[bool, Path]:
     """
     Summary:
         Copy one used artifact into its contained project home with the
-        snapshot semantics (LLR-138.4): skip when a destination the
-        placement could have produced — the requested name or an existing
-        ``_<N>`` sibling — already holds the source's exact bytes (an
-        idempotent re-save, after any number of drifts, adds no further
-        ``_<N>`` duplicate); place a drifted source through HLR-155's
-        placement (LLR-155.1/.2 via :func:`copy_into_workarea`) so it takes
-        the next free ``_<N>`` name and the existing final name is never
-        replaced or deleted (LLR-155.3 as amended by LED
-        2026-10-25-batch-99.7); create the home on demand.
+        snapshot semantics (LLR-138.4), placed through HLR-155's placement
+        (:func:`place_into_workarea`). The placement is the SOLE judge of
+        reuse (security finding SEC2-7, round 4): its byte-identity rule —
+        the requested name and every ``_<N>`` sibling, case-folded on
+        Windows — decides whether a destination already holds the source's
+        exact bytes, and this function translates only the placement's own
+        ``PlacementResult.reused`` flag into the gather's ``copied`` word.
+        The gather holds NO name-based or byte-based pre-check of its own:
+        a case-variant byte-identical file (``BOOST.json`` for a
+        ``boost.json`` source) is reported as REUSED by the placement, so a
+        failed save's rollback never deletes a pre-existing user file.
 
     Args:
         source (Path): The artifact's current on-disk path (the COMMON
@@ -315,11 +283,12 @@ def _gather_copy(
 
     Returns:
         tuple[bool, Path]: ``(copied, destination)`` — ``copied`` is
-            ``False`` when a matching sibling already held the source's
-            bytes (skipped), ``True`` when bytes were placed;
+            ``False`` when the placement REUSED a byte-identical existing
+            file (its ``reused`` flag is True — nothing was written),
+            ``True`` when the placement claimed and filled a name;
             ``destination`` is the resolved target file either way — the
-            sibling that held the bytes on a skip (the requested name or an
-            ``_<N>`` placement), the next free ``_<N>`` name on drift.
+            reused sibling on a reuse, the next free ``_<N>`` name on
+            drift.
 
     Raises:
         WorkareaContainmentError: When ``home`` fails the containment
@@ -331,44 +300,22 @@ def _gather_copy(
         - ``_check_home_contained(home, workarea_root)`` first — no byte
           moves before the containment verdict; the guard sees the home
           UNRESOLVED.
-        - Byte-compare against the requested name and every ``_<N>``
-          sibling; on drift, ``copy_into_workarea`` receives the
-          UNRESOLVED home and the SAME explicit root, and stages privately
-          and claims the next free name — never an ``unlink``/recopy onto
-          the existing final name.
+        - ``place_into_workarea`` receives the UNRESOLVED home and the
+          SAME explicit root, stages privately and claims the next free
+          name — never an ``unlink``/recopy onto an existing final name;
+          its reuse decision alone sets ``copied``.
 
     Dependencies:
         Uses:
             - _check_home_contained
-            - _same_artifact_name (the sibling scan)
-            - copy_into_workarea (the placement, LLR-155.1/.2)
+            - place_into_workarea (the placement, LLR-155.1/.2, and the
+              sole byte-identity judge, LLR-163.1)
         Used by:
             - gather_project_artifacts
     """
-    resolved_home = _check_home_contained(home, workarea_root)
-    source_bytes = source.read_bytes()
-    destination = resolved_home / source.name
-    # LLR-138.4 (review finding F1): the byte-compare must run against
-    # EVERY name the placement could have produced — ``<name>`` and each
-    # ``_<N>`` — not only the requested name. After one drift the current
-    # bytes live at ``_<N>``; comparing only ``<name>`` would place a fresh
-    # ``_<N+1>`` on every unchanged re-save.
-    if resolved_home.is_dir():
-        for sibling in sorted(resolved_home.iterdir()):
-            if sibling.is_symlink() or not _same_artifact_name(
-                source.name, sibling.name
-            ):
-                continue  # a symlinked or foreign name is not a placement
-            # this artifact produced — never trusted as a reuse target
-            try:
-                if sibling.is_file() and sibling.read_bytes() == source_bytes:
-                    return False, sibling
-            except OSError:
-                continue  # an unreadable sibling is not trusted, so the
-                # scan keeps looking and the placement takes the next
-                # free name
-    placed = copy_into_workarea(source, home, workarea_root=workarea_root)
-    return True, placed
+    _check_home_contained(home, workarea_root)
+    placed = place_into_workarea(source, home, workarea_root=workarea_root)
+    return not placed.reused, placed.path
 
 
 @dataclass(slots=True)
@@ -385,6 +332,14 @@ class GatherOutcome:
             paths of the artifacts now held in that home.
         issues (list[ValidationIssue]): Every skip/refusal finding — empty
             on a fully-clean gather.
+        written (list[Path]): The files this gather actually WROTE —
+            absolute paths, in placement order. A destination whose bytes
+            already equalled the source (a reuse) never appears here
+            (LED .53: a failed save removes exactly what the save
+            created, so the rollback consumes this list verbatim).
+        created_homes (list[Path]): The project home folders this gather
+            created on demand — they did not exist when the gather
+            started. A pre-existing home never appears here.
 
     Returns:
         None: Dataclass container.
@@ -392,7 +347,10 @@ class GatherOutcome:
     Data Flow:
         - Produced by :func:`gather_project_artifacts`.
         - Consumed by ``S19TuiApp._handle_save_dialog``, which threads
-          ``gathered`` into the manifest write (``manifest_writer``).
+          ``gathered`` into the manifest write (``manifest_writer``) and,
+          on a failure exit, rolls the save back through
+          ``S19TuiApp._abort_save`` with ``written`` / ``created_homes``
+          (LED .53, LLR-164.4).
 
     Dependencies:
         Used by:
@@ -401,6 +359,8 @@ class GatherOutcome:
 
     gathered: dict[str, list[str]] = field(default_factory=dict)
     issues: list[ValidationIssue] = field(default_factory=list)
+    written: list[Path] = field(default_factory=list)
+    created_homes: list[Path] = field(default_factory=list)
 
 
 def gather_project_artifacts(
@@ -459,9 +419,10 @@ def gather_project_artifacts(
 
     Returns:
         GatherOutcome: The ``gathered`` manifest rows + collected
-        per-artifact findings. Zero used artifacts → empty ``gathered`` +
-        empty ``issues`` — the empty save is never an error (QC-3
-        boundary catalog).
+        per-artifact findings + the exact-created lists (``written``
+        files and ``created_homes`` folders, LED .53). Zero used
+        artifacts → empty ``gathered`` + empty ``issues`` — the empty
+        save is never an error (QC-3 boundary catalog).
 
     Raises:
         None: Every failure mode is a collected finding
@@ -479,6 +440,11 @@ def gather_project_artifacts(
         - Each artifact COPYs through :func:`_gather_copy` into its home;
           successes append the project-relative POSIX path to
           ``gathered[home]`` (sorted per home, canonical home order).
+          LED .53: each WRITTEN destination also appends to
+          ``outcome.written`` and a home the copy created on demand
+          appends to ``outcome.created_homes`` — a reused byte-identical
+          sibling and a pre-existing home never appear, so a failed
+          save's rollback removes exactly what this gather created.
 
     Dependencies:
         Uses:
@@ -566,20 +532,46 @@ def gather_project_artifacts(
 
     gathered_rows: dict[str, list[str]] = {}
     for resolved_source, home in sorted(pending.items(), key=lambda item: str(item[0])):
+        home_dir = resolved_project / home
+        # LED .53 / R5-1: remember what THIS gather creates — the home's
+        # existence BEFORE the copy decides ``created_homes`` (a reused
+        # byte-identical sibling requires a pre-existing home, so a
+        # created home implies bytes were written into it).
+        home_preexisted = home_dir.is_dir()
         try:
-            _copied, destination = _gather_copy(
-                resolved_source, resolved_project / home, workarea_root
+            copied, destination = _gather_copy(
+                resolved_source, home_dir, workarea_root
             )
         except (WorkareaContainmentError, OSError) as exc:
             outcome.issues.append(
                 _gather_issue(
                     GATHER_CONTAINMENT,
                     f"gather: refused to copy {resolved_source} into "
-                    f"{resolved_project / home}: "
+                    f"{home_dir}: "
                     f"{type(exc).__name__}: {exc}",
                 )
             )
+            # R5-1 (review round 5): the placement mkdirs the home BEFORE
+            # staging — a copy that then fails (a full disk, a source that
+            # vanished) still leaves a home THIS gather created. Record it
+            # from whether it now exists, on BOTH paths, never from
+            # whether the copy wrote; the rollback removes a folder only
+            # while it is empty, so this is safe.
+            if (
+                not home_preexisted
+                and home_dir.is_dir()
+                and home_dir not in outcome.created_homes
+            ):
+                outcome.created_homes.append(home_dir)
             continue
+        if copied:
+            outcome.written.append(destination)
+        if (
+            not home_preexisted
+            and home_dir.is_dir()
+            and home_dir not in outcome.created_homes
+        ):
+            outcome.created_homes.append(home_dir)
         relative = destination.relative_to(resolved_project).as_posix()
         gathered_rows.setdefault(home, []).append(relative)
     outcome.gathered = {

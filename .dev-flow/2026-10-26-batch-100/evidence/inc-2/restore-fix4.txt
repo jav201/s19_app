@@ -1,0 +1,14 @@
+cmd: sha256sum restore check (3 mutants reverted) + re-validation of the discriminating arms on the reverted tree
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc2 (detached 2edfee2, LED .53 redesign, mutants reverted)
+
+fcb1bf40064502bab5c3a48e75047402d2c2b04aafaf99c63cd606a646105a0e *s19_app/tui/app.py
+8ef1763e180c639787258f88e69d518ff046113d2597a0990d8912d19f0db8a4 *s19_app/tui/workspace.py
+c2d8cc2864a1cc4e287f678a7834da00cc1dc207862fc416bf29dac1594e5f74 *s19_app/tui/services/project_gather_service.py
+
+expected (pre-mutation-hashes-fix4.txt):
+fcb1bf40064502bab5c3a48e75047402d2c2b04aafaf99c63cd606a646105a0e *s19_app/tui/app.py
+8ef1763e180c639787258f88e69d518ff046113d2597a0990d8912d19f0db8a4 *s19_app/tui/workspace.py
+c2d8cc2864a1cc4e287f678a7834da00cc1dc207862fc416bf29dac1594e5f74 *s19_app/tui/services/project_gather_service.py
+
+......                                                                   [100%]
+6 passed, 30 deselected in 23.81s
