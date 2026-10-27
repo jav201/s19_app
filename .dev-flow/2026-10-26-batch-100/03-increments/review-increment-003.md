@@ -124,3 +124,66 @@ Notes (no finding):
   - The two pre-existing failures need owners: the batch-78 palette artifact and `at_056e_a2b`.
 - **`qa-reviewer`:** F1 (seeding design), F6 (worker boundary arm), F8 (AT ledger observable), F9 (normaliser strength before Inc 8a reuses it).
 - **`security-reviewer`:** nothing new. No placement call and no path resolution were added. LED .50 holds.
+
+---
+
+# Round 2: re-read of corrective pass 1
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix pass 1 uncommitted. `app.py` sha256 `18ee4d450529…`, equal to HANDOFF §"Fix pass 1". Still 1 SOURCE file. CRLF preserved: `app.py` 14508/14508, test file 885/885. The worktree was not edited. |
+| Contract | main `3d3cee0`: LED .55 (a) the notice wording `Closed the Patch Editor document (N entries); unsaved changes were not kept`; (b) the seam calls `panel.mark_loaded()`. `kimi/BRIEF-inc-3-fix1.md`. |
+| Interpreter proof | `…\scratchpad\fix1\s19_app\__init__.py`, a copy of the worktree's `s19_app` with an identical `app.py` (`cmp`). Mutant trees are under `…\scratchpad\mut1\<id>\`. `NO_COLOR` unset, s19env 3.11. |
+| **Verdict** | **approve — PASS-WITH-NOTES.** 0 HIGH open. **F1 is discharged**: I re-read the seeding on the diff and re-ran R6 myself, and it is now RED. F2–F11 are closed, with one exception. **R2-1 (MAJOR)** is new: `mark_loaded()` does not clear the paste buffer, which LED .55(b) and the packet both claim it does. It does not block, but it must be fixed in this increment or the ledger must be corrected before Inc 10. |
+
+## What I executed in round 2 (evidence state: `executed`)
+
+| Run (`…\scratchpad\r2-<id>.txt`) | Result |
+|---|---|
+| GREEN, the fix-pass tree | **17 passed** (104 s) |
+| **R6** (the 7 S7–S11 reset lines deleted), mutant `app.py` `4b958a07…` | **KILLED**, 2 failed. The relative arm prints `LEAK _diff_check_spec: cold=None warm=['p1-check-spec', 2], _diff_check_spec_name …, _diff_last_result …, _last_execution …, _last_flow_run …`. The direct arm prints **`LEAK last_template_path`** (S7). Round 1: 16/16 green. |
+| R7 (S12 plus the 4 A-07 assignments deleted) | KILLED by 2 nodes: the relative arm and the direct arm. Round 1: 1 node. |
+| M4 (old service kept) | KILLED, 6 failed: both TC-09 load-over arms, `change_service_is_rebound`, the new boundary arm, and both AT sizes. The AT now catches it through `0 entries` and the empty ledger. |
+| R12 (the notice is never painted: `if discarded_unsaved:` → `if False:`) | KILLED, 4 failed: both notice arms and both AT sizes. Together with Kimi's m6 (the count read after the rebind), the notice now has killing mutants. **F4 closed.** |
+| R11 (`panel.mark_loaded()` deleted from the seam) | KILLED, 2 failed: both AT sizes, on the no-`●` assertion. **F3's arm is non-vacuous.** |
+| R8b (the seam's `refresh_entries` call deleted, `mark_loaded` kept) | **SURVIVED**, 17 passed. The ledger is still empty because the install repaints it. → R2-2 |
+| Round-1 probes, re-run (`…\scratchpad\probes-r2-out.txt`) | **Saved document:** `changes.json` written, then the line is `Closed the Patch Editor document (1 entries); unsaved changes were not kept`. That is truthful for saved work (F2 ✓). **Dirty marker:** after the load-over by keys, `_dirty=False` and the subtitle is `0 entries`, with no `●` (F3 ✓). **Paste buffer:** `'P1 DRAFT TEXT'` before the load-over and **`'P1 DRAFT TEXT'` after it** → R2-1. |
+| Panel-owning reverse census (`test_b97_patch_editor`, `test_tui_patch_editor_b94`, `test_tui_patch_variant`), full tree with the fix-pass files | 66 passed (Kimi: 66) |
+| `devflow-evidence.py --root . --check evidence/inc-3/*` | All **32 rows bind**: 0 `packet records no digest` lines, and no disk-vs-packet mismatch. The only `MISMATCH` lines are the index limb (`not staged`), which is expected before the commit. Exit 1 comes from that limb alone. **F11(a) closed.** |
+
+## Closure table — round 1 findings
+
+| id | State | Evidence |
+|---|---|---|
+| F1 HIGH | **Discharged** (re-read and re-run) | `_seed_p1_derived_state` (test `:161-191`) seeds S5–S12 and the A-07 names in both the load-over relative arm and the direct arm. The direct arm now asserts 20 names. My R6 goes RED and names `last_template_path`. |
+| F2 MAJOR | Closed by LED .55(a) | `app.py:9349-9353`. The wording matches LED .55(a) exactly, and the line no longer calls the entries unsaved. The saved-document probe gives a truthful line. |
+| F3 MAJOR | Closed for the marker | `app.py:9117-9123` `panel.mark_loaded()`. The AT asserts `●` before the load-over (vacuity guard) and `0 entries` without `●` after it, and R11 kills that assertion. The paste-buffer half of LED .55(b) is not delivered → R2-1. |
+| F4 MAJOR | Closed | Packet m1 and m4 rows rewritten from full-module runs. m6 and my R12 kill the notice arms. |
+| F5 | Closed | Packet §6 now says `at030c` FAILED in `green-06b` and dispositions the 3 first-run nodes, with my 3+3 runs copied in under provenance headers. |
+| F6 | Closed, with a note | `test_tc_b100_10_outgoing_service_finishes_after_rebind`. The "worker" is a test-side asyncio task holding the outgoing service, not one of the app's `@work` threads. That is enough for LLR-165.3's boundary as worded: the old object is still usable, and the rebound one is untouched. M4 kills it. |
+| F7 | Closed | The RED table labels 3 base failures as a missing method. R10 is recorded as LLR-165.2's third negative control (`mut-fix1-r10-no-key-normaliser.txt`). |
+| F8 | Closed for the observable | The AT asserts 0 ledger rows and the empty-state text. Its comment overstates what that proves → R2-2. |
+| F9 | Closed | `app.py:9183-9185` hashes `address:byte`. Dicts reduce to `(len, keys, sha256 of normalised values)` (`:9209-9223`). Cold-vs-cold stays equal (GREEN). |
+| F10 | Closed | The comment now says "eight" (`:9079-9083`). The two Inc-era names are classified in the domain comment (`:1426-1432`). Mirroring that into the ARQ §2.2 text is the orchestrator's. |
+| F11 | (a) closed; (b) the orchestrator's | (a) full paths, all rows bind. (b) `HANDOFF.md` is still at the worktree root, as the fix brief instructed. The orchestrator moves it to `kimi/inc-3-HANDOFF.md` at commit, as for Inc 1 and Inc 2. |
+
+## New findings — round 2
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **R2-1** | **MAJOR** | `app.py:9117-9123`; LED .55(b); packet §1 line 46 | **`mark_loaded()` does not clear the paste buffer, but LED .55(b), the seam's comment and the packet all say it does.** `PatchEditorPanel.mark_loaded` (`screens_directionb.py:5815-5824`) only sets `_dirty = False` and repaints the marker. Its docstring says the CALLER reseeds the buffer. Consequence: a P1 draft typed in `#patch_paste_text` survives into P2's session, now marked clean, so the panel's Load guard no longer protects it. A later change-file load replaces it without a question, and `Parse pasted` would apply P1's draft onto P2's image. Before this pass the dirty flag at least stayed set. The notice's "unsaved changes were not kept" is also inaccurate for the buffer, which was kept. This is the U1 row of ARQ §2.2. | Probe by keys: buffer `'P1 DRAFT TEXT'` before and after; `_dirty` False after | Either clear the buffer in the seam as LED .55(b) states. `app.py` already writes it at `:3932`. Clear it, then call `mark_loaded()` AFTER the buffer's `TextArea.Changed` has been handled (for example `self.call_after_refresh(panel.mark_loaded)`), because writer w2 re-sets `_dirty` on that message. Add an AT assertion that the buffer is empty after the load-over. Or amend LED .55(b) to say the buffer is kept, and route the buffer to Inc 10's question. |
+| R2-2 | MINOR | test `:850-855` (the AT comment) | The AT comment says the ledger assertion is "load-bearing even though today's install chain would repaint it anyway". It is not load-bearing for the seam's repaint: R8b (the `refresh_entries` call deleted) stays 17/17 green. The observable is correctly asserted; only the claim is wrong. | R8b → 17 passed | Reword the comment: it pins HLR-165's observable, not LLR-165.1's repaint clause. Record the R8b survivor in the packet as an equivalent mutant (the install repaints the ledger). |
+
+## Verdict
+
+**approve — PASS-WITH-NOTES.** F1 (HIGH) is discharged by this re-read, with R6 re-run by me. 0 HIGH is open. Open: **R2-1 (MAJOR)**, which LED .55(b) assumed was already done. It needs a code fix in this increment or a ledger correction before Inc 10. **R2-2 (MINOR)**. The F6 note.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH open; 1 MAJOR, 1 MINOR new in round 2) · F1 (HIGH, round 1) was resolved by seeding P1's S5–S12 and A-07 state in both TC-B100-09 load-over arms (`_seed_p1_derived_state`). I re-read it on the diff and re-ran mutant R6 myself: KILLED, 2 failed, `LEAK last_template_path` plus S8–S11 in the relative arm (round 1: 16/16 green). F2–F11 are closed: the LED .55(a) wording, `mark_loaded` in the seam, killing mutants m6/R12 for the notice, the corrected dispositions, the boundary arm, R10 recorded, the AT ledger and no-`●` checks, the content digest, the "eight" comment, and full-path evidence that binds all 32 rows. Open: R2-1 (MAJOR) — `mark_loaded()` does not clear the paste buffer that LED .55(b) says it clears, so a P1 draft survives into P2 marked clean (probed by keys). Fix it here, or correct the ledger before Inc 10. R2-2 (MINOR) — an AT comment overstates what its ledger check pins (R8b survives).
+
+## Hand-offs (round 2)
+
+- **Orchestrator:** R2-1. Choose between clearing the buffer in the seam (with `mark_loaded` deferred until after the buffer's `Changed` message) and amending LED .55(b) to route the buffer to Inc 10. F10: mirror the 8 caches and the two classifications into the ARQ §2.2 text. F11(b): move `HANDOFF.md` at commit.
+- **`qa-reviewer`:** the F6 arm drives a test-side task, not one of the app's `@work` workers. Decide whether Inc 7 or Inc 8a (worker loads) owes a real-worker boundary arm.
