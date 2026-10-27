@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decisiones checks A2L</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--dim:#5f6670;--line:#dcd9d0;--acc:#2f6fb5;--ok:#2e7d4f;--tag:#eceae3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--tag:#2a2e33}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1e2125;--ink:#e6e6e3;--dim:#9aa1a9;--line:#33373d;--acc:#7fb0e8;--ok:#5fbf86;--tag:#2a2e33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:900px;margin:0 auto;padding:24px 16px 90px}
+h1{font-size:1.45rem;margin:0 0 4px} h3{font-size:1.02rem;margin:0 0 4px}
+.lead{color:var(--dim);margin:0 0 14px}
+.bluf{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);padding:12px 14px;border-radius:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0}
+.ctx{color:var(--dim);font-size:.93rem;margin:0 0 10px}
+.opt{display:block;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.opt:has(input:checked){border-color:var(--acc);outline:1px solid var(--acc)}
+.opt .c{font-size:.9rem;color:var(--dim);display:block;margin-top:2px}
+.rec{font-size:.75rem;background:var(--ok);color:#fff;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:middle}
+code{background:var(--tag);border-radius:3px;padding:0 4px;font-size:.88em}
+textarea{width:100%;min-height:40px;margin-top:6px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;font:inherit}
+#gen{min-height:80px}
+.bar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 16px;font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<h1>Tres decisiones: entradas con símbolo A2L en los checks y en la edición</h1>
+<p class="lead">2026-10-26 · defectos T-02, T-03/T-04 y T-12 de la auditoría de pruebas · los tres se reproducen en el <code>main</code> actual (<code>b6722bc</code>) · se implementan en el batch de la ventana Checks (R-049)</p>
+
+<div class="bluf"><b>De qué se trata.</b> Un documento de cambios puede traer entradas con <b>símbolo</b> (el nombre de una etiqueta del A2L). El escritor guarda el símbolo <b>y también</b> la dirección ya resuelta. Hoy esas entradas fallan en tres lugares, y en los tres choca una regla con otra:
+<ul>
+<li><b>La regla del batch 95:</b> «sin A2L implícito». Un flujo solo resuelve símbolos con un A2L que se declaró.</li>
+<li><b>La regla de los checks:</b> un código de error desconocido bloquea toda la corrida, por seguridad.</li>
+</ul>
+<b>No hay nada marcado:</b> elige en cada una. La opción que recomiendo lleva la etiqueta verde. Pulsa «Exportar» cuando termines.</div>
+
+<div id="qs"></div>
+<div class="q"><h3>Notas generales / pedidos nuevos</h3><textarea id="gen" placeholder="Cualquier cosa que falte o que quieras cambiar..."></textarea></div>
+</main>
+<div class="bar"><span id="cnt"></span><button id="exp">Exportar veredicto (JSON)</button></div>
+<script>
+const Q=[
+{id:"T-02",t:"T-02 · Una entrada con símbolo que no se resuelve, ¿bloquea toda la corrida de checks?",
+ ctx:"Hoy basta <b>una</b> entrada con <code>CHG-SYMBOL-UNRESOLVED</code> o <code>CHG-SYMBOL-VALUE</code> para que <b>ningún</b> check corra (<code>doc-fault</code>): «fix the document before running checks». Pasa porque la lista de códigos que no bloquean es del batch 33, y los códigos de símbolo llegaron en el batch 95 sin que nadie los agregara. El batch 95 (LLR-141.1) dice que esa entrada se salta. La regla de seguridad del batch 33 (LLR-050.1(a)) dice que lo desconocido bloquea.",
+ rec:"saltar",
+ o:[["saltar","Se salta solo esa entrada, se corren las demás, y el resultado la nombra («no resuelta: SYMBOL_X»)","Un símbolo roto entre veinte checks no te deja sin los otros diecinueve, y ves cuál faltó. Los códigos de símbolo pasan a la lista de «no bloquean» de forma explícita, y cualquier código realmente nuevo sigue bloqueando."],
+    ["bloquear","Se mantiene: cualquier entrada con símbolo sin resolver bloquea toda la corrida","Ningún check corre a medias. Tienes que corregir o quitar esa entrada antes de ver cualquier resultado, aunque las demás estén bien."]]},
+{id:"T-03",t:"T-03 / T-04 · Al correr checks sin pantalla (Run checks de proyecto, ejecución de variantes), ¿se usa el A2L del proyecto?",
+ ctx:"Hoy <code>run_checks_for_project</code> y la ejecución de variantes leen el documento de checks <b>sin ningún A2L</b>. Rechazan todas las entradas con símbolo, incluso cuando la llamada recibe <code>a2l_path</code> o el proyecto tiene su A2L. En la pantalla del editor las mismas entradas sí funcionan.",
+ rec:"declarado",
+ o:[["declarado","Se usa el A2L que la llamada recibe o el que <code>project.json</code> declara para ese proyecto, y nada más. Sin A2L declarado, esas entradas se saltan y se nombran","El mismo documento da el mismo resultado en la pantalla y sin pantalla. Sigue sin haber A2L implícito, porque solo cuenta uno declarado. Encaja con «saltar» en T-02."],
+    ["rechazar","Se mantiene: sin pantalla, las entradas con símbolo siempre se rechazan","Las corridas sin pantalla solo sirven para documentos por dirección. Un documento con símbolos da un resultado distinto según dónde lo corras."]]},
+{id:"T-12",t:"T-12 · Editar en JSON una entrada con símbolo y confirmarla sin cambios, ¿debe funcionar?",
+ ctx:"Hoy abres el editor JSON de una entrada con símbolo, no tocas nada, confirmas y falla con <code>CHG-SYMBOL-UNRESOLVED</code>. Pasa porque la edición vuelve a leer la entrada sin el A2L, aunque esa misma entrada se creó con el A2L que tienes cargado.",
+ rec:"sesion",
+ o:[["sesion","La edición usa el A2L que ya está cargado en la sesión, el mismo con que se resolvió la entrada","Confirmar sin cambios funciona, y editar un valor también. Si no hay A2L cargado, la edición lo dice en vez de fallar con un código."],
+    ["solo_selector","Las entradas con símbolo no se editan en JSON; se editan solo con el selector de símbolos","Nunca se edita un símbolo a mano. Pierdes la edición rápida en JSON para esas entradas."],
+    ["dejar","Se deja como está","Sigue fallando hasta con la semilla sin cambios."]]}
+];
+const box=document.getElementById("qs");
+Q.forEach(q=>{const d=document.createElement("div");d.className="q";
+d.innerHTML=`<h3>${q.t}</h3><p class="ctx">${q.ctx}</p>`+q.o.map(([v,l,c])=>`<label class="opt"><input type="radio" name="${q.id}" value="${v}"> <b>${l}</b>${v===q.rec?'<span class="rec">recomendada</span>':""}<span class="c">${c}</span></label>`).join("")+`<textarea data-id="${q.id}" placeholder="Nota (opcional)"></textarea>`;
+box.appendChild(d);});
+function upd(){const n=Q.filter(q=>document.querySelector(`input[name="${q.id}"]:checked`)).length;document.getElementById("cnt").textContent=`${n} de ${Q.length} respondidas`;}
+document.addEventListener("change",upd);upd();
+document.getElementById("exp").onclick=()=>{const out={page:"s19-decisiones-checks-a2l",exported:new Date().toISOString(),items:{},general_notes:document.getElementById("gen").value};
+Q.forEach(q=>{const c=document.querySelector(`input[name="${q.id}"]:checked`);out.items[q.id]={verdict:c?c.value:null,note:document.querySelector(`textarea[data-id="${q.id}"]`).value};});
+const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download="veredicto-checks-a2l.json";a.click();};
+</script>
+</body>
+</html>

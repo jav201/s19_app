@@ -1491,7 +1491,10 @@ Source: `.dev-flow/design/RECONCILE-operator-requests-2026-10-23.md` (69 request
 > - T-01..T-04 and the suspects go to the Checks-window batch (R-049, with CW-U-9 / M-6), since they are the same engine.
 > - T-05..T-10 and T-13 form a change-document reader hardening unit; it can join "read/write integrity II".
 > - **T-11 goes into batch-100 Inc 9a.** It is the placement naming rule (`place_into_workarea`, B100-I13) that Inc 1 rewrote.
-> - T-02, T-03/T-04 and T-12 need an operator ruling against batch-95's "no implicit A2L" and LLR-050.1(a)'s fail-safe.
+> - **Operator rulings, 2026-10-26** (`.dev-flow/design/decisiones-checks-a2l-2026-10-26.html`; the operator replied "Recomendaciones aceptadas"):
+>   - **T-02 `saltar`:** an unresolved symbol entry is skipped and named, and the rest of the checks run. `CHG-SYMBOL-UNRESOLVED` / `CHG-SYMBOL-VALUE` join the non-blocking set explicitly, and any truly new code still blocks.
+>   - **T-03/T-04 `declarado`:** headless check runs and variant execution use the A2L the call receives or the one `project.json` declares, and nothing implicit. With no declared A2L, those entries are skipped and named.
+>   - **T-12 `sesion`:** the per-entry JSON edit uses the A2L loaded in the session. With none loaded, it says so instead of failing with a code.
 
 - **▸ (T-01, MAJOR) `run_checks` taints from load-time collision issues.** After an editor remove, the healthy survivor stays `entry-fault`. A collision added after load checks as `pass`/`pass`.
   - Where: `change_service.py` `ChangeService.run_checks`. It never refreshes `collision_issues`, unlike `apply` and `validate`.
