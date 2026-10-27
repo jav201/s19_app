@@ -708,3 +708,15 @@ above this line is ever edited._
 - **Why:** Inc 5 already splits `save_patched` (LLR-167.7), so the emit path is open there.
 - **Evidence:** `03-increments/security-increment-001.md` Round 2 SEC-4.
 
+### LED-2026-10-26-batch-100.57 — Inc 4 gate: focus targets must be focusable and visible; persistent chrome inputs are never taken; judge the default screen
+- **Requirement:** LLR-166.1
+- **Date:** 2026-10-27
+- **What changed:**
+  - **(a) Targets.** Every focus target is focusable (`can_focus` True). The registry assertion checks focusability as well as membership.
+  - **(b) Fallback.** When the window's declared target has region area 0 or is not displayed (an empty-state window), the focus goes to the window's first visible, focusable, non-text widget. If there is none, it goes to the rail's active entry. The rail is always visible and keeps keys reaching the app bindings.
+  - **(c) Persistent chrome.** The re-home never takes the focus from a visible persistent-chrome text field with area > 0, such as `#palette_input` or the Find field. The text-input rule applies only to text fields inside content windows that the load left stale (hidden, or area 0).
+  - **(d) Focus source.** The rule reads `default_screen.focused`, never `self.focused`, so a widget inside an open modal is never judged or moved.
+- **Closes:** code-reviewer Inc 4 F1 (HIGH, two unfocusable targets left P-16 on Diff; executed), F5 (empty-state targets with area 0), F6 (typing in the palette or Find lost its focus), and the reviewer's modal recommendation ahead of Inc 6/9b/10.
+- **Why:** these are orchestrator rulings under the batch's standing authorization. The focus must land where the user can work, and must never be taken from where the user is working.
+- **Evidence:** `03-increments/review-increment-004.md` F1, F5, F6, check 2.
+
