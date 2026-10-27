@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 1995 unique id(s)
+## family US/HLR/LLR — 1996 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1767,7 +1767,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `HLR-163` | batches, tests |
 | `HLR-163..178` | batches |
 | `HLR-164` | batches, tests |
-| `HLR-165` | batches |
+| `HLR-165` | batches, tests |
 | `HLR-166` | batches |
 | `HLR-167` | batches |
 | `HLR-168` | batches |
@@ -2899,14 +2899,15 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `LLR-164.3` | batches, tests |
 | `LLR-164.4` | batches, tests |
 | `LLR-164.x` | batches |
-| `LLR-165.1` | batches |
+| `LLR-165.1` | batches, tests |
 | `LLR-165.1..165.4` | batches |
-| `LLR-165.2` | batches |
-| `LLR-165.3` | batches |
-| `LLR-165.4` | batches |
+| `LLR-165.2` | batches, tests |
+| `LLR-165.3` | batches, tests |
+| `LLR-165.4` | batches, tests |
 | `LLR-165.x` | batches |
 | `LLR-166.1` | batches |
 | `LLR-166.2` | batches |
+| `LLR-166.x` | batches |
 | `LLR-167.1` | batches |
 | `LLR-167.2` | batches |
 | `LLR-167.3` | batches |
@@ -4237,7 +4238,7 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `AT-88` | batches, tests |
 | `AT-B100-01` | batches, tests |
 | `AT-B100-02` | batches, tests |
-| `AT-B100-03` | batches |
+| `AT-B100-03` | batches, tests |
 | `AT-B100-04` | batches |
 | `AT-B100-05` | batches |
 | `AT-B100-06` | batches |
@@ -5353,10 +5354,10 @@ registry: 1514 rows — BURNED 422 · LIVE 994 · RESERVED 75 · RETIRED 23
 | `TC-B100-05` | batches, tests |
 | `TC-B100-06` | batches, tests |
 | `TC-B100-07` | batches, tests |
-| `TC-B100-08` | batches |
-| `TC-B100-09` | batches |
-| `TC-B100-10` | batches |
-| `TC-B100-11` | batches |
+| `TC-B100-08` | batches, tests |
+| `TC-B100-09` | batches, tests |
+| `TC-B100-10` | batches, tests |
+| `TC-B100-11` | batches, tests |
 | `TC-B100-12` | batches |
 | `TC-B100-13` | batches |
 | `TC-B100-14` | batches |

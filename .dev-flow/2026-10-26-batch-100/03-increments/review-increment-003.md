@@ -187,3 +187,59 @@ Notes (no finding):
 
 - **Orchestrator:** R2-1. Choose between clearing the buffer in the seam (with `mark_loaded` deferred until after the buffer's `Changed` message) and amending LED .55(b) to route the buffer to Inc 10. F10: mirror the 8 caches and the two classifications into the ARQ §2.2 text. F11(b): move `HANDOFF.md` at commit.
 - **`qa-reviewer`:** the F6 arm drives a test-side task, not one of the app's `@work` workers. Decide whether Inc 7 or Inc 8a (worker loads) owes a real-worker boundary arm.
+
+---
+
+# Round 3: re-read of corrective pass 2 (bounded to R2-1 and R2-2)
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1–2. I did not write the fix. |
+| Tree re-read | worktree `C:\Users\jjgh8\Github\s19_app-b100-inc3` at `dad6423`, with Inc 3 and fix passes 1–2 uncommitted. `app.py` sha256 `ddc64e1803ee…`. `git diff --name-only` lists `s19_app/tui/app.py` and `tests/test_id_registry.py` only, so **`screens_directionb.py` is untouched** (`git diff --quiet` ✓). Still 1 SOURCE file. CRLF preserved: 14511/14511. The worktree was not edited. |
+| Contract | `kimi/BRIEF-inc-3-fix2.md`; LED .55(b), with the buffer clear now delivered as worded |
+| Interpreter proof | `…\scratchpad\fix2\s19_app\__init__.py`, a copy with an `app.py` identical to the worktree (`cmp`). Mutants are in `…\scratchpad\mut2\<id>\`. `NO_COLOR` unset, s19env 3.11. |
+| **Verdict** | **approve — PASS.** R2-1 and R2-2 are closed. 0 HIGH and 0 MAJOR are open. |
+
+## The fix as read
+
+At `app.py:9118-9126`, inside the seam's `else:` branch (the panel was found), the seam does two things:
+
+1. It runs `self.query_one("#patch_paste_text", TextArea).text = ""`.
+2. It then calls `self.call_after_refresh(panel.mark_loaded)`.
+
+The ordering is right for Textual 8.2.8. `TextArea.text = ""` is `load_text`, which posts `TextArea.Changed`. The panel's writer w2 sets `_dirty` again when it handles that message. `call_after_refresh` posts `InvokeLater` to the app, and its documented contract is to run "after all messages are processed and the screen has been refreshed". So `mark_loaded` runs after w2, never before it.
+
+## What I executed in round 3 (evidence state: `executed`)
+
+| Run (`…\scratchpad\r3-<id>.txt`, `probes-r3-out.txt`) | Result |
+|---|---|
+| GREEN, the fix-pass-2 tree | **17 passed** (97 s) |
+| **The R2-1 key probe re-run**, at both sizes, 5 repetitions each. Each run uses a P1 entry added through the panel plus the draft `'P1 DRAFT TEXT'` in `#patch_paste_text`, then a load of P2 through the dialog. **The FINAL state is read after a 40-pause settle**, not on the first clean frame. | **10 of 10 runs**: before `(dirty=True, 'P1 DRAFT TEXT')`, after `(dirty=False, '', '0 entries')`. The draft is gone and the panel is clean, with no `●`. |
+| Stress probe: the draft is written and `_handle_load_project(P2)` is called **in the same tick**, so both the draft's `Changed` and the clear's `Changed` are still pending when the seam runs. 10 repetitions, final state after 40 pauses. | **10 of 10**: `(False, '', '0 entries')` |
+| **R13**: `call_after_refresh(panel.mark_loaded)` replaced by an immediate `panel.mark_loaded()` | **KILLED**. Both AT sizes time out on `the clean '0 entries' subtitle after the load-over`. All 10 stress probes end at `(True, '', '0 entries ●')`. The deferral is load-bearing, and the AT's poll is not satisfied by the transient clean frame. |
+| R14 = Kimi's m7 (the buffer clear skipped) | **KILLED**. Both AT sizes time out on `the paste buffer cleared by the reset`. This matches the packet's m7 row. |
+| `devflow-evidence.py --check` (39 files) | Every row binds. The only `MISMATCH` lines are the index limb (`not staged`). |
+
+## Race and wait check (question 3)
+
+The new AT observables never rely on a single pause. The buffer-cleared check and the clean-subtitle check both use `_wait_for`, which polls up to 150 pauses. Under R13, the transient clean frame (`mark_loaded`, then w2 re-setting the flag) did not satisfy the poll, and both sizes timed out. So the AT catches a broken ordering in practice.
+
+What remains is theoretical. A poll that happens to sample between those two events could pass without the AT re-checking the final state. My 40-pause final-state probes close that gap as evidence, and they found no flake in 20 runs. The single `await pilot.pause()` after returning to the Inspector tab sits before the load-over and gates nothing. The white-box notice arms use `_flush(12)` and read synchronous state that the seam writes, so they have no race. No finding.
+
+Optional hardening, not required: after the clean-subtitle `_wait_for`, `_flush(pilot)` once and re-assert the subtitle and `_dirty`. That would pin the final state in the suite itself.
+
+## Closure table — round 2 findings
+
+| id | State | Evidence |
+|---|---|---|
+| R2-1 MAJOR | **Closed** (re-read and re-probed) | The buffer is cleared through its widget, and `mark_loaded` is deferred past w2. My key probe gives `'P1 DRAFT TEXT'` → `''` with `_dirty=False` at both sizes. The AT asserts the draft is present before the load-over (vacuity guard) and the empty buffer and no `●` after it. R14/m7 and R13 are both killed. LED .55(b)'s statement and the seam's comment are now accurate. |
+| R2-2 MINOR | **Closed** | The AT comment now states that it pins HLR-165's observable, not LLR-165.1's repaint clause, and that R8b is an equivalent mutant. The packet records R8b as equivalent. |
+| F6 note | Unchanged | Routed to `qa-reviewer` (round 2) |
+
+## Verdict
+
+**approve — PASS.** 0 HIGH, 0 MAJOR open. F1 (HIGH, round 1) stays discharged: nothing in fix pass 2 touches the seeding or the S5–S12 reset, and the 17/17 GREEN includes both TC-B100-09 arms. Remaining non-blocking items for the orchestrator: the F10 ARQ mirror, the F11(b) `HANDOFF.md` move at commit, and the F6 real-worker question.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS** (0 HIGH, 0 MAJOR open) · F1 (HIGH, round 1) was resolved by seeding P1's S5–S12 and A-07 state in both TC-B100-09 load-over arms. I re-read it and re-ran mutant R6 myself: KILLED, `LEAK last_template_path` (round 1: 16/16 green). F2–F11 were closed in round 2. R2-1 (MAJOR, round 2) was resolved by clearing `#patch_paste_text` in the seam and deferring `panel.mark_loaded()` with `call_after_refresh`, past the buffer's `Changed`. I re-read it and re-ran the key probe: `'P1 DRAFT TEXT'` → `''`, `_dirty=False`, `0 entries` with no `●`, 10 of 10 at both sizes plus 10 of 10 same-tick stress runs. Mutants R13 (immediate `mark_loaded`) and m7 (no clear) are both killed by the AT. R2-2 is closed (R8b recorded as equivalent). `screens_directionb.py` is untouched. Notes: the F6 arm uses a test-side task (routed to `qa-reviewer`); ARQ §2.2 mirror (F10); `HANDOFF.md` move (F11b).
