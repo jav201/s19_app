@@ -1,0 +1,4 @@
+cmd: python -m pytest tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3b app.py sha256 f8c5efa0327c screens_directionb.py sha256 47fd3bf24826 (hotfix 3b) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:19:12-06:00
+29 snapshots passed.
+75 passed in 136.10s (0:02:16)

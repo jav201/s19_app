@@ -929,3 +929,46 @@ def test_at_b100_03_project_load_over_unsaved_work_saves_only_p2(
         "Closed the Patch Editor document (1 entries); "
         "unsaved changes were not kept" in log_lines
     ), log_lines
+
+
+def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
+    tmp_path: Path,
+) -> None:
+    """TC-B100-10 (LLR-165.3, LED .55(b), LED .60), hotfix 3b: after a project load
+    the reset empties the paste buffer AND leaves the Patch Editor clean, so
+    the next Patch Load loads directly — it raises no dirty-load question.
+
+    Why: the reset's buffer clear posted ``TextArea.Changed``, whose panel
+    handler (writer w2) set the dirty flag; the deferred ``mark_loaded`` ran
+    before that message was handled, so a fresh session asked "unsaved
+    changes will be lost" with nothing unsaved and the Load did not happen
+    (CI: AT-B97-14[patch] stopped on ``LoadGuardScreen``). RED on 6d8631a:
+    the guard modal is on screen and the document never loads.
+    """
+    from s19_app.tui.screens_directionb import LoadGuardScreen
+    from tests.b97_fixtures import calib_hotfix, fx_project, load_change_file, open_patch_editor
+    from tests.b97_probes import settle
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            fx_project(app)  # the app's own project load -> the reset
+            panel = await open_patch_editor(app, pilot)
+            buffer = app.query_one("#patch_paste_text", TextArea)
+            assert buffer.text == "", repr(buffer.text)
+            # The prevented message is what repaints the gauge and heading;
+            # the clear repaints them itself, so the heading no longer names
+            # the shipped example the fresh session started with.
+            heading = str(app.query_one("#patch_paste_heading", Static).render())
+            assert "editable" in heading, heading
+            await load_change_file(app, pilot, panel, calib_hotfix(app.base_dir))
+            assert not isinstance(app.screen, LoadGuardScreen), (
+                "a clean session raised the dirty-load question"
+            )
+            subtitle = str(
+                app.query_one("#patch_win_script", Container).border_subtitle
+            )
+            assert "6 entries" in subtitle and "●" not in subtitle, subtitle
+
+    asyncio.run(_drive())

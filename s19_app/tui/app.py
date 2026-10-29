@@ -9297,17 +9297,21 @@ class S19TuiApp(App):
               semantics keep the stale rows without this render. A
               not-yet-mounted tree (headless unit tests) is tolerated,
               matching ``_apply_empty_state`` / the load install tail.
-            - The panel's public ``mark_loaded()`` (LED .55(b)): the
-              reset discards the outgoing document — including entries
-              the panel's dirty marker or paste buffer still describe —
-              so the marker is cleared with it; otherwise the panel
-              would paint ``0 entries ●`` over the empty ledger and the
-              Load guard would ask about nothing.
+            - The panel's public ``clear_paste_buffer()`` then
+              ``mark_loaded()`` (LED .55(b), LED .60): the reset discards
+              the outgoing document — including entries the panel's
+              dirty marker or paste buffer still describe — so both are
+              cleared with it, synchronously; the buffer clear posts no
+              ``TextArea.Changed`` that could re-set the marker.
+              Otherwise the panel would paint ``0 entries ●`` over the
+              empty ledger and the Load guard would ask about nothing.
 
         Dependencies:
             Uses:
                 - ``ChangeService`` / ``_invalidate_mac_view_cache`` /
                   ``_strip_source_map`` / ``_patch_document_view``
+                - ``PatchEditorPanel.clear_paste_buffer`` /
+                  ``PatchEditorPanel.mark_loaded``
             Used by:
                 - ``_handle_load_project`` — the ONE caller (LLR-165.1).
         """
@@ -9391,15 +9395,13 @@ class S19TuiApp(App):
                 document=self._patch_document_view(),
             )
             # LED .55(b): the outgoing document is gone — entries AND the
-            # dirty marker / paste buffer that described it. The buffer
-            # is cleared through its own widget (screens_directionb.py
-            # is NOT edited); clearing it posts a TextArea.Changed whose
-            # panel handler re-sets the dirty flag (writer w2), so the
-            # public mark_loaded is deferred until after that message
-            # has been handled — an immediate call would be undone and
-            # the panel would paint "0 entries ●" over the empty ledger.
-            self.query_one("#patch_paste_text", TextArea).text = ""
-            self.call_after_refresh(panel.mark_loaded)
+            # dirty marker / paste buffer that described it. The panel
+            # clears its buffer without posting TextArea.Changed, so
+            # writer w2 never re-sets the dirty flag and mark_loaded runs
+            # now — deferring it raced that message (hotfix 3b: a clean
+            # session then raised the dirty-load question).
+            panel.clear_paste_buffer()
+            panel.mark_loaded()
             self.refresh_bindings()
         return discarded_unsaved
 

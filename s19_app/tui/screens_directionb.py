@@ -5578,7 +5578,8 @@ class PatchEditorPanel(ScrollableContainer):
             Uses:
                 - :meth:`_paste_gauge_text`
             Used by:
-                - :meth:`on_mount`, :meth:`on_text_area_changed`
+                - :meth:`on_mount`, :meth:`on_text_area_changed`,
+                  :meth:`clear_paste_buffer`
 
         The same pass names the buffer in ``#patch_paste_heading``:
         ``example`` while it equals ``DUMMY_CHANGESET_TEXT``, else
@@ -5822,6 +5823,22 @@ class PatchEditorPanel(ScrollableContainer):
         """
         self._dirty = False
         self._refresh_dirty_indicator()
+
+    def clear_paste_buffer(self) -> None:
+        """Empty ``#patch_paste_text`` without marking the panel dirty.
+
+        Called by ``app.py``'s project-session reset (batch-100 LED .55(b)):
+        the outgoing document's buffer is discarded, not edited. The clear
+        runs with ``TextArea.Changed`` prevented, so writer w2 never sees it
+        and no dirty flag is set behind the caller's back — a deferred
+        ``mark_loaded`` raced that message and lost (hotfix 3b). The gauge
+        and heading are repainted here because the prevented message is
+        what normally repaints them.
+        """
+        buffer = self.query_one("#patch_paste_text", TextArea)
+        with buffer.prevent(TextArea.Changed):
+            buffer.text = ""
+        self._refresh_paste_gauge()
 
     def mark_pasted(self) -> None:
         """Set the dirty flag after a successful paste parse (batch-97 Inc-4 gate).

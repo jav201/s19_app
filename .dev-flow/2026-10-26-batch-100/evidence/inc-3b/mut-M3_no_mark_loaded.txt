@@ -1,0 +1,8 @@
+cmd: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe -m pytest tests/test_b100_session_reset.py -k reset_leaves_the_patch_editor_clean or at_b100_03 -p no:cacheprovider -q
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc3b with mutant M3_no_mark_loaded applied to app.py | PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:46:08
+E       AssertionError: timed out waiting for the clean '0 entries' subtitle after the load-over
+E       AssertionError: timed out waiting for the clean '0 entries' subtitle after the load-over
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+2 failed, 1 passed, 15 deselected in 46.57s
+RESTORE OK f8c5efa0327c

@@ -1,0 +1,7 @@
+cmd: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe -m pytest tests/test_b100_session_reset.py -k reset_leaves_the_patch_editor_clean or at_b100_03 -p no:cacheprovider -q
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc3b with mutant M2_no_gauge_refresh applied to screens_directionb.py | PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:44:36
+E           AssertionError: PASTE BUFFER · example
+E           assert 'editable' in 'PASTE BUFFER · example'
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load
+1 failed, 2 passed, 15 deselected in 25.72s
+RESTORE OK 47fd3bf24826
