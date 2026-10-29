@@ -198,3 +198,80 @@ Notes (no finding):
 - **`qa-reviewer`:** the Map arrow arm (`down` walks after a load), the stale-input arm, and adding the map suites to the focus reverse census.
 - **`ux-reviewer`:** R2-1 (the Map's keyboard subject after a load) and R2-2 (typing in Find during a load).
 - **`security-reviewer`:** nothing new. LED .50 holds.
+
+---
+
+# Round 3: re-read of corrective pass 2 and the orchestrator's branch removal
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as rounds 1 and 2. I did not write the fix. Kimi K2.8 wrote fix pass 2, a Sonnet agent finished its tail, and the orchestrator deleted one branch. Who implemented is a process fact; I judged the code. |
+| Tree re-read | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc4`. `app.py` sha256 is `79df3ae1c839…`, the orchestrator's tree. `tests/test_b100_focus.py` is `f85b49f5e3d3…`. Still 1 SOURCE file. CRLF is consistent: 14800/14800. Main `31eb572` and `24d5b7f` are identical under `s19_app/` and `tests/` (`git diff --stat` is empty), so diffing against either base gives the same result. I did not edit the worktree. |
+| Contract | LED .58 (a)–(c) in main `6a1b8ee`; batch-77 LLR-116.5 and HLR-115. |
+| Interpreter proof | `…\scratchpad\r4\fixed3\` = `git archive 31eb572` plus the 3 changed files, hash-equal to the worktree. `…\r4\base3\` = the archive plus the final module. `…\r4\mut3\<id>\` = one tree per mutant. Every transcript prints `s19_app.__file__` from its own tree. `NO_COLOR` unset, s19env 3.11, Textual 8.2.8. |
+| **Verdict** | **approve-with-fixes.** Recorded token: **`PASS-WITH-NOTES`**. 0 HIGH is open. **R2-1 is discharged**: I re-ran the map arrow probe myself, and after a load on Map the focus is on the region row and `down` walks it. R7 is KILLED again. One MAJOR is new (R3-1). It does not block, but it should land before the commit, because the fix is deleting 2 lines. |
+
+## What I executed in round 3 (evidence state: `executed`)
+
+| Run (`…\scratchpad\r4\<file>`) | Result |
+|---|---|
+| GREEN, `fixed3` (`r3-fixed3-green.txt`) | **31 passed**, on the orchestrator's `79df3ae1` tree |
+| RED at base `31eb572` with the final module (`r3-base-red.txt`) | **24 failed, 7 passed** (31 nodes). This equals Kimi's `red-06`, whose header now names `PYTHONPATH` and `NO_COLOR`, so **R2-3 is closed**. The 7 passes pin unchanged behaviour: Split/Join boundary, healthy focus, `every_window[map]`, the down-walk arm, visible Find, palette and modal. LLR-116.5 already works at base, which is why the two Map arms pass there. |
+| **Map arrow probe**, first load and re-load (`r3-probe-map-arrows.txt`) | After the load settles the focus is `RegionRow start=0x80010000`. `down` moves it to `…10080`, and a second `down` to `…10120`. This is identical to base and to the round-1 tree. Round 2 (fix pass 1): `MemoryMapPanel`, and `down` did nothing. **R2-1 discharged.** |
+| **R7** (`None` no longer re-homes), full module | **KILLED: 3 failed** (`empty_state_target_falls_back` and both TC-B100-13 arms). Without the re-assertion, a `None` focus is the tail's job again, as in round 1. |
+| R1 (always re-home) | KILLED: 4 failed (healthy, visible Find, palette, modal) |
+| RT: the fix-pass-1 rule restored, so every text input in a content window is re-homed | KILLED: 1 failed (`visible_find_input_keeps_its_focus`). **R2-2 discharged.** |
+| **RG**: the `RegionRow` guard (`app.py:7695`) disabled | **SURVIVED, 31 passed.** Probe on this tree (`r3-probe-RG.txt`): the arrows still walk after a load on Map, and a hidden row is re-homed. → R3-1 |
+| **Hidden-row probe** (`r3-probe-hidden-row.txt`). On Map with the row focused, rail key `1`/`2`/`3`, then an A2L load | The rail key leaves the focus on the hidden row (`RegionRow area=0`; Textual does not clear it). **After the A2L tail it is still on `RegionRow area=0`** on Workspace, A2L and MAC. `p` bubbles and opens the dialog, but the hidden row still consumes `up`/`down`/`enter`. Under RG the same steps land on `files_list` / `a2l_tags_list` / `mac_records_list`. → R3-1 |
+| Hidden row then an image load (`r3-probe-hidden-row-image.txt`) | The image path is fine: `watch_current_file` moves the focus first, and the tail re-homes it to `files_list` / `mac_records_list` / `validation_issues_groups`. At base the same steps leave the hidden `sje_table`. Only the A2L tail is affected. |
+| The orchestrator's branch removal | **I agree with it.** I diffed Kimi's pristine `77bb9aa6` copy (`%TEMP%\kimi-inc4-fix2\app-pristine.py.bak`) against `79df3ae1`. The only code change is the deleted `isinstance(widget, (Input, TextArea))` block. That block tested `area <= 0`, then the first window ancestor's `hidden` class, then fell through, which is exactly the generic tail below it. The block was dead duplication; the behaviour is unchanged, and GREEN on `79df3ae1` shows the same 31 passes. |
+| `devflow-evidence.py --check evidence/inc-4/*` | Every row binds; apart from the index limb (`not staged`), the only mismatches are the 3 files with no row yet: the orchestrator's `green-19`, `green-20` and `orch-guards.txt`. `orch-guards.txt` holds only its header so far (the run was still in progress), and `orch-guards-census.txt` does not exist yet. → R3-2 |
+
+## Closure table — round 2 findings
+
+| id | State | Evidence |
+|---|---|---|
+| **R2-1 HIGH** | **Discharged** (re-read and re-run) | `_reassert_focus_target` and its scheduling are deleted (LED .58 (b)). `every_window[map]` uses LLR-116.5's threshold. The black-box arm `map_load_keeps_the_region_row_and_down_walks_it` (test `:501-548`) uses rail key `4`, the real Load file dialog and `down` ×2, and `red-05` shows it RED on the fix-pass-1 tree. My map arrow probe walks. |
+| R2-2 MAJOR | **Closed** | Visible inputs keep their focus (LED .58 (c)). The `visible_find_input_keeps_its_focus` arm is killed by RT. The `stale_text_input…` arm uses a hidden A2L-window input and is RED at base. |
+| R2-3 MINOR | Closed | `red-06`: 31 nodes, full header. My base run gives the same counts. |
+| R2-4 LOW | Closed | `_resolve_focus_target` falls back when `not target.focusable or area <= 0`, and FB is killed. |
+
+## New findings — round 3
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| R3-1 | MAJOR | `app.py:7695-7700` (the `RegionRow` guard) and its comment | **The `RegionRow` guard exempts a stale row too, so the A2L tail leaves the focus on a hidden window.** LED .58 (a) protects LLR-116.5's row *on Map*. A visible row on a displayed Map already passes the generic rule (area > 0, window not hidden), so the guard only changes the result for a *stale* row: area 0, or in a hidden Map window. That is exactly where HLR-166 requires a re-home. The comment says a stale row's focus "is either cleared by Textual or re-resolved by the panel's selection-follow". The probe shows neither happens: after a rail key, the hidden row keeps the focus through an A2L load and swallows `up`/`down`/`enter`. This is not a regression, because base leaves the same hidden row. But it is the P-16 shape that LLR-166.2 exists to fix, and no test pins the guard (RG survives 31/31). Deleting the guard keeps LLR-116.5 intact (my RG probe: arrows still walk after a load on Map), because the selection-follow hook runs after the tail and re-focuses the resolved row. | Hidden-row probe: `after A2L tail on workspace: RegionRow#None area=0`; RG: `files_list`; RG → 31 passed | Delete the guard and correct the docstring line; that is the smallest change. Or narrow it to `isinstance(widget, RegionRow) and widget.region.area > 0`, which reduces to the generic rule and so also amounts to deleting it. Add an arm: Map with the row focused, rail key `1`, an A2L load, and the focus must land on `#files_list` (area > 0) while `down` does not walk a hidden row. RG then has a killing arm, or there is no guard left to mutate. The map down-walk arm must stay green. |
+| R3-2 | MINOR | packet §1/§2/§4/§6; `evidence/inc-4/` | **The packet describes the `77bb9aa6` tree, not the one under review.** The reverse census, guards and every mutant ran on `77bb9aa6`. Only the orchestrator's `green-20` (31 passed) and the in-progress `orch-guards` ran on `79df3ae1`. The R2 row still says "SURVIVED — EQUIVALENT"; it should say "mutant subject removed (branch deleted, LED .58 (c))", as the orchestrator proposes. 3 evidence files have no packet row. | `--check`; packet `:154`, `:160`, `:175` | When the orchestrator's guards and census runs finish, record the `79df3ae1` hash in §1/§4. Reword the R2 row and the verdict line. `--write` the 3 rows, plus `orch-guards-census.txt`. Because the deleted block was dead, the `77bb9aa6` mutant and census results carry over; say so in one line. |
+
+Notes (no finding):
+
+- **Reverse census** (`reverse-census-fix2.txt`): 976 passed, 1 xfailed, 5 failed.
+  - Pre-existing at base, confirmed in rounds 1 and 2: `test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact`, `test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched` and `test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection`.
+  - `test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears` flakes at base (my round-2 runs, and `green-16`/`green-17`).
+  - `test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run` failed under load with `2 run_chain_set calls for one Run`. It is green solo 5/5 on this tree (`green-18`) and green at base (`green-19`; that transcript prints each `6 passed` line twice, 8 lines for 5 runs, which is cosmetic).
+  - Inc 4 touches no flow-execution code. I classify `tc_b97_55` as a contention flake and recommend adding it to the test-race backlog item. It is not proven failing at base, only never failing in isolation on either tree.
+- **Inc 1–3 regressions:** none. The source diff adds no `.resolve(`, `workarea_root`, placement call or `_reset_project_session`. The only new import is `RegionRow`.
+- **R3/R4** still overlap (round 1 note). The packet's per-arm counts for K1–K4, LD, F1-diff, F1-map, FB, LC and R5 are full-module runs on `77bb9aa6`; I spot-checked R1 and R7 and my counts match (4 and 3).
+
+## Verdict
+
+**approve-with-fixes — `PASS-WITH-NOTES`.**
+
+- R2-1 (round 2 HIGH) is **discharged** by my re-read and re-run: the map arrow probe walks, and the down-walk arm is black-box and was RED on the fix-pass-1 tree.
+- R7 is KILLED (3), R1 is KILLED (4), and the R2-2 regression mutant RT is KILLED (1).
+- No HIGH is open.
+- **R3-1 (MAJOR)** should land before the commit: delete the `RegionRow` guard, which no test needs (RG survives), and add the hidden-row arm. I do not need to re-review it if the corrective change is exactly that deletion plus the arm and the module stays green. Otherwise send it back to me.
+- R3-2 (MINOR) is record hygiene for the orchestrator.
+
+## §4b `Independent review` cell (final, for the orchestrator to write)
+
+`code-reviewer` · **PASS-WITH-NOTES** (0 HIGH open; round 3: 1 MAJOR, 1 MINOR new) · R2-1 (HIGH, round 2) was resolved under LED .58 (a)/(b). `_reassert_focus_target` is deleted; Map's post-load landing is LLR-116.5's row, pinned black-box by `map_load_keeps_the_region_row_and_down_walks_it` (rail `4`, the Load file dialog, `down` ×2; RED on the fix-pass-1 tree). I re-ran the map arrow probe myself on `79df3ae1`: the focus is on `RegionRow`, and `down` walks `…10000 → …10080 → …10120`. I also re-ran R7 (KILLED, 3), R1 (KILLED, 4) and RT, the fix-pass-1 Find rule (KILLED, 1). R2-2, R2-3 and R2-4 are closed. The orchestrator's deletion of the `Input`/`TextArea` branch is correct dead-code removal (diffed against `77bb9aa6`: equal to the generic tail). Open: **R3-1 (MAJOR)** — the `RegionRow` guard also exempts a row in a hidden Map, so after a rail key an A2L load leaves the focus on `RegionRow area=0` (probe, executed). The guard is unpinned (RG survives 31/31), and deleting it keeps the Map arrows working (RG probe). Delete it and add the hidden-row arm before the commit. R3-2 (MINOR) — the packet should cite the `79df3ae1` tree and read the R2 row as "mutant subject removed".
+
+## Hand-offs (round 3)
+
+- **Orchestrator:**
+  - R3-1: route the 2-line deletion and the hidden-row arm.
+  - R3-2: the packet hash, the R2 row, and 4 evidence rows.
+  - Add `tc_b97_55` to the test-race backlog with `at_061a`, `at_054b`, `at_038a` and `at_038c`.
+- **`qa-reviewer`:** the hidden-row arm (R3-1).
+- **`security-reviewer`:** nothing new. LED .50 holds.

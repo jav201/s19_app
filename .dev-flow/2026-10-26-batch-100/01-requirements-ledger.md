@@ -731,3 +731,13 @@ above this line is ever edited._
 - **Why:** a requirement that already shipped wins over a new landing rule. These are orchestrator rulings under the batch's standing authorization.
 - **Evidence:** `03-increments/review-increment-004.md` Round 2; scratchpad `r4/probe-map-arrows.txt`.
 
+
+### LED-2026-10-26-batch-100.59 — Inc 4 gate round 3: no widget type is exempt from the stale rule; a hidden Map row is re-homed
+- **Requirement:** LLR-166.1
+- **Date:** 2026-10-29
+- **What changed:**
+  - **Amends LED .58 (a).** The Map landing is still the LLR-116.5 row. It needs no exemption: a row in the displayed Map window paints a region, so the stale rule leaves it alone. The `RegionRow` exemption in `_focus_needs_rehome` is removed. A row left holding the focus in a HIDDEN Map window (area 0, still swallowing `up`/`down`/`enter`) is re-homed like any other stale widget.
+  - **Simplification.** The separate `Input`/`TextArea` branch is removed. It repeated the generic stale rule exactly, and mutant R2 survived because of it. LED .58 (c) holds through the generic rule.
+- **Closes:** code-reviewer Inc 4 round 3 R3-1 (MAJOR: the exemption kept a hidden row focused after an A2L load; no test needed it — mutant RG passed 31/31) and the R2 equivalent survivor.
+- **Why:** the exemption's comment claimed Textual clears a hidden row's focus; the reviewer's probe showed it does not. Orchestrator ruling under the batch's standing authorization; the reviewer stated an exact fix needs no re-read.
+- **Evidence:** `03-increments/review-increment-004.md` Round 3; `evidence/inc-4/red-07-r3-1-hidden-map-row.txt` (RED with the exemption), `evidence/inc-4/green-21-r3-final-focus-tuiapp.txt`.
