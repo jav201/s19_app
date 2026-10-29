@@ -1,0 +1,7 @@
+cmd: python -m pytest <6 guard files> -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 app.py sha256 7168c1c9fb37 (R3-1: RegionRow guard removed, orchestrator) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc4 | NO_COLOR unset | 2026-10-29T11:24:18-06:00
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 139.43s (0:02:19)

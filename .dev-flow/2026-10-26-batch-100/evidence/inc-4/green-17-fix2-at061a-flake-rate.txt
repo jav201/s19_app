@@ -1,0 +1,2 @@
+tree=/c/Users/jjgh8/Github/s19_app-b100-inc4 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 NO_COLOR unset: 12 solo runs of at_061a -> passed=9 failed=3
+tree=/tmp/kimi-inc4-fix2/base31 PYTHONPATH=/tmp/kimi-inc4-fix2/base31 NO_COLOR unset: 12 solo runs of at_061a -> passed=10 failed=2

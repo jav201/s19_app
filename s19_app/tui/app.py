@@ -15,6 +15,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.reactive import reactive
+from textual.widget import Widget
 from textual.widgets import (
     Button,
     DataTable,
@@ -2526,11 +2527,21 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
+        panel = MemoryMapPanel()
+        # HLR-166 / LED .58 (a): the panel is the Map window's DECLARED
+        # focus target — the empty-state/fallback landing (its only
+        # focusable children are id-less region rows) — while the landing
+        # after a load is the region row LLR-116.5 auto-selects. A
+        # Container is not focusable by default — declare it here, at the
+        # compose site, rather than in screens_directionb.py.
+        # ``can_focus`` is a plain class attribute on Widget, so the
+        # instance declaration shadows it for this panel only.
+        panel.can_focus = True
         return WindowSection(
             "map",
             titled_header("Memory Map", help_button=WindowHelpChip("map")),
             Container(
-                MemoryMapPanel(),
+                panel,
                 id="map_content",
             ),
             EmptyStatePanel(),
@@ -7150,6 +7161,48 @@ class S19TuiApp(App):
         "checks": ("Issues",),
     }
 
+    #: LLR-166.1 — the per-window focus target: the named, non-text widget a
+    #: load tail lands the keyboard focus on (HLR-166, CW-U-2). Declared per
+    #: window and asserted 1:1 against the window registry — every key of
+    #: ``SCREEN_CONTAINER_IDS`` plus the palette-only Split / Join / Export
+    #: window (``_active_screen_key == "split_join"`` while it rides the rail
+    #: body) — by TC-B100-12, so a window added to the registry without a
+    #: declared target, a dropped window, or a text-input target fails the
+    #: census instead of silently joining the re-home path. Every target must
+    #: be focusable: ``Screen.set_focus`` silently ignores a widget whose
+    #: ``can_focus`` is False (the census asserts this too), so the Map
+    #: target is the panel itself with ``can_focus`` declared at compose and
+    #: the Diff target is its always-painted Compare button. On the Map
+    #: window the post-load LANDING is not the panel but the region row
+    #: LLR-116.5 auto-selects and focuses (LED .58 (a)): the panel stays
+    #: the declared target — the empty-state/fallback landing — and the
+    #: row, an id-less widget, is the Map window's landing by HLR-166's
+    #: "named widget" ledger line ("the selected region row").
+    _FOCUS_TARGETS: "dict[str, str]" = {
+        "workspace": "files_list",
+        "a2l": "a2l_tags_list",
+        "mac": "mac_records_list",
+        "map": "memory_map_panel",
+        "issues": "validation_issues_groups",
+        "patch": "patch_editor_panel",
+        "check_editor": "check_editor_panel",
+        "diff": "diff_compare_button",
+        "flow": "flow_panel",
+        "flow_execution": "fx_panel",
+        "checks": "checks_grouped",
+        "crc_designer": "crc_designer_panel",
+        "split_join": "sje_table",
+    }
+
+    #: Every window container a focused widget can sit in: the registry's
+    #: containers plus the Split / Join / Export window. Derived from
+    #: ``SCREEN_CONTAINER_IDS`` rather than re-listed, so the two sets can
+    #: never disagree (the same C-40 completeness argument as
+    #: ``_FIND_GOTO_INPUT_IDS``).
+    _WINDOW_CONTAINER_IDS = frozenset(SCREEN_CONTAINER_IDS.values()) | {
+        "screen_split_join"
+    }
+
     #: One extra command-palette command outside ``BINDINGS``: the viewer
     #: page-size settings menu lost its ``#view_bar`` trigger in increment 2
     #: (G-1) — it is resurfaced here so it stays keyboard-reachable (C-9).
@@ -7589,6 +7642,229 @@ class S19TuiApp(App):
         except Exception:
             # TC-B78-41: before mount there is no tree to focus into. A no-op,
             # matching `_refresh_loaded_panel` / `update_project_labels`.
+            return
+
+    def _focus_needs_rehome(self, widget: Widget) -> bool:
+        """
+        Summary:
+            Decide whether the focused widget violates HLR-166's landing
+            rule and the load tail must re-home it onto the active window's
+            focus target (LLR-166.1): the painted region has zero area, the
+            widget is a STALE text input (an ``Input`` / ``TextArea`` in a
+            hidden window or of area 0 — LED .58 (c)), or it sits inside a
+            window that is not displayed. A region row takes the same rule:
+            the visible Map row LLR-116.5 lands on is never stale, so it
+            stays; a row left in a hidden Map window is re-homed (R3-1).
+
+        Args:
+            widget (Widget): The currently focused widget.
+
+        Returns:
+            bool: ``True`` when the caller must move the focus to the
+            active window's target.
+
+        Data Flow:
+            - No widget type is exempt (review R3-1). The Map window's
+              LLR-116.5 row paints a region in a displayed window, so it
+              is healthy and keeps the focus (HLR-115); a row left focused
+              in a HIDDEN Map window paints area 0 and still swallows
+              ``up`` / ``down`` / ``enter``, so it is re-homed like any
+              other stale widget.
+            - Text inputs take the same stale rule as every other widget
+              (LED .58 (c)), so no separate branch exists for them: only a
+              STALE input — in a hidden window or of area 0 — is re-homed.
+              A VISIBLE input
+              in the active window — a per-window Find field — is where
+              the operator is typing and keeps the focus; the command
+              palette's ``#palette_input`` sits in no window and falls
+              through to the same ``False``.
+            - A zero-area region is the executed P-16 shape: the hidden
+              Split / Join table holds the focus (``display: none`` paints
+              no region) and the single keys die there.
+            - The window lookup walks the ancestor chain against
+              ``_WINDOW_CONTAINER_IDS``; a widget in the
+              persistent chrome (the rail, the command bar) sits in no
+              window and is never re-homed by this rule.
+
+        Dependencies:
+            Uses:
+                - ``_WINDOW_CONTAINER_IDS``
+            Used by:
+                - ``_rehome_focus_after_load``
+        """
+        if widget.region.area <= 0:
+            return True
+        for ancestor in widget.ancestors:
+            if ancestor.id in self._WINDOW_CONTAINER_IDS:
+                return ancestor.has_class("hidden")
+        return False
+
+    def _fallback_focus_target(self, target: Widget) -> Widget:
+        """
+        Summary:
+            Resolve the landing widget when the active window's declared
+            focus target paints no region (an empty-state window whose
+            target is hidden or zero-area): the window's first visible,
+            focusable, non-text widget, else the rail's active entry
+            (LLR-166.1 — the focus must always land where the operator can
+            work; the rail is always visible and keeps the single keys
+            reaching the app bindings).
+
+        Args:
+            target (Widget): The declared target that failed the
+                visibility check.
+
+        Returns:
+            Widget: The fallback widget — never an ``Input`` /
+            ``TextArea``.
+
+        Data Flow:
+            - The window is the focused-out ancestor whose id is in
+              ``_WINDOW_CONTAINER_IDS``; its descendants are scanned in
+              document order, so the fallback is deterministic.
+            - A widget with a zero painted region (inside a hidden
+              sub-container, not yet laid out) is not a landing spot and
+              is skipped, exactly like the declared target.
+            - The rail's active entry is the ``RailItem`` carrying the
+              ``-active`` marker (LLR-001.2).
+
+        Dependencies:
+            Uses:
+                - ``_WINDOW_CONTAINER_IDS`` / ``Rail`` / ``RailItem``
+            Used by:
+                - ``_resolve_focus_target``
+        """
+        window = next(
+            (
+                ancestor
+                for ancestor in target.ancestors
+                if ancestor.id in self._WINDOW_CONTAINER_IDS
+            ),
+            None,
+        )
+        if window is not None:
+            for candidate in window.query(Widget):
+                if (
+                    candidate.focusable
+                    and candidate.region.area > 0
+                    and not isinstance(candidate, (Input, TextArea))
+                ):
+                    return candidate
+        rail = self.query_one(Rail)
+        for item in rail.query(RailItem):
+            if item.has_class("-active"):
+                return item
+        return target
+
+    def _resolve_focus_target(self) -> "Widget | None":
+        """
+        Summary:
+            Resolve the active window's focus landing widget: the declared
+            target (``_FOCUS_TARGETS``) when it is focusable and paints a
+            region, else the empty-state fallback
+            (``_fallback_focus_target``).
+
+        Args:
+            None
+
+        Returns:
+            Optional[Widget]: The landing widget, or ``None`` when the
+            active window declares no target or the tree is not mounted.
+
+        Dependencies:
+            Uses:
+                - ``_FOCUS_TARGETS`` / ``_fallback_focus_target``
+            Used by:
+                - ``_rehome_focus_after_load``
+        """
+        target_id = self._FOCUS_TARGETS.get(self._active_screen_key)
+        if target_id is None:
+            return None
+        try:
+            target = self.query_one(f"#{target_id}")
+        except Exception:
+            # Before mount there is no tree to focus into (TC-B78-41's
+            # no-op shape, matching `_focus_local_input`).
+            return None
+        if not target.focusable or target.region.area <= 0:
+            # R2-4: a target that is painted but not focusable (a disabled
+            # widget) would still be a silent ``set_focus`` no-op — fall
+            # back exactly like a zero-area (empty-state) target.
+            target = self._fallback_focus_target(target)
+        return target
+
+    def _rehome_focus_after_load(self) -> None:
+        """
+        Summary:
+            Re-home the keyboard focus at the end of a load tail
+            (LLR-166.1 / LLR-166.2): when the focused widget fails
+            ``_focus_needs_rehome``, move the focus to the active window's
+            declared target (``_FOCUS_TARGETS``); a healthy focus is left
+            untouched. ``watch_current_file`` re-focuses the Split / Join
+            table on every install, so without this the tail of every load
+            leaves the focus on a hidden zero-area widget (CW-U-2).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads ``default_screen.focused`` — never ``self.focused`` —
+              so a widget inside an open modal is never judged or moved:
+              the modal keeps its focus and the rule only re-homes behind
+              it.
+            - ``None`` (nothing focused) re-homes onto the target, like a
+              violation would.
+            - Resolves the target through ``_active_screen_key`` — the
+              displayed window: a rail screen or the Split / Join / Export
+              window alike.
+            - A target that is not focusable or paints no region (an
+              empty-state window) lands on ``_fallback_focus_target``
+              instead of an invisible widget.
+            - On the Map window the tail's landing is the panel, and the
+              panel's LLR-116.5 selection-follow hook — queued by
+              ``update_memory_map`` and running AFTER the tail — then
+              moves the focus onto the auto-selected region row. That row
+              is the Map window's landing (LED .58 (a)); a visible row is
+              healthy, so a later tail leaves it (``_focus_needs_rehome``),
+              and the deferred re-assertion fix pass 1 added to fight the hook is
+              GONE (LED .58 (b)) — it is what broke the Map's arrow keys.
+            - The landing is synchronous through ``Screen.set_focus`` —
+              ``Widget.focus()`` only QUEUES the focus (a ``call_later``)
+              and the callbacks queued behind this tail would then
+              override it in order; ``set_focus`` lands now, so the tail's
+              focus is the state the queue drains into.
+            - An unmounted tree is a documented no-op at both ends — the
+              focus read (no screen) and an unresolvable target — matching
+              ``_refresh_loaded_panel`` / ``update_project_labels``.
+
+        Dependencies:
+            Uses:
+                - ``_focus_needs_rehome`` / ``_resolve_focus_target``
+            Used by:
+                - The image load tail ``_step_finalize`` and the A2L load
+                  tail of ``load_a2l_from_path``
+        """
+        try:
+            focused = self.default_screen.focused
+        except Exception:
+            # Before mount there is no screen to read the focus from
+            # (TC-B78-41's no-op shape, matching `_focus_local_input`;
+            # test_apply_prepared_load_chains_updates_via_call_later
+            # drives `_step_finalize` on an app that never mounted).
+            return
+        if focused is not None and not self._focus_needs_rehome(focused):
+            return
+        target = self._resolve_focus_target()
+        if target is None:
+            return
+        try:
+            target.screen.set_focus(target)
+        except Exception:
+            # Before mount there is no tree to focus into (TC-B78-41's
+            # no-op shape, matching `_focus_local_input`).
             return
 
     def action_open_settings_menu(self) -> None:
@@ -9741,6 +10017,9 @@ class S19TuiApp(App):
         self._refresh_loaded_panel()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
+        # LLR-166.2: the A2L load tail re-homes the focus by the same rule
+        # as the image load tail.
+        self._rehome_focus_after_load()
         self.logger.info("A2L loaded: %s", copied)
 
         if self.current_project:
@@ -12074,6 +12353,10 @@ class S19TuiApp(App):
                 self.update_project_labels()
                 self.update_memory_map()
                 self._refresh_loaded_panel()
+                # LLR-166.1: the install re-focused the Split / Join table
+                # through ``watch_current_file``; land the focus on the
+                # displayed window's target.
+                self._rehome_focus_after_load()
             finally:
                 total_elapsed = time.perf_counter() - load_started
                 self.logger.info(

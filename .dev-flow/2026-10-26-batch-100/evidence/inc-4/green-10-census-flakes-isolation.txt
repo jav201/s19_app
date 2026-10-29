@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears tests/test_before_after_report.py::test_tc330_before_after_row_reveal_hide_state_machine
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (Inc 4 fix pass 1, isolation re-run of the census flakes)
+
+...                                                                      [100%]
+3 passed in 6.05s

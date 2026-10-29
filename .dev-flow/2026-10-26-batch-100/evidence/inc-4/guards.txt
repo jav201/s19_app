@@ -1,0 +1,11 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, uncommitted)
+app.py sha256: 77bb9aa6eae8f02d57e29caf8bc9d08f575ffec51dbba52ee8736a7f237e9f0a
+env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 151.83s (0:02:31)
+exit: 0

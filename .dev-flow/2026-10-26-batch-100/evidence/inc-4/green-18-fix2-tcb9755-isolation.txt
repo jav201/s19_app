@@ -1,0 +1,4 @@
+tree=/c/Users/jjgh8/Github/s19_app-b100-inc4 PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 NO_COLOR unset: 5 solo runs of tc_b97_55 -> passed=5 failed=0
+reverse-census-fix2 failure text:
+57-E       AssertionError: 2 run_chain_set calls for one Run
+58-E       assert 2 == 1

@@ -1,0 +1,18 @@
+A) this tree, the earlier isolation trio (as green-10)
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 ; PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset
+tests\test_before_after_report.py:1202: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+1 failed, 2 passed in 6.69s
+
+B) this tree, 061a alone x2
+.                                                                        [100%]
+1 passed in 2.55s
+FAILED tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears
+1 failed in 2.56s
+
+C) BASE main 31eb572 archive, tree: /tmp/kimi-inc4-fix2/base31 ; PYTHONPATH=/tmp/kimi-inc4-fix2/base31 ; 061a alone x2
+.                                                                        [100%]
+1 passed in 2.55s
+.                                                                        [100%]
+1 passed in 2.56s

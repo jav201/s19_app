@@ -1,0 +1,5 @@
+cmd: python -m pytest tests -k census -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 app.py sha256 79df3ae1c839 (R2 duplicate branch removed, orchestrator) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc4 | NO_COLOR unset | 2026-10-29T11:01:38-06:00
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed, 3815 deselected in 176.71s (0:02:56)

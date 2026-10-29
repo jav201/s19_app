@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (Inc 4 fix pass 1 implemented; all mutants restored, hash ac449a2e)
+
+.............................                                            [100%]
+29 passed in 181.95s (0:03:01)

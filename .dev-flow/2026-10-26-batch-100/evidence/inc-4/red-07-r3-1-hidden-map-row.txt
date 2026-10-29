@@ -1,0 +1,9 @@
+cmd: python -m pytest tests/test_b100_focus.py -k hidden_map_row -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 app.py sha256 79df3ae1c839 (RegionRow guard PRESENT — pre-R3-1) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc4 | NO_COLOR unset | 2026-10-29T11:23:13-06:00
+                assert isinstance(app.focused, RegionRow), app.focused
+                assert app.focused.region.area == 0
+                await _assert_p_opens_the_project_dialog(app, pilot)
+        the focus has SETTLED on the window's target, then assert it stays: the
+                _assert_focus_is_the_target(app, target_id)
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: RegionRow#None, region Region(x=0, y=0, width=0, height=0)
+1 failed, 31 deselected in 17.51s
