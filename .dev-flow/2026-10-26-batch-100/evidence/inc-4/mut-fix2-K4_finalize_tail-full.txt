@@ -1,0 +1,1811 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+mutant: K4_finalize_tail
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+applied app.py sha256: 128a7acf8834ee5dad0a4b16481b1273276af17b3094b9a8aa93f0c23fbcf0ae
+env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+.FFFF.FFF.FFFFFFFF.......F...FF                                          [100%]
+================================== FAILURES ===================================
+________________ test_tc_b100_12_load_file_tail_rehomes_focus _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_load_file_tail0')
+
+    def test_tc_b100_12_load_file_tail_rehomes_focus(tmp_path: Path) -> None:
+        """Load file (the dialog route's tail): with the focus on the hidden
+        Split / Join table, the load tail re-homes it onto the workspace
+        window's target and ``p`` reaches the Load project dialog. Base RED
+        (P-16): ``focused region area: 0`` and ``p`` stays on Screen."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            # A project in the work area is what the `p` binding's dialog lists;
+            # the arm loads a LOOSE file over it.
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _hide_split_join_window(app, pilot)
+                app.load_from_path(CASE01_DIR / "firmware.s19")
+                await app.workers.wait_for_complete()
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:313: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_______________ test_tc_b100_12_load_project_tail_rehomes_focus _______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_load_project_t0')
+
+    def test_tc_b100_12_load_project_tail_rehomes_focus(tmp_path: Path) -> None:
+        """Load project: the project install runs the same tail and re-homes
+        the focus the same way (base RED: the hidden table keeps the focus)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _hide_split_join_window(app, pilot)
+                app._handle_load_project(P1_NAME)
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: f"Loaded project '{P1_NAME}'" in _status_text(app),
+                    f"the status naming the loaded project {P1_NAME}",
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:336: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+______________ test_tc_b100_12_workarea_files_pick_rehomes_focus ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_workarea_files0')
+
+    def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
+        """Workarea Files pick: selecting a temp file in the workspace list
+        re-homes the focus too — the third load path of LLR-166.1."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            temp_dir = app.workarea / WORKAREA_TEMP
+            temp_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(CASE01_DIR / "firmware.s19", temp_dir / "firmware.s19")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.refresh_files()
+                await _flush(pilot)
+                await _hide_split_join_window(app, pilot)
+                item = next(
+                    list_item
+                    for list_item in app.query_one("#files_list", ListView).query(
+                        ListItem
+                    )
+                    if getattr(list_item, "data", None) == "firmware.s19"
+                )
+                app._load_from_item(item)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:370: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+__________ test_tc_b100_12_rehome_lands_on_the_active_windows_target __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_rehome_lands_o0')
+
+    def test_tc_b100_12_rehome_lands_on_the_active_windows_target(
+        tmp_path: Path,
+    ) -> None:
+        """The re-home lands on the ACTIVE window's target: with the MAC screen
+        displayed and the focus on its records table, a load whose
+        ``watch_current_file`` refresh steals the focus onto the hidden
+        Split / Join table must end with the focus back on the MAC table —
+        the same visible, non-input widget — never on another window's
+        target."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("3")  # MAC rail screen
+                await _flush(pilot)
+                app.query_one("#mac_records_list").focus()
+                await _flush(pilot)
+                assert app.focused is not None and app.focused.id == "mac_records_list"
+                assert app.focused.region.area > 0
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await _wait_for_focus_on_target(pilot, app, "mac_records_list")
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:403: in _drive
+    await _wait_for_focus_on_target(pilot, app, "mac_records_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'mac_records_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #mac_records_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+______ test_tc_b100_12_every_window_load_lands_on_its_target[workspace] _______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l0')
+window_key = 'workspace'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_________ test_tc_b100_12_every_window_load_lands_on_its_target[a2l] __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l1')
+window_key = 'a2l'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'a2l_tags_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #a2l_tags_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_________ test_tc_b100_12_every_window_load_lands_on_its_target[mac] __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l2')
+window_key = 'mac'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'mac_records_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #mac_records_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+________ test_tc_b100_12_every_window_load_lands_on_its_target[issues] ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l4')
+window_key = 'issues'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'validation_issues_groups'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #validation_issues_groups (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+________ test_tc_b100_12_every_window_load_lands_on_its_target[patch] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l5')
+window_key = 'patch'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'patch_editor_panel'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #patch_editor_panel (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_____ test_tc_b100_12_every_window_load_lands_on_its_target[check_editor] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l6')
+window_key = 'check_editor'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'check_editor_panel'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #check_editor_panel (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_________ test_tc_b100_12_every_window_load_lands_on_its_target[diff] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l7')
+window_key = 'diff'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'diff_compare_button'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #diff_compare_button (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_________ test_tc_b100_12_every_window_load_lands_on_its_target[flow] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l8')
+window_key = 'flow'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'flow_panel'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #flow_panel (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+____ test_tc_b100_12_every_window_load_lands_on_its_target[flow_execution] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l9')
+window_key = 'flow_execution'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'fx_panel'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #fx_panel (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+________ test_tc_b100_12_every_window_load_lands_on_its_target[checks] ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l10')
+window_key = 'checks'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'checks_grouped'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #checks_grouped (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_____ test_tc_b100_12_every_window_load_lands_on_its_target[crc_designer] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_every_window_l11')
+window_key = 'crc_designer'
+
+    @pytest.mark.parametrize("window_key", list(S19TuiApp.SCREEN_CONTAINER_IDS))
+    def test_tc_b100_12_every_window_load_lands_on_its_target(
+        tmp_path: Path, window_key: str
+    ) -> None:
+        """EVERY window of the registry, not only the four the first pass
+        drove: with the window active, an image load re-homes the focus onto
+        the window's declared target (or the empty-state fallback) with a
+        non-zero region, and ``p`` reaches the Load project dialog. The Map
+        param pins LLR-116.5's landing instead (LED .58 (a)): the focus ends
+        on the auto-selected region row whose start is the panel's resolved
+        selection, and ``p`` reaches the dialog from there. The Diff and Map
+        windows fail this on the pre-fix-pass-1 tree (P-16 itself: the
+        hidden Split / Join table keeps the focus, or an unfocusable
+        container swallows it silently)."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                # The executed P-16 shape: the load's ``watch_current_file``
+                # steal re-focuses the hidden Split / Join table; the tail must
+                # re-home onto the ACTIVE window's target.
+                await _hide_split_join_window(app, pilot)
+                app.action_show_screen(window_key)
+                await _flush(pilot)
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                if window_key == "map":
+                    # LED .58 (a): on Map the landing is the LLR-116.5
+                    # auto-selected region row, not the declared target; the
+                    # panel stays the declared/empty-state target only.
+                    await _wait_for_map_row_landing(pilot, app)
+                else:
+                    target_id = S19TuiApp._FOCUS_TARGETS[window_key]
+                    await _wait_for_focus_on_target(pilot, app, target_id)
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:498: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:495: in _drive
+    await _wait_for_focus_on_target(pilot, app, target_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'crc_designer_panel'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #crc_designer_panel (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+_________ test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_tc_b100_12_bad_default_fo0')
+
+    def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
+        tmp_path: Path,
+    ) -> None:
+        """LED .57 (d), the re-home side: with a modal open, the rule judges
+        the DEFAULT screen's focus — a bad default-screen focus (the hidden
+        Split / Join table) is re-homed onto the window's target BEHIND the
+        modal, which keeps its own focus. Mutant LD (the rule reads
+        ``self.focused``) judges the modal's widget instead and goes RED."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                await _flush(pilot)
+                modal_focused = app.focused
+                assert modal_focused is not None, "the modal holds a focus"
+                # Install the P-16 shape on the default screen, behind the modal.
+                hidden_table = app.query_one("#sje_table")
+                app.default_screen.set_focus(hidden_table)
+                assert app.default_screen.focused is hidden_table
+                app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: "A2L loaded:" in _status_text(app),
+                    "the A2L loaded status",
+                )
+                # The tail — and the deferred render hooks behind it — have run.
+                await _flush(pilot, 10)
+                assert app.focused is modal_focused, (
+                    f"the modal keeps its focus (got {app.focused!r})"
+                )
+                assert app.default_screen.focused is not None, (
+                    "the default screen's focus is judged, never the modal's"
+                )
+                assert app.default_screen.focused.id == "files_list", (
+                    f"a bad default-screen focus is re-homed behind the modal "
+                    f"(got {app.default_screen.focused!r})"
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:906: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:874: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal.<locals>._drive.<locals>.<lambda> at 0x000001CF41C98900>
+description = 'the Load project dialog', attempts = 150
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 150) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load project dialog
+
+tests\test_b100_focus.py:78: AssertionError
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_at_b100_04_focus_lands_an0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1112: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+___ test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1] ____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29114/test_at_b100_04_focus_lands_an1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-166 black-box: after a project load and after a file load the
+        focused widget is a named, visible, non-text widget (observed through
+        the painted region — never a private attribute), and the single-key
+        bindings reach their actions: ``p`` opens the Load project dialog,
+        ``k`` opens the Legend, ``t`` opens the report viewer. Base RED (P-16):
+        the hidden Split / Join table holds the focus and ``p`` stays on
+        Screen."""
+        base = tmp_path / "app"
+        # A distinct image for the second load (a different byte content under
+        # the same stem would collide with the project's variant id).
+        src02 = tmp_path / "sources" / "case02" / "firmware.s19"
+        src02.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CASE02_DIR / "firmware.s19", src02)
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            _seed_project_p1(app.workarea)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # The P-16 shape, built through the shipped surface: the
+                # palette-first Split / Join / Export window opens and takes the
+                # focus onto its table; a rail key hides the window and the
+                # table keeps the focus.
+                await _open_split_join_via_palette(pilot, app)
+                await pilot.press("1")
+                await _flush(pilot)
+    
+                # Route 1 — Load project through its dialog.
+                await _load_project_through_dialog(pilot, app, P1_NAME)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+                # The other single-key surfaces reach their screens too.
+                await pilot.press("k")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LegendScreen),
+                    "the Legend screen (the `k` binding reached its action)",
+                )
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, LegendScreen),
+                    "the Legend screen closed",
+                )
+                await pilot.press("t")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer (the `t` binding reached its action)",
+                )
+                assert await pilot.click("#report_close"), "click missed #report_close"
+                await _wait_for(
+                    pilot,
+                    lambda: not isinstance(app.screen, ReportViewerScreen),
+                    "the report viewer closed",
+                )
+    
+                # Route 2 — Load file through its dialog: the same focus landing.
+                await _load_file_through_dialog(pilot, app, src02)
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:1146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:1112: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail. On the Map window that hook is the
+                # LLR-116.5 selection-follow, whose landing is the region row
+                # itself — a different oracle, see _wait_for_map_row_landing —
+                # so on every other window the settled focus cannot be
+                # destabilized after this point.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: _SegTable#sje_table, region Region(x=0, y=0, width=0, height=0)
+
+tests\test_b100_focus.py:174: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_file_tail_rehomes_focus
+FAILED tests/test_b100_focus.py::test_tc_b100_12_load_project_tail_rehomes_focus
+FAILED tests/test_b100_focus.py::test_tc_b100_12_workarea_files_pick_rehomes_focus
+FAILED tests/test_b100_focus.py::test_tc_b100_12_rehome_lands_on_the_active_windows_target
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[workspace]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[a2l]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[mac]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[issues]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[patch]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[check_editor]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[diff]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[flow]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[flow_execution]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[checks]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_every_window_load_lands_on_its_target[crc_designer]
+FAILED tests/test_b100_focus.py::test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size0]
+FAILED tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens[size1]
+18 failed, 13 passed in 352.48s (0:05:52)
+
+RESTORE OK 77bb9aa6eae8

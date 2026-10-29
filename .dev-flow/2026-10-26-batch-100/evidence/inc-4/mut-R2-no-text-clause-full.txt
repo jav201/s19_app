@@ -1,0 +1,104 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R2-no-text-clause)
+started: 2026-10-27 08:22:11
+
+MUTANT R2-no-text-clause APPLIED 66932377248dee287762ad86bded9d0814227774003c4c416958bf63ff3c7635
+
+...................F.........                                            [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_12_text_input_in_a_content_window_is_rehomed __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28933/test_tc_b100_12_text_input_in_0')
+
+    def test_tc_b100_12_text_input_in_a_content_window_is_rehomed(
+        tmp_path: Path,
+    ) -> None:
+        """LLR-166.1's text-input clause has an arm: with an image loaded on
+        Workspace, the operator's focus sits in the hex pane's ``#search_input``
+        (a visible ``Input`` inside a content window) and an A2L load runs its
+        tail — nothing steals the focus first — so the clause is what moves it
+        onto the window's target; ``p`` then opens the Load project dialog.
+        Mutant R2 (the text-input clause deleted) goes RED here."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                app.query_one("#search_input").focus()
+                await _flush(pilot)
+                assert app.focused is not None and app.focused.id == "search_input"
+                assert app.focused.region.area > 0
+                app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: "A2L loaded:" in _status_text(app),
+                    "the A2L loaded status",
+                )
+                await _wait_for_focus_on_target(pilot, app, "files_list")
+                await _assert_p_opens_the_project_dialog(app, pilot)
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:518: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_focus.py:515: in _drive
+    await _wait_for_focus_on_target(pilot, app, "files_list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+target_id = 'files_list'
+
+    async def _wait_for_focus_on_target(pilot, app: S19TuiApp, target_id: str) -> None:
+        """Poll the painted focus until the load's queued steps have drained and
+        the focus has SETTLED on the window's target, then assert it stays: the
+        durable status line is painted synchronously while the load's
+        ``call_later`` chain is still pending, so a single read can observe a
+        transitional (stolen) focus. Only the settled state is the oracle. The
+        timeout names the last painted focus — at base that is the P-16 line
+        (``_SegTable#sje_table, region Region(0, 0, 0, 0)``)."""
+        for _ in range(150):
+            if _focus_is_settled_on(app, target_id):
+                # The stays window covers the deferred render hooks that run
+                # right after a load tail (the map selection-follow) — the
+                # re-assertion must have brought the focus BACK to the target
+                # before the oracle reads it.
+                await _flush(pilot, 10)
+                _assert_focus_is_the_target(app, target_id)
+                return
+            await pilot.pause()
+        focused = app.focused
+>       raise AssertionError(
+            f"timed out waiting for the focus to settle on the window's target "
+            f"#{target_id} (painted region non-zero, never a text input); "
+            f"last painted focus: "
+            f"{type(focused).__name__ if focused is not None else None}"
+            f"#{getattr(focused, 'id', None)}, "
+            f"region {getattr(focused, 'region', None)}"
+        )
+E       AssertionError: timed out waiting for the focus to settle on the window's target #files_list (painted region non-zero, never a text input); last painted focus: OsClipboardInput#search_input, region Region(x=24, y=12, width=6, height=3)
+
+tests\test_b100_focus.py:167: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_text_input_in_a_content_window_is_rehomed
+1 failed, 28 passed in 190.94s (0:03:10)
+
+RESTORE OK ac449a2e411b4d85e74ba57143a64ae9501a1b4db25c39f73fb306e76a71f916

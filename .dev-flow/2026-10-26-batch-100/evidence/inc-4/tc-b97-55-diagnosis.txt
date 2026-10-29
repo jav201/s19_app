@@ -1,0 +1,46 @@
+tc-b97-55 diagnosis  date=2026-10-29T11:15:54-06:00
+test: tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+python: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe  flags: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8  NO_COLOR unset  pytest -p no:cacheprovider
+CHANGE PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4  (s19_app.__file__ verified there)
+BASE   PYTHONPATH=C:\Users\jjgh8\AppData\Local\Temp\kimi-inc4-fix2\base31 (verified)
+command: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/campaign.sh  (10 rounds; each round 20 CPU burners x40s + 4 CHANGE + 4 BASE pytest concurrently, probe plugin tc55probe.py)
+command: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/tc55/force.sh {late_rehome|stale_then_rehome}  (CHANGE only, TC55_FORCE injects a late rehome at the queued enter)
+
+== LOAD RESULTS (rc per run) ==
+     40 base rc=0
+     40 change rc=0
+
+== FORCED RESULTS ==
+change late_rehome1 rc=0
+change late_rehome2 rc=0
+change late_rehome3 rc=0
+change late_rehome4 rc=0
+change late_rehome5 rc=0
+change stale_then_rehome1 rc=1
+change stale_then_rehome2 rc=1
+change stale_then_rehome3 rc=1
+change stale_then_rehome4 rc=1
+change stale_then_rehome5 rc=1
+
+== sample probe log, load run (CHANGE) ==
+375119.3552 REHOME screen=flow_execution before=_SegTable#sje_table(area=0,dis=False) after=FlowExecutionPanel#fx_panel(area=4368,dis=False) inflight=False
+375120.4122 RUN_START focused=FlowChip#fx_run(area=6,dis=True)
+375120.4128 SIMULATE_KEY enter focused=FlowChip#fx_run(area=6,dis=True)
+375120.4526 RUN_END
+375120.4772 ENABLE_RUNS focused=FlowChip#fx_run(area=6,dis=True)
+
+== forced stale_then_rehome probe ==
+375617.9280 REHOME screen=flow_execution before=_SegTable#sje_table(area=0,dis=False) after=FlowExecutionPanel#fx_panel(area=4368,dis=False) inflight=False
+375618.7409 RUN_START focused=FlowChip#fx_run(area=6,dis=True)
+375618.7420 FORCED focus -> _SegTable#sje_table(area=0,dis=False)
+375618.7424 REHOME screen=flow_execution before=_SegTable#sje_table(area=0,dis=False) after=FlowExecutionPanel#fx_panel(area=4368,dis=False) inflight=True
+375618.7425 AFTER_FORCE focused=FlowExecutionPanel#fx_panel(area=4368,dis=False)
+375618.7427 SIMULATE_KEY enter focused=FlowExecutionPanel#fx_panel(area=4368,dis=False)
+375618.7755 RUN_END
+375618.8198 ENABLE_RUNS focused=FlowExecutionPanel#fx_panel(area=4368,dis=False)
+E       AssertionError: assert 'fx_panel' == 'fx_run'
+E         
+E         - fx_run
+E         + fx_panel
+
+== timing: rehome fired >=0.9s BEFORE RUN_START in all 40 CHANGE runs; ENABLE_RUNS lags the queued enter by 48-96ms (CHANGE) / 50-83ms (BASE)

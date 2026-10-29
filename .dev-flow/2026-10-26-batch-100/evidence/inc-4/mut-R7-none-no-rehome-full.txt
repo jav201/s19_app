@@ -1,0 +1,10 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R7-none-no-rehome)
+started: 2026-10-27 08:25:24
+
+MUTANT R7-none-no-rehome APPLIED bb09fa7e08f30ac8201e86e316c856920605db6175c3206bad3c695cbd6e3212
+
+.............................                                            [100%]
+29 passed in 177.81s (0:02:57)
+
+RESTORE OK ac449a2e411b4d85e74ba57143a64ae9501a1b4db25c39f73fb306e76a71f916

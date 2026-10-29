@@ -1,0 +1,5 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_tui_app.py
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 (same tree); supplement to green-12 after the unmounted-tree focus-read guard
+
+.......................................................x.......          [100%]
+62 passed, 1 xfailed in 37.46s

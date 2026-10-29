@@ -1,0 +1,6 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+tree: /c/Users/jjgh8/Github/s19_app-b100-inc4 (worktree + Inc 4 + fix pass 1 + fix pass 2, uncommitted; app.py restored from the pristine byte-copy sha 77bb9aa6eae8)
+env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+...............................                                          [100%]
+31 passed in 222.22s (0:03:42)

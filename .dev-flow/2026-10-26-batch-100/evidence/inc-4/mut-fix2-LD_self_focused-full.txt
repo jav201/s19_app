@@ -1,0 +1,137 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+mutant: LD_self_focused
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+applied app.py sha256: 8694cab1225c6ad445f4e696b435698d766da72152c7e57daa061dc5b350560d
+env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+.........................F.....                                          [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29162/test_tc_b100_12_bad_default_fo0')
+
+    def test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal(
+        tmp_path: Path,
+    ) -> None:
+        """LED .57 (d), the re-home side: with a modal open, the rule judges
+        the DEFAULT screen's focus — a bad default-screen focus (the hidden
+        Split / Join table) is re-homed onto the window's target BEHIND the
+        modal, which keeps its own focus. Mutant LD (the rule reads
+        ``self.focused``) judges the modal's widget instead and goes RED."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            _seed_project_p1(app.workarea)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                await _flush(pilot)
+                modal_focused = app.focused
+                assert modal_focused is not None, "the modal holds a focus"
+                # Install the P-16 shape on the default screen, behind the modal.
+                hidden_table = app.query_one("#sje_table")
+                app.default_screen.set_focus(hidden_table)
+                assert app.default_screen.focused is hidden_table
+                app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: "A2L loaded:" in _status_text(app),
+                    "the A2L loaded status",
+                )
+                # The tail — and the deferred render hooks behind it — have run.
+                await _flush(pilot, 10)
+                assert app.focused is modal_focused, (
+                    f"the modal keeps its focus (got {app.focused!r})"
+                )
+                assert app.default_screen.focused is not None, (
+                    "the default screen's focus is judged, never the modal's"
+                )
+                assert app.default_screen.focused.id == "files_list", (
+                    f"a bad default-screen focus is re-homed behind the modal "
+                    f"(got {app.default_screen.focused!r})"
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:906: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        _seed_project_p1(app.workarea)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            await pilot.press("p")
+            await _wait_for(
+                pilot,
+                lambda: isinstance(app.screen, LoadProjectScreen),
+                "the Load project dialog",
+            )
+            await _flush(pilot)
+            modal_focused = app.focused
+            assert modal_focused is not None, "the modal holds a focus"
+            # Install the P-16 shape on the default screen, behind the modal.
+            hidden_table = app.query_one("#sje_table")
+            app.default_screen.set_focus(hidden_table)
+            assert app.default_screen.focused is hidden_table
+            app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: "A2L loaded:" in _status_text(app),
+                "the A2L loaded status",
+            )
+            # The tail — and the deferred render hooks behind it — have run.
+            await _flush(pilot, 10)
+            assert app.focused is modal_focused, (
+                f"the modal keeps its focus (got {app.focused!r})"
+            )
+            assert app.default_screen.focused is not None, (
+                "the default screen's focus is judged, never the modal's"
+            )
+>           assert app.default_screen.focused.id == "files_list", (
+                f"a bad default-screen focus is re-homed behind the modal "
+                f"(got {app.default_screen.focused!r})"
+            )
+E           AssertionError: a bad default-screen focus is re-homed behind the modal (got _SegTable(id='sje_table'))
+E           assert 'sje_table' == 'files_list'
+E             
+E             - files_list
+E             + sje_table
+
+tests\test_b100_focus.py:901: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_bad_default_focus_is_rehomed_behind_a_modal
+1 failed, 30 passed in 198.77s (0:03:18)
+
+RESTORE OK 77bb9aa6eae8

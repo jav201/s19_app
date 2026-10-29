@@ -1,0 +1,132 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py tests/test_b99_s0.py tests/test_changes_apply.py tests/test_compare_engine.py tests/test_compare_service.py tests/test_crc_operation.py tests/test_entropy_service.py tests/test_hex_emit.py tests/test_map_click_chain.py tests/test_memmap_entropy_merge.py tests/test_patch_dual_entry.py tests/test_segment_ops.py tests/test_segment_split_window.py tests/test_tui_app.py tests/test_tui_crc_surface.py tests/test_tui_diff_compare_realpath.py tests/test_tui_directionb.py tests/test_tui_hostile_map.py tests/test_tui_map_big.py tests/test_tui_map_wrap.py tests/test_tui_snapshot.py tests/test_unload_feature.py 
+files: the 21 files of grep -rln "RegionRow\|memory_map" tests/ --include=*.py
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 (worktree + Inc 4 + fix pass 1 + fix pass 2, uncommitted)
+env: PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc4 ; NO_COLOR unset (env -u) ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 40%]
+......F.........x....................................................... [ 50%]
+........................................................................ [ 60%]
+........................................................................ [ 70%]
+........................................................................ [ 81%]
+........................................................................ [ 91%]
+..............................................................           [100%]
+================================== FAILURES ===================================
+___________ test_apply_prepared_load_chains_updates_via_call_later ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29105/test_apply_prepared_load_chain0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000216DFE11A10>
+
+    def test_apply_prepared_load_chains_updates_via_call_later(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """``_apply_prepared_load`` must install reactive state synchronously and defer
+        every heavy UI refresh through ``call_later`` so the event loop can repaint.
+        """
+        from s19_app.tui.app import PreparedLoad
+    
+        app = S19TuiApp(base_dir=tmp_path)
+    
+        deferred: list = []
+        monkeypatch.setattr(
+            app, "call_later", lambda callback, *args, **kwargs: deferred.append(callback)
+        )
+    
+        call_log: list[str] = []
+    
+        def record(name: str):
+            def _inner(*_a, **_k):
+                call_log.append(name)
+    
+            return _inner
+    
+        monkeypatch.setattr(app, "update_sections", record("sections"))
+        monkeypatch.setattr(app, "update_hex_view", record("hex"))
+        monkeypatch.setattr(app, "update_alt_hex_view", record("alt_hex"))
+        monkeypatch.setattr(app, "update_mac_hex_view", record("mac_hex"))
+        monkeypatch.setattr(app, "update_a2l_view", record("a2l"))
+        monkeypatch.setattr(app, "update_project_labels", record("labels"))
+        # Increment 9: the Memory Map renderer joins the finalize chain step.
+        monkeypatch.setattr(app, "update_memory_map", record("memory_map"))
+        monkeypatch.setattr(app, "set_file_status", record("status"))
+        monkeypatch.setattr(app, "_append_log_line", record("log_line"))
+    
+        loaded = LoadedFile(
+            path=tmp_path / "big.s19",
+            file_type="s19",
+            mem_map={0x1000: 0x11},
+            row_bases=[0x1000],
+            ranges=[(0x1000, 0x1010)],
+            range_validity=[True],
+            errors=[],
+            a2l_path=None,
+            a2l_data=None,
+        )
+        prepared = PreparedLoad(loaded=loaded)
+    
+        app._apply_prepared_load(prepared, tmp_path / "big.s19", 0.0)
+    
+        # Synchronous effects: status + log line appended before any deferred step runs.
+        assert "status" in call_log
+        assert "log_line" in call_log
+        assert app.current_file is loaded
+        assert "sections" not in call_log, "sections must be deferred, not sync"
+        assert "hex" not in call_log, "hex must be deferred, not sync"
+    
+        assert len(deferred) == 1, "first chain step must be queued via call_later"
+        deferred[0]()
+        assert "sections" in call_log
+    
+        assert len(deferred) == 2
+        deferred[1]()
+        assert "hex" in call_log
+        assert "alt_hex" in call_log
+        assert "mac_hex" in call_log
+    
+        assert len(deferred) == 3
+        deferred[2]()
+        assert "a2l" in call_log
+    
+        assert len(deferred) == 4
+>       deferred[3]()
+
+tests\test_tui_app.py:1381: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+s19_app\tui\app.py:12363: in _step_finalize
+    self._rehome_focus_after_load()
+s19_app\tui\app.py:7861: in _rehome_focus_after_load
+    focused = self.default_screen.focused
+              ^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:956: in default_screen
+    return self.screen if self._compose_screen is None else self._compose_screen
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+
+    @property
+    def screen(self) -> Screen[object]:
+        """The current active screen.
+    
+        Returns:
+            The currently active (visible) screen.
+    
+        Raises:
+            ScreenStackError: If there are no screens on the stack.
+        """
+        try:
+            return self._screen_stack[-1]
+        except KeyError:
+            raise UnknownModeError(f"No known mode {self._current_mode!r}") from None
+        except IndexError:
+>           raise ScreenStackError("No screens on stack") from None
+E           textual.app.ScreenStackError: No screens on stack
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:1641: ScreenStackError
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+=========================== short test summary info ===========================
+FAILED tests/test_tui_app.py::test_apply_prepared_load_chains_updates_via_call_later
+1 failed, 708 passed, 1 xfailed in 1423.12s (0:23:43)

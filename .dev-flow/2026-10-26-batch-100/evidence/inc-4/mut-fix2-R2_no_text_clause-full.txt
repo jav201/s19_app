@@ -1,0 +1,10 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+mutant: R2_no_text_clause
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+applied app.py sha256: 9554c809704d4595efaa1eed42a1c9b1fa73c0c87ed292b8a961eaff87e4eba8
+env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+...............................                                          [100%]
+31 passed in 209.37s (0:03:29)
+
+RESTORE OK 77bb9aa6eae8

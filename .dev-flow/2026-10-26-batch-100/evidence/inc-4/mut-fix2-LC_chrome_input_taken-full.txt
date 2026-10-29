@@ -1,0 +1,126 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+mutant: LC_chrome_input_taken
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+applied app.py sha256: 23bb020920a2293d85fe41081b4c6521d36b42d7b9e7111dafaa286ff6f2e604
+env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+.......................F.......                                          [100%]
+================================== FAILURES ===================================
+________________ test_tc_b100_12_palette_input_is_never_taken _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29313/test_tc_b100_12_palette_input_0')
+
+    def test_tc_b100_12_palette_input_is_never_taken(tmp_path: Path) -> None:
+        """LED .57 (c): while the operator types in the command palette, a
+        load that finishes re-homes nothing — the visible, persistent-chrome
+        ``#palette_input`` keeps the focus and the typed text stays in the
+        field: the next key is text, not a command."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                await pilot.press("ctrl+k")
+                await _wait_for(
+                    pilot,
+                    lambda: app.focused is not None and app.focused.id == "palette_input",
+                    "the palette filter input focused",
+                )
+                await pilot.press(*"Spl")
+                await _flush(pilot)
+                app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: "A2L loaded:" in _status_text(app),
+                    "the A2L loaded status",
+                )
+                # The tail — and the deferred render hooks behind it — have run.
+                await _flush(pilot, 10)
+                palette_input = app.query_one("#palette_input", Input)
+                assert app.focused is not None and app.focused.id == "palette_input", (
+                    f"the palette input keeps the focus while a load finishes "
+                    f"(got {app.focused!r})"
+                )
+                assert palette_input.value == "Spl", (
+                    f"the typed text stays in the field (got {palette_input.value!r})"
+                )
+                await pilot.press("i")
+                await _flush(pilot)
+                assert palette_input.value == "Spli", (
+                    "the next typed key is text in the field, not a command "
+                    f"(got {palette_input.value!r})"
+                )
+                assert type(app.screen).__name__ == "Screen", (
+                    "typing must not have dispatched a command / opened a screen "
+                    f"(got {type(app.screen).__name__})"
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:790: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            await pilot.press("ctrl+k")
+            await _wait_for(
+                pilot,
+                lambda: app.focused is not None and app.focused.id == "palette_input",
+                "the palette filter input focused",
+            )
+            await pilot.press(*"Spl")
+            await _flush(pilot)
+            app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: "A2L loaded:" in _status_text(app),
+                "the A2L loaded status",
+            )
+            # The tail — and the deferred render hooks behind it — have run.
+            await _flush(pilot, 10)
+            palette_input = app.query_one("#palette_input", Input)
+>           assert app.focused is not None and app.focused.id == "palette_input", (
+                f"the palette input keeps the focus while a load finishes "
+                f"(got {app.focused!r})"
+            )
+E           AssertionError: the palette input keeps the focus while a load finishes (got ListView(id='files_list'))
+E           assert (ListView(id='files_list') is not None and 'files_list' == 'palette_input'
+E            +  where ListView(id='files_list') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+E             
+E             - palette_input
+E             + files_list)
+
+tests\test_b100_focus.py:772: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_palette_input_is_never_taken
+1 failed, 30 passed in 216.00s (0:03:36)
+
+RESTORE OK 77bb9aa6eae8

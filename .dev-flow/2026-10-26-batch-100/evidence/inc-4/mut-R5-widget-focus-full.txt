@@ -1,0 +1,90 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (MUTANT R5-widget-focus)
+started: 2026-10-27 08:44:48
+
+MUTANT R5-widget-focus APPLIED 5026be1344d6b23d69f1c38bba80fabdece609f7f59d2fb78c1f11b6ded225e2
+
+........................F....                                            [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b100_12_rehome_lands_synchronously __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-28940/test_tc_b100_12_rehome_lands_s0')
+
+    def test_tc_b100_12_rehome_lands_synchronously(tmp_path: Path) -> None:
+        """The landing is a synchronous ``Screen.set_focus``, not
+        ``Widget.focus()`` (which only queues a ``call_later`` the callbacks
+        behind the tail would then override): calling the re-home moves the
+        focus NOW, with no pause for the queue to drain. Mutant R5
+        (``target.focus()``) goes RED here."""
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                app.load_selected_file(CASE01_DIR / "firmware.s19")
+                await _flush(pilot)
+                await _wait_for(
+                    pilot,
+                    lambda: _file_status_text(app).startswith("Loaded "),
+                    "the durable file-state line",
+                )
+                # The P-16 shape, installed directly: the hidden Split / Join
+                # table holds the focus (a zero-area region).
+                hidden_table = app.query_one("#sje_table")
+                app.default_screen.set_focus(hidden_table)
+                assert app.focused is hidden_table
+                assert app.focused.region.area == 0
+                app._rehome_focus_after_load()
+                assert app.focused is app.query_one("#files_list"), (
+                    f"the re-home must land synchronously (got {app.focused!r})"
+                )
+                assert app.focused.region.area > 0
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:754: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            # The P-16 shape, installed directly: the hidden Split / Join
+            # table holds the focus (a zero-area region).
+            hidden_table = app.query_one("#sje_table")
+            app.default_screen.set_focus(hidden_table)
+            assert app.focused is hidden_table
+            assert app.focused.region.area == 0
+            app._rehome_focus_after_load()
+>           assert app.focused is app.query_one("#files_list"), (
+                f"the re-home must land synchronously (got {app.focused!r})"
+            )
+E           AssertionError: the re-home must land synchronously (got _SegTable(id='sje_table'))
+E           assert _SegTable(id='sje_table') is ListView(id='files_list')
+E            +  where _SegTable(id='sje_table') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).focused
+E            +  and   ListView(id='files_list') = query_one('#files_list')
+E            +    where query_one = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).query_one
+
+tests\test_b100_focus.py:749: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_rehome_lands_synchronously
+1 failed, 28 passed in 178.25s (0:02:58)
+
+RESTORE OK ac449a2e411b4d85e74ba57143a64ae9501a1b4db25c39f73fb306e76a71f916

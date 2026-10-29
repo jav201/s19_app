@@ -1,0 +1,88 @@
+cmd: python -m pytest -q -p no:cacheprovider tests/test_b100_focus.py
+mutant: F1_map_unfocusable
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc4 (worktree at 24d5b7f + Inc 4 + fix pass 1 + fix pass 2, mutant applied)
+applied app.py sha256: 292170e6be6d335db425805296bafdc312ec4a27627184a3bd7d76a6b81efd9a
+env: PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc4 ; NO_COLOR unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+
+F..............................                                          [100%]
+================================== FAILURES ===================================
+_______ test_tc_b100_12_focus_target_table_matches_the_window_registry ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29122/test_tc_b100_12_focus_target_t0')
+
+    def test_tc_b100_12_focus_target_table_matches_the_window_registry(
+        tmp_path: Path,
+    ) -> None:
+        """The table is declared per window and asserted 1:1 against the
+        window registry, both directions: exactly one focusable target per
+        window (the 12 rail windows of ``SCREEN_CONTAINER_IDS`` plus the
+        palette-only Split / Join / Export window), unique ids, and no target
+        naming an ``Input`` / ``TextArea``. A window dropped from the table,
+        an unfocusable target, or a text-input target fails THIS arm (the
+        declared mutations), never a downstream re-home arm: a
+        ``can_focus=False`` target is a silent no-op for ``Screen.set_focus``
+        (P-16 survives invisibly), so focusability is part of the census."""
+        expected = set(S19TuiApp.SCREEN_CONTAINER_IDS) | {"split_join"}
+        targets = S19TuiApp._FOCUS_TARGETS
+        assert set(targets) == expected, (
+            f"one focus target per window, no more, no fewer: "
+            f"missing {sorted(expected - set(targets))}, "
+            f"extra {sorted(set(targets) - expected)}"
+        )
+        assert len(set(targets.values())) == len(targets), (
+            "each window's target must be its own widget id"
+        )
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                for window_key, target_id in targets.items():
+                    widget = app.query_one(f"#{target_id}")
+                    assert widget.can_focus, (
+                        f"the {window_key} window's target #{target_id} is not "
+                        f"focusable; Screen.set_focus silently ignores it and "
+                        f"the single keys die on that window (CW-U-2)"
+                    )
+                    assert not isinstance(widget, (Input, TextArea)), (
+                        f"the {window_key} window's target #{target_id} names a "
+                        f"text input ({type(widget).__name__}); a typed key must "
+                        f"reach the app's bindings (CW-U-2)"
+                    )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_focus.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            for window_key, target_id in targets.items():
+                widget = app.query_one(f"#{target_id}")
+>               assert widget.can_focus, (
+                    f"the {window_key} window's target #{target_id} is not "
+                    f"focusable; Screen.set_focus silently ignores it and "
+                    f"the single keys die on that window (CW-U-2)"
+                )
+E               AssertionError: the map window's target #memory_map_panel is not focusable; Screen.set_focus silently ignores it and the single keys die on that window (CW-U-2)
+E               assert False
+E                +  where False = MemoryMapPanel(id='memory_map_panel').can_focus
+
+tests\test_b100_focus.py:278: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_focus.py::test_tc_b100_12_focus_target_table_matches_the_window_registry
+1 failed, 30 passed in 230.84s (0:03:50)
+
+RESTORE OK 77bb9aa6eae8

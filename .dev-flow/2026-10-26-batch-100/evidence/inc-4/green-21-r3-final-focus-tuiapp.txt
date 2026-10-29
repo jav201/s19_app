@@ -1,0 +1,5 @@
+cmd: python -m pytest tests/test_b100_focus.py tests/test_tui_app.py -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc4 app.py sha256 7168c1c9fb37 (R3-1: RegionRow guard removed, orchestrator) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc4 | NO_COLOR unset | 2026-10-29T11:24:18-06:00
+........................................................................ [ 75%]
+...............x.......                                                  [100%]
+94 passed, 1 xfailed in 254.41s (0:04:14)
