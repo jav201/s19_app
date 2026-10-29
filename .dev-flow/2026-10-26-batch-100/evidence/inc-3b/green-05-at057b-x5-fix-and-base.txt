@@ -1,0 +1,12 @@
+cmd: python -m pytest tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression -p no:cacheprovider -q (x5) | tree: C:/Users/jjgh8/Github/s19_app-b100-inc3b at 6d8631a + hotfix 3b (uncommitted) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T13:02:11-06:00
+1 failed in 2.53s
+1 passed in 2.55s
+1 failed in 2.51s
+1 passed in 2.39s
+1 passed in 2.50s
+cmd: python -m pytest tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression -p no:cacheprovider -q (x5) | tree: C:/Users/jjgh8/Github/s19_app at 6d8631a (no fix) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app | NO_COLOR unset | 2026-10-29T13:02:28-06:00
+1 passed in 2.25s
+1 failed in 2.42s
+1 passed in 2.26s
+1 failed in 2.31s
+1 failed in 2.34s

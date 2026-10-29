@@ -1,0 +1,14 @@
+cmd: python -m pytest tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen tests/test_b97_width.py -p no:cacheprovider -q (output filtered to ^E/FAILED/summary)
+tree: C:/Users/jjgh8/Github/s19_app (main checkout) at 6d8631a, no fix | PYTHONPATH=C:/Users/jjgh8/Github/s19_app | NO_COLOR unset | run 2026-10-29 ~11:50 local, copied verbatim from the session task output
+E           textual.css.query.NoMatches: No nodes match '#window_help_patch' on LoadGuardScreen()
+E       AssertionError: did not settle: Run focused
+E       AssertionError: did not settle: Run focused
+E       AssertionError: did not settle: Run focused
+E           AssertionError: ((80, 24), 'check_validate_button', 200)
+E           assert (200 < 200)
+FAILED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]
+FAILED tests/test_b97_width.py::test_at_b97_15_four_screens_with_the_widest_values[size0]
+FAILED tests/test_b97_width.py::test_at_b97_15_four_screens_with_the_widest_values[size1]
+FAILED tests/test_b97_width.py::test_at_b97_16_in_session_resize_grows_and_returns
+FAILED tests/test_b97_width.py::test_at_b97_24_breakpoint_and_below_the_range_by_key
+5 failed, 144 passed in 936.17s (0:15:36)

@@ -1,0 +1,3 @@
+cmd: python -m pytest tests -k census -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3b app.py sha256 f8c5efa0327c screens_directionb.py sha256 47fd3bf24826 (hotfix 3b) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:19:12-06:00
+87 passed, 3817 deselected in 84.57s (0:01:24)

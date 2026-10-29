@@ -1,0 +1,4 @@
+cmd: python -m pytest tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b99_s0.py tests/test_capped_text_area.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_json.py tests/test_tui_patch_layout.py -p no:cacheprovider -q
+tree: C:/Users/jjgh8/Github/s19_app-b100-inc3b app.py sha256 f8c5efa0327c screens_directionb.py sha256 47fd3bf24826 (hotfix 3b final) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:49:03-06:00
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+1 failed, 183 passed in 769.43s (0:12:49)

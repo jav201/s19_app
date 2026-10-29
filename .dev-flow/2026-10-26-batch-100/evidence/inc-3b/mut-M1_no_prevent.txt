@@ -1,0 +1,11 @@
+cmd: C:\Users\jjgh8\anaconda3\envs\s19env\python.exe -m pytest tests/test_b100_session_reset.py -k reset_leaves_the_patch_editor_clean or at_b100_03 -p no:cacheprovider -q
+tree: C:\Users\jjgh8\Github\s19_app-b100-inc3b with mutant M1_no_prevent applied to screens_directionb.py | PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc3b | NO_COLOR unset | 2026-10-29T12:44:09
+E           AssertionError: a clean session raised the dirty-load question
+E           assert not True
+E            +  where True = isinstance(LoadGuardScreen(), <class 's19_app.tui.screens_directionb.LoadGuardScreen'>)
+E            +    where LoadGuardScreen() = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).screen
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size0]
+FAILED tests/test_b100_session_reset.py::test_at_b100_03_project_load_over_unsaved_work_saves_only_p2[size1]
+FAILED tests/test_b100_session_reset.py::test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load
+3 failed, 15 deselected in 44.77s
+RESTORE OK 47fd3bf24826
