@@ -720,3 +720,14 @@ above this line is ever edited._
 - **Why:** these are orchestrator rulings under the batch's standing authorization. The focus must land where the user can work, and must never be taken from where the user is working.
 - **Evidence:** `03-increments/review-increment-004.md` F1, F5, F6, check 2.
 
+### LED-2026-10-26-batch-100.58 — Inc 4 gate round 2: Map keeps the LLR-116.5 row; only stale text inputs are re-homed
+- **Requirement:** LLR-166.1
+- **Date:** 2026-10-27
+- **What changed:**
+  - **(a) Map.** On Map, the landing after a load is the region row that batch-77 LLR-116.5 auto-selects and focuses, because the up/down walk lives on that row. No re-assertion moves focus off a `RegionRow`, whether LLR-116.5 put it there or the user chose it. HLR-166's "named widget" for Map is that row.
+  - **(b) Re-assertion removed.** The general deferred re-assertion goes. If a timing gap still needs covering, it must not apply to a widget the window's own requirement focuses.
+  - **(c) Stale text inputs only.** LED .57 (c) is applied as written: the rule re-homes a text input only when it is stale (in a hidden window, or of area 0). A visible text input in the active window, such as a per-window Find, keeps its focus.
+- **Closes:** code-reviewer Inc 4 round 2 R2-1 (HIGH: after every load the Map arrows did nothing, against LLR-116.5; executed on three trees) and R2-2 (MAJOR: a visible Find field was taken, against LED .57 (c)).
+- **Why:** a requirement that already shipped wins over a new landing rule. These are orchestrator rulings under the batch's standing authorization.
+- **Evidence:** `03-increments/review-increment-004.md` Round 2; scratchpad `r4/probe-map-arrows.txt`.
+

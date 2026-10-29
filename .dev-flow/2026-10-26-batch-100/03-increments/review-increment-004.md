@@ -112,3 +112,89 @@ Notes (no finding):
 - **`qa-reviewer`:** F1(c), the per-window arm; F2/F3, the healthy and `Input` arms; F4, polling the precondition.
 - **`ux-reviewer`:** F1(a), choosing the Diff and Map targets; F5; F6.
 - **`security-reviewer`:** nothing new. No path, placement or resolution change; LED .50 holds.
+
+---
+
+# Round 2: re-read of corrective pass 1
+
+| Field | Value |
+|---|---|
+| Reviewer | `code-reviewer`, the same reviewer as round 1. I did not write the fix. |
+| Tree re-read | Worktree `C:\Users\jjgh8\Github\s19_app-b100-inc4` at `24d5b7f`, with Inc 4 and fix pass 1 uncommitted. `app.py` sha256 is `ac449a2e411b…` and `tests/test_b100_focus.py` is `ac42b2eb1c6d…`, matching HANDOFF §"Fix pass 1". It is still 1 SOURCE file: `git diff --name-only 24d5b7f` lists `app.py` and `test_id_registry.py`, plus the untracked test module. CRLF is consistent: `app.py` 14822/14822, the test 961/961. I did not edit the worktree. |
+| Contract | Main `31eb572`: LED .57 (a)–(d) and `kimi/BRIEF-inc-4-fix1.md`. I also read batch-77 `01-requirements.md` LLR-116.1 and LLR-116.5, and HLR-115 (`RegionRow.on_key`, `screens_directionb.py:1449-1497`). |
+| Interpreter proof | `…\scratchpad\r4\fixed2\` = `git archive 24d5b7f` plus the 3 changed files, hash-equal to the worktree. `…\r4\base\` = the archive plus the fix-pass test module. `…\r4\mut2\<id>\` = one tree per mutant. Every transcript prints `s19_app.__file__` from its own tree. `NO_COLOR` unset (`env -u`), s19env 3.11, Textual 8.2.8. |
+| **Verdict** | **reject until fixed.** Recorded token: **`BLOCK — BLOCK-UNTIL: R2-1`** (1 HIGH, new in this round). **F1 and F2 are discharged**: I re-read both on the diff, re-ran the per-window probe (13 of 13 windows on target) and re-ran R1 (KILLED, 3 nodes). R2-1 is new. The fix pass's `_reassert_focus_target` breaks batch-77 LLR-116.5 on the Map window: after a load the arrow keys stop walking the regions. R2-2 (MAJOR) puts the code against LED .57 (c). |
+
+## What I executed in round 2 (evidence state: `executed`)
+
+| Run (`…\scratchpad\r4\<file>`) | Result |
+|---|---|
+| GREEN, fix-pass tree (`r2-fixed2-green.txt`) | **29 passed** (179 s) |
+| RED at base: the final module on `git archive 24d5b7f` (`r2-base-red.txt`) | **25 failed, 4 passed** (29 nodes). The 4 passes are split_join, healthy, palette and modal, which pin unchanged behaviour as packet §6 says. All 12 `every_window` cases fail at base, not only Diff. **Kimi's `red-04` shows 24 failed, 4 passed = 28 nodes**, so it was run on an earlier, 28-node version of the module → R2-3. |
+| **R1** (always re-home), full module | **KILLED: 3 failed** (`healthy_focus_is_not_moved`, `palette_input_is_never_taken`, `modal_keeps_its_focus…`). Round 1: 10/10 green. **F2 discharged.** |
+| R2 (text-input clause deleted) | KILLED: 1 failed (`text_input_in_a_content_window_is_rehomed`). See R2-2 for what that test asserts. |
+| R3 (hidden clause) / R4 (area clause) | Both SURVIVED, 29 passed. In the P-16 shape the two clauses overlap, as in round 1. Note only. |
+| R5 (`target.focus()` instead of `set_focus`) | KILLED: 1 failed (`rehome_lands_synchronously`). **F9 closed.** |
+| **Per-window probe**, image and A2L loads × 12 rail windows (`r2-probes.txt`) | **24 of 24 land on the declared target, and `p` opens `LoadProjectScreen`**. Diff lands on `Button#diff_compare_button`, Map on `MemoryMapPanel#memory_map_panel`. Round 1: Diff was `sje_table area=0`, `p -> Screen`. **F1 discharged.** |
+| Target probe | All 13 targets are `focusable=True`. In a bare session, Workspace/Map/Issues/Checks still have area 0, and the fallback covers them (next row). |
+| Empty-state probe (bare session, P-16 shape, A2L-only load) | Workspace → `WindowHelpChip#window_help_workspace`, Map → `#window_help_map`, Issues → `RailItem#rail_item_issues`. All have area > 0. **F5 closed per LED .57 (b).** |
+| Modal and user-focus probe | **S1** (dialog open): the modal keeps `#load_path`. **S2** (Legend): keeps `#legend_close`. **S3** (palette): keeps `#palette_input`, and the typed `i` stays text. **S4**: a healthy `#hex_scroll` is kept. **S4b**: a visible `#search_input` (Workspace Find) **is taken** and moved to `files_list` → R2-2. |
+| **Map arrow probe**, three trees (`probe-map-arrows.txt`). Map window shown, image load (first load and re-load), then `down`, `down` | **Base `24d5b7f` and round-1 tree:** the focus settles on `RegionRow start=0x80010000`, and `down` walks it to `…10080` and then `…10120`. **Fix-pass tree:** the focus settles on `MemoryMapPanel#memory_map_panel` and **`down` does nothing (twice)**. In the re-load case the operator's own `RegionRow` focus is also replaced by the panel. → R2-1 |
+| Map suites on the fix-pass tree (`test_map_click_chain.py`, `test_tui_hostile_map.py`, `test_tui_map_big.py`; `r2-map-tests-fixed2.txt`) | 123 passed. None of them loads while the Map window is shown, so they cannot see R2-1. None is in the reverse census either. |
+| Census flakes: isolation and file runs (`r2-flakes-iso-*.txt`, `r2-ba-{base,fixed2}-{1,2,3}.txt`) | `test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden`: green in all 8 of my runs on both trees; I could not reproduce it. `test_at_061a_persistent_control_survives_then_writes_pair_and_clears`: **fails at base too** (isolation 1/1, file run 1/3), and on the fix-pass tree in 2/3 file runs, always `writes … got []`. `at_038a` and `at_038c` flake the same way on both trees. These are pre-existing timing flakes in `test_before_after_report.py`, not Inc 4. Kimi's `green-10` (3 passed in isolation) is consistent with that. |
+| `devflow-evidence.py --root . --check evidence/inc-4/*` | Every file binds to a packet row. The only mismatch is the index limb (`not staged`), which is expected before the commit. The scratch scripts and the `.bak` are gone. **F8 closed.** |
+| Inc 1–3 regressions | `+` lines of the source diff: no `.resolve(`, no `workarea_root`, no `copy_into_workarea`/placement call, no `_reset_project_session`. **None.** |
+
+## Closure table — round 1 findings
+
+| id | State | Evidence |
+|---|---|---|
+| F1 HIGH | **Discharged** (re-read and re-run) | Diff → `#diff_compare_button` (`app.py:7182`). The Map panel is declared `can_focus` at compose (`:2537`). The census asserts `can_focus` (test `:226-231`). The parametrized `every_window` arm covers all 12 windows (`:405-439`). My probe: 24/24 on target with `p` live. The Map half is superseded by R2-1: in round 1 I called the `RegionRow` landing "by accident". That was wrong. It is LLR-116.5's designed landing, and my wording pushed the fix toward the conflict. |
+| F2 HIGH | **Discharged** (re-read and re-run) | The real healthy arm (`:442-479`) uses the probe-S4 shape: an A2L load with no `current_file` change. My R1 re-run is KILLED, with 3 nodes. |
+| F3 MAJOR | Mechanically closed (R2 killed); **reopened in substance as R2-2** | The arm asserts the opposite of LED .57 (c) for the Find field. |
+| F4 MAJOR | Closed | The precondition now polls (`_focus_is_settled_on`). At base the arm is green in my run (25F/4P), and packet §6 now says so. |
+| F5 MAJOR | Closed per LED .57 (b) | `_fallback_focus_target` and `_resolve_focus_target` (`:7747-7778`). Probe: help chip or rail entry, area > 0. |
+| F6 MINOR | Closed for the palette; **not for Find** → R2-2 | S3 keeps the palette and the typed text. |
+| F7 MINOR | Closed | Full-module transcripts. Kimi's R1, R2 and R5 counts (3/1/1) equal mine. |
+| F8 MINOR | Closed | Scratch removed; every file has a row; `--check` binds them all. HANDOFF still sits at the worktree root and moves at commit, as for Inc 1–3. |
+| F9 MINOR | Closed | `rehome_lands_synchronously`; R5 is KILLED. |
+| F10 LOW | Closed | The comment now says "Declared per window and asserted 1:1 against the window registry". |
+| LED .57 (d) / modal note | Closed | `_rehome_focus_after_load` and `_reassert_focus_target` read `default_screen.focused`. Probes S1/S2 and the two modal arms. |
+
+## New findings — round 2
+
+| id | Severity | file:line | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| **R2-1** | **HIGH** (regression of a shipped requirement) | `app.py:7780-7826` (`_reassert_focus_target`), `:7880`; test `:405-439` (`every_window[map]`) | **The re-assertion overrides batch-77 LLR-116.5 and kills the Map's arrow keys after every load.** LLR-116.5 requires that after the selection is resolved, the focus is on the live region row whose `region_start` equals the resolved selection. HLR-115's `up`/`down` walk is implemented on that row (`RegionRow.on_key`) and nowhere else. `_reassert_focus_target` runs one refresh after the tail. It re-lands every *id-less* focus on the declared target, and a `RegionRow` has no id, so the Map window always ends on `#memory_map_panel`, where `up`/`down` do nothing. It also replaces the operator's own `RegionRow` focus (the re-load case), so the rule moves a focus the user chose. The packet frames this as a trade-off ("would leave the focus on an id-less `RegionRow`"), but at base that row is the *required* landing, and `p` already works there (my round-1 probe). `every_window[map]` now asserts the regression as correct behaviour. No map suite loads while the Map is shown, so nothing else catches it. | Map arrow probe: base/round-1 `RegionRow`, `down` walks; fix pass `MemoryMapPanel`, `down` ×2 does nothing | Orchestrator ruling. Recommended: on the Map window the landing is LLR-116.5's auto-selected row. Treat an attached `RegionRow` inside `#memory_map_panel` as the Map's healthy target. Keep the panel only as the empty-state or fallback target. **Remove `_reassert_focus_target`**: it exists only to defeat LLR-116.5. Its "id-less ⇒ re-land" rule would also move any other unnamed widget the operator chose. HLR-166's "named widget" needs a ledger line for the Map ("the selected region row"). Change `every_window[map]` to LLR-116.5's threshold (focused ∈ live `RegionRow`s, `region_start` = the resolved selection) plus `p`, and add `down` → the next row. Discharge: I re-run the map arrow probe on the fix and `down` must walk. Kimi's mutant RA then needs re-recording; and R7 will probably no longer survive (see notes). |
+| R2-2 | MAJOR | `app.py:7676-7680` (`_focus_needs_rehome` text clause); test `:482-518`; packet §5 bullet 2 | **The Find field is still taken, which contradicts LED .57 (c), and the new arm asserts the contradiction.** LED .57 (c) says a visible Find field with area > 0 is never taken, and the text-input rule applies only to fields "the load left stale (hidden, or area 0)". The command bar has had no find input since batch-79 (`command_bar.py:223`). So "the Find field" can only mean the per-window Find inputs of `_FIND_GOTO_INPUTS`, all of which live inside content windows. The code re-homes *every* text input inside a content window. `text_input_in_a_content_window_is_rehomed` pins exactly that, with the Workspace Find `#search_input` visible at area 24. Packet §5 says the Find field "is never taken mid-typing", and its own arm shows the opposite. Impact: typing in Find while an A2L load finishes sends the next keys to the app as commands. | Probe S4b: visible `#search_input` → `files_list` | Implement LED .57 (c) as written. A text input is re-homed only when stale, which the area-0 and hidden-window clauses already cover, so the text clause becomes "a visible text input is healthy". Rewrite the arm: a visible `#search_input` keeps the focus and its typed text through an A2L tail. Add a stale-input arm: focus `#alt_search_input`, hide the A2L window with a rail key, run a load, and the focus must be re-homed. Or the orchestrator amends LED .57 (c) to the palette alone and corrects §5. |
+| R2-3 | MINOR | `evidence/inc-4/red-04-fix1-module-at-base.txt`; `green-08`, `green-09`, `green-10` headers | `red-04` is 24 failed + 4 passed = 28 nodes, but the final module has 29. The RED was taken on an earlier version of the test file, so it is not the counterfactual of the module under review. My run of the final module at base: 25 failed, 4 passed. The `red-04`, `green-08`, `green-09` and `green-10` headers name the command and the tree but not `PYTHONPATH` or `NO_COLOR`, which is a BRIEF-inc-4 lesson. | node count; my `r2-base-red.txt` | Re-run the base RED on the final module with full headers, and update §4. |
+| R2-4 | LOW | `app.py:7776` | `_resolve_focus_target` falls back only on area 0. A target that is painted but not focusable (disabled) would still be a silent `set_focus` no-op. No target can be disabled today (`diff_compare_button` is never disabled). | code read | Fall back when `not target.focusable or target.region.area <= 0`. |
+
+Notes (no finding):
+
+- **R7** (`None` no longer re-homes) survives only because `_reassert_focus_target` lands a `None` focus one frame later. That makes it equivalent, and the explanation is correct for this tree. If R2-1 removes the re-assertion, R7 should be re-run: TC-B100-13 caught it in round 1.
+- **R3/R4**: same overlap as round 1. Keep both clauses.
+- **Flakes**: `at_061a` (pre-existing at base), `at_054b` (not reproduced), and `at_038a`/`at_038c` (both trees) belong on the test-race backlog item that Inc 3 opened for `at058b`.
+
+## Verdict
+
+**reject until fixed — `BLOCK — BLOCK-UNTIL: R2-1`.**
+
+- F1 and F2 (round 1 HIGHs) are **discharged** by this re-read: the per-window probe shows 13 of 13 windows on target with `p` live, and R1 is KILLED with 3 nodes.
+- R2-1 (HIGH) is new and open. It needs an orchestrator ruling on the Map landing, a code fix, and my re-run of the map arrow probe.
+- R2-2 (MAJOR) puts the code against LED .57 (c). Fix it in the same pass, or amend the ledger.
+- Open MINOR/LOW: R2-3 and R2-4.
+
+## §4b `Independent review` cell (round 2, for the orchestrator to write)
+
+`code-reviewer` · **BLOCK — BLOCK-UNTIL: R2-1** (round 2: 1 HIGH, 1 MAJOR, 1 MINOR, 1 LOW new; round-1 HIGHs F1/F2 discharged) · F1 was resolved by the focusable targets (Diff `#diff_compare_button`, Map panel `can_focus`), the `can_focus` census and the 12-window `every_window` arm. I re-ran the per-window probe: 24/24 loads on target with `p` live (round 1: Diff `sje_table area=0`, `p -> Screen`). F2 was resolved by a real healthy arm (A2L load, no steal), and I re-ran R1 myself: KILLED, 3 failed (round 1: 10/10 green). F3–F10 and LED .57 (b)/(d) are closed, with one exception: **R2-1 (HIGH, open)** — `_reassert_focus_target` re-lands any id-less focus, so after a load on the Map window the focus is taken from LLR-116.5's auto-selected `RegionRow` and put on the panel, and `up`/`down` stop walking the regions. Base and round 1 walk; the fix pass does not (map arrow probe, executed, `review-increment-004.md` round 2). It needs an orchestrator ruling on the Map landing, the re-assertion removed, and my re-run of the arrow probe. Open: **R2-2 (MAJOR)** — a visible Find field (`#search_input`) is still taken, against LED .57 (c), and the new arm asserts that. R2-3 (the RED transcript was run on a 28-node earlier version of the module). R2-4 (fall back when a target is not focusable).
+
+## Hand-offs (round 2)
+
+- **Orchestrator:**
+  - R2-1 ruling: the Map landing is the LLR-116.5 row (recommended), plus a ledger line on HLR-166's "named widget" for the Map.
+  - R2-2: implement LED .57 (c) as written, or amend it.
+  - Add `at_061a`, `at_054b`, `at_038a` and `at_038c` to the test-race backlog item.
+- **`qa-reviewer`:** the Map arrow arm (`down` walks after a load), the stale-input arm, and adding the map suites to the focus reverse census.
+- **`ux-reviewer`:** R2-1 (the Map's keyboard subject after a load) and R2-2 (typing in Find during a load).
+- **`security-reviewer`:** nothing new. LED .50 holds.

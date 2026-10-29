@@ -784,7 +784,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-166.1 — The load tails and the modal closes put the focus on the window's target
 - **Traceability:** HLR-166
-- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.57
+- **Ledger:** LED-2026-10-26-batch-100.10, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.57, LED-2026-10-26-batch-100.58
 - **Statement:** Each window shall declare its focus target, a non-text widget (NEW, a per-window table in `app.py`, derived at Phase 3 from the window registry and checked by TC-B100-12 against every window). The load tail `_step_finalize` (`app.py:11191`), the dismiss of the Load dialog, of the load question and of the Load-result panel, and a cancelled load shall move the focus to the displayed window's target when the focused widget has region area 0, belongs to a window that is not displayed, or is an `Input` / `TextArea`. While the Load-result panel is open, the focus stays in it.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-12 — `pytest tests/test_b100_focus.py -k tc_b100_12`
