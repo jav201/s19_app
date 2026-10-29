@@ -741,3 +741,13 @@ above this line is ever edited._
 - **Closes:** code-reviewer Inc 4 round 3 R3-1 (MAJOR: the exemption kept a hidden row focused after an A2L load; no test needed it — mutant RG passed 31/31) and the R2 equivalent survivor.
 - **Why:** the exemption's comment claimed Textual clears a hidden row's focus; the reviewer's probe showed it does not. Orchestrator ruling under the batch's standing authorization; the reviewer stated an exact fix needs no re-read.
 - **Evidence:** `03-increments/review-increment-004.md` Round 3; `evidence/inc-4/red-07-r3-1-hidden-map-row.txt` (RED with the exemption), `evidence/inc-4/green-21-r3-final-focus-tuiapp.txt`.
+
+### LED-2026-10-26-batch-100.60 — Hotfix 3b: the reset clears the paste buffer without marking the Patch Editor dirty
+- **Requirement:** LLR-165.3
+- **Date:** 2026-10-29
+- **What changed:**
+  - **Defect.** Inc 3's reset emptied `#patch_paste_text` by assigning its text. That posted `TextArea.Changed`, and the panel's handler (writer w2) set the dirty flag. The `mark_loaded` meant to clear it was deferred with `call_after_refresh`, and in the fresh-session path it ran before the bubbled message was handled. So after any project load, the next Patch Load raised the dirty-load question with nothing unsaved, and the document did not load.
+  - **Fix.** `PatchEditorPanel.clear_paste_buffer()` (public, `screens_directionb.py`) clears the buffer with `TextArea.Changed` prevented and repaints the gauge and heading. The reset calls it and then `mark_loaded()` synchronously. LED .55 (b)'s outcome (buffer empty, no dirty marker) is unchanged; only its mechanism changes. `screens_directionb.py` is edited one increment before Inc 10, for this one method.
+- **Closes:** the 5 batch-97 nodes red on main since the Inc 3 merge: `test_b97_chips_help.py::test_at_b97_14_…[patch]` (stopped on `LoadGuardScreen`) and `test_b97_width.py::test_at_b97_15_…[size0]`, `[size1]`, `test_at_b97_16_…`, `test_at_b97_24_…`. They failed in CI from run 40497466178 on, and locally on 6d8631a.
+- **Why it escaped:** Inc 3's reverse census was a symbol grep that did not reach the batch-97 files, and nobody compared the failed-node set of the post-merge CI runs with the run before. The operator chose "Hotfix ahora" on 2026-10-29.
+- **Evidence:** `03-increments/increment-015.md` (hotfix 3b, numbered out of sequence); `03-increments/review-increment-015.md`; `evidence/inc-3b/`.
