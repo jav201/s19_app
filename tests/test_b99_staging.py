@@ -2058,7 +2058,19 @@ _FINAL_NAME_ALLOWLIST = {
     # path of the placed-files list recorded at placement/gather time, so
     # nothing pre-existing and nothing a concurrent writer added is ever
     # removed; the exact inverse of the placement claim.
-    "s19_app/tui/app.py": frozenset({"_abort_save", "action_dump_a2l_json"}),
+    # batch-100 Inc 7 (SEC2-10, LED .54 (a)): the abort's restore of the
+    # previous ``project.json`` moved into ``_restore_manifest`` (stage
+    # privately, then ``os.replace`` onto the manifest this save wrote);
+    # ``_keep_previous_manifest`` claims a NEW name with ``O_CREAT|O_EXCL``
+    # (never an overwrite) and unlinks only its own partial claim.
+    "s19_app/tui/app.py": frozenset(
+        {
+            "_abort_save",
+            "_keep_previous_manifest",
+            "_restore_manifest",
+            "action_dump_a2l_json",
+        }
+    ),
     "s19_app/tui/changes/apply.py": frozenset({"save_patched_image"}),
     "s19_app/tui/changes/io.py": frozenset({"write_change_document"}),
     "s19_app/tui/operations/crc.py": frozenset({"write_crc_image"}),

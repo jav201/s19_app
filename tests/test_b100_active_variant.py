@@ -46,11 +46,26 @@ Inc 6 scope notes (declared in the increment packet): ``derived_from``
 (LLR-168.4) and ``active_document`` are written from Inc 7 / Inc 8a, so the
 carry arms here cover the four keys the writer emits today; AT-B100-20's
 Execute-scope arm lands with Inc 8a / 9b.
+
+Inc 7 adds:
+
+  - TC-B100-20 (SEC6-2, LED .68): a manifest the rewrite cannot carry whole
+    — an unknown top-level key, a ``schema_version`` above 1, a skipped
+    entry — is never rewritten by an in-project writer: its bytes are
+    identical and one status line says why. The two SEC6-7 arms are
+    re-pinned to that rule (their skipped entries were dropped silently).
+  - TC-B100-71 — LLR-168.4: ``derived_from`` — a save-back to
+    ``firmware_1.s19`` and to ``firmware-patched.s19`` records
+    ``firmware.s19`` with its SHA-256 and 4 differing bytes; a Save project
+    emit of a session loaded from outside the project records the base,
+    absent from the project; a byte copy records nothing; ``../x.s19`` as a
+    base is 1 issue and 0 entries; a variant append carries the record.
 """
 from __future__ import annotations
 
 import asyncio
 import json
+import time
 from pathlib import Path
 
 import pytest
@@ -562,9 +577,11 @@ def test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash(tmp_path: Pat
     )
     before = (project_dir / "project.json").read_bytes()
     statuses = _run_writer(tmp_path, base, "a2l-sync")
-    after = _assert_carried(project_dir, before)
-    assert after["active_variant"] == "firmware"
-    assert "Project saved + manifest verified" in statuses, statuses
+    # Inc 7 re-pin (SEC6-2): the entries are skipped and the manifest is
+    # left as it is — a rewrite would drop them silently.
+    assert (project_dir / "firmware.a2l").is_file()
+    assert (project_dir / "project.json").read_bytes() == before
+    assert [s for s in statuses if "holds entries that were skipped and was not rewritten" in s], statuses
 
 
 def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
@@ -597,9 +614,98 @@ def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
     finally:
         os.rmdir(loop)
     assert (project_dir / "firmware_1.s19").is_file()
-    after = _assert_carried(project_dir, before)
-    assert after["active_variant"] == "firmware_1"
-    assert "Project 'P' now opens firmware_1.s19" in statuses, statuses
+    # Inc 7 re-pin (SEC6-2): the skipped entry is never dropped silently —
+    # the manifest is left as it is and no line claims Load now opens it.
+    assert (project_dir / "project.json").read_bytes() == before
+    assert [s for s in statuses if "holds entries that were skipped and was not rewritten" in s], statuses
+    assert not [s for s in statuses if "now opens" in s], statuses
+
+
+WRITER_OUTCOMES = ("manifest verified", "not rewritten", "Manifest write failed", "Saved project", "NOT saved")
+
+
+@pytest.mark.parametrize(
+    "writer", ["variant-append", "mac-sync", "a2l-sync", "save-back", "save-project"]
+)
+def test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second(
+    tmp_path: Path, writer: str
+) -> None:
+    """Inc 7 corrective pass 2, SEC7-R2-2 (SEC6-5's time bound for the
+    writers; security probe T2): P records 1 000 real files at the end of a
+    31-folder chain in ``batch``, ``assignments`` and ``gathered`` (no
+    finding, so every writer rewrites). Each in-project writer — variant
+    append, MAC sync, A2L sync, save-back — and Save project with that
+    composition reach their verified manifest line under 1 s from the
+    trigger.
+
+    RED (cp1 tree): append 6.89 s, MAC sync 7.12 s, A2L sync 6.44 s,
+    save-back 6.42 s (one fresh walk per entry in the serializer)."""
+    from s19_app.tui.app import SaveProjectPayload
+
+    base = tmp_path / "app"
+    project_dir = projects.seed_project_with_every_key(_workarea(base))
+    names = projects.real_files_under_a_chain(project_dir)
+    manifest = projects.read_manifest(project_dir)
+    manifest.update(batch=names, assignments={"firmware": names}, gathered={"patches": names})
+    (project_dir / "project.json").write_text(
+        json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+    )
+    sources = {
+        "variant-append": (projects.CASE02_DIR, "firmware.s19"),
+        "mac-sync": (projects.CASE01_DIR, "firmware.mac"),
+        "a2l-sync": (projects.CASE01_DIR, "firmware.a2l"),
+    }
+    src = None
+    if writer in sources:
+        folder, name = sources[writer]
+        src = projects.copy_sources(tmp_path / "src", folder, name) / name
+    statuses: list = []
+
+    async def _drive() -> float:
+        app = S19TuiApp(base_dir=base)
+        real_set_status = app.set_status
+
+        def _capture(message, *args, **kwargs):
+            statuses.append(str(message))
+            return real_set_status(message, *args, **kwargs)
+
+        app.set_status = _capture
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _open_seeded_project(pilot, app)
+            statuses.clear()
+            started = time.perf_counter()
+            if writer == "save-back":
+                _apply_patch(app)
+                app.on_patch_editor_panel_save_back_decision(
+                    PatchEditorPanel.SaveBackDecision("firmware.s19", 32)
+                )
+            elif writer == "variant-append" or writer == "mac-sync":
+                app.load_from_path(src)
+            elif writer == "a2l-sync":
+                app.load_a2l_from_path(src)
+            else:
+                app._handle_save_dialog(
+                    SaveProjectPayload(
+                        parent_folder=str(app.workarea),
+                        project_name="P",
+                        batch=tuple(names),
+                        assignments={"firmware": tuple(names)},
+                    )
+                )
+            await _wait_for(
+                pilot,
+                lambda: any(o in s for s in statuses for o in WRITER_OUTCOMES),
+                f"the {writer}'s manifest outcome",
+                attempts=4000,
+            )
+            return time.perf_counter() - started
+
+    took = asyncio.run(_drive())
+    outcomes = [s for s in statuses if any(o in s for o in WRITER_OUTCOMES)]
+    print(f"{writer}: trigger -> outcome {took:.3f} s; {outcomes[:1]}")
+    assert "manifest verified" in outcomes[0], outcomes
+    assert took < 1.0, took
 
 
 def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
@@ -613,6 +719,10 @@ def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -
     import os
     import stat
 
+    if os.name != "nt":
+        # CI-6-1: a POSIX rename replaces a read-only file; the sibling
+        # ``..._on_any_platform`` forces the same failure without the bit.
+        pytest.skip("a read-only file blocks a replace only on Windows (PDR C-QA-6)")
     base = tmp_path / "app"
     project_dir = projects.seed_project_with_every_key(_workarea(base))
     manifest_path = project_dir / "project.json"
@@ -627,6 +737,238 @@ def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -
     assert "Manifest write failed" in statuses, statuses
     assert not [s for s in statuses if "now opens" in s], statuses
     assert "Added variant 'firmware_1' to project 'P'" in statuses, statuses
+
+
+def test_tc_b100_20_append_says_now_opens_only_after_the_write_on_any_platform(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CI-6-1: the same scene with the failure forced on every platform —
+    every ``os.replace`` onto ``project.json`` raises ``PermissionError``
+    (what Windows raises for a read-only target). The variant is added, the
+    status says the manifest write failed, 0 lines claim "now opens", and
+    ``project.json`` is byte-identical."""
+    import os
+
+    real_replace = os.replace
+
+    def _refuse_manifest(src, dst, *args, **kwargs):
+        if Path(dst).name == "project.json":
+            raise PermissionError(13, "forced by the test", str(dst))
+        return real_replace(src, dst, *args, **kwargs)
+
+    base = tmp_path / "app"
+    project_dir = projects.seed_project_with_every_key(_workarea(base))
+    manifest_path = project_dir / "project.json"
+    before = manifest_path.read_bytes()
+    monkeypatch.setattr(os, "replace", _refuse_manifest)
+    statuses = _run_writer(tmp_path, base, "variant-append")
+    monkeypatch.undo()
+    assert manifest_path.read_bytes() == before
+    assert projects.read_manifest(project_dir)["active_variant"] == "firmware"
+    assert "Manifest write failed" in statuses, statuses
+    assert not [s for s in statuses if "now opens" in s], statuses
+    assert "Added variant 'firmware_1' to project 'P'" in statuses, statuses
+
+
+SEC6_2_CASES = {
+    "unknown-key": lambda manifest: manifest.update({"future_key": {"keep": [1, 2]}}),
+    "newer-schema": lambda manifest: manifest.update({"schema_version": 2}),
+    "skipped-entry": lambda manifest: manifest["batch"].append("../outside.json"),
+    # Inc 7 corrective F8 / SEC7-4 (a): only the integer 1 is version 1.
+    "bool-schema": lambda manifest: manifest.update({"schema_version": True}),
+    "string-schema": lambda manifest: manifest.update({"schema_version": "1"}),
+    "float-schema": lambda manifest: manifest.update({"schema_version": 1.0}),
+}
+
+
+@pytest.mark.parametrize(
+    "version, phrase",
+    [
+        (1, None),
+        (None, None),
+        (2, "was written by a newer version"),
+        (7, "was written by a newer version"),
+        (True, "was written by an unknown version"),
+        ("1", "was written by an unknown version"),
+        (1.0, "was written by an unknown version"),
+        (0, "was written by an unknown version"),
+        (-1, "was written by an unknown version"),
+    ],
+)
+def test_tc_b100_20_schema_version_is_the_integer_one(version, phrase) -> None:
+    """Inc 7 corrective F8 / SEC7-4 (a): only the integer ``1`` (never
+    ``True``, ``"1"`` or ``1.0``) — or no key — is this version; the
+    refusal says "newer version" only for an integer above 1 and "unknown
+    version" otherwise.
+
+    RED (corrective-pass base): ``True`` and ``1.0`` were version 1 and
+    every other value "a newer version"."""
+    from s19_app.tui.services.variant_execution_service import ProjectManifest
+    from s19_app.tui.services.variant_execution_service import manifest_rewrite_refusal
+
+    manifest = ProjectManifest(schema_version=version, active_variant=None)
+    assert manifest_rewrite_refusal(manifest) == phrase
+
+
+def test_tc_b100_20_reader_keeps_a_float_schema_version(tmp_path: Path) -> None:
+    """Inc 7 corrective F8: the reader keeps ``1.0`` as found (it is not
+    version 1), so the refusal names it, not a skipped entry."""
+    from s19_app.tui.services.variant_execution_service import manifest_rewrite_refusal
+    from s19_app.tui.services.variant_execution_service import read_project_manifest
+
+    project = tmp_path / "P"
+    project.mkdir()
+    (project / "project.json").write_text('{"schema_version": 1.0}', encoding="utf-8")
+    manifest = read_project_manifest(project)
+    assert manifest.schema_version == 1.0 and type(manifest.schema_version) is float
+    assert manifest.issues == []
+    assert manifest_rewrite_refusal(manifest) == "was written by an unknown version"
+
+
+@pytest.mark.parametrize("case", sorted(SEC6_2_CASES))
+def test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry(tmp_path: Path, case: str) -> None:
+    """SEC6-2 (LED .68): a variant append into a project whose manifest has
+    an unknown top-level key, a ``schema_version`` of 2, or an entry the
+    reader skips → the variant is placed, ``project.json`` is
+    byte-identical, and one status line says it was not rewritten.
+
+    RED (base 80052cb): the rewrite drops the unknown key, writes
+    ``schema_version`` 1, and drops the skipped entry."""
+    base = tmp_path / "app"
+    project_dir = projects.seed_project_with_every_key(_workarea(base))
+    manifest = projects.read_manifest(project_dir)
+    SEC6_2_CASES[case](manifest)
+    (project_dir / "project.json").write_text(
+        json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+    )
+    before = (project_dir / "project.json").read_bytes()
+    statuses = _run_writer(tmp_path, base, "variant-append")
+    assert (project_dir / "firmware_1.s19").is_file()
+    assert (project_dir / "project.json").read_bytes() == before, case
+    assert [s for s in statuses if "and was not rewritten" in s], statuses
+
+
+# ---------------------------------------------------------------------------
+# TC-B100-71 — LLR-168.4: ``derived_from``
+# ---------------------------------------------------------------------------
+
+
+def _sha256(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+@pytest.mark.parametrize("case", ["A", "B"])
+def test_tc_b100_71_save_back_records_derived_from(tmp_path: Path, case: str) -> None:
+    """``p02`` A (``firmware_1.s19``) and B (``firmware-patched.s19``): the
+    saved variant's ``derived_from`` names ``firmware.s19`` with its SHA-256
+    and the 4 bytes the patch changed.
+
+    RED (base 80052cb): no ``derived_from`` key."""
+    src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+    base = tmp_path / "app"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_through_handler(pilot, app, src / "firmware.s19")
+            await _save_project(pilot, app, "P")
+            _apply_patch(app)
+            typed = projects.typed_name(case) or f"{app.current_file.variant_id}-patched.s19"
+            await _save_back(pilot, app, typed)
+
+    asyncio.run(_drive())
+    project_dir = _workarea(base) / "P"
+    written = projects.read_manifest(project_dir)
+    assert written.get("derived_from") == {
+        projects.landed_name(case): {
+            "base": "firmware.s19",
+            "sha256": _sha256(src / "firmware.s19"),
+            "differ": len(PATCH_BYTES),
+        }
+    }, written
+
+
+def test_tc_b100_71_emit_records_a_base_outside_the_project(tmp_path: Path) -> None:
+    """Save project emits a patched image of a session loaded from outside
+    the project: ``derived_from`` records the base's name and digest, and
+    no project file has that digest (the base is not in the project).
+
+    RED (base 80052cb): no ``derived_from`` key."""
+    src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+    base = tmp_path / "app"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_through_handler(pilot, app, src / "firmware.s19")
+            _apply_patch(app)
+            await _save_project(pilot, app, "P")
+
+    asyncio.run(_drive())
+    project_dir = _workarea(base) / "P"
+    written = projects.read_manifest(project_dir)
+    base_digest = _sha256(src / "firmware.s19")
+    assert written.get("derived_from") == {
+        "firmware.s19": {"base": "firmware.s19", "sha256": base_digest, "differ": len(PATCH_BYTES)}
+    }, written
+    assert base_digest not in {record["sha256"] for record in written["files"].values()}
+
+
+def test_tc_b100_71_byte_copy_records_nothing(tmp_path: Path) -> None:
+    src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+    base = tmp_path / "app"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_through_handler(pilot, app, src / "firmware.s19")
+            await _save_project(pilot, app, "P")
+
+    asyncio.run(_drive())
+    assert "derived_from" not in projects.read_manifest(_workarea(base) / "P")
+
+
+def test_tc_b100_71_unsafe_base_is_one_issue_and_no_entry(tmp_path: Path) -> None:
+    """RED (base 80052cb): ``derived_from`` is ignored, 0 issues."""
+    record = {"base": "../x.s19", "sha256": "a" * 64, "differ": 4}
+    _write_manifest(
+        tmp_path / "P",
+        {"schema_version": 1, "active_variant": None, "derived_from": {"x.s19": record}},
+    )
+    manifest = read_project_manifest(tmp_path / "P")
+    assert [issue.code for issue in manifest.issues] == [MANIFEST_PATH_ESCAPE]
+    assert getattr(manifest, "derived_from", None) == {}
+
+
+def test_tc_b100_71_variant_append_carries_derived_from(tmp_path: Path) -> None:
+    """A save-back records ``derived_from``; a later variant append keeps
+    it (B100-I7: every rewrite carries it)."""
+    src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+    other = projects.copy_sources(tmp_path / "other", projects.CASE02_DIR, "firmware.s19")
+    base = tmp_path / "app"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_through_handler(pilot, app, src / "firmware.s19")
+            await _save_project(pilot, app, "P")
+            _apply_patch(app)
+            await _save_back(pilot, app, "firmware-patched.s19")
+
+    asyncio.run(_drive())
+    project_dir = _workarea(base) / "P"
+    recorded = projects.read_manifest(project_dir).get("derived_from")
+    assert recorded and "firmware-patched.s19" in recorded, recorded
+    projects.append_variant(base, other / "firmware.s19")
+    after = projects.read_manifest(project_dir)
+    assert after["active_variant"] == "firmware_1"
+    assert after.get("derived_from") == recorded, after
 
 
 # ---------------------------------------------------------------------------
@@ -788,6 +1130,10 @@ def test_at_b100_06_reopen_opens_the_saved_back_variant(
     project_dir = _workarea(base) / "P"
     assert _patch_found(project_dir / landed), f"the patch is not in {landed}"
     assert projects.read_manifest(project_dir)["active_variant"] == Path(landed).stem
+    # Inc 7 (AT index: ``derived_from`` on disk): the saved-back variant
+    # records the image it was derived from.
+    derived = projects.read_manifest(project_dir).get("derived_from", {})
+    assert derived.get(landed, {}).get("base") == "firmware.s19", derived
 
 
 # ---------------------------------------------------------------------------
@@ -829,12 +1175,19 @@ def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
     after each, ``project.json`` on disk was rewritten, keeps those keys
     equal (JSON compare) with 0 absolute paths, and after (1) names the new
     variant as active. A fresh app opening P names it in the Load-result
-    panel.
+    panel. Inc 7 (AT index: ``derived_from`` carried): P also records a
+    ``derived_from`` for ``firmware.s19``; every rewrite keeps it equal.
 
     RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
     after (1) ``project.json`` is unchanged and still names ``firmware``."""
     base = tmp_path / "app"
     project_dir = projects.seed_project_with_every_key(_workarea(base))
+    seeded = projects.read_manifest(project_dir)
+    seeded_derived = {
+        "firmware.s19": {"base": "firmware_base.s19", "sha256": "ab" * 32, "differ": 4}
+    }
+    seeded["derived_from"] = seeded_derived
+    (project_dir / "project.json").write_text(json.dumps(seeded), encoding="utf-8")
     s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
     side = projects.copy_sources(
         tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
@@ -896,5 +1249,6 @@ def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
         assert projects.not_owned(manifest) == projects.seeded_keys(), (step, manifest)
         assert projects.absolute_strings(manifest) == [], (step, manifest)
         assert manifest["active_variant"] == "firmware_1", (step, manifest)
+        assert manifest.get("derived_from") == seeded_derived, (step, manifest)
     panel = asyncio.run(_reopen())
     assert "Opened    firmware_1.s19" in panel, panel

@@ -1,0 +1,4 @@
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7\base\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[A1-nested-5x1000] bytes=975561 read=5.74s check=0.00s issues={} kept_entries=3000 problems=0
+[A3-junction-loop-5x1000] bytes=280561 read=11.68s check=0.00s issues={'MANIFEST-PATH-ESCAPE': 3000} kept_entries=0 problems=0

@@ -209,6 +209,10 @@ def test_load_project_unknown_active_variant_falls_back(tmp_path: Path) -> None:
 
     Intent: LLR-005.6 — a stale ``active_variant`` is a status warning plus
     the first-variant fallback, never a crash or a refused load.
+
+    Inc 7 re-pin (batch-100 LLR-169.6): the warning is the summary line's
+    problem count plus the Load-result announcement's ``missing`` problem
+    naming the recorded id; the "activating the first variant" line is gone.
     """
     from s19_app.tui.app import S19TuiApp
 
@@ -227,13 +231,24 @@ def test_load_project_unknown_active_variant_falls_back(tmp_path: Path) -> None:
             app._handle_load_project("proj")
             for _ in range(12):
                 await pilot.pause()
+            problems = app._last_load_announcement.problems
+            # Inc 7 corrective F7: the exact count, never the plural alone
+            # (the seed has no ``files``: ``missing: ghost`` and ``no
+            # digests saved``).
+            count = len(problems)
+            noun = "problem" if count == 1 else "problems"
             warned = any(
-                "active_variant 'ghost'" in line for line in app.log_lines
+                problem.label == "missing" and problem.file == "ghost"
+                for problem in problems
+            ) and any(
+                line.endswith(f", {count} {noun} - details: p")
+                for line in app.log_lines
             )
-            return (app._variant_set.active_id, warned)
+            return (app._variant_set.active_id, warned, count)
 
-    active_id, warned = asyncio.run(_drive())
+    active_id, warned, count = asyncio.run(_drive())
     assert active_id == "a", "unknown active_variant must fall back to variant 1"
+    assert count == 2, count
     assert warned, "the fallback must be announced as a status warning"
 
 

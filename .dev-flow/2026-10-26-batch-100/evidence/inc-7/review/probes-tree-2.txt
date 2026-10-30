@@ -1,0 +1,118 @@
+# cmd: python -m pytest -p no:cacheprovider -s -q -c pyproject.toml --rootdir . <r7>/probes/test_r7_probes.py -k 'pa_ or pb_ or import_proof' (cwd = worktree)
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7  PYTHONPATH=same  NO_COLOR unset; nothing else running
+# b3a8da7ae550bda5 s19_app/tui/services/manifest_writer.py
+# bd33c8be189d2c87 s19_app/tui/services/variant_execution_service.py
+# 0e29d80841fa3f38 s19_app/tui/app.py
+# e23ea8f72bc93153 s19_app/tui/screens.py
+s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+.problems: (LoadProblem(label='not readable', file='firmware.s19', detail='not an S19 or HEX file - replace the file, or Save project to drop it', rank=2),)
+current_file: None
+log: ["Loaded project 'P' -> (no image) - 1 variants, 1 problem - details: p"]
+Fload [0.4245620000292547] s; panel painted 2.45 s; problem rows 999
+F
+================================== FAILURES ===================================
+______________ test_pa_unreadable_a2l_is_not_blamed_on_the_image ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30293/test_pa_unreadable_a2l_is_not_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AD0C806290>
+
+    def test_pa_unreadable_a2l_is_not_blamed_on_the_image(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        base = tmp_path / "app"
+        project_dir = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "P"
+        projects.copy_sources(project_dir, projects.CASE01_DIR, "firmware.s19", "firmware.a2l")
+        (project_dir / "project.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "active_variant": "firmware",
+                    "files": projects.file_records(project_dir),
+                }
+            ),
+            encoding="utf-8",
+        )
+    
+        def _denied(path):
+            raise PermissionError(13, "Permission denied", str(path))
+    
+        monkeypatch.setattr(app_module, "parse_a2l_file", _denied)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                app._handle_load_project("P")
+                for _ in range(12):
+                    await pilot.pause()
+                return app
+    
+        app = asyncio.run(_drive())
+        announcement = app._last_load_announcement
+        print("problems:", announcement.problems)
+        print("current_file:", app.current_file and app.current_file.path)
+        print("log:", list(app.log_lines)[-3:])
+>       assert ("not readable", "firmware.s19") not in [
+            (p.label, p.file) for p in announcement.problems
+        ]
+E       AssertionError: assert ('not readable', 'firmware.s19') not in [('not readable', 'firmware.s19')]
+
+..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:250: AssertionError
+________________ test_pb_files_records_at_the_cap_all_missing _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30293/test_pb_files_records_at_the_c0')
+
+    def test_pb_files_records_at_the_cap_all_missing(tmp_path: Path) -> None:
+        import time
+    
+        from tests import test_b100_project_check as pc
+    
+        base = tmp_path / "app"
+        project_dir = projects.copy_sources(
+            base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "P", projects.CASE01_DIR, "firmware.s19"
+        )
+        records = projects.file_records(project_dir)
+        for i in range(999):
+            records[f"gone{i:04d}.s19"] = {"size": 1, "sha256": "0" * 64}
+        (project_dir / "project.json").write_text(
+            json.dumps({"schema_version": 1, "active_variant": "firmware", "files": records}),
+            encoding="utf-8",
+        )
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            real_load = app._handle_load_project
+            timing: list = []
+    
+            def _timed(name):
+                started = time.perf_counter()
+                real_load(name)
+                timing.append(time.perf_counter() - started)
+    
+            app._handle_load_project = _timed
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await pc._open_panel_through_the_dialog(pilot, app)
+                pressed = time.perf_counter()
+                await pc._wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_summary")) > 0
+                    and app.screen.query_one("#result_summary").size.height > 0,
+                    "the painted Load-result panel",
+                    attempts=4000,
+                )
+                painted = time.perf_counter() - pressed
+                rows = len(app.screen.query("#result_body .result-problem"))
+                return timing, painted, rows
+    
+        timing, painted, rows = asyncio.run(_drive())
+        print(f"load {timing} s; panel painted {painted:.2f} s; problem rows {rows}")
+>       assert rows <= 100 + 1 + 1 + 1, rows
+E       AssertionError: 999
+E       assert 999 <= (((100 + 1) + 1) + 1)
+
+..\..\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\probes\test_r7_probes.py:311: AssertionError
+=========================== short test summary info ===========================
+FAILED ::test_pa_unreadable_a2l_is_not_blamed_on_the_image - AssertionError: ...
+FAILED ::test_pb_files_records_at_the_cap_all_missing - AssertionError: 999
+2 failed, 1 passed, 4 deselected in 109.88s (0:01:49)

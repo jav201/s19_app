@@ -1,0 +1,10 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+fsutil rc: 0
+reader issues: []
+  batch 'sub\\missing.json'    realpath=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2x_1793370520479\app\.s19tool\workarea\P\sub\missing.json
+      read_change_document opened it: False | codes: ['MF-PATH-UNRESOLVED'] | mentions marker: False
+  batch 'SUB\\secret.json'     realpath=C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2x_1793370520479\outside\secret.json
+      read_change_document opened it: True | codes: ['CHG-ENCODING-UNKNOWN', 'CHG-FORMAT', 'CHG-KIND-UNKNOWN', 'CHG-VALUE-MODE-UNKNOWN'] | mentions marker: True
+# junction removed: True
+exit=0

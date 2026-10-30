@@ -40,6 +40,13 @@ Covers HLR-178 / LLR-178.1–LLR-178.3 (P-E verdict B, D2, D3):
 
 The pure composer is imported inside its own nodes, so the integration
 nodes of this module still run (and fail behaviourally) at the base.
+
+Inc 7 re-pins (LLR-169.5 / LLR-169.6 / LLR-169.9, recorded in the Inc 7
+packet §4): problem labels are the §3 kind tokens (``manifest damaged``,
+``no project.json``, ``missing``); the seeded manifests carry ``files``
+records so a clean seed has 0 problems (without them it now reports ``no
+digests saved``); the "activating the first variant" status line is gone.
+Inc 7 adds TC-B100-55's ``derived_from`` arms (ARCH-PDR-3, LED .47).
 Inc 6 scope notes (declared in the packet): the Load dialog's preview of
 the open project arrives with the Load dialog (Inc 9b); the "patched, N
 bytes differ" line arrives with ``derived_from`` (Inc 7).
@@ -154,6 +161,17 @@ def _reasons():
     return service
 
 
+def _checked(manifest):
+    """The project check's problems for an in-memory manifest — the one
+    source of the manifest's own problems (Inc 7 corrective F6: the
+    composer no longer adds them a second time)."""
+    from s19_app.tui.services.manifest_writer import check_project_files
+
+    if manifest is None:
+        return check_project_files(Path("P"), None)
+    return _reasons().manifest_problems(manifest)
+
+
 def test_tc_b100_55_recorded_active(tmp_path: Path) -> None:
     service = _reasons()
     vs = _variants("firmware.s19", "firmware_1.s19", active="firmware_1")
@@ -186,21 +204,43 @@ def test_tc_b100_55_first_by_name_manifest_damaged() -> None:
         active_variant=None,
         issues=[_issue(MANIFEST_JSON_PARSE, "not JSON - ignored: JSONDecodeError")],
     )
-    announcement = _compose("P", vs, manifest)
+    announcement = _compose("P", vs, manifest, problems=_checked(manifest))
     assert announcement.reason == service.LOAD_REASON_MANIFEST_DAMAGED
-    assert [p.label for p in announcement.problems] == ["Manifest damaged"]
+    assert [p.label for p in announcement.problems] == ["manifest damaged"]
     assert announcement.latest is False
 
 
 def test_tc_b100_55_first_by_name_no_project_json() -> None:
     service = _reasons()
     vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
-    announcement = _compose("P", vs, None)
+    announcement = _compose("P", vs, None, problems=_checked(None))
     assert announcement.reason == service.LOAD_REASON_NO_MANIFEST
     assert [(p.label, p.file) for p in announcement.problems] == [
-        ("No manifest", "project.json")
+        ("no project.json", "project.json")
     ]
     assert announcement.latest is False
+
+
+def test_tc_b100_55_composer_adds_no_second_copy_of_the_check() -> None:
+    """Inc 7 corrective F6: the project check is the one source of the
+    manifest's own problems and of ``no project.json``; the composer adds
+    neither again — given no problems, a damaged manifest and a missing
+    manifest list no rows (the reason still names them).
+
+    RED (corrective-pass base): the composer added them a second time."""
+    service = _reasons()
+    vs = _variants("firmware.s19", active="firmware")
+    damaged = ProjectManifest(
+        schema_version=None,
+        active_variant=None,
+        issues=[_issue(MANIFEST_JSON_PARSE, "not JSON - ignored: JSONDecodeError")],
+    )
+    first = _compose("P", vs, damaged, problems=())
+    assert first.reason == service.LOAD_REASON_MANIFEST_DAMAGED
+    assert first.problems == ()
+    second = _compose("P", vs, None, problems=())
+    assert second.reason == service.LOAD_REASON_NO_MANIFEST
+    assert second.problems == ()
 
 
 def test_tc_b100_55_next_valid_when_the_recorded_one_is_missing() -> None:
@@ -214,7 +254,7 @@ def test_tc_b100_55_next_valid_when_the_recorded_one_is_missing() -> None:
     assert announcement.reason == service.LOAD_REASON_NEXT_VALID
     assert announcement.latest is False
     assert [(p.label, p.file) for p in announcement.problems] == [
-        ("Missing variant", "firmware-patched")
+        ("missing", "firmware-patched")
     ]
 
 
@@ -234,18 +274,19 @@ def test_tc_b100_55_five_reasons_have_distinct_user_text() -> None:
 
 
 def test_tc_b100_55_three_problems_in_precedence_order() -> None:
-    """Two skipped manifest entries rank before the missing variant."""
+    """Two manifest findings rank before the missing variant. Inc 7 re-pin
+    (LLR-169.9): findings that name no entry are manifest-level, and at
+    most one manifest-level problem is kept, so 3 rows became 2."""
     vs = _variants("firmware.s19", active="firmware")
     manifest = ProjectManifest(
         schema_version=1,
         active_variant="gone",
         issues=[_issue(MANIFEST_PATH_ESCAPE), _issue(MANIFEST_BAD_STRUCTURE)],
     )
-    announcement = _compose("P", vs, manifest)
+    announcement = _compose("P", vs, manifest, problems=_checked(manifest))
     assert [p.label for p in announcement.problems] == [
-        "Manifest entry skipped",
-        "Manifest entry skipped",
-        "Missing variant",
+        "manifest damaged",
+        "missing",
     ]
 
 
@@ -288,6 +329,59 @@ def test_tc_b100_55_boundaries_one_variant_and_no_image() -> None:
             assert "identical" not in text
 
 
+def _derived_manifest(base_digest: str, files: dict) -> ProjectManifest:
+    from s19_app.tui.services.variant_execution_service import DerivedFrom
+    from s19_app.tui.services.variant_execution_service import FileRecord
+
+    root = Path("P").resolve()
+    return ProjectManifest(
+        schema_version=1,
+        active_variant="firmware-patched",
+        files={root / name: FileRecord(1, digest) for name, digest in files.items()},
+        derived_from={
+            root / "firmware-patched.s19": DerivedFrom("firmware.s19", base_digest, 4)
+        },
+    )
+
+
+def test_tc_b100_55_patched_line_names_the_recorded_base_not_the_first_by_name() -> None:
+    """ARCH-PDR-3 / LED .47 / P-39: ``firmware-patched.s19`` sorts before
+    ``firmware.s19``; the relation names the recorded base, so a composer
+    comparing with the first variant by name would name the image itself.
+
+    RED (base 80052cb): no relation is composed."""
+    vs = _variants("firmware.s19", "firmware-patched.s19", active="firmware-patched")
+    assert vs.variants[0].path.name == "firmware-patched.s19"
+    base = "b" * 64
+    announcement = _compose(
+        "P",
+        vs,
+        _derived_manifest(base, {"firmware.s19": base, "firmware-patched.s19": "c" * 64}),
+    )
+    assert getattr(announcement, "relation", None) == (
+        "patched, 4 bytes differ from firmware.s19"
+    )
+
+
+def test_tc_b100_55_patched_line_when_the_base_is_not_in_the_project() -> None:
+    vs = _variants("firmware.s19", "firmware-patched.s19", active="firmware-patched")
+    announcement = _compose(
+        "P",
+        vs,
+        _derived_manifest("b" * 64, {"firmware.s19": "d" * 64, "firmware-patched.s19": "c" * 64}),
+    )
+    assert announcement.relation == (
+        "patched from firmware.s19 (not in this project); 4 bytes differ from it"
+    )
+    assert "identical" not in announcement.relation
+
+
+def test_tc_b100_55_no_record_no_relation() -> None:
+    vs = _variants("firmware.s19", active="firmware")
+    announcement = _compose("P", vs, ProjectManifest(schema_version=1, active_variant="firmware"))
+    assert announcement.relation is None
+
+
 # ---------------------------------------------------------------------------
 # TC-B100-56 — LLR-178.2: the summary line and the final #status_text
 # ---------------------------------------------------------------------------
@@ -298,7 +392,13 @@ def _seed_two_variants(workarea: Path, second: str = "firmware_1.s19") -> Path:
     projects.copy_sources(project_dir, projects.CASE01_DIR, "firmware.s19")
     shutil.copy2(projects.CASE02_DIR / "firmware.s19", project_dir / second)
     (project_dir / "project.json").write_text(
-        json.dumps({"schema_version": 1, "active_variant": Path(second).stem}),
+        json.dumps(
+            {
+                "schema_version": 1,
+                "active_variant": Path(second).stem,
+                "files": projects.file_records(project_dir),
+            }
+        ),
         encoding="utf-8",
     )
     return project_dir
@@ -368,10 +468,11 @@ def test_tc_b100_56_recorded_variant_with_control_bytes_paints_none(tmp_path: Pa
             return list(app.log_lines), painted
 
     lines, painted = asyncio.run(_drive())
-    named = [line for line in lines if "not found - activating the first variant" in line]
-    assert named == [
-        "Manifest active_variant '[31mZ[red]q' not found - activating the first variant."
-    ], lines
+    # Inc 7 re-pin (LLR-169.6): the recorded id no longer reaches a status
+    # line; the fallback is counted on the one summary line and named in
+    # the panel (safe_text).
+    assert not [line for line in lines if "activating the first variant" in line], lines
+    assert len([line for line in lines if line.endswith("details: p")]) == 1, lines
     control = re.compile(r"[\x00-\x1f\x7f-\x9f]")
     assert not [line for line in lines + painted if control.search(line)], lines + painted
 
@@ -401,6 +502,7 @@ def _seed_problem_project(workarea: Path, problems: int) -> Path:
                 "schema_version": 1,
                 "active_variant": "firmware_1",
                 "batch": [f"../escape_{i:02d}.json" for i in range(problems)],
+                "files": projects.file_records(project_dir),
             }
         ),
         encoding="utf-8",
@@ -506,7 +608,7 @@ def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: 
     assert count == 30, f"{30 - count} problems missing from the panel"
     assert len(set(painted)) == 30, "the 30 problem rows are not distinct"
     for index, row in enumerate(painted):
-        assert row.startswith(f"! Manifest entry skipped: ../escape_{index:02d}.json "), row
+        assert row.startswith(f"! manifest damaged: ../escape_{index:02d}.json "), row
     assert before is False, "the 30th row must start outside the list's view at 118x54"
     assert after is True, "end must bring the last problem row into the list's view"
     assert not EXCEPTION_NAME.search(text), text
@@ -526,7 +628,7 @@ def test_tc_b100_67_damaged_manifest_paints_user_terms_only(tmp_path: Path) -> N
             return _panel_text(app)
 
     text = asyncio.run(_drive())
-    assert "Manifest damaged: project.json" in text, text
+    assert "manifest damaged: project.json" in text, text
     assert "the first variant by name (the manifest could not be read)" in projects.flat(text), text
     assert not EXCEPTION_NAME.search(text), text
     assert not INTERNAL_ID.search(text), text
@@ -563,7 +665,7 @@ def test_tc_b100_67_fallback_and_problems_paint_in_the_warning_colour(tmp_path: 
             _colour_of(summary, "the first variant by name"),
             _colour_of(heading, "Problems found"),
             _colour_of(row, "! "),
-            _colour_of(row, "Manifest damaged: "),
+            _colour_of(row, "manifest damaged: "),
             _colour_of(row, "project.json"),
         )
 
@@ -610,7 +712,7 @@ def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> Non
     for line in reason:
         assert line.startswith(" " * 10) and line[10] != " ", summary
     assert len(row) >= 2, f"the problem did not wrap at 99x54: {row}"
-    assert row[0].startswith("  ! Manifest damaged: project.json"), row
+    assert row[0].startswith("  ! manifest damaged: project.json"), row
     for line in row[1:]:
         assert line.startswith(" " * 4) and line[4] != " ", row
 
@@ -618,6 +720,57 @@ def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> Non
 #: Longer than Windows' ~32 760-character path limit, so ``Path.resolve()``
 #: raises on the base and the reviewed trees (SEC6-7).
 OVERLONG_ENTRY = "q" * 40_000
+
+
+def test_tc_b100_67_overlong_entry_is_decided_on_the_text(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CI-6-1 (Linux): ``Path.resolve()`` does not raise for a 40 000-character
+    entry on POSIX, so the skip cannot rest on the OS. With ``resolve`` and
+    the reparse walk made non-raising (the POSIX behaviour), an entry over
+    32 767 characters is still one skipped entry per key, in the reader and
+    in the default mode;
+    an entry of exactly 32 767 characters is not refused by the length rule.
+
+    RED (Inc 6 CI, Linux): the overlong entry was carried, 0 skipped rows.
+    Mutant: drop the length check → this arm is RED on Windows too."""
+    from s19_app.tui.services import variant_execution_service as service
+
+    monkeypatch.setattr(Path, "resolve", lambda self, strict=False: self.absolute())
+    # The reparse walk's ``lstat`` also raises on Windows for such a path;
+    # on POSIX it does not, so it is made non-raising as well.
+    monkeypatch.setattr(service, "_path_traverses_reparse_point", lambda *_a, **_k: False)
+    project_dir = tmp_path / "P"
+    project_dir.mkdir()
+    (project_dir / "project.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "active_variant": None,
+                "batch": [OVERLONG_ENTRY],
+                "assignments": {"firmware": [OVERLONG_ENTRY]},
+                "gathered": {"patches": [OVERLONG_ENTRY]},
+            }
+        ),
+        encoding="utf-8",
+    )
+    manifest = service.read_project_manifest(project_dir)
+    assert manifest.batch == [] and manifest.gathered.get("patches", []) == [], manifest
+    long_issues = [
+        issue for issue in manifest.issues if "longer than 32767 characters" in issue.message
+    ]
+    assert [issue.code for issue in long_issues] == [MANIFEST_PATH_ESCAPE] * 3, manifest.issues
+    issues: list = []
+    assert (
+        service._resolve_manifest_entry(project_dir, OVERLONG_ENTRY, "batch", issues) is None
+    )
+    assert [issue.code for issue in issues] == [MANIFEST_PATH_ESCAPE]
+    # At the limit the length rule does not fire (the OS may still refuse
+    # the path later, through the SEC6-7 fallback).
+    at_limit: list = []
+    entry = "q" * service.MANIFEST_ENTRY_MAX_CHARS
+    service._resolve_manifest_entry(project_dir, entry, "batch", at_limit)
+    assert not [issue for issue in at_limit if "longer than" in issue.message], at_limit
 
 
 def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path) -> None:
@@ -636,6 +789,7 @@ def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path
             {
                 "schema_version": 1,
                 "active_variant": "firmware_1",
+                "files": projects.file_records(project_dir),
                 "batch": [OVERLONG_ENTRY],
                 "assignments": {"firmware": [OVERLONG_ENTRY]},
                 "gathered": {"patches": [OVERLONG_ENTRY]},
@@ -653,9 +807,11 @@ def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path
             return [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
 
     rows = asyncio.run(_drive())
-    assert len(rows) == 3, rows
+    # Inc 7 re-pin (LLR-169.9): the same recorded entry under three keys is
+    # one file, so one row (it was one row per key).
+    assert len(rows) == 1, rows
     for row in rows:
-        assert row.startswith("! Manifest entry skipped: q"), row
+        assert row.startswith("! manifest damaged: q"), row
         assert 0 < row.count("q") <= 119 and "…" in row, (row.count("q"), row)
 
 
@@ -675,6 +831,7 @@ def test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash(tmp_path: P
             {
                 "schema_version": 1,
                 "active_variant": "firmware_1",
+                "files": projects.file_records(project_dir),
                 "gathered": {"patches": ["loop/x.json"]},
             }
         ),
@@ -694,7 +851,7 @@ def test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash(tmp_path: P
     finally:
         os.rmdir(loop)
     assert len(rows) == 1, rows
-    assert rows[0].startswith("! Manifest entry skipped: loop/x.json "), rows
+    assert rows[0].startswith("! manifest damaged: loop/x.json "), rows
 
 
 def test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged(tmp_path: Path) -> None:
@@ -716,7 +873,7 @@ def test_tc_b100_67_integer_over_the_digit_limit_reads_as_damaged(tmp_path: Path
             return _panel_text(app)
 
     text = asyncio.run(_drive())
-    assert "Manifest damaged: project.json" in text, text
+    assert "manifest damaged: project.json" in text, text
     assert "the first variant by name (the manifest could not be read)" in projects.flat(text), text
     assert not EXCEPTION_NAME.search(text), text
 
@@ -790,6 +947,11 @@ def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
     assert "recorded as the active variant (the latest saved)" in projects.flat(first), first
     assert "Variants  2 in the project" in first, first
     assert "Others    firmware.s19" in first, first
+    # Inc 7 (AT index: the ``derived_from`` line, default-name arm): the
+    # base is the project's ``firmware.s19``, never the first by name
+    # (``firmware-patched.s19`` sorts first, P-39).
+    assert "patched, 4 bytes differ from firmware.s19" in projects.flat(first), first
+    assert "identical" not in first, first
     (_workarea(base) / "P" / "firmware-patched.s19").unlink()
     second = asyncio.run(_reopen("end-esc"))
     assert "Opened    firmware.s19" in second, second
@@ -797,5 +959,5 @@ def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
         "the next valid variant (the recorded one is missing or not readable)"
         in projects.flat(second)
     ), second
-    assert "Missing variant: firmware-patched" in second, second
+    assert "missing: firmware-patched.s19" in second, second
     assert "latest" not in second, second

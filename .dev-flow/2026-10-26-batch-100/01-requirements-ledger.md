@@ -820,3 +820,24 @@ above this line is ever edited._
   - **Not exercised:** POSIX limits of `Path.resolve()` (long entries, symlink loops) — only Windows ran.
 - **Why:** none had a named owner after the Inc 6 gate; code-review and security round reports.
 - **Evidence:** `03-increments/review-increment-006.md`; `03-increments/security-increment-006.md`; `evidence/inc-6/e13/` (real-terminal captures read against P-E verdict B).
+
+### LED-2026-10-26-batch-100.69 — Inc 7 OQ-7a: LLR-169.9's "load errors" means fatal load errors
+- **Requirement:** LLR-169.9
+- **Date:** 2026-10-30
+- **What changed:** `not readable` applies only to a project image whose install yields no data (an empty `mem_map`) or that does not parse as S19 or HEX. LLR-169.9 says "an image whose install reports load errors"; that is read as *fatal* load errors. An image that installs with data but carries record-level errors (bad checksums, `examples/case_04_bad_checksums`) stays open, is not a `not readable` problem, and its errors show on the loaded file where the app showed them before this batch. The statement's wording is not rewritten; this entry is the reading.
+- **Why:** viewing a file with checksum errors is a primary use of the tool; refusing to open it would be a regression. Orchestrator ruling OQ-7a, 2026-10-30, on the implementer's open question.
+- **Evidence:** `03-increments/increment-007.md` §6 (OQ-7a); arms `test_tc_b100_61_checksum_errors_only_keep_the_image_open` and `test_tc_b100_61_empty_image_is_not_readable_and_load_moves_on`; mutants `OQ-7a-record-errors` and `OQ-7a-empty` KILLED (`evidence/inc-7/mut-OQ-7a-record-errors.txt`, `evidence/inc-7/mut-OQ-7a-empty.txt`).
+
+### LED-2026-10-26-batch-100.70 — Inc 7 close: the corrective-pass-2 verification was cut by the operator; the remaining runs go to Inc 8a's validation
+- **Requirement:** HLR-169
+- **Date:** 2026-10-30
+- **What changed:** corrective pass 2 (round-2 findings R2-1 to R2-4 and SEC7-R2-1 to SEC7-R2-4) finished its code and ran part of its chain on the final tree: RED 15 failed / 2 passed, the cp2 arms 17 passed, the touched modules 379 passed, the reviewers' probes 10 passed / 1 failed (Q2 = R2-3, backlog), 50 of 50 mutants KILLED and restored. The operator then cut the remaining runs to move to Inc 8a. They are **not run** and are routed to Inc 8a's validation: (1) the 31-module reverse census on the final tree (`census-tree-cp2.txt` stopped at about 29 %, no failure so far); (2) the guards and the census sweep on the final `app.py` bytes (the cp2 runs, 75 + 87 passed, are on the previous bytes); (3) the security probes re-run (`sec-probes-cp2.txt` is empty); (4) round-3 code and security review of the cp2 diff. The Inc 7 packet marks checklist row 5 (reverse census) as not met and row 6 (`code-reviewer`) as partial; neither is marked met.
+- **Why:** operator decision at the Inc 7 close, 2026-10-30.
+- **Evidence:** `03-increments/increment-007.md` §4 (Corrective pass 2 — results), §4b, §7; `evidence/inc-7/` (`red-cp2-vs-cp1-tree.txt`, `green-cp2-arms.txt`, `green-cp2-touched-modules.txt`, `review-probes-cp2.txt`, `mut-cp2-*`, `guards-cp2.txt`, `guards-census-cp2.txt`, `census-tree-cp2.txt`, `sec-probes-cp2.txt`).
+
+### LED-2026-10-26-batch-100.71 — Inc 6 CI-6-1: the overlong-entry rule is decided on the text (fixed in Inc 7)
+- **Requirement:** LLR-169.4, LLR-169.8
+- **Date:** 2026-10-30
+- **What changed:** Inc 6's CI on Linux had three new failures. The rule that skips an overlong manifest entry depended on `Path.resolve()` raising `ValueError`, which Windows does for a 40 000-character path and POSIX does not. Now an entry longer than `MANIFEST_ENTRY_MAX_CHARS = 32 767` characters (the Windows path maximum) is one skipped entry (`MANIFEST-PATH-ESCAPE`, "a file path is not a plain name in the project") on the text, in every mode and on every platform, before any filesystem call; the `OSError` / `ValueError` / `RuntimeError` fallback stays. On POSIX an entry over that length in a flow reference (the default mode) is now skipped instead of carried. A third CI node (`test_tc_b100_20_append_says_now_opens_only_after_the_write`) had a different root cause (a POSIX `rename` replaces a read-only file): it now skips off Windows with a named reason and has an any-platform sibling that forces `os.replace` onto `project.json` to raise `PermissionError`.
+- **Why:** orchestrator item at the Inc 6 close (the Linux CI result); a rule that depends on the platform's error is not a rule.
+- **Evidence:** `03-increments/increment-007.md` §6 (CI-6-1); `test_tc_b100_67_overlong_entry_is_decided_on_the_text` RED at base (`evidence/inc-7/red-04-ci-6-1-vs-base.txt`), mutant `CI-6-1` KILLED (`evidence/inc-7/mut-CI-6-1.txt`). Reasoned for Linux, not executed there; the orchestrator confirms on a Linux CI run.

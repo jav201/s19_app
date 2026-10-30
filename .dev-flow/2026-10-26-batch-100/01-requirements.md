@@ -462,7 +462,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-169 — Load opens what is valid and lists every problem
 - **Traceability:** US-159
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29, LED-2026-10-26-batch-100.42
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.70
 - **Statement:** When the manifest seam writes `project.json`, the system shall record under `files` the size and SHA-256 of every top-level file with a project data or A2L suffix and of the active document, computed from disk after every copy has landed, and shall stage the manifest in a private directory. When a project is loaded, the system shall open every valid file, open the next valid variant when the active one is missing or unreadable, and report at most one problem per file, its highest by this precedence: manifest damaged or no `project.json` > missing > not readable > changed on disk > not recorded > no digests saved. It shall read at most 1 MiB of `project.json` and at most 1 000 entries in each of `batch`, `declared_regions`, `gathered`, `files` and `derived_from`, and 1 000 in total across `assignments`, reporting the excess as a damaged manifest. Problems shall be painted in user terms with their next step; internal issue codes go to the log only. The status log shall carry one summary line; the Load-result panel shall carry the full list (HLR-178). Every malformed or unsafe manifest record shall be reported and skipped, never trusted.
 - **Rationale (informative):** damaged manifests, corrupt images and edited images load as success (P-4); a missing image gives a misleading status (P-5). D3; O-2; O-11; QA-07; A-01; A-18; S-08 and security R2-03 (P-40: every array is capped); A-05; QA R2-09 (user terms).
 - **Validation:** `test`
@@ -954,7 +954,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.4 — The reader treats `project.json` as untrusted (C6)
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.29, LED-2026-10-26-batch-100.71
 - **Statement:** `read_project_manifest` shall read at most 1 MiB of `project.json` (an excess gives one `MANIFEST-SIZE-CAP`), parse at most 1 000 entries in each of `batch`, `declared_regions`, `gathered`, `files` and `derived_from`, and at most 1 000 entries in total across all `assignments` lists with at most 1 000 `assignments` keys (an excess gives one `MANIFEST-BAD-STRUCTURE`), and parse `files` into `dict[Path, FileRecord]`. A `files` key passes the manifest-key predicate (LLR-169.8) or gives one `MANIFEST-PATH-ESCAPE`; a contained key outside the scope (not a top-level name with a project data or A2L suffix, and not `active_document`) gives one `MANIFEST-BAD-STRUCTURE`. A record whose `size` is not an `int` ≥ 0 (a `bool` included) or whose `sha256` is not 64 hex characters gives one `MANIFEST-BAD-STRUCTURE`. Every refused record is skipped; an absent key gives an empty dict and no issue. These codes go to the log; the panel words them in user terms (LLR-169.9).
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-24 — `pytest tests/test_b100_project_check.py -k tc_b100_24`
@@ -994,7 +994,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.8 — A manifest-key mode refuses drive-relative, stream and device names (S-09)
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.71
 - **Statement:** `_resolve_manifest_entry` (`variant_execution_service.py:205`) shall gain a manifest-key mode, used by `read_project_manifest` and `_reject_unsafe_entry` only, that refuses with `MANIFEST-PATH-ESCAPE` an entry with a drive or a root (`PureWindowsPath(entry).drive or .root`), a `:` anywhere, or a path component that ends in a dot or a space or for which `is_windows_device_name` is true, with or without an extension. Both flow-reference callers — `flow_persistence_service.py` (`:84`, `:582`, `:619`, `:780`, `:1433`) and `flow_execution_service.py` (`:117`, `:315`, `:345`, `:427`, `:448`, `:734`, `:798`, `:942`, `:1695`) — keep the default mode, so `tests/test_b97_flow_builder.py::test_tc_b97_20_hostile_refs_render_literally` stays green.
 - **Validation:** `test (unit)`
 - **Executed verification:** TC-B100-60 — `pytest tests/test_b100_project_check.py -k tc_b100_60` and `pytest tests/test_b97_flow_builder.py tests/test_flow_persistence.py tests/test_flow_execution_service.py`
@@ -1004,7 +1004,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-169.9 — The load result adds `not readable`, one problem per file wins, worded for the user
 - **Traceability:** HLR-169
-- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.22
+- **Ledger:** LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.22, LED-2026-10-26-batch-100.69
 - **Statement:** `_handle_load_project` shall add `not readable` for an image whose install reports load errors or an empty `mem_map`, merge it with `check_project_files`' list, and keep for each file only its highest problem by the precedence `manifest damaged` / `no project.json` > `missing` > `not readable` > `changed on disk` > `not recorded` > `no digests saved`; at most one manifest-level problem is kept. Each problem is painted with its reason in user terms ("not an S19 or HEX file", "0 data bytes", "a file path points outside the project") and its next-step token (§3 table); internal issue codes and exception class names go to the log only.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-61 — `pytest tests/test_b100_project_check.py -k tc_b100_61`

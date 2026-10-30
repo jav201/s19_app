@@ -1,0 +1,63 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q -rA -s --tb=line tests/test_b100_project_check.py::test_tc_b100_61_unreadable_a2l_is_its_own_problem_and_the_image_opens tests/test_b100_project_check.py::test_tc_b100_61_skipped_entries_beyond_the_bound_are_counted tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_stop_at_the_ceiling tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded tests/test_b100_project_check.py::test_tc_b100_62_swap_after_the_check_is_reported_never_written tests/test_b100_announce.py::test_tc_b100_55_composer_adds_no_second_copy_of_the_check tests/test_b100_announce.py::test_tc_b100_55_first_by_name_manifest_damaged tests/test_b100_announce.py::test_tc_b100_55_first_by_name_no_project_json tests/test_b100_announce.py::test_tc_b100_55_three_problems_in_precedence_order tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class tests/test_b100_save_guards.py::test_tc_b100_07_restore_retry_lands_when_the_holder_lets_go tests/test_b100_save_guards.py::test_tc_b100_07_previous_copy_never_lands_outside_the_work_area tests/test_b100_save_guards.py::test_tc_b100_07_taken_previous_names_move_to_the_next_candidate tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry tests/test_b100_save_image.py::test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one tests/test_b100_active_variant.py::test_tc_b100_20_reader_keeps_a_float_schema_version tests/test_variant_execution.py::test_load_project_unknown_active_variant_falls_back
+# label: GREEN: corrective-pass arms on the fixed tree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py ab36c9a2a6216de5
+#   s19_app/tui/services/variant_execution_service.py aae7d7fdde4d735e
+#   s19_app/tui/app.py 3b46619711652f9c
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# started: 2026-10-30T06:38:36-06:00
+...SEC6-5 timings (s): {'read': 0.233, 'load': 0.362, 'painted': 0.001, 'appended': 0.634}
+.SEC6-5 timings (s): {'read': 0.116, 'load': 0.161, 'painted': 0.0, 'appended': 0.614}
+.SEC6-5 timings (s): {'read': 0.071, 'load': 0.111, 'painted': 0.001, 'appended': 0.57}
+.load [0.19530580000719056] s; panel painted 0.00 s; rows 103
+....................................
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_unreadable_a2l_is_its_own_problem_and_the_image_opens
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_skipped_entries_beyond_the_bound_are_counted
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_stop_at_the_ceiling
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+PASSED tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+PASSED tests/test_b100_project_check.py::test_tc_b100_62_swap_after_the_check_is_reported_never_written
+PASSED tests/test_b100_announce.py::test_tc_b100_55_composer_adds_no_second_copy_of_the_check
+PASSED tests/test_b100_announce.py::test_tc_b100_55_first_by_name_manifest_damaged
+PASSED tests/test_b100_announce.py::test_tc_b100_55_first_by_name_no_project_json
+PASSED tests/test_b100_announce.py::test_tc_b100_55_three_problems_in_precedence_order
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class[held]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class[no-space]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_restore_retry_lands_when_the_holder_lets_go
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_previous_copy_never_lands_outside_the_work_area
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_taken_previous_names_move_to_the_next_candidate
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry[unknown-key-{"schema_version": 1, "active_variant": null, "custom_user_key": 7}-holds keys this version does not know]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry[newer-schema-{"schema_version": 2, "active_variant": null}-was written by a newer version]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry[bool-schema-{"schema_version": true, "active_variant": null}-was written by an unknown version]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry[damaged-{"schema_version": 1, "batch": [-is damaged]
+PASSED tests/test_b100_save_guards.py::test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry[clean-{"schema_version": 1, "active_variant": null}-None]
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from[carried-True]
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from[emit-True]
+PASSED tests/test_b100_save_image.py::test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from[emit-base-unreadable-False]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[bool-schema]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[float-schema]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[newer-schema]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[skipped-entry]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[string-schema]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_rewrite_never_drops_what_it_cannot_carry[unknown-key]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1-None]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[None-None]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[2-was written by a newer version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[7-was written by a newer version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[True-was written by an unknown version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1-was written by an unknown version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[1.0-was written by an unknown version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[0-was written by an unknown version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_schema_version_is_the_integer_one[-1-was written by an unknown version]
+PASSED tests/test_b100_active_variant.py::test_tc_b100_20_reader_keeps_a_float_schema_version
+PASSED tests/test_variant_execution.py::test_load_project_unknown_active_variant_falls_back
+42 passed in 84.00s (0:01:24)
+# exit: 0
+# finished: 2026-10-30T06:40:02-06:00

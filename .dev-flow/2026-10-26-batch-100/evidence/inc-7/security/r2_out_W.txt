@@ -1,0 +1,43 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[W1 intermediate junction] issues: [('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', './jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/../jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real\\..\\jdir\\secret.json'), ('MANIFEST-PATH-ESCAPE', 'JDIR/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/./inner/secret.json'), ('MANIFEST-PATH-ESCAPE', 'jdir/secret.json'), ('MANIFEST-PATH-ESCAPE', 'real/inner/secret.json')]
+   accepted: 'real\\a.json'                     INSIDE exists=True
+   fsutil: 4049\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2a real-then-junction] issues: []
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   accepted: 'sub\\a.json'                      INSIDE exists=True
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2a_1793370564049\outside\secret.json exists=True
+   rewrite refusal: None
+   fsutil: 4084\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json', 'sub']
+[W2b junction-first] issues: [('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'sub/a.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'sub/a.json'), ('MANIFEST-PATH-ESCAPE', 'SUB/secret.json'), ('MANIFEST-PATH-ESCAPE', 'sub/a.json')]
+   rewrite refusal: holds entries that were skipped
+   fsutil: 4117\app\.s19tool\workarea\P is enabled.
+   folder entries: ['SUB', 'project.json']
+[W2c missing-name-then-junction] issues: []
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   accepted: 'sub\\missing.json'                INSIDE exists=False
+   accepted: 'SUB\\secret.json'                 OUTSIDE -> C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\s7b\runs\W2c_1793370564117\outside\secret.json exists=True
+   rewrite refusal: None
+   fsutil: 4153\app\.s19tool\workarea\P is enabled.
+   folder entries: ['A.s19', 'a.s19', 'project.json']
+[W2d files key through a file symlink (case-sensitive)] issues: []
+   accepted: 'a.s19'                            INSIDE exists=True
+   accepted: 'a.s19'                            INSIDE exists=True
+   check_project_files problems: [('changed on disk', 'a.s19')]
+[W2e control: symlink key first] issues: [('MANIFEST-PATH-ESCAPE', 'A.s19'), ('MANIFEST-PATH-ESCAPE', 'a.s19')]
+   8.3 name of the junction: A_LONG~1
+[W3 short name / ADS / dots / spaces] issues: [('MANIFEST-PATH-ESCAPE', 'f.s19:secret'), ('MANIFEST-PATH-ESCAPE', 'f.s19::$DATA'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here./secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long_junction_name_here /secret.json'), ('MANIFEST-PATH-ESCAPE', 'A_LONG~1/secret.json'), ('MANIFEST-PATH-ESCAPE', 'a_long~1/secret.json')]
+   accepted: 'a_long_junction_name_here\u3000\\secret.json' INSIDE exists=False
+[W4 ceiling] lstat calls=2000 batch=1000 assignments={'firmware': 1000} gathered={'patches': []} files=[] derived_from=[]
+   fold: ['4 more manifest entries were skipped (4 unchecked: over 2000 filesystem checks)']
+   any lstat of jdir: False | rewrite refusal: holds entries that were skipped | keep reason (Save project): None
+# links created: 8 | removed: 8
+exit=0

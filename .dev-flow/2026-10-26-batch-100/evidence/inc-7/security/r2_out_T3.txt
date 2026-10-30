@@ -1,0 +1,6 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T3 read] batch: 1000 | assignments: {'firmware': 960} | fold: ['42 more manifest entries were skipped (42 unchecked: over 2000 filesystem checks)'] | keep reason: None
+[T3 after Save project] batch: 0 | assignments: {} | previous-* copies: []
+   statuses: ['Project saved + manifest verified', 'Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\claude\\C--Users-jjgh8-clde\\a8feab43-c248-4ccb-86cf-122b894659b2\\scrat']
+exit=0

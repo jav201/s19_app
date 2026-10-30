@@ -1,0 +1,5 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[S4 SEC7-3 no copy possible] project.json unchanged: True | pre-claimed names intact: True 60
+   statuses: ['Project NOT saved: project.json holds keys this version does not know and its content could not be kept beside it in C:\\Users\\jjgh8\\AppData\\']
+exit=0

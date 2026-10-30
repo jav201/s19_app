@@ -69,6 +69,7 @@ import asyncio
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -1718,6 +1719,402 @@ def test_tc_b100_07_failed_verify_restores_previous_manifest(
     assert tree_after == tree_before, (
         "the failed merge must leave the project tree byte-identical"
     )
+
+
+def _failed_merge_with_restore_blocked(tmp_path: Path, monkeypatch, block: str) -> tuple:
+    """A merge whose verify raises (the SEC2-9 scene); the rollback's
+    restore of the previous ``project.json`` is then blocked: ``held`` — the
+    file is held open by another handle, so ``os.replace`` onto it fails;
+    ``no-space`` — staging the previous bytes fails with no space left."""
+    base = tmp_path / "app"
+    holder: list = []
+
+    def _raise(project_dir, *args, **kwargs):
+        if block == "held":
+            holder.append(open(project_dir / "project.json", "rb"))
+        raise OSError("forced verify re-read failure")
+
+    def _no_space(workarea_root):
+        raise OSError(28, "No space left on device")
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._handle_save_dialog(_payload(app, "ab"))
+            await _flush(pilot)
+            project_dir = app.workarea / "ab"
+            before_bytes = (project_dir / "project.json").read_bytes()
+            src_b = tmp_path / "sources" / "b.s19"
+            src_b.write_text(_S19_B, encoding="ascii")
+            app.load_selected_file(src_b)
+            await _flush(pilot)
+            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            if block == "no-space":
+                monkeypatch.setattr(app_module, "_private_stage_dir", _no_space)
+            try:
+                app._handle_save_dialog(_payload(app, "ab"))
+                await _flush(pilot)
+            finally:
+                for handle in holder:
+                    handle.close()
+            kept = sorted(project_dir.glob("project.json.previous-*"))
+            kept_bytes = [path.read_bytes() for path in kept]
+        return probe.last, before_bytes, kept, kept_bytes
+
+    return asyncio.run(_drive())
+
+
+@pytest.mark.parametrize("block", ["held", "no-space"])
+def test_tc_b100_07_failed_restore_keeps_the_previous_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, block: str
+) -> None:
+    """SEC2-10 (LED .54 (a)): when the rollback cannot put the previous
+    ``project.json`` back — held by another handle, or staging out of space
+    — the previous bytes are written to one claimed
+    ``project.json.previous-<UTC timestamp>`` beside it, and the status
+    names that copy.
+
+    RED (base 80052cb): the restore failure was swallowed; no copy exists
+    and the previous bytes are lost."""
+    if block == "held" and os.name != "nt":
+        pytest.skip("an open handle blocks a replace only on Windows (PDR C-QA-6)")
+    status, before, kept, kept_bytes = _failed_merge_with_restore_blocked(
+        tmp_path, monkeypatch, block
+    )
+    assert len(kept) == 1, kept
+    assert kept_bytes == [before]
+    assert kept[0].name in status and "could not be restored" in status, status
+
+
+_EXCEPTION_NAME = re.compile(r"\b[A-Z][A-Za-z]*(Error|Exception)\b")
+
+
+@pytest.mark.parametrize("block", ["held", "no-space"])
+def test_tc_b100_07_restore_status_paints_no_exception_class(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, block: str
+) -> None:
+    """Inc 7 corrective SEC7-5 (HLR-169: class names go to the log only):
+    the SEC2-10 status line names the kept copy in user terms and no
+    exception class; the class is in the log file.
+
+    RED (corrective-pass base): ``could not be restored
+    (PermissionError)`` / ``(OSError)`` painted."""
+    if block == "held" and os.name != "nt":
+        pytest.skip("an open handle blocks a replace only on Windows (PDR C-QA-6)")
+    status, _before, kept, _bytes = _failed_merge_with_restore_blocked(
+        tmp_path, monkeypatch, block
+    )
+    assert "could not be restored" in status and kept[0].name in status, status
+    assert not _EXCEPTION_NAME.search(status), status
+    log_file = tmp_path / "app" / WORKAREA_DIRNAME / "logs" / "s19tui.log"
+    log = log_file.read_text(encoding="utf-8", errors="replace")
+    restore_lines = [line for line in log.splitlines() if "Manifest restore failed" in line]
+    assert restore_lines and _EXCEPTION_NAME.search(restore_lines[-1]), restore_lines
+
+
+def test_tc_b100_07_restore_retry_lands_when_the_holder_lets_go(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Inc 7 corrective F4 (reviewer probe PR; SEC2-10: the restore retries
+    a held file up to 5 times within 1 s): another handle holds the new
+    ``project.json`` and lets go after 0.15 s, inside the retry window →
+    the previous bytes are restored, no ``.previous`` copy is made and no
+    "could not be restored" line is painted. A restore that does not retry
+    fails here (reviewer mutant MR)."""
+    import threading
+
+    base = tmp_path / "app"
+    timers: list = []
+
+    def _raise(project_dir, *args, **kwargs):
+        handle = open(project_dir / "project.json", "rb")
+        timer = threading.Timer(0.15, handle.close)
+        timer.start()
+        timers.append(timer)
+        raise OSError("forced verify re-read failure")
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._handle_save_dialog(_payload(app, "ab"))
+            await _flush(pilot)
+            project_dir = app.workarea / "ab"
+            before = (project_dir / "project.json").read_bytes()
+            src_b = tmp_path / "sources" / "b.s19"
+            src_b.write_text(_S19_B, encoding="ascii")
+            app.load_selected_file(src_b)
+            await _flush(pilot)
+            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            app._handle_save_dialog(_payload(app, "ab"))
+            await _flush(pilot)
+            for timer in timers:
+                timer.join()
+            after = (project_dir / "project.json").read_bytes()
+            kept = sorted(project_dir.glob("project.json.previous-*"))
+        return probe.messages, before, after, kept
+
+    if os.name != "nt":
+        pytest.skip("an open handle blocks a replace only on Windows (PDR C-QA-6)")
+    messages, before, after, kept = asyncio.run(_drive())
+    assert timers, "the verify seam never ran"
+    assert kept == [], kept
+    assert after == before
+    assert not [m for m in messages if "could not be restored" in m], messages
+
+
+class _FixedClock:
+    """``datetime`` with a fixed ``now`` so the claimed names are known."""
+
+    @staticmethod
+    def now(tz=None):
+        from datetime import datetime as real
+
+        return real(2026, 1, 2, 3, 4, 5, tzinfo=tz)
+
+
+def test_tc_b100_07_previous_copy_never_lands_outside_the_work_area(tmp_path: Path) -> None:
+    """Inc 7 corrective SEC7-6 (a): the project folder is a junction to a
+    folder outside the work area when the previous bytes are kept → no copy
+    is written (the outside folder stays empty) and the keeper says so
+    (``None``).
+
+    RED (corrective-pass base): the copy was created in the outside
+    folder."""
+    b100_links.require_junctions()
+    app = S19TuiApp(base_dir=tmp_path / "app")
+    app.workarea.mkdir(parents=True, exist_ok=True)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    project = app.workarea / "P"
+    b100_links.create_junction(project, outside)
+    try:
+        kept = app._keep_previous_manifest(project / "project.json", b"previous")
+        landed = sorted(item.name for item in outside.iterdir())
+    finally:
+        os.rmdir(project)
+    assert kept is None, kept
+    assert landed == []
+
+
+def test_tc_b100_07_taken_previous_names_move_to_the_next_candidate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Inc 7 corrective SEC7-6 (b): the first candidate name is a junction
+    to an outside folder and the second a folder → both are taken, the copy
+    lands on the third (``-2``) with the previous bytes, and the outside
+    folder is untouched.
+
+    RED (corrective-pass base): the claim refused on the junction ended the
+    search; no copy was kept."""
+    b100_links.require_junctions()
+    monkeypatch.setattr(app_module, "datetime", _FixedClock)
+    app = S19TuiApp(base_dir=tmp_path / "app")
+    project = app.workarea / "P"
+    project.mkdir(parents=True)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    stem = "project.json.previous-20260102T030405Z"
+    b100_links.create_junction(project / stem, outside)
+    (project / f"{stem}-1").mkdir()
+    try:
+        kept = app._keep_previous_manifest(project / "project.json", b"previous")
+        landed = sorted(item.name for item in outside.iterdir())
+    finally:
+        os.rmdir(project / stem)
+    assert kept == project / f"{stem}-2", kept
+    assert kept.read_bytes() == b"previous"
+    assert landed == []
+
+
+@pytest.mark.parametrize(
+    "case, text, why",
+    [
+        (
+            "unknown-key",
+            '{"schema_version": 1, "active_variant": null, "custom_user_key": 7}',
+            "holds keys this version does not know",
+        ),
+        ("newer-schema", '{"schema_version": 2, "active_variant": null}', "was written by a newer version"),
+        ("bool-schema", '{"schema_version": true, "active_variant": null}', "was written by an unknown version"),
+        ("damaged", '{"schema_version": 1, "batch": [', "is damaged"),
+        ("clean", '{"schema_version": 1, "active_variant": null}', None),
+    ],
+)
+def test_tc_b100_07_save_project_keeps_a_manifest_it_cannot_carry(
+    tmp_path: Path, case: str, text: str, why
+) -> None:
+    """Inc 7 corrective SEC7-3 (ruling: Save project stays the recovery):
+    Save project into P whose ``project.json`` it cannot carry whole —
+    unknown top-level keys, another ``schema_version`` (an int above 1, or
+    ``true``), or damaged — first keeps the old bytes as one claimed
+    ``project.json.previous-<UTC>`` and a status line names the copy and
+    why; the new manifest is written (schema 1). A clean manifest keeps no
+    copy.
+
+    RED (corrective-pass base): the old bytes were replaced and no copy or
+    line said so."""
+    base = tmp_path / "app"
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        project = app.workarea / "P"
+        project.mkdir(parents=True)
+        (project / "project.json").write_text(text, encoding="utf-8")
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._handle_save_dialog(_payload(app, "P"))
+            await _flush(pilot)
+            kept = sorted(project.glob("project.json.previous-*"))
+            written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+        return probe.messages, kept, written
+
+    messages, kept, written = asyncio.run(_drive())
+    assert written["schema_version"] == 1 and "custom_user_key" not in written, written
+    assert any(m.startswith("Saved project to") for m in messages), messages
+    if why is None:
+        assert kept == [], kept
+        assert not [m for m in messages if "previous content" in m], messages
+        return
+    assert len(kept) == 1, kept
+    assert kept[0].read_text(encoding="utf-8") == text
+    lines = [m for m in messages if kept[0].name in m]
+    assert len(lines) == 1, messages
+    assert f"project.json {why}" in lines[0], lines
+
+
+_UNKNOWN_KEY_MANIFEST = '{"schema_version": 1, "active_variant": null, "custom_user_key": 7}'
+
+
+def test_tc_b100_07_save_project_refuses_when_no_previous_copy_can_be_kept(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Inc 7 corrective pass 2, R2-1 (reviewer probe Q1; the SEC7-3 ruling:
+    Save project refuses and rolls back when it cannot keep
+    ``project.json.previous-<UTC>``): P's ``project.json`` holds a key this
+    version does not know and no copy can be claimed → "Project NOT saved",
+    ``project.json`` byte-identical, the image the save copied into P
+    removed again, and no "Saved project to" line.
+
+    RED (Inc 7 pre-corrective tree): the manifest was overwritten and the
+    image left in P. Mutant: the refusal branch disabled."""
+    base = tmp_path / "app"
+    monkeypatch.setattr(S19TuiApp, "_keep_previous_manifest", lambda self, path, data: None)
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        project = app.workarea / "P"
+        project.mkdir(parents=True)
+        (project / "project.json").write_text(_UNKNOWN_KEY_MANIFEST, encoding="utf-8")
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            app._handle_save_dialog(_payload(app, "P"))
+            await _flush(pilot)
+            after = (project / "project.json").read_text(encoding="utf-8")
+            listing = sorted(item.name for item in project.iterdir())
+        return probe.messages, after, listing
+
+    messages, after, listing = asyncio.run(_drive())
+    assert after == _UNKNOWN_KEY_MANIFEST
+    assert listing == ["project.json"], listing
+    refusals = [m for m in messages if m.startswith("Project NOT saved")]
+    assert len(refusals) == 1 and "could not be kept beside it" in refusals[0], messages
+    assert not any(m.startswith("Saved project to") for m in messages), messages
+
+
+@pytest.mark.parametrize("block", ["held", "no-space", "restored"])
+def test_tc_b100_07_rollback_keeps_the_previous_copy_unless_restored(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, block: str
+) -> None:
+    """Inc 7 corrective pass 2, SEC7-R2-4 (security probe S3a): Save
+    project over a manifest it cannot carry keeps
+    ``project.json.previous-<UTC>``; the save then fails after the manifest
+    write. When the restore cannot land (``held``: another handle holds
+    ``project.json``; ``no-space``: staging fails) and no second copy can be
+    kept, the first copy is never deleted: it still holds the previous
+    bytes and a status line names it. When the restore lands
+    (``restored``), ``project.json`` holds the previous bytes again and the
+    copy is removed.
+
+    RED (cp1 tree): the rollback deleted the first copy, the only file
+    still holding the previous bytes."""
+    if block == "held" and os.name != "nt":
+        pytest.skip("an open handle blocks a replace only on Windows (PDR C-QA-6)")
+    base = tmp_path / "app"
+    holder: list = []
+    keeps: list = []
+    real_keep = S19TuiApp._keep_previous_manifest
+
+    def _keep(self, path, data):
+        keeps.append(path)
+        return real_keep(self, path, data) if len(keeps) == 1 else None
+
+    def _raise(project_dir, *args, **kwargs):
+        if block == "held":
+            holder.append(open(project_dir / "project.json", "rb"))
+        raise OSError("forced verify re-read failure")
+
+    def _no_space(workarea_root):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(S19TuiApp, "_keep_previous_manifest", _keep)
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=base)
+        probe = _StatusProbe(app)
+        project = app.workarea / "P"
+        project.mkdir(parents=True)
+        (project / "project.json").write_text(_UNKNOWN_KEY_MANIFEST, encoding="utf-8")
+        src = _copy_source(tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(src)
+            await _flush(pilot)
+            monkeypatch.setattr(app_module, "verify_written_manifest", _raise)
+            if block == "no-space":
+                monkeypatch.setattr(app_module, "_private_stage_dir", _no_space)
+            try:
+                app._handle_save_dialog(_payload(app, "P"))
+                await _flush(pilot)
+            finally:
+                for handle in holder:
+                    handle.close()
+            copies = sorted(project.glob("project.json.previous-*"))
+            holding = [
+                item.name
+                for item in sorted(project.iterdir())
+                if item.is_file() and item.read_bytes() == _UNKNOWN_KEY_MANIFEST.encode()
+            ]
+        return probe.messages, copies, holding
+
+    messages, copies, holding = asyncio.run(_drive())
+    if block == "restored":
+        assert len(keeps) == 1, keeps
+        assert holding == ["project.json"], holding
+        assert copies == [], copies
+        return
+    assert len(keeps) == 2, keeps
+    assert len(copies) == 1, copies
+    assert holding == [copies[0].name], holding
+    named = [m for m in messages if f"is kept as {copies[0].name}" in m]
+    assert len(named) == 1, messages
 
 
 def test_tc_b100_07_gather_home_created_then_copy_fails_no_folder_left(

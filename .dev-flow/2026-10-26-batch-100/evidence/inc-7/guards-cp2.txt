@@ -1,0 +1,18 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+# label: Whole-tree guards (BRIEF-COMMON step 5), cp2 tree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py 3711eba2c27f3691
+#   s19_app/tui/services/variant_execution_service.py 425f610345f263c6
+#   s19_app/tui/app.py bd4dca9461d381c5
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# started: 2026-10-30T13:03:01-06:00
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 145.96s (0:02:25)
+# exit: 0
+# finished: 2026-10-30T13:05:32-06:00

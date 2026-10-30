@@ -1,0 +1,21 @@
+# mutation SEC7-5: the exception class painted again [cp2 override: the target line now also occurs in the SEC7-R2-4 kept-copy line of _abort_save; anchored on the preceding `message = (` line]
+# file: s19_app/tui/app.py (sha256 before 923de169c6c44bc8)
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -q -p no:cacheprovider --tb=line tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 with the mutant applied; NO_COLOR unset
+# mutant (old -> new):
+#  -             message = (
+#  -                 f"{PROJECT_MANIFEST_NAME} could not be restored; its previous "
+#  +             message = (
+#  +                 f"{PROJECT_MANIFEST_NAME} could not be restored "
+#  +                 f"({type(failure).__name__}); its previous "
+FF                                                                       [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b100_save_guards.py:1813: AssertionError: project.json could not be restored (PermissionError); its previous content is kept as project.json.previous-20261030T191324Z in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30538\test_tc_b100_07_restore_status0\app\.s19tool\workarea\ab - rename it to project.json
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b100_save_guards.py:1813: AssertionError: project.json could not be restored (OSError); its previous content is kept as project.json.previous-20261030T191332Z in C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-30538\test_tc_b100_07_restore_status1\app\.s19tool\workarea\ab - rename it to project.json
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class[held]
+FAILED tests/test_b100_save_guards.py::test_tc_b100_07_restore_status_paints_no_exception_class[no-space]
+2 failed in 20.64s
+
+# exit: 1
+# reverted: sha256 restored = True

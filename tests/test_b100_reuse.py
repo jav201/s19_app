@@ -525,6 +525,10 @@ def test_tc_b100_57_export_holds_no_byte_identity_rule() -> None:
         # The group's frozen reuse rule (R30, B99-I2a) — converted by no
         # increment; it stays "requested names only".
         ("s19_app/tui/workspace.py", "place_group_into_workarea"),
+        # Inc 7 corrective pass 2 (SEC7-R2-4): not a reuse rule — the
+        # rollback compares project.json with the previous bytes to decide
+        # whether the kept project.json.previous-<UTC> copy may go.
+        ("s19_app/tui/app.py", "_abort_save"),
     }
     found: set = set()
     for path in sorted(package.rglob("*.py")):

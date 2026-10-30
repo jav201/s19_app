@@ -1,0 +1,54 @@
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# NO_COLOR present: False | python 3.11.15
+[T0 baseline, seeded manifest] click->panel s: 0.743
+[T2 mac-sync under the profiler] {'bytes': 236860, 'longest path': 244, 'trigger->outcome s': 13.689, 'reads s': [1.174], 'outcome': 'Project saved + manifest verified'}
+         51161435 function calls (51096177 primitive calls) in 22.949 seconds
+
+   Ordered by: cumulative time
+   List reduced from 2721 to 832 due to restriction <'s19_app|ntpath|pathlib|nt\\.|lstat|resolve|realpath'>
+   List reduced from 832 to 40 due to restriction <40>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    12002    0.017    0.000   13.191    0.001 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:664(_resolve_manifest_entry)
+        1    0.000    0.000   12.919   12.919 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:10868(_sync_loaded_file_to_project)
+        1    0.000    0.000   12.910   12.910 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:10702(_rewrite_project_manifest)
+        1    0.003    0.003   11.603   11.603 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:9935(_write_and_verify_manifest)
+    12004    0.109    0.000   11.323    0.001 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:596(_walk_manifest_entry)
+    12004    0.632    0.000   10.107    0.001 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:466(check)
+        1    0.000    0.000    9.816    9.816 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:459(write_project_manifest)
+        1    0.003    0.003    9.809    9.809 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:245(serialize_manifest)
+     3002    0.002    0.000    9.801    0.003 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:196(_reject_unsafe_entry)
+   156317    1.465    0.000    6.292    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:484(_parse_args)
+   115210    0.185    0.000    5.719    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:530(_make_child)
+   111102    0.040    0.000    5.679    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:757(joinpath)
+   156320    2.522    0.000    4.350    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:56(parse_parts)
+    99097    0.145    0.000    4.219    0.000 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:426(_lstat_state)
+    99140    3.692    0.000    4.045    0.000 {built-in method nt.lstat}
+        3    0.009    0.003    3.416    1.139 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:1179(read_project_manifest)
+    12004    0.056    0.000    1.850    0.000 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:490(_entry_text)
+        1    0.001    0.001    1.782    1.782 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:707(verify_written_manifest)
+       13    0.001    0.000    1.464    0.113 C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b100_active_variant.py:313(_open_seeded_project)
+        2    0.000    0.000    1.451    0.725 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:8502(on_resize)
+        2    0.000    0.000    1.410    0.705 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:8440(_apply_width_regime)
+        1    0.000    0.000    1.313    1.313 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:10442(_handle_load_project)
+    12004    0.195    0.000    1.158    0.000 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\variant_execution_service.py:360(_manifest_key_refusal)
+  2147253    1.089    0.000    1.090    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:147(splitroot)
+        1    0.000    0.000    0.951    0.951 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:6864(on_mount)
+    38103    0.032    0.000    0.830    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:504(_from_parts)
+    36012    0.015    0.000    0.773    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:469(__new__)
+        2    0.000    0.000    0.595    0.298 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:670(_resolve_intended_entries)
+        2    0.003    0.002    0.595    0.297 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:704(<listcomp>)
+   384004    0.380    0.000    0.576    0.000 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\workspace.py:1803(is_windows_device_name)
+   388189    0.308    0.000    0.560    0.000 <frozen ntpath>:52(normcase)
+     2028    0.005    0.000    0.548    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:981(resolve)
+     2034    0.010    0.000    0.380    0.000 <frozen ntpath>:633(realpath)
+   104491    0.053    0.000    0.376    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:546(__fspath__)
+     4068    0.339    0.000    0.339    0.000 {built-in method nt._getfinalpathname}
+   108529    0.200    0.000    0.330    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:536(__str__)
+     1005    0.003    0.000    0.324    0.000 C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1070(write_text)
+        1    0.000    0.000    0.287    0.287 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\services\manifest_writer.py:794(<dictcomp>)
+        2    0.000    0.000    0.277    0.138 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:13547(_step_sections)
+        2    0.000    0.000    0.276    0.138 C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\tui\app.py:14027(update_sections)
+
+
+exit=0

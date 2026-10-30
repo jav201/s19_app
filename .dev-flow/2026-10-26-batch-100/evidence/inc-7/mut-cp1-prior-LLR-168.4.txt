@@ -1,0 +1,19 @@
+# mutation LLR-168.4: drop derived_from from the carry
+# file: s19_app/tui/app.py (sha256 before 3b46619711652f9c)
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -q -p no:cacheprovider --tb=line tests/test_b100_active_variant.py::test_tc_b100_71_variant_append_carries_derived_from
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 with the mutant applied; NO_COLOR unset
+# mutant (old -> new):
+#  -             "derived_from": {
+#  -                 path.relative_to(root).as_posix(): record
+#  -                 for path, record in manifest.derived_from.items()
+#  -             },
+#  +             "derived_from": {},
+F                                                                        [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b100_active_variant.py:883: AssertionError: {'active_variant': 'firmware_1', 'assignments': {}, 'batch': [], 'files': {'firmware-patched.s19': {'sha256': 'd37fbac...}, 'firmware_1.s19': {'sha256': 'a9e114d56077e58ab5030cf4211938cbadb1c2fc2ae9f5d91d1f50c7bf16bc8a', 'size': 310}}, ...}
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_71_variant_append_carries_derived_from
+1 failed in 4.43s
+
+# exit: 1
+# reverted: sha256 restored = True

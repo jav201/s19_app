@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import time
+from datetime import datetime, timezone
 from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
 
 from textual import events, work
@@ -58,7 +59,7 @@ from .changes.model import (
 )
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
-from .models import LoadedFile, ProjectVariantSet
+from .models import LoadedFile, ProjectVariantSet, VariantDescriptor
 from .operations import get_operation, list_operation_ids
 from .os_clipboard_input import OsClipboardInput
 from .rail import Rail, RailEntry, RailItem, RAIL_ENTRIES
@@ -163,6 +164,9 @@ from .services.report_service import (
 from .services.manifest_writer import (
     ManifestVerifyResult,
     MANIFEST_VERIFIED,
+    check_project_files,
+    derive_record,
+    project_file_records,
     serialize_manifest,
     verify_written_manifest,
     write_project_manifest,
@@ -195,17 +199,24 @@ from .services.validation_service import (
 )
 from .services.variant_execution_service import (
     EXECUTION_SCOPES,
+    PROBLEM_NOT_READABLE,
     PROJECT_MANIFEST_NAME,
     SCOPE_ACTIVE,
+    DerivedFrom,
+    FileRecord,
     LoadAnnouncement,
+    ProjectFileProblem,
     ProjectManifest,
     VariantExecutionResult,
     compose_load_announcement,
     execute_project_variants,
     manifest_is_damaged,
+    manifest_keep_reason,
+    manifest_rewrite_refusal,
     read_project_manifest,
 )
 from .workspace import (
+    _guarded_destination,
     _is_reparse_point,
     _private_stage_dir,
     A2L_EXTENSIONS,
@@ -1444,6 +1455,8 @@ _SAVE_FULL_PATH_LIMIT = 259
 
 def _save_manifest_keys(
     declared_regions: Sequence[DeclaredRegion],
+    *,
+    derived: bool = False,
 ) -> tuple[str, ...]:
     """
     Summary:
@@ -1454,14 +1467,18 @@ def _save_manifest_keys(
     Args:
         declared_regions (Sequence[DeclaredRegion]): The regions the save
             writes; the writer adds ``declared_regions`` only when any exist.
+        derived (bool): True when the save emits a patched image, which
+            records ``derived_from`` (LLR-168.4).
 
     Returns:
-        tuple[str, ...]: The keys, in the writer's order. ``gathered`` is
-            not among them: the gather decides it AFTER the plan and has no
-            plan rows until Inc 7 / 8a (LED .63).
+        tuple[str, ...]: The keys, in the writer's order. ``files`` is
+            always among them (every save places at least one file and the
+            seam records it, LLR-169.2). ``gathered`` is not: the gather
+            decides it AFTER the plan (LED .63).
 
     Data Flow:
-        - Serialize an empty composition with these regions through
+        - Serialize an empty composition with these regions, one ``files``
+          record and, for an emit, one ``derived_from`` record through
           ``serialize_manifest`` (no file is touched).
         - Parse the text back and keep its top-level key order.
 
@@ -1471,12 +1488,118 @@ def _save_manifest_keys(
         Used by:
             - S19TuiApp._plan_project_save
     """
+    digest = "0" * 64
     text, _issues = serialize_manifest(
         ProjectVariantSet(project_name="", variants=(), active_id=None),
-        Path(),
+        Path().resolve(),
         declared_regions=declared_regions,
+        files={"image.s19": FileRecord(0, digest)},
+        derived_from=(
+            {"image.s19": DerivedFrom("base.s19", digest, 0)} if derived else None
+        ),
     )
     return tuple(json.loads(text))
+
+
+def _image_map(path: Path) -> dict[int, int]:
+    """
+    Summary:
+        The data of one S19 or HEX image file, read with the core parsers —
+        the base side of a ``derived_from`` count (LLR-168.4).
+
+    Args:
+        path (Path): The image file.
+
+    Returns:
+        dict[int, int]: Address -> byte.
+
+    Raises:
+        OSError: The file cannot be read.
+        ValueError: The suffix is not an S19 or HEX one.
+    """
+    suffix = path.suffix.lower()
+    if suffix in S19_EXTENSIONS:
+        return S19File(str(path)).get_memory_map()
+    if suffix in HEX_EXTENSIONS:
+        return dict(IntelHexFile(str(path)).memory)
+    raise ValueError(f"not an S19 or HEX image: {path.name}")
+
+
+@dataclass(frozen=True)
+class InstallSet:
+    """
+    Summary:
+        What a project load installs (LLR-169.6, LED .34): the variant, the
+        MAC and the A2L, as ``choose_install_set`` decides them.
+
+    Args:
+        variant (Optional[VariantDescriptor]): The variant to open, or
+            ``None`` when no variant is left to try.
+        mac (Optional[Path]): The project's MAC file, if any.
+        a2l (Optional[Path]): The project's A2L file, if any.
+    """
+
+    variant: Optional[VariantDescriptor]
+    mac: Optional[Path]
+    a2l: Optional[Path]
+
+
+def choose_install_set(
+    variant_set: ProjectVariantSet,
+    recorded: Optional[str],
+    data_files: Sequence[Path],
+    a2l_files: Sequence[Path],
+    unreadable: Sequence[str] = (),
+) -> InstallSet:
+    """
+    Summary:
+        The fallback rule of a project load (LLR-169.6, LED .34), pure so the
+        Load dialog's preview (Inc 9b) marks exactly what a load installs:
+        the recorded active variant when it is valid, otherwise the next
+        valid variant in ``build_variant_set`` order; then the MAC and A2L.
+
+    Args:
+        variant_set (ProjectVariantSet): The project's variants, in
+            ``build_variant_set`` order.
+        recorded (Optional[str]): The manifest's ``active_variant`` (``None``
+            when none is recorded or the manifest is damaged or absent).
+        data_files (Sequence[Path]): The project's data files (the MAC is
+            taken from them).
+        a2l_files (Sequence[Path]): The project's A2L files.
+        unreadable (Sequence[str]): Variant ids the install already found
+            not readable; they are skipped.
+
+    Returns:
+        InstallSet: The variant (``None`` when every variant is unreadable
+            or there is none), the MAC and the A2L.
+
+    Data Flow:
+        - Start at the recorded variant when it is a variant of the project,
+          else at the first; walk the variants in order, wrapping once.
+        - The first variant not in ``unreadable`` wins. A missing recorded
+          variant is never in the set, so the walk starts at the first.
+
+    Dependencies:
+        Used by:
+            - S19TuiApp._handle_load_project
+            - the Load dialog preview (Inc 9b)
+    """
+    variants = list(variant_set.variants)
+    ids = [variant.variant_id for variant in variants]
+    start = ids.index(recorded) if recorded in ids else 0
+    skipped = set(unreadable)
+    variant = next(
+        (
+            candidate
+            for candidate in variants[start:] + variants[:start]
+            if candidate.variant_id not in skipped
+        ),
+        None,
+    )
+    mac = next(
+        (item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS), None
+    )
+    return InstallSet(variant, mac, a2l_files[0] if a2l_files else None)
 
 
 @dataclass(frozen=True)
@@ -3683,9 +3806,10 @@ class S19TuiApp(App):
               project's active variant (``_activate_project_file``) and
               rewrites ``project.json`` through
               ``_rewrite_project_manifest`` with every key the save-back
-              does not own carried (LLR-168.2 / LLR-168.3); a damaged
-              ``project.json`` is left as it is; ``current_file.path``
-              stays on the loaded image.
+              does not own carried (LLR-168.2 / LLR-168.3) and the saved
+              file's ``derived_from`` record (LLR-168.4: the loaded image
+              is the base); a damaged ``project.json`` is left as it is;
+              ``current_file.path`` stays on the loaded image.
 
         Dependencies:
             Uses:
@@ -3742,7 +3866,12 @@ class S19TuiApp(App):
             saved = summary.saved_path if summary is not None else None
             if project_dir is not None and saved is not None:
                 if self._activate_project_file(project_dir, saved) is not None:
-                    self._rewrite_project_manifest(project_dir, saved)
+                    # LLR-168.4: the saved variant records its base.
+                    self._rewrite_project_manifest(
+                        project_dir,
+                        saved,
+                        self._derived_record(loaded.path, loaded.mem_map),
+                    )
             self._surface_verify_result()
             # US-061 / LLR-061.1: reveal the PERSISTENT before/after-report
             # control (a durable widget, not a Toast) so the report stays
@@ -8708,6 +8837,7 @@ class S19TuiApp(App):
         created_dirs: Sequence[Path],
         save_state: Tuple,
         manifest_restores: Sequence[Tuple[Path, bytes]] = (),
+        kept_copies: Sequence[Tuple[Path, bytes]] = (),
     ) -> None:
         """Roll a failed Save project back to its pre-save state (LED
         .52(b)'s state restore unchanged; LED .53's exact-removal
@@ -8732,8 +8862,11 @@ class S19TuiApp(App):
         unreadable folder, SEC2-5) and a file another writer added
         during the save (SEC2-6) are never touched, and a byte-identical
         file the placement or the gather REUSED survives because it
-        never entered ``placed_files``. Never raises: LLR-164.4 keeps
-        the app running.
+        never entered ``placed_files``. SEC7-R2-4: each
+        ``kept_copies`` entry (a ``project.json.previous-<UTC>`` copy
+        and the bytes it holds) is removed only when ``project.json``
+        reads back as those bytes; otherwise the copy stays and a status
+        line names it. Never raises: LLR-164.4 keeps the app running.
         """
         (
             variant_set,
@@ -8752,18 +8885,10 @@ class S19TuiApp(App):
         # pre-existing project.json before the save failed — put the
         # previous bytes back, staged privately then os.replace'd, so the
         # restore is atomic and the work area is exactly as it was.
+        # SEC2-10 (LED .54 (a)): a restore that cannot land never loses
+        # the previous bytes silently.
         for manifest_path, previous_bytes in manifest_restores:
-            staged_dir: Optional[Path] = None
-            try:
-                staged_dir = _private_stage_dir(self.workarea)
-                staged = staged_dir / PROJECT_MANIFEST_NAME
-                staged.write_bytes(previous_bytes)
-                os.replace(staged, manifest_path)
-            except (OSError, WorkareaContainmentError):
-                pass  # the rollback must never raise
-            finally:
-                if staged_dir is not None:
-                    shutil.rmtree(staged_dir, ignore_errors=True)
+            self._restore_manifest(manifest_path, previous_bytes)
         # LED .53: unlink only the files THIS save created — each path
         # was recorded the moment its placement claim or gather copy
         # wrote it. A reused byte-identical file and anything a
@@ -8771,6 +8896,26 @@ class S19TuiApp(App):
         for path in placed_files:
             try:
                 path.unlink()
+            except OSError:
+                pass  # the rollback must never raise
+        for copy, previous_bytes in kept_copies:
+            try:
+                restored = (
+                    copy.with_name(PROJECT_MANIFEST_NAME).read_bytes() == previous_bytes
+                )
+            except OSError:
+                restored = False
+            if not restored:
+                self.set_status(
+                    safe_text(
+                        f"{PROJECT_MANIFEST_NAME} could not be restored; its previous "
+                        f"content is kept as {copy.name} in {copy.parent} - rename it "
+                        f"to {PROJECT_MANIFEST_NAME}"
+                    ).plain
+                )
+                continue
+            try:
+                copy.unlink()
             except OSError:
                 pass  # the rollback must never raise
         # The folders THIS save created go deepest first, each removed
@@ -8786,6 +8931,135 @@ class S19TuiApp(App):
                 folder.rmdir()
             except OSError:
                 pass  # not empty or already gone — the rollback must never raise
+
+    def _restore_manifest(self, manifest_path: Path, previous_bytes: bytes) -> None:
+        """
+        Summary:
+            Put a failed save's previous ``project.json`` back (SEC2-9), and
+            when that cannot land, keep the previous bytes beside it and say
+            where (SEC2-10, LED .54 (a)): nothing is lost silently.
+
+        Args:
+            manifest_path (Path): The project's ``project.json``.
+            previous_bytes (bytes): What it held before the save.
+
+        Returns:
+            None: Never raises (the rollback keeps the app running).
+
+        Data Flow:
+            - Stage the bytes privately, then ``os.replace`` them onto the
+              manifest, retrying a ``PermissionError`` (another program
+              holds the file) up to 5 times within 1 s, as placement does.
+            - If staging or the replace still fails, write the bytes to a
+              claimed ``project.json.previous-<UTC timestamp>`` beside the
+              manifest and paint a status line naming that copy; if even
+              that fails, the status line says the previous content could
+              not be kept.
+
+        Dependencies:
+            Uses:
+                - workspace._private_stage_dir / _keep_previous_manifest
+            Used by:
+                - _abort_save
+        """
+        staged_dir: Optional[Path] = None
+        failure: Optional[BaseException] = None
+        try:
+            staged_dir = _private_stage_dir(self.workarea)
+            staged = staged_dir / PROJECT_MANIFEST_NAME
+            staged.write_bytes(previous_bytes)
+            deadline = time.monotonic() + 1.0
+            attempts = 0
+            while True:
+                try:
+                    os.replace(staged, manifest_path)
+                    return
+                except PermissionError:
+                    attempts += 1
+                    if attempts >= 5 or time.monotonic() >= deadline:
+                        raise
+                    time.sleep(0.05)
+        except (OSError, WorkareaContainmentError) as exc:
+            failure = exc
+        finally:
+            if staged_dir is not None:
+                shutil.rmtree(staged_dir, ignore_errors=True)
+        kept = self._keep_previous_manifest(manifest_path, previous_bytes)
+        folder = manifest_path.parent
+        # SEC7-5: the exception class goes to the log only.
+        if kept is not None:
+            message = (
+                f"{PROJECT_MANIFEST_NAME} could not be restored; its previous "
+                f"content is kept as {kept.name} in {folder} - rename it to "
+                f"{PROJECT_MANIFEST_NAME}"
+            )
+        else:
+            message = (
+                f"{PROJECT_MANIFEST_NAME} could not be restored and its previous "
+                f"content could not be kept in {folder}"
+            )
+        self.set_status(safe_text(message).plain)
+        self.logger.warning(
+            "Manifest restore failed: %s (%s: %s)",
+            manifest_path,
+            type(failure).__name__,
+            failure,
+        )
+
+    def _keep_previous_manifest(
+        self, manifest_path: Path, previous_bytes: bytes
+    ) -> Optional[Path]:
+        """
+        Summary:
+            Write a manifest's previous bytes to a newly claimed
+            ``project.json.previous-<UTC timestamp>`` beside it (SEC2-10,
+            SEC7-3), inside this work area only (SEC7-6).
+
+        Args:
+            manifest_path (Path): The project's ``project.json``.
+            previous_bytes (bytes): The bytes to keep.
+
+        Returns:
+            Optional[Path]: The copy, or ``None`` when no copy could be
+                written (the project folder is outside this work area, every
+                candidate name is taken, or the write failed; a partial
+                claim is removed).
+
+        Data Flow:
+            - ``_guarded_destination(project folder, this work area)``
+              first: a folder that is or passes a link or junction, or that
+              resolves outside the work area, keeps no copy.
+            - Claim the name with ``O_CREAT | O_EXCL`` so no existing file
+              is ever overwritten; a name taken in any way (a file, a folder
+              or junction, any other claim error) tries the next of ``-1``
+              .. ``-9``.
+        """
+        try:
+            _guarded_destination(manifest_path.parent, self.workarea)
+        except (WorkareaContainmentError, OSError) as exc:
+            self.logger.warning(
+                "Previous manifest not kept: %s (%s)", manifest_path, type(exc).__name__
+            )
+            return None
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        base = f"{manifest_path.name}.previous-{stamp}"
+        for suffix in ("", *(f"-{n}" for n in range(1, 10))):
+            copy = manifest_path.with_name(base + suffix)
+            try:
+                handle = os.open(str(copy), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except OSError:
+                continue
+            try:
+                with os.fdopen(handle, "wb") as stream:
+                    stream.write(previous_bytes)
+                return copy
+            except OSError:
+                try:
+                    copy.unlink()
+                except OSError:
+                    pass
+                return None
+        return None
 
     def _handle_save_dialog(self, payload: Optional[SaveProjectPayload]) -> None:
         if payload is None:
@@ -8990,7 +9264,28 @@ class S19TuiApp(App):
                 if self.current_file
                 else _ProjectImageStep(emit=False)
             )
-            plan = self._plan_project_save(project_dir, cleaned, image_step)
+            # LLR-168.4 / LLR-167.6 (F3): the save's derived_from records —
+            # the target's readable ones, carried, and the emitted image's
+            # own — are decided HERE, once, so the plan lists exactly the
+            # keys the save writes (an emit whose base cannot be read again
+            # records none, and the plan shows none).
+            existing = read_project_manifest(project_dir)
+            carried_derived: dict[str, DerivedFrom] = (
+                dict(self._manifest_carry(project_dir, existing)["derived_from"])
+                if existing is not None and not manifest_is_damaged(existing)
+                else {}
+            )
+            emitted_record = (
+                self._derived_record(self.current_file.path, image_step.derived or {})
+                if image_step.emit and self.current_file is not None
+                else None
+            )
+            plan = self._plan_project_save(
+                project_dir,
+                cleaned,
+                image_step,
+                derived=bool(carried_derived) or emitted_record is not None,
+            )
         except OSError as exc:
             unreadable = (
                 Path(exc.filename).name if exc.filename else "a source file"
@@ -9048,6 +9343,7 @@ class S19TuiApp(App):
         # bytes) pair — armed the moment a merge's manifest write returns,
         # consumed by the one ``_abort_save`` rollback.
         manifest_restores: list[Tuple[Path, bytes]] = []
+        kept_copies: list[Tuple[Path, bytes]] = []
         # R2-3: initialized before the try — the committed block below the
         # excepts reads them once the save has succeeded.
         saved_variant_id: Optional[str] = None
@@ -9107,6 +9403,10 @@ class S19TuiApp(App):
                     manifest_restores,
                 )
                 return
+            # LLR-168.4 / B100-I7: the target's readable derived_from
+            # records are carried; an emit below adds its own (both decided
+            # before the plan, F3).
+            derived_from: dict[str, DerivedFrom] = dict(carried_derived)
             # LLR-167.2 / LLR-167.6 (R-PC): execute exactly the plan's file
             # rows. LED .53: each placement reports its reuse flag — a
             # byte-identical file the placement REUSED is never recorded,
@@ -9163,6 +9463,11 @@ class S19TuiApp(App):
                         )
                         return
                     placed = landed[0]
+                    # LLR-168.4: the emitted image records its base, the
+                    # session's source image (which need not be in the
+                    # project).
+                    if emitted_record is not None:
+                        derived_from[placed.path.name] = emitted_record
                 else:
                     placed = place_into_workarea(
                         row.source, project_dir,
@@ -9260,6 +9565,39 @@ class S19TuiApp(App):
             manifest_previous: Optional[bytes] = None
             if manifest_path.is_file():
                 manifest_previous = manifest_path.read_bytes()
+            # SEC7-3: Save project rebuilds project.json from the session;
+            # one it cannot carry whole (damaged, another schema_version,
+            # unknown keys) is first kept beside it, and the status names
+            # the copy. When no copy can be kept, nothing is overwritten.
+            kept_note: Optional[str] = None
+            keep_reason = (
+                manifest_keep_reason(existing) if existing is not None else None
+            )
+            if manifest_previous is not None and keep_reason is not None:
+                kept = self._keep_previous_manifest(manifest_path, manifest_previous)
+                if kept is None:
+                    self.set_status(
+                        f"Project NOT saved: {PROJECT_MANIFEST_NAME} {keep_reason} "
+                        f"and its content could not be kept beside it in {project_dir}"
+                    )
+                    self.logger.warning(
+                        "Save project refused: previous manifest not kept: %s",
+                        manifest_path,
+                    )
+                    self._abort_save(
+                        project_dir,
+                        created_project_dir,
+                        placed_files,
+                        created_dirs,
+                        save_state,
+                        manifest_restores,
+                    )
+                    return
+                kept_copies.append((kept, manifest_previous))
+                kept_note = (
+                    f"{PROJECT_MANIFEST_NAME} {keep_reason}: its previous content "
+                    f"is kept as {kept.name} in {project_dir}"
+                )
 
             def _manifest_written(written: Path) -> None:
                 # Invoked by ``_write_and_verify_manifest`` the moment the
@@ -9275,6 +9613,7 @@ class S19TuiApp(App):
                 assignments=payload.assignments,
                 declared_regions=self._declared_regions,
                 gathered=gather_outcome.gathered,
+                derived_from=derived_from,
                 on_written=_manifest_written,
             )
             if not manifest_ok:
@@ -9291,6 +9630,7 @@ class S19TuiApp(App):
                     created_dirs,
                     save_state,
                     manifest_restores,
+                    kept_copies,
                 )
                 return
         except WorkareaPlacementError as exc:
@@ -9314,6 +9654,7 @@ class S19TuiApp(App):
                 created_dirs,
                 save_state,
                 manifest_restores,
+                kept_copies,
             )
             return
         except WorkareaContainmentError as exc:
@@ -9326,6 +9667,7 @@ class S19TuiApp(App):
                 created_dirs,
                 save_state,
                 manifest_restores,
+                kept_copies,
             )
             return
         except OSError as exc:
@@ -9350,6 +9692,7 @@ class S19TuiApp(App):
                 created_dirs,
                 save_state,
                 manifest_restores,
+                kept_copies,
             )
             return
         except Exception:
@@ -9363,6 +9706,7 @@ class S19TuiApp(App):
                 created_dirs,
                 save_state,
                 manifest_restores,
+                kept_copies,
             )
             raise
         # R2-3: the save is COMMITTED — the statements below run OUTSIDE
@@ -9398,6 +9742,8 @@ class S19TuiApp(App):
             )
         else:
             self.set_status(f"Saved project to {project_dir}{image_clause}")
+        if kept_note is not None:
+            self.set_status(safe_text(kept_note).plain)
         # R2-5: a manifest verify MISMATCH (LLR-004.2 — reported, not a
         # failure) stays the NEWEST status line: the drift report is
         # re-painted after the success line, never buried beneath it.
@@ -9525,6 +9871,7 @@ class S19TuiApp(App):
         project_dir: Path,
         project_name: str,
         image_step: _ProjectImageStep,
+        derived: bool = False,
     ) -> SavePlan:
         """
         Summary:
@@ -9611,7 +9958,7 @@ class S19TuiApp(App):
             target_kind=target_kind,
             files=files,
             image=image,
-            manifest_keys=_save_manifest_keys(self._declared_regions),
+            manifest_keys=_save_manifest_keys(self._declared_regions, derived=derived),
             refusal=image_step.refusal,
         )
 
@@ -9623,6 +9970,7 @@ class S19TuiApp(App):
         assignments: Optional[Mapping[str, Sequence[str]]] = None,
         declared_regions: Sequence[DeclaredRegion] = (),
         gathered: Optional[Mapping[str, Sequence[str]]] = None,
+        derived_from: Optional[Mapping[str, DerivedFrom]] = None,
         on_written: Optional[Callable[[Path], None]] = None,
     ) -> bool:
         """
@@ -9661,6 +10009,10 @@ class S19TuiApp(App):
                 ``write_project_manifest`` ONLY (the reader ignores the
                 additive key, so the verify oracle is unchanged); ``None`` /
                 empty ⇒ the serializer omits the key (back-compat).
+            derived_from (Optional[Mapping[str, DerivedFrom]]): The
+                ``derived_from`` records to write (LLR-168.4): the ones the
+                writer carries plus the one a save-back or an emit adds.
+                Threaded into the write AND the verify (LLR-169.3).
             on_written (Optional[Callable[[Path], None]]): A hook the save
                 handler passes — invoked with the written manifest path
                 the MOMENT the write returns, before the verify can raise
@@ -9685,6 +10037,10 @@ class S19TuiApp(App):
         Data Flow:
             - No ``_variant_set`` (an empty / failed save) → no manifest write,
               reported as success (nothing was owed).
+            - ``files`` is computed HERE, from disk, after every copy has
+              landed (LLR-169.2): one size + file digest per top-level data
+              or A2L file (``project_file_records``), threaded into the
+              write and the verify alike.
             - ``write_project_manifest`` returns ``(None, issues)`` on a refused
               serialize or a containment / IO failure (collect-don't-abort);
               that is surfaced as an error notice, never raised.
@@ -9714,6 +10070,7 @@ class S19TuiApp(App):
         self._last_manifest_verify_result = None
         if variant_set is None:
             return True
+        files = project_file_records(project_dir)
         written, issues = write_project_manifest(
             variant_set,
             project_dir,
@@ -9722,6 +10079,8 @@ class S19TuiApp(App):
             assignments=assignments,
             declared_regions=declared_regions,
             gathered=gathered,
+            files=files,
+            derived_from=derived_from,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"
@@ -9733,7 +10092,15 @@ class S19TuiApp(App):
                 timeout=10.0,
                 markup=False,
             )
-            self.logger.warning("Manifest write refused: %s", detail)
+            # SEC7-R2-3: an exception class a finding carries goes to the log only.
+            causes = "; ".join(
+                getattr(issue, "details", {})["exception"]
+                for issue in issues
+                if "exception" in getattr(issue, "details", {})
+            )
+            self.logger.warning(
+                "Manifest write refused: %s%s", detail, f" ({causes})" if causes else ""
+            )
             return False
         # SEC2-8 / SEC2-9 (security round 4): the write has landed — give
         # the save handler the moment-before-verify so it can record the
@@ -9746,6 +10113,8 @@ class S19TuiApp(App):
             project_dir,
             batch=batch,
             assignments=assignments,
+            files=files,
+            derived_from=derived_from,
         )
         self._last_manifest_verify_result = result
         self._surface_manifest_verify_result(result)
@@ -10132,11 +10501,11 @@ class S19TuiApp(App):
         # outgoing document's entry count returns for the interim
         # closed-document notice below (LED .55(a)).
         discarded_unsaved = self._reset_project_session()
-        # Multi-variant model (LLR-005.6, completed at E6): the manifest's
-        # recorded ``active_variant`` wins when present AND valid; otherwise
-        # the FIRST variant in the deterministic ``(name.lower(), name)``
-        # order of ``build_variant_set`` (with a status warning when the
-        # manifest names an unknown variant).
+        # Multi-variant model (LLR-005.6, completed at E6) with HLR-169's
+        # fallback (LLR-169.6): the manifest's recorded ``active_variant``
+        # opens when it is a valid variant; otherwise the next valid one in
+        # the deterministic ``(name.lower(), name)`` order of
+        # ``build_variant_set`` (``choose_install_set``).
         variant_set = build_variant_set(name, data_files)
         manifest = read_project_manifest(project_dir)
         # LLR-028.1 — adopt the manifest's declared regions as app state so the
@@ -10145,35 +10514,37 @@ class S19TuiApp(App):
         self._declared_regions = (
             tuple(manifest.declared_regions) if manifest is not None else ()
         )
-        if manifest is not None and manifest.active_variant is not None:
-            known_ids = {variant.variant_id for variant in variant_set.variants}
-            if manifest.active_variant in known_ids:
-                variant_set.active_id = manifest.active_variant
-            else:
-                # SEC6-6: the recorded id is any JSON string; scrub it.
-                self.set_status(
-                    safe_text(
-                        f"Manifest active_variant '{manifest.active_variant}' "
-                        "not found - activating the first variant."
-                    ).plain
-                )
-                self.logger.warning(
-                    "Manifest active_variant unknown: %s (known: %s)",
-                    manifest.active_variant,
-                    sorted(known_ids),
-                )
-        active_variant = next(
-            (
-                variant
-                for variant in variant_set.variants
-                if variant.variant_id == variant_set.active_id
-            ),
-            None,
+        # LLR-169.5: the manifest and disk problems; the internal codes go
+        # to the log only (HLR-169).
+        problems = check_project_files(project_dir, manifest)
+        for problem in problems:
+            self.logger.warning(
+                "Project %s: %s %s (%s)", name, problem.kind, problem.file, problem.code
+            )
+        recorded = (
+            manifest.active_variant
+            if manifest is not None and not manifest_is_damaged(manifest)
+            else None
         )
-        primary_file = active_variant.path if active_variant else None
-        mac_file = next((item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS), None)
-        selected_file = primary_file or mac_file
-        if selected_file is None:
+        # F1 (LLR-169.9): the project's A2L is read on its own, before any
+        # image, so an A2L that cannot be read is a problem on the A2L file
+        # and the images still open without it — never "not readable" on a
+        # valid image.
+        if a2l_files:
+            try:
+                self._load_a2l_data_with_cache(a2l_files[0])
+            except Exception as exc:  # noqa: BLE001 - an untrusted A2L file
+                self.logger.warning(
+                    "Project A2L not readable: %s (%s)", a2l_files[0], type(exc).__name__
+                )
+                problems.append(
+                    ProjectFileProblem(
+                        PROBLEM_NOT_READABLE, a2l_files[0].name, "the file cannot be read"
+                    )
+                )
+                a2l_files = []
+        install = choose_install_set(variant_set, recorded, data_files, a2l_files)
+        if install.variant is None and install.mac is None:
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No loadable data file in project: %s", name)
             return
@@ -10184,12 +10555,29 @@ class S19TuiApp(App):
         # guard downstream.
         self.current_project_dir = project_dir
         self._variant_set = variant_set
-        self._pending_variant_id = (
-            active_variant.variant_id if active_variant else None
-        )
-        self.load_selected_file(selected_file, a2l_files)
-        if primary_file and mac_file:
-            self.load_selected_file(mac_file, a2l_files)
+        # LLR-169.6 / LLR-169.9 (OQ-7a): an image that does not parse or
+        # holds no data is ``not readable``; the next valid variant is tried.
+        # Record-level errors alone keep the image open and shown as before.
+        unreadable: list[VariantDescriptor] = []
+        while install.variant is not None:
+            reason = self._install_project_image(install.variant, a2l_files)
+            if reason is None:
+                break
+            unreadable.append(install.variant)
+            problems.append(
+                ProjectFileProblem(PROBLEM_NOT_READABLE, install.variant.path.name, reason)
+            )
+            install = choose_install_set(
+                variant_set,
+                recorded,
+                data_files,
+                a2l_files,
+                [variant.variant_id for variant in unreadable],
+            )
+        opened = install.variant
+        variant_set.active_id = opened.variant_id if opened is not None else None
+        if install.mac is not None:
+            self.load_selected_file(install.mac, a2l_files)
         loaded = self.current_file
         announcement = compose_load_announcement(
             name,
@@ -10203,6 +10591,8 @@ class S19TuiApp(App):
             a2l_name=(
                 self.current_a2l_path.name if self.current_a2l_path else None
             ),
+            problems=problems,
+            unreadable=[variant.path.name for variant in unreadable],
         )
         self._last_load_announcement = announcement
         # LLR-178.2: one summary line (opened file, k of n, problem count,
@@ -10221,9 +10611,66 @@ class S19TuiApp(App):
                 f"Closed the Patch Editor document ({discarded_unsaved} entries); "
                 "unsaved changes were not kept"
             )
-        self.logger.info("Project loaded. name=%s file=%s mac=%s", name, selected_file, mac_file)
+        self.logger.info(
+            "Project loaded. name=%s file=%s mac=%s",
+            name,
+            opened.path if opened is not None else None,
+            install.mac,
+        )
         self.update_project_labels()
         self._publish_flow_session_dir()
+
+    def _install_project_image(
+        self, variant: VariantDescriptor, a2l_files: Sequence[Path]
+    ) -> Optional[str]:
+        """
+        Summary:
+            Install one project variant if it is readable (LLR-169.6 /
+            LLR-169.9, OQ-7a): parse it first, and apply it only when it
+            parses as S19/HEX and holds some data. Record-level errors (a
+            bad checksum) do not make it unreadable; they show as before.
+
+        Args:
+            variant (VariantDescriptor): The variant to open.
+            a2l_files (Sequence[Path]): The project's A2L files.
+
+        Returns:
+            Optional[str]: ``None`` when installed; otherwise why it is not
+                readable, in user terms ("not an S19 or HEX file", "0 data
+                bytes") — the exception class goes to the log only.
+
+        Data Flow:
+            - ``_parse_loaded_file`` touches no UI state, so a rejected image
+              never reaches the views.
+            - A readable image goes through ``_apply_loaded_file``, the same
+              install path as ``load_selected_file``.
+
+        Dependencies:
+            Uses:
+                - _parse_loaded_file / _apply_loaded_file
+            Used by:
+                - _handle_load_project
+        """
+        started = time.perf_counter()
+        self._pending_variant_id = variant.variant_id
+        try:
+            loaded = self._parse_loaded_file(variant.path, list(a2l_files))
+        except Exception as exc:  # noqa: BLE001 - an untrusted image file
+            self.logger.warning(
+                "Project image not readable: %s (%s)", variant.path, type(exc).__name__
+            )
+            loaded = None
+        if loaded is None:
+            reason: Optional[str] = "not an S19 or HEX file"
+        elif not loaded.mem_map:
+            reason = "not an S19 or HEX file" if loaded.errors else "0 data bytes"
+        else:
+            reason = None
+        if reason is not None:
+            self._pending_variant_id = None
+            return reason
+        self._apply_loaded_file(loaded, variant.path, started)
+        return None
 
     def list_projects(self) -> List[str]:
         reserved_folded = {home.casefold() for home in RESERVED_WORKAREA_HOMES}
@@ -10251,10 +10698,11 @@ class S19TuiApp(App):
                 ``project.json``.
 
         Returns:
-            dict: ``batch``, ``assignments``, ``declared_regions`` and
-                ``gathered`` keyword arguments for
+            dict: ``batch``, ``assignments``, ``declared_regions``,
+                ``gathered`` and ``derived_from`` keyword arguments for
                 ``_write_and_verify_manifest``; empty when the project has
-                no ``project.json``.
+                no ``project.json``. ``files`` is not carried: the seam
+                recomputes it from disk.
 
         Data Flow:
             - ``read_project_manifest`` resolves every entry against the
@@ -10283,19 +10731,32 @@ class S19TuiApp(App):
             "gathered": {
                 home: _relative(paths) for home, paths in manifest.gathered.items()
             },
+            "derived_from": {
+                path.relative_to(root).as_posix(): record
+                for path, record in manifest.derived_from.items()
+            },
         }
 
-    def _rewrite_project_manifest(self, project_dir: Path, placed: Path) -> bool:
+    def _rewrite_project_manifest(
+        self,
+        project_dir: Path,
+        placed: Path,
+        derived: Optional[DerivedFrom] = None,
+    ) -> bool:
         """
         Summary:
             The one ``project.json`` rewrite of the in-project writers
             (LLR-168.3, the OQ-1 ruling): a readable manifest is rewritten
             through the seam with every key the writer does not own
-            carried; a damaged one is never rewritten.
+            carried; a manifest it cannot carry whole — damaged, a newer
+            ``schema_version``, unknown keys or skipped entries (SEC6-2) —
+            is never rewritten.
 
         Args:
             project_dir (Path): The open project's folder.
             placed (Path): The file the writer just placed or saved there.
+            derived (Optional[DerivedFrom]): The ``derived_from`` record of
+                ``placed`` when the writer is a save-back (LLR-168.4).
 
         Returns:
             bool: True when ``project.json`` now records the session's
@@ -10306,16 +10767,19 @@ class S19TuiApp(App):
         Data Flow:
             - The manifest is read once; the carry is built from that read.
             - No ``project.json`` -> one is written (OQ-1 (a)).
-            - ``manifest_is_damaged`` (over the size cap, not JSON, a top
-              level that is not an object) -> no write: the placed file
-              stays and one status line names the project and the file;
-              the user's Save project stays the recovery (OQ-1 (b)).
-            - Entries the reader skipped (unsafe or malformed) are not
-              carried: reported and skipped, never trusted (HLR-169).
+            - ``manifest_rewrite_refusal`` (damaged: over the size cap, not
+              JSON, a top level that is not an object, an array over the
+              entry cap; or SEC6-2: a ``schema_version`` other than 1,
+              unknown top-level keys, skipped entries) -> no write: the
+              placed file stays and one status line names the project, why
+              and the file; the user's Save project stays the recovery
+              (OQ-1 (b)). So a rewrite never drops what it cannot carry.
+            - ``derived`` joins the carried ``derived_from`` records under
+              the placed file's name.
 
         Dependencies:
             Uses:
-                - read_project_manifest / manifest_is_damaged
+                - read_project_manifest / manifest_rewrite_refusal
                 - _manifest_carry / _write_and_verify_manifest
             Used by:
                 - on_patch_editor_panel_save_back_decision
@@ -10323,25 +10787,66 @@ class S19TuiApp(App):
                 - _sync_loaded_a2l_to_project
         """
         manifest = read_project_manifest(project_dir)
-        if manifest is not None and manifest_is_damaged(manifest):
+        refusal = manifest_rewrite_refusal(manifest) if manifest is not None else None
+        if refusal is not None:
             project_name = self.current_project or project_dir.name
             self.set_status(
                 safe_text(
-                    f"{PROJECT_MANIFEST_NAME} in project '{project_name}' is "
-                    f"damaged and was not rewritten - {placed.name} stays in "
+                    f"{PROJECT_MANIFEST_NAME} in project '{project_name}' "
+                    f"{refusal} and was not rewritten - {placed.name} stays in "
                     "the project; Save project rewrites it"
                 ).plain
             )
             self.logger.warning(
-                "Damaged manifest not rewritten: %s (placed %s)", project_dir, placed
+                "Manifest not rewritten (%s): %s (placed %s)", refusal, project_dir, placed
             )
             return False
-        if not self._write_and_verify_manifest(
-            project_dir, **self._manifest_carry(project_dir, manifest)
-        ):
+        carry = self._manifest_carry(project_dir, manifest)
+        if derived is not None:
+            carry["derived_from"] = {
+                **carry.get("derived_from", {}),
+                placed.name: derived,
+            }
+        if not self._write_and_verify_manifest(project_dir, **carry):
             return False
         result = self._last_manifest_verify_result
         return result is not None and result.status == MANIFEST_VERIFIED
+
+    def _derived_record(
+        self, base_path: Path, derived_map: Mapping[int, int]
+    ) -> Optional[DerivedFrom]:
+        """
+        Summary:
+            The ``derived_from`` record of an image this session just wrote
+            (LLR-168.4): the base's file name and file digest, and how many
+            bytes the written data differs from the base's data, computed
+            while both are in hand.
+
+        Args:
+            base_path (Path): The base image file (the loaded image).
+            derived_map (Mapping[int, int]): The written image's data.
+
+        Returns:
+            Optional[DerivedFrom]: The record; ``None`` when the base cannot
+                be read again (logged) — the variant is then recorded
+                without one, never with a guessed one.
+
+        Dependencies:
+            Uses:
+                - manifest_writer.derive_record / _image_map
+            Used by:
+                - on_patch_editor_panel_save_back_decision
+                - _handle_save_dialog (the emit)
+        """
+        try:
+            return derive_record(base_path, _image_map(base_path), derived_map)
+        except (OSError, ValueError, RuntimeError) as exc:
+            self.logger.warning(
+                "derived_from not recorded: base %s unreadable (%s)",
+                base_path,
+                type(exc).__name__,
+            )
+            return None
 
     def _activate_project_file(self, project_dir: Path, landed: Path) -> Optional[str]:
         """

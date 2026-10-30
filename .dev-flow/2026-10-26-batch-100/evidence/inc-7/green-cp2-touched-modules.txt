@@ -1,0 +1,20 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_project_check.py tests/test_b100_announce.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b100_active_variant.py tests/test_variant_execution.py tests/test_b100_session_reset.py tests/test_b99_staging.py tests/test_tui_variants.py tests/test_id_registry.py
+# label: GREEN: every touched / re-pinned module, cp2 tree
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (cwd = tree)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py 3711eba2c27f3691
+#   s19_app/tui/services/variant_execution_service.py 425f610345f263c6
+#   s19_app/tui/app.py 923de169c6c44bc8
+#   s19_app/tui/screens.py 49d6efdc73e26b28
+# started: 2026-10-30T13:16:31-06:00
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+........................................................................ [ 94%]
+...................                                                      [100%]
+379 passed in 1175.29s (0:19:35)
+# exit: 0
+# finished: 2026-10-30T13:36:08-06:00

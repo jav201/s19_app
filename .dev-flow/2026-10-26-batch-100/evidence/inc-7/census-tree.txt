@@ -1,0 +1,43 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q --tb=line -rfE tests/test_b100_focus.py tests/test_b100_reuse.py tests/test_b100_session_reset.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_load_project_dialog.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_export.py tests/test_b99_load_project.py tests/test_b99_patch_truth.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_flow_multi_image_ui.py tests/test_legend_n8.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_project_gather.py tests/test_report_document_bound.py tests/test_report_progress.py tests/test_tui_commandbar.py tests/test_tui_evidence_packs.py tests/test_tui_manifest_save.py tests/test_tui_map_big.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py
+# label: Reverse census on the FINAL Inc 7 tree: the 34 grep-found test modules not in green-01 (serial, nothing else running)
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (git HEAD 80052cb; working changes: 16 paths)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py b3a8da7ae550bda5
+#   s19_app/tui/services/variant_execution_service.py bd33c8be189d2c87
+#   s19_app/tui/app.py 0e29d80841fa3f38
+#   s19_app/tui/screens.py e23ea8f72bc93153
+# started: 2026-10-30T04:19:10-06:00
+........................................................................ [  6%]
+F....................................................................... [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 54%]
+........................................................................ [ 61%]
+..........F............................................................. [ 68%]
+........................................................................ [ 75%]
+.........................................................F.............. [ 82%]
+........................................................................ [ 89%]
+................................................F.........F............. [ 96%]
+................................F........                                [100%]
+================================== FAILURES ===================================
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b100_session_reset.py:234: AssertionError: ['reset', 'install', 'reset', 'install']
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_b99_staging.py:2182: AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/app.py:8944 write_bytes outside the pinned placement allow-list (in '_restore_manifest')", "s19_app/tui/app.py:8949 os.replace outside the pinned placement allow-list (in '_restore_manifest')", "s19_app/tui/app.py:9013 unlink outside the pinned placement allow-list (in '_keep_previous_manifest')"]
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_tui_commandbar.py:2704: AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_tui_patch_variant.py:732: AssertionError: the run button must route execute_scope exactly once with the cycled scope, got []
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_tui_report_filter_surface.py:773: AssertionError: baseline wrote []
+C:\Users\jjgh8\Github\s19_app-b100-inc7\tests\test_tui_variants.py:223: AssertionError: unexpected _parse_loaded_file call sites: ['_install_project_image', '_start_load_worker', 'load_selected_file'] (LLR-005.4 allows only the pre-existing worker + sync-path sites)
+=========================== short test summary info ===========================
+FAILED tests/test_b100_session_reset.py::test_tc_b100_08_reset_runs_once_before_the_first_install
+FAILED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_patch_variant.py::test_tc_035_4_routing_guards - Assert...
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_variants.py::test_no_new_parse_loaded_file_call_sites
+6 failed, 1043 passed in 4337.35s (1:12:17)
+# exit: 1
+# finished: 2026-10-30T05:31:30-06:00

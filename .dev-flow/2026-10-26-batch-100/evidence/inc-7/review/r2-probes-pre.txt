@@ -1,0 +1,21 @@
+# r2 probes on /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/cp7-1/pre
+s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\cp7-1\pre\s19_app\__init__.py
+tui/services/manifest_writer.py b3a8da7ae550bda5
+tui/services/variant_execution_service.py bd33c8be189d2c87
+tui/app.py 0e29d80841fa3f38
+tui/screens.py e23ea8f72bc93153
+.messages: ['Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-30346\\test_q1_sec7_3_no_copy_refuses0\\app\\.s19tool\\workarea\\P (variant 'firmware')"]
+listing: ['firmware.s19', 'project.json']
+Ffiles keys: ['firmware.s19']
+problems: []
+.read 0.55 s
+batch 1000 assignments 1000 files 1
+issues: []
+problems: []
+rewrite refusal: None
+.
+================================== FAILURES ===================================
+C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7b\rp\test_r2_probes.py:82: assert '{\n  "schema...    }\n  }\n}' == '{"schema_ver...user_key": 7}'
+=========================== short test summary info ===========================
+FAILED ::test_q1_sec7_3_no_copy_refuses_and_rolls_back - assert '{\n  "schema...
+1 failed, 3 passed in 4.69s

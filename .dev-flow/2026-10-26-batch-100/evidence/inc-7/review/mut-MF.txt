@@ -1,0 +1,41 @@
+# mutant: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\tui\services\variant_execution_service.py
+#   old: b'    issues[:] = [issue for issue in issues if id(issue) not in folded]\r\n    issues.append('
+#   new: b'    issues[:] = [issue for issue in issues if id(issue) not in folded]\r\n    return\r\n    issues.append('
+#   sha256[:16] before bd33c8be189d2c87 after 5b724f03aef8749b
+# cmd: python -m pytest -p no:cacheprovider -q tests/test_b100_project_check.py tests/test_r7_probes.py::test_pf_skipped_entries_beyond_the_bound_are_counted
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r7/mut/MF  NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r7\mut\MF\s19_app\__init__.py
+........................................................................ [ 98%]
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_pf_skipped_entries_beyond_the_bound_are_counted _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30292/test_pf_skipped_entries_beyond0')
+
+    def test_pf_skipped_entries_beyond_the_bound_are_counted(tmp_path: Path) -> None:
+        project_dir = tmp_path / "P"
+        project_dir.mkdir()
+        (project_dir / "project.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "active_variant": None,
+                    "batch": [f"../escape_{i:03d}.json" for i in range(150)],
+                }
+            ),
+            encoding="utf-8",
+        )
+        manifest = service.read_project_manifest(project_dir)
+        entries = [issue.details.get("entry") for issue in manifest.issues]
+        print("issues:", len(manifest.issues), "last:", entries[-1])
+>       assert len(manifest.issues) == 101
+E       assert 100 == 101
+E        +  where 100 = len([ValidationIssue(code='MANIFEST-PATH-ESCAPE', severity=<ValidationSeverity.ERROR: 'error'>, message="manifest batch en...est', symbol=None, address=None, line_number=None, related_artifacts=[], details={'entry': '../escape_005.json'}), ...])
+E        +    where [ValidationIssue(code='MANIFEST-PATH-ESCAPE', severity=<ValidationSeverity.ERROR: 'error'>, message="manifest batch en...est', symbol=None, address=None, line_number=None, related_artifacts=[], details={'entry': '../escape_005.json'}), ...] = ProjectManifest(schema_version=1, active_variant=None, batch=[], assignments={}, declared_regions=(), gathered={}, iss...mber=None, related_artifacts=[], details={'entry': '../escape_099.json'})], files={}, derived_from={}, unknown_keys=()).issues
+
+tests\test_r7_probes.py:162: AssertionError
+---------------------------- Captured stdout call -----------------------------
+issues: 100 last: ../escape_099.json
+=========================== short test summary info ===========================
+FAILED tests/test_r7_probes.py::test_pf_skipped_entries_beyond_the_bound_are_counted
+1 failed, 72 passed in 127.10s (0:02:07)

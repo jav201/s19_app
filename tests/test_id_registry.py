@@ -156,7 +156,8 @@ from tools.id_registry import (
 # batch-100 Inc-5: 218 -> 219 (tests/test_b100_save_image.py).
 # batch-100 Inc-6: 219 -> 222 (tests/test_b100_active_variant.py, tests/test_b100_announce.py,
 # tests/support/b100_projects.py).
-EXPECTED_SCANNED_TEST_FILES = 222
+# batch-100 Inc-7: 222 -> 224 (tests/test_b100_project_check.py, tests/support/b100_manifests.py).
+EXPECTED_SCANNED_TEST_FILES = 224
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

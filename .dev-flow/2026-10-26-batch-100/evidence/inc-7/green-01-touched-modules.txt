@@ -1,0 +1,18 @@
+# command: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 python -m pytest -p no:cacheprovider -q --tb=short -rs tests/test_b100_project_check.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_save_image.py tests/test_b100_save_guards.py tests/test_variant_execution.py tests/test_id_registry.py
+# label: GREEN on the FINAL Inc 7 tree: every touched test module (incl. the 3 Inc 6 CI-6-1 nodes)
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc7 (git HEAD 80052cb; working changes: 16 paths)
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc7 ; NO_COLOR unset
+# s19_app import: C:\Users\jjgh8\Github\s19_app-b100-inc7\s19_app\__init__.py
+# source sha256[:16]:
+#   s19_app/tui/services/manifest_writer.py b3a8da7ae550bda5
+#   s19_app/tui/services/variant_execution_service.py bd33c8be189d2c87
+#   s19_app/tui/app.py 0e29d80841fa3f38
+#   s19_app/tui/screens.py e23ea8f72bc93153
+# started: 2026-10-30T04:05:22-06:00
+........................................................................ [ 26%]
+........................................................................ [ 53%]
+........................................................................ [ 80%]
+.....................................................                    [100%]
+269 passed in 825.96s (0:13:45)
+# exit: 0
+# finished: 2026-10-30T04:19:10-06:00

@@ -35,7 +35,7 @@ from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from ..render.hexview import MAX_HEX_ROWS, render_hex_view_text
 from ..utils import safe_text
-from .insight_style import DGRAY, GREEN, YELLOW
+from .insight_style import DGRAY, GREEN, RED, YELLOW
 from .open_folder_chip import OpenFolderChip, titled_header
 from .window_help import WindowHelpChip, open_window_help
 from .os_clipboard_input import OsClipboardInput
@@ -1050,9 +1050,11 @@ class LoadResultScreen(ModalScreen[Optional[str]]):
         selector. ``#result_variant`` is reached by its key, not by
         ``tab``, so ``tab`` from the list lands on Close. Severity colours
         follow the prototype (``insight_style``): the fallback reason, the
-        problem heading and each problem's mark and label in the warning
-        colour, the recorded reason in the OK colour, labels and details
-        dim; every colour is a ``Text`` style, never markup.
+        ``derived_from`` "patched" line, the problem heading and each
+        problem's mark and label in the warning colour, the recorded reason
+        in the OK colour, a variant that is not readable marked in the error
+        colour (Inc 7), labels and details dim; every colour is a ``Text``
+        style, never markup.
 
     Args:
         announcement (LoadAnnouncement): The composed announcement
@@ -1084,7 +1086,8 @@ class LoadResultScreen(ModalScreen[Optional[str]]):
 
     def compose(self) -> ComposeResult:
         announcement = self.announcement
-        count = len(announcement.problems)
+        # F2: the count covers the problems the last row counts.
+        count = announcement.problem_count
         title = f"Project {announcement.project} opened" + (
             f" with {count} problem{'' if count == 1 else 's'}" if count else ""
         )
@@ -1131,9 +1134,17 @@ class LoadResultScreen(ModalScreen[Optional[str]]):
                 style=GREEN if announcement.latest else YELLOW,
             ),
         )
+        if announcement.relation:
+            # LLR-178.1 / UX-26: the derived_from line (P-E verdict B).
+            grid.add_row("", safe_text(announcement.relation, YELLOW))
         grid.add_row("Variants", Text(f"{announcement.count} in the project"))
         for index, name in enumerate(announcement.others):
-            grid.add_row("Others" if index == 0 else "", safe_text(name))
+            value = safe_text(name)
+            if name in announcement.unreadable:
+                # P-E verdict B: a variant the load could not read is marked
+                # in the error colour beside its name.
+                value.append("   not readable", style=RED)
+            grid.add_row("Others" if index == 0 else "", value)
         for key, name in (("MAC", announcement.mac), ("A2L", announcement.a2l)):
             grid.add_row(key, safe_text(name) if name else Text("(none)", style=DGRAY))
         return grid

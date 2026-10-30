@@ -71,6 +71,7 @@ from s19_app.tui.workspace import WORKAREA_SUBDIR
 
 from tests import b97_fixtures
 from tests.support import b100_links
+from tests.support import b100_projects as projects
 from tests.support import b100_projects
 from tests.support.independent_reader import read_hex
 from tests.support.independent_reader import read_s19
@@ -1182,6 +1183,119 @@ def test_tc_b100_59_fresh_folder(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     _assert_plan_equals_tree(plan, before, after)
 
 
+def test_tc_b100_59_files_row(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Inc 7 (LED .63, LED .19 B-06): the plan's ``project.json`` keys
+    include ``files``, and the written ``files`` records name exactly the
+    files the plan's rows land, each with the size and SHA-256 of its bytes.
+
+    RED (base 80052cb): neither the plan nor the manifest has ``files``."""
+    import hashlib
+
+    plans = _capture_plans(monkeypatch)
+    folder = _copy_case01(tmp_path, "firmware.s19", "firmware.a2l")
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_image(pilot, app, folder / "firmware.s19")
+            app.load_a2l_from_path(folder / "firmware.a2l")
+            await _wait_for(pilot, lambda: app.current_a2l_path is not None, "the A2L load")
+            await _save(pilot, app, "P1")
+            await _wait_for(
+                pilot, lambda: _status_text(app).startswith("Saved project to"), "the save"
+            )
+        return app.workarea / "P1"
+
+    project = asyncio.run(_drive())
+    plan = plans[0]
+    assert "files" in plan.manifest_keys, plan.manifest_keys
+    written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+    landed = {row.landing.name for row in plan.rows if row.role != "manifest"}
+    assert set(written.get("files", {})) == landed, written
+    for name, record in written["files"].items():
+        data = (project / name).read_bytes()
+        assert record == {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+    assert tuple(written) == plan.manifest_keys
+
+
+def _carried_derived_from_save(tmp_path: Path) -> Path:
+    """Reviewer probe P1: open project P1 (S19 + MAC, ``files`` and one
+    ``derived_from`` record) and Save project P1 again, unchanged (a copy:
+    the record is carried, nothing is emitted)."""
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=tmp_path / "app")
+        p1 = app.workarea / "P1"
+        p1.mkdir(parents=True)
+        for name in ("firmware.s19", "firmware.mac"):
+            shutil.copy2(CASE01_DIR / name, p1 / name)
+        (p1 / "project.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "active_variant": "firmware",
+                    "files": projects.file_records(p1),
+                    "derived_from": {
+                        "firmware.s19": {"base": "orig.s19", "sha256": "a" * 64, "differ": 3}
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        async with app.run_test(size=(220, 60)) as pilot:
+            await pilot.pause()
+            await _load_project(pilot, app, "P1")
+            await _save(pilot, app, "P1")
+            await _wait_for(
+                pilot,
+                lambda: _status_text(app).startswith("Saved project to"),
+                "the save into the open project",
+            )
+        return p1
+
+    return asyncio.run(_drive())
+
+
+@pytest.mark.parametrize(
+    "case, derived",
+    [("carried", True), ("emit", True), ("emit-base-unreadable", False)],
+)
+def test_tc_b100_59_plan_keys_equal_written_keys_with_derived_from(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str, derived: bool
+) -> None:
+    """Inc 7 corrective F3 (LLR-167.6: the plan lists the keys the app
+    writes; LLR-168.4): the plan's ``project.json`` keys equal the keys the
+    save writes, ``derived_from`` included, in all three cases — a record
+    carried from the target (a copy into the open project), an emit that
+    records its base, and an emit whose base cannot be read again (no
+    record, so the plan shows none).
+
+    RED (corrective-pass base): ``carried`` — the plan omits
+    ``derived_from``; ``emit-base-unreadable`` — the plan lists it, the
+    save writes none."""
+    plans = _capture_plans(monkeypatch)
+    if case == "carried":
+        project = _carried_derived_from_save(tmp_path)
+    else:
+        if case == "emit-base-unreadable":
+
+            def _unreadable(path):
+                raise OSError(13, "Permission denied", str(path))
+
+            monkeypatch.setattr(app_module, "_image_map", _unreadable)
+
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+
+        _lines, project, _variant = _save_session(tmp_path, scenario)
+    written = json.loads((project / "project.json").read_text(encoding="utf-8"))
+    plan = plans[-1]
+    assert ("derived_from" in written) is derived, written
+    assert tuple(written) == plan.manifest_keys, (tuple(written), plan.manifest_keys)
+
+
 def _open_project_session(tmp_path: Path, patch: bool) -> tuple:
     """P1 holds S19 + MAC (no A2L: a save into a project that already
     holds an A2L is refused by the pre-existing single-A2L guard, even for
@@ -1755,3 +1869,11 @@ def test_at_b100_05_save_project_saves_the_patched_image(
     assert "firmware.s19" in loaded_panel, loaded_panel
     assert "Opened    firmware.s19" in reopened_panels[0], reopened_panels
     assert "recorded as the active variant" in reopened_panels[0], reopened_panels
+    # Inc 7 (AT index: the "patched" line against ``derived_from``): the
+    # base is the loaded source, which is not a file of P1, so the line
+    # names it as outside the project; the patch is the 4 differing bytes.
+    assert (
+        "patched from firmware.s19 (not in this project); 4 bytes differ from it"
+        in b100_projects.flat(reopened_panels[0])
+    ), reopened_panels
+    assert "identical" not in reopened_panels[0], reopened_panels
