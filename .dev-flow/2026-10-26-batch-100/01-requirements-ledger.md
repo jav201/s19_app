@@ -751,3 +751,52 @@ above this line is ever edited._
 - **Closes:** the 5 batch-97 nodes red on main since the Inc 3 merge: `test_b97_chips_help.py::test_at_b97_14_…[patch]` (stopped on `LoadGuardScreen`) and `test_b97_width.py::test_at_b97_15_…[size0]`, `[size1]`, `test_at_b97_16_…`, `test_at_b97_24_…`. They failed in CI from run 40497466178 on, and locally on 6d8631a.
 - **Why it escaped:** Inc 3's reverse census was a symbol grep that did not reach the batch-97 files, and nobody compared the failed-node set of the post-merge CI runs with the run before. The operator chose "Hotfix ahora" on 2026-10-29.
 - **Evidence:** `03-increments/increment-015.md` (hotfix 3b, numbered out of sequence); `03-increments/review-increment-015.md`; `evidence/inc-3b/`.
+
+### LED-2026-10-26-batch-100.61 — Inc 5: the panel's `mark_saved` and TC-B100-70's positive arm move to Inc 8a
+- **Requirement:** LLR-167.8
+- **Date:** 2026-10-29
+- **What changed:**
+  - LLR-167.8 binds only after a Save project that **wrote the change or check document into the project**. In Inc 5, Save project writes no editor document; the pasted-document write is Inc 8a (LLR-170.2). The gather copies only the document's on-disk file, and that file differs from the editor's document whenever the panel is dirty.
+  - So in Inc 5, Save project calls `ChangeService.mark_saved` (the image record) and does NOT call `PatchEditorPanel.mark_saved`. Clearing the panel's flag here would hide unsaved document edits, and a later Patch Load would then replace them without asking (a silent-loss path).
+  - TC-B100-70 in Inc 5 keeps its refused arm and adds an arm that pins "document not written → flag kept". The positive arm (entry added → Save project → project load → 0 questions) and the panel `mark_saved` call move to Inc 8a, which writes the document.
+- **Closes:** the Inc 5 implementer's STOP item (`HANDOFF.md`, "LLR-167.8 panel `mark_saved`").
+- **Why:** losing no user work outranks a premature clean flag. Orchestrator ruling under the batch's standing authorization.
+- **Evidence:** `03-increments/increment-005.md` (when written); Inc 8a brief carries the positive arm.
+
+### LED-2026-10-26-batch-100.62 — Inc 5: B100-I15 re-frozen with `ranges` and `session_map`
+- **Requirement:** HLR-167 (B100-I15, the `save_patched` split)
+- **Date:** 2026-10-29
+- **What changed:** `ChangeService.rederive_for_save` takes two more required keywords than the frozen form: `ranges` (the apply needs them) and `session_map` (the journal binds by dict identity, and a copy has none; without it a newly loaded image could take the previous image's source bytes). The public helpers the packet lists in §6 (`image_differs_from_source`, `mark_saved`, `differs_from_last_saved`, `record_save_entries`, `rederived_differs_from_source`, `apply.render_patched_image`) are part of the frozen interface, each with a named caller. Code-review F7 is resolved in corrective pass 1: the new pure `ChangeService.save_entry_split()` (wrapped by `record_save_entries()`) is added to the frozen interface; the decide step writes no service state, and the handler records the split on the line before `emit_and_verify` (a precondition its docstring states). A save that rolls back keeps its own split in `last_save_*`; both readers record before reading, so the stale value is never shown.
+- **Why:** the independent code-reviewer ruled the deviation justified, not scope creep (`review-increment-005.md`, ruling 1).
+- **Evidence:** `03-increments/increment-005.md` §6; `03-increments/review-increment-005.md`.
+
+### LED-2026-10-26-batch-100.63 — Inc 5: the save plan is partial until Inc 7, 8a and 8b
+- **Requirement:** HLR-167, LLR-167.6, TC-B100-59
+- **Date:** 2026-10-29
+- **What changed:** In Inc 5 the plan names the image and the files Save project copies; it has no rows for gathered sub-folders or merges. Until Inc 7, 8a and 8b land, (a) the gather still writes files the plan does not name, so HLR-167's "every file … the plan names" is not yet true for a project with gathered content, and (b) the single-MAC and single-A2L refusals still run after the project folder exists, with the existing rollback removing it.
+- **Why:** declared TC-B100-59 split; the code-reviewer accepted it on condition of these two lines (ruling 3).
+- **Evidence:** `03-increments/review-increment-005.md`.
+
+### LED-2026-10-26-batch-100.64 — Inc 5: LLR-167.3 counts on two status lines
+- **Requirement:** LLR-167.3
+- **Date:** 2026-10-29
+- **What changed:** The verify line carries `save_back_status_suffix` (document entries); the success line carries "N change entries, K applied by this save" (summary dispositions). The two count different things. The success line's image clause comes after the full project path and the status log caps each line at the terminal width, so the clause is clipped whenever the path is long (at 118 columns, and also at 220 with a deep path; code-review R2-1). The verify line still names the entries. Moving the counts before the path goes to the UX pass of Inc 11; until then the TC-B100-16 nodes and AT-B100-05 read the full `set_status` message, so they do not depend on the path's length (Inc 5 corrective pass 2).
+- **Why:** threshold met at 220 columns; code-reviewer ruling 2.
+- **Evidence:** `03-increments/review-increment-005.md`.
+
+### LED-2026-10-26-batch-100.65 — Inc 5 security notes routed: SEC-8 to Inc 11, SEC-9 to the LED .50 backlog item
+- **Requirement:** LLR-171.4 (containment)
+- **Date:** 2026-10-29
+- **What changed:** SEC-8 (pre-existing, not made worse): Save project creates the project folder before any containment guard; through a junction a folder briefly exists outside this work area and the rollback removes it (net 0). Fix (`_guarded_destination(project_dir, self.workarea)` before decide, plan and `mkdir`) goes to Inc 11, which owns Save project's dialog. SEC-9 (pre-existing): `variant_execution_service.py:797` calls `save_patched_image` without `workarea_root`; added to the LED .50 backlog item. SEC-7 is the same defect as code-review F1 and is fixed in the Inc 5 corrective pass.
+- **Why:** `security-increment-005.md` (PASS-WITH-NOTES, SEC-4 discharged).
+- **Evidence:** `03-increments/security-increment-005.md`; `evidence/inc-5/sec/`.
+
+### LED-2026-10-26-batch-100.66 — Inc 5 leftovers assigned to Inc 8b, Inc 11 and the LED .50 backlog item
+- **Requirement:** HLR-167, LLR-171.4
+- **Date:** 2026-10-29
+- **What changed:**
+  - **Inc 8b:** the single-MAC and single-A2L refusals move before the project folder is created (LED .63 (b)). Inc 8b closes the save plan, so the refusal becomes a plan-time decision there.
+  - **Inc 11:** a Save project arm that emits through a junction project (only the save-back has one today; code-review hand-off to `security-reviewer`). It lands with SEC-8 (LED .65), which moves the containment check before `mkdir` in the same handler.
+  - **LED .50 backlog item:** `flow_execution_service` still passes `workarea_root=None`, which Inc 5 made stricter (a junction destination as written is refused). The security confirmation the code-reviewer asked for goes with SEC-9 in that item.
+- **Why:** none of the three had a named owner after the Inc 5 gate. The operator approved the assignment on 2026-10-29.
+- **Evidence:** `03-increments/review-increment-005.md` (hand-offs), `03-increments/security-increment-005.md`.

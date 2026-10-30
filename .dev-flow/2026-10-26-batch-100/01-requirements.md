@@ -430,7 +430,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-167 — Save project saves the source plus the change document, verified, and copies when nothing changed
 - **Traceability:** US-157
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13, LED-2026-10-26-batch-100.14, LED-2026-10-26-batch-100.42
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.13, LED-2026-10-26-batch-100.14, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.62, LED-2026-10-26-batch-100.63, LED-2026-10-26-batch-100.66
 - **Statement:** When Save project runs, the system shall re-derive the change document's entries onto a copy of the source image; a check document never counts. If the re-derived data differs from the source file's data, the system shall emit that image into the project through `save_patched`'s emit-and-verify half (the save-back's rule, B99-I7), with 32 bytes per line and the source's S0 header, record its `derived_from`, and update the view's image in place so that it equals what was saved; the status shall say how many document entries the image carries and how many this save applied. Otherwise the system shall copy the source byte for byte and create no new variant. A check document is saved to `checks/` and never blocks the save. If the re-derive blocks any entry of a change document, then the system shall refuse the whole save, name the blocked entries with their tokens, and leave no folder it created. MAC and A2L files stay byte copies. When the target folder already holds a different file with the image's name, the image shall land as the save plan predicts (`<stem>_<N>`) and become the project's active variant. Every file a Save project writes shall be the one its save plan names (HLR-175, R-PC). A successful Save project shall record the saved image state and clear the Patch Editor's dirty flag once the document is written.
 - **Rationale (informative):** the save copies the work copy and drops the patch (P-1). D1 = `imagen`; A-06 keeps one rule for one fact. B-01 / QA R2-01 move the emit decision onto data (P-37, P-38): the round-2 rule ("differs from source or the document holds an entry") made a check document refuse every save and wrote byte-different copies of unchanged data — §6.3 records it as a round-2 deviation corrected here. UX-27: the dirty flag is cleared like the save-back clears it.
 - **Validation:** `test`
@@ -824,7 +824,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.3 — The status names the entries the image carries
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.4
+- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.64
 - **Statement:** The status of an emitting Save project shall name the number of document entries the image carries and how many of them this save applied, from `save_back_status_suffix` (`change_service.py:131`).
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-16 — `pytest tests/test_b100_save_image.py -k tc_b100_16`
@@ -874,7 +874,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.8 — Save project clears the Patch Editor's dirty flag
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.17
+- **Ledger:** LED-2026-10-26-batch-100.17, LED-2026-10-26-batch-100.61
 - **Statement:** After a Save project that wrote the change or check document into the project, `_handle_save_dialog` shall call the Patch Editor panel's `mark_saved` (`screens_directionb.py:5805`) and `ChangeService.mark_saved`, so neither the document flag nor the image predicate reports unsaved work that is on disk.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-70 — `pytest tests/test_b100_save_image.py -k tc_b100_70`
@@ -1074,7 +1074,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4 — Containment means this work area, checked inside the placement (S-02)
 - **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66
 - **Statement:** `contained_in_workarea(path, workarea) -> bool` (NEW, `workspace.py`, B100-I14, frozen before Inc 1) shall be true iff the path, after resolving every link and junction, is inside `workarea.resolve()`. `place_into_workarea` (LLR-163.1) shall require it for every destination, so every placing writer — Save project's image, MAC, A2L and sub-folder copies, its emit (`save_patched_image` places through `copy_into_workarea`, `changes/apply.py:781`), the save-back, the variant append, the MAC and A2L syncs, and document placement — is covered by construction. The manifest seam replaces `project.json` rather than placing it, so `write_project_manifest`'s `_check_destination_contained` (`manifest_writer.py:366`) shall call `contained_in_workarea` with this app's work area. `list_projects` and `_handle_load_project` (picked or typed) shall require it too, and `_handle_save_dialog`, `list_projects` and `_handle_load_project` shall refuse a project folder for which `_is_reparse_point` is true, checked before `resolve()`, for new and merge targets alike.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62` (the placement guard and its junction arm are written at Inc 1 with `place_into_workarea`; the listing and load uses at Inc 8b)
