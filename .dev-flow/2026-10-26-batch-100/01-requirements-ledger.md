@@ -800,3 +800,23 @@ above this line is ever edited._
   - **LED .50 backlog item:** `flow_execution_service` still passes `workarea_root=None`, which Inc 5 made stricter (a junction destination as written is refused). The security confirmation the code-reviewer asked for goes with SEC-9 in that item.
 - **Why:** none of the three had a named owner after the Inc 5 gate. The operator approved the assignment on 2026-10-29.
 - **Evidence:** `03-increments/review-increment-005.md` (hand-offs), `03-increments/security-increment-005.md`.
+
+### LED-2026-10-26-batch-100.67 — Inc 6 OQ-1: a writer creates a missing project.json and never rewrites a damaged one
+- **Requirement:** HLR-168, LLR-168.3
+- **Date:** 2026-10-29
+- **What changed:** (a) In a project folder with no `project.json`, an in-project writer (save-back, variant append, MAC sync, A2L sync) creates one, as HLR-168 reads literally; Execute in such a project then moves from the "no manifest" fallback to "manifest present". (b) A damaged `project.json` (not JSON — including an integer over Python's digit limit —, top level not an object, over the size cap, or unreadable) is never rewritten by those four writers: the placed file stays, the rewrite is skipped and one status line says the manifest is damaged and was not rewritten. The session's active variant is then the new file while disk still records the old one; the status line says why. Save project, the explicit user command, stays the recovery path that replaces a damaged manifest.
+- **Why:** the implementer's open question OQ-1; orchestrator ruling under the standing authorization. Both reviewers found (b) violated in the first cut (code-review F1, SEC6-1, HIGH); fixed in Inc 6 corrective pass 1 and re-verified (12/12 byte-identical).
+- **Evidence:** `03-increments/increment-006.md` §5/§6; `03-increments/review-increment-006.md`; `03-increments/security-increment-006.md`.
+
+### LED-2026-10-26-batch-100.68 — Inc 6 leftovers routed to Inc 7, Inc 9b, Inc 11 and the LED .50 backlog item
+- **Requirement:** HLR-168, LLR-178.3, LLR-171.4
+- **Date:** 2026-10-29
+- **What changed:**
+  - **Inc 7:** SEC6-2 (a rewrite drops unknown top-level keys, writes `schema_version` 1 over a higher one, and drops skipped entries, silently) lands with the manifest-keys mode; SEC6-5 (the panel builds one row per problem with no cap: 6 000 bad entries froze load and panel for 10.2 s) lands with Inc 7's caps and the one-problem-per-file rule, with an explicit test arm; the panel's error-colour "not readable" mark of the P-E verdict B lands with HLR-169's readability state.
+  - **Inc 9b:** the summary line's `details: p` points at the Load dialog's preview of the open project (LLR-178.3, last sentence), which Inc 9b builds; until then `p` opens the dialog without it.
+  - **Inc 11:** code-review F4 — the seam's `Project saved + manifest verified` line now also follows the MAC and A2L syncs and the variant append, where "Project saved" reads wrong.
+  - **Inc 7 (re-routed at the Inc 6 close; first routed to the LED .50 backlog item):** SEC6-3 (pre-existing, now reachable from four more writers) — `manifest_writer._check_destination_contained` resolves before it checks, so a project folder swapped for a junction between placement and the manifest write lands the manifest in another work area; the fix (`_guarded_destination` on the unresolved destination) needs a fifth source file. Inc 7 owns `manifest_writer.py` and its design (§5.7, SEC PDR-C1) already has `_check_destination_contained` call `contained_in_workarea`, so the fix needs no fifth file there.
+  - **Accepted deviation:** `tests/test_import_census.py::MEASURED_SAFE_TEXT_CONSUMERS` gained `s19_app.tui.screens` (the panel renders disk names through `safe_text`, LLR-178.3), measured in as the guard's own comment prescribes instead of stopping; both reviewers accepted it.
+  - **Not exercised:** POSIX limits of `Path.resolve()` (long entries, symlink loops) — only Windows ran.
+- **Why:** none had a named owner after the Inc 6 gate; code-review and security round reports.
+- **Evidence:** `03-increments/review-increment-006.md`; `03-increments/security-increment-006.md`; `evidence/inc-6/e13/` (real-terminal captures read against P-E verdict B).

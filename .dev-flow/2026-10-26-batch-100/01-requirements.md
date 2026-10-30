@@ -446,7 +446,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### HLR-168 — A save-back into the project becomes the active variant
 - **Traceability:** US-158
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.42
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.42, LED-2026-10-26-batch-100.67, LED-2026-10-26-batch-100.68
 - **Statement:** When a Patch Editor save-back writes an image into the open project, the system shall make that image the project's active variant in the session and in `project.json`, record the variant it derives from as `derived_from`, and keep `current_file.path` on the source the image was loaded from. When any write lands a file in the open project — Save project, the save-back, the Load-file variant append, the MAC sync or the A2L sync — the system shall rewrite `project.json` through the manifest seam, carrying every key it does not own (`batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `derived_from`, `files` records of untouched files) unchanged and project-relative. A Load file that makes the loaded file the project's active variant shall say so in a status line naming the project and the file it now opens. When the project is loaded, the system shall open the active variant `project.json` records.
 - **Rationale (informative):** the save-back adds a variant that Load never opens (P-3). D2 = `ultima`; O-1; O-10. A-02, A-03, UX-14; UX-26 (`derived_from`).
 - **Validation:** `test`
@@ -904,7 +904,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-168.3 — Every in-project writer rewrites the manifest, carrying every key it does not own
 - **Traceability:** HLR-168
-- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16
+- **Ledger:** LED-2026-10-26-batch-100.1, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.67
 - **Statement:** The Load-file variant append and the MAC and A2L syncs (`app.py:8591`, `:8622`, `:8630`, `:8652`) shall place their files through `place_into_workarea` and each end in `_write_and_verify_manifest`, passing every key of the existing manifest they do not change — `batch`, `assignments`, `declared_regions`, `gathered`, `active_document`, `derived_from` — converted from the reader's absolute paths back to project-relative POSIX strings. The variant append shall make the appended file active and paint a status line naming the project and the file it now opens.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-20 — `pytest tests/test_b100_active_variant.py -k tc_b100_20`
@@ -1074,7 +1074,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-171.4 — Containment means this work area, checked inside the placement (S-02)
 - **Traceability:** HLR-171
-- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66
+- **Ledger:** LED-2026-10-26-batch-100.6, LED-2026-10-26-batch-100.20, LED-2026-10-26-batch-100.28, LED-2026-10-26-batch-100.44, LED-2026-10-26-batch-100.50, LED-2026-10-26-batch-100.65, LED-2026-10-26-batch-100.66, LED-2026-10-26-batch-100.68
 - **Statement:** `contained_in_workarea(path, workarea) -> bool` (NEW, `workspace.py`, B100-I14, frozen before Inc 1) shall be true iff the path, after resolving every link and junction, is inside `workarea.resolve()`. `place_into_workarea` (LLR-163.1) shall require it for every destination, so every placing writer — Save project's image, MAC, A2L and sub-folder copies, its emit (`save_patched_image` places through `copy_into_workarea`, `changes/apply.py:781`), the save-back, the variant append, the MAC and A2L syncs, and document placement — is covered by construction. The manifest seam replaces `project.json` rather than placing it, so `write_project_manifest`'s `_check_destination_contained` (`manifest_writer.py:366`) shall call `contained_in_workarea` with this app's work area. `list_projects` and `_handle_load_project` (picked or typed) shall require it too, and `_handle_save_dialog`, `list_projects` and `_handle_load_project` shall refuse a project folder for which `_is_reparse_point` is true, checked before `resolve()`, for new and merge targets alike.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-62 — `pytest tests/test_b100_project_homes.py -k tc_b100_62` (the placement guard and its junction arm are written at Inc 1 with `place_into_workarea`; the listing and load uses at Inc 8b)
@@ -1374,7 +1374,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-178.3 — The Load-result panel, reachable by keyboard
 - **Traceability:** HLR-178
-- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.25
+- **Ledger:** LED-2026-10-26-batch-100.2, LED-2026-10-26-batch-100.7, LED-2026-10-26-batch-100.16, LED-2026-10-26-batch-100.25, LED-2026-10-26-batch-100.68
 - **Statement:** After a project load, the app shall push the Load-result panel (NEW, `screens.py`, on the `pe_B` ids `#result_body`, `#result_variant`, `#result_ok`) with the composed announcement and every problem in a scrolling list with no truncation, rendered through `safe_text`. The focus starts on the list (↑, ↓, PgUp, PgDn, Home, End scroll it); `tab` moves to `#result_ok`, labelled "Close (esc)"; `escape` dismisses it from anywhere and `enter` dismisses it only when `#result_ok` has the focus; `v` dismisses it and runs `select_variant` (`app.py:6687`) through the one load seam. The Load dialog's preview of the open project shows the same announcement for the session.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-67 — `pytest tests/test_b100_announce.py -k tc_b100_67`
