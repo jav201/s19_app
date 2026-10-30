@@ -1,0 +1,101 @@
+# command: python -m pytest -q -p no:cacheprovider -k census tests
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree; corrective pass 1 applied)
+# source sha256 (16): app.py 8032dead73f7ee54 · apply.py 6d00f17fcefb704c · change_service.py 95da58bf3bcc27cd · project_gather_service.py 11697d6c85efb9e2 · test_b100_save_image.py 559768f390ded771
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:56:20Z
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc5\s19_app\__init__.py
+........................................................................ [ 82%]
+.........F.....                                                          [100%]
+================================== FAILURES ===================================
+______________ test_at058b_id_census_and_wiring_survive_reparent ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30050/test_at058b_id_census_and_wiri0')
+
+    def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
+        """AT-058b — every patch_* id + the run_checks wiring survive the reparent.
+    
+        Intent: LLR-058.3 (US-058) — the batch-36 change is compose-tree + CSS
+        only; moving ``#patch_paste_row`` out of ``#patch_pane_changefile`` into its
+        own panel cell must not drop any widget id or alter any handler / binding.
+        Assert (a) all 14 preserved ids resolve to exactly one widget after the
+        reparent (the save-back ids are queried once its hidden row is composed —
+        it is composed, just ``.hidden``; the census shrank from 15 at batch-94:
+        ``patch_variant_select`` retired with the HLR-006 variant group), (b) the
+        AT-032a locked ``#patch_checks_help``
+        token span is unchanged, and (c) the AT-032b run_checks idiom still routes
+        (pressing ``#patch_checks_run_button`` posts the "Checks:" status line —
+        C-12: the status line is produced by the real handler, not injected).
+    
+        Counterfactual: dropping/renaming any id fails (a); a handler regression
+        fails (c).
+        """
+        from textual.widgets import Button, Label, Static
+    
+        from s19_app.tui.capped_text_area import CappedTextArea
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                # (a) 14-id census — each id resolves to exactly one widget.
+                outcomes["id_counts"] = {
+                    wid: len(app.query(f"#{wid}")) for wid in _PATCH_PRESERVED_IDS
+                }
+    
+                # (b) the AT-032a locked help token span survives.
+                outcomes["help_text"] = str(
+                    app.query_one("#patch_checks_help", Label).render()
+                )
+    
+                # (c) the run_checks wiring still routes (real handler produces the
+                # status line — C-12).
+                _set_entry_inputs(app, address="0x100", bytes_text="AA")
+                panel.request_action("add_entry")
+                await pilot.pause()
+                app.query_one("#patch_checks_run_button", Button).press()
+                await pilot.pause()
+                outcomes["checks_line"] = any(
+                    line.startswith("Checks:") for line in app.log_lines
+                )
+    
+                # batch-46 FOLD-6 (C-17 / security F1/F4): the three-window
+                # reparent must NOT downgrade the markup-safety of the two
+                # file-derived-text sinks, nor swap the paste editor's 64 KiB
+                # CappedTextArea for a stock TextArea.
+                outcomes["checks_status_markup"] = app.query_one(
+                    "#patch_checks_status", Label
+                )._render_markup
+                outcomes["doc_issues_markup"] = app.query_one(
+                    "#patch_doc_issues", Static
+                )._render_markup
+                outcomes["paste_is_capped"] = isinstance(
+                    app.query_one("#patch_paste_text"), CappedTextArea
+                )
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        missing = [
+            wid for wid, count in outcomes["id_counts"].items() if count != 1
+        ]
+        assert not missing, f"patch ids missing after the reparent: {missing}"
+        assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
+            f"the AT-032a locked Checks-help token span must survive the reparent, "
+            f"got {outcomes['help_text']!r}"
+        )
+>       assert outcomes["checks_line"] is True, (
+            "pressing Run checks must still route run_checks after the reparent "
+            "(wiring unchanged)"
+        )
+E       AssertionError: pressing Run checks must still route run_checks after the reparent (wiring unchanged)
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:2696: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent
+1 failed, 86 passed, 3865 deselected in 86.94s (0:01:26)
+# exit: 1

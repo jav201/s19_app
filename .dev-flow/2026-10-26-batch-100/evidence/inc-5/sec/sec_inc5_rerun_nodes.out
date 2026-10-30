@@ -1,0 +1,6 @@
+..                                                                       [100%]
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b100_save_image.py::test_tc_b100_69_sec4_junction_save_back_stages_in_this_work_area
+PASSED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+2 passed in 1.84s

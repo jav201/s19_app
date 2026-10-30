@@ -153,7 +153,8 @@ from tools.id_registry import (
 # batch-100 Inc-2: 215 -> 216 (tests/test_b100_save_guards.py).
 # batch-100 Inc-3: 216 -> 217 (tests/test_b100_session_reset.py).
 # batch-100 Inc-4: 217 -> 218 (tests/test_b100_focus.py).
-EXPECTED_SCANNED_TEST_FILES = 218
+# batch-100 Inc-5: 218 -> 219 (tests/test_b100_save_image.py).
+EXPECTED_SCANNED_TEST_FILES = 219
 """Test modules scanned, including this one.
 
 batch-97 Inc-8: 197 -> 198. ``tests/test_b97_key_bar.py`` was added for the

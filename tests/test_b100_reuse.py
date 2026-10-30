@@ -785,13 +785,28 @@ def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
         and isinstance(node.func, ast.Name)
         and node.func.id in placements
     ]
-    assert len(calls) == 9, (
-        f"expected the 9 app.py placement calls (LED .50), found {len(calls)}"
+    # batch-100 Inc 5 re-pin (LLR-167.6): Save project's three placement
+    # calls (image, MAC, A2L) became ONE call inside the plan-row loop, so
+    # 9 -> 7; the emitted image is placed by ``save_patched_image`` and its
+    # root is threaded through the two emit entry points checked below.
+    assert len(calls) == 7, (
+        f"expected the 7 app.py placement calls (LED .50), found {len(calls)}"
     )
-    for call in calls:
+    emit_calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr in ("save_patched", "emit_and_verify")
+    ]
+    assert len(emit_calls) == 2, (
+        f"expected the 2 app.py emit calls (LED .56), found {len(emit_calls)}"
+    )
+    for call in calls + emit_calls:
+        name = getattr(call.func, "id", None) or call.func.attr
         assert any(keyword.arg == "workarea_root" for keyword in call.keywords), (
-            f"app.py call {call.func.id} at line {call.lineno} must pass "
-            "workarea_root explicitly (LED .50, SEC-1)"
+            f"app.py call {name} at line {call.lineno} must pass "
+            "workarea_root explicitly (LED .50, SEC-1, SEC-4)"
         )
 
 

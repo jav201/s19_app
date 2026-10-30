@@ -1,0 +1,34 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.8-inverse-clears-flag
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:59:10+00:00
+# requirement: LLR-167.8
+# mutation: INVERSE probe for the STOP item: Save project clears the panel's dirty flag unconditionally — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: e616ff506ca2ef4c1fe4434d66255b66ad747b11459c7f6fbaa0a01d189a6988
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+....................................F..                                  [100%]
+================================== FAILURES ===================================
+______________ test_tc_b100_70_unwritten_document_keeps_the_flag ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29963/test_tc_b100_70_unwritten_docu0')
+
+    def test_tc_b100_70_unwritten_document_keeps_the_flag(tmp_path: Path) -> None:
+        """A Save project that emits the image but does NOT write the editor's
+        document into the project (an unsaved, typed document — the document
+        is written by Save project only from Inc 8a) keeps the flag set: the
+        entries exist only in the editor and the image, so nothing on disk
+        holds the document."""
+        dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=False)
+        assert dirty_before is True
+        assert status.startswith("Saved project to"), status
+>       assert dirty_after is True
+E       assert False is True
+
+tests\test_b100_save_image.py:1276: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_unwritten_document_keeps_the_flag
+1 failed, 38 passed in 96.17s (0:01:36)
+
+# exit: 1

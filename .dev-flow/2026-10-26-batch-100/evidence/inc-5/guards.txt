@@ -1,0 +1,10 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:02:42Z
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 136.12s (0:02:16)
+# exit: 0

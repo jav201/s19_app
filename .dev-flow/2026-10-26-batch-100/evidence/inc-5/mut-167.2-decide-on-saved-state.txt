@@ -1,0 +1,111 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.2-decide-on-saved-state
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:48:25+00:00
+# requirement: LLR-167.2
+# mutation: emit-or-copy decided on differs_from_last_saved (A-08) — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: 9aa8a6527cb6f1426c4ce9c6a9863f531a49177571941f0bea70e307c9cd3771
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+....FFF.......F........................                                  [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b100_14_applied_then_undone_copies __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_applied_then_u0')
+
+    def test_tc_b100_14_applied_then_undone_copies(tmp_path: Path) -> None:
+        """Applied, then the entry undone (the image still holds the applied
+        bytes): the pre-check is true, the comparison runs, the re-derived
+        data equals the source → copy."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            app._change_service.undo()
+            assert not app._change_service.document.entries
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (pre, emit, refusal) == (True, False, None)
+E       assert (True, True, None) == (True, False, None)
+E         
+E         At index 1 diff: True != False
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:346: AssertionError
+____________________ test_tc_b100_14_unapplied_entry_emits ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_unapplied_entr0')
+
+    def test_tc_b100_14_unapplied_entry_emits(tmp_path: Path) -> None:
+        """Only an unapplied change entry writing new bytes: the pre-check is
+        false, the comparison still runs → emit."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (pre, emit, refusal) == (False, True, None)
+E       assert (False, False, None) == (False, True, None)
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:357: AssertionError
+_____________________ test_tc_b100_14_save_back_then_emit _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_14_save_back_then0')
+
+    def test_tc_b100_14_save_back_then_emit(tmp_path: Path) -> None:
+        """Save-back, then the decision: pre-check true → emit."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            await _save_back(pilot, app, "firmware.s19")
+            assert "Saved + verified" in _painted_log(app)
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (pre, emit, refusal) == (True, True, None)
+E       assert (True, False, None) == (True, True, None)
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:370: AssertionError
+_________ test_tc_b100_15_save_back_then_save_project_keeps_the_patch _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29957/test_tc_b100_15_save_back_then0')
+
+    def test_tc_b100_15_save_back_then_save_project_keeps_the_patch(
+        tmp_path: Path,
+    ) -> None:
+        """Save-back, then Save project → the patch is in the project image
+        (A-08: deciding on ``differs_from_last_saved`` would copy the
+        unpatched source here, because the save-back recorded the state)."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            await _save_back(pilot, app, "firmware.s19")
+            assert not app._change_service.differs_from_last_saved(
+                app.current_file.mem_map
+            )
+    
+        _, project, _ = _save_session(tmp_path, scenario)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+>       assert _differing(read_s19(project / "firmware.s19").data, expected) == []
+E       assert [2147483772, ...4, 2147483775] == []
+E         
+E         Left contains 4 more items, first extra item: 2147483772
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:599: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_applied_then_undone_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_unapplied_entry_emits
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_save_back_then_emit - a...
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_save_back_then_save_project_keeps_the_patch
+4 failed, 35 passed in 93.36s (0:01:33)
+
+# exit: 1

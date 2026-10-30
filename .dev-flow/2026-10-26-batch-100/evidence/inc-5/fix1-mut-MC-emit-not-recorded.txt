@@ -1,0 +1,187 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MC-emit-not-recorded
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:43:36+00:00
+# finding: review F1 / SEC-7 (LLR-167.4, LED .53)
+# mutation: the emitted image is never recorded for rollback — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: 3a977e61e2a7c10abac711efa6b866c836c8faaf2d66a05a0d481870353770ee
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+....................FFF...........F.............                         [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_17_verify_reread_failure_rolls_the_emit_back __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_verify_reread_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001287C58AC90>
+
+    def test_tc_b100_17_verify_reread_failure_rolls_the_emit_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F1 / SEC-7 (LLR-167.4, LED .53): the emit LANDS, then the
+        verify re-read raises ``OSError`` (an AV or indexer lock on the
+        just-written file) → the status says not saved, and the emitted image
+        and the folder this save created are both gone. The emitted file must
+        join the rollback list the moment it lands — recording it only after
+        the emit returns leaves ``P1/firmware.s19`` and a folder ``list_projects``
+        treats as a project."""
+    
+        def _refuse_reread(path, image, kind):
+            assert Path(path).is_file(), "the emit has not landed yet"
+            raise PermissionError(13, "re-read refused", str(path))
+    
+        monkeypatch.setattr(
+            change_service_module, "verify_written_image", _refuse_reread
+        )
+        before: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            before.update(_tree_digests(app.workarea))
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        assert "Project NOT saved: could not save" in lines[-1], lines
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_verify_reread_0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:766: AssertionError
+____ test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_non_os_error_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001287BCBB550>
+
+    def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F1 / SEC-7 (LLR-167.4): an error that is not an ``OSError``
+        after the emit landed still rolls the save back — no folder, no
+        image — and then surfaces (it is a defect, never swallowed)."""
+    
+        def _defect(path, image, kind):
+            raise ValueError("forced defect after the emit")
+    
+        monkeypatch.setattr(change_service_module, "verify_written_image", _defect)
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                before = _tree_digests(app.workarea)
+                with pytest.raises(ValueError, match="forced defect"):
+                    app._handle_save_dialog(_payload(app, "P1"))
+                return before, _tree_digests(app.workarea), app.workarea / "P1"
+    
+        before, after, project = asyncio.run(_drive())
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:796: AssertionError
+____________ test_tc_b100_17_failed_manifest_write_adopts_nothing _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_failed_manifes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001287FF53090>
+
+    def test_tc_b100_17_failed_manifest_write_adopts_nothing(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F4 (LLR-167.2, LLR-167.4): an UNAPPLIED entry makes the save
+        emit, then the manifest write fails → the save rolls back AND the
+        session view is not the re-derived image: the session map still holds
+        the source bytes at the entry and no summary carries a saved path.
+        Adopting before ``project.json`` is on disk would show the operator a
+        patched image that no file holds."""
+        monkeypatch.setattr(
+            S19TuiApp, "_write_and_verify_manifest", lambda self, *a, **k: False
+        )
+        seen: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            seen["map"] = app.current_file.mem_map
+            seen["service"] = app._change_service
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        assert "project.json was not written" in lines[-1], lines
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_failed_manifes0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_17_failed_manifes0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:821: AssertionError
+_____ test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[emit] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30043/test_tc_b100_59_landing_that_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001287F3EB0D0>
+patch = True
+
+    @pytest.mark.parametrize("patch", [True, False], ids=["emit", "copy"])
+    def test_tc_b100_59_landing_that_differs_from_its_row_rolls_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, patch: bool
+    ) -> None:
+        """Review F3 (LLR-163.7, LLR-167.6): another writer claims the planned
+        landing between the plan and the placement, so the image lands at
+        ``firmware_1.s19`` instead of the planned ``firmware.s19`` → the save
+        refuses with a line naming BOTH paths, removes the file it wrote and
+        writes no ``project.json``; the other writer's file survives
+        byte-identical. A silent mismatch would leave a project whose files
+        are not the ones the plan showed."""
+        foreign = b"S0030000FC\r\nS9030000FC\r\n"
+        original = app_module.plan_project_save
+    
+        def _plan_then_race(target, **kwargs):
+            plan = original(target, **kwargs)
+            Path(target).mkdir(parents=True, exist_ok=True)
+            (Path(target) / "firmware.s19").write_bytes(foreign)
+            return plan
+    
+        monkeypatch.setattr(app_module, "plan_project_save", _plan_then_race)
+        # The painted line is capped at the terminal width; the full message is
+        # read where the app sets it.
+        statuses: list = []
+        real_set_status = S19TuiApp.set_status
+    
+        def _set_status(self, message, *args, **kwargs):
+            statuses.append(str(message))
+            return real_set_status(self, message, *args, **kwargs)
+    
+        monkeypatch.setattr(S19TuiApp, "set_status", _set_status)
+    
+        async def scenario(app, pilot) -> None:
+            if patch:
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+    
+        _save_session(tmp_path, scenario)
+        project = _workarea(tmp_path / "app") / "P1"
+        refusal = statuses[-1]
+        planned = f"{os.sep}P1{os.sep}firmware.s19 (new) but the file landed at "
+        landed = f"{os.sep}P1{os.sep}firmware_1.s19 (new)"
+        assert refusal.startswith("Project NOT saved: the plan named "), lines
+        assert planned in refusal and landed in refusal, refusal
+>       assert sorted(p.name for p in project.iterdir()) == ["firmware.s19"]
+E       AssertionError: assert ['firmware.s1...rmware_1.s19'] == ['firmware.s19']
+E         
+E         Left contains one more item: 'firmware_1.s19'
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:1297: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_verify_reread_failure_rolls_the_emit_back
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_failed_manifest_write_adopts_nothing
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[emit]
+4 failed, 44 passed in 118.48s (0:01:58)
+
+# exit: 1

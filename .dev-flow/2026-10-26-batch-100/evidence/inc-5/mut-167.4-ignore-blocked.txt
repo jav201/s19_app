@@ -1,0 +1,84 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.4-ignore-blocked
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:51:34+00:00
+# requirement: LLR-167.4
+# mutation: the blocked re-derive is ignored (ok=False not honoured) — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: ed4301c142b0f8c55859732055272f0efd3f22a24adb961666bbb861a6536f82
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+..................F.......F........F...                                  [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_17_blocked_entry_refuses_the_whole_save _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29959/test_tc_b100_17_blocked_entry_0')
+
+    def test_tc_b100_17_blocked_entry_refuses_the_whole_save(tmp_path: Path) -> None:
+        """A document with 1 blocked entry → 1 status naming it, 0 files,
+        0 folders left."""
+        before: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            app._change_service.load_text(_one_blocked_document_text())
+            document = app._change_service.document
+            assert len(document.entries) == 1 and document.has_errors, (
+                document.entries,
+                document.issues,
+            )
+            before.update(_tree_digests(app.workarea))
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+        refusal = lines[-1]
+>       assert "Project NOT saved: 1 blocked entry (0x8000007C)" in refusal, lines
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project saved + manifest verified', "Saved project to C:\\Users\\jjgh8\\AppData\\L...emp\\pytest-of-jjgh8\\pytest-29959\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"]
+E       assert 'Project NOT saved: 1 blocked entry (0x8000007C)' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29959\\test_tc_b100_17_blocked_entry_0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+
+tests\test_b100_save_image.py:704: AssertionError
+_________________ test_tc_b100_59_refused_plan_writes_nothing _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29959/test_tc_b100_59_refused_plan_w0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000242E789E090>
+
+    def test_tc_b100_59_refused_plan_writes_nothing(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A blocked document → the plan carries the refusal and no row;
+        0 files written."""
+        plans = _capture_plans(monkeypatch)
+        before: dict = {}
+    
+        async def scenario(app, pilot) -> None:
+            app._change_service.load_text(_one_blocked_document_text())
+            before.update(_tree_digests(app.workarea))
+    
+        _, project, _ = _save_session(tmp_path, scenario)
+        plan = plans[-1]
+>       assert plan.rows == () and "1 blocked entry" in (plan.refusal or "")
+E       AssertionError: assert ((SavePlanRow(...action='new')) == ()
+E         
+E         Left contains 2 more items, first extra item: SavePlanRow(role='image', source=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29959/test_tc_b...emp/pytest-of-jjgh8/pytest-29959/test_tc_b100_59_refused_plan_w0/app/.s19tool/workarea/P1/firmware.s19'), action='new')
+E         Use -v to get more diff)
+
+tests\test_b100_save_image.py:996: AssertionError
+_________________ test_tc_b100_70_refused_save_keeps_the_flag _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29959/test_tc_b100_70_refused_save_k0')
+
+    def test_tc_b100_70_refused_save_keeps_the_flag(tmp_path: Path) -> None:
+        """A refused Save project (a blocked document) → the flag is still set
+        (1 assertion after the vacuity guard)."""
+        dirty_before, dirty_after, status = _dirty_after_save(tmp_path, blocked=True)
+        assert dirty_before is True
+>       assert "blocked" in status, status
+E       AssertionError: Saved project to C:\Users\jjgh8\AppData\Local\Temp\pytest-of-jjgh8\pytest-29959\test_tc_b100_70_refused_save_k0\app\.s19tool\workarea\P1 (variant 'firmware')
+E       assert 'blocked' in "Saved project to C:\\Users\\jjgh8\\AppData\\Local\\Temp\\pytest-of-jjgh8\\pytest-29959\\test_tc_b100_70_refused_save_k0\\app\\.s19tool\\workarea\\P1 (variant 'firmware')"
+
+tests\test_b100_save_image.py:1263: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_blocked_entry_refuses_the_whole_save
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_refused_plan_writes_nothing
+FAILED tests/test_b100_save_image.py::test_tc_b100_70_refused_save_keeps_the_flag
+3 failed, 36 passed in 94.86s (0:01:34)
+
+# exit: 1

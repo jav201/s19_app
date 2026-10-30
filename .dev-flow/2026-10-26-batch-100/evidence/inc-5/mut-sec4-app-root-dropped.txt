@@ -1,0 +1,65 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 with mutation: workarea_root dropped from app.py's emit_and_verify call (SEC-4 threading)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset
+# pre 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant 6bd766e3e194cf1fa43481296ce912d9daaf7463925f7e0bb92dffc0f9913046
+# restored 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________
+
+    def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), security finding SEC-1 â€” the AST
+        census: EVERY placement call in ``app.py`` names ``workarea_root``
+        explicitly, so the guard's containment authority is always THIS app's
+        work area (B100-I14), never one the destination's own text names.
+        Dropping the root from any single call turns this RED (transcript
+        ``mut-census-root.txt``)."""
+        source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        placements = (
+            "place_into_workarea",
+            "copy_into_workarea",
+            "place_group_into_workarea",
+        )
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in placements
+        ]
+        # batch-100 Inc 5 re-pin (LLR-167.6): Save project's three placement
+        # calls (image, MAC, A2L) became ONE call inside the plan-row loop, so
+        # 9 -> 7; the emitted image is placed by ``save_patched_image`` and its
+        # root is threaded through the two emit entry points checked below.
+        assert len(calls) == 7, (
+            f"expected the 7 app.py placement calls (LED .50), found {len(calls)}"
+        )
+        emit_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr in ("save_patched", "emit_and_verify")
+        ]
+        assert len(emit_calls) == 2, (
+            f"expected the 2 app.py emit calls (LED .56), found {len(emit_calls)}"
+        )
+        for call in calls + emit_calls:
+            name = getattr(call.func, "id", None) or call.func.attr
+>           assert any(keyword.arg == "workarea_root" for keyword in call.keywords), (
+                f"app.py call {name} at line {call.lineno} must pass "
+                "workarea_root explicitly (LED .50, SEC-1, SEC-4)"
+            )
+E           AssertionError: app.py call emit_and_verify at line 8971 must pass workarea_root explicitly (LED .50, SEC-1, SEC-4)
+E           assert False
+E            +  where False = any(<generator object test_tc_b100_01_app_placements_name_the_workarea_root.<locals>.<genexpr> at 0x0000025B8BCFDBE0>)
+
+tests\test_b100_reuse.py:807: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+1 failed in 0.74s
+
+# exit: 1

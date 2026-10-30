@@ -1,0 +1,16 @@
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + Inc 5 after corrective pass 2) | app.py ecfe48ae4da0f24e apply.py 6d00f17fcefb704c change_service.py 95da58bf3bcc27cd project_gather_service.py 11697d6c85efb9e2 | PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 | NO_COLOR unset | 2026-10-29T16:44:59-06:00 | orchestrator re-run
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_save_image.py tests/test_b100_focus.py tests/test_b100_reuse.py tests/test_b100_save_guards.py tests/test_b100_session_reset.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_load_project_dialog.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_editor_image.py tests/test_b99_export.py tests/test_b99_patch_truth.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_flow_execution.py -rfE
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 33%]
+........................................................................ [ 41%]
+........................................................................ [ 49%]
+........................................................................ [ 58%]
+........................................................................ [ 66%]
+........................................................................ [ 74%]
+........................................................................ [ 83%]
+........................................................................ [ 91%]
+........................................................................ [ 99%]
+...                                                                      [100%]
+867 passed in 3425.81s (0:57:05)

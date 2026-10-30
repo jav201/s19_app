@@ -1,0 +1,132 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.1-round2-rule
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:45:11+00:00
+# requirement: LLR-167.1
+# mutation: the round-2 rule: any document kind counts and emit whenever the document holds an entry (the data comparison removed) — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: 57de62ac20c4115454ccfe41d5fb98d150f078fc0b066874773d9ed6eb06e825
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+..FFF....FF............................                                  [100%]
+================================== FAILURES ===================================
+_______________________ test_tc_b100_14_same_bytes_copy _______________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_same_bytes_cop0')
+
+    def test_tc_b100_14_same_bytes_copy(tmp_path: Path) -> None:
+        """An entry that writes the bytes already there → copy (P-38: the
+        round-2 rule emitted a byte-different ``_1`` file here)."""
+        same = tuple(_source_data()[0x80000070 + i] for i in range(4))
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, 0x80000070, same)
+            assert _apply(app).counts[DISPOSITION_APPLIED] == 1
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (emit, refusal) == (False, None), (pre, emit, refusal)
+E       AssertionError: (False, True, None)
+E       assert (True, None) == (False, None)
+E         
+E         At index 0 diff: True != False
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:316: AssertionError
+____________________ test_tc_b100_14_check_document_copies ____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_check_document0')
+
+    def test_tc_b100_14_check_document_copies(tmp_path: Path) -> None:
+        """A check document with entries never counts → copy, never a refusal
+        (P-37: the round-2 rule re-derived it and every entry was blocked)."""
+    
+        async def scenario(app, pilot) -> None:
+            doc = b97_fixtures.baseline_check(app.workarea / WORKAREA_PATCHES)
+            result = app._change_service.load(str(doc), app.base_dir)
+            assert result.ok, result.message
+            assert app._change_service.document.kind == "check"
+            assert app._change_service.document.entries
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (emit, refusal) == (False, None), (pre, emit, refusal)
+E       AssertionError: (False, False, 'Project NOT saved: 4 blocked entries (0x0000EB10, 0x0000EB40, 0x0000ED00, 0x0000FCB0) — fix them in the Patch Editor.')
+E       assert (False, 'Proj...atch Editor.') == (False, None)
+E         
+E         At index 1 diff: 'Project NOT saved: 4 blocked entries (0x0000EB10, 0x0000EB40, 0x0000ED00, 0x0000FCB0) — fix them in the Patch Editor.' != None
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:331: AssertionError
+_________________ test_tc_b100_14_applied_then_undone_copies __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_14_applied_then_u0')
+
+    def test_tc_b100_14_applied_then_undone_copies(tmp_path: Path) -> None:
+        """Applied, then the entry undone (the image still holds the applied
+        bytes): the pre-check is true, the comparison runs, the re-derived
+        data equals the source → copy."""
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            app._change_service.undo()
+            assert not app._change_service.document.entries
+    
+        pre, emit, refusal, _ = _decide(tmp_path, scenario)
+>       assert (pre, emit, refusal) == (True, False, None)
+E       assert (True, True, None) == (True, False, None)
+E         
+E         At index 1 diff: True != False
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:346: AssertionError
+_________________ test_tc_b100_15_check_document_only_copies __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_15_check_document0')
+
+    def test_tc_b100_15_check_document_only_copies(tmp_path: Path) -> None:
+        """Check document only → byte copy (0 differing bytes) + the document
+        under ``checks/``, 0 refusals (the TC-700 pattern)."""
+    
+        async def scenario(app, pilot) -> None:
+            doc = b97_fixtures.baseline_check(app.workarea / WORKAREA_PATCHES)
+            assert app._change_service.load(str(doc), app.base_dir).ok
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+>       assert not any("NOT saved" in line for line in lines), lines
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Project NOT saved: 4 blocked entries (0x0000EB10, 0x0000EB40, 0x0000ED00, 0x0000FCB0) — fix them in the Patch Editor.']
+E       assert not True
+E        +  where True = any(<generator object test_tc_b100_15_check_document_only_copies.<locals>.<genexpr> at 0x00000132FA1F3030>)
+
+tests\test_b100_save_image.py:466: AssertionError
+__________________ test_tc_b100_15_unchanged_document_copies __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29955/test_tc_b100_15_unchanged_docu0')
+
+    def test_tc_b100_15_unchanged_document_copies(tmp_path: Path) -> None:
+        """A change entry that writes the bytes already there → byte copy,
+        0 new variants."""
+        same = tuple(_source_data()[0x80000070 + i] for i in range(4))
+    
+        async def scenario(app, pilot) -> None:
+            _add(app, 0x80000070, same)
+            _apply(app)
+    
+        lines, project, _ = _save_session(tmp_path, scenario)
+>       assert (project / "firmware.s19").read_bytes() == (
+            CASE01_DIR / "firmware.s19"
+        ).read_bytes()
+E       AssertionError: assert b'S00F0000434...0000000FA\r\n' == b'S00F0000434...00000007A\r\n'
+E         
+E         At index 38 diff: b'2' != b'1'
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:483: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_same_bytes_copy - Asser...
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_check_document_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_applied_then_undone_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_check_document_only_copies
+FAILED tests/test_b100_save_image.py::test_tc_b100_15_unchanged_document_copies
+5 failed, 34 passed in 95.48s (0:01:35)
+
+# exit: 1

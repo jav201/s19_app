@@ -1,0 +1,39 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.5-saveback-only
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:53:09+00:00
+# requirement: LLR-167.5
+# mutation: mark_saved called on the save-back path only (Save project's call removed) — file s19_app/tui/app.py
+# pre-mutation sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# mutant sha256: 43a23e0b754e3fa9568ca84ac5d35bed38c18f0c40c654e9b946cfa1e6150fcb
+# restored sha256: 2f6b446594652dbc34ea05dc1be9f206791bff5e871e166306873d36e12bdf32
+# RESTORE OK
+.....................F.................                                  [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_58_save_project_records_the_saved_state _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29960/test_tc_b100_58_save_project_r0')
+
+    def test_tc_b100_58_save_project_records_the_saved_state(tmp_path: Path) -> None:
+        """loaded → False; applied → True; applied → Save project → False."""
+    
+        async def scenario(app, pilot) -> None:
+            await _save(pilot, app, "P1")
+            await _wait_for(
+                pilot,
+                lambda: _status_text(app).startswith("Saved project to"),
+                "the Save project success line",
+            )
+    
+>       assert _predicate_after(tmp_path, scenario) == (False, True, False)
+E       assert (False, True, True) == (False, True, False)
+E         
+E         At index 2 diff: True != False
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:818: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_save_project_records_the_saved_state
+1 failed, 38 passed in 93.21s (0:01:33)
+
+# exit: 1

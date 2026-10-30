@@ -1,0 +1,74 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree) with mutation 167.7-rederive-writes-session
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-29T19:57:32+00:00
+# requirement: LLR-167.7
+# mutation: rederive_for_save writes the session map — file s19_app/tui/services/change_service.py
+# pre-mutation sha256: 3623a42e6d1cd13e0de88b9ca8cb57918ba86ef2d586b818def1d94130774971
+# mutant sha256: 6eb75e9af9f5abb7616548519fdca970f3bf9eb70822620ebd96431fd73ee9af
+# restored sha256: 3623a42e6d1cd13e0de88b9ca8cb57918ba86ef2d586b818def1d94130774971
+# RESTORE OK
+.......F.....................F.........                                  [100%]
+================================== FAILURES ===================================
+___________________ test_tc_b100_14_deciding_writes_nothing ___________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29962/test_tc_b100_14_deciding_write0')
+
+    def test_tc_b100_14_deciding_writes_nothing(tmp_path: Path) -> None:
+        """0 writes to the session map while deciding (the trap map is the
+        session map from before the apply, so the journal binds to it)."""
+    
+        async def scenario(app, pilot) -> None:
+            trap = _TrapDict(app.current_file.mem_map)
+            app.current_file.mem_map = trap
+            _add(app, PATCH_ADDRESS, PATCH_BYTES)
+            _apply(app)
+            _add(app, SECOND_ADDRESS, SECOND_BYTES)
+            trap.writes = 0
+    
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                await scenario(app, pilot)
+                trap = app.current_file.mem_map
+                step = app._decide_project_image()
+            return step.emit, trap.writes
+    
+        emit, writes = asyncio.run(_drive())
+        assert emit is True
+>       assert writes == 0, f"deciding wrote {writes} bytes into the session map"
+E       AssertionError: deciding wrote 4 bytes into the session map
+E       assert 4 == 0
+
+tests\test_b100_save_image.py:399: AssertionError
+________ test_tc_b100_69_rederive_writes_nothing_into_the_session_map _________
+
+    def test_tc_b100_69_rederive_writes_nothing_into_the_session_map() -> None:
+        """``rederive_for_save`` → 0 writes to the session map; the copy holds
+        source + the current document (the journal restored on the copy)."""
+        service = ChangeService()
+        mem_map, ranges = _small_image()
+        source = dict(mem_map)
+        service.add_entry("0x1000", "", "AA BB")
+        service.apply(mem_map, ranges, None, None)
+        service.remove_entry("0x1000")
+        service.add_entry("0x2000", "", "01 02")
+        mem_map.writes = 0
+        derived, summary = service.rederive_for_save(
+            dict(mem_map), ranges=ranges, session_map=mem_map
+        )
+>       assert mem_map.writes == 0
+E       assert 2 == 0
+E        +  where 2 = {4096: 0, 4097: 1, 4098: 2, 4099: 3, 4100: 4, 4101: 5, 4102: 6, 4103: 7, 4104: 8, 4105: 9, 4106: 10, 4107: 11, 4108: 12, 4109: 13, 4110: 14, 4111: 15, 8192: 64, 8193: 65, 8194: 66, 8195: 67, 8196: 68, 8197: 69, 8198: 70, 8199: 71}.writes
+
+tests\test_b100_save_image.py:1102: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_14_deciding_writes_nothing
+FAILED tests/test_b100_save_image.py::test_tc_b100_69_rederive_writes_nothing_into_the_session_map
+2 failed, 37 passed in 95.93s (0:01:35)
+
+# exit: 1

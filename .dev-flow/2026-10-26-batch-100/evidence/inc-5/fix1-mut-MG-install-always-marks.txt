@@ -1,0 +1,60 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MG-install-always-marks
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:47:44+00:00
+# finding: review F5 (LLR-167.5)
+# mutation: every install (a MAC attach included) records the saved state — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: 038b9a4c46dbe4c3d2b5a8ce061f75a46076abd1988969fed197c45487ab1865
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+.............................F..................                         [100%]
+================================== FAILURES ===================================
+__________ test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30045/test_tc_b100_58_mac_attach_kee0')
+
+    def test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved(
+        tmp_path: Path,
+    ) -> None:
+        """Review F5 (LLR-167.5): attaching a MAC re-installs the SAME image
+        dict, so it is not a load — an applied, unsaved patch must stay
+        unsaved, or the Inc 10 load question would not ask before replacing
+        it."""
+        folder = _copy_case01(tmp_path, "firmware.s19", "firmware.mac")
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, folder / "firmware.s19")
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                mem_map = app.current_file.mem_map
+                assert app._change_service.differs_from_last_saved(mem_map)
+                app.load_selected_file(folder / "firmware.mac")
+                await _wait_for(
+                    pilot,
+                    lambda: app.current_file is not None
+                    and app.current_file.mac_path is not None,
+                    "the MAC attach",
+                )
+                return (
+                    app.current_file.mem_map is mem_map,
+                    app._change_service.differs_from_last_saved(
+                        app.current_file.mem_map
+                    ),
+                )
+    
+>       assert asyncio.run(_drive()) == (True, True)
+E       assert (True, False) == (True, True)
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+tests\test_b100_save_image.py:1077: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_58_mac_attach_keeps_an_unsaved_patch_unsaved
+1 failed, 47 passed in 122.33s (0:02:02)
+
+# exit: 1

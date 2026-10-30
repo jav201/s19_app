@@ -1445,9 +1445,13 @@ def test_at_b99_05_save_project_after_same_name_save_back(tmp_path: Path) -> Non
     )
     placed = tmp_path / ".s19tool" / "workarea" / "proj" / "firmware.s19"
     assert placed.is_file(), "the project folder must hold the image"
-    # the project save copies the loaded work copy (the source image) — the
-    # patched save-back landed separately under the workarea root
-    assert _data(placed) == {0x1000: 0x11, 0x2000: 0x00}, _data(placed)
+    # batch-100 HLR-167 / LLR-167.2 re-pin: the project image is the image
+    # the session shows — source + the document (the save-back's patch at
+    # 0x2000) — and the success line names the entries it carries
+    # (LLR-167.3). Before batch-100 Inc 5 the save copied the unpatched
+    # work copy (P-1).
+    assert _data(placed) == {0x1000: 0x11, 0x2000: 0xAA}, _data(placed)
+    assert "1 change entry" in save_lines[-1], save_lines[-1]
 
 
 # ---------------------------------------------------------------------------

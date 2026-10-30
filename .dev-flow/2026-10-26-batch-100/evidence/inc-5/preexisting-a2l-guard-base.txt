@@ -1,0 +1,7 @@
+# command: python probe_open.py (open project P1 = S19+MAC+A2L, Save project into P1 unchanged)
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f, unmodified) ; PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset
+path C:\Users\jjgh8\AppData\Local\Temp\tmpd4nf17q1\app\.s19tool\workarea\P1\firmware.s19 mac C:\Users\jjgh8\AppData\Local\Temp\tmpd4nf17q1\app\.s19tool\workarea\P1\firmware.mac a2l C:\Users\jjgh8\AppData\Local\Temp\tmpd4nf17q1\app\.s19tool\workarea\P1\firmware.a2l
+LOG Loaded firmware.s19 (S19 only)
+LOG Loaded firmware.mac (S19+MAC)
+LOG Loaded project 'P1' -> firmware.s19 + firmware.mac
+LOG Project already has an A2L file.

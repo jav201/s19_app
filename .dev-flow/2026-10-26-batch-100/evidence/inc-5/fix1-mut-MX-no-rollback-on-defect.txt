@@ -1,0 +1,55 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MX-no-rollback-on-defect
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:49:47+00:00
+# finding: review F1 / SEC-7 (non-OSError half)
+# mutation: a non-OSError after the folder's creation escapes without rollback — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: 81b52098bac9713063e38e75ad85ffbde50b6841cf3e72e6313cbe5eff8dc061
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+.....................F..........................                         [100%]
+================================== FAILURES ===================================
+____ test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000029F459485D0>
+
+    def test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Review F1 / SEC-7 (LLR-167.4): an error that is not an ``OSError``
+        after the emit landed still rolls the save back — no folder, no
+        image — and then surfaces (it is a defect, never swallowed)."""
+    
+        def _defect(path, image, kind):
+            raise ValueError("forced defect after the emit")
+    
+        monkeypatch.setattr(change_service_module, "verify_written_image", _defect)
+        src = _copy_case01(tmp_path) / "firmware.s19"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path / "app")
+            async with app.run_test(size=(220, 60)) as pilot:
+                await pilot.pause()
+                await _load_image(pilot, app, src)
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+                before = _tree_digests(app.workarea)
+                with pytest.raises(ValueError, match="forced defect"):
+                    app._handle_save_dialog(_payload(app, "P1"))
+                return before, _tree_digests(app.workarea), app.workarea / "P1"
+    
+        before, after, project = asyncio.run(_drive())
+>       assert not project.exists(), sorted(project.rglob("*"))
+E       AssertionError: [WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1/firmware.s19')]
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30046/test_tc_b100_17_non_os_error_a0/app/.s19tool/workarea/P1').exists
+
+tests\test_b100_save_image.py:796: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_17_non_os_error_after_the_emit_rolls_back_then_surfaces
+1 failed, 47 passed in 120.38s (0:02:00)
+
+# exit: 1

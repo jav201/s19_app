@@ -1,0 +1,124 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_save_image.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc5 (base 8d6056f + Inc 5 working tree + corrective pass 1) with mutation MB-mismatch-silenced
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:41:36+00:00
+# finding: review F3 (LLR-163.7, LLR-167.6)
+# mutation: the plan-row landing check is silenced — file s19_app/tui/app.py
+# pre-mutation sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# mutant sha256: e771a94b2645b33413de0984c3928914a81994d47e1b7bfd09d0889def3a6ad8
+# restored sha256: 8032dead73f7ee542aabe188794f816f897bba76f64268011b94cc708a831cd2
+# RESTORE OK
+..................................FF............                         [100%]
+================================== FAILURES ===================================
+_____ test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[emit] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30042/test_tc_b100_59_landing_that_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000224AAB14B90>
+patch = True
+
+    @pytest.mark.parametrize("patch", [True, False], ids=["emit", "copy"])
+    def test_tc_b100_59_landing_that_differs_from_its_row_rolls_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, patch: bool
+    ) -> None:
+        """Review F3 (LLR-163.7, LLR-167.6): another writer claims the planned
+        landing between the plan and the placement, so the image lands at
+        ``firmware_1.s19`` instead of the planned ``firmware.s19`` → the save
+        refuses with a line naming BOTH paths, removes the file it wrote and
+        writes no ``project.json``; the other writer's file survives
+        byte-identical. A silent mismatch would leave a project whose files
+        are not the ones the plan showed."""
+        foreign = b"S0030000FC\r\nS9030000FC\r\n"
+        original = app_module.plan_project_save
+    
+        def _plan_then_race(target, **kwargs):
+            plan = original(target, **kwargs)
+            Path(target).mkdir(parents=True, exist_ok=True)
+            (Path(target) / "firmware.s19").write_bytes(foreign)
+            return plan
+    
+        monkeypatch.setattr(app_module, "plan_project_save", _plan_then_race)
+        # The painted line is capped at the terminal width; the full message is
+        # read where the app sets it.
+        statuses: list = []
+        real_set_status = S19TuiApp.set_status
+    
+        def _set_status(self, message, *args, **kwargs):
+            statuses.append(str(message))
+            return real_set_status(self, message, *args, **kwargs)
+    
+        monkeypatch.setattr(S19TuiApp, "set_status", _set_status)
+    
+        async def scenario(app, pilot) -> None:
+            if patch:
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+    
+        _save_session(tmp_path, scenario)
+        project = _workarea(tmp_path / "app") / "P1"
+        refusal = statuses[-1]
+        planned = f"{os.sep}P1{os.sep}firmware.s19 (new) but the file landed at "
+        landed = f"{os.sep}P1{os.sep}firmware_1.s19 (new)"
+>       assert refusal.startswith("Project NOT saved: the plan named "), lines
+                                                                         ^^^^^
+E       NameError: name 'lines' is not defined
+
+tests\test_b100_save_image.py:1295: NameError
+_____ test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[copy] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30042/test_tc_b100_59_landing_that_d1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000224ABD01A90>
+patch = False
+
+    @pytest.mark.parametrize("patch", [True, False], ids=["emit", "copy"])
+    def test_tc_b100_59_landing_that_differs_from_its_row_rolls_back(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, patch: bool
+    ) -> None:
+        """Review F3 (LLR-163.7, LLR-167.6): another writer claims the planned
+        landing between the plan and the placement, so the image lands at
+        ``firmware_1.s19`` instead of the planned ``firmware.s19`` → the save
+        refuses with a line naming BOTH paths, removes the file it wrote and
+        writes no ``project.json``; the other writer's file survives
+        byte-identical. A silent mismatch would leave a project whose files
+        are not the ones the plan showed."""
+        foreign = b"S0030000FC\r\nS9030000FC\r\n"
+        original = app_module.plan_project_save
+    
+        def _plan_then_race(target, **kwargs):
+            plan = original(target, **kwargs)
+            Path(target).mkdir(parents=True, exist_ok=True)
+            (Path(target) / "firmware.s19").write_bytes(foreign)
+            return plan
+    
+        monkeypatch.setattr(app_module, "plan_project_save", _plan_then_race)
+        # The painted line is capped at the terminal width; the full message is
+        # read where the app sets it.
+        statuses: list = []
+        real_set_status = S19TuiApp.set_status
+    
+        def _set_status(self, message, *args, **kwargs):
+            statuses.append(str(message))
+            return real_set_status(self, message, *args, **kwargs)
+    
+        monkeypatch.setattr(S19TuiApp, "set_status", _set_status)
+    
+        async def scenario(app, pilot) -> None:
+            if patch:
+                _add(app, PATCH_ADDRESS, PATCH_BYTES)
+                _apply(app)
+    
+        _save_session(tmp_path, scenario)
+        project = _workarea(tmp_path / "app") / "P1"
+        refusal = statuses[-1]
+        planned = f"{os.sep}P1{os.sep}firmware.s19 (new) but the file landed at "
+        landed = f"{os.sep}P1{os.sep}firmware_1.s19 (new)"
+>       assert refusal.startswith("Project NOT saved: the plan named "), lines
+                                                                         ^^^^^
+E       NameError: name 'lines' is not defined
+
+tests\test_b100_save_image.py:1295: NameError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[emit]
+FAILED tests/test_b100_save_image.py::test_tc_b100_59_landing_that_differs_from_its_row_rolls_back[copy]
+2 failed, 46 passed in 118.85s (0:01:58)
+
+# exit: 1

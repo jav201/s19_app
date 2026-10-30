@@ -72,6 +72,7 @@ from ..changes.io import parse_change_document
 from ..changes.model import CHECK_AGGREGATE_KEYS, CheckRunResult
 from ..color_policy import css_class_for_severity
 from ..mac import parse_mac_file
+from ..workspace import PlacementResult
 from .a2l_service import enrich_tags_and_render
 from .load_service import build_loaded_hex, build_loaded_s19
 
@@ -911,6 +912,14 @@ class ChangeService:
         #: these after the verify result lands.
         self.last_save_applied: Tuple[int, ...] = ()
         self.last_save_not_applied: Tuple[int, ...] = ()
+        #: The batch-100 saved-state record (LLR-167.5, B100-I18): the bytes
+        #: of the journaled addresses as last loaded or written, and the
+        #: image dict they describe. Written by :meth:`mark_saved` after a
+        #: load, a successful save-back and a successful Save project; read
+        #: by :meth:`differs_from_last_saved`. Never consulted by the emit
+        #: decision (A-08).
+        self._saved_bytes: Dict[int, int] = {}
+        self._saved_map: Optional[Dict[int, int]] = None
 
     @staticmethod
     def _empty_document() -> ChangeDocument:
@@ -2006,6 +2015,471 @@ class ChangeService:
         )
         return summary
 
+    # ------------------------------------------------------------------
+    # Batch-100 save steps — the ``save_patched`` split (B100-I15), the
+    # source pre-check (B100-I5) and the saved-state record (B100-I18)
+    # ------------------------------------------------------------------
+
+    def image_differs_from_source(
+        self, mem_map: Optional[Dict[int, int]]
+    ) -> bool:
+        """
+        Summary:
+            The fast path into Save project's emit decision (B100-I5,
+            LLR-167.1): true iff the journal is bound to this dict and some
+            journaled address now holds a byte other than its source byte.
+            It only starts the re-derive and comparison early; it never
+            decides copy by itself.
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The session image map.
+
+        Returns:
+            bool: ``False`` for ``None`` or a dict the journal is not bound
+                to. Cost O(journaled addresses); ``mem_map`` is never
+                iterated or written.
+
+        Data Flow:
+            - Only a dict the journal is bound to can differ.
+            - Compare each journaled address's live byte with its source
+              byte; the first difference answers ``True``.
+
+        Dependencies:
+            Uses:
+                - the journal (``_journal`` / ``_image_map``)
+            Used by:
+                - S19TuiApp._decide_project_image
+                - S19TuiApp._handle_save_dialog (the commit's record rule)
+        """
+        if mem_map is None or mem_map is not self._image_map:
+            return False
+        return any(
+            mem_map.get(address) != byte
+            for address, byte in self._journal.items()
+        )
+
+    def mark_saved(self, mem_map: Optional[Dict[int, int]]) -> None:
+        """
+        Summary:
+            Record the saved image state (B100-I18, LLR-167.5): the bytes of
+            the journaled addresses as just loaded or written. Called after
+            a load, a successful save-back and a successful Save project.
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The session image map, which
+                now equals what was loaded or written.
+
+        Returns:
+            None. Cost O(journaled addresses).
+
+        Data Flow:
+            - Remember which dict was recorded.
+            - Keep the byte of every journaled address it holds; a dict
+              the journal is not bound to records no byte.
+
+        Dependencies:
+            Uses:
+                - the journal (``_journal`` / ``_image_map``)
+            Used by:
+                - S19TuiApp._apply_prepared_load (a NEW image dict only)
+                - S19TuiApp.on_patch_editor_panel_save_back_decision
+                - S19TuiApp._handle_save_dialog (the commit)
+        """
+        self._saved_map = mem_map
+        if mem_map is None or mem_map is not self._image_map:
+            self._saved_bytes = {}
+            return
+        self._saved_bytes = {
+            address: mem_map[address]
+            for address in self._journal
+            if address in mem_map
+        }
+
+    def differs_from_last_saved(
+        self, mem_map: Optional[Dict[int, int]]
+    ) -> bool:
+        """
+        Summary:
+            The unsaved-state predicate (B100-I18, LLR-167.5): whether any
+            journaled or recorded address now holds a byte other than the
+            one last loaded or written. It decides the load question and the
+            Save summary's pending line, and nothing else — never the emit
+            decision (A-08).
+
+        Args:
+            mem_map (Optional[Dict[int, int]]): The session image map.
+
+        Returns:
+            bool: ``False`` for ``None``. A journaled address that was not
+                recorded held its source byte at the last record, so it is
+                compared with the journal's source byte. Cost O(journaled +
+                recorded addresses); ``mem_map`` is never iterated.
+
+        Data Flow:
+            - The recorded bytes count only for the dict that was recorded;
+              the journal only for the dict it is bound to.
+            - Any recorded address now holding another byte → ``True``.
+            - Any journaled, unrecorded address no longer holding its
+              source byte → ``True``.
+
+        Dependencies:
+            Uses:
+                - mark_saved's record; the journal
+            Used by:
+                - the Inc 10 load question (no app caller before it)
+                - tests/test_b100_save_image.py (TC-B100-58)
+        """
+        if mem_map is None:
+            return False
+        recorded = self._saved_bytes if mem_map is self._saved_map else {}
+        journal = self._journal if mem_map is self._image_map else {}
+        for address, byte in recorded.items():
+            if mem_map.get(address) != byte:
+                return True
+        for address, source_byte in journal.items():
+            if address not in recorded and mem_map.get(address) != source_byte:
+                return True
+        return False
+
+    def save_entry_split(self) -> Tuple[Tuple[int, ...], Tuple[int, ...]]:
+        """
+        Summary:
+            Split the document's entries, in document order, into those the
+            last apply applied and those never applied before this save —
+            without storing anything (Save project decides on it before any
+            folder exists, review F7).
+
+        Returns:
+            Tuple[Tuple[int, ...], Tuple[int, ...]]: ``(applied, not_applied)``
+                addresses.
+
+        Data Flow:
+            - The applied set is the last apply's (empty after any
+              invalidating document mutation).
+            - Each document entry goes to one side by its address.
+
+        Dependencies:
+            Uses:
+                - ``document.entries`` / ``_applied_addresses``
+            Used by:
+                - record_save_entries
+                - S19TuiApp._decide_project_image
+        """
+        applied_before = self._applied_addresses or frozenset()
+        applied = tuple(
+            entry.address
+            for entry in self.document.entries
+            if entry.address in applied_before
+        )
+        not_applied = tuple(
+            entry.address
+            for entry in self.document.entries
+            if entry.address not in applied_before
+        )
+        return applied, not_applied
+
+    def record_save_entries(self) -> Tuple[Tuple[int, ...], Tuple[int, ...]]:
+        """
+        Summary:
+            Store :meth:`save_entry_split` on :attr:`last_save_applied` /
+            :attr:`last_save_not_applied` (PDR-UX-C6) — the inputs of the
+            emit's message and of the verify line. Run right before the
+            emit, while the applied set is still the last apply's.
+
+        Returns:
+            Tuple[Tuple[int, ...], Tuple[int, ...]]: ``(applied, not_applied)``
+                addresses — the inputs of :func:`save_back_status_suffix`.
+
+        Data Flow:
+            - Compute the split; store both halves; return them.
+
+        Dependencies:
+            Uses:
+                - save_entry_split
+            Used by:
+                - save_patched (the save-back)
+                - S19TuiApp._handle_save_dialog (right before the emit)
+        """
+        self.last_save_applied, self.last_save_not_applied = (
+            self.save_entry_split()
+        )
+        return self.last_save_applied, self.last_save_not_applied
+
+    def rederive_for_save(
+        self,
+        copy: Dict[int, int],
+        *,
+        ranges: Optional[Sequence[Tuple[int, int]]],
+        session_map: Optional[Dict[int, int]],
+        mac_records: Optional[Sequence[dict]] = None,
+        a2l_tags: Optional[Sequence[dict]] = None,
+    ) -> Tuple[Dict[int, int], ChangeSummary]:
+        """
+        Summary:
+            The re-derive half of the ``save_patched`` split (B100-I15,
+            LLR-167.7): restore the journal onto ``copy`` and apply the
+            current document to it, so ``copy`` becomes the source plus the
+            document's current entries. The session map is never written.
+
+        Args:
+            copy (Dict[int, int]): A copy of the session map; written in
+                place and returned.
+            ranges (Optional[Sequence[Tuple[int, int]]]): The image ranges.
+            session_map (Optional[Dict[int, int]]): The session map the copy
+                was taken from — read only to tell whether the journal
+                describes this image. A dict the journal is not bound to
+                restores nothing (the copy is then the image as loaded).
+            mac_records (Optional[Sequence[dict]]): Linkage input.
+            a2l_tags (Optional[Sequence[dict]]): Linkage input.
+
+        Returns:
+            Tuple[Dict[int, int], ChangeSummary]: ``copy`` and the fresh
+                summary. A blocked document (an ERROR finding, or a
+                non-``change`` kind) writes nothing and every entry is
+                ``blocked``.
+
+        Data Flow:
+            - Journal restore onto the copy, then the collision refresh the
+              apply runs, then ``apply_change_document`` onto the copy.
+
+        Dependencies:
+            Uses:
+                - collision_issues / apply_change_document
+            Used by:
+                - save_patched (the save-back)
+                - S19TuiApp._decide_project_image
+        """
+        if session_map is not None and session_map is self._image_map:
+            for address, byte in self._journal.items():
+                copy[address] = byte
+        retained = [
+            issue
+            for issue in self.document.issues
+            if issue.code != CHG_COLLISION
+        ]
+        self.document.issues = retained + collision_issues(
+            self.document.entries
+        )
+        prior = self.last_summary
+        summary = apply_change_document(
+            self.document,
+            copy,
+            ranges,
+            mac_records,
+            a2l_tags,
+            variant_id=prior.variant_id if prior is not None else None,
+        )
+        return copy, summary
+
+    def rederived_differs_from_source(
+        self, mem_map: Dict[int, int], derived: Dict[int, int]
+    ) -> bool:
+        """
+        Summary:
+            Save project's emit decision on data (LLR-167.1): whether the
+            re-derived image holds, at any address the document addresses,
+            a byte other than the source's. Outside those addresses the
+            re-derived copy equals the source by construction (the journal
+            restore), so the comparison is complete.
+
+        Args:
+            mem_map (Dict[int, int]): The session map (read only).
+            derived (Dict[int, int]): The copy :meth:`rederive_for_save`
+                returned.
+
+        Returns:
+            bool: ``True`` iff the data differs — Save project emits.
+
+        Data Flow:
+            - For each document entry, walk its addressed span.
+            - The source byte is the journal's (when bound) or the live
+              byte; the first re-derived byte that differs answers ``True``.
+
+        Dependencies:
+            Uses:
+                - the journal; ``document.entries``
+            Used by:
+                - S19TuiApp._decide_project_image
+        """
+        journal = self._journal if mem_map is self._image_map else {}
+        for entry in self.document.entries:
+            start, end = entry.addressed_range
+            for address in range(start, end):
+                if address not in derived:
+                    continue
+                source_byte = journal.get(address, mem_map.get(address))
+                if derived[address] != source_byte:
+                    return True
+        return False
+
+    def adopt_rederived(
+        self,
+        mem_map: Dict[int, int],
+        derived: Dict[int, int],
+        summary: Optional[ChangeSummary] = None,
+    ) -> None:
+        """
+        Summary:
+            The in-place view update of the split (LLR-157.1, LLR-167.2):
+            write the re-derived bytes into the session map IN PLACE (aliases
+            hold the dict) and re-journal the source bytes of the document's
+            spans — the same end state the pre-split ``save_patched`` left.
+
+        Args:
+            mem_map (Dict[int, int]): The session map, written in place.
+            derived (Dict[int, int]): The re-derived copy.
+            summary (Optional[ChangeSummary]): When given, it becomes
+                :attr:`last_summary` and its applied entries the applied
+                set (Save project's commit); ``None`` leaves both to the
+                caller (``save_patched``'s reuse rule).
+
+        Returns:
+            None. Cost O(journaled addresses + document spans).
+
+        Data Flow:
+            - Bind the journal to ``mem_map``.
+            - Build the new journal: each document-span address keeps its
+              source byte (the old journal's, else the live byte).
+            - Write the re-derived byte at every old or new journaled
+              address, then swap the journal in.
+            - With a summary: it becomes :attr:`last_summary` and its
+              applied entries the applied set.
+
+        Dependencies:
+            Uses:
+                - _note_image
+            Used by:
+                - save_patched (the save-back)
+                - S19TuiApp._handle_save_dialog (only after project.json is
+                  written)
+        """
+        self._note_image(mem_map)
+        journal: Dict[int, int] = {}
+        for entry in self.document.entries:
+            start, end = entry.addressed_range
+            for address in range(start, end):
+                if address in mem_map:
+                    journal.setdefault(
+                        address, self._journal.get(address, mem_map[address])
+                    )
+        for address in set(self._journal) | set(journal):
+            mem_map[address] = derived[address]
+        self._journal.clear()
+        self._journal.update(journal)
+        if summary is not None:
+            self.last_summary = summary
+            self._applied_addresses = frozenset(
+                record.address_start
+                for record in summary.entries
+                if record.disposition == DISPOSITION_APPLIED
+            )
+
+    def emit_and_verify(
+        self,
+        image: Dict[int, int],
+        ranges: Sequence[Tuple[int, int]],
+        dest_dir: Path,
+        filename: str,
+        *,
+        source_kind: str,
+        bytes_per_line: int = 32,
+        s0_header: bytes | None = None,
+        source_image_path: Optional[Path] = None,
+        summary: Optional[ChangeSummary] = None,
+        workarea_root: Optional[Path] = None,
+        on_placed: Optional[Callable[[PlacementResult], None]] = None,
+    ) -> ChangeActionResult:
+        """
+        Summary:
+            The emit-and-verify half of the ``save_patched`` split
+            (B100-I15, LLR-167.7): emit ``image`` through
+            ``save_patched_image`` (placed by ``place_into_workarea``),
+            stamp the saved path and the source image on the summary, and
+            verify the written file against ``image``.
+
+        Args:
+            image (Dict[int, int]): The image to emit (read only).
+            ranges (Sequence[Tuple[int, int]]): The image ranges.
+            dest_dir (Path): The destination folder, UNRESOLVED.
+            filename (str): The requested file name.
+            source_kind (str): ``"s19"`` or ``"hex"``; others are refused.
+            bytes_per_line (int): S19 record width, ``{16, 32}``.
+            s0_header (bytes | None): S19 header payload, or ``None``.
+            source_image_path (Optional[Path]): The image the map was
+                loaded from (the LLR-038.2 provenance stamp).
+            summary (Optional[ChangeSummary]): The summary to stamp;
+                ``None`` stamps :attr:`last_summary`.
+            workarea_root (Optional[Path]): This app's work-area root; the
+                staging root comes from the destination guard (SEC-4).
+            on_placed (Optional[Callable[[PlacementResult], None]]): Told
+                the placement's result the moment it lands (LED .53).
+
+        Returns:
+            ChangeActionResult: ``ok`` with the written name and the
+                :func:`save_back_status_suffix` of :attr:`last_save_applied`
+                / :attr:`last_save_not_applied`, or ``ok=False`` with the
+                refusal findings.
+
+        Raises:
+            OSError: The verify re-read of the landed file failed. The
+                placement has already been reported through ``on_placed``,
+                so the caller's rollback can remove it.
+
+        Data Flow:
+            - Precondition: :meth:`record_save_entries` ran for this save
+              (the ``ok`` message reads its two tuples).
+            - Emit and place through ``save_patched_image``; the landing is
+              reported through ``on_placed`` before anything else runs.
+            - Stamp the saved path and the source image on the summary.
+            - Re-read the written file and diff it against ``image``; the
+              ``VerifyResult`` rides the summary (collect-don't-abort).
+
+        Dependencies:
+            Uses:
+                - save_patched_image / verify_written_image
+                - save_back_status_suffix
+            Used by:
+                - save_patched (the save-back)
+                - S19TuiApp._handle_save_dialog (Save project's emit row)
+        """
+        stamped = summary if summary is not None else self.last_summary
+        path, issues = save_patched_image(
+            image,
+            ranges,
+            dest_dir,
+            filename,
+            source_kind=source_kind,
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header,
+            workarea_root=workarea_root,
+            on_placed=on_placed,
+        )
+        if stamped is not None:
+            stamped.saved_path = path
+            stamped.source_image_path = source_image_path
+        if path is None:
+            return ChangeActionResult(
+                message="Patched image not saved - see issues",
+                issues=issues,
+                ok=False,
+            )
+        # Verify-on-save (HLR-003, §6.2 C-10 back-compatible carrier): re-read
+        # the just-written file and diff it against the intended map. The
+        # VerifyResult rides the saved summary — save_patched_image's 2-tuple
+        # return is untouched (M-1). collect-don't-abort: a mismatch never
+        # unlinks the written file; surfacing is the TUI's job (HLR-004, I4).
+        verify = verify_written_image(path, image, source_kind)
+        if stamped is not None:
+            stamped.verify_result = verify
+        return ChangeActionResult(
+            message=(
+                f"Patched image saved as {path.name}"
+                f"{save_back_status_suffix(self.last_save_applied, self.last_save_not_applied)}"
+            ),
+            issues=issues,
+            ok=True,
+        )
+
     def save_patched(
         self,
         mem_map: Dict[int, int],
@@ -2019,6 +2493,7 @@ class ChangeService:
         source_image_path: Optional[Path] = None,
         mac_records: Optional[Sequence[dict]] = None,
         a2l_tags: Optional[Sequence[dict]] = None,
+        workarea_root: Optional[Path] = None,
     ) -> ChangeActionResult:
         """
         Summary:
@@ -2080,6 +2555,11 @@ class ChangeService:
                 standalone classification (existing direct callers).
             a2l_tags (Optional[Sequence[dict]]): Enriched A2L tags for the
                 re-derived summary's linkage; ``None`` gives standalone.
+            workarea_root (Optional[Path]): This app's work-area root
+                (SEC-4, LED .56): the emit's staging root comes from the
+                destination guard with this root, never from a resolved
+                ``dest_dir``. ``None`` derives it from ``dest_dir``'s own
+                textual path.
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
@@ -2092,57 +2572,23 @@ class ChangeService:
 
         Dependencies:
             Uses:
-                - save_patched_image
-                - verify_written_image
-                - apply_change_document (the save re-derivation)
-                - collision_issues (the apply's collision refresh)
-                - _note_image / _restore_journal / _capture_journal
-                - save_back_status_suffix
+                - record_save_entries / rederive_for_save /
+                  adopt_rederived / emit_and_verify (the B100-I15 split)
             Used by:
                 - app.py save-back confirm handling
         """
-        applied_before = self._applied_addresses or frozenset()
-        applied_now = tuple(
-            entry.address
-            for entry in self.document.entries
-            if entry.address in applied_before
+        # B100-I15: the composition of the split — the naming, the
+        # re-derive onto a copy, the in-place view update, the reuse rule,
+        # then the emit-and-verify — so B99-I7's rule is unchanged.
+        self.record_save_entries()
+        derived, fresh = self.rederive_for_save(
+            dict(mem_map),
+            ranges=ranges,
+            session_map=mem_map,
+            mac_records=mac_records,
+            a2l_tags=a2l_tags,
         )
-        not_applied = tuple(
-            entry.address
-            for entry in self.document.entries
-            if entry.address not in applied_before
-        )
-        self.last_save_applied = applied_now
-        self.last_save_not_applied = not_applied
-        # Re-derive (LLR-157.2): restore the journal in place, then apply
-        # every entry currently in the document, so the emitted image is the
-        # source plus the current document — an undone/removed/edited entry's
-        # bytes return to the source and an added entry is written.
-        self._note_image(mem_map)
-        self._restore_journal(mem_map)
-        self._capture_journal(mem_map)
-        # Refresh collisions first — the same rule :meth:`apply` runs — so
-        # an interactively created span overlap blocks the save re-derive
-        # exactly as it blocks the apply (review round 1, finding F1): the
-        # engine gates on ERROR findings, and without this refresh the save
-        # would write overlapping entries the apply refuses.
-        retained = [
-            issue
-            for issue in self.document.issues
-            if issue.code != CHG_COLLISION
-        ]
-        self.document.issues = retained + collision_issues(
-            self.document.entries
-        )
-        prior = self.last_summary
-        fresh = apply_change_document(
-            self.document,
-            mem_map,
-            ranges,
-            mac_records,
-            a2l_tags,
-            variant_id=prior.variant_id if prior is not None else None,
-        )
+        self.adopt_rederived(mem_map, derived)
         blocked = fresh.counts[DISPOSITION_BLOCKED]
         if blocked:
             # A blocked document saves nothing and says why — the same gate
@@ -2163,6 +2609,7 @@ class ChangeService:
         # source bytes thanks to the journal. Otherwise the fresh summary —
         # built over the just re-derived image — becomes the saved summary,
         # listing exactly the entries the image holds.
+        prior = self.last_summary
         reuse_summary = (
             prior is not None
             and self._applied_addresses is not None
@@ -2170,14 +2617,13 @@ class ChangeService:
             == set(self._applied_addresses)
         )
         summary = prior if reuse_summary else fresh
-        if not reuse_summary:
-            self.last_summary = fresh
+        self.last_summary = summary
         self._applied_addresses = frozenset(
             record.address_start
             for record in summary.entries
             if record.disposition == DISPOSITION_APPLIED
         )
-        path, issues = save_patched_image(
+        return self.emit_and_verify(
             mem_map,
             ranges,
             dest_dir,
@@ -2185,29 +2631,8 @@ class ChangeService:
             source_kind=source_kind,
             bytes_per_line=bytes_per_line,
             s0_header=s0_header,
-        )
-        summary.saved_path = path
-        summary.source_image_path = source_image_path
-        if path is None:
-            return ChangeActionResult(
-                message="Patched image not saved - see issues",
-                issues=issues,
-                ok=False,
-            )
-        # Verify-on-save (HLR-003, §6.2 C-10 back-compatible carrier): re-read
-        # the just-written file and diff it against the intended map. The
-        # VerifyResult rides the saved summary — save_patched_image's 2-tuple
-        # return is untouched (M-1). collect-don't-abort: a mismatch never
-        # unlinks the written file; surfacing is the TUI's job (HLR-004, I4).
-        verify = verify_written_image(path, mem_map, source_kind)
-        summary.verify_result = verify
-        return ChangeActionResult(
-            message=(
-                f"Patched image saved as {path.name}"
-                f"{save_back_status_suffix(applied_now, not_applied)}"
-            ),
-            issues=issues,
-            ok=True,
+            source_image_path=source_image_path,
+            workarea_root=workarea_root,
         )
 
     # ------------------------------------------------------------------

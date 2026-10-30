@@ -1,0 +1,45 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root -rfE
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base (8d6056f + working-tree changes: 0 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc5/base ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T20:59:47Z
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________
+
+    def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), security finding SEC-1 — the AST
+        census: EVERY placement call in ``app.py`` names ``workarea_root``
+        explicitly, so the guard's containment authority is always THIS app's
+        work area (B100-I14), never one the destination's own text names.
+        Dropping the root from any single call turns this RED (transcript
+        ``mut-census-root.txt``)."""
+        source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        placements = (
+            "place_into_workarea",
+            "copy_into_workarea",
+            "place_group_into_workarea",
+        )
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in placements
+        ]
+        # batch-100 Inc 5 re-pin (LLR-167.6): Save project's three placement
+        # calls (image, MAC, A2L) became ONE call inside the plan-row loop, so
+        # 9 -> 7; the emitted image is placed by ``save_patched_image`` and its
+        # root is threaded through the two emit entry points checked below.
+>       assert len(calls) == 7, (
+            f"expected the 7 app.py placement calls (LED .50), found {len(calls)}"
+        )
+E       AssertionError: expected the 7 app.py placement calls (LED .50), found 9
+E       assert 9 == 7
+E        +  where 9 = len([<ast.Call object at 0x000001DD85E6FDC0>, <ast.Call object at 0x000001DD85E8ED10>, <ast.Call object at 0x000001DD85EB1...l object at 0x000001DD85DA35E0>, <ast.Call object at 0x000001DD85DC0760>, <ast.Call object at 0x000001DD85E6ECB0>, ...])
+
+tests\test_b100_reuse.py:792: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+1 failed in 0.65s
+# exit: 1

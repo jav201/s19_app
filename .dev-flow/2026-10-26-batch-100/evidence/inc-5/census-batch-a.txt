@@ -1,0 +1,96 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_b100_save_image.py tests/test_b100_focus.py tests/test_b100_reuse.py tests/test_b100_save_guards.py tests/test_b100_session_reset.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_load_project_dialog.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_editor_image.py tests/test_b99_export.py tests/test_b99_patch_truth.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_flow_execution.py -rfE
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc5 (8d6056f + working-tree changes: 4 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/Github/s19_app-b100-inc5 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T20:01:06Z
+........................................................................ [  8%]
+.................F...................................................... [ 16%]
+........................................................................ [ 25%]
+........................................................................ [ 33%]
+........................................................................ [ 41%]
+........................................................................ [ 50%]
+........................................................................ [ 58%]
+........................................................................ [ 67%]
+........................................................................ [ 75%]
+........................................................................ [ 83%]
+.......................................................F................ [ 92%]
+..................................................................       [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_01_app_placements_name_the_workarea_root ____________
+
+    def test_tc_b100_01_app_placements_name_the_workarea_root() -> None:
+        """LLR-163.1 / LLR-171.4 (LED .50), security finding SEC-1 — the AST
+        census: EVERY placement call in ``app.py`` names ``workarea_root``
+        explicitly, so the guard's containment authority is always THIS app's
+        work area (B100-I14), never one the destination's own text names.
+        Dropping the root from any single call turns this RED (transcript
+        ``mut-census-root.txt``)."""
+        source = (ROOT / "s19_app" / "tui" / "app.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        placements = (
+            "place_into_workarea",
+            "copy_into_workarea",
+            "place_group_into_workarea",
+        )
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in placements
+        ]
+>       assert len(calls) == 9, (
+            f"expected the 9 app.py placement calls (LED .50), found {len(calls)}"
+        )
+E       AssertionError: expected the 9 app.py placement calls (LED .50), found 7
+E       assert 7 == 9
+E        +  where 7 = len([<ast.Call object at 0x0000024469A4F7C0>, <ast.Call object at 0x0000024469686E90>, <ast.Call object at 0x000002446951A...l object at 0x0000024469A4DF90>, <ast.Call object at 0x0000024465A2D660>, <ast.Call object at 0x000002446966E4A0>, ...])
+
+tests\test_b100_reuse.py:788: AssertionError
+______ test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-29966/test_at_038b_declined_saveback0')
+
+    def test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing(
+        tmp_path: Path,
+    ) -> None:
+        """Decline the save-back, invoke ``b`` -> surfaced refusal, 0 files.
+    
+        Intent: LLR-038.4 class 2 (``saved_path`` is ``None``). GUARD-class: the
+        positive surfaced-refusal-diagnostic assert is load-bearing (Q-m1) — the
+        0-file listing alone would pass vacuously pre-implementation.
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> tuple[list[str], set[str]]:
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                await _drive_apply(app, pilot)
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await pilot.pause()
+                statuses = _statuses(app)
+                app.set_focus(None)
+                await pilot.press("b")
+                await pilot.pause()
+                return list(statuses), _report_names(project_dir / "reports")
+    
+        statuses, report_files = asyncio.run(_drive())
+        refusals = [s for s in statuses if "Before/after report refused" in s]
+>       assert refusals, f"AT-038b: no surfaced refusal diagnostic; statuses: {statuses}"
+E       AssertionError: AT-038b: no surfaced refusal diagnostic; statuses: []
+E       assert []
+
+tests\test_before_after_report.py:373: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_reuse.py::test_tc_b100_01_app_placements_name_the_workarea_root
+FAILED tests/test_before_after_report.py::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing
+2 failed, 856 passed in 3369.46s (0:56:09)
+# exit: 1

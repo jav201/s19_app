@@ -1,0 +1,66 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent  (30 runs, alternating; runs 11-30 appended in a second loop base / tree, isolated)
+# base tree: C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r5/base (git archive 8d6056f, the code-reviewer's copy)
+# fixed tree: C:/Users/jjgh8/Github/s19_app-b100-inc5 (base 8d6056f + Inc 5 + corrective pass 1); app.py 8032dead73f7ee54
+# PYTHONPATH=<the tree under test> ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-29T21:58:09Z
+run 1 base: 1 passed in 2.30s
+run 1 tree: 1 passed in 2.24s
+run 2 base: 1 passed in 2.15s
+run 2 tree: 1 passed in 2.11s
+run 3 base: 1 passed in 2.15s
+run 3 tree: 1 passed in 2.17s
+run 4 base: 1 passed in 2.14s
+run 4 tree: 1 passed in 2.20s
+run 5 base: 1 passed in 2.26s
+run 5 tree: 1 failed in 2.33s
+run 6 base: 1 passed in 2.11s
+run 6 tree: 1 passed in 2.18s
+run 7 base: 1 passed in 2.15s
+run 7 tree: 1 passed in 2.21s
+run 8 base: 1 passed in 2.14s
+run 8 tree: 1 passed in 2.25s
+run 9 base: 1 passed in 2.31s
+run 9 tree: 1 passed in 2.24s
+run 10 base: 1 passed in 2.20s
+run 10 tree: 1 passed in 2.10s
+run 11 base: 1 passed in 2.23s
+run 11 tree: 1 passed in 2.19s
+run 12 base: 1 passed in 2.08s
+run 12 tree: 1 passed in 2.17s
+run 13 base: 1 passed in 2.16s
+run 13 tree: 1 passed in 2.17s
+run 14 base: 1 passed in 2.13s
+run 14 tree: 1 passed in 2.13s
+run 15 base: 1 passed in 2.23s
+run 15 tree: 1 passed in 2.11s
+run 16 base: 1 passed in 2.17s
+run 16 tree: 1 passed in 2.11s
+run 17 base: 1 passed in 2.13s
+run 17 tree: 1 passed in 2.21s
+run 18 base: 1 passed in 2.33s
+run 18 tree: 1 passed in 2.26s
+run 19 base: 1 passed in 2.19s
+run 19 tree: 1 passed in 2.15s
+run 20 base: 1 passed in 2.10s
+run 20 tree: 1 passed in 2.16s
+run 21 base: 1 passed in 2.11s
+run 21 tree: 1 passed in 2.13s
+run 22 base: 1 passed in 2.27s
+run 22 tree: 1 passed in 2.23s
+run 23 base: 1 passed in 2.08s
+run 23 tree: 1 passed in 2.11s
+run 24 base: 1 passed in 2.20s
+run 24 tree: 1 passed in 2.16s
+run 25 base: 1 passed in 2.15s
+run 25 tree: 1 passed in 2.18s
+run 26 base: 1 passed in 2.14s
+run 26 tree: 1 passed in 2.14s
+run 27 base: 1 passed in 2.24s
+run 27 tree: 1 passed in 2.07s
+run 28 base: 1 passed in 2.15s
+run 28 tree: 1 passed in 2.19s
+run 29 base: 1 failed in 2.26s
+run 29 tree: 1 passed in 2.10s
+run 30 base: 1 passed in 2.16s
+run 30 tree: 1 passed in 2.17s
+# base failures: 1/30 ; tree failures: 1/30

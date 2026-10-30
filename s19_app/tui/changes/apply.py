@@ -39,6 +39,7 @@ never raw byte or value content.
 from __future__ import annotations
 
 import bisect
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path, PureWindowsPath
@@ -53,9 +54,11 @@ from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     WORKAREA_DIRNAME,
     WORKAREA_SUBDIR,
+    PlacementResult,
     WorkareaContainmentError,
+    _guarded_destination,
     _private_stage_dir,
-    copy_into_workarea,
+    place_into_workarea,
 )
 from .io import (
     MF_WRITE_CONTAINMENT,
@@ -623,6 +626,63 @@ def _classify_linkage(
     return LINKAGE_STANDALONE, None
 
 
+def render_patched_image(
+    mem_map: Dict[int, int],
+    ranges: Sequence[Tuple[int, int]],
+    *,
+    source_kind: str,
+    bytes_per_line: int = 32,
+    s0_header: bytes | None = None,
+) -> Optional[bytes]:
+    """
+    Summary:
+        The exact bytes :func:`save_patched_image` writes for this image —
+        the S19 or Intel HEX text with the platform line ending a text-mode
+        write produces — so the Save project plan can digest the emitted
+        image before anything is placed (B100-I17, LLR-167.6).
+
+    Args:
+        mem_map (Dict[int, int]): The image to serialize (read only).
+        ranges (Sequence[Tuple[int, int]]): The image's ranges.
+        source_kind (str): ``"s19"`` or ``"hex"``.
+        bytes_per_line (int): S19 record width, ``{16, 32}``.
+        s0_header (bytes | None): S19 header payload, or ``None``.
+
+    Returns:
+        Optional[bytes]: The payload, or ``None`` for an unsupported
+            ``source_kind``.
+
+    Data Flow:
+        - Pick the emitter by ``source_kind`` (``_SAVE_BACK_EMITTERS``).
+        - Emit the text (the S19 branch alone takes the width and header).
+        - Convert ``\\n`` to the platform line ending and encode ASCII.
+
+    Dependencies:
+        Uses:
+            - emit_s19_from_mem_map / emit_intel_hex_from_mem_map
+        Used by:
+            - save_patched_image
+            - s19_app.tui.app.S19TuiApp._decide_project_image
+    """
+    emitter_spec = _SAVE_BACK_EMITTERS.get(source_kind)
+    if emitter_spec is None:
+        return None
+    emit, _suffix = emitter_spec
+    # C1: the S19 emitter takes the LLR-015.3 width + header kwargs; the HEX
+    # emitter (emit_intel_hex_from_mem_map) does NOT — pass them only on the
+    # S19 branch, or the HEX branch would TypeError.
+    if source_kind == "s19":
+        text = emit(
+            dict(mem_map),
+            list(ranges),
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header,
+        )
+    else:
+        text = emit(dict(mem_map), list(ranges))
+    return text.replace("\n", os.linesep).encode("ascii")
+
+
 def save_patched_image(
     mem_map: Dict[int, int],
     ranges: Sequence[Tuple[int, int]],
@@ -632,6 +692,8 @@ def save_patched_image(
     source_kind: str,
     bytes_per_line: int = 32,
     s0_header: bytes | None = None,
+    workarea_root: Optional[Path] = None,
+    on_placed: Optional[Callable[[PlacementResult], None]] = None,
 ) -> Tuple[Optional[Path], List[ValidationIssue]]:
     """
     Summary:
@@ -640,7 +702,7 @@ def save_patched_image(
         operator-provided ``filename`` passes the F-S-01 sanitizer; the
         bytes are staged under ``.s19tool/workarea/temp/.staging/`` (the
         shared reparse-checked staging home) and placed via
-        ``workspace.copy_into_workarea`` (containment + reparse-point +
+        ``workspace.place_into_workarea`` (containment + reparse-point +
         dedup checks reused).
 
     Args:
@@ -676,11 +738,20 @@ def save_patched_image(
             (LLR-015.3). When ``None`` the emitter writes the legacy empty S0.
             This increment only forwards a caller-supplied header; the
             preserve/synthesize policy is a later increment.
+        workarea_root (Optional[Path]): This app's work-area root (SEC-4,
+            LED .56). The staging root comes from the destination guard
+            (``_guarded_destination(dest_dir, workarea_root)``), never from
+            a resolved ``dest_dir`` — a junctioned destination is refused
+            before any staging folder exists. ``None`` derives the root from
+            ``dest_dir``'s own textual path.
+        on_placed (Optional[Callable[[PlacementResult], None]]): Told the
+            placement's result the moment it lands, so a caller's rollback
+            knows whether this call created the file (LED .53).
 
     Returns:
         Tuple[Optional[Path], List[ValidationIssue]]: The absolute path of
         the written file (a name collision is dedup-suffixed by
-        ``copy_into_workarea`` — never a silent clobber) and the collected
+        ``place_into_workarea`` — never a silent clobber) and the collected
         issues, or ``(None, issues)`` when the request was refused or the
         placement failed containment. The caller records a non-``None`` path
         as ``ChangeSummary.saved_path``.
@@ -691,21 +762,22 @@ def save_patched_image(
             file names and reasons — never image byte content (C-9).
 
     Data Flow:
-        - Select the emitter + suffix by ``source_kind`` (``_SAVE_BACK_EMITTERS``)
-          or refuse an unsupported source (LLR-002.2); sanitize the filename
-          with the format-matched suffix (F-S-01).
-        - Locate the ``.s19tool/workarea/`` ancestor of ``dest_dir``; emit the
-          format text (S19 or Intel HEX); stage it in a private ``mkdtemp``
-          directory under ``<workarea>/temp/.staging/`` via
+        - Render the payload (:func:`render_patched_image`), or refuse an
+          unsupported source (LLR-002.2); sanitize the filename with the
+          format-matched suffix (F-S-01).
+        - Run the destination guard on the UNRESOLVED ``dest_dir`` (SEC-4)
+          and take its work-area root as the staging root; stage the
+          payload in a private
+          ``mkdtemp`` directory under ``<workarea>/temp/.staging/`` via
           ``workspace._private_stage_dir``; place with
-          ``copy_into_workarea``; remove only the owned staging directory
+          ``place_into_workarea``; remove only the owned staging directory
           either way (LLR-155.1/.7).
 
     Dependencies:
         Uses:
-            - emit_s19_from_mem_map / emit_intel_hex_from_mem_map
-            - copy_into_workarea
-            - _sanitize_s19_filename / _find_workarea_ancestor
+            - render_patched_image
+            - _guarded_destination / place_into_workarea
+            - _sanitize_s19_filename
             - _issue
         Used by:
             - The E3a save-back prompt flow (later increment)
@@ -718,8 +790,16 @@ def save_patched_image(
     """
     issues: List[ValidationIssue] = []
 
-    emitter_spec = _SAVE_BACK_EMITTERS.get(source_kind)
-    if emitter_spec is None:
+    # Review F9: rendering first makes the unsupported-source refusal the
+    # one check that also proves a payload exists — no assert downstream.
+    payload = render_patched_image(
+        mem_map,
+        ranges,
+        source_kind=source_kind,
+        bytes_per_line=bytes_per_line,
+        s0_header=s0_header,
+    )
+    if payload is None:
         issues.append(
             _issue(
                 CHG_HEX_SAVE_UNSUPPORTED,
@@ -730,7 +810,7 @@ def save_patched_image(
             )
         )
         return None, issues
-    emit, suffix = emitter_spec
+    _emit, suffix = _SAVE_BACK_EMITTERS[source_kind]
 
     safe_name, rejection = _sanitize_s19_filename(filename, suffix=suffix)
     if safe_name is None:
@@ -738,31 +818,26 @@ def save_patched_image(
         issues.append(rejection)
         return None, issues
 
-    workarea_root = _find_workarea_ancestor(dest_dir)
-    if workarea_root is None:
+    # SEC-4 (LED .56): the staging root is the destination guard's root,
+    # read off the UNRESOLVED destination (or the app's explicit root) —
+    # never a walk over the resolved path, which would follow a junction
+    # into another work area and stage there.
+    try:
+        _resolved_destination, staging_root = _guarded_destination(
+            dest_dir, workarea_root
+        )
+    except WorkareaContainmentError as exc:
         issues.append(
             _issue(
                 MF_WRITE_CONTAINMENT,
-                f"the save-back destination is not inside a "
+                f"the save-back destination is not inside this "
                 f"{WORKAREA_DIRNAME}/{WORKAREA_SUBDIR}/ tree — the patched "
-                f"image was not written: {dest_dir}",
+                f"image was not written: {exc}",
                 severity=ValidationSeverity.WARNING,
             )
         )
         return None, issues
 
-    # C1: the S19 emitter takes the LLR-015.3 width + header kwargs; the HEX
-    # emitter (emit_intel_hex_from_mem_map) does NOT — pass them only on the
-    # S19 branch, or the HEX branch would TypeError.
-    if source_kind == "s19":
-        text = emit(
-            dict(mem_map),
-            list(ranges),
-            bytes_per_line=bytes_per_line,
-            s0_header=s0_header,
-        )
-    else:
-        text = emit(dict(mem_map), list(ranges))
     # Private staging (LLR-155.1): the emitted bytes are written into a
     # mkdtemp directory under the shared, reparse-checked
     # ``temp/.staging/`` home (``workspace._private_stage_dir`` — the same
@@ -774,12 +849,16 @@ def save_patched_image(
     stage_dir: Optional[Path] = None
     stage_owned = False
     try:
-        stage_dir = _private_stage_dir(workarea_root)
+        stage_dir = _private_stage_dir(staging_root)
         stage_owned = True
         staged = stage_dir / safe_name
-        staged.write_text(text, encoding="ascii")
-        target = copy_into_workarea(staged, dest_dir)
-        return target, issues
+        staged.write_bytes(payload)
+        placed = place_into_workarea(
+            staged, dest_dir, workarea_root=workarea_root
+        )
+        if on_placed is not None:
+            on_placed(placed)
+        return placed.path, issues
     except (WorkareaContainmentError, OSError) as exc:
         issues.append(
             _issue(
@@ -860,33 +939,3 @@ def _sanitize_s19_filename(
             severity=ValidationSeverity.WARNING,
         )
     return bare, None
-
-
-def _find_workarea_ancestor(dest_dir: Path) -> Optional[Path]:
-    """
-    Summary:
-        Walk ``dest_dir`` upwards looking for the ``.s19tool/workarea``
-        directory it is contained in — the staging root for the
-        temp-then-copy placement pattern.
-
-    Args:
-        dest_dir (Path): The requested destination directory.
-
-    Returns:
-        Optional[Path]: The ``<base>/.s19tool/workarea`` ancestor (possibly
-        ``dest_dir`` itself), or ``None`` when no such ancestor exists —
-        ``copy_into_workarea`` would refuse the placement anyway; this
-        pre-check just yields a clearer issue without touching the disk.
-
-    Dependencies:
-        Used by:
-            - save_patched_image
-    """
-    resolved = dest_dir.resolve()
-    for candidate in (resolved, *resolved.parents):
-        if (
-            candidate.name == WORKAREA_SUBDIR
-            and candidate.parent.name == WORKAREA_DIRNAME
-        ):
-            return candidate
-    return None
