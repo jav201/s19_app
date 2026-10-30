@@ -854,7 +854,7 @@ Probes P-1..P-21 were executed 2026-10-26 on a `git archive` of `1d677ba` (this 
 
 ### LLR-167.6 — One save plan, painted and executed (R-PC)
 - **Traceability:** HLR-167
-- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.26, LED-2026-10-26-batch-100.45
+- **Ledger:** LED-2026-10-26-batch-100.4, LED-2026-10-26-batch-100.15, LED-2026-10-26-batch-100.23, LED-2026-10-26-batch-100.26, LED-2026-10-26-batch-100.45, LED-2026-10-26-batch-100.63
 - **Statement:** `plan_project_save(...) -> SavePlan` (NEW, a pure function in `services/project_gather_service.py`) shall compute, without writing, the target folder and its kind (new, open project, merge), one row per top-level file, one row per sub-folder with its file count, and one row for `project.json`, each with its source, landing name (from `predict_placement`, LLR-163.7) and action word (`new`, `replace`, `keep`, `merge`, `rewrite`), plus the image description (source + N change entries, K applied by this save, or an unchanged copy), the document, skipped links and the manifest keys, or the refusal with its tokens. The manifest-key list is an input of `plan_project_save` from Inc 5 (the app passes the keys it writes), so the function does not change when Inc 7 or Inc 8a adds a key. The emitted image's bytes and digest, and the copied files' digests, are computed once per dialog open on a worker (LLR-175.4) and passed in, so `project_gather_service` gains no import of `change_service` or `changes`. `_handle_save_dialog` shall execute exactly that plan.
 - **Validation:** `test (integration)`
 - **Executed verification:** TC-B100-59 — `pytest tests/test_b100_save_image.py -k tc_b100_59`
