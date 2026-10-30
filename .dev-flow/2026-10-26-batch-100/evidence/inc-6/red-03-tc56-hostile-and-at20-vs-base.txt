@@ -1,0 +1,243 @@
+# command: python -m pytest -q -p no:cacheprovider -rA tests/test_b100_announce.py::test_tc_b100_56_hostile_variant_name_paints_no_markup tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b (093a7c0 base; the Inc 6 test files copied in after the two RED-strengthening edits; 0 source paths modified)
+# PYTHONPATH=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/i6b ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# date: 2026-10-30T01:44:36Z
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+____________ test_tc_b100_56_hostile_variant_name_paints_no_markup ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30150/test_tc_b100_56_hostile_varian0')
+
+    def test_tc_b100_56_hostile_variant_name_paints_no_markup(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        _seed_two_variants(_workarea(base), second="[b]x.s19")
+        lines, log4, status, _panel = _load_directly(base)
+>       assert str(log4).endswith("details: p"), str(log4)
+E       AssertionError: Loaded project 'P' -> [b]x.s19
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x00000239DBBD6510>('details: p')
+E        +    where <built-in method endswith of str object at 0x00000239DBBD6510> = "Loaded project 'P' -> [b]x.s19".endswith
+E        +      where "Loaded project 'P' -> [b]x.s19" = str(Content("Loaded project 'P' -> [b]x.s19"))
+
+tests\test_b100_announce.py:315: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30150/test_at_b100_20_every_writer_c0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # Open P; the Load-result panel this route opens (asserted on
+                # the final reopen below) is closed by its shown key first.
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming P",
+                )
+                for _ in range(20):
+                    if len(app.screen.query("#result_ok")) > 0:
+                        await pilot.press("escape")
+                        break
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: len(app.screen.query("#result_ok")) == 0, "no panel open"
+                )
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+>       asyncio.run(_writers())
+
+tests\test_b100_active_variant.py:672: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:657: in _writers
+    await _load_through_dialog_until(
+tests\test_b100_active_variant.py:585: in _load_through_dialog_until
+    await _wait_for(pilot, lambda: not isinstance(app.screen, LoadFileScreen) and until(), what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _load_through_dialog_until.<locals>.<lambda> at 0x00000239DB6FA480>
+description = 'firmware_1.s19 placed and project.json rewritten', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for firmware_1.s19 placed and project.json rewritten
+
+tests\test_b100_active_variant.py:75: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30150/test_at_b100_20_every_writer_c1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # Open P; the Load-result panel this route opens (asserted on
+                # the final reopen below) is closed by its shown key first.
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming P",
+                )
+                for _ in range(20):
+                    if len(app.screen.query("#result_ok")) > 0:
+                        await pilot.press("escape")
+                        break
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: len(app.screen.query("#result_ok")) == 0, "no panel open"
+                )
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+>       asyncio.run(_writers())
+
+tests\test_b100_active_variant.py:672: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\jjgh8\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:657: in _writers
+    await _load_through_dialog_until(
+tests\test_b100_active_variant.py:585: in _load_through_dialog_until
+    await _wait_for(pilot, lambda: not isinstance(app.screen, LoadFileScreen) and until(), what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _load_through_dialog_until.<locals>.<lambda> at 0x00000239DBDAC9A0>
+description = 'firmware_1.s19 placed and project.json rewritten', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for firmware_1.s19 placed and project.json rewritten
+
+tests\test_b100_active_variant.py:75: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_56_hostile_variant_name_paints_no_markup
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1]
+3 failed in 54.74s

@@ -1,0 +1,44 @@
+# mutation: UX2-entry-not-named — UX-2 (LLR-178.3): every manifest problem row names project.json instead of its entry
+# file: s19_app/tui/services/variant_execution_service.py (sha256 before 395dcbde3b28851b)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-UX2-entry-not-named tests/test_b100_announce.py -k thirty
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T03:35:16Z
+# --- old
+#                   issue.details.get(_ISSUE_ENTRY, PROJECT_MANIFEST_NAME),
+# --- new
+#                   PROJECT_MANIFEST_NAME,
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-UX2-entry-not-named/test_tc_b100_67_thirty_problem0')
+
+    def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            rows = list(app.screen.query("#result_body .result-problem"))
+            body = app.screen.query_one("#result_body")
+            before = body.region.contains_region(rows[-1].region)
+            await pilot.press("end")
+            await _flush(pilot)
+            after = body.region.contains_region(rows[-1].region)
+            painted = [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
+            return len(rows), before, after, _panel_text(app), painted
+    
+        count, before, after, text, painted = _run_panel(tmp_path, _scenario, problems=30)
+        assert count == 30, f"{30 - count} problems missing from the panel"
+>       assert len(set(painted)) == 30, "the 30 problem rows are not distinct"
+E       AssertionError: the 30 problem rows are not distinct
+E       assert 1 == 30
+E        +  where 1 = len({'! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it'})
+E        +    where {'! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it'} = set(['! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it', '! Ma...', '! Manifest entry skipped: project.json a recorded entry points outside the project; Save project rewrites it', ...])
+
+tests\test_b100_announce.py:501: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last
+1 failed, 23 deselected in 6.17s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 395dcbde3b28851b)

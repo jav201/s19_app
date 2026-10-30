@@ -3606,3 +3606,37 @@ ModalScreen {
 #window_help_scroll:focus {
     background: $bg-base;
 }
+
+/* batch-100 Load-result panel (Inc 6, LLR-178.3, P-E verdict B) -----------
+ * Reuses the shared `.modal-dialog` box model. The title is docked like the
+ * shared `.modal-buttons`, the dialog is capped at the screen, and
+ * `#result_body` takes the height left between them and scrolls, so every
+ * problem row is reachable by key with no truncation. The body tints when it
+ * holds the focus (where the panel's focus starts). */
+#load_result_dialog {
+    max-height: 90%;
+    max-width: 100;
+    min-width: 56;
+}
+
+#load_result_dialog .modal-title {
+    dock: top;
+}
+
+#result_body {
+    height: auto;
+    max-height: 100%;
+}
+
+#result_body:focus {
+    background: $bg-base;
+}
+
+.result-heading {
+    margin-top: 1;
+    text-style: bold;
+}
+
+.result-problem {
+    height: auto;
+}

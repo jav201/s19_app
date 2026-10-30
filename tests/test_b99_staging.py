@@ -143,6 +143,7 @@ from s19_app.tui.services.project_gather_service import gather_project_artifacts
 from s19_app.tui.workspace import WorkareaContainmentError, copy_into_workarea
 
 from tests.support import independent_reader
+from tests.support.b100_projects import dismiss_load_result_panel
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -1566,6 +1567,9 @@ def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -
             assert await _poll(
                 pilot, lambda: "Loaded project 'proj'" in _painted_status(app)
             ), f"the project load did not paint: {_painted_status(app)}"
+            # Inc 6 (HLR-178): the dialog route opens the Load-result panel;
+            # dismiss it first with its shown key ``esc``.
+            await dismiss_load_result_panel(pilot, app)
 
             # Flow Execution (rail key ``]``)
             await pilot.press("right_square_bracket")

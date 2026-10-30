@@ -1,0 +1,175 @@
+# mutation: F2-now-opens-unconditional — F2 / SEC6-4 (LLR-168.3): the append paints 'now opens' whatever the rewrite returned
+# file: s19_app/tui/app.py (sha256 before 762d1a98c8a65903)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f1mut-F2-now-opens-unconditional tests/test_b100_active_variant.py -k now_opens_only or (damaged_manifest_is_never and variant-append)
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 1, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T03:33:59Z
+# --- old
+#                           if self._rewrite_project_manifest(project_dir, saved):
+# --- new
+#                           if self._rewrite_project_manifest(project_dir, saved) or True:
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3D7B9810>
+writer = 'variant-append', damage = 'not-json'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm â€”
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+        assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+        assert (project_dir / placed).is_file(), f"{placed} was not placed"
+        expected = (
+            f"project.json in project 'P' is damaged and was not rewritten - "
+            f"{placed} stays in the project; Save project rewrites it"
+        )
+        assert statuses.count(expected) == 1, statuses
+        assert not [s for s in statuses if "manifest verified" in s], statuses
+>       assert not [s for s in statuses if "now opens" in s], statuses
+E       AssertionError: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is da...roject; Save project rewrites it", "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+E       assert not ["Project 'P' now opens firmware_1.s19"]
+
+tests\test_b100_active_variant.py:531: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3D92D050>
+writer = 'variant-append', damage = 'not-an-object'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm â€”
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+        assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+        assert (project_dir / placed).is_file(), f"{placed} was not placed"
+        expected = (
+            f"project.json in project 'P' is damaged and was not rewritten - "
+            f"{placed} stays in the project; Save project rewrites it"
+        )
+        assert statuses.count(expected) == 1, statuses
+        assert not [s for s in statuses if "manifest verified" in s], statuses
+>       assert not [s for s in statuses if "now opens" in s], statuses
+E       AssertionError: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is da...roject; Save project rewrites it", "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+E       assert not ["Project 'P' now opens firmware_1.s19"]
+
+tests\test_b100_active_variant.py:531: AssertionError
+_ test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap] _
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_damaged_manife2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027A3EF7CDD0>
+writer = 'variant-append', damage = 'over-cap'
+
+    @pytest.mark.parametrize("damage", DAMAGE_KINDS)
+    @pytest.mark.parametrize("writer", WRITERS)
+    def test_tc_b100_20_damaged_manifest_is_never_rewritten(
+        tmp_path: Path, monkeypatch, writer: str, damage: str
+    ) -> None:
+        """Each in-project writer, with a ``project.json`` the reader cannot
+        read as a manifest: the damaged bytes are identical afterwards (the
+        user's records in them survive), the writer's file is placed, the status
+        says the manifest is damaged and was not rewritten, and nothing claims
+        a save, a verify or a new opening variant.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): every arm â€”
+        the writer replaced the file with an almost empty manifest and painted
+        ``Project saved + manifest verified``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        damaged = _damage(project_dir, damage, monkeypatch)
+        statuses = _run_writer(tmp_path, base, writer)
+        placed = PLACED[writer]
+        assert (project_dir / "project.json").read_bytes() == damaged, (
+            "the damaged project.json was rewritten"
+        )
+        assert (project_dir / placed).is_file(), f"{placed} was not placed"
+        expected = (
+            f"project.json in project 'P' is damaged and was not rewritten - "
+            f"{placed} stays in the project; Save project rewrites it"
+        )
+        assert statuses.count(expected) == 1, statuses
+        assert not [s for s in statuses if "manifest verified" in s], statuses
+>       assert not [s for s in statuses if "now opens" in s], statuses
+E       AssertionError: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is da...roject; Save project rewrites it", "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+E       assert not ["Project 'P' now opens firmware_1.s19"]
+
+tests\test_b100_active_variant.py:531: AssertionError
+_________ test_tc_b100_20_append_says_now_opens_only_after_the_write __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f1mut-F2-now-opens-unconditional/test_tc_b100_20_append_says_no0')
+
+    def test_tc_b100_20_append_says_now_opens_only_after_the_write(tmp_path: Path) -> None:
+        """A real write failure (``project.json`` read-only, review probe P2):
+        the append still adds the variant, the status says the manifest write
+        failed, and 0 lines claim that Load now opens the new file â€” on disk
+        ``active_variant`` is still the old one.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): ``'Manifest write
+        failed', "Project 'P' now opens firmware_1.s19"``."""
+        import os
+        import stat
+    
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        before = manifest_path.read_bytes()
+        os.chmod(manifest_path, stat.S_IREAD)
+        try:
+            statuses = _run_writer(tmp_path, base, "variant-append")
+        finally:
+            os.chmod(manifest_path, stat.S_IREAD | stat.S_IWRITE)
+        assert manifest_path.read_bytes() == before
+        assert projects.read_manifest(project_dir)["active_variant"] == "firmware"
+        assert "Manifest write failed" in statuses, statuses
+>       assert not [s for s in statuses if "now opens" in s], statuses
+E       AssertionError: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest write failed', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+E       assert not ["Project 'P' now opens firmware_1.s19"]
+
+tests\test_b100_active_variant.py:557: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-json]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-not-an-object]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_damaged_manifest_is_never_rewritten[variant-append-over-cap]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_append_says_now_opens_only_after_the_write
+4 failed, 27 deselected in 13.71s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 762d1a98c8a65903)

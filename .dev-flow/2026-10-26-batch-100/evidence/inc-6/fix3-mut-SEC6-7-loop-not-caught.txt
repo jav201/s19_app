@@ -1,0 +1,468 @@
+# mutation: SEC6-7-loop-not-caught — SEC6-7 remainder (LLR-168.1 / LLR-178.1): the resolver no longer catches RuntimeError (a junction that points to itself)
+# file: s19_app/tui/services/variant_execution_service.py (sha256 before 76b276077ded9717)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f3mut-SEC6-7-loop-not-caught tests/test_b100_announce.py tests/test_b100_active_variant.py -k junction_loop
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 3, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T05:15:01Z
+# --- old
+#       except (OSError, ValueError, RuntimeError) as exc:
+# --- new
+#       except (OSError, ValueError) as exc:
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash _______
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+>           await _open_panel(pilot, app)
+
+tests\test_b100_announce.py:688: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:424: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x0000020B84D28B80>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:96: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_67_junction_loop_0')
+
+    def test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash(tmp_path: Path) -> None:
+        """SEC6-7 remainder: ``gathered`` records ``loop/x.json`` where ``loop``
+        is a junction to itself — the project opens through the Load project
+        dialog and the panel shows exactly one skipped-entry row naming it.
+    
+        RED (executed on the corrective-pass-2 tree, e494c50c): ``RuntimeError:
+        Symlink loop`` out of ``Path.resolve()``; the app exited."""
+        b100_links.require_junctions()
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        loop = projects.create_junction_loop(project_dir / "loop")
+        (project_dir / "project.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "active_variant": "firmware_1",
+                    "gathered": {"patches": ["loop/x.json"]},
+                }
+            ),
+            encoding="utf-8",
+        )
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_panel(pilot, app)
+                rows = list(app.screen.query("#result_body .result-problem"))
+                return [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
+    
+        try:
+>           rows = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:693: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:686: in _drive
+    async with app.run_test(size=(118, 54), notifications=True) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:7019: in _route_load_project
+    self._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:635: in read_project_manifest
+    resolved = _resolve_manifest_entry(
+s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
+    resolved = (project_root / text).resolve()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+    check_eloop(e)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+e = OSError(22, 'The name of the file cannot be resolved by the system')
+
+    def check_eloop(e):
+        winerror = getattr(e, 'winerror', 0)
+        if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+>           raise RuntimeError("Symlink loop from %r" % e.filename)
+E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│                                                                              
+│   1000 │   │   # Ensure we get an exception by calling stat()                
+│   1001 │   │   if not strict:                                                
+│   1002 │   │   │   try:                                                      
+│ ❱ 1003 │   │   │   │   p.stat()                                              
+│   1004 │   │   │   except OSError as e:                                      
+│   1005 │   │   │   │   check_eloop(e)                                        
+│   1006 │   │   return p                                                      
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
+│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │ strict = False                                                           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│                                                                              
+│   1010 │   │   Return the result of the stat() system call on this path, lik 
+│   1011 │   │   os.stat() does.                                               
+│   1012 │   │   """                                                           
+│ ❱ 1013 │   │   return os.stat(self, follow_symlinks=follow_symlinks)         
+│   1014 │                                                                     
+│   1015 │   def owner(self):                                                  
+│   1016 │   │   """                                                           
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ follow_symlinks = True                                                   │ 
+│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+OSError: [WinError 1921] The name of the file cannot be resolved by the system:
+'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
+100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+
+During handling of the above exception, another exception occurred:
+
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ _route_load_project                                                          
+│                                                                              
+│    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
+│    7017 │   │   """                                                          
+│    7018 │   │   before = self._last_load_announcement                        
+│ ❱  7019 │   │   self._handle_load_project(name)                              
+│    7020 │   │   announcement = self._last_load_announcement                  
+│    7021 │   │   if announcement is None or announcement is before:           
+│    7022 │   │   │   return                                                   
+│                                                                              
+│ ╭─────────────────── locals ────────────────────╮                            
+│ │ before = None                                 │                            
+│ │   name = 'P'                                  │                            
+│ │   self = S19TuiApp(                           │                            
+│ │          │   title='Hex Edit Tool',           │                            
+│ │          │   classes={'-dark-mode'},          │                            
+│ │          │   pseudo_classes={                 │                            
+│ │          │   │   'focus',                     │                            
+│ │          │   │   'dark'                       │                            
+│ │          │   }                                │                            
+│ │          )                                    │                            
+│ ╰───────────────────────────────────────────────╯                            
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ _handle_load_project                                                         
+│                                                                              
+│   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
+│   10139 │   │   # manifest names an unknown variant).                        
+│   10140 │   │   variant_set = build_variant_set(name, data_files)            
+│ ❱ 10141 │   │   manifest = read_project_manifest(project_dir)                
+│   10142 │   │   # LLR-028.1 — adopt the manifest's declared regions as app s 
+│   10143 │   │   # next Reports dialog seeds from them (HLR-028 capture); res 
+│   10144 │   │   # for a legacy/no-key project so a prior project's regions d 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │         a2l_files = []                                                   │ 
+│ │        data_files = [                                                    │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │                     ]                                                    │ 
+│ │ discarded_unsaved = 0                                                    │ 
+│ │             error = None                                                 │ 
+│ │              name = 'P'                                                  │ 
+│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mu… │ 
+│ │              self = S19TuiApp(                                           │ 
+│ │                     │   title='Hex Edit Tool',                           │ 
+│ │                     │   classes={'-dark-mode'},                          │ 
+│ │                     │   pseudo_classes={'focus', 'dark'}                 │ 
+│ │                     )                                                    │ 
+│ │       variant_set = ProjectVariantSet(                                   │ 
+│ │                     │   project_name='P',                                │ 
+│ │                     │   variants=(                                       │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware',                   │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   ),                                           │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware_1',                 │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   )                                            │ 
+│ │                     │   ),                                               │ 
+│ │                     │   active_id='firmware'                             │ 
+│ │                     )                                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ on_service.py:635 in read_project_manifest                                   
+│                                                                              
+│    632 │   │   │   │   continue                                              
+│    633 │   │   │   resolved_entries = []                                     
+│    634 │   │   │   for entry in entries:                                     
+│ ❱  635 │   │   │   │   resolved = _resolve_manifest_entry(                   
+│    636 │   │   │   │   │   project_root,                                     
+│    637 │   │   │   │   │   entry,                                            
+│    638 │   │   │   │   │   f"gathered[{home!r}]",                            
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │       active_raw = 'firmware_1'                                          │ 
+│ │   active_variant = 'firmware_1'                                          │ 
+│ │      assignments = {}                                                    │ 
+│ │  assignments_raw = {}                                                    │ 
+│ │            batch = []                                                    │ 
+│ │        batch_raw = []                                                    │ 
+│ │            empty = ProjectManifest(                                      │ 
+│ │                    │   schema_version=None,                              │ 
+│ │                    │   active_variant=None,                              │ 
+│ │                    │   batch=[],                                         │ 
+│ │                    │   assignments={},                                   │ 
+│ │                    │   declared_regions=(),                              │ 
+│ │                    │   gathered={},                                      │ 
+│ │                    │   issues=[]                                         │ 
+│ │                    )                                                     │ 
+│ │          entries = ['loop/x.json']                                       │ 
+│ │            entry = 'loop/x.json'                                         │ 
+│ │         gathered = {}                                                    │ 
+│ │     gathered_raw = {'patches': ['loop/x.json']}                          │ 
+│ │           handle = <_io.BufferedReader                                   │ 
+│ │                    name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-… │ 
+│ │             home = 'patches'                                             │ 
+│ │           issues = []                                                    │ 
+│ │    manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
+│ │          payload = {                                                     │ 
+│ │                    │   'schema_version': 1,                              │ 
+│ │                    │   'active_variant': 'firmware_1',                   │ 
+│ │                    │   'gathered': {'patches': ['loop/x.json']}          │ 
+│ │                    }                                                     │ 
+│ │      project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
+│ │     project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut… │ 
+│ │ resolved_entries = []                                                    │ 
+│ │   schema_version = 1                                                     │ 
+│ │       size_bytes = 95                                                    │ 
+│ │       size_probe = None                                                  │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ on_service.py:325 in _resolve_manifest_entry                                 
+│                                                                              
+│    322 │   │   )                                                             
+│    323 │   │   return None                                                   
+│    324 │   try:                                                              
+│ ❱  325 │   │   resolved = (project_root / text).resolve()                    
+│    326 │   │   escapes = not resolved.is_relative_to(project_root)           
+│    327 │   │   traverses = not escapes and _path_traverses_reparse_point(    
+│    328 │   │   │   resolved, stop_at=project_root                            
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      context = "gathered['patches']"                                     │ 
+│ │       issues = []                                                        │ 
+│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC… │ 
+│ │    raw_entry = 'loop/x.json'                                             │ 
+│ │         text = 'loop/x.json'                                             │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1005 in resolve          
+│                                                                              
+│   1002 │   │   │   try:                                                      
+│   1003 │   │   │   │   p.stat()                                              
+│   1004 │   │   │   except OSError as e:                                      
+│ ❱ 1005 │   │   │   │   check_eloop(e)                                        
+│   1006 │   │   return p                                                      
+│   1007 │                                                                     
+│   1008 │   def stat(self, *, follow_symlinks=True):                          
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not… │ 
+│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-lo… │ 
+│ │ strict = False                                                           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:990 in check_eloop       
+│                                                                              
+│    987 │   │   def check_eloop(e):                                           
+│    988 │   │   │   winerror = getattr(e, 'winerror', 0)                      
+│    989 │   │   │   if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE 
+│ ❱  990 │   │   │   │   raise RuntimeError("Symlink loop from %r" % e.filenam 
+│    991 │   │                                                                 
+│    992 │   │   try:                                                          
+│    993 │   │   │   s = os.path.realpath(self, strict=strict)                 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │        e = OSError(22, 'The name of the file cannot be resolved by the   │ 
+│ │            system')                                                      │ 
+│ │ winerror = 1921                                                          │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+RuntimeError: Symlink loop from 
+'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_
+100_67_junction_loop_0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+__ test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash ___
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+strict = False
+
+    def resolve(self, strict=False):
+        """
+        Make the path absolute, resolving all symlinks on the way and also
+        normalizing it.
+        """
+    
+        def check_eloop(e):
+            winerror = getattr(e, 'winerror', 0)
+            if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+                raise RuntimeError("Symlink loop from %r" % e.filename)
+    
+        try:
+            s = os.path.realpath(self, strict=strict)
+        except OSError as e:
+            check_eloop(e)
+            raise
+        p = self._from_parts((s,))
+    
+        # In non-strict mode, realpath() doesn't raise on symlink loops.
+        # Ensure we get an exception by calling stat()
+        if not strict:
+            try:
+>               p.stat()
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1003: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P/loop/x.json')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       OSError: [WinError 1921] The name of the file cannot be resolved by the system: 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: OSError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f3mut-SEC6-7-loop-not-caught/test_tc_b100_20_variant_append0')
+
+    def test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash(
+        tmp_path: Path,
+    ) -> None:
+        """SEC6-7 remainder: ``gathered`` records ``loop/x.json`` where ``loop``
+        is a junction to itself, next to the seeded keys. The project opens and
+        a variant append (which re-reads the manifest after placing) keeps
+        ``firmware_1.s19`` and rewrites ``project.json``: the loop entry is
+        skipped and every seeded key is carried.
+    
+        RED (executed on the corrective-pass-2 tree, e494c50c): ``RuntimeError:
+        Symlink loop`` out of ``Path.resolve()``."""
+        import os
+    
+        from tests.support import b100_links
+    
+        b100_links.require_junctions()
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        loop = projects.create_junction_loop(project_dir / "loop")
+        manifest = projects.read_manifest(project_dir)
+        manifest["gathered"]["patches"].append("loop/x.json")
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        before = (project_dir / "project.json").read_bytes()
+        try:
+>           statuses = _run_writer(tmp_path, base, "variant-append")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:596: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:507: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:482: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:300: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:635: in read_project_manifest
+    resolved = _resolve_manifest_entry(
+s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
+    resolved = (project_root / text).resolve()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1005: in resolve
+    check_eloop(e)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+e = OSError(22, 'The name of the file cannot be resolved by the system')
+
+    def check_eloop(e):
+        winerror = getattr(e, 'winerror', 0)
+        if e.errno == ELOOP or winerror == _WINERROR_CANT_RESOLVE_FILENAME:
+>           raise RuntimeError("Symlink loop from %r" % e.filename)
+E           RuntimeError: Symlink loop from 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f3mut-SEC6-7-loop-not-caught\\test_tc_b100_20_variant_append0\\app\\.s19tool\\workarea\\P\\loop\\x.json'
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:990: RuntimeError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_junction_loop_entry_is_a_skipped_row_not_a_crash
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_variant_append_with_a_junction_loop_entry_does_not_crash
+2 failed, 62 deselected in 17.63s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 76b276077ded9717)

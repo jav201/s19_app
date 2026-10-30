@@ -1,0 +1,417 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t3 tests/test_b100_save_guards.py tests/test_b97_chips_help.py tests/test_b97_load_project_dialog.py tests/test_b99_crc_region.py tests/test_b99_staging.py tests/test_loadfilescreen_input.py tests/test_report_progress.py tests/test_tui_manifest_save.py tests/test_tui_report_view.py 
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# date: 2026-10-30T01:48:43Z
+........................................................................ [ 32%]
+..........................................................F............. [ 65%]
+.......F................................................................ [ 97%]
+.....                                                                    [100%]
+================================== FAILURES ===================================
+____________________ test_at_b99_10_flow_crc_region_pilot _____________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t3/test_at_b99_10_flow_crc_region0')
+
+    def test_at_b99_10_flow_crc_region_pilot(tmp_path: Path) -> None:
+        """Flow Execution, driven ONLY by keys and clicks: the empty-region lane
+        paints its CRC card ``✗ error``, writes no file and the run log names the
+        cause (``CRC region 0x20000-0x30000 holds 0 image bytes - nothing
+        written``); the gap-region lane paints ``◇ notices``, names the exact
+        absent count on its terminal log line (``466 of 512 region bytes absent
+        (0xFA00-0xFC00)``, HLR-159 / UX-C2 — Inc-5 review fix F1) and writes a
+        file whose slot matches an independent CRC over the present bytes.
+    
+        RED at HEAD (P-9): both lanes run ``ok`` — the empty lane writes
+        ``out_empty.s19`` and the log carries no cause line. RED at the pre-fix
+        Inc-5 tree: the count text never reached the painted lane log line."""
+        from textual.widgets import Label
+    
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(PRG, project_dir / "prg.s19")
+        (project_dir / "empty_crc.json").write_text(
+            _crc_config("0x20000", "0x30000", "0x2FFFC"), encoding="utf-8"
+        )
+        (project_dir / "partial_crc.json").write_text(
+            _crc_config("0xFA00", "0xFC00", "0xFC00"), encoding="utf-8"
+        )
+        (project_dir / "noop.json").write_text(_change_doc([]), encoding="utf-8")
+        write_flow(
+            project_dir,
+            "empty_flow",
+            [
+                SourceBlock("prg.s19"),
+                CrcBlock("empty_crc.json"),
+                WriteOutBlock("out_empty.s19"),
+            ],
+        )
+        write_flow(
+            project_dir,
+            "partial_flow",
+            [
+                SourceBlock("prg.s19"),
+                PatchBlock("noop.json"),
+                CrcBlock("partial_crc.json"),
+                WriteOutBlock("out_partial.s19"),
+            ],
+        )
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                # The project loads through the Load project dialog.
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                row = next(
+                    row
+                    for row in app.screen.query("#project_list ListItem")
+                    if "proj1" in str(row.query_one(Label).render())
+                )
+                await pilot.click(row)
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "proj1"
+                    in str(app.query_one("#status_context").render()),
+                    "the project context label",
+                )
+                await pilot.press("right_square_bracket")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#fx_panel")) > 0,
+                    "the Flow Execution panel",
+                )
+                await _import_lane(app, pilot, "empty_flow", 0)
+                await _import_lane(app, pilot, "partial_flow", 1)
+                assert await pilot.click("#fx_run"), "click missed #fx_run"
+                await _wait_for(
+                    pilot,
+                    lambda: "chain halted" in _painted_log(app)
+                    and not app.query_one("#fx_run").disabled,
+                    "the failed lane painted in the run log",
+                )
+    
+                log = _painted_log(app)
+                # Empty region: the terminal line names the user-facing cause
+                # (UX-C2) and the chain halts before WRITE-OUT.
+                assert "empty_flow" in log, log
+                assert "chain halted" in log, log
+                assert (
+                    "CRC region 0x20000-0x30000 holds 0 image bytes - nothing written"
+                    in log
+                ), log
+                # Gap region: the lane ends with notices and still writes.
+                assert "partial_flow" in log, log
+                assert "done with notices" in log, log
+                # F1 (HLR-159 / LLR-159.2, UX-C2): the painted terminal line
+                # names the exact absent count against the declared span length.
+                assert "466 of 512 region bytes absent (0xFA00-0xFC00)" in log, log
+                # The painted lane cards carry the block statuses.
+                panel = app.query_one("#fx_panel")
+                assert "✗ error" in panel.lane_paint_plain(0), (
+                    panel.lane_paint_plain(0)
+                )
+                assert "◇ notices" in panel.lane_paint_plain(1), (
+                    panel.lane_paint_plain(1)
+                )
+                # The empty lane wrote nothing; the gap lane's slot matches an
+                # independent CRC over the present bytes (the reader's oracle).
+                assert not (project_dir / "out_empty.s19").exists(), (
+                    "WRITE-OUT ran despite the empty-region error"
+                )
+                out_partial = project_dir / "out_partial.s19"
+                assert out_partial.exists(), "the notices lane wrote no file"
+                oracle = read_s19(project_dir / "prg.s19")
+                present = bytes(
+                    oracle.data[addr]
+                    for addr in range(PARTIAL_START, PARTIAL_END)
+                    if addr in oracle.data
+                )
+                written = read_s19(out_partial)
+                slot = bytes(written.data[PARTIAL_OUTPUT + i] for i in range(4))
+                assert slot == zlib.crc32(present).to_bytes(4, "little")
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_crc_region.py:666: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_crc_region.py:616: in _drive
+    await _import_lane(app, pilot, "empty_flow", 0)
+tests\test_b99_crc_region.py:517: in _import_lane
+    assert await pilot.click("#fx_import"), "click missed #fx_import"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#fx_import', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#fx_import' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+_________ test_at_b99_04_duplicate_refused_distinct_parallel_markers __________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t3/test_at_b99_04_duplicate_refus0')
+
+    def test_at_b99_04_duplicate_refused_distinct_parallel_markers(tmp_path: Path) -> None:
+        """AT-B99-04 (HLR-155 D7 + the distinct-name parallel arm, LLR-155.5):
+        ONE black-box pilot session drives both outcomes through the shipped
+        surface. (b) First — a chain set of 8 lanes with distinct output names,
+        run in PARALLEL through Flow Execution (the ``parallel`` word of
+        ``#fx_mode`` clicked, Run clicked on ``#fx_run``), writes 8 files, each
+        holding its lane's marker; the run's chain-set report reads
+        ``- **Mode:** parallel`` (a written artifact, never an attribute read).
+        (a) Then — two more lanes whose WRITE-OUT names resolve to one file
+        (``same.s19`` / ``SAME.s19``, case-folded) refuse the WHOLE set: the
+        painted run log (``#fx_log``) leads with the outcome inside the first
+        50 characters (UX-C4), names both lanes and the file, the refusal also
+        reaches the status line (``#log_line_4``), and nothing new is written.
+    
+        Lanes cannot be removed from the panel, so the distinct set runs first
+        and the colliding pair is imported after it — a refused set is observed
+        as ``nothing new on disk``, not as ``the directory is empty`` (the 8
+        lane files and the reports of run (b) legitimately stay).
+    
+        Every entry is the shipped control: the project loads through the Load
+        project dialog (rail key ``p``, the ``proj`` row, ``#project_ok``), the
+        lanes import through ``#fx_import`` clicks, the mode and Run are
+        clicks; every wait and assertion reads the painted surface, a file on
+        disk, or an ``isinstance`` screen predicate — never
+        ``app._handle_load_project``, ``Button.press()``,
+        ``ModeToggle.set_mode``, ``Input.value =``, or an internal attribute.
+        """
+        from textual.widgets import Label, Static
+    
+        from s19_app.tui.screens import LoadProjectScreen
+        from tests.b97_fixtures import make_project, write_flow
+        from tests.b97_probes import settle
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            outcomes: dict = {}
+            async with app.run_test(size=(260, 90)) as pilot:
+                await settle(pilot)
+                # fixture staging through the accepted residual: app.workarea
+                project_dir = make_project(app, "proj")
+                for i in range(8):
+                    (project_dir / f"base{i}.s19").write_text(
+                        _emit(0x41 + i), encoding="ascii"
+                    )
+                    write_flow(
+                        project_dir,
+                        f"lane{i}",
+                        [SourceBlock(f"base{i}.s19"), WriteOutBlock(f"lane{i}.s19")],
+                    )
+                (project_dir / "base_a.s19").write_text(_emit(0x41), "ascii")
+                (project_dir / "base_b.s19").write_text(_emit(0x42), "ascii")
+                write_flow(
+                    project_dir,
+                    "lane_a",
+                    [SourceBlock("base_a.s19"), WriteOutBlock("same.s19")],
+                )
+                write_flow(
+                    project_dir,
+                    "lane_b",
+                    [SourceBlock("base_b.s19"), WriteOutBlock("SAME.s19")],
+                )
+    
+                # load the project through the Load project dialog (rail key ``p``)
+                await pilot.press("p")
+                assert await _poll(
+                    pilot, lambda: isinstance(app.screen, LoadProjectScreen)
+                ), "the Load project dialog never opened"
+                row = next(
+                    item
+                    for item in app.screen.query("#project_list ListItem")
+                    if str(item.query_one(Label).render()) == "proj"
+                )
+                await pilot.click(row)
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                assert await _poll(
+                    pilot, lambda: "Loaded project 'proj'" in _painted_status(app)
+                ), f"the project load did not paint: {_painted_status(app)}"
+    
+                # Flow Execution (rail key ``]``)
+                await pilot.press("right_square_bracket")
+                panel = app.query_one("#fx_panel")
+                await _poll(pilot, lambda: panel.region.height > 0)
+    
+                # (b) the 8-lane distinct-name set, run in parallel
+                for i in range(8):
+                    await _fx_import_lane_click(app, pilot, f"lane{i}", i)
+                assert await pilot.click("#fx_mode", offset=(18, 0)), (
+                    "click missed the parallel word of #fx_mode"
+                )
+                await settle(pilot)
+                assert await pilot.click("#fx_run"), "click missed #fx_run"
+                assert await _poll(
+                    pilot,
+                    lambda: all(
+                        (project_dir / f"lane{i}.s19").is_file() for i in range(8)
+                    ),
+                    attempts=400,
+                ), "the parallel run did not write all 8 lane files"
+                assert await _poll(
+                    pilot,
+                    lambda: "· done" in app.query_one("#fx_log", Static).render().plain
+                    and not app.query_one("#fx_run").disabled,
+                    attempts=400,
+                ), "the run never painted its terminal line"
+    
+                # (a) the duplicate-name pair refuses the whole set
+                await _fx_import_lane_click(app, pilot, "lane_a", 8)
+                await _fx_import_lane_click(app, pilot, "lane_b", 9)
+                outcomes["pre_refusal"] = sorted(p.name for p in project_dir.iterdir())
+                assert await pilot.click("#fx_run"), "click missed #fx_run"
+                assert await _poll(
+                    pilot,
+                    lambda: "Chain set not run"
+                    in app.query_one("#fx_log", Static).render().plain,
+                ), f"the refusal never painted: {_painted_status(app)}"
+                outcomes["log"] = app.query_one("#fx_log", Static).render().plain
+                outcomes["status"] = _painted_status(app)
+                outcomes["after"] = sorted(p.name for p in project_dir.iterdir())
+                outcomes["project_dir"] = project_dir
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_staging.py:1613: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_staging.py:1577: in _drive
+    await _fx_import_lane_click(app, pilot, f"lane{i}", i)
+tests\test_b99_staging.py:1469: in _fx_import_lane_click
+    assert await pilot.click("#fx_import"), "click missed #fx_import"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#fx_import', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#fx_import' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+=========================== short test summary info ===========================
+FAILED tests/test_b99_crc_region.py::test_at_b99_10_flow_crc_region_pilot - t...
+FAILED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+2 failed, 219 passed in 923.22s (0:15:23)

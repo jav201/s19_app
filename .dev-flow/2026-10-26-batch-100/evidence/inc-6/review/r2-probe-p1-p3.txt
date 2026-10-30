@@ -1,0 +1,75 @@
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed2
+# command: python -m pytest -q -p no:cacheprovider -s -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/r2p /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/probes/test_r6_probes.py
+# date: 2026-10-30T04:15:42Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed2\s19_app\__init__.py
+# python 3.11.15
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed2\s19_app\__init__.py
+
+[P1 unparseable / a2l_sync] placed file kept: True
+[P1 unparseable / a2l_sync] project.json replaced: False
+[P1 unparseable / a2l_sync] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],'
+[P1 unparseable / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', "project.json in project 'P' is damaged and was not rewritten - firmware.a2l stays in the project; Save project rewrites it"]
+.
+[P1 toplevel_list / a2l_sync] placed file kept: True
+[P1 toplevel_list / a2l_sync] project.json replaced: False
+[P1 toplevel_list / a2l_sync] project.json now: '[{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"]}]'
+[P1 toplevel_list / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', "project.json in project 'P' is damaged and was not rewritten - firmware.a2l stays in the project; Save project rewrites it"]
+.
+[P1 oversize / a2l_sync] placed file kept: True
+[P1 oversize / a2l_sync] project.json replaced: False
+[P1 oversize / a2l_sync] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/ck_seed.json"]},"declared_regions":[{"name":"cal_block","start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+[P1 oversize / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', "project.json in project 'P' is damaged and was not rewritten - firmware.a2l stays in the project; Save project rewrites it"]
+.
+[P1 unparseable / variant_append] placed file kept: True
+[P1 unparseable / variant_append] project.json replaced: False
+[P1 unparseable / variant_append] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],'
+[P1 unparseable / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", "Added variant 'firmware_1' to project 'P'"]
+.
+[P1 toplevel_list / variant_append] placed file kept: True
+[P1 toplevel_list / variant_append] project.json replaced: False
+[P1 toplevel_list / variant_append] project.json now: '[{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"]}]'
+[P1 toplevel_list / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", "Added variant 'firmware_1' to project 'P'"]
+.
+[P1 oversize / variant_append] placed file kept: True
+[P1 oversize / variant_append] project.json replaced: False
+[P1 oversize / variant_append] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/ck_seed.json"]},"declared_regions":[{"name":"cal_block","start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+[P1 oversize / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", "Added variant 'firmware_1' to project 'P'"]
+.
+[P1 unparseable / mac_sync] placed file kept: True
+[P1 unparseable / mac_sync] project.json replaced: False
+[P1 unparseable / mac_sync] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],'
+[P1 unparseable / mac_sync] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.mac...', 'Loaded firmware.mac', "project.json in project 'P' is damaged and was not rewritten - firmware.mac stays in the project; Save project rewrites it"]
+.
+[P1 toplevel_list / mac_sync] placed file kept: True
+[P1 toplevel_list / mac_sync] project.json replaced: False
+[P1 toplevel_list / mac_sync] project.json now: '[{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"]}]'
+[P1 toplevel_list / mac_sync] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.mac...', 'Loaded firmware.mac', "project.json in project 'P' is damaged and was not rewritten - firmware.mac stays in the project; Save project rewrites it"]
+.
+[P1 oversize / mac_sync] placed file kept: True
+[P1 oversize / mac_sync] project.json replaced: False
+[P1 oversize / mac_sync] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/ck_seed.json"]},"declared_regions":[{"name":"cal_block","start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+[P1 oversize / mac_sync] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.mac...', 'Loaded firmware.mac', "project.json in project 'P' is damaged and was not rewritten - firmware.mac stays in the project; Save project rewrites it"]
+.
+[P1 unparseable / save_back] placed file kept: True
+[P1 unparseable / save_back] project.json replaced: False
+[P1 unparseable / save_back] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],'
+[P1 unparseable / save_back] statuses after the writer: ['Patched image saved as firmware_1.s19 — 1 entry applied before this save (0x8000007C)', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", 'Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)']
+.
+[P1 toplevel_list / save_back] placed file kept: True
+[P1 toplevel_list / save_back] project.json replaced: False
+[P1 toplevel_list / save_back] project.json now: '[{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"]}]'
+[P1 toplevel_list / save_back] statuses after the writer: ['Patched image saved as firmware_1.s19 — 1 entry applied before this save (0x8000007C)', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", 'Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)']
+.
+[P1 oversize / save_back] placed file kept: True
+[P1 oversize / save_back] project.json replaced: False
+[P1 oversize / save_back] project.json now: '{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/ck_seed.json"]},"declared_regions":[{"name":"cal_block","start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+[P1 oversize / save_back] statuses after the writer: ['Patched image saved as firmware_1.s19 — 1 entry applied before this save (0x8000007C)', "project.json in project 'P' is damaged and was not rewritten - firmware_1.s19 stays in the project; Save project rewrites it", 'Saved + verified: firmware_1.s19 — 1 entry applied before this save (0x8000007C)']
+.
+[P2] statuses: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest write failed', "Added variant 'firmware_1' to project 'P'"]
+[P2] session active: 'firmware_1'; project.json active_variant: 'firmware'
+.
+[P3] statuses: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', 'Project saved + manifest verified']
+[P3] keys after: ['active_variant', 'assignments', 'batch', 'declared_regions', 'gathered', 'schema_version']; batch after: []
+.
+14 passed in 77.38s (0:01:17)
+# exit: 0

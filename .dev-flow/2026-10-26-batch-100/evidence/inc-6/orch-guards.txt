@@ -1,0 +1,9 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_import_census.py tests/test_tui_snapshot.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_address_census.py tests/test_engine_unchanged.py
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-30T01:15:47-06:00
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+........................................................................ [ 96%]
+...                                                                      [100%]
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+75 passed in 129.94s (0:02:09)

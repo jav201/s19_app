@@ -1,0 +1,9 @@
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_focus.py tests/test_b100_save_image.py
+# date: 2026-10-30T03:01:26Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
+# python 3.11.15
+........................................................................ [ 60%]
+................................................                         [100%]
+120 passed in 672.99s (0:11:12)
+# exit: 0

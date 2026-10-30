@@ -1,0 +1,44 @@
+# command: python -m pytest -q -p no:cacheprovider tests/test_flow_execution_service.py tests/test_flow_multi_image_ui.py tests/test_id_registry.py tests/test_loadfilescreen_input.py tests/test_manifest_verify.py tests/test_manifest_writer.py tests/test_project_gather.py tests/test_report_logging.py tests/test_report_progress.py tests/test_tui_app.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_evidence_packs.py tests/test_tui_flow_execution_b94.py tests/test_tui_manifest_save.py tests/test_tui_patch_card.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_history_strip.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_tui_variants.py tests/test_variant_execution.py tests/test_workspace_variants.py -rfE
+# tree: /c/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6, fix3) | sources: 762d1a98c8a65903 *s19_app/tui/app.py;ea549ab4bd9d3ef4 *s19_app/tui/screens.py;76b276077ded9717 *s19_app/tui/services/variant_execution_service.py;781f04ed2cc30897 *s19_app/tui/styles.tcss;
+# PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset | 2026-10-30T00:42:34-06:00
+s19_app: C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_diff_screen.py::test_at_b78_32_app_bindings_block_is_untouched
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+FAILED tests/test_tui_patch_editor_v2.py::test_at057b_regroup_wiring_and_binding_regression
+FAILED tests/test_tui_patch_editor_v2.py::test_tc344_undo_redo_disabled_for_file_backed_document
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+6 failed, 672 passed, 1 xfailed in 1988.18s (0:33:08)

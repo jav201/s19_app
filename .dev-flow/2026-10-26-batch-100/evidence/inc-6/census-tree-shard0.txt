@@ -1,0 +1,674 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=C:/Users/jjgh8/AppData/Local/Temp/i6t0 tests/test_b100_save_image.py tests/test_b97_flow_builder.py tests/test_b97_patch_editor.py tests/test_b99_export.py tests/test_b99_truncation.py tests/test_manifest_verify.py tests/test_tui_commandbar.py tests/test_tui_patch_variant.py tests/test_tui_variants.py 
+# tree: C:/Users/jjgh8/Github/s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree incl. re-pins)
+# runner: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/inc6-impl/py.sh (sets PYTHONPATH to that tree; NO_COLOR unset; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8)
+# date: 2026-10-30T01:48:43Z
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+...............................F.F.......................F.............. [ 79%]
+..............................F..........................                [100%]
+================================== FAILURES ===================================
+________ test_at_b99_11_sanitised_mac_only_second_export_takes_suffix _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t0/test_at_b99_11_sanitised_mac_o0')
+
+    def test_at_b99_11_sanitised_mac_only_second_export_takes_suffix(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B99-11 (HLR-160) end to end in ONE pilot session, all three
+        clauses in sequence through the shipped Split / Join / Export window
+        (SegmentSplitView) export action.
+    
+        HLR-160's Observable outcome: "with an A2L whose segment is named
+        `x/../../../ESCAPED`, the export writes its file inside the
+        destination under a sanitised name, and nothing appears outside it. A
+        MAC-only export writes a file holding no data record. A second export
+        after a patch writes `<name>_1`, the status names it, and the first
+        file is intact."
+    
+        Clause (a) — the hostile-segment A2L project exports INSIDE the
+        destination under ``prg_x__________ESCAPED.s19`` and nothing appears
+        outside it. Clause (b) — every artifact is unloaded and
+        ``firmware.mac`` is loaded on its own, so the session is genuinely
+        MAC-only: a manual-range export writes ``firmware_locality_00.s19``
+        holding NO data record (independent reader). Clause (c) — the project
+        is reloaded, one byte is patched through the Patch Editor, and the
+        second export lands as ``_<N>``, named in the painted status
+        (wrote/reused), while the first file's bytes stay intact.
+        """
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True)
+        shutil.copyfile(PRG_S19, project_dir / "prg.s19")
+        _write_hostile_segment_a2l(project_dir, "x/../../../ESCAPED")
+        mac_src = tmp_path / "firmware.mac"
+        shutil.copyfile(FIRMWARE_MAC, mac_src)
+        oracle = read_s19(PRG_S19)
+        patch_addr = min(oracle.data)
+        patch_value = 0x5A if oracle.data[patch_addr] != 0x5A else 0xC3
+        dest = project_dir / "splits"
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_project_pilot(app, pilot, "proj1")
+    
+                # ---- Clause (a): hostile A2L segment name stays inside dest.
+                await _open_split_join_window(app, pilot)
+                before_a = _snapshot(tmp_path)
+                # Entering the manual tab hands focus to its TextArea (by
+                # design) — click the table back so the window bindings, not
+                # the box, take the letters.
+                await pilot.press("t")  # ranges -> manual (focus -> TextArea)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("t")  # manual -> a2l (focus -> table)
+                await pilot.press("a")  # select all (2 A2L segments, 0 coverage)
+                await pilot.press("e")  # arm: empty files behind the confirm
+                await pilot.press("e")  # confirm
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the clause-a export status line",
+                    attempts=200,
+                )
+                status_a = _status_text(app)
+                after_a = _snapshot(tmp_path)
+                created_a = sorted(
+                    str(p.relative_to(tmp_path)) for p in after_a - before_a
+                )
+    
+                # ---- Clause (b): a MAC-only export writes no data record.
+                # Unload every artifact first — loading the MAC beside prg.s19
+                # would merely attach it (the coexistence model) and the clause
+                # would not be a MAC-ONLY session. Focus is on the table (the
+                # a2l tab), so the rail keys below bubble to the app.
+                await pilot.press("escape")  # close the window
+                await pilot.press("U")  # unload all artifacts
+                await _wait_for(
+                    pilot,
+                    lambda: "nloaded" in _status_text(app),
+                    "the unload-all status line",
+                )
+                await pilot.press("l")
+                await _wait_for(
+                    pilot,
+                    lambda: "LoadFileScreen" in type(app.screen).__name__
+                    and len(app.screen.query("#load_path")) > 0,
+                    "the Load file dialog",
+                )
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(mac_src))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.mac" in _status_text(app),
+                    "the MAC load status line",
+                    attempts=200,
+                )
+                await _open_split_join_window(app, pilot)
+                await pilot.press("t")  # a2l -> ranges (focus -> table)
+                await pilot.press("t")  # ranges -> manual (focus -> TextArea)
+                await pilot.press(*"0x80000000-0x8000000F")
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")  # select all (parses the manual box)
+                await pilot.press("e")  # arm: the session holds 0 declared bytes
+                await pilot.press("e")  # confirm
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the clause-b export status line",
+                    attempts=200,
+                )
+    
+                # ---- Clause (c): patch, export again -> <name>_1, first intact.
+                # Leave the window on a table-focused tab BEFORE closing it: a
+                # hidden manual TextArea keeps focus and would swallow the next
+                # key (it is the one widget that eats letters).
+                await pilot.press("t")  # manual -> a2l (focus -> table)
+                await pilot.press("escape")  # close the window
+                await _load_project_pilot(app, pilot, "proj1")
+                await _open_split_join_window(app, pilot)
+                await pilot.press("t")  # a2l -> ranges (focus -> table)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")  # ranges tab: all rows
+                await pilot.press("e")
+                await _wait_for(
+                    pilot,
+                    lambda: "xported" in _status_text(app).lower(),
+                    "the first (clause-c) export status line",
+                    attempts=200,
+                )
+                before_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+    
+                # Patch one byte through the Patch Editor (rail key ``6``).
+                await pilot.press("escape")  # close the window
+                await pilot.press("6")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#patch_editor_panel")) > 0,
+                    "the Patch Editor",
+                )
+                assert await pilot.click(
+                    "#patch_entry_address_input"
+                ), "click missed #patch_entry_address_input"
+                await pilot.press(*f"0x{patch_addr:X}")
+                assert await pilot.click(
+                    "#patch_entry_bytes_input"
+                ), "click missed #patch_entry_bytes_input"
+                await pilot.press(*f"0x{patch_value:02X}")
+                assert await pilot.click(
+                    "#patch_entry_add_button"
+                ), "click missed #patch_entry_add_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "entry added" in _status_text(app),
+                    "the add status line",
+                )
+                assert await pilot.click(
+                    "#patch_doc_apply_button"
+                ), "click missed #patch_doc_apply_button"
+                await _wait_for(
+                    pilot,
+                    lambda: "Apply:" in _status_text(app),
+                    "the apply status line",
+                )
+    
+                await _open_split_join_window(app, pilot)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")
+                await pilot.press("e")
+                # Wait for the SECOND export's status: it names the `_1` write
+                # and the reused siblings (UX-C11).
+                status_c = ""
+                for _ in range(200):
+                    await pilot.pause()
+                    status_c = _status_text(app)
+                    if "xported" in status_c.lower() and "reused" in status_c:
+                        break
+                after_c = {p.name: p.read_bytes() for p in dest.iterdir()}
+                return status_a, created_a, before_c, after_c, status_c
+    
+>       status_a, created_a, before_c, after_c, status_c = asyncio.run(_drive())
+                                                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_export.py:1159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_export.py:1025: in _drive
+    await _open_split_join_window(app, pilot)
+tests\test_b99_export.py:942: in _open_split_join_window
+    assert await pilot.click("#palette_input"), "click missed #palette_input"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#palette_input', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#palette_input' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+____________ test_tc_b99_29_junctioned_project_home_shows_refusal _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t0/test_tc_b99_29_junctioned_proj0')
+
+    def test_tc_b99_29_junctioned_project_home_shows_refusal(tmp_path: Path) -> None:
+        """TC-B99-29 sub-arm through the shipped window (AT-B99-11's surface):
+        F6 arm — a project dir swapped for a junction escaping the work area
+        makes the scoped destination resolution refuse — the refusal is painted
+        and the app does not crash. RED before the fix: ``_dest_dir()`` raised
+        OUTSIDE the handler's try, so the key press propagated the exception
+        and the pilot run errored."""
+        from tests.b97_fixtures import make_junction
+    
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True)
+        shutil.copyfile(PRG_S19, project_dir / "prg.s19")
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                await _load_project_pilot(app, pilot, "proj1")
+                # Swap the loaded project's dir for a junction whose target
+                # sits OUTSIDE the work-area root: the scoped project home can
+                # no longer be resolved inside it.
+                for child in project_dir.iterdir():
+                    child.unlink()
+                project_dir.rmdir()
+                make_junction(project_dir, tmp_path / "escaped_home")
+                await _open_split_join_window(app, pilot)
+                assert await pilot.click("#sje_table"), "click missed #sje_table"
+                await pilot.press("a")  # ranges tab: all rows
+                await pilot.press("e")
+                await _wait_for(
+                    pilot,
+                    lambda: "xport" in _status_text(app).lower(),
+                    "the export outcome status line",
+                    attempts=200,
+                )
+                return _status_text(app)
+    
+>       status = asyncio.run(_drive())
+                 ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b99_export.py:1325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_export.py:1313: in _drive
+    await _open_split_join_window(app, pilot)
+tests\test_b99_export.py:942: in _open_split_join_window
+    assert await pilot.click("#palette_input"), "click missed #palette_input"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#palette_input', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#palette_input' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+____________ test_at_b99_03_status_leads_defect_flow_source_fails _____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t0/test_at_b99_03_status_leads_de0')
+
+    def test_at_b99_03_status_leads_defect_flow_source_fails(tmp_path):
+        """One pilot session drives the whole HLR-154 observable outcome: Load
+        file (``l``) of the cut corpus S19 paints ``Loaded cut.s19 with
+        integrity notices: S19-NO-TERMINATOR`` (never a plain
+        ``Loaded <name> (S19 only)``), the Issues panel names the code, and Flow
+        Execution (``#fx_run``) over the same defect fails the SOURCE lane and
+        writes no file."""
+        from textual.widgets import Label
+        from textual.widgets import Static
+    
+        from s19_app.tui.screens import LoadFlowScreen, LoadProjectScreen
+    
+        from tests.b97_fixtures import write_flow
+    
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = app.workarea / "proj1"
+        project_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(CORPUS / "synth_no_terminator.s19", project_dir / "cut.s19")
+        write_flow(
+            project_dir,
+            "cut_flow",
+            [SourceBlock("cut.s19"), WriteOutBlock("out.s19")],
+        )
+    
+        def painted_log() -> str:
+            return str(app.query_one("#fx_log", Static).render())
+    
+        async def _drive():
+            async with app.run_test(size=(120, 54)) as pilot:
+                await pilot.pause()
+                # 1. Load file dialog: the cut corpus S19 leads with the defect.
+                await pilot.press("l")
+                for _ in range(6):
+                    await pilot.pause()
+                assert await pilot.click("#load_path"), "click missed #load_path"
+                await pilot.press(*str(project_dir / "cut.s19"))
+                assert await pilot.click("#load_ok"), "click missed #load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: "integrity notices" in _status_text(app),
+                    "load status line",
+                )
+                status = _status_text(app)
+                assert status.startswith(
+                    "Loaded cut.s19 with integrity notices: S19-NO-TERMINATOR"
+                ), status
+                assert "(S19 only)" not in status, status
+                await _wait_for(
+                    pilot,
+                    lambda: any(
+                        "S19-NO-TERMINATOR" in str(chip.render())
+                        for chip in app.query(".issue-code-chip")
+                    ),
+                    "issues panel names the code",
+                )
+                # 2. Flow Execution over the same defect: SOURCE fails, no file.
+                # The file-load worker leaves focus on the segment table, whose
+                # window binds ``p`` (pad cycle); ``tab`` walks focus back out so
+                # the rail key reaches the app binding.
+                await pilot.press("tab")
+                await pilot.press("p")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadProjectScreen),
+                    "the Load project dialog",
+                )
+                # The row pick is a CLICK on the painted row (the flow-picker
+                # idiom below), never an assignment to ``listing.index``.
+                row = next(
+                    row
+                    for row in app.screen.query("#project_list ListItem")
+                    if "proj1" in str(row.query_one(Label).render())
+                )
+                await pilot.click(row)
+                await pilot.pause()
+                assert await pilot.click("#project_ok"), "click missed #project_ok"
+                # ``#status_context`` carries the project name durably; the rolling
+                # ``#status_text`` line can be overwritten by the file-load worker.
+                await _wait_for(
+                    pilot,
+                    lambda: "proj1"
+                    in str(app.query_one("#status_context").render()),
+                    "the project context label",
+                )
+                await pilot.press("right_square_bracket")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#fx_panel")) > 0,
+                    "the Flow Execution panel",
+                )
+                assert await pilot.click("#fx_import"), "click missed #fx_import"
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, LoadFlowScreen)
+                    and any(
+                        item.name == "cut_flow"
+                        for item in app.screen.query("#flow_list ListItem")
+                    ),
+                    "the flow picker lists cut_flow",
+                )
+                item = next(
+                    item
+                    for item in app.screen.query("#flow_list ListItem")
+                    if item.name == "cut_flow"
+                )
+                await pilot.click(item)
+                await pilot.pause()
+                assert await pilot.click("#flow_load_ok"), "click missed #flow_load_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.query("#fx_lane_0")) > 0,
+                    "the imported lane",
+                )
+                assert await pilot.click("#fx_run"), "click missed #fx_run"
+                await _wait_for(
+                    pilot,
+                    lambda: "S19-NO-TERMINATOR" in painted_log()
+                    and not app.query_one("#fx_run").disabled,
+                    "the failed run painted in the lane log",
+                    attempts=200,
+                )
+                log = painted_log()
+                assert "S19-NO-TERMINATOR" in log, log
+                assert "cut.s19" in log, log
+                assert not (project_dir / "out.s19").exists(), (
+                    "WRITE-OUT ran despite the integrity notice"
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b99_truncation.py:651: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b99_truncation.py:613: in _drive
+    assert await pilot.click("#fx_import"), "click missed #fx_import"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:238: in click
+    return await self._post_mouse_events(
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\pilot.py:429: in _post_mouse_events
+    target_widget = screen.query_one(widget)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = LoadResultScreen(), selector = '#fx_import', expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#fx_import' on LoadResultScreen()
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/i6t0/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests\test_tui_commandbar.py:2704: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix
+FAILED tests/test_b99_export.py::test_tc_b99_29_junctioned_project_home_shows_refusal
+FAILED tests/test_b99_truncation.py::test_at_b99_03_status_leads_defect_flow_source_fails
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+4 failed, 269 passed in 1469.48s (0:24:29)

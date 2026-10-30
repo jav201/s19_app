@@ -1,0 +1,150 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_active_variant.py -k tc_b100_18 or tc_b100_19 or tc_b100_20
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.2-saveback-not-activated
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-30T01:15:08+00:00
+# requirement: LLR-168.2
+# mutation: the save-back no longer activates the written file nor rewrites the manifest — file s19_app/tui/app.py
+# pre-mutation sha256: 8b7d332e9ae171ef56ca9033de1e5aeed32b7af30ffd06e30a16107ee36d9ca6
+# mutant sha256: d3b1801c4a2692bf48c2444074739a3bbc5b42edaf9ee0de9ed78d6a07b141d7
+# restored sha256: 8b7d332e9ae171ef56ca9033de1e5aeed32b7af30ffd06e30a16107ee36d9ca6
+# RESTORE OK
+.....FF.F...                                                             [100%]
+================================== FAILURES ===================================
+___________ test_tc_b100_19_save_back_becomes_the_active_variant[A] ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_19_save_back_beco0')
+case = 'A'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    def test_tc_b100_19_save_back_becomes_the_active_variant(tmp_path: Path, case: str) -> None:
+        """``p02`` A (typed ``firmware.s19`` -> ``firmware_1.s19``) and B (the
+        default ``firmware-patched.s19``): after the save-back the session's
+        active variant, the image's variant id and ``project.json`` all name the
+        written file; ``current_file.path`` is still the loaded image.
+    
+        RED (executed on 1d677ba, P-3): ``active_variant 'firmware'``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_through_handler(pilot, app, src / "firmware.s19")
+                await _save_project(pilot, app, "P")
+                loaded_path = app.current_file.path
+                _apply_patch(app)
+                typed = projects.typed_name(case) or f"{app.current_file.variant_id}-patched.s19"
+                await _save_back(pilot, app, typed)
+                return (
+                    loaded_path,
+                    app.current_file.path,
+                    app._variant_set.active_id,
+                    app.current_file.variant_id,
+                )
+    
+        loaded_path, path_after, active_id, variant_id = asyncio.run(_drive())
+        expected = Path(projects.landed_name(case)).stem
+        project_dir = _workarea(base) / "P"
+        assert (project_dir / projects.landed_name(case)).is_file()
+>       assert projects.read_manifest(project_dir)["active_variant"] == expected, (
+            f"active_variant {projects.read_manifest(project_dir)['active_variant']!r}"
+        )
+E       AssertionError: active_variant 'firmware'
+E       assert 'firmware' == 'firmware_1'
+E         
+E         - firmware_1
+E         ?         --
+E         + firmware
+
+tests\test_b100_active_variant.py:253: AssertionError
+___________ test_tc_b100_19_save_back_becomes_the_active_variant[B] ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_19_save_back_beco1')
+case = 'B'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    def test_tc_b100_19_save_back_becomes_the_active_variant(tmp_path: Path, case: str) -> None:
+        """``p02`` A (typed ``firmware.s19`` -> ``firmware_1.s19``) and B (the
+        default ``firmware-patched.s19``): after the save-back the session's
+        active variant, the image's variant id and ``project.json`` all name the
+        written file; ``current_file.path`` is still the loaded image.
+    
+        RED (executed on 1d677ba, P-3): ``active_variant 'firmware'``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_through_handler(pilot, app, src / "firmware.s19")
+                await _save_project(pilot, app, "P")
+                loaded_path = app.current_file.path
+                _apply_patch(app)
+                typed = projects.typed_name(case) or f"{app.current_file.variant_id}-patched.s19"
+                await _save_back(pilot, app, typed)
+                return (
+                    loaded_path,
+                    app.current_file.path,
+                    app._variant_set.active_id,
+                    app.current_file.variant_id,
+                )
+    
+        loaded_path, path_after, active_id, variant_id = asyncio.run(_drive())
+        expected = Path(projects.landed_name(case)).stem
+        project_dir = _workarea(base) / "P"
+        assert (project_dir / projects.landed_name(case)).is_file()
+>       assert projects.read_manifest(project_dir)["active_variant"] == expected, (
+            f"active_variant {projects.read_manifest(project_dir)['active_variant']!r}"
+        )
+E       AssertionError: active_variant 'firmware'
+E       assert 'firmware' == 'firmware-patched'
+E         
+E         - firmware-patched
+E         + firmware
+
+tests\test_b100_active_variant.py:253: AssertionError
+_________________ test_tc_b100_20_save_back_carries_every_key _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_20_save_back_carr0')
+
+    def test_tc_b100_20_save_back_carries_every_key(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        before = (project_dir / "project.json").read_bytes()
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                _apply_patch(app)
+                await _save_back(pilot, app, "firmware.s19")
+    
+        asyncio.run(_drive())
+>       manifest = _assert_carried(project_dir, before)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30135/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
+before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+    def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
+        """The manifest was rewritten (bytes changed), keeps the four
+        not-owned keys equal, and holds 0 absolute paths."""
+        after_bytes = (project_dir / "project.json").read_bytes()
+>       assert after_bytes != before_bytes, "project.json was not rewritten"
+E       AssertionError: project.json was not rewritten
+E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}' != b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+tests\test_b100_active_variant.py:302: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant[A]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant[B]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_save_back_carries_every_key
+3 failed, 9 passed, 4 deselected in 23.96s
+
+# exit: 1

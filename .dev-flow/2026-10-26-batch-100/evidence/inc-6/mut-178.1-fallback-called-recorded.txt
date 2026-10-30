@@ -1,0 +1,223 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.1-fallback-called-recorded
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-30T01:47:09+00:00
+# requirement: LLR-178.1
+# mutation: the composer reports 'recorded active' for the fallback (next valid) case — file s19_app/tui/services/variant_execution_service.py
+# pre-mutation sha256: 8e2e8cf059eb48aaf9d0295c488872841e0d2c16da84eaa0acd224aa0c63a62e
+# mutant sha256: 23e140b4abf08091a7e713ece556ff12e12df5636a674a0d79b1518d85e9bd00
+# restored sha256: 8e2e8cf059eb48aaf9d0295c488872841e0d2c16da84eaa0acd224aa0c63a62e
+# RESTORE OK
+....F..F..........FF                                                     [100%]
+================================== FAILURES ===================================
+_________ test_tc_b100_55_next_valid_when_the_recorded_one_is_missing _________
+
+    def test_tc_b100_55_next_valid_when_the_recorded_one_is_missing() -> None:
+        """The recorded ``firmware-patched`` is gone: the app opened
+        ``firmware``; the announcement says why and is never "recorded"."""
+        service = _reasons()
+        vs = _variants("firmware.s19", "firmware_1.s19", active="firmware")
+        announcement = _compose(
+            "P", vs, ProjectManifest(schema_version=1, active_variant="firmware-patched")
+        )
+>       assert announcement.reason == service.LOAD_REASON_NEXT_VALID
+E       AssertionError: assert 'recorded' == 'next-valid'
+E         
+E         - next-valid
+E         + recorded
+
+tests\test_b100_announce.py:189: AssertionError
+_____________ test_tc_b100_55_latest_never_comes_from_file_times ______________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_tc_b100_55_latest_never_c0')
+
+    def test_tc_b100_55_latest_never_comes_from_file_times(tmp_path: Path) -> None:
+        """A touched (newer) file is never called latest: only the variant the
+        manifest records is; a fallback open is not latest either."""
+        service = _reasons()
+        folder = tmp_path / "P"
+        folder.mkdir()
+        for name in ("firmware.s19", "firmware_1.s19"):
+            (folder / name).write_text("S0030000FC\n", encoding="ascii")
+        future = time.time() + 3600
+        os.utime(folder / "firmware.s19", (future, future))
+        recorded = build_variant_set("P", sorted(folder.iterdir()))
+        recorded.active_id = "firmware_1"
+        first = _compose("P", recorded, ProjectManifest(schema_version=1, active_variant="firmware_1"))
+        assert (first.opened, first.latest) == ("firmware_1.s19", True)
+        touched = build_variant_set("P", sorted(folder.iterdir()))
+        touched.active_id = "firmware"
+        second = _compose("P", touched, ProjectManifest(schema_version=1, active_variant="gone"))
+>       assert (second.opened, second.latest) == ("firmware.s19", False)
+E       AssertionError: assert ('firmware.s19', True) == ('firmware.s19', False)
+E         
+E         At index 1 diff: True != False
+E         Use -v to get more diff
+
+tests\test_b100_announce.py:244: AssertionError
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_at_b100_19_the_panel_name0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+        first = asyncio.run(_reopen("tab-enter"))
+        assert "Opened    firmware-patched.s19" in first, first
+        assert "recorded as the active variant (the latest saved)" in first, first
+        assert "Variants  2 in the project" in first, first
+        assert "Others    firmware.s19" in first, first
+        (_workarea(base) / "P" / "firmware-patched.s19").unlink()
+        second = asyncio.run(_reopen("end-esc"))
+        assert "Opened    firmware.s19" in second, second
+>       assert "the next valid variant (the recorded one is missing or not readable)" in second, second
+E       AssertionError: Project P opened with 1 problem
+E         Problems found (the rest loaded)
+E         Opened    firmware.s19
+E                   recorded as the active variant (the latest saved)
+E         Variants  1 in the project
+E         MAC       (none)
+E         A2L       (none)
+E         
+E         Problems found (the rest loaded)
+E         ! Missing variant: firmware-patched  recorded as active but not in the project - the next valid variant opened
+E       assert 'the next valid variant (the recorded one is missing or not readable)' in 'Project P opened with 1 problem\nProblems found (the rest loaded)\nOpened    firmware.s19\n          recorded as the ...oaded)\n! Missing variant: firmware-patched  recorded as active but not in the project - the next valid variant opened'
+
+tests\test_b100_announce.py:544: AssertionError
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30151/test_at_b100_19_the_panel_name1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+        first = asyncio.run(_reopen("tab-enter"))
+        assert "Opened    firmware-patched.s19" in first, first
+        assert "recorded as the active variant (the latest saved)" in first, first
+        assert "Variants  2 in the project" in first, first
+        assert "Others    firmware.s19" in first, first
+        (_workarea(base) / "P" / "firmware-patched.s19").unlink()
+        second = asyncio.run(_reopen("end-esc"))
+        assert "Opened    firmware.s19" in second, second
+>       assert "the next valid variant (the recorded one is missing or not readable)" in second, second
+E       AssertionError: Project P opened with 1 problem
+E         Problems found (the rest loaded)
+E         Opened    firmware.s19
+E                   recorded as the active variant (the latest saved)
+E         Variants  1 in the project
+E         MAC       (none)
+E         A2L       (none)
+E         
+E         Problems found (the rest loaded)
+E         ! Missing variant: firmware-patched  recorded as active but not in the project - the next valid variant opened
+E       assert 'the next valid variant (the recorded one is missing or not readable)' in 'Project P opened with 1 problem\nProblems found (the rest loaded)\nOpened    firmware.s19\n          recorded as the ...oaded)\n! Missing variant: firmware-patched  recorded as active but not in the project - the next valid variant opened'
+
+tests\test_b100_announce.py:544: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_55_next_valid_when_the_recorded_one_is_missing
+FAILED tests/test_b100_announce.py::test_tc_b100_55_latest_never_comes_from_file_times
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0]
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1]
+4 failed, 16 passed in 75.41s (0:01:15)
+
+# exit: 1

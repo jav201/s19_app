@@ -1,0 +1,639 @@
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/mut/MV
+# command: python -m pytest -q -p no:cacheprovider -rfE --basetemp=/c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV tests/test_b100_announce.py tests/test_b100_active_variant.py tests/test_b100_save_image.py -k tc_b100_67 or at_b100_19 or at_b100_20 or at_b100_05
+# date: 2026-10-30T04:17:24Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\mut\MV\s19_app\__init__.py
+# python 3.11.15
+....FF..FFFFFFF                                                          [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_thirty_problem0')
+
+    def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            rows = list(app.screen.query("#result_body .result-problem"))
+            body = app.screen.query_one("#result_body")
+            before = body.region.contains_region(rows[-1].region)
+            await pilot.press("end")
+            await _flush(pilot)
+            after = body.region.contains_region(rows[-1].region)
+            painted = [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
+            return len(rows), before, after, _panel_text(app), painted
+    
+        count, before, after, text, painted = _run_panel(tmp_path, _scenario, problems=30)
+        assert count == 30, f"{30 - count} problems missing from the panel"
+>       assert len(set(painted)) == 30, "the 30 problem rows are not distinct"
+E       AssertionError: the 30 problem rows are not distinct
+E       assert 1 == 30
+E        +  where 1 = len({''})
+E        +    where {''} = set(['', '', '', '', '', '', ...])
+
+tests\test_b100_announce.py:501: AssertionError
+___________ test_tc_b100_67_damaged_manifest_paints_user_terms_only ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_damaged_manife0')
+
+    def test_tc_b100_67_damaged_manifest_paints_user_terms_only(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text("{not json", encoding="utf-8")
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_panel(pilot, app)
+                return _panel_text(app)
+    
+        text = asyncio.run(_drive())
+>       assert "Manifest damaged: project.json" in text, text
+E       AssertionError: 
+E       assert 'Manifest damaged: project.json' in ''
+
+tests\test_b100_announce.py:523: AssertionError
+____________ test_tc_b100_67_wrapped_lines_hang_under_their_column ____________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_tc_b100_67_wrapped_lines_0')
+
+    def test_tc_b100_67_wrapped_lines_hang_under_their_column(tmp_path: Path) -> None:
+        """UX-2 / UX-3 at 99x54: the fallback reason wraps and its continuation
+        starts under the value column (10 cells), and the damaged-manifest
+        problem wraps and its continuation starts under the label (4 cells),
+        never at column 0 nor under the ``!``.
+    
+        RED (executed on the reviewed Inc 6 tree, d37ee857): both continuations
+        started at column 0."""
+    
+        def _scenario(app):
+            summary = projects.painted_lines(app.screen.query_one("#result_summary"))
+            row = projects.painted_lines(app.screen.query("#result_body .result-problem").first())
+            return summary, row
+    
+        summary, row = _run_damaged_panel(tmp_path, (99, 54), _scenario)
+>       start = next(i for i, line in enumerate(summary) if "the first variant by name" in line)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests\test_b100_announce.py:601: StopIteration
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+        first = asyncio.run(_reopen("tab-enter"))
+>       assert "Opened    firmware-patched.s19" in first, first
+E       AssertionError: 
+E       assert 'Opened    firmware-patched.s19' in ''
+
+tests\test_b100_announce.py:677: AssertionError
+______ test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_19_the_panel_name1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_19_the_panel_names_the_opened_variant_and_why(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-178's acceptance scene by keys and clicks: Load file, Save
+        project P, apply a patch and save back with the default name; reopen P
+        in a fresh app through the Load project dialog — the panel names
+        ``firmware-patched.s19`` as opened, recorded as active, among P's 2
+        variants; ``tab`` then ``enter`` closes it. Delete that file and reopen:
+        the panel names ``firmware.s19`` as the next valid variant and lists the
+        missing one; ``end`` reaches the last problem; the shown ``esc`` closes.
+    
+        RED (executed on 1d677ba, P-3): the reload status is ``Loaded project
+        'P' -> firmware.s19`` with no panel, no count and no reason."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _save_scene() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src / "firmware.s19")
+                await _save_project_through_dialog(pilot, app, "P")
+                await _add_and_apply_through_the_panel(pilot, app)
+                await _save_back_through_the_prompt(pilot, app, None)
+    
+        async def _reopen(close_with: str) -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                text = await _open_project_and_read_the_panel(pilot, app)
+                if close_with == "tab-enter":
+                    await pilot.press("tab")
+                    await _wait_for(
+                        pilot,
+                        lambda: app.focused is not None and app.focused.id == "result_ok",
+                        "tab on Close",
+                    )
+                    await pilot.press("enter")
+                else:
+                    await pilot.press("end")
+                    await _flush(pilot, 4)
+                    rows = list(app.screen.query("#result_body .result-problem"))
+                    body = app.screen.query_one("#result_body")
+                    assert rows and body.region.contains_region(rows[-1].region), (
+                        "end must show the last problem"
+                    )
+                    await pilot.press("escape")
+                await _wait_for(pilot, lambda: not _panel_open(app), "the panel closed")
+                return text
+    
+        asyncio.run(_save_scene())
+        first = asyncio.run(_reopen("tab-enter"))
+>       assert "Opened    firmware-patched.s19" in first, first
+E       AssertionError: 
+E       assert 'Opened    firmware-patched.s19' in ''
+
+tests\test_b100_announce.py:677: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # Open P; the Load-result panel this route opens (asserted on
+                # the final reopen below) is closed by its shown key first.
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming P",
+                )
+                for _ in range(20):
+                    if len(app.screen.query("#result_ok")) > 0:
+                        await pilot.press("escape")
+                        break
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: len(app.screen.query("#result_ok")) == 0, "no panel open"
+                )
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+        asyncio.run(_writers())
+        assert len(snapshots) == 3
+        for step, manifest in enumerate(snapshots, start=1):
+            assert projects.not_owned(manifest) == projects.seeded_keys(), (step, manifest)
+            assert projects.absolute_strings(manifest) == [], (step, manifest)
+            assert manifest["active_variant"] == "firmware_1", (step, manifest)
+        panel = asyncio.run(_reopen())
+>       assert "Opened    firmware_1.s19" in panel, panel
+E       AssertionError: 
+E       assert 'Opened    firmware_1.s19' in ''
+
+tests\test_b100_active_variant.py:829: AssertionError
+____ test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_20_every_writer_c1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", SIZES)
+    def test_at_b100_20_every_writer_carries_the_keys_it_does_not_own(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-168's carry scene by keys and clicks: P records ``batch``,
+        ``assignments``, ``declared_regions`` and ``gathered``. With P open, the
+        engineer loads (1) a new S19, (2) a MAC and (3) an A2L through Load;
+        after each, ``project.json`` on disk was rewritten, keeps those keys
+        equal (JSON compare) with 0 absolute paths, and after (1) names the new
+        variant as active. A fresh app opening P names it in the Load-result
+        panel.
+    
+        RED (A-03 / P-3 shape): at the base no writer rewrites the manifest, so
+        after (1) ``project.json`` is unchanged and still names ``firmware``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        s19 = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        side = projects.copy_sources(
+            tmp_path / "side", projects.CASE01_DIR, "firmware.mac", "firmware.a2l"
+        )
+        manifest_path = project_dir / "project.json"
+        snapshots: list = []
+    
+        def _stamp() -> tuple:
+            # The write replaces the file (staged, then moved in): a new file
+            # identity or time stamp proves a rewrite even when a step leaves
+            # the bytes identical (the MAC and A2L steps change no key).
+            stat = manifest_path.stat()
+            return (stat.st_ino, stat.st_mtime_ns)
+    
+        async def _writers() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                # Open P; the Load-result panel this route opens (asserted on
+                # the final reopen below) is closed by its shown key first.
+                await _open_project_through_dialog(pilot, app, "P")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P' ->" in _painted_log(app),
+                    "the painted line naming P",
+                )
+                for _ in range(20):
+                    if len(app.screen.query("#result_ok")) > 0:
+                        await pilot.press("escape")
+                        break
+                    await pilot.pause()
+                await _wait_for(
+                    pilot, lambda: len(app.screen.query("#result_ok")) == 0, "no panel open"
+                )
+                for src, landed in (
+                    (s19 / "firmware.s19", "firmware_1.s19"),
+                    (side / "firmware.mac", "firmware.mac"),
+                    (side / "firmware.a2l", "firmware.a2l"),
+                ):
+                    previous = _stamp()
+                    await _load_through_dialog_until(
+                        pilot,
+                        app,
+                        src,
+                        lambda: (project_dir / landed).is_file() and _stamp() != previous,
+                        f"{landed} placed and project.json rewritten",
+                    )
+                    snapshots.append(json.loads(manifest_path.read_bytes()))
+    
+        async def _reopen() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                return await _open_and_close_the_panel(pilot, app, "P")
+    
+        asyncio.run(_writers())
+        assert len(snapshots) == 3
+        for step, manifest in enumerate(snapshots, start=1):
+            assert projects.not_owned(manifest) == projects.seeded_keys(), (step, manifest)
+            assert projects.absolute_strings(manifest) == [], (step, manifest)
+            assert manifest["active_variant"] == "firmware_1", (step, manifest)
+        panel = asyncio.run(_reopen())
+>       assert "Opened    firmware_1.s19" in panel, panel
+E       AssertionError: 
+E       assert 'Opened    firmware_1.s19' in ''
+
+tests\test_b100_active_variant.py:829: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size0] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s0')
+size = (118, 54)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+        painted = asyncio.run(_save_scene())
+        project_image = _workarea(base) / "P1" / "firmware.s19"
+        written = read_s19(project_image)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+        assert _differing(written.data, expected) == [], (
+            "project firmware.s19 == in-memory patched image? False"
+        )
+        # The save status names the entry at both sizes: the verify line
+        # (``save_back_status_suffix``) is checked as painted. The success
+        # line's own clause is capped at the terminal width by the log, and
+        # follows the project path, so it is checked on the full message the
+        # app passed to ``set_status`` (independent of the temp-path depth).
+        assert "1 entry applied before this save (0x8000007C)" in painted, painted
+        success = next((m for m in statuses if m.startswith("Saved project to")), "")
+        assert "1 change entry, 0 applied by this save" in success, statuses
+        reopened_panels: list = []
+        loaded_panel = asyncio.run(_reopen_scene())
+        assert "firmware.s19" in loaded_panel, loaded_panel
+>       assert "Opened    firmware.s19" in reopened_panels[0], reopened_panels
+E       AssertionError: ['']
+E       assert 'Opened    firmware.s19' in ''
+
+tests\test_b100_save_image.py:1756: AssertionError
+_________ test_at_b100_05_save_project_saves_the_patched_image[size1] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/bt/MV/test_at_b100_05_save_project_s1')
+size = (220, 60)
+
+    @pytest.mark.parametrize("size", [(118, 54), (220, 60)])
+    def test_at_b100_05_save_project_saves_the_patched_image(
+        tmp_path: Path, size: tuple
+    ) -> None:
+        """HLR-167's acceptance scene, by keys and clicks: load ``case_01``
+        ``firmware.s19`` through the Load file dialog, add and apply
+        ``0x8000007C DE AD BE EF`` in the Patch Editor (no save-back), Save
+        project P1 through the current dialog (``ctrl+s``), then open P1 in a
+        FRESH app through the Load project dialog (``p``). The project image,
+        read by the independent reader, equals source + patch (0 differing
+        addresses); the save status names 1 entry; the reopened Loaded panel
+        names ``firmware.s19``. Both reference sizes, notifications on.
+    
+        RED (executed on 1d677ba, P-1): ``project firmware.s19 == in-memory
+        patched image? False`` — the save copied the unpatched work copy."""
+        src = _copy_case01(tmp_path) / "firmware.s19"
+        base = tmp_path / "app"
+    
+        statuses: list = []
+    
+        async def _save_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _load_file_through_dialog(pilot, app, src)
+                await _add_entry_through_the_panel(pilot, app, "0x8000007C", "DE AD BE EF")
+                assert await pilot.click("#patch_doc_apply_button"), (
+                    "click missed #patch_doc_apply_button"
+                )
+                await _wait_for(
+                    pilot, lambda: "Apply:" in _status_text(app), "the painted apply line"
+                )
+                await pilot.press("ctrl+s")
+                await _wait_for(
+                    pilot,
+                    lambda: isinstance(app.screen, SaveProjectScreen),
+                    "the Save project dialog",
+                )
+                assert await pilot.click("#project_name"), "click missed #project_name"
+                await pilot.press(*"P1")
+                assert await pilot.click("#save_ok"), "click missed #save_ok"
+                await _wait_for(
+                    pilot,
+                    lambda: _status_text(app).startswith("Saved project to"),
+                    "the painted Save project success line",
+                )
+                return _painted_log(app)
+    
+        async def _reopen_scene() -> str:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=size, notifications=True) as pilot:
+                await pilot.pause()
+                await _open_project_through_dialog(pilot, app, "P1")
+                await _wait_for(
+                    pilot,
+                    lambda: "Loaded project 'P1'" in " ".join(
+                        str(app.query_one(f"#log_line_{i}", Label).render())
+                        for i in (1, 2, 3, 4)
+                    ),
+                    "the painted line naming the reopened project",
+                )
+                # Inc 6 (HLR-178): the dialog route opens the Load-result
+                # panel; it is the oracle of what opened and why, then its
+                # shown key ``esc`` closes it.
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) > 0,
+                    "the Load-result panel",
+                )
+                panel = await b100_projects.read_load_result_panel(pilot, app)
+                await pilot.press("escape")
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_ok")) == 0,
+                    "the Load-result panel closed",
+                )
+                await _wait_for(
+                    pilot,
+                    lambda: "firmware.s19"
+                    in " ".join(
+                        str(static.render()) for static in app.query("#loaded_slots Static")
+                    ),
+                    "the Loaded panel naming firmware.s19",
+                )
+                reopened_panels.append(panel)
+                return " ".join(
+                    str(static.render()) for static in app.query("#loaded_slots Static")
+                )
+    
+        painted = asyncio.run(_save_scene())
+        project_image = _workarea(base) / "P1" / "firmware.s19"
+        written = read_s19(project_image)
+        expected = _patched(_source_data(), PATCH_ADDRESS, PATCH_BYTES)
+        assert _differing(written.data, expected) == [], (
+            "project firmware.s19 == in-memory patched image? False"
+        )
+        # The save status names the entry at both sizes: the verify line
+        # (``save_back_status_suffix``) is checked as painted. The success
+        # line's own clause is capped at the terminal width by the log, and
+        # follows the project path, so it is checked on the full message the
+        # app passed to ``set_status`` (independent of the temp-path depth).
+        assert "1 entry applied before this save (0x8000007C)" in painted, painted
+        success = next((m for m in statuses if m.startswith("Saved project to")), "")
+        assert "1 change entry, 0 applied by this save" in success, statuses
+        reopened_panels: list = []
+        loaded_panel = asyncio.run(_reopen_scene())
+        assert "firmware.s19" in loaded_panel, loaded_panel
+>       assert "Opened    firmware.s19" in reopened_panels[0], reopened_panels
+E       AssertionError: ['']
+E       assert 'Opened    firmware.s19' in ''
+
+tests\test_b100_save_image.py:1756: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last
+FAILED tests/test_b100_announce.py::test_tc_b100_67_damaged_manifest_paints_user_terms_only
+FAILED tests/test_b100_announce.py::test_tc_b100_67_wrapped_lines_hang_under_their_column
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size0]
+FAILED tests/test_b100_announce.py::test_at_b100_19_the_panel_names_the_opened_variant_and_why[size1]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size0]
+FAILED tests/test_b100_active_variant.py::test_at_b100_20_every_writer_carries_the_keys_it_does_not_own[size1]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size0]
+FAILED tests/test_b100_save_image.py::test_at_b100_05_save_project_saves_the_patched_image[size1]
+9 failed, 6 passed, 88 deselected in 197.81s (0:03:17)
+# exit: 1

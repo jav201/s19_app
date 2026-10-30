@@ -1,0 +1,394 @@
+# mutation: SEC6-7-no-resolve-catch — SEC6-7 (LLR-168.1 / LLR-178.1): the resolver no longer catches OSError / ValueError around resolve() and the reparse walk
+# file: s19_app/tui/services/variant_execution_service.py (sha256 before e494c50cd7266bff)
+# command: -m pytest -q -p no:cacheprovider -rfE --basetemp=C:\Users\jjgh8\AppData\Local\Temp\f2mut-SEC6-7-no-resolve-catch tests/test_b100_announce.py tests/test_b100_active_variant.py -k overlong
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (corrective pass 2, mutated in place, then restored)
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+# s19_app.__file__ = C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+# date: 2026-10-30T04:41:01Z
+# --- old
+#       except (OSError, ValueError) as exc:
+# --- new
+#       except () as exc:
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash ________
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+>           await _open_panel(pilot, app)
+
+tests\test_b100_announce.py:648: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_announce.py:421: in _open_panel
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _open_panel.<locals>.<lambda> at 0x000001A23E1CC680>
+description = 'the Load-result panel holding a focus', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the Load-result panel holding a focus
+
+tests\test_b100_announce.py:93: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0')
+
+    def test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash(tmp_path: Path) -> None:
+        """SEC6-7: a recorded 40 000-character entry in ``batch``,
+        ``assignments`` and ``gathered`` — the project opens through the Load
+        project dialog, the panel shows exactly one skipped-entry row per key,
+        and each row paints the entry clipped (at most 119 of its characters
+        plus an ellipsis), so the panel stays readable.
+    
+        RED (executed on the corrective-pass-1 tree, 395dcbde): the load
+        raised ``ValueError`` out of ``Path.resolve()`` and the app exited."""
+        base = tmp_path / "app"
+        project_dir = _seed_two_variants(_workarea(base))
+        (project_dir / "project.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "active_variant": "firmware_1",
+                    "batch": [OVERLONG_ENTRY],
+                    "assignments": {"firmware": [OVERLONG_ENTRY]},
+                    "gathered": {"patches": [OVERLONG_ENTRY]},
+                }
+            ),
+            encoding="utf-8",
+        )
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test(size=(118, 54), notifications=True) as pilot:
+                await pilot.pause()
+                await _open_panel(pilot, app)
+                rows = list(app.screen.query("#result_body .result-problem"))
+                return [projects.flat("\n".join(projects.painted_lines(row))) for row in rows]
+    
+>       rows = asyncio.run(_drive())
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_announce.py:652: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_announce.py:646: in _drive
+    async with app.run_test(size=(118, 54), notifications=True) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:7019: in _route_load_project
+    self._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:569: in read_project_manifest
+    resolved = _resolve_manifest_entry(
+s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
+    resolved = (project_root / text).resolve()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
+    p.stat()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_67_overlong_entri0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: stat: path too long for Windows
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
+---------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:7019 in           
+│ _route_load_project                                                          
+│                                                                              
+│    7016 │   │   │   │   - ``action_load_project`` (the dialog's dismiss call 
+│    7017 │   │   """                                                          
+│    7018 │   │   before = self._last_load_announcement                        
+│ ❱  7019 │   │   self._handle_load_project(name)                              
+│    7020 │   │   announcement = self._last_load_announcement                  
+│    7021 │   │   if announcement is None or announcement is before:           
+│    7022 │   │   │   return                                                   
+│                                                                              
+│ ╭─────────────────── locals ────────────────────╮                            
+│ │ before = None                                 │                            
+│ │   name = 'P'                                  │                            
+│ │   self = S19TuiApp(                           │                            
+│ │          │   title='Hex Edit Tool',           │                            
+│ │          │   classes={'-dark-mode'},          │                            
+│ │          │   pseudo_classes={                 │                            
+│ │          │   │   'focus',                     │                            
+│ │          │   │   'dark'                       │                            
+│ │          │   }                                │                            
+│ │          )                                    │                            
+│ ╰───────────────────────────────────────────────╯                            
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\app.py:10141 in          
+│ _handle_load_project                                                         
+│                                                                              
+│   10138 │   │   # order of ``build_variant_set`` (with a status warning when 
+│   10139 │   │   # manifest names an unknown variant).                        
+│   10140 │   │   variant_set = build_variant_set(name, data_files)            
+│ ❱ 10141 │   │   manifest = read_project_manifest(project_dir)                
+│   10142 │   │   # LLR-028.1 — adopt the manifest's declared regions as app s 
+│   10143 │   │   # next Reports dialog seeds from them (HLR-028 capture); res 
+│   10144 │   │   # for a legacy/no-key project so a prior project's regions d 
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │         a2l_files = []                                                   │ 
+│ │        data_files = [                                                    │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │                     │                                                    │ 
+│ │                     WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │                     ]                                                    │ 
+│ │ discarded_unsaved = 0                                                    │ 
+│ │             error = None                                                 │ 
+│ │              name = 'P'                                                  │ 
+│ │       project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mu… │ 
+│ │              self = S19TuiApp(                                           │ 
+│ │                     │   title='Hex Edit Tool',                           │ 
+│ │                     │   classes={'-dark-mode'},                          │ 
+│ │                     │   pseudo_classes={'focus', 'dark'}                 │ 
+│ │                     )                                                    │ 
+│ │       variant_set = ProjectVariantSet(                                   │ 
+│ │                     │   project_name='P',                                │ 
+│ │                     │   variants=(                                       │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware',                   │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   ),                                           │ 
+│ │                     │   │   VariantDescriptor(                           │ 
+│ │                     │   │   │   variant_id='firmware_1',                 │ 
+│ │                     │   │   │                                            │ 
+│ │                     path=WindowsPath('C:/Users/jjgh8/AppData/Local/Temp… │ 
+│ │                     │   │   │   file_type='s19'                          │ 
+│ │                     │   │   )                                            │ 
+│ │                     │   ),                                               │ 
+│ │                     │   active_id='firmware'                             │ 
+│ │                     )                                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ on_service.py:569 in read_project_manifest                                   
+│                                                                              
+│    566 │   │   )                                                             
+│    567 │   else:                                                             
+│    568 │   │   for entry in batch_raw:                                       
+│ ❱  569 │   │   │   resolved = _resolve_manifest_entry(                       
+│    570 │   │   │   │   project_root, entry, "batch", issues                  
+│    571 │   │   │   )                                                         
+│    572 │   │   │   if resolved is not None:                                  
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │     active_raw = 'firmware_1'                                            │ 
+│ │ active_variant = 'firmware_1'                                            │ 
+│ │          batch = []                                                      │ 
+│ │      batch_raw = [                                                       │ 
+│ │                  │                                                       │ 
+│ │                  'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │                  ]                                                       │ 
+│ │          empty = ProjectManifest(                                        │ 
+│ │                  │   schema_version=None,                                │ 
+│ │                  │   active_variant=None,                                │ 
+│ │                  │   batch=[],                                           │ 
+│ │                  │   assignments={},                                     │ 
+│ │                  │   declared_regions=(),                                │ 
+│ │                  │   gathered={},                                        │ 
+│ │                  │   issues=[]                                           │ 
+│ │                  )                                                       │ 
+│ │          entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │         handle = <_io.BufferedReader                                     │ 
+│ │                  name='C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f2mut-SE… │ 
+│ │         issues = []                                                      │ 
+│ │  manifest_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
+│ │        payload = {                                                       │ 
+│ │                  │   'schema_version': 1,                                │ 
+│ │                  │   'active_variant': 'firmware_1',                     │ 
+│ │                  │   'batch': [                                          │ 
+│ │                  │   │                                                   │ 
+│ │                  'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │                  │   ],                                                  │ 
+│ │                  │   'assignments': {                                    │ 
+│ │                  │   │   'firmware': [                                   │ 
+│ │                  │   │   │                                               │ 
+│ │                  'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │                  │   │   ]                                               │ 
+│ │                  │   },                                                  │ 
+│ │                  │   'gathered': {                                       │ 
+│ │                  │   │   'patches': [                                    │ 
+│ │                  │   │   │                                               │ 
+│ │                  'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │                  │   │   ]                                               │ 
+│ │                  │   }                                                   │ 
+│ │                  }                                                       │ 
+│ │    project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
+│ │   project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-S… │ 
+│ │ schema_version = 1                                                       │ 
+│ │     size_bytes = 120134                                                  │ 
+│ │     size_probe = None                                                    │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\tui\services\variant_executi 
+│ on_service.py:325 in _resolve_manifest_entry                                 
+│                                                                              
+│    322 │   │   )                                                             
+│    323 │   │   return None                                                   
+│    324 │   try:                                                              
+│ ❱  325 │   │   resolved = (project_root / text).resolve()                    
+│    326 │   │   escapes = not resolved.is_relative_to(project_root)           
+│    327 │   │   traverses = not escapes and _path_traverses_reparse_point(    
+│    328 │   │   │   resolved, stop_at=project_root                            
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      context = 'batch'                                                   │ 
+│ │       issues = []                                                        │ 
+│ │ project_root = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC… │ 
+│ │    raw_entry = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ │         text = 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1003 in resolve          
+│                                                                              
+│   1000 │   │   # Ensure we get an exception by calling stat()                
+│   1001 │   │   if not strict:                                                
+│   1002 │   │   │   try:                                                      
+│ ❱ 1003 │   │   │   │   p.stat()                                              
+│   1004 │   │   │   except OSError as e:                                      
+│   1005 │   │   │   │   check_eloop(e)                                        
+│   1006 │   │   return p                                                      
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │      p = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
+│ │      s = 'C:\\Users\\jjgh8\\AppData\\Local\\Temp\\f2mut-SEC6-7-no-resol… │ 
+│ │   self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no… │ 
+│ │ strict = False                                                           │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+│                                                                              
+│ C:\Users\jjgh8\anaconda3\envs\s19env\Lib\pathlib.py:1013 in stat             
+│                                                                              
+│   1010 │   │   Return the result of the stat() system call on this path, lik 
+│   1011 │   │   os.stat() does.                                               
+│   1012 │   │   """                                                           
+│ ❱ 1013 │   │   return os.stat(self, follow_symlinks=follow_symlinks)         
+│   1014 │                                                                     
+│   1015 │   def owner(self):                                                  
+│   1016 │   │   """                                                           
+│                                                                              
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ 
+│ │ follow_symlinks = True                                                   │ 
+│ │            self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-… │ 
+│ ╰──────────────────────────────────────────────────────────────────────────╯ 
+╰──────────────────────────────────────────────────────────────────────────────
+ValueError: stat: path too long for Windows
+_______ test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0')
+
+    def test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash(tmp_path: Path) -> None:
+        """SEC6-7: the manifest records a 40 000-character entry in ``batch``,
+        ``assignments`` and ``gathered`` next to the seeded keys. The project
+        opens and an A2L sync (which re-reads the manifest to build the carry)
+        places ``firmware.a2l`` and rewrites ``project.json``: the over-long
+        entries are skipped (reported, never trusted) and every seeded key is
+        carried.
+    
+        RED (executed on the corrective-pass-1 tree, 395dcbde): ``ValueError``
+        out of ``Path.resolve()``."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest = projects.read_manifest(project_dir)
+        overlong = "q" * 40_000
+        manifest["batch"].append(overlong)
+        manifest["assignments"]["firmware"].append(overlong)
+        manifest["gathered"]["patches"].append(overlong)
+        (project_dir / "project.json").write_text(
+            json.dumps(manifest, separators=(",", ":")), encoding="utf-8"
+        )
+        before = (project_dir / "project.json").read_bytes()
+>       statuses = _run_writer(tmp_path, base, "a2l-sync")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:557: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_b100_active_variant.py:500: in _run_writer
+    asyncio.run(_drive())
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:475: in _drive
+    await _open_seeded_project(pilot, app)
+tests\test_b100_active_variant.py:296: in _open_seeded_project
+    app._handle_load_project(name)
+s19_app\tui\app.py:10141: in _handle_load_project
+    manifest = read_project_manifest(project_dir)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\services\variant_execution_service.py:569: in read_project_manifest
+    resolved = _resolve_manifest_entry(
+s19_app\tui\services\variant_execution_service.py:325: in _resolve_manifest_entry
+    resolved = (project_root / text).resolve()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1003: in resolve
+    p.stat()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/f2mut-SEC6-7-no-resolve-catch/test_tc_b100_20_a2l_sync_with_0/app/.s19t...qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: stat: path too long for Windows
+
+..\..\anaconda3\envs\s19env\Lib\pathlib.py:1013: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_overlong_entries_are_skipped_rows_not_a_crash
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_a2l_sync_with_an_overlong_entry_does_not_crash
+2 failed, 55 deselected in 18.73s
+
+
+VERDICT: KILLED (pytest exit 1)
+RESTORE OK (sha256 e494c50cd7266bff)

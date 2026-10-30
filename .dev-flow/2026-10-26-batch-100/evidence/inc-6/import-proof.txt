@@ -1,0 +1,3 @@
+# cmd: python -c 'import s19_app; print(s19_app.__file__)' | tree: worktree s19_app-b100-inc6 @ 093a7c0 (unmodified) | PYTHONPATH=C:/Users/jjgh8/Github/s19_app-b100-inc6 | NO_COLOR unset
+C:\Users\jjgh8\Github\s19_app-b100-inc6\s19_app\__init__.py
+False

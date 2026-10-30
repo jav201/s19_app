@@ -1,0 +1,37 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_announce.py -k tc_b100_67
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 178.3-truncate-10
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-30T01:48:20+00:00
+# requirement: LLR-178.3
+# mutation: the problem list is truncated at 10 rows — file s19_app/tui/screens.py
+# pre-mutation sha256: a957b576658777b07db111a778d158542ac0d08c1b7fdec49676cb71340ff7c1
+# mutant sha256: fdfbfec70e61a520f7209d12725f010910c4652516fa6e5b57286c039282ddf9
+# restored sha256: a957b576658777b07db111a778d158542ac0d08c1b7fdec49676cb71340ff7c1
+# RESTORE OK
+....F.                                                                   [100%]
+================================== FAILURES ===================================
+______ test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30155/test_tc_b100_67_thirty_problem0')
+
+    def test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last(tmp_path: Path) -> None:
+        async def _scenario(pilot, app):
+            rows = list(app.screen.query("#result_body .result-problem"))
+            body = app.screen.query_one("#result_body")
+            before = body.region.contains_region(rows[-1].region)
+            await pilot.press("end")
+            await _flush(pilot)
+            after = body.region.contains_region(rows[-1].region)
+            return len(rows), before, after, _panel_text(app)
+    
+        count, before, after, text = _run_panel(tmp_path, _scenario, problems=30)
+>       assert count == 30, f"{30 - count} problems missing from the panel"
+E       AssertionError: 20 problems missing from the panel
+E       assert 10 == 30
+
+tests\test_b100_announce.py:446: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_announce.py::test_tc_b100_67_thirty_problems_all_rows_and_end_reaches_the_last
+1 failed, 5 passed, 14 deselected in 22.29s
+
+# exit: 1

@@ -1075,8 +1075,16 @@ async def _open_split_join_via_palette(pilot, app: S19TuiApp) -> None:
     )
 
 
-async def _load_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
-    """Drive the Load project dialog (rail key ``p``) and wait for the load."""
+def _result_panel_open(app: S19TuiApp) -> bool:
+    """The Load-result panel (HLR-178) is the active screen, by its id."""
+    return len(app.screen.query("#result_ok")) > 0
+
+
+async def _open_project_and_wait_for_the_panel(
+    pilot, app: S19TuiApp, name: str
+) -> None:
+    """``p``, pick ``name``, Load — then wait for the load's status line and
+    the Load-result panel the dialog route opens (Inc 6, HLR-178)."""
     await pilot.press("p")
     await _wait_for(
         pilot,
@@ -1092,8 +1100,20 @@ async def _load_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None
     assert await pilot.click("#project_ok"), "click missed #project_ok"
     await _wait_for(
         pilot,
-        lambda: f"Loaded project '{name}'" in _status_text(app),
-        f"the status naming the loaded project {name}",
+        lambda: f"Loaded project '{name}'" in _status_text(app)
+        and _result_panel_open(app),
+        f"the status naming the loaded project {name} and the Load-result panel",
+    )
+
+
+async def _load_project_through_dialog(pilot, app: S19TuiApp, name: str) -> None:
+    """Drive the Load project dialog (rail key ``p``) and wait for the load,
+    then dismiss the Load-result panel first (Inc 6 re-pin of AT-B100-04)
+    with its shown key ``esc``."""
+    await _open_project_and_wait_for_the_panel(pilot, app, name)
+    await pilot.press("escape")
+    await _wait_for(
+        pilot, lambda: not _result_panel_open(app), "the Load-result panel closed"
     )
 
 
@@ -1186,5 +1206,43 @@ def test_at_b100_04_focus_lands_and_single_keys_reach_their_screens(
             await _load_file_through_dialog(pilot, app, src02)
             await _wait_for_focus_on_target(pilot, app, "files_list")
             await _assert_p_opens_the_project_dialog(app, pilot)
+
+    asyncio.run(_drive())
+
+
+@pytest.mark.parametrize(
+    "close_keys", [("escape",), ("tab", "enter")], ids=["esc", "tab_enter"]
+)
+def test_tc_b100_12_panel_close_lands_on_the_windows_target(
+    tmp_path: Path, close_keys: tuple
+) -> None:
+    """LLR-166.1, Inc 6 arms: the Load-result panel's two closes — its shown
+    key ``esc`` from the list, and ``tab`` to Close then ``enter`` — each
+    leave the focus on the displayed window's declared target, starting
+    from the P-16 shape (the hidden Split / Join table held the focus
+    before the load)."""
+    base = tmp_path / "app"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=base)
+        _seed_project_p1(app.workarea)
+        async with app.run_test(size=(118, 54), notifications=True) as pilot:
+            await pilot.pause()
+            await _open_split_join_via_palette(pilot, app)
+            await pilot.press("1")
+            await _flush(pilot)
+            await _open_project_and_wait_for_the_panel(pilot, app, P1_NAME)
+            await _wait_for(
+                pilot,
+                lambda: app.focused is not None and app.focused.id == "result_body",
+                "the panel's focus on its list",
+            )
+            for key in close_keys:
+                await pilot.press(key)
+                await pilot.pause()
+            await _wait_for(
+                pilot, lambda: not _result_panel_open(app), "the panel closed"
+            )
+            await _wait_for_focus_on_target(pilot, app, "files_list")
 
     asyncio.run(_drive())

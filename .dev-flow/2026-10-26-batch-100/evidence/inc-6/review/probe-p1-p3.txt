@@ -1,0 +1,442 @@
+# tree: /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/fixed
+# command: python -m pytest -q -p no:cacheprovider -s -rfE /c/Users/jjgh8/AppData/Local/Temp/claude/C--Users-jjgh8-clde/a8feab43-c248-4ccb-86cf-122b894659b2/scratchpad/r6/probes/test_r6_probes.py
+# date: 2026-10-30T03:00:03Z
+# s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
+# python 3.11.15
+s19_app.__file__ = C:\Users\jjgh8\AppData\Local\Temp\claude\C--Users-jjgh8-clde\a8feab43-c248-4ccb-86cf-122b894659b2\scratchpad\r6\fixed\s19_app\__init__.py
+
+[P1 unparseable / a2l_sync] placed file kept: True
+[P1 unparseable / a2l_sync] project.json replaced: True
+[P1 unparseable / a2l_sync] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 unparseable / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', 'Project saved + manifest verified']
+F
+[P1 toplevel_list / a2l_sync] placed file kept: True
+[P1 toplevel_list / a2l_sync] project.json replaced: True
+[P1 toplevel_list / a2l_sync] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 toplevel_list / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', 'Project saved + manifest verified']
+F
+[P1 oversize / a2l_sync] placed file kept: True
+[P1 oversize / a2l_sync] project.json replaced: True
+[P1 oversize / a2l_sync] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 oversize / a2l_sync] statuses after the writer: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', 'Manifest verify MISMATCH']
+F
+[P1 unparseable / variant_append] placed file kept: True
+[P1 unparseable / variant_append] project.json replaced: True
+[P1 unparseable / variant_append] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware_1",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 unparseable / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Project saved + manifest verified', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+F
+[P1 toplevel_list / variant_append] placed file kept: True
+[P1 toplevel_list / variant_append] project.json replaced: True
+[P1 toplevel_list / variant_append] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware_1",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 toplevel_list / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Project saved + manifest verified', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+F
+[P1 oversize / variant_append] placed file kept: True
+[P1 oversize / variant_append] project.json replaced: True
+[P1 oversize / variant_append] project.json now: '{\r\n  "schema_version": 1,\r\n  "active_variant": "firmware_1",\r\n  "batch": [],\r\n  "assignments": {}\r\n}'
+[P1 oversize / variant_append] statuses after the writer: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest verify MISMATCH', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+F
+[P2] statuses: ['Copying into workarea temp...', 'Parsing firmware.s19...', 'Loaded firmware.s19', 'Manifest write failed', "Project 'P' now opens firmware_1.s19", "Added variant 'firmware_1' to project 'P'"]
+[P2] session active: 'firmware_1'; project.json active_variant: 'firmware'
+F
+[P3] statuses: ['Copying A2L into workarea temp...', 'Parsing firmware.a2l...', 'Loaded firmware.a2l', 'A2L loaded: firmware.a2l', 'Project saved + manifest verified']
+[P3] keys after: ['active_variant', 'assignments', 'batch', 'declared_regions', 'gathered', 'schema_version']; batch after: []
+.
+================================== FAILURES ===================================
+_________ test_p1_damaged_manifest_and_a_writer[a2l_sync-unparseable] _________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993C390>
+kind = 'unparseable', writer = 'a2l_sync'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve..._seed.json"],'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+________ test_p1_damaged_manifest_and_a_writer[a2l_sync-toplevel_list] ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993DED0>
+kind = 'toplevel_list', writer = 'a2l_sync'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'[{"schema_v...seed.json"]}]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+__________ test_p1_damaged_manifest_and_a_writer[a2l_sync-oversize] ___________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5E993C310>
+kind = 'oversize', writer = 'a2l_sync'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+______ test_p1_damaged_manifest_and_a_writer[variant_append-unparseable] ______
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5ED4C3D10>
+kind = 'unparseable', writer = 'variant_append'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve..._seed.json"],'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+_____ test_p1_damaged_manifest_and_a_writer[variant_append-toplevel_list] _____
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5ED2E1890>
+kind = 'toplevel_list', writer = 'variant_append'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'[{"schema_v...seed.json"]}]'
+E         
+E         At index 0 diff: b'{' != b'['
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+_______ test_p1_damaged_manifest_and_a_writer[variant_append-oversize] ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p1_damaged_manifest_and_a5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C5EE0BEDD0>
+kind = 'oversize', writer = 'variant_append'
+
+    @pytest.mark.parametrize("kind", ["unparseable", "toplevel_list", "oversize"])
+    @pytest.mark.parametrize("writer", ["a2l_sync", "variant_append"])
+    def test_p1_damaged_manifest_and_a_writer(tmp_path: Path, monkeypatch, kind: str, writer: str) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        if kind in DAMAGED:
+            manifest_path.write_text(DAMAGED[kind], encoding="utf-8")
+        else:
+            # A valid manifest the reader refuses by size (cap lowered for the probe).
+            monkeypatch.setattr(service, "MANIFEST_SIZE_CAP_BYTES", 16)
+        before = manifest_path.read_bytes()
+        a2l_src = projects.copy_sources(tmp_path / "side", projects.CASE01_DIR, "firmware.a2l")
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                statuses.clear()
+                if writer == "a2l_sync":
+                    app.load_a2l_from_path(a2l_src / "firmware.a2l")
+                    landed = project_dir / "firmware.a2l"
+                else:
+                    app.load_from_path(s19_src / "firmware.s19")
+                    landed = project_dir / "firmware_1.s19"
+                await _wait_for(pilot, lambda: landed.is_file(), "the placement")
+                for _ in range(20):
+                    await pilot.pause()
+                out["statuses"] = list(statuses)
+                out["landed"] = landed.is_file()
+    
+        asyncio.run(_drive())
+        after = manifest_path.read_bytes()
+        print(f"\n[P1 {kind} / {writer}] placed file kept: {out['landed']}")
+        print(f"[P1 {kind} / {writer}] project.json replaced: {after != before}")
+        print(f"[P1 {kind} / {writer}] project.json now: {after.decode('utf-8', 'replace')!r}")
+        print(f"[P1 {kind} / {writer}] statuses after the writer: {out['statuses']}")
+        # OQ-1 ruling (b): a damaged project.json is not silently replaced; the
+        # writer keeps its file, skips the rewrite and says so.
+        assert out["landed"]
+>       assert after == before, "damaged project.json was replaced"
+E       AssertionError: damaged project.json was replaced
+E       assert b'{\r\n  "sch...nts": {}\r\n}' == b'{"schema_ve...seed.json"]}}'
+E         
+E         At index 1 diff: b'\r' != b'"'
+E         Use -v to get more diff
+
+..\probes\test_r6_probes.py:109: AssertionError
+__________________ test_p2_manifest_write_fails_after_append __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30171/test_p2_manifest_write_fails_a0')
+
+    def test_p2_manifest_write_fails_after_append(tmp_path: Path) -> None:
+        """A read-only project.json (real trigger): the seam's write fails, yet
+        the append's status claims Load now opens the new file."""
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        manifest_path = project_dir / "project.json"
+        s19_src = projects.copy_sources(tmp_path / "s19", projects.CASE02_DIR, "firmware.s19")
+        out: dict = {}
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=base)
+            statuses = _capture_status(app)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open(pilot, app)
+                os.chmod(manifest_path, stat.S_IREAD)
+                statuses.clear()
+                app.load_from_path(s19_src / "firmware.s19")
+                await _wait_for(pilot, lambda: any(s.startswith("Added variant") for s in statuses), "append")
+                out["statuses"] = list(statuses)
+                out["session_active"] = app._variant_set.active_id
+    
+        try:
+            asyncio.run(_drive())
+        finally:
+            os.chmod(manifest_path, stat.S_IWRITE | stat.S_IREAD)
+        disk_active = projects.read_manifest(project_dir)["active_variant"]
+        print(f"\n[P2] statuses: {out['statuses']}")
+        print(f"[P2] session active: {out['session_active']!r}; project.json active_variant: {disk_active!r}")
+        assert "Manifest write failed" in out["statuses"]
+>       assert not any("now opens" in s for s in out["statuses"]), "false 'now opens' after a failed write"
+E       AssertionError: false 'now opens' after a failed write
+E       assert not True
+E        +  where True = any(<generator object test_p2_manifest_write_fails_after_append.<locals>.<genexpr> at 0x000001C5E51D6190>)
+
+..\probes\test_r6_probes.py:143: AssertionError
+=========================== short test summary info ===========================
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[a2l_sync-unparseable]
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[a2l_sync-toplevel_list]
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[a2l_sync-oversize]
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[variant_append-unparseable]
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[variant_append-toplevel_list]
+FAILED ..\probes\test_r6_probes.py::test_p1_damaged_manifest_and_a_writer[variant_append-oversize]
+FAILED ..\probes\test_r6_probes.py::test_p2_manifest_write_fails_after_append
+7 failed, 1 passed in 40.57s
+# exit: 1

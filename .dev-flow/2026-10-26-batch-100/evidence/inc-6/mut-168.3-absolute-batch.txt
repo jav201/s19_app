@@ -1,0 +1,212 @@
+# command: python -m pytest -q -p no:cacheprovider -rfE tests/test_b100_active_variant.py -k tc_b100_18 or tc_b100_19 or tc_b100_20
+# tree: C:\Users\jjgh8\Github\s19_app-b100-inc6 (base 093a7c0 + Inc 6 working tree) with mutation 168.3-absolute-batch
+# PYTHONPATH=C:\Users\jjgh8\Github\s19_app-b100-inc6 ; NO_COLOR=unset ; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
+# date: 2026-10-30T01:16:30+00:00
+# requirement: LLR-168.3
+# mutation: the carry passes the reader's absolute batch paths (A-03 probe) — file s19_app/tui/app.py
+# pre-mutation sha256: 8b7d332e9ae171ef56ca9033de1e5aeed32b7af30ffd06e30a16107ee36d9ca6
+# mutant sha256: c821bb321e525ee1e3295761b306af02b2bee6d9246145a11f84401f15a7e4a2
+# restored sha256: 8b7d332e9ae171ef56ca9033de1e5aeed32b7af30ffd06e30a16107ee36d9ca6
+# RESTORE OK
+........FFFF                                                             [100%]
+================================== FAILURES ===================================
+_________________ test_tc_b100_20_save_back_carries_every_key _________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_save_back_carr0')
+
+    def test_tc_b100_20_save_back_carries_every_key(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        before = (project_dir / "project.json").read_bytes()
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                _apply_patch(app)
+                await _save_back(pilot, app, "firmware.s19")
+    
+        asyncio.run(_drive())
+>       manifest = _assert_carried(project_dir, before)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_save_back_carr0/app/.s19tool/workarea/P')
+before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+    def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
+        """The manifest was rewritten (bytes changed), keeps the four
+        not-owned keys equal, and holds 0 absolute paths."""
+        after_bytes = (project_dir / "project.json").read_bytes()
+>       assert after_bytes != before_bytes, "project.json was not rewritten"
+E       AssertionError: project.json was not rewritten
+E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}' != b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+tests\test_b100_active_variant.py:302: AssertionError
+_______ test_tc_b100_20_variant_append_carries_every_key_and_activates ________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_variant_append0')
+
+    def test_tc_b100_20_variant_append_carries_every_key_and_activates(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        before = (project_dir / "project.json").read_bytes()
+        src = projects.copy_sources(tmp_path / "src", projects.CASE02_DIR, "firmware.s19")
+        statuses: list = []
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            real_set_status = app.set_status
+    
+            def _capture(message, *args, **kwargs):
+                statuses.append(str(message))
+                return real_set_status(message, *args, **kwargs)
+    
+            app.set_status = _capture
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                statuses.clear()
+                app.load_from_path(src / "firmware.s19")
+                await _wait_for(
+                    pilot,
+                    lambda: any(s.startswith("Added variant") for s in statuses),
+                    "the variant append",
+                )
+    
+        asyncio.run(_drive())
+>       manifest = _assert_carried(project_dir, before)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b100_active_variant.py:355: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+project_dir = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_variant_append0/app/.s19tool/workarea/P')
+before_bytes = b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+    def _assert_carried(project_dir: Path, before_bytes: bytes) -> dict:
+        """The manifest was rewritten (bytes changed), keeps the four
+        not-owned keys equal, and holds 0 absolute paths."""
+        after_bytes = (project_dir / "project.json").read_bytes()
+>       assert after_bytes != before_bytes, "project.json was not rewritten"
+E       AssertionError: project.json was not rewritten
+E       assert b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}' != b'{"schema_version":1,"active_variant":"firmware","batch":["patches/cs_seed.json"],"assignments":{"firmware":["checks/...start":2147483712,"end":2147483775}],"gathered":{"patches":["patches/cs_seed.json"],"checks":["checks/ck_seed.json"]}}'
+
+tests\test_b100_active_variant.py:302: AssertionError
+_________________ test_tc_b100_20_mac_sync_carries_every_key __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_mac_sync_carri0')
+
+    def test_tc_b100_20_mac_sync_carries_every_key(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        before = (project_dir / "project.json").read_bytes()
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.mac")
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                app.load_from_path(src / "firmware.mac")
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware.mac").is_file()
+                    and (project_dir / "project.json").read_bytes() != before,
+                    "the MAC sync and its manifest rewrite",
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_active_variant.py:380: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:373: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_tc_b100_20_mac_sync_carries_every_key.<locals>._drive.<locals>.<lambda> at 0x000002918EE98FE0>
+description = 'the MAC sync and its manifest rewrite', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the MAC sync and its manifest rewrite
+
+tests\test_b100_active_variant.py:75: AssertionError
+_________________ test_tc_b100_20_a2l_sync_carries_every_key __________________
+
+tmp_path = WindowsPath('C:/Users/jjgh8/AppData/Local/Temp/pytest-of-jjgh8/pytest-30137/test_tc_b100_20_a2l_sync_carri0')
+
+    def test_tc_b100_20_a2l_sync_carries_every_key(tmp_path: Path) -> None:
+        base = tmp_path / "app"
+        project_dir = projects.seed_project_with_every_key(_workarea(base))
+        before = (project_dir / "project.json").read_bytes()
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.a2l")
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _open_seeded_project(pilot, app)
+                app.load_a2l_from_path(src / "firmware.a2l")
+                await _wait_for(
+                    pilot,
+                    lambda: (project_dir / "firmware.a2l").is_file()
+                    and (project_dir / "project.json").read_bytes() != before,
+                    "the A2L sync and its manifest rewrite",
+                )
+    
+>       asyncio.run(_drive())
+
+tests\test_b100_active_variant.py:404: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_b100_active_variant.py:397: in _drive
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_tc_b100_20_a2l_sync_carries_every_key.<locals>._drive.<locals>.<lambda> at 0x000002918F7D7E20>
+description = 'the A2L sync and its manifest rewrite', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the A2L sync and its manifest rewrite
+
+tests\test_b100_active_variant.py:75: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_save_back_carries_every_key
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_variant_append_carries_every_key_and_activates
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_mac_sync_carries_every_key
+FAILED tests/test_b100_active_variant.py::test_tc_b100_20_a2l_sync_carries_every_key
+4 failed, 8 passed, 4 deselected in 55.22s
+
+# exit: 1
